@@ -1,0 +1,2 @@
+# Run formatter + linter on staged files only (fast)
+npx lint-staged

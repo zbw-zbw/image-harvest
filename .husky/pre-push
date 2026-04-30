@@ -1,0 +1,5 @@
+# Slower checks that should not block every commit
+echo "▶ typecheck"
+npm run typecheck || exit 1
+echo "▶ test"
+npm test || exit 1

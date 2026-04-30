@@ -1,0 +1,65 @@
+{
+  "compilerOptions": {
+    // ── Target / module ─────────────────────────────────────────────────
+    "target": "ES2022",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "lib": ["ES2022", "DOM", "DOM.Iterable", "WebWorker"],
+    "types": ["chrome", "node", "vite/client"],
+
+    // ── Interop ────────────────────────────────────────────────────────
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": false,
+
+    // ── Migration mode (intentionally permissive) ──────────────────────
+    // We are gradually moving JS → TS. allowJs + checkJs:false lets
+    // un-migrated .js files keep working alongside .ts. Tighten over time.
+    "allowJs": true,
+    "checkJs": false,
+    "strict": false,
+    "noImplicitAny": false,
+    "noImplicitThis": false,
+    "strictNullChecks": false,
+    "useUnknownInCatchVariables": false,
+
+    // ── Quality of life ────────────────────────────────────────────────
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "jsx": "preserve",
+
+    // ── Path aliases (optional, makes refactors easier) ────────────────
+    "baseUrl": ".",
+    "paths": {
+      "@shared/*": ["shared/*"],
+      "@background/*": ["background/*"],
+      "@sidepanel/*": ["sidepanel/*"],
+      "@content/*": ["content/*"]
+    }
+  },
+  "include": [
+    "shared/**/*",
+    "background/**/*",
+    "sidepanel/**/*",
+    "content/**/*",
+    "pages/**/*",
+    "tests/**/*",
+    "scripts/**/*",
+    "*.config.{ts,mts,js,mjs}",
+    "src/**/*",
+    "vite-env.d.ts"
+  ],
+  "exclude": [
+    "node_modules",
+    "dist",
+    "lib",
+    "website",
+    "docs",
+    "icons",
+    "assets",
+    "scripts/icons"
+  ]
+}

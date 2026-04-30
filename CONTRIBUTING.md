@@ -56,27 +56,55 @@ See [Development Setup](#development-setup) below.
 ### Prerequisites
 
 - **Google Chrome 88+** (Manifest V3 support)
-- **Node.js 18+** (only required if you want to build the `website/` subproject; the extension itself uses no build step)
+- **Node.js 18+** (required for the Vite build, lint, and tests)
 - **Git**
+
+### Install dev dependencies
+
+```bash
+npm install
+```
+
+This installs Vite + `@crxjs/vite-plugin` (build), TypeScript + `@types/chrome` (types), and Vitest (unit tests).
+
+### Daily commands
+
+```bash
+npm run dev               # Vite dev server with HMR — auto-rebuilds dist/ on every save
+npm run build             # Production build into dist/
+npm run preview           # Preview the built bundle
+npm run typecheck         # tsc --noEmit (no emitted files, type-check only)
+npm run lint              # ESLint flat config
+npm run lint:fix          # Auto-fix what can be fixed
+npm test                  # Vitest unit tests for shared/*.ts pure helpers
+npm run test:watch        # Watch mode while iterating on tests
+npm run test:coverage     # v8 coverage report under coverage/
+```
 
 ### Run the Extension Locally
 
 ```bash
-# 1. Clone
+# 1. Clone & install
 git clone https://github.com/zbw-zbw/image-harvest.git
 cd image-harvest
+npm install
 
-# 2. Load the extension in Chrome
+# 2. Build (or `npm run dev` for HMR)
+npm run build
+
+# 3. Load the extension in Chrome
 # - Open chrome://extensions/
 # - Enable "Developer mode" (top-right toggle)
 # - Click "Load unpacked"
-# - Select the repository root folder (the one containing manifest.json)
+# - Select the **dist/** folder (NOT the repo root)
 
-# 3. Pin the extension to the toolbar for easier access
+# 4. Pin the extension to the toolbar for easier access
 # Click the puzzle icon → pin Image Harvest
 
-# 4. Open any image-rich webpage and click the extension icon
+# 5. Open any image-rich webpage and click the extension icon
 ```
+
+> **Tip:** Running `npm run dev` keeps `dist/` updated as you edit. After a save, just hit the **reload** button on the Image Harvest card in `chrome://extensions/`. For content-script changes you'll also need to refresh the target webpage.
 
 ### Run the Marketing Website Locally (optional)
 
@@ -87,71 +115,82 @@ npm run dev
 # Visit http://localhost:3000
 ```
 
-### Making Changes to the Extension
-
-Because the extension is plain HTML/CSS/JS (no bundler), your workflow is:
-
-1. Edit source files in `background/`, `content/`, `sidepanel/`, `pages/`, `shared/`, or `css/`
-2. Go to `chrome://extensions/`
-3. Click the **reload** button on the Image Harvest card
-4. Re-open the extension to see your changes
-
-For content scripts, you'll also need to refresh the target webpage after reloading the extension.
-
 ## Project Structure
 
-```
+```text
 image-harvest/
-├── manifest.json              # MV3 extension manifest
-├── background/                # Service worker modules
-│   ├── index.js              # Entry point
-│   ├── extractor.js          # Cross-tab coordination
-│   ├── injector.js           # Content-script injection
-│   ├── download.js           # ZIP packaging + download
-│   ├── display-mode.js       # Popup / Side Panel switch
-│   ├── license.js            # Pro license validation
-│   ├── reverse-search.js     # Google/TinEye/Yandex search
-│   └── utils.js
-├── content/                   # Page-injected scripts
-│   ├── main.js               # Entry: collect <img>, <picture>
-│   ├── extract-advanced.js   # CSS backgrounds, lazy loading
-│   ├── shadow-iframe.js      # Shadow DOM + same-origin iframes
-│   ├── monitor.js            # MutationObserver live tracking
-│   └── highlight.js          # On-page image highlighting
-├── sidepanel/                 # Side Panel UI modules (11 modules)
-├── pages/                     # popup.html / sidepanel.html
+├── manifest.config.ts         # Typed MV3 manifest (consumed by @crxjs/vite-plugin)
+├── vite.config.ts             # Vite + crxjs config
+├── tsconfig.json              # TypeScript config (allowJs: true, noImplicitAny: false)
+├── package.json
+├── background/                # Service-worker modules (ES modules)
+│   ├── index.ts              # Entry point
+│   ├── extractor.ts          # Cross-tab coordination
+│   ├── injector.ts           # Content-script injection
+│   ├── display-mode.ts       # Popup / Side Panel switch
+│   ├── license.ts            # Pro license validation
+│   ├── reverse-search.ts     # Google/TinEye/Yandex search
+│   └── utils.ts
+├── content/                   # Page-injected scripts (single bundle, ES modules)
+│   ├── main.ts               # Entry: routing, primary extraction
+│   ├── state.ts              # Module-level shared state
+│   ├── utils.ts              # parseSrcset / sendDiscoveredImages / ...
+│   ├── extract-advanced.ts   # CSS backgrounds, lazy loading, SVG, canvas
+│   ├── shadow-iframe.ts      # Shadow DOM + same-origin iframes
+│   ├── monitor.ts            # MutationObserver live tracking
+│   └── highlight.ts          # On-page image highlighting
+├── sidepanel/                 # Side Panel UI modules (11 .ts files)
+├── pages/                     # popup.ts / popup.html / sidepanel.html / reverse-search.{ts,html}
 ├── css/                       # Stylesheets (8 files, themed via CSS vars)
-├── shared/                    # Shared utilities
-│   ├── constants.js/.mjs     # Config & magic strings
-│   ├── utils.js/.mjs         # Misc helpers
-│   ├── phash.js/.mjs         # Perceptual hash
-│   ├── color-extract.js/.mjs # Median Cut color extraction
-│   ├── converter.js/.mjs     # PNG ↔ JPG ↔ WebP conversion
-│   ├── naming.js/.mjs        # Filename template engine
-│   ├── storage.js/.mjs       # chrome.storage wrappers
-│   ├── collection.js/.mjs    # IndexedDB collections
-│   └── license.js/.mjs       # License state machine
+├── shared/                    # Shared utilities (single TypeScript source of truth)
+│   ├── types.ts              # Shared interfaces (ImageItem, AppSettings, ...)
+│   ├── constants.ts          # Message types, enums, defaults
+│   ├── utils.ts              # Misc helpers
+│   ├── phash.ts              # Perceptual hash
+│   ├── color-extract.ts      # Median Cut color extraction
+│   ├── converter.ts          # PNG ↔ JPG ↔ WebP conversion
+│   ├── naming.ts             # Filename template engine
+│   ├── storage.ts            # chrome.storage wrappers
+│   ├── collection.ts         # IndexedDB collections
+│   └── license.ts            # License state machine
+├── tests/                     # Vitest *.test.ts → shared/*.ts
 ├── assets/ + icons/           # Visual assets
 ├── docs/chrome-store/         # Chrome Web Store listing copy
 ├── website/                   # Next.js marketing site (separate subproject)
-└── scripts/                   # Icon generation & other build helpers
+└── scripts/icons/             # Icon generation scripts
 ```
 
-### Why `.js` + `.mjs` Dual Builds?
+### Build Pipeline
 
-Chrome MV3 service workers are ES modules (`type: "module"` in manifest), but content scripts are classic scripts. The `shared/` directory provides both formats so a single source of logic can be consumed from both contexts.
+The extension is built with **Vite + `@crxjs/vite-plugin`**:
 
-When editing any `shared/*.js`, remember to update the matching `.mjs` file too (or write a helper that keeps them in sync).
+- `manifest.config.ts` is the typed manifest source (no more `manifest.json` to hand-edit)
+- All sources are **TypeScript ES modules**; `jszip` is consumed via `import JSZip from 'jszip'` from npm
+- crxjs takes care of:
+  - Bundling content scripts into a single IIFE per entry
+  - Generating the service-worker loader
+  - Emitting the production manifest into `dist/manifest.json`
+- Output goes into `dist/` — that is the folder you load into Chrome via "Load unpacked"
+
+There is **no longer a `.js` / `.mjs` dual-build dance** or a `sync-shared` script: every shared helper has exactly one source file (`shared/*.ts`).
 
 ## Coding Standards
 
-### JavaScript
+### TypeScript
 
-- **ES2020+ only**, use `const`/`let` (never `var`)
-- Prefer `async`/`await` over `.then()` chains
-- Use optional chaining (`?.`) and nullish coalescing (`??`)
-- Explicit naming: `numSuccessfulRequests` > `n`, `generateDateString` > `genYmdStr`
-- No ESLint config yet; follow the style of existing files
+- **TypeScript everywhere** — no plain `.js` sources allowed in `background/`, `content/`, `sidepanel/`, `shared/`, `pages/`
+- **TS strictness is intentionally relaxed during the migration** (`allowJs: true`, `noImplicitAny: false`). Function parameters and event handlers may be typed `any` where the runtime contract is dynamic. Tightening can happen module-by-module in follow-up PRs.
+- Use ES2020+ features: `async`/`await`, optional chaining (`?.`), nullish coalescing (`??`), `const`/`let` (never `var`).
+- Explicit naming: `numSuccessfulRequests` > `n`, `generateDateString` > `genYmdStr`.
+- Run `npm run typecheck` and `npm run lint` before opening a PR.
+
+### Tests
+
+Pure helpers under `shared/*.ts` are unit-tested with Vitest. When you add or change a pure function:
+
+- Add a matching test in `tests/<module>.test.ts`
+- Run `npm test` to make sure everything still passes
+- Canvas / Image / `chrome.*` / IndexedDB-dependent code is intentionally not unit-tested (it would require heavy mocking with little benefit); test those manually in the browser.
 
 ### CSS
 
@@ -178,7 +217,7 @@ Use [Conventional Commits](https://www.conventionalcommits.org/):
 
 Example:
 
-```
+```text
 feat(extractor): add support for <object type="image/svg+xml">
 
 Some legacy sites embed SVGs via <object> tags. Treat them like <img>

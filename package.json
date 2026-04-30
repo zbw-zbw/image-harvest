@@ -2,16 +2,50 @@
   "name": "image-harvest",
   "version": "1.0.1",
   "description": "Image Harvest - Download Any Image from Any Webpage (Chrome Extension)",
+  "type": "module",
   "scripts": {
-    "build": "./scripts/build/build.sh",
-    "build:sync": "./scripts/build/build.sh --sync-from-package",
-    "build:check": "./scripts/build/build.sh --check",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
     "icons:generate": "open ./scripts/icons/generate-icons.html",
     "icons:sync": "./scripts/icons/sync-icons.sh",
-    "promo:small": "./scripts/build/resize-promo.sh assets/promo/small.png assets/promo/promo-small.png 440 280 -r 16",
-    "promo:marquee": "./scripts/build/resize-promo.sh assets/promo/top.png assets/promo/promo-marquee.png 1400 560 -r 24",
-    "promo:all": "npm run promo:small && npm run promo:marquee",
-    "screenshot": "./scripts/build/resize-promo.sh assets/screenshots/sidepanel.png assets/screenshots/sidepanel-1280x800.png 1280 800 --no-radius"
+    "prepare": "husky"
+  },
+  "lint-staged": {
+    "*.{ts,js,mjs,cjs}": [
+      "prettier --write",
+      "eslint --fix --no-warn-ignored"
+    ],
+    "*.{json,md,html,css}": [
+      "prettier --write"
+    ]
+  },
+  "dependencies": {
+    "jszip": "^3.10.1"
+  },
+  "devDependencies": {
+    "@crxjs/vite-plugin": "2.0.0-beta.25",
+    "@eslint/js": "^10.0.1",
+    "@types/chrome": "^0.0.270",
+    "@types/node": "^22.0.0",
+    "@vitest/coverage-v8": "^2.1.0",
+    "eslint": "^9.14.0",
+    "globals": "^15.12.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^15.5.0",
+    "prettier": "^3.3.3",
+    "typescript": "^5.6.0",
+    "typescript-eslint": "^8.59.1",
+    "vite": "^5.4.0",
+    "vitest": "^2.1.0"
   },
   "author": "kyriewen",
   "license": "MIT"

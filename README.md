@@ -138,87 +138,80 @@
 
 ```
 image-harvest/
-├── manifest.json              # Chrome Extension Manifest V3 config
+├── manifest.config.ts         # Typed MV3 manifest (consumed by @crxjs/vite-plugin)
+├── vite.config.ts             # Vite + crxjs config
+├── tsconfig.json              # TypeScript config
 ├── package.json
 ├── README.md                  # English README (you are here)
 ├── README.zh-CN.md            # Chinese README
 ├── CHANGELOG.md               # Release history
-├── .gitignore
 ├── docs/                      # Documentation
-│   ├── PRD.md                                  # Product Requirements Document
-│   ├── chrome-web-store-summary.txt            # Chrome Web Store summary copy
-│   ├── chrome-web-store-description.txt        # Chrome Web Store description copy
-│   ├── launch-copy.md                          # Launch copy for Reddit / Twitter / HN / PH
-│   └── youtube-seo.md                          # YouTube SEO copy & strategy
-├── background/                # Service Worker (ES modules)
-│   ├── index.js               # Main entry, message routing
-│   ├── utils.js               # Utility functions
-│   ├── license.js             # License periodic check (alarms-based)
-│   ├── display-mode.js        # Side panel / popup mode switching
-│   ├── injector.js            # Content script injection
-│   ├── extractor.js           # Image extraction coordination
-│   ├── download.js            # ZIP download management
-│   └── reverse-search.js      # Reverse search proxy
-├── content/                   # Content Scripts (injected into pages)
-│   ├── main.js                # Message handling, primary extraction
-│   ├── monitor.js             # Live monitoring (MutationObserver)
-│   ├── highlight.js           # Page highlight overlay
-│   ├── extract-advanced.js    # Advanced extraction (stylesheet BG, etc.)
-│   └── shadow-iframe.js       # Shadow DOM + iframe extraction
-├── pages/                     # HTML pages & page-level assets
-│   ├── sidepanel.html         # Side panel page
-│   ├── popup.html             # Popup page
-│   ├── popup.js               # Popup mode detection & height adjustment
+├── background/                # Service Worker (TypeScript ES modules)
+│   ├── index.ts               # Main entry, message routing
+│   ├── utils.ts
+│   ├── license.ts             # License periodic check (alarms-based)
+│   ├── display-mode.ts        # Side panel / popup mode switching
+│   ├── injector.ts            # Content script injection
+│   ├── extractor.ts           # Image extraction coordination
+│   └── reverse-search.ts      # Reverse search proxy
+├── content/                   # Content Scripts (single ESM bundle via crxjs)
+│   ├── main.ts                # Message handling, primary extraction
+│   ├── state.ts               # Module-level shared state
+│   ├── utils.ts               # parseSrcset / sendDiscoveredImages / ...
+│   ├── monitor.ts             # Live monitoring (MutationObserver)
+│   ├── highlight.ts           # Page highlight overlay
+│   ├── extract-advanced.ts    # Advanced extraction (stylesheet BG, SVG, canvas, ...)
+│   └── shadow-iframe.ts       # Shadow DOM + iframe extraction
+├── pages/                     # HTML pages & their TypeScript entries
+│   ├── sidepanel.html
+│   ├── popup.html
+│   ├── popup.ts               # Popup mode detection & height adjustment
 │   ├── popup.css              # Popup-specific style overrides
-│   ├── reverse-search.html    # Reverse image search page
-│   └── reverse-search.js      # Reverse search logic
+│   ├── reverse-search.html
+│   └── reverse-search.ts      # Reverse search logic
 ├── css/                       # Shared stylesheets (themed via CSS variables)
-│   ├── variables.css          # CSS variables, theme definitions (light/dark)
-│   ├── base.css               # Base layout
-│   ├── toolbar.css            # Toolbar styles
-│   ├── cards.css              # Image card styles
-│   ├── modals.css             # Modal / dialog styles
-│   ├── states.css             # State display styles
-│   ├── settings.css           # Settings panel styles
-│   └── license.css            # License activation styles
-├── sidepanel/                 # Side panel JS modules (shared with popup)
-│   ├── state.js               # Global state & DOM references
-│   ├── utils.js               # Utility functions, settings loader
-│   ├── ui.js                  # Common UI components
-│   ├── filter.js              # Filter & sort logic
-│   ├── render.js              # Image rendering & grouping
-│   ├── scan.js                # Scan overlay, image fetching
-│   ├── actions.js             # Select, highlight, download actions
-│   ├── pro-features.js        # Pro feature modules
-│   ├── settings.js            # Settings, hotkeys, license UI
-│   ├── message.js             # Message handling, keyboard shortcuts
-│   └── init.js                # Initialization entry, event bindings
-├── shared/                    # Shared JS modules (.js for content scripts, .mjs for ES modules)
-│   ├── constants.js / .mjs    # Message types, enums, defaults, pricing, license consts
-│   ├── storage.js / .mjs      # Settings CRUD, display mode
-│   ├── utils.js / .mjs        # Common utility functions
-│   ├── converter.js / .mjs    # Image format conversion (Canvas API)
-│   ├── naming.js / .mjs       # Naming template engine
-│   ├── phash.js / .mjs        # Perceptual hash algorithm
-│   ├── collection.js / .mjs   # Collection IndexedDB management
-│   ├── color-extract.js / .mjs # Color extraction (Median Cut)
-│   └── license.js / .mjs      # License validation (remote API + local cache)
-├── lib/                       # Third-party libraries
-│   ├── jszip.min.js           # JSZip (classic script)
-│   ├── jszip.mjs              # JSZip (ES module wrapper)
-│   └── jszip-wrapper.js       # JSZip loader wrapper
+├── sidepanel/                 # Side panel TypeScript modules (shared with popup)
+│   ├── state.ts               # Global mutable state object & DOM refs
+│   ├── utils.ts               # Utility functions, settings loader
+│   ├── ui.ts                  # Common UI components
+│   ├── filter.ts              # Filter & sort logic
+│   ├── render.ts              # Image rendering & grouping
+│   ├── scan.ts                # Scan overlay, image fetching
+│   ├── actions.ts             # Select, highlight, download actions
+│   ├── pro-features.ts        # Pro feature modules
+│   ├── settings.ts            # Settings, hotkeys, license UI
+│   ├── message.ts             # Message handling, keyboard shortcuts
+│   └── init.ts                # Initialization entry, event bindings
+├── shared/                    # Shared TypeScript modules (single source of truth)
+│   ├── types.ts               # Shared interfaces (ImageItem, AppSettings, ...)
+│   ├── constants.ts           # Message types, enums, defaults, pricing, license consts
+│   ├── storage.ts             # Settings CRUD, display mode
+│   ├── utils.ts               # Common utility functions
+│   ├── converter.ts           # Image format conversion (Canvas API)
+│   ├── naming.ts              # Naming template engine
+│   ├── phash.ts               # Perceptual hash algorithm
+│   ├── collection.ts          # Collection IndexedDB management
+│   ├── color-extract.ts       # Color extraction (Median Cut)
+│   └── license.ts             # License validation (remote API + local cache)
+├── tests/                     # Vitest *.test.ts (pure helpers under shared/*.ts)
 ├── icons/                     # Extension icons (PNG, generated from SVG source)
 ├── assets/                    # Marketing assets
-│   ├── promo-tiles/           # Chrome Web Store promo tiles
-│   └── screenshots/           # Screenshots for store listing & README
-├── scripts/                   # Build & icon-generation scripts
-│   ├── build/
-│   └── icons/
+├── scripts/icons/             # Icon-generation scripts
 └── website/                   # Marketing website (Next.js, deployed at image-harvest.kyriewen.cn)
-    ├── src/
-    ├── public/
-    └── README.md
 ```
+
+### Build & Dev
+
+```bash
+npm install                    # one-time setup
+npm run dev                    # Vite dev server with HMR (writes dist/ on every save)
+npm run build                  # Production build to dist/
+npm run typecheck              # tsc --noEmit
+npm run lint                   # ESLint
+npm test                       # Vitest unit tests
+```
+
+To install in Chrome: `chrome://extensions/` → Developer mode → **Load unpacked** → select the `dist/` folder.
 
 ---
 

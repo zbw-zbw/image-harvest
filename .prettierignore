@@ -1,0 +1,32 @@
+# Don't reformat third-party code or generated artifacts.
+node_modules/
+dist/
+coverage/
+lib/
+website/
+
+# Generated files (these are produced by scripts/build/sync-shared.mjs).
+shared/*.js
+
+# Binary / non-text assets.
+assets/
+icons/
+*.png
+*.jpg
+*.jpeg
+*.gif
+*.webp
+*.ico
+*.svg
+
+# Local-only / private docs (matches .gitignore).
+docs/launch/
+docs/ads/
+docs/release/
+docs/product/
+
+# Editor / tool state.
+.vscode/
+.idea/
+.aone_copilot/
+.qoder/
