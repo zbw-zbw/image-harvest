@@ -146,20 +146,32 @@ echo ""
 # ---------- 打包 ----------
 cd "$PROJECT_ROOT"
 
+# 注意：CHANGELOG.md / CONTRIBUTING.md 由 -x "*.md" 排除（用户在 GitHub 上看即可）
+# 但 README.md 和 README.zh-CN.md 必须保留（用户 unzip 后能看到说明）
 zip -r "$ZIP_PATH" . \
   -x ".git/*" \
+  -x ".git-backup-*/*" \
+  -x ".github/*" \
   -x ".gitignore" \
   -x ".aone_copilot/*" \
+  -x ".qoder/*" \
+  -x ".vscode/*" \
+  -x ".idea/*" \
   -x "dist/*" \
   -x "docs/*" \
   -x "scripts/*" \
   -x "website/*" \
   -x "node_modules/*" \
-  -x "*.md" \
+  -x "package.json" \
+  -x "package-lock.json" \
+  -x "CHANGELOG.md" \
+  -x "CONTRIBUTING.md" \
   -x ".DS_Store" \
   -x "**/.DS_Store" \
   -x ".env*" \
   -x "*.zip" \
+  -x "*.log" \
+  -x "*.tmp" \
   > /dev/null 2>&1
 
 # ---------- 统计 ----------
