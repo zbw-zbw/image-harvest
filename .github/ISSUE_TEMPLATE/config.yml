@@ -1,0 +1,11 @@
+blank_issues_enabled: false
+contact_links:
+  - name: 💬 Question or Discussion
+    url: https://github.com/zbw-zbw/image-harvest/discussions
+    about: Ask questions, share workflows, or discuss ideas before opening a feature request.
+  - name: 📧 Email the maintainer
+    url: mailto:coderkyriewen@gmail.com
+    about: For private / security-related concerns only.
+  - name: 🛒 Install from Chrome Web Store
+    url: https://chromewebstore.google.com/detail/iecgnjidmogebokcfnejncgnelcepffo
+    about: Get the latest stable version.

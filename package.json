@@ -1,0 +1,19 @@
+{
+  "name": "image-harvest",
+  "version": "1.0.1",
+  "description": "Image Harvest - Download Any Image from Any Webpage (Chrome Extension)",
+  "private": true,
+  "scripts": {
+    "build": "./scripts/build/build.sh",
+    "build:sync": "./scripts/build/build.sh --sync-from-package",
+    "build:check": "./scripts/build/build.sh --check",
+    "icons:generate": "open ./scripts/icons/generate-icons.html",
+    "icons:sync": "./scripts/icons/sync-icons.sh",
+    "promo:small": "./scripts/build/resize-promo.sh assets/promo/small.png assets/promo/promo-small.png 440 280 -r 16",
+    "promo:marquee": "./scripts/build/resize-promo.sh assets/promo/top.png assets/promo/promo-marquee.png 1400 560 -r 24",
+    "promo:all": "npm run promo:small && npm run promo:marquee",
+    "screenshot": "./scripts/build/resize-promo.sh assets/screenshots/sidepanel.png assets/screenshots/sidepanel-1280x800.png 1280 800 --no-radius"
+  },
+  "author": "kyriewen",
+  "license": "MIT"
+}

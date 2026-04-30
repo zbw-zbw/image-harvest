@@ -1,0 +1,37 @@
+# Node modules
+node_modules/
+
+# Logs
+logs/
+*.log
+
+# OS generated files
+.DS_Store
+
+# Build output
+dist/
+
+# Temporary files
+*.tmp
+*.swp
+
+# IDE specific files
+.vscode/
+.idea/
+
+# Environment variables
+.env
+.env.local
+
+# AI configuration files
+.aone_copilot/
+.qoder/
+
+# Private docs (business strategy, marketing, PRD, release notes, design drafts) - local only, never pushed
+docs/marketing/
+docs/launch-content/
+docs/product/
+docs/_notes/
+
+# Local git backups (never commit)
+.git-backup-*/

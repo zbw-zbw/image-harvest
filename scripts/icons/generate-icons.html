@@ -1,0 +1,827 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Generate Icons from Logo</title>
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      max-width: 960px;
+      margin: 40px auto;
+      padding: 20px;
+      background: #fafafa;
+      color: #333;
+    }
+    h1 { color: #222; margin-bottom: 8px; }
+    h1 span { font-size: 0.5em; color: #999; font-weight: normal; margin-left: 8px; }
+    h2 { color: #444; font-size: 16px; margin: 24px 0 12px; border-bottom: 2px solid #e0e0e0; padding-bottom: 6px; }
+
+    .icon-group {
+      margin-bottom: 24px;
+      background: #fff;
+      border: 1px solid #e8e8e8;
+      border-radius: 10px;
+      padding: 16px 20px;
+    }
+    .icon-group h3 {
+      font-size: 14px;
+      color: #555;
+      margin: 0 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .icon-group h3 .badge {
+      font-size: 11px;
+      background: #e3f2fd;
+      color: #1976D2;
+      padding: 2px 8px;
+      border-radius: 10px;
+      font-weight: normal;
+    }
+
+    .preview {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      align-items: end;
+    }
+    .preview-item {
+      text-align: center;
+    }
+    .preview-item img {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      background: repeating-conic-gradient(#eee 0% 25%, #fff 0% 50%) 50% / 10px 10px;
+    }
+    .preview-item p {
+      margin: 4px 0 0;
+      font-size: 11px;
+      color: #888;
+      word-break: break-all;
+    }
+    .preview-item .size-label {
+      font-weight: 600;
+      color: #555;
+    }
+
+    .btn-group { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 16px; }
+    button {
+      padding: 10px 24px;
+      font-size: 14px;
+      background: #2196F3;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    button:hover { background: #1976D2; }
+    button.secondary { background: #78909C; }
+    button.secondary:hover { background: #546E7A; }
+
+    .status {
+      margin: 16px 0;
+      padding: 12px 16px;
+      background: #e8f5e9;
+      border-radius: 6px;
+      display: none;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+
+    .instructions {
+      background: #fff3e0;
+      padding: 16px;
+      border-radius: 8px;
+      margin: 16px 0;
+      font-size: 14px;
+    }
+    .instructions ol { margin: 8px 0 0; padding-left: 20px; }
+    .instructions li { margin-bottom: 4px; }
+
+    #drop-zone {
+      border: 3px dashed #ccc;
+      border-radius: 12px;
+      padding: 40px;
+      text-align: center;
+      margin: 20px 0;
+      cursor: pointer;
+      transition: all 0.2s;
+      background: #fff;
+    }
+    #drop-zone:hover { border-color: #90CAF9; background: #f5faff; }
+    #drop-zone.dragover { border-color: #2196F3; background: #e3f2fd; }
+    #drop-zone img { max-width: 200px; max-height: 200px; margin-top: 10px; border-radius: 8px; }
+
+    .options {
+      background: #fff;
+      border: 1px solid #e8e8e8;
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin: 16px 0;
+    }
+    .options label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 14px;
+      cursor: pointer;
+      margin-bottom: 8px;
+    }
+    .options label:last-child { margin-bottom: 0; }
+
+    .summary {
+      font-size: 13px;
+      color: #777;
+      margin: 8px 0;
+    }
+  </style>
+</head>
+<body>
+  <h1>🖼️ Image Snatcher Icon Generator <span>v2.0</span></h1>
+
+  <div class="instructions">
+    <strong>使用方法：</strong>
+    <ol>
+      <li>拖拽 logo 图片到下方区域（或点击选择文件），建议使用 <strong>512×512</strong> 或更大的高清源图</li>
+      <li>工具会自动裁剪白边，让图标内容占满画布</li>
+      <li>按需勾选要生成的图标类别</li>
+      <li>点击 <strong>"Download as ZIP"</strong> 下载所有尺寸的 PNG 图标</li>
+      <li>将对应图标文件放到 <code>icons/</code> 和 <code>website/public/</code> 目录下</li>
+    </ol>
+  </div>
+
+  <div id="drop-zone" onclick="document.getElementById('file-input').click()">
+    <p>📁 拖拽图片到这里，或点击选择文件</p>
+    <input type="file" id="file-input" accept="image/*" style="display:none">
+    <img id="original-preview" style="display:none">
+  </div>
+
+  <div class="options" id="options-panel" style="display:none">
+    <strong style="font-size:14px; display:block; margin-bottom:10px;">选择生成的图标类别：</strong>
+    <label><input type="checkbox" data-group="extension" checked> 🧩 Chrome 扩展图标 (16, 32, 48, 128, 256)</label>
+    <label><input type="checkbox" data-group="favicon" checked> 🌐 网站 Favicon (16, 32, 48, favicon.ico)</label>
+    <label><input type="checkbox" data-group="apple" checked> 🍎 Apple Touch Icon (180, 152, 120, 76)</label>
+    <label><input type="checkbox" data-group="pwa" checked> 📱 PWA / Android (192, 512, maskable)</label>
+    <label><input type="checkbox" data-group="og" checked> 🖼️ Open Graph / Social (1200×630, 512×512)</label>
+    <label><input type="checkbox" data-group="msft" checked> 🪟 Microsoft Tile (150, 310)</label>
+    <label><input type="checkbox" data-group="removeWhite" checked> ✂️ 自动移除外围白色背景</label>
+  </div>
+
+  <div id="previews-container" style="display:none"></div>
+
+  <div id="actions" style="display:none" class="btn-group">
+    <button onclick="downloadAsZip()">⬇️ Download as ZIP</button>
+    <button class="secondary" onclick="regenerate()">🔄 Regenerate</button>
+  </div>
+
+  <div id="status" class="status"></div>
+
+  <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+  <script>
+    /**
+     * All icon definitions grouped by purpose.
+     * Each entry: { name, size, [width, height] (if non-square), folder }
+     */
+    const ICON_GROUPS = {
+      extension: {
+        label: '🧩 Chrome Extension Icons',
+        folder: 'extension',
+        icons: [
+          { name: 'icon.png', size: 256 },
+          { name: 'icon128.png', size: 128 },
+          { name: 'icon48.png', size: 48 },
+          { name: 'icon32.png', size: 32 },
+          { name: 'icon16.png', size: 16 },
+        ],
+      },
+      favicon: {
+        label: '🌐 Website Favicons',
+        folder: 'favicon',
+        icons: [
+          { name: 'favicon-48x48.png', size: 48 },
+          { name: 'favicon-32x32.png', size: 32 },
+          { name: 'favicon-16x16.png', size: 16 },
+        ],
+      },
+      apple: {
+        label: '🍎 Apple Touch Icons',
+        folder: 'apple',
+        icons: [
+          { name: 'apple-touch-icon.png', size: 180 },
+          { name: 'apple-touch-icon-152x152.png', size: 152 },
+          { name: 'apple-touch-icon-120x120.png', size: 120 },
+          { name: 'apple-touch-icon-76x76.png', size: 76 },
+        ],
+      },
+      pwa: {
+        label: '📱 PWA / Android Icons',
+        folder: 'pwa',
+        icons: [
+          { name: 'android-chrome-512x512.png', size: 512 },
+          { name: 'android-chrome-192x192.png', size: 192 },
+          { name: 'maskable-icon-512x512.png', size: 512, maskable: true },
+          { name: 'maskable-icon-192x192.png', size: 192, maskable: true },
+        ],
+      },
+      og: {
+        label: '🖼️ Open Graph / Social Media',
+        folder: 'social',
+        icons: [
+          { name: 'og-image.png', width: 1200, height: 630 },
+          { name: 'logo-512.png', size: 512 },
+        ],
+      },
+      msft: {
+        label: '🪟 Microsoft Tile Icons',
+        folder: 'microsoft',
+        icons: [
+          { name: 'mstile-310x310.png', size: 310 },
+          { name: 'mstile-150x150.png', size: 150 },
+        ],
+      },
+    };
+
+    let generatedIcons = [];
+    let currentSourceImg = null;
+
+    // Drag & drop
+    const dropZone = document.getElementById('drop-zone');
+    dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('dragover'); });
+    dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      if (e.dataTransfer.files.length > 0) processFile(e.dataTransfer.files[0]);
+    });
+
+    document.getElementById('file-input').addEventListener('change', (e) => {
+      if (e.target.files.length > 0) processFile(e.target.files[0]);
+    });
+
+    function processFile(file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const img = new Image();
+        img.onload = () => {
+          currentSourceImg = img;
+          showStatus('⏳ Processing image...');
+          // Defer to let the UI update before heavy work
+          setTimeout(() => generateAllIcons(img), 50);
+        };
+        img.src = e.target.result;
+
+        const preview = document.getElementById('original-preview');
+        preview.src = e.target.result;
+        preview.style.display = 'block';
+      };
+      reader.readAsDataURL(file);
+    }
+
+    function regenerate() {
+      if (currentSourceImg) {
+        showStatus('⏳ Regenerating icons...');
+        setTimeout(() => generateAllIcons(currentSourceImg), 50);
+      }
+    }
+
+    function getEnabledGroups() {
+      const groups = [];
+      document.querySelectorAll('#options-panel input[data-group]').forEach((checkbox) => {
+        if (checkbox.checked && checkbox.dataset.group !== 'removeWhite') {
+          groups.push(checkbox.dataset.group);
+        }
+      });
+      return groups;
+    }
+
+    function isRemoveWhiteEnabled() {
+      const checkbox = document.querySelector('#options-panel input[data-group="removeWhite"]');
+      return checkbox ? checkbox.checked : true;
+    }
+
+    /**
+     * Check if a pixel looks like white/near-white background.
+     */
+    function isWhiteish(r, g, b, a) {
+      if (a < 10) return true;
+      const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+      return luminance > 240;
+    }
+
+    /**
+     * Flood-fill from all edge pixels to mark edge-connected white pixels
+     * as transparent. Preserves white pixels inside the icon content.
+     * Uses typed-array ring buffer instead of Array.shift() for O(1) dequeue.
+     */
+    function removeOuterWhiteBackground(canvas, ctx) {
+      const w = canvas.width;
+      const h = canvas.height;
+      const totalPixels = w * h;
+      const imageData = ctx.getImageData(0, 0, w, h);
+      const data = imageData.data;
+      const visited = new Uint8Array(totalPixels);
+
+      // Pre-allocate a typed-array queue (worst case: every pixel is in queue)
+      const queue = new Int32Array(totalPixels);
+      let qHead = 0;
+      let qTail = 0;
+
+      const seedPixel = (pixelIndex) => {
+        if (visited[pixelIndex]) return;
+        const dataIndex = pixelIndex * 4;
+        if (isWhiteish(data[dataIndex], data[dataIndex + 1], data[dataIndex + 2], data[dataIndex + 3])) {
+          visited[pixelIndex] = 1;
+          queue[qTail++] = pixelIndex;
+        }
+      };
+
+      // Seed from all edge pixels
+      for (let x = 0; x < w; x++) {
+        seedPixel(x);               // top row
+        seedPixel((h - 1) * w + x); // bottom row
+      }
+      for (let y = 1; y < h - 1; y++) {
+        seedPixel(y * w);           // left column
+        seedPixel(y * w + w - 1);   // right column
+      }
+
+      // BFS flood fill with O(1) dequeue via index pointer
+      while (qHead < qTail) {
+        const pos = queue[qHead++];
+        data[pos * 4 + 3] = 0; // set transparent
+
+        const px = pos % w;
+        const py = (pos - px) / w;
+
+        // Check 4-connected neighbors (inlined for speed)
+        if (px > 0) {
+          const ni = pos - 1;
+          if (!visited[ni]) { visited[ni] = 1; const nIdx = ni * 4; if (isWhiteish(data[nIdx], data[nIdx + 1], data[nIdx + 2], data[nIdx + 3])) queue[qTail++] = ni; }
+        }
+        if (px < w - 1) {
+          const ni = pos + 1;
+          if (!visited[ni]) { visited[ni] = 1; const nIdx = ni * 4; if (isWhiteish(data[nIdx], data[nIdx + 1], data[nIdx + 2], data[nIdx + 3])) queue[qTail++] = ni; }
+        }
+        if (py > 0) {
+          const ni = pos - w;
+          if (!visited[ni]) { visited[ni] = 1; const nIdx = ni * 4; if (isWhiteish(data[nIdx], data[nIdx + 1], data[nIdx + 2], data[nIdx + 3])) queue[qTail++] = ni; }
+        }
+        if (py < h - 1) {
+          const ni = pos + w;
+          if (!visited[ni]) { visited[ni] = 1; const nIdx = ni * 4; if (isWhiteish(data[nIdx], data[nIdx + 1], data[nIdx + 2], data[nIdx + 3])) queue[qTail++] = ni; }
+        }
+      }
+
+      ctx.putImageData(imageData, 0, 0);
+    }
+
+    /**
+     * Find the bounding box of visible (non-transparent) content.
+     */
+    function findContentBounds(canvas, ctx) {
+      const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
+      const data = imageData.data;
+      const w = canvas.width;
+      const h = canvas.height;
+
+      let top = h, bottom = 0, left = w, right = 0;
+      for (let y = 0; y < h; y++) {
+        for (let x = 0; x < w; x++) {
+          if (data[(y * w + x) * 4 + 3] > 0) {
+            if (y < top) top = y;
+            if (y > bottom) bottom = y;
+            if (x < left) left = x;
+            if (x > right) right = x;
+          }
+        }
+      }
+
+      if (top > bottom || left > right) {
+        return { top: 0, bottom: h - 1, left: 0, right: w - 1 };
+      }
+      return { top, bottom, left, right };
+    }
+
+    /**
+     * High-quality step-down resize: halve the canvas repeatedly until close
+     * to target size, then do one final resize.
+     * This preserves sharpness far better than a single large-ratio downscale.
+     */
+    function stepDownResize(sourceCanvas, targetWidth, targetHeight) {
+      let current = sourceCanvas;
+      let currentWidth = current.width;
+      let currentHeight = current.height;
+
+      // Halve repeatedly until within 2x of target
+      while (currentWidth / 2 >= targetWidth && currentHeight / 2 >= targetHeight) {
+        const halfWidth = Math.floor(currentWidth / 2);
+        const halfHeight = Math.floor(currentHeight / 2);
+        const half = document.createElement('canvas');
+        half.width = halfWidth;
+        half.height = halfHeight;
+        const hCtx = half.getContext('2d');
+        hCtx.imageSmoothingEnabled = true;
+        hCtx.imageSmoothingQuality = 'high';
+        hCtx.drawImage(current, 0, 0, halfWidth, halfHeight);
+        current = half;
+        currentWidth = halfWidth;
+        currentHeight = halfHeight;
+      }
+
+      // Final resize to exact target
+      if (currentWidth !== targetWidth || currentHeight !== targetHeight) {
+        const finalCanvas = document.createElement('canvas');
+        finalCanvas.width = targetWidth;
+        finalCanvas.height = targetHeight;
+        const fCtx = finalCanvas.getContext('2d');
+        fCtx.imageSmoothingEnabled = true;
+        fCtx.imageSmoothingQuality = 'high';
+        fCtx.drawImage(current, 0, 0, targetWidth, targetHeight);
+        return finalCanvas;
+      }
+      return current;
+    }
+
+    /**
+     * Generate a maskable icon: content occupies the inner 80% safe zone,
+     * with a solid background fill for the outer area.
+     */
+    function generateMaskableIcon(intermediateCanvas, targetSize) {
+      const canvas = document.createElement('canvas');
+      canvas.width = targetSize;
+      canvas.height = targetSize;
+      const ctx = canvas.getContext('2d');
+
+      // Fill with white background for maskable icons
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, targetSize, targetSize);
+
+      // Content occupies 80% safe zone
+      const safeZoneSize = Math.round(targetSize * 0.8);
+      const offset = Math.round((targetSize - safeZoneSize) / 2);
+
+      // Resize the intermediate to safe zone size
+      const resized = stepDownResize(intermediateCanvas, safeZoneSize, safeZoneSize);
+      ctx.drawImage(resized, offset, offset, safeZoneSize, safeZoneSize);
+
+      return canvas;
+    }
+
+    /**
+     * Generate an Open Graph image (non-square, 1200×630).
+     * Centers the icon on a white background.
+     */
+    function generateOgImage(intermediateCanvas, targetWidth, targetHeight) {
+      const canvas = document.createElement('canvas');
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
+      const ctx = canvas.getContext('2d');
+
+      // White background
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(0, 0, targetWidth, targetHeight);
+
+      // Fit icon within the canvas with padding
+      const maxIconSize = Math.min(targetWidth, targetHeight) * 0.6;
+      const iconSize = Math.round(maxIconSize);
+      const resized = stepDownResize(intermediateCanvas, iconSize, iconSize);
+
+      const offsetX = Math.round((targetWidth - iconSize) / 2);
+      const offsetY = Math.round((targetHeight - iconSize) / 2);
+      ctx.drawImage(resized, offsetX, offsetY, iconSize, iconSize);
+
+      return canvas;
+    }
+
+    /**
+     * Build a favicon.ico containing 16×16 and 32×32 PNG images
+     * encoded in the ICO container format.
+     */
+    function buildFaviconIco(intermediateCanvas) {
+      const sizes = [16, 32, 48];
+      const pngBuffers = [];
+
+      for (const size of sizes) {
+        const resized = stepDownResize(intermediateCanvas, size, size);
+        const dataUrl = resized.toDataURL('image/png');
+        const base64 = dataUrl.split(',')[1];
+        const binaryStr = atob(base64);
+        const bytes = new Uint8Array(binaryStr.length);
+        for (let i = 0; i < binaryStr.length; i++) {
+          bytes[i] = binaryStr.charCodeAt(i);
+        }
+        pngBuffers.push({ size, data: bytes });
+      }
+
+      // ICO file format:
+      // Header: 6 bytes
+      // Directory entries: 16 bytes each
+      // Image data follows
+      const headerSize = 6;
+      const dirEntrySize = 16;
+      const dirSize = dirEntrySize * pngBuffers.length;
+      let totalDataSize = 0;
+      for (const buf of pngBuffers) {
+        totalDataSize += buf.data.length;
+      }
+
+      const fileSize = headerSize + dirSize + totalDataSize;
+      const buffer = new ArrayBuffer(fileSize);
+      const view = new DataView(buffer);
+
+      // ICO header
+      view.setUint16(0, 0, true);      // reserved
+      view.setUint16(2, 1, true);      // type: 1 = ICO
+      view.setUint16(4, pngBuffers.length, true); // number of images
+
+      // Directory entries
+      let dataOffset = headerSize + dirSize;
+      for (let i = 0; i < pngBuffers.length; i++) {
+        const entry = pngBuffers[i];
+        const entryOffset = headerSize + i * dirEntrySize;
+        view.setUint8(entryOffset, entry.size < 256 ? entry.size : 0);     // width
+        view.setUint8(entryOffset + 1, entry.size < 256 ? entry.size : 0); // height
+        view.setUint8(entryOffset + 2, 0);       // color palette
+        view.setUint8(entryOffset + 3, 0);       // reserved
+        view.setUint16(entryOffset + 4, 1, true); // color planes
+        view.setUint16(entryOffset + 6, 32, true); // bits per pixel
+        view.setUint32(entryOffset + 8, entry.data.length, true);  // image data size
+        view.setUint32(entryOffset + 12, dataOffset, true);        // image data offset
+
+        // Copy PNG data
+        const uint8View = new Uint8Array(buffer);
+        uint8View.set(entry.data, dataOffset);
+        dataOffset += entry.data.length;
+      }
+
+      return new Uint8Array(buffer);
+    }
+
+    /**
+     * Cap the working canvas to a max dimension for performance.
+     * BFS flood-fill on a 4000×4000 image = 16M pixels is too slow.
+     * We pre-scale to at most MAX_PROCESS_SIZE, do white-removal + crop
+     * on the smaller canvas, then map bounds back to the original.
+     */
+    const MAX_PROCESS_SIZE = 1024;
+
+    function createWorkingCanvas(sourceImg) {
+      const origW = sourceImg.naturalWidth;
+      const origH = sourceImg.naturalHeight;
+      const maxDim = Math.max(origW, origH);
+
+      // If small enough, use original resolution
+      if (maxDim <= MAX_PROCESS_SIZE) {
+        const canvas = document.createElement('canvas');
+        canvas.width = origW;
+        canvas.height = origH;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(sourceImg, 0, 0, origW, origH);
+        return { canvas, ctx, scale: 1 };
+      }
+
+      // Scale down proportionally
+      const scale = MAX_PROCESS_SIZE / maxDim;
+      const scaledW = Math.round(origW * scale);
+      const scaledH = Math.round(origH * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = scaledW;
+      canvas.height = scaledH;
+      const ctx = canvas.getContext('2d');
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = 'high';
+      ctx.drawImage(sourceImg, 0, 0, scaledW, scaledH);
+      return { canvas, ctx, scale };
+    }
+
+    /**
+     * Main generation entry point.
+     */
+    function generateAllIcons(sourceImg) {
+      generatedIcons = [];
+
+      const origW = sourceImg.naturalWidth;
+      const origH = sourceImg.naturalHeight;
+
+      document.getElementById('options-panel').style.display = 'block';
+
+      // Create a working canvas (capped at MAX_PROCESS_SIZE for performance)
+      const { canvas: workCanvas, ctx: workCtx, scale } = createWorkingCanvas(sourceImg);
+
+      // Optionally remove outer white background (on the smaller working canvas)
+      if (isRemoveWhiteEnabled()) {
+        removeOuterWhiteBackground(workCanvas, workCtx);
+      }
+
+      // Find content bounds on working canvas, then map back to original coords
+      const bounds = findContentBounds(workCanvas, workCtx);
+      const cropLeft = Math.floor(bounds.left / scale);
+      const cropTop = Math.floor(bounds.top / scale);
+      const cropRight = Math.ceil((bounds.right + 1) / scale);
+      const cropBottom = Math.ceil((bounds.bottom + 1) / scale);
+
+      const contentWidth = cropRight - cropLeft;
+      const contentHeight = cropBottom - cropTop;
+      const squareSize = Math.max(contentWidth, contentHeight);
+      const offsetX = Math.floor((squareSize - contentWidth) / 2);
+      const offsetY = Math.floor((squareSize - contentHeight) / 2);
+
+      // Draw the ORIGINAL high-res image (not the scaled working copy)
+      // into the intermediate canvas for maximum output quality
+      const fullCanvas = document.createElement('canvas');
+      fullCanvas.width = origW;
+      fullCanvas.height = origH;
+      const fullCtx = fullCanvas.getContext('2d');
+      fullCtx.drawImage(sourceImg, 0, 0, origW, origH);
+
+      // High-res square intermediate canvas (transparent background)
+      const intermediateCanvas = document.createElement('canvas');
+      intermediateCanvas.width = squareSize;
+      intermediateCanvas.height = squareSize;
+      const intermediateCtx = intermediateCanvas.getContext('2d');
+      intermediateCtx.clearRect(0, 0, squareSize, squareSize);
+      intermediateCtx.drawImage(
+        fullCanvas,
+        cropLeft, cropTop, contentWidth, contentHeight,
+        offsetX, offsetY, contentWidth, contentHeight,
+      );
+
+      // Build previews grouped by category
+      const container = document.getElementById('previews-container');
+      container.innerHTML = '';
+
+      const enabledGroups = getEnabledGroups();
+      let totalCount = 0;
+
+      for (const groupKey of enabledGroups) {
+        const group = ICON_GROUPS[groupKey];
+        if (!group) continue;
+
+        const groupDiv = document.createElement('div');
+        groupDiv.className = 'icon-group';
+
+        const title = document.createElement('h3');
+        title.innerHTML = `${group.label} <span class="badge">${group.icons.length} files</span>`;
+        groupDiv.appendChild(title);
+
+        const previewRow = document.createElement('div');
+        previewRow.className = 'preview';
+
+        for (const iconDef of group.icons) {
+          const targetWidth = iconDef.width || iconDef.size;
+          const targetHeight = iconDef.height || iconDef.size;
+          let resizedCanvas;
+
+          if (iconDef.maskable) {
+            resizedCanvas = generateMaskableIcon(intermediateCanvas, iconDef.size);
+          } else if (iconDef.width && iconDef.height && iconDef.width !== iconDef.height) {
+            resizedCanvas = generateOgImage(intermediateCanvas, iconDef.width, iconDef.height);
+          } else {
+            resizedCanvas = stepDownResize(intermediateCanvas, targetWidth, targetHeight);
+          }
+
+          // Export as lossless PNG (canvas.toDataURL defaults to max quality for PNG)
+          const dataUrl = resizedCanvas.toDataURL('image/png');
+          generatedIcons.push({
+            name: iconDef.name,
+            folder: group.folder,
+            dataUrl,
+            width: targetWidth,
+            height: targetHeight,
+          });
+
+          // Preview element
+          const item = document.createElement('div');
+          item.className = 'preview-item';
+
+          const img = document.createElement('img');
+          img.src = dataUrl;
+          const displaySize = Math.max(Math.min(targetWidth, 128), 32);
+          const displayHeight = Math.round(displaySize * (targetHeight / targetWidth));
+          img.width = displaySize;
+          img.height = displayHeight;
+          if (targetWidth <= 32) img.style.imageRendering = 'pixelated';
+
+          const sizeLabel = document.createElement('p');
+          sizeLabel.className = 'size-label';
+          sizeLabel.textContent = `${targetWidth}×${targetHeight}`;
+
+          const nameLabel = document.createElement('p');
+          nameLabel.textContent = iconDef.name;
+
+          item.appendChild(img);
+          item.appendChild(sizeLabel);
+          item.appendChild(nameLabel);
+          previewRow.appendChild(item);
+          totalCount++;
+        }
+
+        groupDiv.appendChild(previewRow);
+        container.appendChild(groupDiv);
+      }
+
+      // Generate favicon.ico
+      if (enabledGroups.includes('favicon')) {
+        const icoData = buildFaviconIco(intermediateCanvas);
+        const icoBlob = new Blob([icoData], { type: 'image/x-icon' });
+        const icoUrl = URL.createObjectURL(icoBlob);
+        generatedIcons.push({
+          name: 'favicon.ico',
+          folder: 'favicon',
+          binaryData: icoData,
+          width: 48,
+          height: 48,
+        });
+
+        // Add ICO preview to the favicon group
+        const faviconGroup = container.querySelector('.icon-group');
+        if (faviconGroup) {
+          const previewRow = faviconGroup.querySelector('.preview');
+          const item = document.createElement('div');
+          item.className = 'preview-item';
+          const img = document.createElement('img');
+          img.src = icoUrl;
+          img.width = 48;
+          img.height = 48;
+          const sizeLabel = document.createElement('p');
+          sizeLabel.className = 'size-label';
+          sizeLabel.textContent = 'ICO (multi-size)';
+          const nameLabel = document.createElement('p');
+          nameLabel.textContent = 'favicon.ico';
+          item.appendChild(img);
+          item.appendChild(sizeLabel);
+          item.appendChild(nameLabel);
+          previewRow.appendChild(item);
+          totalCount++;
+        }
+      }
+
+      container.style.display = 'block';
+      document.getElementById('actions').style.display = 'flex';
+
+      showStatus(
+        `✅ Generated ${totalCount} icon files across ${enabledGroups.length} categories!\n` +
+        `Source: ${origW}×${origH} → Content area: ${contentWidth}×${contentHeight} → Square: ${squareSize}×${squareSize}\n` +
+        `All PNG files exported at maximum quality (lossless).`
+      );
+    }
+
+    async function downloadAsZip() {
+      const zip = new JSZip();
+
+      for (const icon of generatedIcons) {
+        const folderPath = icon.folder ? icon.folder : '';
+        const folder = folderPath ? zip.folder(folderPath) : zip;
+
+        if (icon.binaryData) {
+          // ICO file — already binary
+          folder.file(icon.name, icon.binaryData);
+        } else {
+          // PNG — extract base64
+          const base64 = icon.dataUrl.split(',')[1];
+          folder.file(icon.name, base64, { base64: true });
+        }
+      }
+
+      // Add a README with usage instructions
+      zip.file('README.txt',
+        'Image Snatcher - Generated Icons\n' +
+        '=================================\n\n' +
+        'Folder structure:\n' +
+        '  extension/  → Place in icons/ directory of the Chrome extension\n' +
+        '  favicon/    → Place in website/public/ (favicon.ico, favicon-*.png)\n' +
+        '  apple/      → Place in website/public/ (apple-touch-icon*.png)\n' +
+        '  pwa/        → Place in website/public/ (android-chrome-*.png, maskable-*.png)\n' +
+        '  social/     → Place in website/public/ (og-image.png, logo-512.png)\n' +
+        '  microsoft/  → Place in website/public/ (mstile-*.png)\n\n' +
+        'All PNG files are exported at maximum quality (lossless).\n' +
+        'favicon.ico contains 16x16, 32x32, and 48x48 sizes.\n'
+      );
+
+      const blob = await zip.generateAsync({ type: 'blob', compression: 'STORE' });
+      const url = URL.createObjectURL(blob);
+      const anchor = document.createElement('a');
+      anchor.href = url;
+      anchor.download = 'image-snatcher-icons.zip';
+      document.body.appendChild(anchor);
+      anchor.click();
+      document.body.removeChild(anchor);
+      URL.revokeObjectURL(url);
+
+      showStatus(
+        `⬇️ Downloaded image-snatcher-icons.zip (${generatedIcons.length} files, no compression applied).\n` +
+        'Unzip and place files into the corresponding directories.'
+      );
+    }
+
+    function showStatus(msg) {
+      const el = document.getElementById('status');
+      el.textContent = msg;
+      el.style.display = 'block';
+    }
+  </script>
+</body>
+</html>

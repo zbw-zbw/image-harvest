@@ -1,0 +1,89 @@
+/* Popup Mode Overrides for Image Harvest V2.0 */
+/* This file is loaded after sidepanel.css to apply popup-specific constraints */
+
+html.popup-mode {
+  width: 600px;
+  height: 600px;
+  overflow: hidden;
+}
+
+body.popup-mode {
+  width: 600px;
+  height: 600px;
+  overflow: hidden;
+}
+
+.popup-mode #app {
+  height: 600px;
+  overflow: hidden;
+}
+
+/*
+ * .image-grid height is dynamically set by popup.js (adjustImageGridHeight).
+ * Grid uses explicit pixel height + overflow-y: auto for scrolling.
+ */
+
+/* Popup grid: inherit sidepanel grid settings, auto-rows prevent compression */
+.popup-mode .image-grid {
+  grid-auto-rows: min-content;
+}
+
+.popup-mode .image-grid:not(.list-view) .card-thumb,
+.popup-mode .image-grid:not(.list-view) .skeleton-thumb {
+  height: 120px;
+  flex-shrink: 0;
+}
+
+/* Popup density overrides for thumbnail height */
+.popup-mode.density-compact .image-grid:not(.list-view) .card-thumb,
+.popup-mode.density-compact .image-grid:not(.list-view) .skeleton-thumb {
+  height: 80px;
+}
+
+.popup-mode.density-comfortable .image-grid:not(.list-view) .card-thumb,
+.popup-mode.density-comfortable .image-grid:not(.list-view) .skeleton-thumb {
+  height: 180px;
+}
+
+/* Popup list-view: ensure scrolling works with JS-set height */
+.popup-mode .image-grid.list-view {
+  overflow-y: auto;
+}
+
+/* Adjust modal sizes for popup */
+.popup-mode .modal-content {
+  max-width: 600px;
+  max-height: 560px;
+}
+
+.popup-mode .settings-content {
+  max-width: 580px;
+}
+
+/* Adjust preview modal */
+.popup-mode .preview-image-container {
+  max-height: 350px;
+}
+
+/* Card Colors - same as sidepanel */
+.popup-mode .card-colors {
+  display: flex;
+  height: 6px;
+  flex-shrink: 0;
+}
+
+.popup-mode .card-colors .card-color-bar {
+  flex: 1;
+  cursor: pointer;
+  transition: transform 0.15s ease;
+}
+
+.popup-mode .card-colors .card-color-bar:hover {
+  transform: scaleY(2);
+  z-index: 1;
+}
+
+.popup-mode .card-colors .card-color-bar-transparent {
+  background: repeating-conic-gradient(var(--checkerboard-color, #d0d0d0) 0% 25%, var(--card-bg, #fff) 0% 50%) 50% / 8px 8px;
+  cursor: pointer;
+}

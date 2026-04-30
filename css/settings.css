@@ -1,0 +1,343 @@
+/* ============================================
+   Settings Panel Styles
+   ============================================ */
+
+/* Settings Section Title */
+.settings-section {
+  margin-bottom: 20px;
+}
+
+.settings-section h3 {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--text-secondary);
+  margin: 0 0 12px 0;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+/* Checkbox Style for Settings - uses span+SVG like select-all-checkbox */
+.settings-content .checkbox-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 10px;
+  font-size: 13px;
+  line-height: 18px;
+  color: var(--text-primary);
+  cursor: pointer;
+  border-radius: var(--radius-md);
+  transition: background 0.15s;
+  user-select: none;
+  margin: 0;
+  vertical-align: middle;
+}
+
+/* Pro toggle style: not greyed out, normal appearance, click triggers upgrade */
+
+.settings-content .checkbox-label:hover {
+  background: var(--bg-secondary);
+}
+
+.settings-content .checkbox-label input[type="checkbox"] {
+  display: none;
+}
+
+.settings-content .checkbox-label .settings-checkbox {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: 2px solid var(--border-color);
+  border-radius: 4px;
+  background: var(--bg-color);
+  transition: all 0.15s;
+  flex-shrink: 0;
+  vertical-align: middle;
+}
+
+.settings-content .checkbox-label .settings-checkbox .check-icon {
+  display: none;
+}
+
+.settings-content .checkbox-label input[type="checkbox"]:checked + .settings-checkbox {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.settings-content .checkbox-label input[type="checkbox"]:checked + .settings-checkbox .check-icon {
+  display: block;
+  color: white;
+}
+
+/* Custom Radio Button Group (Segmented Control) */
+.settings-content .radio-group {
+  display: inline-flex;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  padding: 3px;
+  gap: 2px;
+  margin-top: 6px;
+  margin-left: 12px;
+}
+
+.settings-content .radio-group label {
+  display: flex;
+  align-items: center;
+  padding: 5px 12px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all 0.2s ease;
+  user-select: none;
+  white-space: nowrap;
+  margin: 0;
+}
+
+.settings-content .radio-group label:hover {
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+}
+
+.settings-content .radio-group input[type="radio"] {
+  display: none;
+}
+
+.settings-content .radio-group input[type="radio"]:checked + span,
+.settings-content .radio-group label:has(input[type="radio"]:checked) {
+  background: var(--primary-color);
+  color: white;
+  font-weight: 600;
+  box-shadow: 0 1px 3px rgba(96, 181, 87, 0.3);
+}
+
+/* Custom Select Dropdown - matches filter-dropdown style */
+.setting-select {
+  position: relative;
+  display: inline-block;
+  margin-top: 4px;
+  margin-left: 12px;
+}
+
+.setting-select-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-color);
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: all 0.2s;
+  min-width: 120px;
+  justify-content: space-between;
+}
+
+.setting-select-btn:hover {
+  border-color: var(--primary-color);
+}
+
+.setting-select-btn svg {
+  color: var(--text-secondary);
+  flex-shrink: 0;
+}
+
+.setting-select-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  background: var(--bg-color);
+  box-shadow: var(--shadow-lg);
+  border-radius: var(--radius-md);
+  padding: 6px;
+  z-index: 50;
+  min-width: 100%;
+  border: 1px solid var(--border-color);
+  margin-top: 4px;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transform-origin: top left;
+  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+  visibility: visible;
+}
+
+.setting-select-dropdown.hidden {
+  display: block !important;
+  opacity: 0;
+  transform: translateY(-4px) scale(0.97);
+  visibility: hidden;
+  pointer-events: none;
+}
+
+.setting-select-option {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 12px;
+  font-size: 12px;
+  color: var(--text-primary);
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+  transition: all 0.15s;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.setting-select-option:hover {
+  background: var(--bg-secondary);
+  color: var(--primary-color);
+}
+
+.setting-select-option.active {
+  background: var(--selected-bg);
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.setting-select-option.active::after {
+  content: '✓';
+  font-size: 11px;
+  margin-left: 12px;
+  flex-shrink: 0;
+}
+
+/* Settings Text/Number Inputs - matches filter-custom style */
+.settings-content input[type="text"],
+.settings-content input[type="number"] {
+  padding: 6px 10px;
+  font-size: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  background: var(--bg-color);
+  color: var(--text-primary);
+  transition: all 0.15s;
+  box-shadow: var(--shadow-sm);
+}
+
+.settings-content input[type="text"]:hover,
+.settings-content input[type="number"]:hover {
+  border-color: var(--primary-color);
+}
+
+.settings-content input[type="text"]:focus,
+.settings-content input[type="number"]:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(96, 181, 87, 0.15);
+  background-color: var(--bg-color);
+}
+
+.settings-content input[type="number"] {
+  width: 70px;
+}
+
+/* Settings Textarea */
+.settings-content textarea {
+  width: 100%;
+  padding: 8px 10px;
+  font-size: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-color);
+  color: var(--text-primary);
+  resize: vertical;
+  font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.settings-content textarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(96, 181, 87, 0.15);
+}
+
+/* Setting Group Label */
+.settings-content .setting-group > label {
+  font-size: 13px;
+  color: var(--text-primary);
+  white-space: nowrap;
+  margin: 0;
+}
+
+/* Setting Inputs Sub-panel */
+.settings-content .setting-inputs {
+  margin-top: 8px;
+  margin-left: 0;
+  padding: 10px 12px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-md);
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.settings-content .setting-inputs label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.settings-content .setting-inputs label input[type="text"] {
+  flex: 1;
+  min-width: 0;
+}
+
+.settings-content .setting-inputs label input[type="number"] {
+  width: 80px;
+}
+
+.settings-content .setting-inputs > .setting-select {
+  display: inline-flex;
+  width: auto;
+}
+
+.settings-content .setting-inputs .setting-format-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.settings-content .setting-inputs.hidden {
+  display: none;
+}
+
+/* Settings Modal Footer */
+.settings-content .modal-footer {
+  gap: 12px;
+  padding: 14px 16px;
+}
+
+.settings-content .modal-footer .btn {
+  padding: 8px 20px;
+  font-size: 13px;
+  font-weight: 600;
+  border-radius: var(--radius-md);
+}
+
+/* ============================================
+   Settings Pro Section (merged Pro + License)
+   ============================================ */
+
+.settings-pro-section {
+  border: none;
+  border-radius: 0;
+  background: none;
+}
+
+.pro-feature-toggles {
+  margin-top: 4px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-color);
+}

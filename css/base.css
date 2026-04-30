@@ -1,0 +1,377 @@
+/* ============================================
+   Base Layout Styles
+   ============================================ */
+
+/* Toolbar rows */
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 10px;
+  background: var(--bg-color);
+  flex-shrink: 0;
+  overflow: visible;
+  min-width: 0;
+  position: relative;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.toolbar-actions {
+  padding: 6px 10px;
+  justify-content: flex-end;
+}
+
+/* Pro Status Area (toolbar, left side) */
+.pro-status-area {
+  margin-right: auto;
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.btn-upgrade-pro {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #5a3e00;
+  background: linear-gradient(135deg, #ffd700, #ffb800);
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: box-shadow 0.2s, filter 0.2s;
+}
+
+.btn-upgrade-pro:hover {
+  box-shadow: 0 2px 8px rgba(255, 184, 0, 0.45);
+  filter: brightness(1.06);
+}
+
+.btn-upgrade-pro svg {
+  stroke: #5a3e00;
+  flex-shrink: 0;
+}
+
+/* Pro Active Status */
+.pro-status-active {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: nowrap;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.pro-active-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  line-height: 16px;
+  color: #5a3e00;
+  background: linear-gradient(135deg, #ffd700, #ffb800);
+  border-radius: 10px;
+  white-space: nowrap;
+  text-shadow: 0 0.5px 0 rgba(255,255,255,0.3);
+  flex-shrink: 0;
+}
+
+.pro-active-badge svg {
+  stroke: #5a3e00;
+  flex-shrink: 0;
+}
+
+.pro-plan-label {
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 16px;
+  padding: 2px 6px;
+  border-radius: 8px;
+  background: var(--bg-tertiary);
+  color: var(--text-secondary);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.pro-expiry-label {
+  font-size: 11px;
+  line-height: 16px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.btn-deactivate-inline {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 18px;
+  height: 18px;
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+  flex-shrink: 0;
+  padding: 0;
+  opacity: 0.5;
+}
+
+.btn-deactivate-inline:hover {
+  background: var(--bg-tertiary);
+  color: var(--error-color);
+  opacity: 1;
+}
+
+/* Pro status responsive: progressively hide info on narrow panels */
+/* Step 1: hide plan label */
+@media (max-width: 420px) {
+  .pro-responsive-plan {
+    display: none;
+  }
+
+  .pro-status-active {
+    gap: 4px;
+  }
+}
+
+/* Step 2: hide expiry */
+@media (max-width: 340px) {
+  .pro-responsive-expiry {
+    display: none;
+  }
+}
+
+/* Step 3: hide expiry on very narrow widths via container-based approach */
+@media (max-width: 300px) {
+  .pro-active-badge {
+    padding: 2px 6px;
+    font-size: 10px;
+  }
+}
+
+/* Pro Upgrade Modal */
+.pro-upgrade-content {
+  max-width: 380px;
+}
+
+.pro-upgrade-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.pro-upgrade-input-section {
+  margin-top: 12px;
+}
+
+.pro-upgrade-features {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid var(--border-color);
+}
+
+.pro-upgrade-features h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-primary);
+  margin: 0 0 12px;
+}
+
+.pro-feature-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pro-feature-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  font-size: 13px;
+  color: var(--text-secondary);
+}
+
+.pro-feature-list li div {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.pro-feature-list li strong {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.pro-feature-list li p {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  margin: 0;
+  line-height: 1.4;
+}
+
+.pro-feature-list li svg {
+  stroke: var(--primary-color);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+/* Pro Feature Lock — visually indicate locked but keep clickable */
+.pro-locked-wrapper {
+  position: relative;
+}
+
+/* Pro setting items: not greyed out, just disabled interaction */
+.pro-setting-disabled {
+  cursor: not-allowed;
+}
+
+.pro-setting-disabled .checkbox-label {
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.pro-setting-disabled input[type="checkbox"],
+.pro-setting-disabled input[type="text"],
+.pro-setting-disabled textarea {
+  pointer-events: none;
+  cursor: not-allowed;
+}
+
+/* Pro-locked state for dropdown items, filter options, settings */
+.pro-locked {
+  opacity: 0.5;
+  cursor: not-allowed !important;
+  position: relative;
+}
+
+.pro-locked:hover {
+  opacity: 0.65;
+}
+
+/* Pro-locked setting items */
+.setting-item.pro-locked input,
+.setting-item.pro-locked select,
+.setting-item.pro-locked textarea {
+  pointer-events: none;
+  opacity: 0.5;
+}
+
+/* Pro-locked filter options in dropdowns */
+.filter-option.pro-locked,
+.dropdown-item.pro-locked,
+.context-menu-item.pro-locked {
+  opacity: 0.55;
+}
+
+.filter-option.pro-locked:hover,
+.dropdown-item.pro-locked:hover,
+.context-menu-item.pro-locked:hover {
+  opacity: 0.7;
+}
+
+/* Pro-locked delete button on cards */
+.btn-delete.pro-locked {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
+
+.btn-delete.pro-locked:hover {
+  opacity: 0.5;
+}
+
+/* Toolbar Row: Select All + View Toggle */
+.toolbar-select-row {
+  justify-content: space-between;
+  padding: 12px 10px;
+  flex-wrap: wrap;
+}
+
+.toolbar-filters {
+  flex-wrap: wrap;
+  z-index: 10;
+  gap: 8px 16px;
+  padding-top: 8px;
+  padding-bottom: 8px;
+}
+
+.toolbar-filters .toolbar-left {
+  flex: 1 1 auto;
+  min-width: 200px;
+}
+
+.toolbar-filters .toolbar-right {
+  flex: 0 0 auto;
+  margin-left: auto;
+  padding-left: 8px;
+}
+
+.filter-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  position: relative;
+}
+
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex: 1 1 0;
+  min-width: 0;
+  overflow: visible;
+  position: relative;
+}
+
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.icon-btn {
+  width: 28px;
+  height: 28px;
+  border: none;
+  background: transparent;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  transition: background 0.2s;
+}
+
+.icon-btn:hover {
+  background: var(--bg-secondary);
+  color: var(--text-primary);
+}
+
+.icon-btn-small {
+  width: 24px;
+  height: 24px;
+}
+
+.icon-btn-small:active svg {
+  animation: spin 0.6s ease-in-out;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
