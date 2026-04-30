@@ -2,7 +2,6 @@
   "name": "image-harvest",
   "version": "1.0.1",
   "description": "Image Harvest - Download Any Image from Any Webpage (Chrome Extension)",
-  "private": true,
   "scripts": {
     "build": "./scripts/build/build.sh",
     "build:sync": "./scripts/build/build.sh --sync-from-package",
