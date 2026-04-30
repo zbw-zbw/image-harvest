@@ -27,11 +27,11 @@ dist/
 .aone_copilot/
 .qoder/
 
-# Private docs (business strategy, marketing, PRD, release notes, design drafts) - local only, never pushed
-docs/marketing/
-docs/launch-content/
+# Private docs (business strategy, launch content, ads, release notes, PRD) - local only, never pushed
+docs/launch/
+docs/ads/
+docs/release/
 docs/product/
-docs/_notes/
 
 # Local git backups (never commit)
 .git-backup-*/
