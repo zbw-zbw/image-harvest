@@ -180,7 +180,10 @@ describe('ImageCard – click handlers', () => {
     });
   });
 
-  it('confirms before deleting and calls removeImageById', async () => {
+  it('confirms before deleting and calls removeImageById (Pro user)', async () => {
+    // After the Pro-guard refactor handleDelete fast-fails for free
+    // users — the confirm dialog never appears unless isProUser is true.
+    state.isProUser = true;
     const img = makeImage({ id: 'del-1' });
     const { container } = render(<ImageCard img={img} index={0} />);
     fireEvent.click(container.querySelector('.btn-delete')!);
@@ -190,7 +193,8 @@ describe('ImageCard – click handlers', () => {
     });
   });
 
-  it('aborts deletion when the user cancels the confirm dialog', async () => {
+  it('aborts deletion when the user cancels the confirm dialog (Pro user)', async () => {
+    state.isProUser = true;
     mocks.ui.showConfirmDialog.mockResolvedValueOnce(false);
     const img = makeImage({ id: 'del-2' });
     const { container } = render(<ImageCard img={img} index={0} />);
@@ -198,6 +202,25 @@ describe('ImageCard – click handlers', () => {
     await waitFor(() => {
       expect(mocks.ui.showConfirmDialog).toHaveBeenCalled();
     });
+    expect(mocks.pro.removeImageById).not.toHaveBeenCalled();
+  });
+
+  it('shows the upgrade modal when a free user clicks delete (no confirm dialog)', async () => {
+    // Pins the bug fix: the Pro guard runs BEFORE the confirm dialog
+    // so free users see ProUpgradeModal immediately, not after dismissing
+    // a confirm prompt.
+    state.isProUser = false;
+    const img = makeImage({ id: 'del-3' });
+    const { container } = render(<ImageCard img={img} index={0} />);
+    fireEvent.click(container.querySelector('.btn-delete')!);
+    await waitFor(() => {
+      expect(mocks.ui.showToast).toHaveBeenCalledWith(
+        'Image removal is a Pro feature. Upgrade to unlock!',
+        'warning'
+      );
+      expect(mocks.settings.showProUpgradeModal).toHaveBeenCalled();
+    });
+    expect(mocks.ui.showConfirmDialog).not.toHaveBeenCalled();
     expect(mocks.pro.removeImageById).not.toHaveBeenCalled();
   });
 

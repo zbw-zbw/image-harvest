@@ -208,6 +208,15 @@ export function ImageCard({ img, index }: Props) {
 
   const handleDelete = async (e: MouseEvent) => {
     e.stopPropagation();
+    // Pro guard up-front: don't make the user dismiss a confirm dialog
+    // only to silently land in the upgrade modal afterwards. Mirrors
+    // the handleFavorite pattern above and matches the fast-fail UX
+    // of the toolbar Pro guards in settings.bindProGuards.
+    if (!isProUser) {
+      showToast('Image removal is a Pro feature. Upgrade to unlock!', 'warning');
+      showProUpgradeModal();
+      return;
+    }
     const confirmed = await showConfirmDialog({
       title: 'Remove Image',
       message: 'Are you sure you want to remove this image from the list?',

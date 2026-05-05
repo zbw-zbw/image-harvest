@@ -1,34 +1,20 @@
-// Pro Features: Reverse Search, Similar Detection, Collection, Color Extraction, Multi-Tab Extract
+// Pro Features facade: collects the synchronous Pro APIs (favorites,
+// dedup detection, color helpers) that the rest of the app imports
+// at module load time, plus thin lazy-loader entry points for the
+// modal UIs that have been split out (./multitab, ./collection-ui,
+// ./dedup-ui). Heavy code paths — JSZip, modal markup, bulk
+// operations — live in those split chunks.
 //
-// JSZip is dynamically imported inside exportCollection only — see actions.ts
-// for the same pattern. Avoids pulling ~100 KB into the sidepanel main bundle
-// for users who never export their collection.
-
-import type JSZipType from 'jszip';
+// Earlier versions of this file housed the full implementations;
+// after the lazy-split refactor most of the legacy imports turned
+// into dead weight. Trimmed here to silence lint and make the
+// remaining surface area honest about what's actually used.
 import { collectionAdd, collectionGetAll, collectionRemove } from '../shared/collection';
 import { hammingDistance } from '../shared/phash';
-import { isRestrictedUrl } from '../shared/utils';
 import type { CollectionItem, ImageItem } from '../shared/types';
-import {
-  downloadSingle,
-  formatTimestamp,
-  getActivePageInfo,
-  openInNewTab,
-  showReverseSearchMenu,
-} from './actions';
 import { applyFilters } from './filter';
-import { processImageExtras } from './scan';
-import { showProUpgradeModal } from './settings';
 import { elements, state } from './state';
-import {
-  hideProgress,
-  showConfirmDialog,
-  showProgress,
-  showToast,
-  updateFilterButtonLabels,
-  updateProgress,
-} from './ui';
-import { formatBytes, generateFilename, generateId, truncateUrl } from './utils';
+import { showToast } from './ui';
 
 // ============================================
 // Similar Image Detection (Pro)
@@ -116,13 +102,18 @@ export function closeDedupModal(): void {
   state.dedupModalState = { open: false };
 }
 
+/**
+ * Remove an image from the in-memory list and re-run downstream
+ * pipelines (filters + similar-group detection).
+ *
+ * Pure business inverse: callers are responsible for any Pro/permission
+ * gating *before* invoking this. Embedding the Pro check at this level
+ * (the previous behavior) misled callers into thinking they could call
+ * unconditionally, and produced surprising silent redirects to the
+ * upgrade modal — see ImageCard.handleDelete which originally awaited
+ * the confirm dialog and only then discovered the action would not run.
+ */
 export function removeImageById(imageId: string): void {
-  // Free tier: image deletion requires Pro
-  if (!state.isProUser) {
-    showToast('Image removal is a Pro feature. Upgrade to unlock!', 'warning');
-    showProUpgradeModal();
-    return;
-  }
   state.allImages = state.allImages.filter((img) => img.id !== imageId);
   state.selectedImages.delete(imageId);
   applyFilters();
