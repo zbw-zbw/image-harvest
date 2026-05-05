@@ -3,7 +3,11 @@
 // ============================================
 // 选择、高亮、下载等操作模块
 
-import JSZip from 'jszip';
+// JSZip is heavy (~100 KB rendered, ~28 KB gzip). It's only needed when the
+// user actually triggers "download as ZIP" (downloadAllAsZip below) — keep it
+// out of the main sidepanel bundle by importing on demand. See also
+// pro-features.ts which does the same for exportCollection.
+import type JSZipType from 'jszip';
 import { FREE_LIMITS, MESSAGE_TYPES } from '../shared/constants';
 import { convertImageFormat } from '../shared/converter';
 import type { ImageItem } from '../shared/types';
@@ -335,6 +339,7 @@ export async function downloadSelectedAsZip(targetFormat: string | null): Promis
   });
 
   try {
+    const { default: JSZip } = (await import('jszip')) as { default: typeof JSZipType };
     const zip = new JSZip();
     const pageInfo = await getActivePageInfo();
     const now = new Date();

@@ -1,6 +1,10 @@
 // Pro Features: Reverse Search, Similar Detection, Collection, Color Extraction, Multi-Tab Extract
+//
+// JSZip is dynamically imported inside exportCollection only — see actions.ts
+// for the same pattern. Avoids pulling ~100 KB into the sidepanel main bundle
+// for users who never export their collection.
 
-import JSZip from 'jszip';
+import type JSZipType from 'jszip';
 import { collectionAdd, collectionGetAll, collectionRemove } from '../shared/collection';
 import { hammingDistance } from '../shared/phash';
 import { isRestrictedUrl } from '../shared/utils';
@@ -466,6 +470,7 @@ export async function exportCollection(): Promise<void> {
       showToast('Export cancelled', 'info');
     });
 
+    const { default: JSZip } = (await import('jszip')) as { default: typeof JSZipType };
     const zip = new JSZip();
     const pageInfo = await getActivePageInfo();
     const folder = zip.folder('collection')!;

@@ -15,8 +15,14 @@
 
 import { defineConfig } from 'vite';
 import { crx } from '@crxjs/vite-plugin';
+import { visualizer } from 'rollup-plugin-visualizer';
 import manifest from './manifest.config';
 import { htmlIncludePlugin } from './vite-html-include';
+
+// Toggle bundle-size analysis with `ANALYZE=1 npm run build`. The visualizer
+// emits dist/stats.html (treemap) — useful for spotting which deps dominate
+// the largest chunks. Off by default so production builds stay clean.
+const analyze = process.env.ANALYZE === '1';
 
 export default defineConfig({
   // Preact JSX automatic runtime — matches the tsconfig "jsxImportSource":
@@ -26,13 +32,16 @@ export default defineConfig({
     jsxImportSource: 'preact',
   },
   resolve: {
-    // Reroute any `react` / `react-dom` imports to Preact's compat layer.
-    // Lets us pull in third-party React-typed components later without a
-    // bundler-level rewrite pass. Pure Preact code still imports from
-    // `preact` directly and bypasses this alias.
+    // virtua hard-imports from 'react' / 'react-dom' / 'react/jsx-runtime'.
+    // Reroute those to Preact's compat layer so virtua can run on Preact.
+    // Our own code uses 'preact' / 'preact/hooks' directly and bypasses
+    // this alias, so the only ~6.6 KB of compat code that ships is the
+    // subset virtua actually touches (useLayoutEffect / useEffect /
+    // useRef / memo / forwardRef / useReducer / flushSync / jsx).
     alias: {
       react: 'preact/compat',
       'react-dom': 'preact/compat',
+      'react/jsx-runtime': 'preact/jsx-runtime',
     },
   },
   plugins: [
@@ -40,6 +49,26 @@ export default defineConfig({
     // crxjs entry-point analyzer parses a fully-expanded document.
     htmlIncludePlugin(),
     crx({ manifest }),
+    ...(analyze
+      ? [
+          // Treemap for human eyeballing.
+          visualizer({
+            filename: 'dist/stats.html',
+            template: 'treemap',
+            gzipSize: true,
+            brotliSize: true,
+            open: false,
+          }),
+          // Plain-text list for diffing in CI / commit messages.
+          visualizer({
+            filename: 'dist/stats.txt',
+            template: 'list',
+            gzipSize: true,
+            brotliSize: true,
+            open: false,
+          }),
+        ]
+      : []),
   ],
   build: {
     outDir: 'dist',
