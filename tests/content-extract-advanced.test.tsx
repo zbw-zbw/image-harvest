@@ -28,7 +28,11 @@ vi.mock('../content/state', () => ({
 }));
 
 // Mock shared/utils — generateId / generateDataUriKey just need to be
-// deterministic and url-shaped so dedup works.
+// deterministic and url-shaped so dedup works. The other helpers need
+// realistic-enough implementations so the async DOM-walking extractors
+// (extractInlineSvgs / VideoPosterImages / InputImages / ObjectEmbedImages
+// / MetaAndLinkImages / LazyLoadImages / CssContentImages) can actually
+// produce ImageItems instead of always early-returning.
 vi.mock('../shared/utils', () => ({
   generateId: vi.fn((url: string) => `id-${url.slice(0, 16)}`),
   // Use the FULL dataUri as the dedup key. Same input → same key
@@ -45,16 +49,36 @@ vi.mock('../shared/utils', () => ({
       return '';
     }
   }),
-  getFileFormat: vi.fn(() => 'unknown'),
+  getFileFormat: vi.fn((u: string) => {
+    if (!u) return 'unknown';
+    if (u.includes('.png')) return 'png';
+    if (u.includes('.jpg') || u.includes('.jpeg')) return 'jpg';
+    if (u.includes('.svg')) return 'svg';
+    if (u.includes('.gif')) return 'gif';
+    if (u.includes('.webp')) return 'webp';
+    if (u.includes('.ico')) return 'ico';
+    return 'unknown';
+  }),
   isDataUri: vi.fn((u: string) => u.startsWith('data:')),
   isImageDataUri: vi.fn((u: string) => u.startsWith('data:image/')),
-  extractBackgroundUrls: vi.fn(() => []),
-  isGradient: vi.fn(() => false),
+  // Real-ish url() parser so background-image / css-content / data-bg
+  // url() syntax all work end-to-end.
+  extractBackgroundUrls: vi.fn((value: string) => {
+    if (!value) return [];
+    const matches = Array.from(value.matchAll(/url\(['"]?([^'")]+)['"]?\)/g));
+    return matches.map((m) => m[1]);
+  }),
+  isGradient: vi.fn((u: string) => u.includes('gradient(')),
 }));
 
 vi.mock('../content/utils', () => ({
   skipElement: vi.fn(() => false),
-  parseSrcset: vi.fn(() => []),
+  parseSrcset: vi.fn((srcset: string) =>
+    srcset.split(',').map((part) => {
+      const [url] = part.trim().split(/\s+/);
+      return { url, width: 0 };
+    })
+  ),
 }));
 
 import { extractInlineSvg, extractCanvasImage } from '../content/extract-advanced';
@@ -68,6 +92,10 @@ beforeEach(() => {
 
 afterEach(() => {
   document.body.innerHTML = '';
+  // Also clear <head> — the async extractors that run on link[rel=icon]
+  // and meta[property=og:image] append fixtures to <head>, which would
+  // otherwise leak across cases and inflate counts.
+  document.head.innerHTML = '';
   seenUrls.clear();
   // Use restoreAllMocks (not clearAllMocks) so vi.spyOn() impls are
   // reverted to the original prototype methods. Otherwise the spy
@@ -281,5 +309,589 @@ describe('extractCanvasImage', () => {
 
     const item = extractCanvasImage(canvas);
     expect(item?.sourceDomain).toBe(window.location.hostname);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// Async DOM-walking extractors — page-level scanners that populate
+// the shared `images` Map. Each delegates to either:
+//   - the element-level helpers tested above (extractInlineSvg /
+//     extractCanvasImage), or
+//   - inline URL → ImageItem construction with the shared dedup logic.
+// ─────────────────────────────────────────────────────────────────────
+
+import {
+  extractInlineSvgs,
+  extractCanvasElements,
+  extractVideoPosterImages,
+  extractInputImages,
+  extractObjectEmbedImages,
+  extractMetaAndLinkImages,
+  extractLazyLoadImages,
+  extractCssContentImages,
+} from '../content/extract-advanced';
+
+// Helper — stub getBoundingClientRect (jsdom returns 0).
+function stubElementRect(el: Element, w: number, h: number): void {
+  Object.defineProperty(el, 'getBoundingClientRect', {
+    value: () => ({
+      width: w,
+      height: h,
+      top: 0,
+      left: 0,
+      right: w,
+      bottom: h,
+      x: 0,
+      y: 0,
+      toJSON: () => ({}),
+    }),
+    configurable: true,
+  });
+}
+
+// ─────────────────────────────────────────────────────────────────────
+// extractInlineSvgs — page-wide <svg> scan with closest('img') skip
+// ─────────────────────────────────────────────────────────────────────
+
+describe('extractInlineSvgs', () => {
+  it('finds top-level <svg> elements and writes ImageItems into the Map', async () => {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('id', 'hero-svg');
+    const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
+    rect.setAttribute('width', '100');
+    rect.setAttribute('height', '50');
+    svg.appendChild(rect);
+    stubElementRect(svg, 100, 50);
+    document.body.appendChild(svg);
+
+    const images = new Map();
+    await extractInlineSvgs(images);
+    expect(images.size).toBe(1);
+    const [item] = Array.from(images.values());
+    expect(item.type).toBe('svg');
+  });
+
+  it('skips <svg> nested inside an <img> (already handled by extractInlineSvg path)', async () => {
+    // Pin: <img><svg/></img> is an unusual but valid construct (some
+    // libraries inline SVG inside <img> via XHTML). The extractor
+    // must skip these to avoid double-counting.
+    const img = document.createElement('img');
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    stubElementRect(svg, 100, 100);
+    img.appendChild(svg);
+    document.body.appendChild(img);
+
+    const images = new Map();
+    await extractInlineSvgs(images);
+    expect(images.size).toBe(0);
+  });
+
+  it('skips <svg> with rect.width < 2 (icon-skip threshold)', async () => {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    stubElementRect(svg, 1, 100);
+    document.body.appendChild(svg);
+
+    const images = new Map();
+    await extractInlineSvgs(images);
+    expect(images.size).toBe(0);
+  });
+
+  it('skips <svg> when getBoundingClientRect throws (defensive try/catch)', async () => {
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    Object.defineProperty(svg, 'getBoundingClientRect', {
+      value: () => {
+        throw new Error('jsdom rect failure');
+      },
+      configurable: true,
+    });
+    document.body.appendChild(svg);
+
+    const images = new Map();
+    // Must NOT throw — defensive try/catch swallows the error.
+    await expect(extractInlineSvgs(images)).resolves.toBeUndefined();
+    expect(images.size).toBe(0);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// extractCanvasElements — page-wide <canvas> scan
+// ─────────────────────────────────────────────────────────────────────
+
+describe('extractCanvasElements', () => {
+  it('finds all <canvas> elements and writes ImageItems into the Map', async () => {
+    const c1 = document.createElement('canvas');
+    c1.width = 100;
+    c1.height = 100;
+    const dataUri = 'data:image/png;base64,' + 'A'.repeat(200);
+    vi.spyOn(c1, 'toDataURL').mockReturnValue(dataUri);
+    document.body.appendChild(c1);
+
+    const images = new Map();
+    await extractCanvasElements(images);
+    expect(images.size).toBe(1);
+    const [item] = Array.from(images.values());
+    expect(item.type).toBe('canvas');
+  });
+
+  it('skips canvases that extractCanvasImage rejects (tainted / blank)', async () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 100;
+    canvas.height = 100;
+    vi.spyOn(canvas, 'toDataURL').mockImplementation(() => {
+      throw new DOMException('Tainted', 'SecurityError');
+    });
+    document.body.appendChild(canvas);
+
+    const images = new Map();
+    await extractCanvasElements(images);
+    expect(images.size).toBe(0);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// extractVideoPosterImages — video[poster] selector
+// ─────────────────────────────────────────────────────────────────────
+
+describe('extractVideoPosterImages', () => {
+  it('extracts video[poster] as type="video-poster"', async () => {
+    const v = document.createElement('video');
+    v.poster = 'https://example.com/cover.jpg';
+    document.body.appendChild(v);
+
+    const images = new Map();
+    await extractVideoPosterImages(images);
+    expect(images.size).toBe(1);
+    const [item] = Array.from(images.values());
+    expect(item.type).toBe('video-poster');
+    expect(item.format).toBe('jpg');
+  });
+
+  it('skips non-image data: URI poster', async () => {
+    const v = document.createElement('video');
+    v.poster = 'data:text/plain,hello';
+    document.body.appendChild(v);
+
+    const images = new Map();
+    await extractVideoPosterImages(images);
+    expect(images.size).toBe(0);
+  });
+
+  it('handles image data: URI poster with type="video-poster"', async () => {
+    const v = document.createElement('video');
+    v.poster = 'data:image/jpeg;base64,AAAA';
+    document.body.appendChild(v);
+
+    const images = new Map();
+    await extractVideoPosterImages(images);
+    expect(images.size).toBe(1);
+    const [item] = Array.from(images.values());
+    expect(item.url.startsWith('data:image/jpeg')).toBe(true);
+  });
+
+  it('dedups identical poster URLs across multiple videos', async () => {
+    for (let i = 0; i < 3; i++) {
+      const v = document.createElement('video');
+      v.poster = 'https://example.com/shared.jpg';
+      document.body.appendChild(v);
+    }
+    const images = new Map();
+    await extractVideoPosterImages(images);
+    expect(images.size).toBe(1);
+  });
+
+  it('selector `video[poster]` filters out videos with NO poster attribute', async () => {
+    // Pin: a <video> without poster shouldn't even be queried — the
+    // CSS selector itself enforces this. Confirm by mixing one with
+    // and one without.
+    const withPoster = document.createElement('video');
+    withPoster.poster = 'https://example.com/has.jpg';
+    const withoutPoster = document.createElement('video');
+    document.body.appendChild(withPoster);
+    document.body.appendChild(withoutPoster);
+
+    const images = new Map();
+    await extractVideoPosterImages(images);
+    expect(images.size).toBe(1);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// extractInputImages — input[type="image"] selector
+// ─────────────────────────────────────────────────────────────────────
+
+describe('extractInputImages', () => {
+  it('extracts input[type="image"] as type="input-image"', async () => {
+    const input = document.createElement('input');
+    input.type = 'image';
+    input.src = 'https://example.com/submit.png';
+    document.body.appendChild(input);
+
+    const images = new Map();
+    await extractInputImages(images);
+    expect(images.size).toBe(1);
+    const [item] = Array.from(images.values());
+    expect(item.type).toBe('input-image');
+  });
+
+  it('selector ignores input[type="text"] etc.', async () => {
+    const text = document.createElement('input');
+    text.type = 'text';
+    text.src = 'https://example.com/photo.jpg';
+    document.body.appendChild(text);
+
+    const images = new Map();
+    await extractInputImages(images);
+    expect(images.size).toBe(0);
+  });
+
+  it('skips input[type="image"] with empty src (prevents undefined ImageItem)', async () => {
+    const input = document.createElement('input');
+    input.type = 'image';
+    document.body.appendChild(input);
+
+    const images = new Map();
+    await extractInputImages(images);
+    expect(images.size).toBe(0);
+  });
+
+  it('handles data: URI src', async () => {
+    const input = document.createElement('input');
+    input.type = 'image';
+    input.src = 'data:image/png;base64,AAAA';
+    document.body.appendChild(input);
+
+    const images = new Map();
+    await extractInputImages(images);
+    expect(images.size).toBe(1);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// extractObjectEmbedImages — <object> + <embed> with image type filter
+// ─────────────────────────────────────────────────────────────────────
+
+describe('extractObjectEmbedImages', () => {
+  it('extracts <object type="image/png" data="..."> as type="object"', async () => {
+    const obj = document.createElement('object');
+    obj.type = 'image/png';
+    obj.data = 'https://example.com/g.png';
+    stubElementRect(obj, 200, 100);
+    document.body.appendChild(obj);
+
+    const images = new Map();
+    await extractObjectEmbedImages(images);
+    const items = Array.from(images.values());
+    expect(items).toHaveLength(1);
+    expect(items[0].type).toBe('object');
+    expect(items[0].displayWidth).toBe(200);
+  });
+
+  it('extracts <object> when type is missing but URL has image extension', async () => {
+    // Pin: the type attribute is OPTIONAL; getFileFormat fallback is the
+    // only way to detect images embedded as <object> without explicit type.
+    const obj = document.createElement('object');
+    obj.data = 'https://example.com/g.png';
+    stubElementRect(obj, 50, 50);
+    document.body.appendChild(obj);
+
+    const images = new Map();
+    await extractObjectEmbedImages(images);
+    expect(images.size).toBe(1);
+  });
+
+  it('skips <object> with non-image type AND unknown extension (PDF etc.)', async () => {
+    const obj = document.createElement('object');
+    obj.type = 'application/pdf';
+    obj.data = 'https://example.com/doc.pdf';
+    document.body.appendChild(obj);
+
+    const images = new Map();
+    await extractObjectEmbedImages(images);
+    expect(images.size).toBe(0);
+  });
+
+  it('extracts <embed type="image/jpeg"> as type="embed"', async () => {
+    const embed = document.createElement('embed');
+    embed.type = 'image/jpeg';
+    embed.src = 'https://example.com/g.jpg';
+    stubElementRect(embed, 300, 200);
+    document.body.appendChild(embed);
+
+    const images = new Map();
+    await extractObjectEmbedImages(images);
+    const items = Array.from(images.values());
+    expect(items).toHaveLength(1);
+    expect(items[0].type).toBe('embed');
+  });
+
+  it('handles a mix of <object> and <embed> in the same scan', async () => {
+    const obj = document.createElement('object');
+    obj.type = 'image/png';
+    obj.data = 'https://example.com/o.png';
+    stubElementRect(obj, 100, 100);
+
+    const embed = document.createElement('embed');
+    embed.type = 'image/jpeg';
+    embed.src = 'https://example.com/e.jpg';
+    stubElementRect(embed, 100, 100);
+
+    document.body.appendChild(obj);
+    document.body.appendChild(embed);
+
+    const images = new Map();
+    await extractObjectEmbedImages(images);
+    expect(images.size).toBe(2);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// extractMetaAndLinkImages — <link rel=icon> + <meta property=og:image>
+// ─────────────────────────────────────────────────────────────────────
+
+describe('extractMetaAndLinkImages', () => {
+  it.each([
+    'icon',
+    'shortcut icon',
+    'apple-touch-icon',
+    'apple-touch-icon-precomposed',
+    'mask-icon',
+  ])('extracts <link rel="%s" href="..."> as type="link-icon"', async (rel) => {
+    const link = document.createElement('link');
+    link.setAttribute('rel', rel);
+    link.href = `https://example.com/${rel.replace(/\s/g, '-')}.png`;
+    document.head.appendChild(link);
+
+    const images = new Map();
+    await extractMetaAndLinkImages(images);
+    const items = Array.from(images.values());
+    expect(items).toHaveLength(1);
+    expect(items[0].type).toBe('link-icon');
+  });
+
+  it('parses link[sizes="WxH"] into displayWidth/Height', async () => {
+    const link = document.createElement('link');
+    link.setAttribute('rel', 'icon');
+    link.setAttribute('sizes', '32x32');
+    link.href = 'https://example.com/favicon.ico';
+    document.head.appendChild(link);
+
+    const images = new Map();
+    await extractMetaAndLinkImages(images);
+    const [item] = Array.from(images.values());
+    expect(item.displayWidth).toBe(32);
+    expect(item.displayHeight).toBe(32);
+  });
+
+  it('treats link[sizes="any"] as 0×0 (vector icon — exact dimensions unknown)', async () => {
+    // Pin: sizes='any' is the SVG/vector convention. Skipping the parse
+    // is correct — assigning a fake dimension would mislead downstream
+    // size-filter UI.
+    const link = document.createElement('link');
+    link.setAttribute('rel', 'icon');
+    link.setAttribute('sizes', 'any');
+    link.href = 'https://example.com/icon.svg';
+    document.head.appendChild(link);
+
+    const images = new Map();
+    await extractMetaAndLinkImages(images);
+    const [item] = Array.from(images.values());
+    expect(item.displayWidth).toBe(0);
+    expect(item.displayHeight).toBe(0);
+  });
+
+  it('skips data: URI link href (favicons embedded as data URIs are noise)', async () => {
+    // Pin: many sites embed a 1×1 pixel as data: URI favicon. Skipping
+    // these prevents polluting the gallery with junk.
+    const link = document.createElement('link');
+    link.setAttribute('rel', 'icon');
+    link.href = 'data:image/png;base64,iVBORw0KGgo=';
+    document.head.appendChild(link);
+
+    const images = new Map();
+    await extractMetaAndLinkImages(images);
+    expect(images.size).toBe(0);
+  });
+
+  it.each([
+    'meta[property="og:image"]',
+    'meta[property="og:image:url"]',
+    'meta[name="twitter:image"]',
+    'meta[name="twitter:image:src"]',
+    'meta[itemprop="image"]',
+  ])('extracts %s content as type="meta"', async (selector) => {
+    const meta = document.createElement('meta');
+    // Parse selector to get attr=value.
+    const match = selector.match(/\[([^=]+)="([^"]+)"\]/);
+    meta.setAttribute(match![1], match![2]);
+    meta.setAttribute('content', `https://example.com/${match![2]}.jpg`);
+    document.head.appendChild(meta);
+
+    const images = new Map();
+    await extractMetaAndLinkImages(images);
+    const items = Array.from(images.values());
+    expect(items).toHaveLength(1);
+    expect(items[0].type).toBe('meta');
+  });
+
+  it('meta with empty content is skipped', async () => {
+    const meta = document.createElement('meta');
+    meta.setAttribute('property', 'og:image');
+    meta.setAttribute('content', '');
+    document.head.appendChild(meta);
+
+    const images = new Map();
+    await extractMetaAndLinkImages(images);
+    expect(images.size).toBe(0);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// extractLazyLoadImages — 11 single-URL data-* + 2 srcset-style attrs
+// ─────────────────────────────────────────────────────────────────────
+
+describe('extractLazyLoadImages', () => {
+  it.each([
+    'data-src',
+    'data-original',
+    'data-lazy',
+    'data-lazy-src',
+    'data-hi-res-src',
+    'data-image',
+    'data-full-src',
+    'data-poster',
+  ])('extracts an <img> with %s lazy-load attribute', async (attr) => {
+    const img = document.createElement('img');
+    img.setAttribute(attr, `https://example.com/${attr}.jpg`);
+    document.body.appendChild(img);
+
+    const images = new Map();
+    await extractLazyLoadImages(images);
+    const items = Array.from(images.values());
+    expect(items).toHaveLength(1);
+    expect(items[0].type).toBe('lazy');
+  });
+
+  it('parses url() syntax in data-bg attribute', async () => {
+    const div = document.createElement('div');
+    div.setAttribute('data-bg', "url('https://example.com/bg.png')");
+    stubElementRect(div, 200, 100);
+    document.body.appendChild(div);
+
+    const images = new Map();
+    await extractLazyLoadImages(images);
+    const items = Array.from(images.values());
+    expect(items).toHaveLength(1);
+    expect(items[0].url).toBe('https://example.com/bg.png');
+  });
+
+  it('extracts data-srcset candidates via parseSrcset', async () => {
+    const img = document.createElement('img');
+    img.setAttribute(
+      'data-srcset',
+      'https://example.com/s.jpg 320w, https://example.com/l.jpg 800w'
+    );
+    document.body.appendChild(img);
+
+    const images = new Map();
+    await extractLazyLoadImages(images);
+    expect(images.size).toBe(2);
+  });
+
+  it('skips non-bg/non-img elements with unknown-format value (defensive context check)', async () => {
+    // Pin: <span data-src="not-an-image-url"> with no .jpg/.png hint
+    // and not on an <img> is treated as junk. This prevents arbitrary
+    // strings on random elements from polluting results.
+    const span = document.createElement('span');
+    span.setAttribute('data-src', 'arbitrary-non-image-string');
+    document.body.appendChild(span);
+
+    const images = new Map();
+    await extractLazyLoadImages(images);
+    expect(images.size).toBe(0);
+  });
+
+  it('ALLOWS the same value on a bg-named attribute even with unknown format (bg path is permissive)', async () => {
+    // Pin: data-bg / data-background can be CSS shorthand or arbitrary
+    // strings — the bg-context fallback bypasses the format check.
+    const div = document.createElement('div');
+    div.setAttribute('data-bg', 'arbitrary-non-image-string');
+    stubElementRect(div, 100, 100);
+    document.body.appendChild(div);
+
+    const images = new Map();
+    await extractLazyLoadImages(images);
+    expect(images.size).toBe(1);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// extractCssContentImages — ::before / ::after pseudo-elements
+// ─────────────────────────────────────────────────────────────────────
+
+describe('extractCssContentImages', () => {
+  it('returns silently when no pseudo-content url() values exist', async () => {
+    const div = document.createElement('div');
+    document.body.appendChild(div);
+
+    const images = new Map();
+    await extractCssContentImages(images);
+    expect(images.size).toBe(0);
+  });
+
+  it('extracts url() from ::before content via getComputedStyle', async () => {
+    // jsdom doesn't actually compute pseudo-element styles, so we stub
+    // window.getComputedStyle to return content with a url() for the
+    // ::before query and 'none' otherwise.
+    const div = document.createElement('div');
+    document.body.appendChild(div);
+
+    const realGCS = window.getComputedStyle.bind(window);
+    vi.spyOn(window, 'getComputedStyle').mockImplementation(
+      (el: Element, pseudo?: string | null) => {
+        if (pseudo === '::before') {
+          return {
+            content: 'url("https://example.com/before.png")',
+          } as CSSStyleDeclaration;
+        }
+        if (pseudo === '::after') {
+          return { content: 'none' } as CSSStyleDeclaration;
+        }
+        return realGCS(el);
+      }
+    );
+
+    const images = new Map();
+    await extractCssContentImages(images);
+    const items = Array.from(images.values());
+    expect(items.some((i) => i.type === 'css-content')).toBe(true);
+  });
+
+  it('skips elements that skipElement says to skip (delegation contract)', async () => {
+    const { skipElement } = await import('../content/utils');
+    vi.mocked(skipElement).mockReturnValue(true);
+
+    const div = document.createElement('div');
+    document.body.appendChild(div);
+
+    vi.spyOn(window, 'getComputedStyle').mockReturnValue({
+      content: 'url("https://example.com/skip-me.png")',
+    } as CSSStyleDeclaration);
+
+    const images = new Map();
+    await extractCssContentImages(images);
+    expect(images.size).toBe(0);
+  });
+
+  it('swallows getComputedStyle exceptions (defensive — some pseudos are inaccessible)', async () => {
+    const div = document.createElement('div');
+    document.body.appendChild(div);
+
+    vi.spyOn(window, 'getComputedStyle').mockImplementation(() => {
+      throw new Error('jsdom pseudo not implemented');
+    });
+
+    const images = new Map();
+    await expect(extractCssContentImages(images)).resolves.toBeUndefined();
+    expect(images.size).toBe(0);
   });
 });
