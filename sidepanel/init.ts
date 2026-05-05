@@ -1064,6 +1064,15 @@ declare global {
     __IH__?: {
       store: typeof import('./state').store;
       applyFilters: typeof import('./filter').applyFilters;
+      /**
+       * Lazy-load and return the multitab module (sidepanel/multitab.ts).
+       * Used by e2e tests to drive showMultiTabModal / loadTabList without
+       * relying on the toolbar button's click wiring (which has init-time
+       * timing quirks under Playwright). The module is the same one the
+       * production lazy wrapper in pro-features.ts loads, so the rendered
+       * DOM matches real-user paths.
+       */
+      loadMultitab: () => Promise<typeof import('./multitab')>;
     };
   }
 }
@@ -1073,6 +1082,10 @@ if (typeof window !== 'undefined' && window.__IH_E2E__) {
   // already in the bundle so this resolves synchronously off the module
   // cache once init runs.
   void Promise.all([import('./state'), import('./filter')]).then(([stateMod, filterMod]) => {
-    window.__IH__ = { store: stateMod.store, applyFilters: filterMod.applyFilters };
+    window.__IH__ = {
+      store: stateMod.store,
+      applyFilters: filterMod.applyFilters,
+      loadMultitab: () => import('./multitab'),
+    };
   });
 }

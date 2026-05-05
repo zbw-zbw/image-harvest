@@ -117,6 +117,28 @@ export interface OpenSidepanelOptions {
   fixture?: string;
   /** Max wait (ms) for the first image card to appear. Default: 30_000. */
   scanTimeout?: number;
+  /**
+   * If true, replaces chrome.downloads.download with a stub that records
+   * each call into `window.__IH_DOWNLOAD_CALLS__` (an array of the
+   * DownloadOptions argument) instead of actually starting a download.
+   * Use `readDownloadCalls(sidepanel)` to inspect them in tests.
+   */
+  stubDownloads?: boolean;
+}
+
+/** Shape of a recorded chrome.downloads.download call. */
+export interface RecordedDownloadCall {
+  url: string;
+  filename?: string;
+  saveAs?: boolean;
+}
+
+/** Read recorded download calls from a sidepanel that was launched with stubDownloads:true. */
+export async function readDownloadCalls(sidepanel: Page): Promise<RecordedDownloadCall[]> {
+  return sidepanel.evaluate(() => {
+    const w = window as unknown as { __IH_DOWNLOAD_CALLS__?: RecordedDownloadCall[] };
+    return w.__IH_DOWNLOAD_CALLS__ ?? [];
+  });
 }
 
 export async function openSidepanelWithImages(
@@ -141,9 +163,54 @@ export async function openSidepanelWithImages(
   // Enable the e2e hook BEFORE the page's modules load — init.ts checks
   // window.__IH_E2E__ inside its top-level guard and only then attaches
   // the window.__IH__ accessors that drive deterministic test scenarios.
-  await sidepanel.addInitScript(() => {
+  const stubDownloads = options.stubDownloads ?? false;
+  await sidepanel.addInitScript((stub: boolean) => {
     (window as unknown as { __IH_E2E__?: boolean }).__IH_E2E__ = true;
-  });
+
+    if (stub) {
+      // Wrap chrome.downloads.download so test cases can assert that the
+      // app tried to download something without polluting the user's
+      // Downloads folder with synthetic blob URLs. Init scripts run at
+      // document_start; chrome APIs are already defined on extension
+      // pages at that point, but we guard with a tiny retry loop in case
+      // the install order differs across Chromium versions.
+      const calls: RecordedDownloadCall[] = [];
+      (
+        window as unknown as { __IH_DOWNLOAD_CALLS__: RecordedDownloadCall[] }
+      ).__IH_DOWNLOAD_CALLS__ = calls;
+      const install = (): boolean => {
+        const c = (
+          window as unknown as {
+            chrome?: { downloads?: { download?: (...args: unknown[]) => unknown } };
+          }
+        ).chrome;
+        if (!c?.downloads) return false;
+        c.downloads.download = (
+          opts: RecordedDownloadCall,
+          cb?: (id: number) => void
+        ): Promise<number> => {
+          calls.push(opts);
+          if (cb) cb(0);
+          return Promise.resolve(0);
+        };
+        return true;
+      };
+      if (!install()) {
+        const t = setInterval(() => {
+          if (install()) clearInterval(t);
+        }, 10);
+        // Give up quietly after 2s — the test will fail later when the
+        // assertion runs, with a clearer message than "interval forever".
+        setTimeout(() => clearInterval(t), 2000);
+      }
+    }
+
+    interface RecordedDownloadCall {
+      url: string;
+      filename?: string;
+      saveAs?: boolean;
+    }
+  }, stubDownloads);
   await sidepanel.goto(extensionUrl(extensionId, 'pages/sidepanel.html'));
 
   // Re-focus fixture so chrome.tabs.query({active:true, currentWindow:true})
