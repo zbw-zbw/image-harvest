@@ -12,6 +12,9 @@ logs/
 dist/
 .vite/
 
+# Release artifacts (produced by `npm run zip` or the release workflow)
+image-harvest-v*.zip
+
 # Temporary files
 *.tmp
 *.swp
