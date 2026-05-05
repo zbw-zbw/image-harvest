@@ -124,6 +124,20 @@ export interface OpenSidepanelOptions {
    * Use `readDownloadCalls(sidepanel)` to inspect them in tests.
    */
   stubDownloads?: boolean;
+  /**
+   * If true, sets `state.isProUser=true` after init by writing through
+   * `__IH__.store.set('isProUser', true)`. Without this flag the Pro
+   * feature click guard in settings.ts (a capture-phase listener that
+   * calls `stopImmediatePropagation`) intercepts clicks on
+   * `#btn-collection` and `#btn-multitab` and surfaces the upgrade modal
+   * instead of opening the underlying feature — which is correct
+   * production behavior, but breaks tests that want to drive those
+   * features end-to-end.
+   *
+   * Tests that exercise the upgrade-modal path itself should leave this
+   * unset (default false).
+   */
+  enablePro?: boolean;
 }
 
 /** Shape of a recorded chrome.downloads.download call. */
@@ -228,6 +242,25 @@ export async function openSidepanelWithImages(
       { timeout: scanTimeout, intervals: [500, 1000, 2000] }
     )
     .toBeGreaterThan(0);
+
+  if (options.enablePro) {
+    // __IH__ is wired up asynchronously inside init.ts behind a
+    // Promise.all([import('./state'), import('./filter')]).then(...) so
+    // we can't rely on it being present immediately after the first
+    // image card renders. Wait for the hook, then flip the Pro flag.
+    await sidepanel.waitForFunction(
+      () => Boolean((window as unknown as { __IH__?: unknown }).__IH__),
+      undefined,
+      { timeout: 5_000 }
+    );
+    await sidepanel.evaluate(() => {
+      interface IH {
+        store: { set: (k: string, v: unknown) => void };
+      }
+      const w = window as unknown as { __IH__: IH };
+      w.__IH__.store.set('isProUser', true);
+    });
+  }
 
   return { fixturePage, sidepanel, sidepanelErrors };
 }

@@ -1,18 +1,22 @@
 // e2e: clicking the toolbar Multi-Tab button should open the modal AND
 // populate the tab list with the currently-open tabs in the test window.
 //
+// Multi-Tab is a Pro feature: settings.ts L780 attaches a capture-phase
+// click listener on #btn-multitab that calls stopImmediatePropagation
+// + opens the upgrade modal when state.isProUser is false. We pass
+// enablePro:true to the launcher so that guard short-circuits and the
+// real showMultiTabModal handler runs.
+//
 // Under Playwright the test context has at least 2 tabs open at this
 // point: the fixture page (http://127.0.0.1:port/page-with-images.html)
 // and the sidepanel itself (chrome-extension://...). The sidepanel tab
 // is filtered out by sidepanel/multitab.ts > isRestrictedUrl, so we
-// expect to see exactly the fixture tab in the rendered list.
+// expect to see the fixture tab in the rendered list.
 //
 // The whole multi-tab path is lazy-loaded
 // (sidepanel/pro-features.ts > showMultiTabModal does
 // `await import('./multitab')`), so we use expect.poll to wait for the
-// first .tab-item to appear. Same direct-DOM-click pattern as
-// dedup.e2e.ts: the button may sit inside a Pro-gated wrapper that
-// Playwright's hit-test refuses to click through.
+// first .tab-item to appear.
 import { test, expect } from '@playwright/test';
 import {
   launchExtension,
@@ -35,71 +39,49 @@ test.afterAll(async () => {
   await fixtureServer?.close();
 });
 
-/**
- * Open the multi-tab modal via __IH__ (store-driven), not via the
- * toolbar button. We tried `document.getElementById('btn-multitab').click()`
- * first, but the init.ts addEventListener wiring for that specific button
- * has a timing quirk under Playwright (state.multitabModalState never
- * flips). Since this test verifies the modal-rendering + tab-list-rendering
- * contract (not the button wiring — that's covered by selection.e2e.ts
- * style click tests on stable buttons), we drive state directly:
- *
- *   1. store.set('multitabModalState', { open: true })
- *      → MultitabModal Preact subscribes and removes the .hidden class.
- *   2. __IH__.loadMultitab() lazy-imports the same chunk the production
- *      lazy wrapper would, then we call loadTabList() to populate the
- *      tab list — exactly what showMultiTabModal does in production.
- */
-async function openMultitabAndLoad(sidepanel: import('@playwright/test').Page): Promise<void> {
-  await expect
-    .poll(() =>
-      sidepanel.evaluate(() => Boolean((window as unknown as { __IH__?: unknown }).__IH__))
-    )
-    .toBe(true);
-
-  await sidepanel.evaluate(async () => {
-    interface IH {
-      store: { set: (k: 'multitabModalState', v: { open: boolean }) => void };
-      loadMultitab: () => Promise<{ loadTabList: () => Promise<void> }>;
-    }
-    const w = window as unknown as { __IH__: IH };
-    w.__IH__.store.set('multitabModalState', { open: true });
-    const mod = await w.__IH__.loadMultitab();
-    await mod.loadTabList();
-  });
-}
-
 test('multitab modal opens and renders a list of available tabs', async () => {
-  const { sidepanel } = await openSidepanelWithImages(ext.context, fixtureServer, ext.extensionId);
+  const { sidepanel } = await openSidepanelWithImages(ext.context, fixtureServer, ext.extensionId, {
+    enablePro: true,
+  });
 
   // Modal starts hidden.
   await expect(sidepanel.locator('#multitab-modal')).toHaveClass(/hidden/);
 
-  await openMultitabAndLoad(sidepanel);
+  // Real click on the toolbar button — this is what a Pro user does.
+  // We use direct DOM .click() (not Playwright's locator.click()) to
+  // avoid the locator's hit-test, which can flake in headed mode if the
+  // sidepanel hasn't fully laid out the icon row yet.
+  await sidepanel.evaluate(() => {
+    document.getElementById('btn-multitab')?.click();
+  });
 
-  // Modal becomes visible (hidden class removed by Preact re-render).
+  // showMultiTabModal in pro-features.ts dynamic-imports
+  // sidepanel/multitab.ts. Wait for the modal to un-hide.
   await expect(sidepanel.locator('#multitab-modal')).not.toHaveClass(/hidden/, {
     timeout: 5_000,
   });
 
-  // loadTabList is async (chrome.tabs.query + DOM build). Wait for at
+  // loadTabList runs chrome.tabs.query + builds the DOM. Wait for at
   // least one .tab-item to land.
   await expect
     .poll(() => sidepanel.locator('#multitab-list .tab-item').count(), { timeout: 5_000 })
     .toBeGreaterThan(0);
 
-  // The fixture page is in the same window — its title or URL should
-  // appear in the list. Don't assume an exact tab count: chromium may
+  // The fixture page is in the same window — its URL should appear in
+  // the rendered list. We don't assume an exact tab count: chromium may
   // create extra about:blank or DevTools tabs depending on flags.
-  const tabItems = sidepanel.locator('#multitab-list .tab-item');
-  const tabUrls = await tabItems.locator('.tab-url').allTextContents();
+  const tabUrls = await sidepanel.locator('#multitab-list .tab-item .tab-url').allTextContents();
   expect(tabUrls.some((url) => url.includes('page-with-images.html'))).toBe(true);
 });
 
 test('each rendered tab item has a checkbox + title + url + favicon slot', async () => {
-  const { sidepanel } = await openSidepanelWithImages(ext.context, fixtureServer, ext.extensionId);
+  const { sidepanel } = await openSidepanelWithImages(ext.context, fixtureServer, ext.extensionId, {
+    enablePro: true,
+  });
 
-  await openMultitabAndLoad(sidepanel);
+  await sidepanel.evaluate(() => {
+    document.getElementById('btn-multitab')?.click();
+  });
 
   await expect
     .poll(() => sidepanel.locator('#multitab-list .tab-item').count(), { timeout: 5_000 })
