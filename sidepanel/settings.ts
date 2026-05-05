@@ -527,7 +527,15 @@ export async function applyProFeatureVisibility(): Promise<void> {
   // Update License UI in settings — lazy-loaded since the License section
   // markup only matters when the Settings modal is actually open. The
   // import resolves off the module cache after the first call.
-  void import('./license-ui').then((mod) => mod.updateLicenseUI());
+  // bindLicenseModalEvents is idempotent (guarded by a module-level flag),
+  // so calling it on every Settings open is safe; it only attaches click
+  // listeners on the very first open. Without this call, the activate /
+  // deactivate buttons inside the License section have no click handler
+  // and the user is silently stuck on the inactive screen.
+  void import('./license-ui').then((mod) => {
+    mod.bindLicenseModalEvents();
+    return mod.updateLicenseUI();
+  });
 
   // Update Live indicator and similar detection state in real-time
   updateLiveIndicator();
