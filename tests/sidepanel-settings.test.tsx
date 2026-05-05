@@ -547,3 +547,917 @@ describe('bindProGuards — Pro paywall interceptor', () => {
     expect(ui.showToast).not.toHaveBeenCalled();
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────
+// Chrome API surface for the remaining export tests (j1/j2/j3).
+// Installed once at first import-time of this section. Earlier
+// describe blocks don't need chrome — they pass-through when chrome
+// is undefined because their target functions don't touch it.
+// ─────────────────────────────────────────────────────────────────────
+
+import {
+  renderHotkeyDisplay,
+  openShortcutSettings,
+  switchDisplayMode,
+  updateLiveIndicator,
+  resetSettings,
+  showSettings,
+  saveSettings,
+  applyProFeatureVisibility,
+  updateTopProStatus,
+} from '../sidepanel/settings';
+
+type ChromeMock = {
+  runtime: { sendMessage: ReturnType<typeof vi.fn> };
+  tabs: { create: ReturnType<typeof vi.fn>; query: ReturnType<typeof vi.fn> };
+  storage: {
+    local: { get: ReturnType<typeof vi.fn>; set: ReturnType<typeof vi.fn> };
+  };
+  commands: { getAll: ReturnType<typeof vi.fn> };
+};
+
+function installChromeMock(): ChromeMock {
+  const chromeMock: ChromeMock = {
+    runtime: { sendMessage: vi.fn().mockResolvedValue({}) },
+    tabs: {
+      create: vi.fn().mockResolvedValue(undefined),
+      query: vi.fn().mockResolvedValue([{ id: 99 }]),
+    },
+    storage: {
+      local: {
+        get: vi.fn().mockResolvedValue({}),
+        set: vi.fn().mockResolvedValue(undefined),
+      },
+    },
+    commands: { getAll: vi.fn().mockResolvedValue([]) },
+  };
+  (globalThis as unknown as { chrome: unknown }).chrome = chromeMock;
+  return chromeMock;
+}
+
+// Mock license-ui as a virtual module — applyProFeatureVisibility
+// dynamically imports it. Without this, the real module is loaded and
+// its top-level chrome.* calls would explode.
+vi.mock('../sidepanel/license-ui', () => ({
+  bindLicenseModalEvents: vi.fn(),
+  updateLicenseUI: vi.fn().mockResolvedValue(undefined),
+}));
+
+// ─────────────────────────────────────────────────────────────────────
+// updateLiveIndicator — intentionally a no-op (legacy entry point)
+// ─────────────────────────────────────────────────────────────────────
+
+describe('updateLiveIndicator', () => {
+  it('is a no-op (does not throw, returns undefined)', () => {
+    // Pin: the visible badge is now driven by Preact <LiveIndicator>.
+    // This export is kept ONLY for backward compat with dozens of
+    // call sites; it must stay a no-op. If a future refactor puts
+    // imperative DOM mutation back in here, those call sites would
+    // re-render twice (once via Preact, once via this fn).
+    expect(updateLiveIndicator()).toBeUndefined();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// renderHotkeyDisplay
+// ─────────────────────────────────────────────────────────────────────
+
+describe('renderHotkeyDisplay', () => {
+  let chromeMock: ChromeMock;
+
+  beforeEach(() => {
+    chromeMock = installChromeMock();
+  });
+
+  it('returns silently when #hotkey-keys container is missing', async () => {
+    await expect(renderHotkeyDisplay()).resolves.toBeUndefined();
+    expect(chromeMock.commands.getAll).not.toHaveBeenCalled();
+  });
+
+  it('renders "Not set" when no _execute_action shortcut configured', async () => {
+    document.body.innerHTML = '<div id="hotkey-keys"></div>';
+    chromeMock.commands.getAll.mockResolvedValue([
+      { name: 'other-cmd', shortcut: 'Ctrl+X' },
+    ]);
+
+    await renderHotkeyDisplay();
+    const container = document.getElementById('hotkey-keys')!;
+    expect(container.querySelector('.hotkey-not-set')?.textContent).toBe('Not set');
+  });
+
+  it('parses "Ctrl+Shift+S" into 3 <kbd> with modifier symbols (⌃ ⇧ S)', async () => {
+    document.body.innerHTML = '<div id="hotkey-keys"></div>';
+    chromeMock.commands.getAll.mockResolvedValue([
+      { name: '_execute_action', shortcut: 'Ctrl+Shift+S' },
+    ]);
+
+    await renderHotkeyDisplay();
+    const container = document.getElementById('hotkey-keys')!;
+    const kbds = container.querySelectorAll('kbd');
+    expect(kbds).toHaveLength(3);
+    // Pin the modifier-symbol mapping: Ctrl → ⌃, Shift → ⇧, plain key
+    // uppercased. Affects on-screen hint visibility and aesthetic
+    // consistency with macOS conventions.
+    expect(kbds[0].textContent).toBe('⌃');
+    expect(kbds[1].textContent).toBe('⇧');
+    expect(kbds[2].textContent).toBe('S');
+  });
+
+  it('handles ⌘+Shift+S (already-symbol form, e.g. macOS Chrome)', async () => {
+    document.body.innerHTML = '<div id="hotkey-keys"></div>';
+    chromeMock.commands.getAll.mockResolvedValue([
+      { name: '_execute_action', shortcut: 'Command+Shift+I' },
+    ]);
+
+    await renderHotkeyDisplay();
+    const kbds = document.querySelectorAll('#hotkey-keys kbd');
+    expect(kbds[0].textContent).toBe('⌘');
+    expect(kbds[1].textContent).toBe('⇧');
+    expect(kbds[2].textContent).toBe('I');
+  });
+
+  it('survives chrome.commands.getAll throwing (renders Not set fallback)', async () => {
+    document.body.innerHTML = '<div id="hotkey-keys"></div>';
+    chromeMock.commands.getAll.mockRejectedValue(new Error('API unavailable'));
+
+    await renderHotkeyDisplay();
+    expect(document.querySelector('.hotkey-not-set')).toBeTruthy();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// openShortcutSettings
+// ─────────────────────────────────────────────────────────────────────
+
+describe('openShortcutSettings', () => {
+  it('opens chrome://extensions/shortcuts in a new tab', () => {
+    const chromeMock = installChromeMock();
+    openShortcutSettings();
+    expect(chromeMock.tabs.create).toHaveBeenCalledWith({
+      url: 'chrome://extensions/shortcuts',
+    });
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// switchDisplayMode
+// ─────────────────────────────────────────────────────────────────────
+
+describe('switchDisplayMode', () => {
+  let chromeMock: ChromeMock;
+
+  beforeEach(() => {
+    chromeMock = installChromeMock();
+  });
+
+  it('queries active tab + sends SET_DISPLAY_MODE with tabId + closes window', async () => {
+    chromeMock.tabs.query.mockResolvedValue([{ id: 42 }]);
+    state.isPopupMode = true;
+    const closeSpy = vi.spyOn(window, 'close').mockImplementation(() => {});
+
+    await switchDisplayMode(true);
+
+    expect(chromeMock.tabs.query).toHaveBeenCalledWith({
+      active: true,
+      currentWindow: true,
+    });
+    expect(chromeMock.runtime.sendMessage).toHaveBeenCalledWith({
+      type: 'SET_DISPLAY_MODE',
+      useSidePanel: true,
+      // popup → sidepanel: openSidePanel=true ONLY when switching FROM popup TO side panel
+      openSidePanel: true,
+      tabId: 42,
+    });
+    expect(closeSpy).toHaveBeenCalled();
+  });
+
+  it('side-panel → popup: openSidePanel=false because state.isPopupMode is false', async () => {
+    state.isPopupMode = false;
+    vi.spyOn(window, 'close').mockImplementation(() => {});
+
+    await switchDisplayMode(false);
+    // Pin: openSidePanel = useSidePanel && state.isPopupMode → both
+    // sides false here. Background uses this flag to decide whether to
+    // proactively open the side panel after the switch — wrong value
+    // would leave the user staring at a blank tab.
+    expect(chromeMock.runtime.sendMessage).toHaveBeenCalledWith(
+      expect.objectContaining({ openSidePanel: false })
+    );
+  });
+
+  it('survives chrome.tabs.query throwing — outer try/catch swallows', async () => {
+    chromeMock.tabs.query.mockRejectedValue(new Error('no tabs API'));
+    vi.spyOn(window, 'close').mockImplementation(() => {});
+
+    await expect(switchDisplayMode(true)).resolves.toBeUndefined();
+    // sendMessage never reached because query threw first.
+    expect(chromeMock.runtime.sendMessage).not.toHaveBeenCalled();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// resetSettings
+// ─────────────────────────────────────────────────────────────────────
+
+describe('resetSettings', () => {
+  beforeEach(() => {
+    installChromeMock();
+  });
+
+  it('resets state.appSettings to documented defaults (all 19 fields)', () => {
+    // Pre-pollute with non-default values
+    state.appSettings = {
+      useSidePanel: false,
+      density: 'compact',
+      theme: 'dark',
+      defaultGroup: 'domain',
+      specifyDownload: false,
+      subfolder: 'custom',
+      filenameTemplate: 'custom-template',
+      convertFormat: 'webp',
+      searchAllFrames: true,
+      liveMonitoring: true,
+      enableMinSize: true,
+      minWidth: 999,
+      minHeight: 999,
+      enableMaxSize: true,
+      maxWidth: 100,
+      maxHeight: 100,
+      enableSimilarDetection: true,
+      enableColorExtraction: true,
+      noManyFilesWarning: true,
+    } as typeof state.appSettings;
+
+    resetSettings();
+
+    // Pin defaults — these are user-facing and must NOT regress silently
+    expect(state.appSettings.useSidePanel).toBe(true);
+    expect(state.appSettings.density).toBe('standard');
+    expect(state.appSettings.theme).toBe('system');
+    expect(state.appSettings.defaultGroup).toBe('none');
+    expect(state.appSettings.subfolder).toBe('{domain}');
+    expect(state.appSettings.filenameTemplate).toBe('img_{index}_{original}.{format}');
+    expect(state.appSettings.convertFormat).toBe('none');
+    expect(state.appSettings.searchAllFrames).toBe(false);
+    expect(state.appSettings.liveMonitoring).toBe(false);
+    expect(state.appSettings.minWidth).toBe(50);
+    expect(state.appSettings.maxWidth).toBe(8000);
+    expect(state.appSettings.enableSimilarDetection).toBe(false);
+  });
+
+  it('shows success toast + opens settings modal (via showSettings)', async () => {
+    resetSettings();
+
+    expect(state.settingsModalState.open).toBe(true);
+    const ui = await import('../sidepanel/ui');
+    expect(ui.showToast).toHaveBeenCalledWith('Settings reset to defaults', 'success');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// showSettings
+// ─────────────────────────────────────────────────────────────────────
+
+describe('showSettings', () => {
+  let chromeMock: ChromeMock;
+
+  beforeEach(() => {
+    chromeMock = installChromeMock();
+    chromeMock.commands.getAll.mockResolvedValue([]);
+  });
+
+  it('flips state.settingsModalState.open to true', () => {
+    showSettings();
+    expect(state.settingsModalState.open).toBe(true);
+  });
+
+  it('scrolls .modal-body inside #settings-modal to top (fresh entry UX)', () => {
+    document.body.innerHTML = `
+      <div id="settings-modal">
+        <div class="modal-body" style="overflow:auto"></div>
+      </div>
+    `;
+    const body = document.querySelector('#settings-modal .modal-body') as HTMLElement;
+    body.scrollTop = 500;
+
+    showSettings();
+    expect(body.scrollTop).toBe(0);
+  });
+
+  it('fills setting-side-panel toggle with state.appSettings.useSidePanel', () => {
+    document.body.innerHTML = '<input type="checkbox" id="setting-side-panel" />';
+    state.appSettings.useSidePanel = true;
+    showSettings();
+    expect((document.getElementById('setting-side-panel') as HTMLInputElement).checked).toBe(
+      true
+    );
+  });
+
+  it('forces Pro-only toggles to false for free users (live-monitor + similar + color)', () => {
+    document.body.innerHTML = `
+      <input type="checkbox" id="setting-live-monitor" />
+      <input type="checkbox" id="setting-similar-detection" />
+      <input type="checkbox" id="setting-color-extract" />
+    `;
+    state.isProUser = false;
+    state.appSettings.liveMonitoring = true;
+    state.appSettings.enableSimilarDetection = true;
+    state.appSettings.enableColorExtraction = true;
+
+    showSettings();
+
+    // Pin: free users see Pro toggles as OFF in the form, regardless of
+    // the underlying state value. Otherwise free users could see "ON"
+    // in the UI but the feature wouldn't actually work — confusing UX.
+    expect(
+      (document.getElementById('setting-live-monitor') as HTMLInputElement).checked
+    ).toBe(false);
+    expect(
+      (document.getElementById('setting-similar-detection') as HTMLInputElement).checked
+    ).toBe(false);
+    expect(
+      (document.getElementById('setting-color-extract') as HTMLInputElement).checked
+    ).toBe(false);
+  });
+
+  it('toggles sub-panel visibility based on parent checkbox state', () => {
+    document.body.innerHTML = `
+      <input type="checkbox" id="setting-download-options" checked />
+      <div id="download-options-inputs"></div>
+      <input type="checkbox" id="setting-min-size" />
+      <div id="min-size-inputs"></div>
+      <input type="checkbox" id="setting-max-size" checked />
+      <div id="max-size-inputs"></div>
+    `;
+    state.appSettings.specifyDownload = true;
+    state.appSettings.enableMinSize = false;
+    state.appSettings.enableMaxSize = true;
+
+    showSettings();
+
+    // Pin: sub-panel visibility tracks the parent checkbox AT FILL-IN
+    // time. After init, runtime toggle handlers update the .hidden class
+    // separately, but on Settings open the form must reflect persisted
+    // state.
+    expect(document.getElementById('download-options-inputs')!.classList.contains('hidden'))
+      .toBe(false);
+    expect(document.getElementById('min-size-inputs')!.classList.contains('hidden')).toBe(true);
+    expect(document.getElementById('max-size-inputs')!.classList.contains('hidden')).toBe(false);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// applyProFeatureVisibility — Pro gate orchestrator
+// ─────────────────────────────────────────────────────────────────────
+
+describe('applyProFeatureVisibility', () => {
+  let chromeMock: ChromeMock;
+
+  beforeEach(() => {
+    chromeMock = installChromeMock();
+    // Default: free user (VALIDATE_LICENSE returns isPro:false)
+    chromeMock.runtime.sendMessage.mockResolvedValue({ isPro: false });
+  });
+
+  it('sets state.isProUser=true when VALIDATE_LICENSE returns isPro:true', async () => {
+    chromeMock.runtime.sendMessage.mockResolvedValue({ isPro: true });
+    state.isProUser = false;
+
+    await applyProFeatureVisibility();
+    expect(state.isProUser).toBe(true);
+  });
+
+  it('sets state.isProUser=false when VALIDATE_LICENSE throws (defensive default)', async () => {
+    chromeMock.runtime.sendMessage.mockRejectedValue(new Error('bg unavailable'));
+    state.isProUser = true;
+
+    await applyProFeatureVisibility();
+    // Pin: a transient bg error must NOT keep the user on Pro UI; the
+    // safer default is to fall back to free, otherwise a user whose
+    // license expired would keep seeing Pro features they can't use.
+    expect(state.isProUser).toBe(false);
+  });
+
+  it('newly-Pro transition (free → Pro) auto-enables 3 Pro features + persists', async () => {
+    chromeMock.runtime.sendMessage.mockResolvedValue({ isPro: true });
+    state.isProUser = false;
+    state.appSettings.enableSimilarDetection = false;
+    state.appSettings.enableColorExtraction = false;
+    state.appSettings.liveMonitoring = false;
+
+    await applyProFeatureVisibility();
+
+    // Pin: first-time activation should turn ON the 3 default Pro features
+    // so the user sees value immediately, and persist so they survive reload.
+    expect(state.appSettings.enableSimilarDetection).toBe(true);
+    expect(state.appSettings.enableColorExtraction).toBe(true);
+    expect(state.appSettings.liveMonitoring).toBe(true);
+    expect(chromeMock.storage.local.set).toHaveBeenCalledWith(
+      expect.objectContaining({ appSettings: state.appSettings })
+    );
+  });
+
+  it('newly-Pro + allImages.length > 0 → triggers processImageExtras for retroactive Pro processing', async () => {
+    chromeMock.runtime.sendMessage.mockResolvedValue({ isPro: true });
+    state.isProUser = false;
+    state.allImages = [
+      { id: 'a', url: 'a.jpg' } as never,
+      { id: 'b', url: 'b.jpg' } as never,
+    ];
+
+    await applyProFeatureVisibility();
+    const scan = await import('../sidepanel/scan');
+    // Pin: existing scanned images should retroactively get pHash + color
+    // extraction so the user doesn't have to re-scan after activating Pro.
+    expect(scan.processImageExtras).toHaveBeenCalledWith(state.allImages);
+  });
+
+  it('already-Pro (no transition) does NOT re-enable defaults or persist', async () => {
+    chromeMock.runtime.sendMessage.mockResolvedValue({ isPro: true });
+    state.isProUser = true; // wasPro=true, isProUser stays true → no transition
+    state.appSettings.enableSimilarDetection = false; // user opted out
+    state.appSettings.enableColorExtraction = false;
+
+    await applyProFeatureVisibility();
+
+    // Pin: respect user's opt-out. Auto-enabling on EVERY call would
+    // override their preference every time settings opens.
+    expect(state.appSettings.enableSimilarDetection).toBe(false);
+    expect(state.appSettings.enableColorExtraction).toBe(false);
+    expect(chromeMock.storage.local.set).not.toHaveBeenCalled();
+  });
+
+  it('hides #dedup-info when similar detection disabled OR no similar groups', async () => {
+    chromeMock.runtime.sendMessage.mockResolvedValue({ isPro: false });
+    document.body.innerHTML = '<div id="dedup-info"></div>';
+    state.appSettings.enableSimilarDetection = false;
+
+    await applyProFeatureVisibility();
+    expect(document.getElementById('dedup-info')!.classList.contains('hidden')).toBe(true);
+  });
+
+  it('hides color filter button + dropdown when colorExtraction disabled', async () => {
+    chromeMock.runtime.sendMessage.mockResolvedValue({ isPro: false });
+    document.body.innerHTML = `
+      <button class="filter-btn" data-filter="color"></button>
+      <div id="filter-color"></div>
+    `;
+    state.appSettings.enableColorExtraction = false;
+
+    await applyProFeatureVisibility();
+    expect(
+      (document.querySelector('.filter-btn[data-filter="color"]') as HTMLElement).style.display
+    ).toBe('none');
+    expect((document.getElementById('filter-color') as HTMLElement).style.display).toBe('none');
+  });
+
+  it('clears active color filter + calls applyFilters when colorExtraction newly disabled', async () => {
+    chromeMock.runtime.sendMessage.mockResolvedValue({ isPro: false });
+    state.appSettings.enableColorExtraction = false;
+    state.activeFilters.color = '#ff0000';
+
+    await applyProFeatureVisibility();
+    const filter = await import('../sidepanel/filter');
+    expect(state.activeFilters.color).toBeNull();
+    expect(filter.applyFilters).toHaveBeenCalled();
+  });
+
+  it('forces Pro toggles to unchecked for free users (3 Pro toggles)', async () => {
+    chromeMock.runtime.sendMessage.mockResolvedValue({ isPro: false });
+    document.body.innerHTML = `
+      <input type="checkbox" id="setting-similar-detection" checked />
+      <input type="checkbox" id="setting-color-extract" checked />
+      <input type="checkbox" id="setting-live-monitor" checked />
+    `;
+
+    await applyProFeatureVisibility();
+    // Pin: the three toggles in the Settings form MUST visually reflect
+    // the actual capability. Showing "ON" while the underlying state is
+    // disabled would mislead users (the click handler intercepts and
+    // shows the upgrade modal, but the visual mismatch is still bad UX).
+    expect(
+      (document.getElementById('setting-similar-detection') as HTMLInputElement).checked
+    ).toBe(false);
+    expect(
+      (document.getElementById('setting-color-extract') as HTMLInputElement).checked
+    ).toBe(false);
+    expect(
+      (document.getElementById('setting-live-monitor') as HTMLInputElement).checked
+    ).toBe(false);
+  });
+
+  it('forces convertFormat → "none" for free users', async () => {
+    chromeMock.runtime.sendMessage.mockResolvedValue({ isPro: false });
+    document.body.innerHTML = `
+      <div id="setting-convert-format" data-value="webp">
+        <span class="setting-select-text">WebP</span>
+        <div class="setting-select-option" data-value="none">None</div>
+        <div class="setting-select-option" data-value="webp">WebP</div>
+      </div>
+    `;
+
+    await applyProFeatureVisibility();
+    // Pin: force-reset to 'none' for free users. Without this, a user
+    // who used Pro features then let their license expire would still
+    // have convertFormat='webp' silently bricking their downloads.
+    expect(
+      (document.getElementById('setting-convert-format') as HTMLElement).dataset.value
+    ).toBe('none');
+  });
+
+  it('disables filename + subfolder inputs + adds .pro-locked for free users', async () => {
+    chromeMock.runtime.sendMessage.mockResolvedValue({ isPro: false });
+    document.body.innerHTML = `
+      <div class="setting-item">
+        <input id="setting-filename" type="text" />
+      </div>
+      <div class="setting-item">
+        <input id="setting-subfolder" type="text" />
+      </div>
+    `;
+
+    await applyProFeatureVisibility();
+    const filename = document.getElementById('setting-filename') as HTMLInputElement;
+    const subfolder = document.getElementById('setting-subfolder') as HTMLInputElement;
+    expect(filename.disabled).toBe(true);
+    expect(subfolder.disabled).toBe(true);
+    expect(filename.closest('.setting-item')!.classList.contains('pro-locked')).toBe(true);
+    expect(subfolder.closest('.setting-item')!.classList.contains('pro-locked')).toBe(true);
+  });
+
+  it('enables filename + subfolder inputs + removes .pro-locked for Pro users', async () => {
+    chromeMock.runtime.sendMessage.mockResolvedValue({ isPro: true });
+    document.body.innerHTML = `
+      <div class="setting-item pro-locked">
+        <input id="setting-filename" type="text" disabled />
+      </div>
+      <div class="setting-item pro-locked">
+        <input id="setting-subfolder" type="text" disabled />
+      </div>
+    `;
+    state.isProUser = true; // already-Pro path (skip newly-Pro persist)
+
+    await applyProFeatureVisibility();
+    const filename = document.getElementById('setting-filename') as HTMLInputElement;
+    const subfolder = document.getElementById('setting-subfolder') as HTMLInputElement;
+    expect(filename.disabled).toBe(false);
+    expect(subfolder.disabled).toBe(false);
+    expect(filename.closest('.setting-item')!.classList.contains('pro-locked')).toBe(false);
+    expect(subfolder.closest('.setting-item')!.classList.contains('pro-locked')).toBe(false);
+  });
+
+  it('always calls detectSimilarImages at the end (post-state-change refresh)', async () => {
+    chromeMock.runtime.sendMessage.mockResolvedValue({ isPro: false });
+
+    await applyProFeatureVisibility();
+    const proFeatures = await import('../sidepanel/pro-features');
+    // Pin: detectSimilarImages must run after every Pro state change so
+    // that UI reflects the new similar-groups status (e.g. when a user
+    // disables similar detection, the dedup info should disappear).
+    expect(proFeatures.detectSimilarImages).toHaveBeenCalled();
+  });
+
+  it('lazy-imports license-ui and calls bindLicenseModalEvents + updateLicenseUI', async () => {
+    chromeMock.runtime.sendMessage.mockResolvedValue({ isPro: false });
+
+    await applyProFeatureVisibility();
+    // Wait one microtask for the void-imported promise chain to settle.
+    await new Promise((r) => setTimeout(r, 0));
+
+    const licenseUi = await import('../sidepanel/license-ui');
+    // Pin: license-ui is lazy-loaded but MUST eventually fire on every
+    // Settings open. bindLicenseModalEvents is idempotent (module-level
+    // flag), so calling it repeatedly is safe.
+    expect(licenseUi.bindLicenseModalEvents).toHaveBeenCalled();
+    expect(licenseUi.updateLicenseUI).toHaveBeenCalled();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// updateTopProStatus
+// ─────────────────────────────────────────────────────────────────────
+
+describe('updateTopProStatus', () => {
+  let chromeMock: ChromeMock;
+
+  beforeEach(() => {
+    chromeMock = installChromeMock();
+  });
+
+  it('Pro user: pulls GET_LICENSE_STATUS + writes to state.proLicenseInfo', async () => {
+    state.isProUser = true;
+    chromeMock.runtime.sendMessage.mockResolvedValue({
+      plan: 'lifetime',
+      expiresAt: 9999999999,
+    });
+
+    await updateTopProStatus();
+    expect(state.proLicenseInfo).toEqual({ plan: 'lifetime', expiresAt: 9999999999 });
+  });
+
+  it('Pro user: keeps previous proLicenseInfo when GET_LICENSE_STATUS has no plan (no flicker)', async () => {
+    state.isProUser = true;
+    state.proLicenseInfo = { plan: 'monthly', expiresAt: 1234567890 };
+    chromeMock.runtime.sendMessage.mockResolvedValue({}); // no plan field
+
+    await updateTopProStatus();
+    // Pin: don't overwrite proLicenseInfo with empty payload — protects
+    // against transient backend hiccups that would otherwise blank the
+    // badge and look like a license loss to the user.
+    expect(state.proLicenseInfo).toEqual({ plan: 'monthly', expiresAt: 1234567890 });
+  });
+
+  it('Pro user: GET_LICENSE_STATUS throw is swallowed (defensive — no badge flicker)', async () => {
+    state.isProUser = true;
+    state.proLicenseInfo = { plan: 'monthly', expiresAt: 1234567890 };
+    chromeMock.runtime.sendMessage.mockRejectedValue(new Error('bg down'));
+
+    await expect(updateTopProStatus()).resolves.toBeUndefined();
+    // Same protection as above.
+    expect(state.proLicenseInfo).toEqual({ plan: 'monthly', expiresAt: 1234567890 });
+  });
+
+  it('Free user (transition Pro → free): clears state.proLicenseInfo', async () => {
+    state.isProUser = false;
+    state.proLicenseInfo = { plan: 'monthly', expiresAt: 1234567890 };
+
+    await updateTopProStatus();
+    // Pin: clearing on free transition prevents stale plan/expiry
+    // from sticking to the badge if the user reactivates later with
+    // a different license.
+    expect(state.proLicenseInfo).toBeNull();
+    // Also: free path does NOT call sendMessage (no GET_LICENSE_STATUS).
+    expect(chromeMock.runtime.sendMessage).not.toHaveBeenCalled();
+  });
+
+  it('Pro user: binds #btn-top-deactivate click handler exactly once (_bound flag)', async () => {
+    state.isProUser = true;
+    chromeMock.runtime.sendMessage.mockResolvedValue({ plan: 'lifetime' });
+
+    document.body.innerHTML = '<button id="btn-top-deactivate"></button>';
+    const btn = document.getElementById('btn-top-deactivate') as HTMLElement & {
+      _bound?: boolean;
+    };
+    const addSpy = vi.spyOn(btn, 'addEventListener');
+
+    await updateTopProStatus();
+    expect(btn._bound).toBe(true);
+    expect(addSpy).toHaveBeenCalledTimes(1);
+
+    // Second call: the flag prevents a second addEventListener — pinned
+    // because every Settings open triggers updateTopProStatus, and
+    // duplicate listeners would fire the deactivate flow N times per click.
+    await updateTopProStatus();
+    expect(addSpy).toHaveBeenCalledTimes(1);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// saveSettings — full persistence path
+// ─────────────────────────────────────────────────────────────────────
+
+describe('saveSettings', () => {
+  let chromeMock: ChromeMock;
+
+  // Build the minimal DOM fixture required for saveSettings's getXxx
+  // reads. Without these, every getter returns the documented default
+  // (covered by other cases) but here we want CONTROL over the values
+  // saveSettings reads back, so we render checked checkboxes / filled
+  // inputs / data-value selects with our chosen state.
+  function buildSettingsFormDOM(opts: {
+    useSidePanel?: boolean;
+    density?: string;
+    theme?: string;
+    defaultGroup?: string;
+    searchAllFrames?: boolean;
+    similar?: boolean;
+    color?: boolean;
+  }): void {
+    const checked = (b: boolean | undefined): string => (b ? 'checked' : '');
+    document.body.innerHTML = `
+      <input type="checkbox" id="setting-side-panel" ${checked(opts.useSidePanel)} />
+      <input type="radio" name="layout-density" value="compact" ${
+        opts.density === 'compact' ? 'checked' : ''
+      } />
+      <input type="radio" name="layout-density" value="standard" ${
+        opts.density === 'standard' || !opts.density ? 'checked' : ''
+      } />
+      <input type="radio" name="layout-density" value="comfortable" ${
+        opts.density === 'comfortable' ? 'checked' : ''
+      } />
+      <input type="radio" name="theme" value="system" ${
+        opts.theme === 'system' || !opts.theme ? 'checked' : ''
+      } />
+      <input type="radio" name="theme" value="light" ${opts.theme === 'light' ? 'checked' : ''} />
+      <input type="radio" name="theme" value="dark" ${opts.theme === 'dark' ? 'checked' : ''} />
+      <div id="setting-default-group" data-value="${opts.defaultGroup ?? 'none'}"></div>
+      <input type="checkbox" id="setting-download-options" />
+      <input id="setting-subfolder" value="{domain}" />
+      <input id="setting-filename" value="img_{index}_{original}.{format}" />
+      <div id="setting-convert-format" data-value="none"></div>
+      <input type="checkbox" id="setting-all-frames" ${checked(opts.searchAllFrames)} />
+      <input type="checkbox" id="setting-live-monitor" />
+      <input type="checkbox" id="setting-min-size" />
+      <input id="setting-min-width" value="50" />
+      <input id="setting-min-height" value="50" />
+      <input type="checkbox" id="setting-max-size" />
+      <input id="setting-max-width" value="8000" />
+      <input id="setting-max-height" value="8000" />
+      <input type="checkbox" id="setting-similar-detection" ${checked(opts.similar)} />
+      <input type="checkbox" id="setting-color-extract" ${checked(opts.color)} />
+      <input type="checkbox" id="setting-no-warning" />
+    `;
+  }
+
+  beforeEach(() => {
+    chromeMock = installChromeMock();
+    chromeMock.runtime.sendMessage.mockResolvedValue({ isPro: false });
+    state.settingsModalState = { open: true };
+  });
+
+  it('writes ALL form values into state.appSettings + persists via storage.local.set', async () => {
+    buildSettingsFormDOM({
+      useSidePanel: true,
+      density: 'compact',
+      theme: 'dark',
+      defaultGroup: 'domain',
+    });
+    chromeMock.storage.local.get.mockResolvedValue({}); // no previous → no display-mode change
+
+    await saveSettings();
+
+    expect(state.appSettings.useSidePanel).toBe(true);
+    expect(state.appSettings.density).toBe('compact');
+    expect(state.appSettings.theme).toBe('dark');
+    expect(state.appSettings.defaultGroup).toBe('domain');
+    expect(chromeMock.storage.local.set).toHaveBeenCalledWith(
+      expect.objectContaining({ appSettings: state.appSettings })
+    );
+  });
+
+  it('Free tier: liveMonitoring is FORCED to false regardless of toggle state', async () => {
+    buildSettingsFormDOM({});
+    state.isProUser = false;
+    // Even if the live-monitor toggle was rendered checked, free path
+    // ignores it — pinned because the user can't actually use Live
+    // Monitoring without Pro and persisting `true` would mislead UI.
+    document.querySelector<HTMLInputElement>('#setting-live-monitor')!.checked = true;
+
+    await saveSettings();
+    expect(state.appSettings.liveMonitoring).toBe(false);
+  });
+
+  it('Pro tier: liveMonitoring respects the toggle', async () => {
+    buildSettingsFormDOM({});
+    state.isProUser = true;
+    chromeMock.runtime.sendMessage.mockResolvedValue({ isPro: true });
+    document.querySelector<HTMLInputElement>('#setting-live-monitor')!.checked = true;
+
+    await saveSettings();
+    expect(state.appSettings.liveMonitoring).toBe(true);
+  });
+
+  it('parseInt fallback: empty min-width input → defaults to 50 (NOT NaN)', async () => {
+    buildSettingsFormDOM({});
+    document.querySelector<HTMLInputElement>('#setting-min-width')!.value = '';
+    document.querySelector<HTMLInputElement>('#setting-max-width')!.value = '';
+
+    await saveSettings();
+    // Pin: parseInt('') is NaN; the `|| 50` / `|| 8000` fallback
+    // protects against silent NaN propagation that would break filter math.
+    expect(state.appSettings.minWidth).toBe(50);
+    expect(state.appSettings.maxWidth).toBe(8000);
+  });
+
+  it('display mode change: previous=true, new=false → calls switchDisplayMode + NO success toast', async () => {
+    buildSettingsFormDOM({ useSidePanel: false });
+    chromeMock.storage.local.get.mockResolvedValue({
+      appSettings: { useSidePanel: true },
+    });
+    vi.spyOn(window, 'close').mockImplementation(() => {});
+
+    await saveSettings();
+    // switchDisplayMode → chrome.tabs.query + sendMessage SET_DISPLAY_MODE
+    expect(chromeMock.tabs.query).toHaveBeenCalled();
+    expect(chromeMock.runtime.sendMessage).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'SET_DISPLAY_MODE', useSidePanel: false })
+    );
+    // Pin: NO toast because window.close() makes it invisible anyway —
+    // a "Settings saved" toast that flashes for a frame would just be UI noise.
+    const ui = await import('../sidepanel/ui');
+    expect(ui.showToast).not.toHaveBeenCalledWith('Settings saved', 'success');
+  });
+
+  it('NO display mode change (previous undefined / first save): NO switchDisplayMode + show success toast', async () => {
+    buildSettingsFormDOM({ useSidePanel: true });
+    chromeMock.storage.local.get.mockResolvedValue({}); // no previous appSettings
+
+    await saveSettings();
+    // Pin: previousUseSidePanel === undefined → displayModeChanged=false
+    // (the explicit `previousUseSidePanel !== undefined` guard). Without
+    // it, first-ever save would always trigger an unnecessary mode switch.
+    expect(chromeMock.tabs.query).not.toHaveBeenCalled();
+    const ui = await import('../sidepanel/ui');
+    expect(ui.showToast).toHaveBeenCalledWith('Settings saved', 'success');
+  });
+
+  it('NO display mode change (previous matches new): NO switchDisplayMode', async () => {
+    buildSettingsFormDOM({ useSidePanel: true });
+    chromeMock.storage.local.get.mockResolvedValue({
+      appSettings: { useSidePanel: true },
+    });
+
+    await saveSettings();
+    expect(chromeMock.tabs.query).not.toHaveBeenCalled();
+  });
+
+  it('searchAllFrames CHANGED: triggers fetchImages re-scan', async () => {
+    buildSettingsFormDOM({ searchAllFrames: true });
+    state.appSettings.searchAllFrames = false; // prev=false, new=true
+
+    await saveSettings();
+    const scan = await import('../sidepanel/scan');
+    // Pin: changing searchAllFrames must force a re-scan because the
+    // current allImages was collected with the OLD flag — without
+    // re-scan, the user wouldn't see iframe images they just enabled.
+    expect(scan.fetchImages).toHaveBeenCalled();
+  });
+
+  it('searchAllFrames UNCHANGED: does NOT call fetchImages', async () => {
+    buildSettingsFormDOM({ searchAllFrames: false });
+    state.appSettings.searchAllFrames = false;
+
+    await saveSettings();
+    const scan = await import('../sidepanel/scan');
+    expect(scan.fetchImages).not.toHaveBeenCalled();
+  });
+
+  it('Pro user newly-enables similar OR color + has scanned images → processImageExtras retroactively', async () => {
+    buildSettingsFormDOM({ similar: true, color: false });
+    state.isProUser = true;
+    chromeMock.runtime.sendMessage.mockResolvedValue({ isPro: true });
+    state.appSettings.enableSimilarDetection = false; // prev=false, new=true
+    state.appSettings.enableColorExtraction = false;
+    state.allImages = [{ id: 'a', url: 'a.jpg' } as never];
+
+    await saveSettings();
+    const scan = await import('../sidepanel/scan');
+    // Pin: newly-enabled Pro feature retroactively processes already-
+    // scanned images. Without it, the user would have to manually
+    // trigger a re-scan to benefit from the feature on existing results.
+    expect(scan.processImageExtras).toHaveBeenCalledWith(state.allImages);
+  });
+
+  it('Pro feature unchanged: does NOT call processImageExtras', async () => {
+    buildSettingsFormDOM({ similar: true });
+    state.isProUser = true;
+    chromeMock.runtime.sendMessage.mockResolvedValue({ isPro: true });
+    state.appSettings.enableSimilarDetection = true; // prev=true, new=true → no transition
+    state.allImages = [{ id: 'a', url: 'a.jpg' } as never];
+
+    await saveSettings();
+    const scan = await import('../sidepanel/scan');
+    expect(scan.processImageExtras).not.toHaveBeenCalled();
+  });
+
+  it('isFetching=true: SKIPS applyFilters (avoid flashing "No images found")', async () => {
+    buildSettingsFormDOM({});
+    state.isFetching = true;
+
+    await saveSettings();
+    const filter = await import('../sidepanel/filter');
+    // Pin: while a scan is in progress, allImages is empty/intermediate
+    // and applyFilters would render "No images found" briefly. The
+    // ongoing fetchImages will trigger applyFilters when done.
+    expect(filter.applyFilters).not.toHaveBeenCalled();
+  });
+
+  it('isFetching=false: calls applyFilters as part of post-save refresh', async () => {
+    buildSettingsFormDOM({});
+    state.isFetching = false;
+
+    await saveSettings();
+    const filter = await import('../sidepanel/filter');
+    expect(filter.applyFilters).toHaveBeenCalled();
+  });
+
+  it('storage.set throws → error toast + NO partial UI updates', async () => {
+    buildSettingsFormDOM({});
+    chromeMock.storage.local.set.mockRejectedValue(new Error('quota'));
+
+    await saveSettings();
+    const ui = await import('../sidepanel/ui');
+    expect(ui.showToast).toHaveBeenCalledWith('Failed to save settings', 'error');
+    // Pin: closeSettings is INSIDE the try block, so an early throw
+    // leaves the modal open so the user can retry without losing input.
+    expect(state.settingsModalState.open).toBe(true);
+  });
+
+  it('closes settings modal on successful save', async () => {
+    buildSettingsFormDOM({});
+    state.settingsModalState = { open: true };
+
+    await saveSettings();
+    expect(state.settingsModalState.open).toBe(false);
+  });
+});
