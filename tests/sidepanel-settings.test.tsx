@@ -1461,3 +1461,87 @@ describe('saveSettings', () => {
     expect(state.settingsModalState.open).toBe(false);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────
+// toggleFilterDropdown — simplified-path coverage (jsdom doesn't compute
+// layout, so wouldOverflowRight / wouldOverflowLeft positioning is left
+// as e2e territory; here we pin the open/close state machine + special
+// color-filter renderColorSwatches call + missing-element guards)
+// ─────────────────────────────────────────────────────────────────────
+
+import { toggleFilterDropdown } from '../sidepanel/settings';
+
+describe('toggleFilterDropdown', () => {
+  beforeEach(() => {
+    installChromeMock();
+  });
+
+  it('non-existent dropdown id → no-op (no crash, no DOM mutation)', () => {
+    document.body.innerHTML = '<div class="filter-dropdown" id="filter-other"></div>';
+    expect(() => toggleFilterDropdown('does-not-exist')).not.toThrow();
+    // closeAllFilterDropdowns still ran — pinned because the close path
+    // is unconditional, ensuring stale dropdowns from a previous toggle
+    // don't linger when the user clicks an unrelated trigger.
+    expect(document.getElementById('filter-other')!.classList.contains('hidden')).toBe(true);
+  });
+
+  it('hidden dropdown becomes visible (open path)', () => {
+    document.body.innerHTML = `
+      <div class="filter-container">
+        <button class="filter-btn" data-filter="size"></button>
+        <div class="filter-dropdown hidden" id="filter-size"></div>
+      </div>
+    `;
+    toggleFilterDropdown('size');
+    // Pin: wasHidden=true → unconditional .remove('hidden') at end of fn,
+    // independent of the layout-positioning branches that jsdom can't
+    // exercise (offsetWidth/getBoundingClientRect are 0 in jsdom).
+    expect(document.getElementById('filter-size')!.classList.contains('hidden')).toBe(false);
+  });
+
+  it('visible dropdown stays closed after toggle (close path via wasHidden=false)', () => {
+    document.body.innerHTML = `
+      <div class="filter-container">
+        <button class="filter-btn" data-filter="size"></button>
+        <div class="filter-dropdown" id="filter-size"></div>
+      </div>
+    `;
+    toggleFilterDropdown('size');
+    // Pin: wasHidden=false → closeAllFilterDropdowns hides it + the
+    // post-condition 'if (dropdown && wasHidden)' branch is skipped, so
+    // the dropdown ends hidden. This is the toggle-to-close behavior.
+    expect(document.getElementById('filter-size')!.classList.contains('hidden')).toBe(true);
+  });
+
+  it('opening another dropdown closes the previously open one', () => {
+    document.body.innerHTML = `
+      <div class="filter-container">
+        <button class="filter-btn" data-filter="size"></button>
+        <div class="filter-dropdown" id="filter-size"></div>
+        <button class="filter-btn" data-filter="format"></button>
+        <div class="filter-dropdown hidden" id="filter-format"></div>
+      </div>
+    `;
+    // Pin: opening 'format' must close 'size' — only ONE dropdown
+    // visible at a time (UX contract: floating menus are mutex).
+    toggleFilterDropdown('format');
+    expect(document.getElementById('filter-size')!.classList.contains('hidden')).toBe(true);
+    expect(document.getElementById('filter-format')!.classList.contains('hidden')).toBe(false);
+  });
+
+  it("color filter type → calls renderColorSwatches before measuring (dynamic content prep)", async () => {
+    document.body.innerHTML = `
+      <div class="filter-container">
+        <button class="filter-btn" data-filter="color"></button>
+        <div class="filter-dropdown hidden" id="filter-color"></div>
+      </div>
+    `;
+    toggleFilterDropdown('color');
+    const filter = await import('../sidepanel/filter');
+    // Pin: 'color' is special — swatches are rendered lazily so the
+    // dropdown can be sized correctly. Removing this call would leave
+    // the dropdown empty on first open until something else triggers
+    // a re-render (effectively broken UX).
+    expect(filter.renderColorSwatches).toHaveBeenCalled();
+  });
+});
