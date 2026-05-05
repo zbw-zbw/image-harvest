@@ -95,7 +95,24 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: 'npm'
       - run: npm ci --legacy-peer-deps
-      - run: npm run build
+      # ANALYZE=1 emits dist/stats.html (treemap) + dist/stats.txt (per-source
+      # rendered byte breakdown). Only adds ~150 ms to the build but gives
+      # reviewers a permanent record of what's in each chunk per commit.
+      - name: Build (with bundle analyzer)
+        run: ANALYZE=1 npm run build
+      # Print the chunk size summary right in the CI log so size regressions
+      # are visible without downloading the artifact.
+      - name: Print chunk sizes
+        run: |
+          echo '### Chunk sizes' >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          ls -lh dist/assets/*.js | awk '{ printf "%-10s %s\n", $5, $9 }' >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+      # Enforce a hard size budget on the sidepanel main chunk. Failing the
+      # build forces the offending PR to either justify the regression or
+      # bump the budget intentionally — see scripts/check-bundle-size.mjs.
+      - name: Check bundle size budget
+        run: node scripts/check-bundle-size.mjs
       # The artifact lets reviewers download dist/ and sideload the extension
       # without checking out the branch locally — useful for design-review PRs.
       - name: Upload extension build
@@ -104,6 +121,17 @@ jobs:
           name: image-harvest-dist-${{ github.sha }}
           path: dist/
           retention-days: 14
+      # Bundle analyzer reports — separate artifact so reviewers can grab
+      # just the treemap without re-downloading the whole dist/.
+      - name: Upload bundle analyzer report
+        uses: actions/upload-artifact@v4
+        with:
+          name: bundle-stats-${{ github.sha }}
+          path: |
+            dist/stats.html
+            dist/stats.txt
+          if-no-files-found: warn
+          retention-days: 30
 
   e2e:
     name: E2E (Playwright)
