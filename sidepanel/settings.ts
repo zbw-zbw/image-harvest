@@ -1,6 +1,7 @@
-// Settings: Hotkey display, Settings modal, Filter dropdowns, Pro feature visibility, License UI
+// Settings: Hotkey display, Settings modal, Filter dropdowns, Pro feature visibility.
+// (License UI is lazy-loaded from ./license-ui on first Settings open.)
 
-import { MESSAGE_TYPES, PRICING_PAGE_URL } from '../shared/constants';
+import { MESSAGE_TYPES } from '../shared/constants';
 import { applyFilters, renderColorSwatches, syncCustomSizeInputsFromSettings } from './filter';
 import { detectSimilarImages } from './pro-features';
 import { fetchImages, processImageExtras } from './scan';
@@ -523,8 +524,10 @@ export async function applyProFeatureVisibility(): Promise<void> {
   // Update top Pro status area
   updateTopProStatus();
 
-  // Update License UI in settings
-  updateLicenseUI();
+  // Update License UI in settings — lazy-loaded since the License section
+  // markup only matters when the Settings modal is actually open. The
+  // import resolves off the module cache after the first call.
+  void import('./license-ui').then((mod) => mod.updateLicenseUI());
 
   // Update Live indicator and similar detection state in real-time
   updateLiveIndicator();
@@ -536,18 +539,6 @@ export async function applyProFeatureVisibility(): Promise<void> {
  * Free users see "Pro" upgrade button + expandable key input.
  * Pro users see Pro badge + plan + expiry + deactivate button.
  */
-export function formatDateYMD(dateStr: string | number): string {
-  const d = new Date(dateStr);
-  const year = d.getFullYear();
-  const month = String(d.getMonth() + 1).padStart(2, '0');
-  const day = String(d.getDate()).padStart(2, '0');
-  return `${year}/${month}/${day}`;
-}
-
-export function maskLicenseKey(key: string): string {
-  if (!key || key.length <= 8) return key || '';
-  return key.substring(0, 4) + '-****-****-' + key.substring(key.length - 4);
-}
 
 // Internal: extends HTMLElement with a one-time-bound flag
 type BoundButton = HTMLElement & { _bound?: boolean };
@@ -619,158 +610,32 @@ export function closeProUpgradeModal(): void {
 }
 
 /**
- * Update the License section UI in settings modal
+ * Bind synchronous Pro guards + the toolbar Upgrade button + ProUpgradeModal
+ * close interactions. Called once from init.ts > bindEvents.
+ *
+ * License-section events (activate / deactivate / formatter) and the
+ * activation form INSIDE the Pro Upgrade modal live in license-ui.ts and
+ * are bound lazily on the first Settings modal open. Splitting them out
+ * keeps the heavy license-management code path off the cold-start path.
  */
-export async function updateLicenseUI(): Promise<void> {
-  const inactiveSection = document.getElementById('license-inactive');
-  const activeSection = document.getElementById('license-active');
-  if (!inactiveSection || !activeSection) return;
-
-  try {
-    const info = await chrome.runtime.sendMessage({ type: MESSAGE_TYPES.GET_LICENSE_STATUS });
-
-    if (info?.hasLicense && info.status === 'active') {
-      inactiveSection.classList.add('hidden');
-      activeSection.classList.remove('hidden');
-
-      // Mask the license key: show first and last 4 chars
-      const keyMasked = document.getElementById('license-key-masked');
-      if (keyMasked && info.licenseKey) {
-        const key: string = info.licenseKey;
-        keyMasked.textContent =
-          key.length > 8
-            ? key.substring(0, 4) + '-****-****-' + key.substring(key.length - 4)
-            : key;
-      }
-
-      // Plan badge
-      const planBadge = document.getElementById('license-plan-badge');
-      if (planBadge && info.plan) {
-        const planLabels: Record<string, string> = {
-          monthly: 'Monthly',
-          yearly: 'Yearly',
-          lifetime: 'Lifetime',
-        };
-        planBadge.textContent = planLabels[info.plan] || info.plan;
-      }
-
-      // Expiry info
-      const expiresEl = document.getElementById('license-expires');
-      if (expiresEl) {
-        if (info.plan === 'lifetime') {
-          expiresEl.textContent = 'Never expires';
-        } else if (info.expiresAt) {
-          expiresEl.textContent = 'Expires: ' + formatDateYMD(info.expiresAt);
-        } else {
-          expiresEl.textContent = '';
-        }
-      }
-    } else {
-      inactiveSection.classList.remove('hidden');
-      activeSection.classList.add('hidden');
-    }
-  } catch {
-    inactiveSection.classList.remove('hidden');
-    activeSection.classList.add('hidden');
-  }
-}
-
-/**
- * Bind License UI events (called once from bindEvents)
- */
-export function bindLicenseEvents(): void {
-  // ---- Settings modal: License activation ----
-  const activateBtn = document.getElementById('btn-activate-license') as HTMLButtonElement | null;
-  const deactivateBtn = document.getElementById(
-    'btn-deactivate-license'
-  ) as HTMLButtonElement | null;
-  const licenseInput = document.getElementById('license-key-input') as HTMLInputElement | null;
-  const licenseError = document.getElementById('license-error');
-  const getProLink = document.getElementById('link-get-pro');
-
-  if (activateBtn && licenseInput) {
-    activateBtn.addEventListener('click', () =>
-      activateLicenseFromInput(licenseInput, licenseError, activateBtn)
-    );
-    bindLicenseKeyFormatter(licenseInput);
-    licenseInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') activateBtn.click();
-    });
-  }
-
-  if (deactivateBtn) {
-    deactivateBtn.addEventListener('click', async () => {
-      const confirmed = await showConfirmDialog({
-        title: 'Deactivate License',
-        message:
-          'Are you sure you want to deactivate your license on this device? You can reactivate it later.',
-        confirmText: 'Deactivate',
-        cancelText: 'Cancel',
-        type: 'danger',
-      });
-      if (!confirmed) return;
-      deactivateBtn.disabled = true;
-      deactivateBtn.textContent = 'Deactivating...';
-      try {
-        await chrome.runtime.sendMessage({ type: MESSAGE_TYPES.DEACTIVATE_LICENSE });
-        await applyProFeatureVisibility();
-        showToast('License deactivated', 'info');
-      } catch {
-        showToast('Failed to deactivate', 'error');
-      } finally {
-        deactivateBtn.disabled = false;
-        deactivateBtn.textContent = 'Deactivate';
-      }
-    });
-  }
-
-  if (getProLink) {
-    getProLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      chrome.tabs.create({ url: PRICING_PAGE_URL });
-    });
-  }
-
+export function bindProGuards(): void {
   // ---- Top toolbar: Upgrade Pro button → open modal ----
   const btnUpgradePro = document.getElementById('btn-upgrade-pro');
   if (btnUpgradePro) {
     btnUpgradePro.addEventListener('click', showProUpgradeModal);
   }
 
-  // ---- Pro Upgrade Modal events ----
+  // ---- Pro Upgrade Modal: chrome (close button + overlay) ----
+  // The activation form INSIDE the modal is bound by
+  // license-ui.ts > bindLicenseModalEvents on first Settings open.
   const proModalClose = document.getElementById('btn-pro-upgrade-close');
   if (proModalClose) {
     proModalClose.addEventListener('click', closeProUpgradeModal);
   }
-
   const proModal = document.getElementById('pro-upgrade-modal');
   if (proModal) {
     const overlay = proModal.querySelector('.modal-overlay');
     if (overlay) overlay.addEventListener('click', closeProUpgradeModal);
-  }
-
-  const proModalActivateBtn = document.getElementById(
-    'btn-pro-modal-activate'
-  ) as HTMLButtonElement | null;
-  const proModalInput = document.getElementById('pro-modal-key-input') as HTMLInputElement | null;
-  const proModalError = document.getElementById('pro-modal-error');
-  const proModalGetLink = document.getElementById('link-pro-modal-get');
-
-  if (proModalActivateBtn && proModalInput) {
-    proModalActivateBtn.addEventListener('click', () =>
-      activateLicenseFromInput(proModalInput, proModalError, proModalActivateBtn, true)
-    );
-    bindLicenseKeyFormatter(proModalInput);
-    proModalInput.addEventListener('keydown', (e) => {
-      if (e.key === 'Enter') proModalActivateBtn.click();
-    });
-  }
-
-  if (proModalGetLink) {
-    proModalGetLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      chrome.tabs.create({ url: PRICING_PAGE_URL });
-    });
   }
 
   // ---- Pro feature click interception → open upgrade modal ----
@@ -838,68 +703,7 @@ export function bindLicenseEvents(): void {
   });
 }
 
-/**
- * Shared license activation logic for both settings and modal inputs
- */
-export async function activateLicenseFromInput(
-  inputEl: HTMLInputElement,
-  errorEl: HTMLElement | null,
-  buttonEl: HTMLButtonElement,
-  closeModalOnSuccess = false
-): Promise<void> {
-  const key = inputEl.value.trim();
-  if (!key) {
-    if (errorEl) {
-      errorEl.textContent = 'Please enter a license key';
-      errorEl.classList.remove('hidden');
-    }
-    return;
-  }
-
-  const originalText = buttonEl.textContent;
-  buttonEl.disabled = true;
-  buttonEl.textContent = 'Activating...';
-  if (errorEl) errorEl.classList.add('hidden');
-
-  try {
-    const result = await chrome.runtime.sendMessage({
-      type: MESSAGE_TYPES.ACTIVATE_LICENSE,
-      licenseKey: key,
-    });
-
-    if (result?.success) {
-      inputEl.value = '';
-      if (closeModalOnSuccess) closeProUpgradeModal();
-      await applyProFeatureVisibility();
-      showToast('Pro activated successfully!', 'success');
-    } else {
-      if (errorEl) {
-        errorEl.textContent = result?.error || 'Activation failed';
-        errorEl.classList.remove('hidden');
-      }
-    }
-  } catch {
-    if (errorEl) {
-      errorEl.textContent = 'Network error. Please try again.';
-      errorEl.classList.remove('hidden');
-    }
-  } finally {
-    buttonEl.disabled = false;
-    buttonEl.textContent = originalText;
-  }
-}
-
-/**
- * Auto-format license key input (add dashes every 4 chars)
- */
-export function bindLicenseKeyFormatter(inputEl: HTMLInputElement): void {
-  inputEl.addEventListener('input', (e) => {
-    const target = e.target as HTMLInputElement;
-    const val = target.value.replace(/[^A-Za-z0-9]/g, '').toUpperCase();
-    const parts: string[] = [];
-    for (let i = 0; i < val.length && i < 16; i += 4) {
-      parts.push(val.substring(i, i + 4));
-    }
-    target.value = parts.join('-');
-  });
-}
+// activateLicenseFromInput / bindLicenseKeyFormatter / formatDateYMD /
+// maskLicenseKey have moved to ./license-ui — they're only needed when
+// the user opens Settings or the Pro Upgrade modal's activation form,
+// both of which lazy-import license-ui on demand.

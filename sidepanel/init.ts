@@ -41,7 +41,7 @@ import {
   applyDensity,
   applyProFeatureVisibility,
   applyTheme,
-  bindLicenseEvents,
+  bindProGuards,
   closeAllFilterDropdowns,
   closeSettings,
   openShortcutSettings,
@@ -1043,8 +1043,10 @@ function bindEvents(): void {
     });
   }
 
-  // License events
-  bindLicenseEvents();
+  // Pro feature click guards + Upgrade button + ProUpgradeModal close.
+  // License-section events live in ./license-ui and are bound lazily on
+  // the first Settings modal open.
+  bindProGuards();
 }
 
 // ============================================
@@ -1073,6 +1075,15 @@ declare global {
        * DOM matches real-user paths.
        */
       loadMultitab: () => Promise<typeof import('./multitab')>;
+      /**
+       * Synchronous applyTheme accessor for e2e — saves us from driving
+       * the full Settings modal → radio flip → click Save → chrome.
+       * storage.local round-trip just to verify applyTheme's contract
+       * (set/clear documentElement.dataset.theme). The Settings modal
+       * → save → applyTheme integration itself is exercised manually
+       * during dev; what we want to pin in e2e is the leaf behavior.
+       */
+      applyTheme: typeof import('./settings').applyTheme;
     };
   }
 }
@@ -1081,11 +1092,14 @@ if (typeof window !== 'undefined' && window.__IH_E2E__) {
   // Lazy-imported to avoid a circular boot-time import; both modules are
   // already in the bundle so this resolves synchronously off the module
   // cache once init runs.
-  void Promise.all([import('./state'), import('./filter')]).then(([stateMod, filterMod]) => {
-    window.__IH__ = {
-      store: stateMod.store,
-      applyFilters: filterMod.applyFilters,
-      loadMultitab: () => import('./multitab'),
-    };
-  });
+  void Promise.all([import('./state'), import('./filter'), import('./settings')]).then(
+    ([stateMod, filterMod, settingsMod]) => {
+      window.__IH__ = {
+        store: stateMod.store,
+        applyFilters: filterMod.applyFilters,
+        loadMultitab: () => import('./multitab'),
+        applyTheme: settingsMod.applyTheme,
+      };
+    }
+  );
 }
