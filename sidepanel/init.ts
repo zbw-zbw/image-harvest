@@ -1079,6 +1079,17 @@ declare global {
        * during dev; what we want to pin in e2e is the leaf behavior.
        */
       applyTheme: typeof import('./settings').applyTheme;
+      /**
+       * Direct entry into sidepanel's port message handler. Used by the
+       * live-monitor e2e to dispatch synthetic IMAGES_DISCOVERED frames
+       * without going through the real chrome.runtime + background SW
+       * fan-out (which Playwright cannot inject into). The function
+       * itself is the same one wired into uiPort.onMessage at L103, so
+       * the four guard branches (fromTabId mismatch / isTabSwitching /
+       * isSilentScanning|isFetching|isMultiTabExtracting / isScanning)
+       * exercise their production paths verbatim.
+       */
+      handleMessage: typeof import('./message').handleMessage;
     };
   }
 }
@@ -1087,14 +1098,18 @@ if (typeof window !== 'undefined' && window.__IH_E2E__) {
   // Lazy-imported to avoid a circular boot-time import; both modules are
   // already in the bundle so this resolves synchronously off the module
   // cache once init runs.
-  void Promise.all([import('./state'), import('./filter'), import('./settings')]).then(
-    ([stateMod, filterMod, settingsMod]) => {
-      window.__IH__ = {
-        store: stateMod.store,
-        applyFilters: filterMod.applyFilters,
-        loadMultitab: () => import('./multitab'),
-        applyTheme: settingsMod.applyTheme,
-      };
-    }
-  );
+  void Promise.all([
+    import('./state'),
+    import('./filter'),
+    import('./settings'),
+    import('./message'),
+  ]).then(([stateMod, filterMod, settingsMod, messageMod]) => {
+    window.__IH__ = {
+      store: stateMod.store,
+      applyFilters: filterMod.applyFilters,
+      loadMultitab: () => import('./multitab'),
+      applyTheme: settingsMod.applyTheme,
+      handleMessage: messageMod.handleMessage,
+    };
+  });
 }
