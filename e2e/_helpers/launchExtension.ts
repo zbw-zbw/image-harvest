@@ -8,7 +8,7 @@
 // http(s) — file:// pages would never get the extractor injected. We
 // therefore serve fixture HTML from a local http server (see startFixture
 // Server below) instead of using file:// URLs.
-import { chromium, type BrowserContext, type Worker } from '@playwright/test';
+import { chromium, expect, type BrowserContext, type Page, type Worker } from '@playwright/test';
 import { createServer, type Server } from 'node:http';
 import { mkdtempSync, existsSync, readFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -94,6 +94,76 @@ const MIME: Record<string, string> = {
   '.css': 'text/css; charset=utf-8',
   '.js': 'application/javascript; charset=utf-8',
 };
+
+/**
+ * Higher-level convenience wrapper used by feature tests: serves the named
+ * fixture, opens it, opens the sidepanel, waits until the sidepanel has
+ * extracted at least one image card, and returns both pages.
+ *
+ * Tests should prefer this over re-implementing the dance — it's the only
+ * sequence we've found to reliably get the content script + sidepanel into
+ * a stable "scan complete" state under Playwright. See smoke.e2e.ts for
+ * the underlying primitives.
+ */
+export interface OpenedSidepanel {
+  fixturePage: Page;
+  sidepanel: Page;
+  /** Errors captured on the sidepanel page (pageerror + console.error). */
+  sidepanelErrors: string[];
+}
+
+export interface OpenSidepanelOptions {
+  /** Fixture filename relative to e2e/fixtures/. Default: page-with-images.html. */
+  fixture?: string;
+  /** Max wait (ms) for the first image card to appear. Default: 30_000. */
+  scanTimeout?: number;
+}
+
+export async function openSidepanelWithImages(
+  context: BrowserContext,
+  fixtureServer: FixtureServer,
+  extensionId: string,
+  options: OpenSidepanelOptions = {}
+): Promise<OpenedSidepanel> {
+  const fixture = options.fixture ?? 'page-with-images.html';
+  const scanTimeout = options.scanTimeout ?? 30_000;
+  const fixturePage = await context.newPage();
+  await fixturePage.goto(`${fixtureServer.baseUrl}/${fixture}`);
+  await fixturePage.waitForLoadState('networkidle');
+  await fixturePage.bringToFront();
+
+  const sidepanel = await context.newPage();
+  const sidepanelErrors: string[] = [];
+  sidepanel.on('pageerror', (err) => sidepanelErrors.push(err.message));
+  sidepanel.on('console', (msg) => {
+    if (msg.type() === 'error') sidepanelErrors.push(`[console.error] ${msg.text()}`);
+  });
+  // Enable the e2e hook BEFORE the page's modules load — init.ts checks
+  // window.__IH_E2E__ inside its top-level guard and only then attaches
+  // the window.__IH__ accessors that drive deterministic test scenarios.
+  await sidepanel.addInitScript(() => {
+    (window as unknown as { __IH_E2E__?: boolean }).__IH_E2E__ = true;
+  });
+  await sidepanel.goto(extensionUrl(extensionId, 'pages/sidepanel.html'));
+
+  // Re-focus fixture so chrome.tabs.query({active:true, currentWindow:true})
+  // resolves to it (and not the chrome-extension:// sidepanel tab).
+  await fixturePage.bringToFront();
+
+  // Wait for the first real <ImageCard> to land. The sidepanel renders
+  // skeleton cards first; the .image-card class only attaches to real ones.
+  await expect
+    .poll(
+      async () => {
+        if (sidepanel.isClosed()) return -1;
+        return sidepanel.locator('#image-grid .image-card').count();
+      },
+      { timeout: scanTimeout, intervals: [500, 1000, 2000] }
+    )
+    .toBeGreaterThan(0);
+
+  return { fixturePage, sidepanel, sidepanelErrors };
+}
 
 export function startFixtureServer(): Promise<FixtureServer> {
   return new Promise((resolveStart, rejectStart) => {

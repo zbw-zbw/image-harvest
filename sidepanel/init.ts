@@ -1051,3 +1051,28 @@ function bindEvents(): void {
 // Initialize
 // ============================================
 document.addEventListener('DOMContentLoaded', init);
+
+// ── E2E test hooks ──────────────────────────────────────────────────────────
+// Playwright's addInitScript runs before any module on the page evaluates,
+// so it can set this flag synchronously. We expose the store + filter API
+// on a clearly-namespaced global so e2e tests can drive deterministic state
+// transitions without clicking through 4-deep dropdown menus. No-op in
+// production (the flag is never set by any real user code).
+declare global {
+  interface Window {
+    __IH_E2E__?: boolean;
+    __IH__?: {
+      store: typeof import('./state').store;
+      applyFilters: typeof import('./filter').applyFilters;
+    };
+  }
+}
+
+if (typeof window !== 'undefined' && window.__IH_E2E__) {
+  // Lazy-imported to avoid a circular boot-time import; both modules are
+  // already in the bundle so this resolves synchronously off the module
+  // cache once init runs.
+  void Promise.all([import('./state'), import('./filter')]).then(([stateMod, filterMod]) => {
+    window.__IH__ = { store: stateMod.store, applyFilters: filterMod.applyFilters };
+  });
+}

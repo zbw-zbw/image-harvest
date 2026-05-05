@@ -37,52 +37,70 @@
     <p>This page contains several representative image scenarios.</p>
 
     <div class="grid">
-      <!-- Scenario 1: standard <img> with PNG-style data URL (red square) -->
+      <!-- Each <img> uses a different intrinsic width/height so size-asc vs
+           size-desc give a strict, deterministic reordering — important for
+           the e2e sort test. Sizes: 60, 90, 120, 150, 180. -->
+      <!-- Scenario 1: smallest red square (60×60) -->
       <div>
         <img
           alt="red square"
-          width="120"
-          height="120"
-          src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22120%22%20height%3D%22120%22%3E%3Crect%20width%3D%22120%22%20height%3D%22120%22%20fill%3D%22%23e74c3c%22%2F%3E%3C%2Fsvg%3E"
+          width="60"
+          height="60"
+          src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2260%22%20height%3D%2260%22%3E%3Crect%20width%3D%2260%22%20height%3D%2260%22%20fill%3D%22%23e74c3c%22%2F%3E%3C%2Fsvg%3E"
         />
-        <div>img tag (SVG data URL)</div>
+        <div>img tag (60)</div>
       </div>
 
-      <!-- Scenario 2: standard <img> with a JPEG-shaped data URL (blue square) -->
+      <!-- Scenario 2: blue square (90×90) -->
       <div>
         <img
           alt="blue square"
-          width="120"
-          height="120"
-          src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22120%22%20height%3D%22120%22%3E%3Crect%20width%3D%22120%22%20height%3D%22120%22%20fill%3D%22%233498db%22%2F%3E%3C%2Fsvg%3E"
+          width="90"
+          height="90"
+          src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2290%22%20height%3D%2290%22%3E%3Crect%20width%3D%2290%22%20height%3D%2290%22%20fill%3D%22%233498db%22%2F%3E%3C%2Fsvg%3E"
         />
-        <div>img tag (blue)</div>
+        <div>img tag (90)</div>
       </div>
 
-      <!-- Scenario 3: CSS background-image -->
+      <!-- Scenario 3: CSS background-image (extracted as 200×120 separate
+           image — kept for the smoke test's "scan finds N>0" coverage but
+           not relied on for ordering since CSS bg ordering is unstable). -->
       <div>
         <div class="bg-tile" role="img" aria-label="gold background"></div>
         <div>CSS background-image</div>
       </div>
 
-      <!-- Scenario 4: inline SVG element -->
+      <!-- Scenario 4: green square (120×120) -->
       <div>
-        <svg width="120" height="120" viewBox="0 0 120 120">
-          <rect width="120" height="120" fill="#27ae60" />
-          <text x="60" y="65" text-anchor="middle" fill="#fff" font-size="14">SVG</text>
-        </svg>
-        <div>inline SVG</div>
+        <img
+          alt="green square"
+          width="120"
+          height="120"
+          src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22120%22%20height%3D%22120%22%3E%3Crect%20width%3D%22120%22%20height%3D%22120%22%20fill%3D%22%2327ae60%22%2F%3E%3C%2Fsvg%3E"
+        />
+        <div>img tag (120)</div>
       </div>
 
-      <!-- Scenario 5: another <img> to ensure count > 1 reliably -->
+      <!-- Scenario 5: purple square (150×150) -->
       <div>
         <img
           alt="purple square"
-          width="120"
-          height="120"
-          src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22120%22%20height%3D%22120%22%3E%3Crect%20width%3D%22120%22%20height%3D%22120%22%20fill%3D%22%239b59b6%22%2F%3E%3C%2Fsvg%3E"
+          width="150"
+          height="150"
+          src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22150%22%20height%3D%22150%22%3E%3Crect%20width%3D%22150%22%20height%3D%22150%22%20fill%3D%22%239b59b6%22%2F%3E%3C%2Fsvg%3E"
         />
-        <div>img tag (purple)</div>
+        <div>img tag (150)</div>
+      </div>
+
+      <!-- Scenario 6: largest orange square (180×180) -->
+      <div>
+        <img
+          alt="orange square"
+          width="180"
+          height="180"
+          src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22180%22%20height%3D%22180%22%3E%3Crect%20width%3D%22180%22%20height%3D%22180%22%20fill%3D%22%23e67e22%22%2F%3E%3C%2Fsvg%3E"
+        />
+        <div>img tag (180)</div>
       </div>
     </div>
   </body>
