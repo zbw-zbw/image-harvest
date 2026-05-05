@@ -112,10 +112,25 @@ export function closeDedupModal(): void {
  * unconditionally, and produced surprising silent redirects to the
  * upgrade modal — see ImageCard.handleDelete which originally awaited
  * the confirm dialog and only then discovered the action would not run.
+ *
+ * Implementation note: state is a Proxy that only traps property
+ * assignments — calling `state.selectedImages.delete(id)` mutates the
+ * Set in place and never reaches the trap, so selector subscribers
+ * watching `s.selectedImages.size` (StatusCounts.DownloadLabel) would
+ * silently go stale after deleting a selected image. Reassigning
+ * `state.selectedImages = new Set(...)` goes through the trap and
+ * fires notifySelectors so the "Download (N)" label re-renders. We
+ * only allocate when the deleted image was actually selected; in the
+ * common case (deleting an un-selected image) the Set reference is
+ * left untouched.
  */
 export function removeImageById(imageId: string): void {
   state.allImages = state.allImages.filter((img) => img.id !== imageId);
-  state.selectedImages.delete(imageId);
+  if (state.selectedImages.has(imageId)) {
+    const next = new Set(state.selectedImages);
+    next.delete(imageId);
+    state.selectedImages = next;
+  }
   applyFilters();
   detectSimilarImages();
   showToast('Image removed', 'success');

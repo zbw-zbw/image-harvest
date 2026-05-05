@@ -161,3 +161,55 @@ describe('reset', () => {
     expect(spy).toHaveBeenCalledWith(false, true);
   });
 });
+
+// Regression net for the bug where pro-features.removeImageById used
+// state.selectedImages.delete(id) — Set's mutating methods bypass the
+// Proxy trap, so selector subscribers watching s.selectedImages.size
+// (StatusCounts.DownloadLabel) silently went stale after deleting a
+// selected image. The fix reassigns the Set so the trap fires.
+//
+// We import removeImageById dynamically AFTER store.reset so the
+// module's static dependencies (applyFilters, detectSimilarImages,
+// showToast) read the freshly-reset state.
+describe('removeImageById — Proxy notification (regression)', () => {
+  it('notifies selectedImages.size subscribers when a selected image is removed', async () => {
+    const { removeImageById } = await import('../sidepanel/pro-features');
+
+    state.allImages = [
+      { id: 'img-1', url: 'https://example.com/a.png' } as never,
+      { id: 'img-2', url: 'https://example.com/b.png' } as never,
+    ];
+    state.selectedImages = new Set(['img-1', 'img-2']);
+    state.isProUser = true; // not strictly required after the Pro-guard hoist
+
+    const sizeSpy = vi.fn();
+    store.subscribeSelector((s) => s.selectedImages.size, sizeSpy);
+
+    removeImageById('img-1');
+
+    expect(state.selectedImages.has('img-1')).toBe(false);
+    expect(state.selectedImages.size).toBe(1);
+    expect(sizeSpy).toHaveBeenCalledTimes(1);
+    expect(sizeSpy).toHaveBeenCalledWith(1, 2);
+  });
+
+  it('does NOT reallocate selectedImages when removing an un-selected image', async () => {
+    const { removeImageById } = await import('../sidepanel/pro-features');
+
+    state.allImages = [
+      { id: 'img-1', url: 'https://example.com/a.png' } as never,
+      { id: 'img-2', url: 'https://example.com/b.png' } as never,
+    ];
+    const originalSet = new Set(['img-2']);
+    state.selectedImages = originalSet;
+
+    const sizeSpy = vi.fn();
+    store.subscribeSelector((s) => s.selectedImages.size, sizeSpy);
+
+    removeImageById('img-1'); // not in the selection
+
+    // Reference identity preserved — no needless re-render churn.
+    expect(state.selectedImages).toBe(originalSet);
+    expect(sizeSpy).not.toHaveBeenCalled();
+  });
+});
