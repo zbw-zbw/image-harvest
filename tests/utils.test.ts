@@ -302,3 +302,105 @@ describe('deepMerge', () => {
     expect(deepMerge({ list: [1, 2] }, { list: [3] })).toEqual({ list: [3] });
   });
 });
+
+// ── Gap-fill round (extra coverage for previously-missed branches) ──────────
+
+describe('generateFilename — extension fallback', () => {
+  it('falls back to "unknown" extension when neither format nor URL extension is available', () => {
+    // shared/utils L250-255: ext = format || getFileFormat(url).
+    // getFileFormat returns "unknown" for URLs without an image
+    // extension AND no content-type — the resulting filename ends
+    // with ".unknown", documenting an edge case downloaders should
+    // probably guard against.
+    const name = generateFilename('https://x.com/page', 0);
+    expect(name).toMatch(/^image_\d{8}_001\.unknown$/);
+  });
+
+  it('preserves zero-based index padding for index >= 99', () => {
+    expect(generateFilename('https://x.com/a.png', 99, 'png')).toMatch(/_100\.png$/);
+    expect(generateFilename('https://x.com/a.png', 998, 'png')).toMatch(/_999\.png$/);
+  });
+
+  it('does not zero-pad beyond 3 digits for 4+ digit indices', () => {
+    expect(generateFilename('https://x.com/a.png', 9999, 'png')).toMatch(/_10000\.png$/);
+  });
+});
+
+describe('isImageDataUri — extra MIME variants', () => {
+  it('accepts SVG, AVIF, HEIF, BMP, ICO data URIs (all "image/*" prefixed)', () => {
+    expect(isImageDataUri('data:image/svg+xml;utf8,<svg/>')).toBe(true);
+    expect(isImageDataUri('data:image/avif;base64,abc')).toBe(true);
+    expect(isImageDataUri('data:image/heif;base64,abc')).toBe(true);
+    expect(isImageDataUri('data:image/bmp;base64,abc')).toBe(true);
+    expect(isImageDataUri('data:image/x-icon;base64,abc')).toBe(true);
+    expect(isImageDataUri('data:image/vnd.microsoft.icon;base64,abc')).toBe(true);
+  });
+
+  it('is case-insensitive on the IMAGE/ prefix (but the data: scheme itself is strict-lowercase)', () => {
+    // shared/utils L131: isDataUri uses startsWith('data:') — the
+    // `data:` scheme matcher is strict-lowercase. The `image/` part
+    // however goes through a /^data:image\//i regex, so the MIME
+    // half is genuinely case-insensitive.
+    expect(isImageDataUri('data:IMAGE/PNG;base64,abc')).toBe(true);
+    expect(isImageDataUri('data:Image/Png;base64,abc')).toBe(true);
+    // Capitalized scheme is rejected — pin the contract so a future
+    // refactor that makes the scheme matcher loose surfaces here.
+    expect(isImageDataUri('Data:image/png;base64,abc')).toBe(false);
+  });
+
+  it('rejects non-image data URIs with similar prefixes', () => {
+    expect(isImageDataUri('data:text/html,<img/>')).toBe(false);
+    expect(isImageDataUri('data:application/octet-stream;base64,abc')).toBe(false);
+    // No "image/" prefix even though the URL contains "image"
+    expect(isImageDataUri('data:text/plain,image/png')).toBe(false);
+  });
+});
+
+describe('getDataUriFormat — extra MIME variants', () => {
+  it('maps SVG, AVIF, BMP, ICO, TIFF correctly', () => {
+    expect(getDataUriFormat('data:image/svg+xml;utf8,<svg/>')).toBe('svg');
+    expect(getDataUriFormat('data:image/bmp;base64,abc')).toBe('bmp');
+    expect(getDataUriFormat('data:image/avif;base64,abc')).toBe('avif');
+    expect(getDataUriFormat('data:image/tiff;base64,abc')).toBe('tiff');
+    expect(getDataUriFormat('data:image/x-icon;base64,abc')).toBe('ico');
+    expect(getDataUriFormat('data:image/vnd.microsoft.icon;base64,abc')).toBe('ico');
+  });
+
+  it('treats apng as png (animated PNG shares the decoder)', () => {
+    expect(getDataUriFormat('data:image/apng;base64,abc')).toBe('png');
+  });
+});
+
+describe('extractBackgroundUrls — quote and whitespace variants', () => {
+  it('handles double-quoted, single-quoted, and unquoted url() forms in one value', () => {
+    // shared/utils L188-200: regex /url\(['"]?([^'")]+)['"]?\)/g.
+    const css = 'url("a.png"), url(\'b.jpg\'), url(c.gif)';
+    expect(extractBackgroundUrls(css)).toEqual(['a.png', 'b.jpg', 'c.gif']);
+  });
+
+  it('extracts http(s) urls with query strings + fragments untouched', () => {
+    const css = "url('https://cdn.example.com/x.png?v=1#frag')";
+    expect(extractBackgroundUrls(css)).toEqual(['https://cdn.example.com/x.png?v=1#frag']);
+  });
+
+  it('strips data: URIs out of url() containers same as any other URL', () => {
+    const css = 'url(data:image/png;base64,iVBORw0)';
+    expect(extractBackgroundUrls(css)).toEqual(['data:image/png;base64,iVBORw0']);
+  });
+
+  it('returns an empty array for the literal string "none" (CSS keyword)', () => {
+    expect(extractBackgroundUrls('none')).toEqual([]);
+  });
+
+  it('returns an empty array for whitespace-only input (still falsy-after-trim is not a guard, just no matches)', () => {
+    // shared/utils L189: only !cssValue || cssValue === 'none' bail
+    // out — pure whitespace would fall through to the regex and just
+    // return [] because there's no url() to match.
+    expect(extractBackgroundUrls('   ')).toEqual([]);
+  });
+
+  it('coexists with linear-gradient — extracts only the url() portion', () => {
+    const css = 'linear-gradient(red, blue), url("hero.png")';
+    expect(extractBackgroundUrls(css)).toEqual(['hero.png']);
+  });
+});
