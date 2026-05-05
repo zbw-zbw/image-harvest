@@ -1,13 +1,18 @@
 # CI for Image Harvest
 #
-# Four lightweight jobs run in parallel on every push/PR. Each one is small
-# enough that splitting them gives faster feedback than a single mega-job:
+# Five jobs run on every push/PR. Each one is small enough that splitting
+# them gives faster feedback than a single mega-job:
 #   - lint:       eslint over the whole tree (fast, no compile)
 #   - typecheck:  tsc --noEmit (catches the most regressions, run alone so
 #                 the log is easy to read)
 #   - test:       vitest unit suite + coverage
 #   - build:      vite build, plus uploads dist/ as an artifact so reviewers
 #                 can sideload the unpacked extension into Chrome.
+#   - e2e:        Playwright smoke tests against a real Chromium with the
+#                 unpacked extension loaded. Depends on `build` because the
+#                 extension is loaded from dist/. Headed Chromium is run
+#                 under xvfb-run because MV3 service workers don't init in
+#                 headless-shell.
 #
 # `npm ci --legacy-peer-deps` mirrors what we do locally — @crxjs/vite-plugin
 # (beta) declares a peer dep range Vite 5 doesn't satisfy, but the runtime
@@ -98,4 +103,41 @@ jobs:
         with:
           name: image-harvest-dist-${{ github.sha }}
           path: dist/
+          retention-days: 14
+
+  e2e:
+    name: E2E (Playwright)
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - run: npm ci --legacy-peer-deps
+      # Re-run the build inside this job so dist/ is local. Cheaper than
+      # downloading the artifact from the build job and unpacking it.
+      - run: npm run build
+      # `playwright install --with-deps` pulls Chromium + the system libs
+      # (libnss3, libatk, etc) needed for headed mode. xvfb is not part of
+      # --with-deps, so we install it explicitly.
+      - name: Install Playwright + xvfb
+        run: |
+          npx playwright install --with-deps chromium
+          sudo apt-get update
+          sudo apt-get install -y xvfb
+      # MV3 service workers won't initialize in headless-shell — wrap the
+      # whole run in xvfb-run so headed Chromium gets a virtual display.
+      - name: Run Playwright smoke tests
+        run: xvfb-run --auto-servernum npm run test:e2e
+      - name: Upload Playwright report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-${{ github.sha }}
+          path: |
+            playwright-report/
+            test-results/
+          if-no-files-found: ignore
           retention-days: 14

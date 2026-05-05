@@ -15,6 +15,11 @@ dist/
 # Release artifacts (produced by `npm run zip` or the release workflow)
 image-harvest-v*.zip
 
+# Playwright e2e artifacts
+/test-results/
+/playwright-report/
+/.playwright-user-data/
+
 # Temporary files
 *.tmp
 *.swp

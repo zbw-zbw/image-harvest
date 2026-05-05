@@ -21,7 +21,9 @@
     "zip": "npm run build && node scripts/zip-extension.mjs",
     "release:patch": "npm version patch && git push --follow-tags",
     "release:minor": "npm version minor && git push --follow-tags",
-    "release:major": "npm version major && git push --follow-tags"
+    "release:major": "npm version major && git push --follow-tags",
+    "test:e2e": "playwright test",
+    "test:e2e:ui": "playwright test --ui"
   },
   "lint-staged": {
     "*.{ts,js,mjs,cjs}": [
@@ -40,6 +42,7 @@
   "devDependencies": {
     "@crxjs/vite-plugin": "2.0.0-beta.25",
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.59.1",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/preact": "^3.2.4",
     "@types/chrome": "^0.0.270",
