@@ -24,9 +24,6 @@ import {
 import { mountPreactComponents } from './components/mount';
 import { handleKeyDown, handleMessage } from './message';
 import {
-  closeCollectionModal,
-  closeDedupModal,
-  closeMultiTabModal,
   exportCollection,
   removeDuplicates,
   showCollectionModal,
@@ -56,12 +53,10 @@ import {
 import { clearTabImageCache, getTabImageCache, saveTabImageCache } from '../shared/storage';
 import { elements, state } from './state';
 import {
-  checkNarrowMode,
   handleProgressClose,
   hideLoading,
   hideRestricted,
   initResizeObserver,
-  showError,
   showLoading,
   showRestricted,
   showToast,

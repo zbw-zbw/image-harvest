@@ -1,7 +1,6 @@
 // Content Script Live Monitoring Module
 // Handles real-time image discovery via MutationObserver
 
-import { MESSAGE_TYPES } from '../shared/constants';
 import {
   generateId,
   resolveUrl,
