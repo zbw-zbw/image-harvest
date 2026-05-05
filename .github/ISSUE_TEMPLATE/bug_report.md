@@ -1,7 +1,7 @@
 ---
 name: 🐛 Bug Report
 about: Something isn't working as expected
-title: "[Bug] "
+title: '[Bug] '
 labels: bug
 assignees: zbw-zbw
 ---
@@ -27,13 +27,13 @@ What actually happened. Screenshots or a short screen recording (GIF) are very h
 
 ## Environment
 
-| | |
-|---|---|
-| **Image Harvest version** | e.g. 1.0.1 (see `chrome://extensions/`) |
-| **Chrome version** | e.g. 125.0.6422.112 (see `chrome://version/`) |
-| **Operating System** | e.g. macOS 14.5 / Windows 11 / Ubuntu 22.04 |
-| **Display mode** | Side Panel / Popup |
-| **Pro user?** | Yes / No |
+|                           |                                               |
+| ------------------------- | --------------------------------------------- |
+| **Image Harvest version** | e.g. 1.0.1 (see `chrome://extensions/`)       |
+| **Chrome version**        | e.g. 125.0.6422.112 (see `chrome://version/`) |
+| **Operating System**      | e.g. macOS 14.5 / Windows 11 / Ubuntu 22.04   |
+| **Display mode**          | Side Panel / Popup                            |
+| **Pro user?**             | Yes / No                                      |
 
 ## Target Website
 

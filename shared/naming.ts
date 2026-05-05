@@ -42,7 +42,7 @@ export function buildVariables(options: NamingVariableInput): NamingVariables {
     height = 0,
     format = '',
     date = '',
-    timestamp = 0
+    timestamp = 0,
   } = options;
 
   const originalName = getOriginalName(url);
@@ -59,7 +59,7 @@ export function buildVariables(options: NamingVariableInput): NamingVariables {
     timestamp: String(timestamp),
     year: date ? date.substring(0, 4) : '',
     month: date ? date.substring(5, 7) : '',
-    day: date ? date.substring(8, 10) : ''
+    day: date ? date.substring(8, 10) : '',
   };
 }
 

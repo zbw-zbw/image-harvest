@@ -90,7 +90,7 @@
 }
 
 .download-group .btn-dropdown-toggle {
-  border-left: 1px solid rgba(255,255,255,0.3);
+  border-left: 1px solid rgba(255, 255, 255, 0.3);
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   padding: 5px 8px;
@@ -177,7 +177,10 @@
   opacity: 1;
   transform: translateY(0) scale(1);
   transform-origin: bottom right;
-  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease,
+    visibility 0.15s;
   visibility: visible;
 }
 
@@ -372,7 +375,10 @@
   opacity: 1;
   transform: translateY(0) scale(1);
   transform-origin: top left;
-  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease,
+    visibility 0.15s;
   visibility: visible;
 }
 
@@ -440,7 +446,7 @@
   gap: 8px;
 }
 
-.filter-custom input[type="number"] {
+.filter-custom input[type='number'] {
   width: 70px;
   padding: 4px 8px;
   font-size: 11px;
@@ -451,7 +457,7 @@
   transition: border-color 0.2s;
 }
 
-.filter-custom input[type="number"]:focus {
+.filter-custom input[type='number']:focus {
   outline: none;
   border-color: var(--primary-color);
 }
@@ -482,7 +488,7 @@
   min-width: 32px;
 }
 
-.filter-custom-row input[type="number"] {
+.filter-custom-row input[type='number'] {
   width: 60px;
   padding: 4px 6px;
   font-size: 11px;
@@ -493,12 +499,12 @@
   transition: border-color 0.2s;
 }
 
-.filter-custom-row input[type="number"]:focus {
+.filter-custom-row input[type='number']:focus {
   outline: none;
   border-color: var(--primary-color);
 }
 
-.filter-custom-row input[type="number"]::placeholder {
+.filter-custom-row input[type='number']::placeholder {
   color: var(--text-tertiary);
 }
 
@@ -520,7 +526,7 @@
   background: var(--bg-secondary);
 }
 
-.filter-dropdown .checkbox-label input[type="checkbox"] {
+.filter-dropdown .checkbox-label input[type='checkbox'] {
   display: none;
 }
 
@@ -541,18 +547,18 @@
   display: none;
 }
 
-.filter-dropdown .checkbox-label input[type="checkbox"]:checked + .filter-checkbox {
+.filter-dropdown .checkbox-label input[type='checkbox']:checked + .filter-checkbox {
   background: var(--primary-color);
   border-color: var(--primary-color);
 }
 
-.filter-dropdown .checkbox-label input[type="checkbox"]:checked + .filter-checkbox .check-icon {
+.filter-dropdown .checkbox-label input[type='checkbox']:checked + .filter-checkbox .check-icon {
   display: block;
   color: white;
 }
 
 /* URL filter input inside dropdown */
-.filter-dropdown input[type="text"] {
+.filter-dropdown input[type='text'] {
   width: calc(100% - 8px);
   padding: 7px 10px;
   font-size: 12px;
@@ -570,7 +576,7 @@
   min-width: 200px;
 }
 
-.filter-dropdown input[type="text"]:focus {
+.filter-dropdown input[type='text']:focus {
   outline: none;
   border-color: var(--primary-color);
 }

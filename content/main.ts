@@ -11,7 +11,7 @@ import {
   isImageDataUri,
   generateDataUriKey,
   extractBackgroundUrls,
-  isGradient
+  isGradient,
 } from '../shared/utils';
 import type { ImageItem } from '../shared/types';
 import { state, isExtensionContextValid } from './state';
@@ -24,7 +24,7 @@ import {
   extractObjectEmbedImages,
   extractMetaAndLinkImages,
   extractCssContentImages,
-  extractLazyLoadImages
+  extractLazyLoadImages,
 } from './extract-advanced';
 import { extractFromShadowDom, extractFromIframes } from './shadow-iframe';
 import {
@@ -32,7 +32,7 @@ import {
   removeSingleHighlight,
   syncHighlights,
   removeAllHighlights,
-  removeFAB
+  removeFAB,
 } from './highlight';
 import { startLiveMonitoring, stopLiveMonitoring } from './monitor';
 
@@ -66,7 +66,9 @@ async function handleMessage(
       break;
 
     case MESSAGE_TYPES.EXTRACT_IMAGES: {
-      const images = await extractImages({ skipIframes: message.skipIframes as boolean | undefined });
+      const images = await extractImages({
+        skipIframes: message.skipIframes as boolean | undefined,
+      });
       sendResponse({ success: true, images });
       break;
     }
@@ -238,7 +240,7 @@ async function extractImgTags(images: Map<string, ImageItem>): Promise<void> {
             format: getFileFormat(url),
             sourceDomain: window.location.hostname,
             checked: false,
-            timestamp: Date.now()
+            timestamp: Date.now(),
           } as ImageItem;
           images.set(dataKey, item);
           sendDiscoveredImages([item]);
@@ -260,7 +262,7 @@ async function extractImgTags(images: Map<string, ImageItem>): Promise<void> {
           format: getFileFormat(resolvedUrl),
           sourceDomain: getDomain(resolvedUrl),
           checked: false,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         } as ImageItem;
 
         images.set(resolvedUrl, item);
@@ -311,7 +313,7 @@ async function extractBackgroundImages(images: Map<string, ImageItem>): Promise<
             format: getFileFormat(url),
             sourceDomain: window.location.hostname,
             checked: false,
-            timestamp: Date.now()
+            timestamp: Date.now(),
           } as ImageItem);
           continue;
         }
@@ -322,7 +324,8 @@ async function extractBackgroundImages(images: Map<string, ImageItem>): Promise<
           const existing = images.get(resolvedUrl);
           if (existing) {
             const rect = el.getBoundingClientRect();
-            if (rect.width * rect.height > existing.displayWidth * existing.displayHeight) {
+            const existingArea = (existing.displayWidth ?? 0) * (existing.displayHeight ?? 0);
+            if (rect.width * rect.height > existingArea) {
               existing.displayWidth = Math.round(rect.width);
               existing.displayHeight = Math.round(rect.height);
             }
@@ -342,7 +345,7 @@ async function extractBackgroundImages(images: Map<string, ImageItem>): Promise<
           format: getFileFormat(resolvedUrl),
           sourceDomain: getDomain(resolvedUrl),
           checked: false,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         } as ImageItem;
 
         images.set(resolvedUrl, item);
@@ -395,7 +398,7 @@ async function extractPictureSources(images: Map<string, ImageItem>): Promise<vo
             format: getFileFormat(url),
             sourceDomain: window.location.hostname,
             checked: false,
-            timestamp: Date.now()
+            timestamp: Date.now(),
           } as ImageItem);
           continue;
         }
@@ -415,7 +418,7 @@ async function extractPictureSources(images: Map<string, ImageItem>): Promise<vo
           format: getFileFormat(resolvedUrl),
           sourceDomain: getDomain(resolvedUrl),
           checked: false,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         } as ImageItem;
 
         images.set(resolvedUrl, item);

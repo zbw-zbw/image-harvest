@@ -10,7 +10,7 @@ import {
   isImageDataUri,
   generateDataUriKey,
   extractBackgroundUrls,
-  isGradient
+  isGradient,
 } from '../shared/utils';
 import type { ImageItem } from '../shared/types';
 import { state } from './state';
@@ -43,7 +43,10 @@ export function collectShadowRoots(root: Document | ShadowRoot = document): Shad
 /**
  * querySelectorAll that also searches inside Shadow DOM trees.
  */
-export function querySelectorAllDeep(selector: string, root: Document | ShadowRoot = document): Element[] {
+export function querySelectorAllDeep(
+  selector: string,
+  root: Document | ShadowRoot = document
+): Element[] {
   const results: Element[] = Array.from(root.querySelectorAll(selector));
   const shadowRoots = collectShadowRoots(root);
   for (const shadowRoot of shadowRoots) {
@@ -86,13 +89,17 @@ export async function extractFromShadowDom(images: Map<string, ImageItem>): Prom
             if (state.seenUrls.has(dataKey)) continue;
             state.seenUrls.add(dataKey);
             images.set(dataKey, {
-              id: generateId(dataKey), url,
+              id: generateId(dataKey),
+              url,
               displayWidth: img.naturalWidth || img.width || 0,
               displayHeight: img.naturalHeight || img.height || 0,
-              naturalWidth: img.naturalWidth, naturalHeight: img.naturalHeight,
-              type: 'img', format: getFileFormat(url),
+              naturalWidth: img.naturalWidth,
+              naturalHeight: img.naturalHeight,
+              type: 'img',
+              format: getFileFormat(url),
               sourceDomain: window.location.hostname,
-              checked: false, timestamp: Date.now()
+              checked: false,
+              timestamp: Date.now(),
             } as ImageItem);
             continue;
           }
@@ -100,16 +107,22 @@ export async function extractFromShadowDom(images: Map<string, ImageItem>): Prom
           if (state.seenUrls.has(resolvedUrl)) continue;
           state.seenUrls.add(resolvedUrl);
           images.set(resolvedUrl, {
-            id: generateId(resolvedUrl), url: resolvedUrl,
+            id: generateId(resolvedUrl),
+            url: resolvedUrl,
             displayWidth: img.naturalWidth || img.width || 0,
             displayHeight: img.naturalHeight || img.height || 0,
-            naturalWidth: img.naturalWidth, naturalHeight: img.naturalHeight,
-            type: 'img', format: getFileFormat(resolvedUrl),
+            naturalWidth: img.naturalWidth,
+            naturalHeight: img.naturalHeight,
+            type: 'img',
+            format: getFileFormat(resolvedUrl),
             sourceDomain: getDomain(resolvedUrl),
-            checked: false, timestamp: Date.now()
+            checked: false,
+            timestamp: Date.now(),
           } as ImageItem);
         }
-      } catch { /* skip */ }
+      } catch {
+        /* skip */
+      }
     }
 
     // Extract background images from shadow DOM
@@ -130,11 +143,15 @@ export async function extractFromShadowDom(images: Map<string, ImageItem>): Prom
             state.seenUrls.add(dataKey);
             const rect = els[i].getBoundingClientRect();
             images.set(dataKey, {
-              id: generateId(dataKey), url,
-              displayWidth: Math.round(rect.width), displayHeight: Math.round(rect.height),
-              type: 'bg', format: getFileFormat(url),
+              id: generateId(dataKey),
+              url,
+              displayWidth: Math.round(rect.width),
+              displayHeight: Math.round(rect.height),
+              type: 'bg',
+              format: getFileFormat(url),
               sourceDomain: window.location.hostname,
-              checked: false, timestamp: Date.now()
+              checked: false,
+              timestamp: Date.now(),
             } as ImageItem);
             continue;
           }
@@ -143,14 +160,20 @@ export async function extractFromShadowDom(images: Map<string, ImageItem>): Prom
           state.seenUrls.add(resolvedUrl);
           const rect = els[i].getBoundingClientRect();
           images.set(resolvedUrl, {
-            id: generateId(resolvedUrl), url: resolvedUrl,
-            displayWidth: Math.round(rect.width), displayHeight: Math.round(rect.height),
-            type: 'bg', format: getFileFormat(resolvedUrl),
+            id: generateId(resolvedUrl),
+            url: resolvedUrl,
+            displayWidth: Math.round(rect.width),
+            displayHeight: Math.round(rect.height),
+            type: 'bg',
+            format: getFileFormat(resolvedUrl),
             sourceDomain: getDomain(resolvedUrl),
-            checked: false, timestamp: Date.now()
+            checked: false,
+            timestamp: Date.now(),
           } as ImageItem);
         }
-      } catch { /* skip */ }
+      } catch {
+        /* skip */
+      }
     }
 
     // Extract <picture> sources from shadow DOM
@@ -177,12 +200,15 @@ export async function extractFromShadowDom(images: Map<string, ImageItem>): Prom
             if (state.seenUrls.has(dataKey)) continue;
             state.seenUrls.add(dataKey);
             images.set(dataKey, {
-              id: generateId(dataKey), url,
+              id: generateId(dataKey),
+              url,
               displayWidth: fallbackImg?.naturalWidth || 0,
               displayHeight: fallbackImg?.naturalHeight || 0,
-              type: 'img', format: getFileFormat(url),
+              type: 'img',
+              format: getFileFormat(url),
               sourceDomain: window.location.hostname,
-              checked: false, timestamp: Date.now()
+              checked: false,
+              timestamp: Date.now(),
             } as ImageItem);
             continue;
           }
@@ -190,12 +216,15 @@ export async function extractFromShadowDom(images: Map<string, ImageItem>): Prom
           if (state.seenUrls.has(resolvedUrl)) continue;
           state.seenUrls.add(resolvedUrl);
           images.set(resolvedUrl, {
-            id: generateId(resolvedUrl), url: resolvedUrl,
+            id: generateId(resolvedUrl),
+            url: resolvedUrl,
             displayWidth: fallbackImg?.naturalWidth || 0,
             displayHeight: fallbackImg?.naturalHeight || 0,
-            type: 'img', format: getFileFormat(resolvedUrl),
+            type: 'img',
+            format: getFileFormat(resolvedUrl),
             sourceDomain: getDomain(resolvedUrl),
-            checked: false, timestamp: Date.now()
+            checked: false,
+            timestamp: Date.now(),
           } as ImageItem);
         }
       }
@@ -210,12 +239,15 @@ export async function extractFromShadowDom(images: Map<string, ImageItem>): Prom
       if (state.seenUrls.has(resolvedUrl)) continue;
       state.seenUrls.add(resolvedUrl);
       images.set(resolvedUrl, {
-        id: generateId(resolvedUrl), url: resolvedUrl,
+        id: generateId(resolvedUrl),
+        url: resolvedUrl,
         displayWidth: video.videoWidth || video.width || 0,
         displayHeight: video.videoHeight || video.height || 0,
-        type: 'video-poster', format: getFileFormat(resolvedUrl),
+        type: 'video-poster',
+        format: getFileFormat(resolvedUrl),
         sourceDomain: getDomain(resolvedUrl),
-        checked: false, timestamp: Date.now()
+        checked: false,
+        timestamp: Date.now(),
       } as ImageItem);
     }
 
@@ -266,7 +298,7 @@ export async function extractFromIframes(images: Map<string, ImageItem>): Promis
             format: getFileFormat(url),
             sourceDomain: window.location.hostname,
             checked: false,
-            timestamp: Date.now()
+            timestamp: Date.now(),
           } as ImageItem);
           continue;
         }
@@ -286,7 +318,7 @@ export async function extractFromIframes(images: Map<string, ImageItem>): Promis
           format: getFileFormat(resolvedUrl),
           sourceDomain: getDomain(resolvedUrl),
           checked: false,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         } as ImageItem);
       }
 
@@ -319,7 +351,7 @@ export async function extractFromIframes(images: Map<string, ImageItem>): Promis
                 format: getFileFormat(u),
                 sourceDomain: window.location.hostname,
                 checked: false,
-                timestamp: Date.now()
+                timestamp: Date.now(),
               } as ImageItem);
               continue;
             }
@@ -337,14 +369,15 @@ export async function extractFromIframes(images: Map<string, ImageItem>): Promis
               format: getFileFormat(resolvedUrl),
               sourceDomain: getDomain(resolvedUrl),
               checked: false,
-              timestamp: Date.now()
+              timestamp: Date.now(),
             } as ImageItem);
           }
-        } catch { /* skip */ }
+        } catch {
+          /* skip */
+        }
       }
     } catch {
       // Cross-origin iframe, skip
     }
   }
 }
-

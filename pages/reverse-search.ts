@@ -41,7 +41,7 @@ interface FetchImageDataResult {
     // Ask background to fetch the image data
     const response: FetchImageDataResult | undefined = await chrome.runtime.sendMessage({
       type: 'FETCH_IMAGE_DATA',
-      url: imageUrl
+      url: imageUrl,
     });
 
     if (!response || !response.success || !response.dataUrl) {
@@ -118,7 +118,7 @@ interface FetchImageDataResult {
       const result: ReverseSearchUploadResult | undefined = await chrome.runtime.sendMessage({
         type: 'REVERSE_SEARCH_UPLOAD',
         engine: 'yandex',
-        imageDataUrl: imageDataUrl
+        imageDataUrl: imageDataUrl,
       });
 
       if (result && result.success && result.redirectUrl) {
@@ -141,7 +141,7 @@ interface FetchImageDataResult {
       const result: ReverseSearchUploadResult | undefined = await chrome.runtime.sendMessage({
         type: 'REVERSE_SEARCH_UPLOAD',
         engine: 'baidu',
-        imageDataUrl: imageDataUrl
+        imageDataUrl: imageDataUrl,
       });
 
       if (result && result.success) {
@@ -203,7 +203,7 @@ interface FetchImageDataResult {
       'image/gif': '.gif',
       'image/bmp': '.bmp',
       'image/svg+xml': '.svg',
-      'image/avif': '.avif'
+      'image/avif': '.avif',
     };
     const ext = extMap[mimeType] || '.jpg';
     return `image${ext}`;
@@ -215,7 +215,7 @@ interface FetchImageDataResult {
       google: `https://lens.google.com/uploadbyurl?url=${encodedUrl}`,
       tineye: `https://tineye.com/search?url=${encodedUrl}`,
       baidu: `https://graph.baidu.com/details?isfromtusdk=1&tn=pc&image=${encodedUrl}`,
-      yandex: `https://yandex.com/images/search?rpt=imageview&url=${encodedUrl}`
+      yandex: `https://yandex.com/images/search?rpt=imageview&url=${encodedUrl}`,
     };
     if (fallbackUrls[engine]) {
       window.location.href = fallbackUrls[engine];

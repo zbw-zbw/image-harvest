@@ -52,7 +52,7 @@ export function extractColors(imageUrl: string, colorCount: number = 5): Promise
             const avg = getAverageColor(bucket);
             return {
               color: rgbToHex(avg.r, avg.g, avg.b),
-              count: bucket.length
+              count: bucket.length,
             };
           })
           .sort((a, b) => b.count - a.count);
@@ -83,9 +83,12 @@ function medianCut(pixels: RGB[], depth: number, maxDepth: number): RGB[][] {
     return [pixels];
   }
 
-  let rMin = 255, rMax = 0;
-  let gMin = 255, gMax = 0;
-  let bMin = 255, bMax = 0;
+  let rMin = 255,
+    rMax = 0;
+  let gMin = 255,
+    gMax = 0;
+  let bMin = 255,
+    bMax = 0;
 
   for (const pixel of pixels) {
     rMin = Math.min(rMin, pixel.r);
@@ -140,14 +143,16 @@ export function hexToRgb(hex: string): RGB {
   return {
     r: parseInt(result[1], 16),
     g: parseInt(result[2], 16),
-    b: parseInt(result[3], 16)
+    b: parseInt(result[3], 16),
   };
 }
 
 function getAverageColor(pixels: RGB[]): RGB {
   if (pixels.length === 0) return { r: 0, g: 0, b: 0 };
 
-  let rSum = 0, gSum = 0, bSum = 0;
+  let rSum = 0,
+    gSum = 0,
+    bSum = 0;
   for (const pixel of pixels) {
     rSum += pixel.r;
     gSum += pixel.g;
@@ -157,7 +162,7 @@ function getAverageColor(pixels: RGB[]): RGB {
   return {
     r: Math.round(rSum / pixels.length),
     g: Math.round(gSum / pixels.length),
-    b: Math.round(bSum / pixels.length)
+    b: Math.round(bSum / pixels.length),
   };
 }
 
@@ -168,7 +173,9 @@ interface HSL {
 }
 
 function rgbToHsl(r: number, g: number, b: number): HSL {
-  r /= 255; g /= 255; b /= 255;
+  r /= 255;
+  g /= 255;
+  b /= 255;
   const max = Math.max(r, g, b);
   const min = Math.min(r, g, b);
   const l = (max + min) / 2;

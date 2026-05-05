@@ -44,7 +44,7 @@
   background: var(--bg-secondary);
 }
 
-.settings-content .checkbox-label input[type="checkbox"] {
+.settings-content .checkbox-label input[type='checkbox'] {
   display: none;
 }
 
@@ -66,12 +66,12 @@
   display: none;
 }
 
-.settings-content .checkbox-label input[type="checkbox"]:checked + .settings-checkbox {
+.settings-content .checkbox-label input[type='checkbox']:checked + .settings-checkbox {
   background: var(--primary-color);
   border-color: var(--primary-color);
 }
 
-.settings-content .checkbox-label input[type="checkbox"]:checked + .settings-checkbox .check-icon {
+.settings-content .checkbox-label input[type='checkbox']:checked + .settings-checkbox .check-icon {
   display: block;
   color: white;
 }
@@ -106,12 +106,12 @@
   background: var(--bg-tertiary);
 }
 
-.settings-content .radio-group input[type="radio"] {
+.settings-content .radio-group input[type='radio'] {
   display: none;
 }
 
-.settings-content .radio-group input[type="radio"]:checked + span,
-.settings-content .radio-group label:has(input[type="radio"]:checked) {
+.settings-content .radio-group input[type='radio']:checked + span,
+.settings-content .radio-group label:has(input[type='radio']:checked) {
   background: var(--primary-color);
   color: white;
   font-weight: 600;
@@ -166,7 +166,10 @@
   opacity: 1;
   transform: translateY(0) scale(1);
   transform-origin: top left;
-  transition: opacity 0.15s ease, transform 0.15s ease, visibility 0.15s;
+  transition:
+    opacity 0.15s ease,
+    transform 0.15s ease,
+    visibility 0.15s;
   visibility: visible;
 }
 
@@ -211,8 +214,8 @@
 }
 
 /* Settings Text/Number Inputs - matches filter-custom style */
-.settings-content input[type="text"],
-.settings-content input[type="number"] {
+.settings-content input[type='text'],
+.settings-content input[type='number'] {
   padding: 6px 10px;
   font-size: 12px;
   border: 1px solid var(--border-color);
@@ -223,20 +226,20 @@
   box-shadow: var(--shadow-sm);
 }
 
-.settings-content input[type="text"]:hover,
-.settings-content input[type="number"]:hover {
+.settings-content input[type='text']:hover,
+.settings-content input[type='number']:hover {
   border-color: var(--primary-color);
 }
 
-.settings-content input[type="text"]:focus,
-.settings-content input[type="number"]:focus {
+.settings-content input[type='text']:focus,
+.settings-content input[type='number']:focus {
   outline: none;
   border-color: var(--primary-color);
   box-shadow: 0 0 0 2px rgba(96, 181, 87, 0.15);
   background-color: var(--bg-color);
 }
 
-.settings-content input[type="number"] {
+.settings-content input[type='number'] {
   width: 70px;
 }
 
@@ -251,7 +254,9 @@
   color: var(--text-primary);
   resize: vertical;
   font-family: inherit;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
 .settings-content textarea:focus {
@@ -289,12 +294,12 @@
   white-space: nowrap;
 }
 
-.settings-content .setting-inputs label input[type="text"] {
+.settings-content .setting-inputs label input[type='text'] {
   flex: 1;
   min-width: 0;
 }
 
-.settings-content .setting-inputs label input[type="number"] {
+.settings-content .setting-inputs label input[type='number'] {
   width: 80px;
 }
 

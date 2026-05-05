@@ -64,7 +64,7 @@
 - 🌐 **Website** — [image-harvest.kyriewen.cn](https://image-harvest.kyriewen.cn)
 
 > Product roadmap, marketing strategy, and platform-specific launch content are maintained in a separate private repository and not distributed with this open-source release.
-> 
+>
 > 👉 **Documentation index:** [`docs/README.md`](./docs/README.md)
 
 ---
@@ -78,13 +78,13 @@
 - **`<picture>` / `<source>` elements**
 - **Same-origin iframe** content extraction
 - **Shadow DOM** traversal
-- **Live Monitoring** — real-time detection of newly added images via `MutationObserver` *(Pro)*
+- **Live Monitoring** — real-time detection of newly added images via `MutationObserver` _(Pro)_
 
 ### 🖼️ Image Display & Management
 
 - **Grid / List view** toggle with 3 density levels (Compact / Standard / Comfortable)
-- **Color palette extraction** — displays top 5 dominant colors per image *(Median Cut algorithm)*
-- **Perceptual hash (pHash)** based similar image detection *(Pro)*
+- **Color palette extraction** — displays top 5 dominant colors per image _(Median Cut algorithm)_
+- **Perceptual hash (pHash)** based similar image detection _(Pro)_
 
 ### 🎛️ Powerful Filtering & Sorting
 
@@ -99,8 +99,8 @@
 
 - **Single image download** — original or converted format
 - **Batch ZIP download** — powered by JSZip
-- **Format conversion** — PNG / JPG / WebP via Canvas API *(Pro)*
-- **Custom naming templates** — `{index}`, `{original}`, `{pageTitle}`, `{pageDomain}`, `{width}`, `{height}`, `{format}`, `{date}` and more *(Pro)*
+- **Format conversion** — PNG / JPG / WebP via Canvas API _(Pro)_
+- **Custom naming templates** — `{index}`, `{original}`, `{pageTitle}`, `{pageDomain}`, `{width}`, `{height}`, `{format}`, `{date}` and more _(Pro)_
 - **Download progress** modal with progress bar
 
 ### 🎯 Page Highlight
@@ -109,7 +109,7 @@
 - Auto-scroll to the highlighted image
 - Synchronized with panel checkbox state
 
-### ⭐ Image Collection *(Pro)*
+### ⭐ Image Collection _(Pro)_
 
 - Save images to local IndexedDB with tags, notes, and metadata
 - Browse, search, and filter your collection
@@ -118,7 +118,7 @@
 ### 🔎 Reverse Image Search
 
 - **Google Images** (free)
-- **TinEye / Baidu / Yandex** *(Pro)*
+- **TinEye / Baidu / Yandex** _(Pro)_
 
 ### 🖥️ Dual Display Mode
 
@@ -217,8 +217,8 @@ To install in Chrome: `chrome://extensions/` → Developer mode → **Load unpac
 
 ## 📸 Screenshots
 
-| Side Panel Mode | Popup Mode |
-|:---:|:---:|
+|                 Side Panel Mode                 |               Popup Mode               |
+| :---------------------------------------------: | :------------------------------------: |
 | ![Side Panel](assets/screenshots/sidepanel.png) | ![Popup](assets/screenshots/popup.png) |
 
 > Screenshots may be added/updated post-launch. See `assets/screenshots/` for the latest assets.
@@ -274,31 +274,31 @@ To install in Chrome: `chrome://extensions/` → Developer mode → **Load unpac
 
 ### Keyboard Shortcuts
 
-| Shortcut | Action |
-|----------|--------|
+| Shortcut                     | Action               |
+| ---------------------------- | -------------------- |
 | `Ctrl+Shift+S` / `⌘+Shift+S` | Toggle Image Harvest |
 
 ---
 
 ## 💎 Free vs Pro
 
-| Feature | Free | Pro |
-|---------|------|-----|
-| Smart image extraction | ✅ Full | ✅ Full |
-| Filters (size / format / layout / URL) | ✅ Full | ✅ Full |
-| Sorting & view modes | ✅ Full | ✅ Full |
-| Single download | ✅ Full | ✅ Full |
-| Side Panel / Popup modes | ✅ Full | ✅ Full |
-| Batch ZIP download | ⚡ Up to 20 | ✅ Unlimited |
-| Format conversion | ❌ | ✅ PNG / JPG / WebP |
-| Custom naming templates | ⚡ Default only | ✅ Full template variables |
-| Page highlight | ⚡ Single only | ✅ Batch + auto-scroll |
-| Smart grouping | ⚡ None / Format | ✅ All 5 modes |
-| Live monitoring | ❌ | ✅ Real-time |
-| Similar image detection | ❌ | ✅ pHash-based |
-| Image collection | ❌ | ✅ Full collection system |
-| Multi-tab extraction | ❌ | ✅ Cross-tab |
-| Reverse image search | ⚡ Google only | ✅ 4 engines |
+| Feature                                | Free             | Pro                        |
+| -------------------------------------- | ---------------- | -------------------------- |
+| Smart image extraction                 | ✅ Full          | ✅ Full                    |
+| Filters (size / format / layout / URL) | ✅ Full          | ✅ Full                    |
+| Sorting & view modes                   | ✅ Full          | ✅ Full                    |
+| Single download                        | ✅ Full          | ✅ Full                    |
+| Side Panel / Popup modes               | ✅ Full          | ✅ Full                    |
+| Batch ZIP download                     | ⚡ Up to 20      | ✅ Unlimited               |
+| Format conversion                      | ❌               | ✅ PNG / JPG / WebP        |
+| Custom naming templates                | ⚡ Default only  | ✅ Full template variables |
+| Page highlight                         | ⚡ Single only   | ✅ Batch + auto-scroll     |
+| Smart grouping                         | ⚡ None / Format | ✅ All 5 modes             |
+| Live monitoring                        | ❌               | ✅ Real-time               |
+| Similar image detection                | ❌               | ✅ pHash-based             |
+| Image collection                       | ❌               | ✅ Full collection system  |
+| Multi-tab extraction                   | ❌               | ✅ Cross-tab               |
+| Reverse image search                   | ⚡ Google only   | ✅ 4 engines               |
 
 ---
 
@@ -306,12 +306,12 @@ To install in Chrome: `chrome://extensions/` → Developer mode → **Load unpac
 
 Image Harvest is **free to use** with optional Pro plans for power users.
 
-| Plan | Price | Billing | Best For |
-|------|------:|---------|----------|
-| **Free** | $0 | Forever | Casual users — covers 95% of everyday use cases |
-| **Monthly** | $2.99 | per month | Trying out Pro features short-term |
-| **Yearly** | $19.99 | per year (~44% off) | Regular users — best value for ongoing use |
-| **Lifetime** | $39.99 | one-time | Pay once, use forever — no subscription |
+| Plan         |  Price | Billing             | Best For                                        |
+| ------------ | -----: | ------------------- | ----------------------------------------------- |
+| **Free**     |     $0 | Forever             | Casual users — covers 95% of everyday use cases |
+| **Monthly**  |  $2.99 | per month           | Trying out Pro features short-term              |
+| **Yearly**   | $19.99 | per year (~44% off) | Regular users — best value for ongoing use      |
+| **Lifetime** | $39.99 | one-time            | Pay once, use forever — no subscription         |
 
 > 💡 All Pro plans unlock the same features. View the full feature comparison on the [Pricing page](https://image-harvest.kyriewen.cn/pricing).
 
@@ -319,17 +319,17 @@ Image Harvest is **free to use** with optional Pro plans for power users.
 
 ## 🛠️ Tech Stack
 
-| Component | Technology | Rationale |
-|-----------|-----------|-----------|
-| Platform | Chrome Extension Manifest V3 | Latest extension standard |
-| UI | Vanilla HTML/CSS/JS | Zero framework dependency, minimal bundle size |
-| ZIP packaging | JSZip | Mature, supports blob streaming |
-| Image extraction | DOM traversal + `getComputedStyle` | Accurate runtime background image detection |
-| Perceptual hash | Canvas API + DCT | Pure frontend, no external dependencies |
-| Color extraction | Canvas API + Median Cut | Pure frontend, extracts dominant colors |
-| Format conversion | Canvas API (`toDataURL` / `toBlob`) | Supports PNG / JPG / WebP |
-| Collection storage | IndexedDB | Supports large datasets and Blob storage |
-| Settings storage | `chrome.storage.local` / `sync` | Persists user preferences |
+| Component          | Technology                          | Rationale                                      |
+| ------------------ | ----------------------------------- | ---------------------------------------------- |
+| Platform           | Chrome Extension Manifest V3        | Latest extension standard                      |
+| UI                 | Vanilla HTML/CSS/JS                 | Zero framework dependency, minimal bundle size |
+| ZIP packaging      | JSZip                               | Mature, supports blob streaming                |
+| Image extraction   | DOM traversal + `getComputedStyle`  | Accurate runtime background image detection    |
+| Perceptual hash    | Canvas API + DCT                    | Pure frontend, no external dependencies        |
+| Color extraction   | Canvas API + Median Cut             | Pure frontend, extracts dominant colors        |
+| Format conversion  | Canvas API (`toDataURL` / `toBlob`) | Supports PNG / JPG / WebP                      |
+| Collection storage | IndexedDB                           | Supports large datasets and Blob storage       |
+| Settings storage   | `chrome.storage.local` / `sync`     | Persists user preferences                      |
 
 ---
 

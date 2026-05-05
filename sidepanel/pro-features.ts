@@ -1,11 +1,7 @@
 // Pro Features: Reverse Search, Similar Detection, Collection, Color Extraction, Multi-Tab Extract
 
 import JSZip from 'jszip';
-import {
-  collectionAdd,
-  collectionGetAll,
-  collectionRemove
-} from '../shared/collection';
+import { collectionAdd, collectionGetAll, collectionRemove } from '../shared/collection';
 import { hammingDistance } from '../shared/phash';
 import { isRestrictedUrl } from '../shared/utils';
 import type { CollectionItem, ImageItem } from '../shared/types';
@@ -14,7 +10,7 @@ import {
   formatTimestamp,
   getActivePageInfo,
   openInNewTab,
-  showReverseSearchMenu
+  showReverseSearchMenu,
 } from './actions';
 import { applyFilters } from './filter';
 import { processImageExtras } from './scan';
@@ -26,20 +22,15 @@ import {
   showProgress,
   showToast,
   updateFilterButtonLabels,
-  updateProgress
+  updateProgress,
 } from './ui';
-import {
-  formatBytes,
-  generateFilename,
-  generateId,
-  truncateUrl
-} from './utils';
+import { formatBytes, generateFilename, generateId, truncateUrl } from './utils';
 
 // ============================================
 // Similar Image Detection (Pro)
 // ============================================
 export function detectSimilarImages(): void {
-  const withHash = state.allImages.filter(img => img.phash);
+  const withHash = state.allImages.filter((img) => img.phash);
   if (withHash.length < 2) return;
 
   const HASH_THRESHOLD = 0;
@@ -69,7 +60,7 @@ export function detectSimilarImages(): void {
     for (let j = i + 1; j < withHash.length; j++) {
       if (used.has(j)) continue;
       const candidateRatio = getAspectRatio(withHash[j]);
-      const isSimilarToAll = group.every(member => {
+      const isSimilarToAll = group.every((member) => {
         const dist = hammingDistance(member.phash!, withHash[j].phash!);
         return dist <= HASH_THRESHOLD;
       });
@@ -85,13 +76,13 @@ export function detectSimilarImages(): void {
     }
   }
 
-  if (elements.similarCount) {
-    elements.similarCount.textContent = String(state.similarGroups.length);
-  }
+  // similarCount is now a Preact component (StatusCounts.SimilarCount)
+  // subscribed to state.similarGroups.length.
 
   const similarEnabled = state.appSettings.enableSimilarDetection !== false;
   if (elements.btnDedup) {
-    elements.btnDedup.style.display = (similarEnabled && state.similarGroups.length > 0) ? '' : 'none';
+    elements.btnDedup.style.display =
+      similarEnabled && state.similarGroups.length > 0 ? '' : 'none';
   }
 
   const dedupInfo = document.getElementById('dedup-info');
@@ -101,36 +92,49 @@ export function detectSimilarImages(): void {
 }
 
 export function showDedupModal(): void {
-  if (!elements.dedupModal) return;
-  elements.dedupModal.classList.remove('hidden');
-  // Reset scroll position to top
-  const modalBody = elements.dedupModal.querySelector('.modal-body');
+  // Open the Preact-managed shell. The cached `elements.dedupModal` ref may
+  // be stale (Preact replaced the DOM node on mount), so look it up fresh
+  // when we need to scroll the body.
+  state.dedupModalState = { open: true };
+  const modalEl = document.getElementById('dedup-modal');
+  const modalBody = modalEl?.querySelector('.modal-body');
   if (modalBody) modalBody.scrollTop = 0;
 
-  if (elements.dedupBody) {
+  // Re-resolve the body slot too — it lives inside the Preact-rendered
+  // subtree so the cached ref is unreliable.
+  const dedupBody = document.getElementById('dedup-body');
+  if (dedupBody) {
     if (state.similarGroups.length === 0) {
-      elements.dedupBody.innerHTML = '<p class="empty-message">No similar images found</p>';
+      dedupBody.innerHTML = '<p class="empty-message">No similar images found</p>';
       return;
     }
-    elements.dedupBody.innerHTML = `
+    dedupBody.innerHTML = `
       <p class="dedup-hint">Click images to mark them for removal</p>
-      ${state.similarGroups.map((group, gi) => `
+      ${state.similarGroups
+        .map(
+          (group, gi) => `
       <div class="dedup-group" data-group="${gi}">
         <div class="dedup-group-title">Group ${gi + 1} (${group.length} similar)</div>
         <div class="dedup-group-images">
-          ${group.map((img, ii) => `
+          ${group
+            .map(
+              (img, ii) => `
             <div class="dedup-image" data-group="${gi}" data-index="${ii}">
               <div class="dedup-image-thumb">
                 <img src="${img.url}" alt="">
               </div>
             </div>
-          `).join('')}
+          `
+            )
+            .join('')}
         </div>
       </div>
-    `).join('')}`;
+    `
+        )
+        .join('')}`;
 
     // Click image to toggle selection (mark for removal)
-    elements.dedupBody.querySelectorAll('.dedup-image').forEach(el => {
+    dedupBody.querySelectorAll('.dedup-image').forEach((el) => {
       el.addEventListener('click', () => {
         el.classList.toggle('selected');
       });
@@ -139,7 +143,7 @@ export function showDedupModal(): void {
 }
 
 export function closeDedupModal(): void {
-  if (elements.dedupModal) elements.dedupModal.classList.add('hidden');
+  state.dedupModalState = { open: false };
 }
 
 export async function removeDuplicates(): Promise<void> {
@@ -162,7 +166,7 @@ export async function removeDuplicates(): Promise<void> {
   // If no images were manually selected, default to removing all duplicates
   // in each similar group (keep the first image, remove the rest).
   if (toRemove.size === 0) {
-    state.similarGroups.forEach(group => {
+    state.similarGroups.forEach((group) => {
       for (let i = 1; i < group.length; i++) {
         toRemove.add(group[i].id);
       }
@@ -179,12 +183,12 @@ export async function removeDuplicates(): Promise<void> {
     message: `Are you sure you want to remove ${toRemove.size} selected duplicate image${toRemove.size > 1 ? 's' : ''}?`,
     confirmText: 'Remove',
     cancelText: 'Cancel',
-    type: 'danger'
+    type: 'danger',
   });
   if (!confirmed) return;
 
-  state.allImages = state.allImages.filter(img => !toRemove.has(img.id));
-  state.selectedImages = new Set([...state.selectedImages].filter(id => !toRemove.has(id)));
+  state.allImages = state.allImages.filter((img) => !toRemove.has(img.id));
+  state.selectedImages = new Set([...state.selectedImages].filter((id) => !toRemove.has(id)));
 
   closeDedupModal();
   applyFilters();
@@ -199,7 +203,7 @@ export function removeImageById(imageId: string): void {
     showProUpgradeModal();
     return;
   }
-  state.allImages = state.allImages.filter(img => img.id !== imageId);
+  state.allImages = state.allImages.filter((img) => img.id !== imageId);
   state.selectedImages.delete(imageId);
   applyFilters();
   detectSimilarImages();
@@ -238,7 +242,7 @@ export async function addToCollection(img: ImageItem): Promise<void> {
       sourceTitle: pageTitle,
       tags: [],
       notes: '',
-      createdAt: Date.now()
+      createdAt: Date.now(),
     } as CollectionItem);
     showToast('Added to collection', 'success');
   } catch {
@@ -265,23 +269,26 @@ export async function removeFromCollection(imgId: string): Promise<void> {
 }
 
 export function showCollectionModal(): void {
-  if (!elements.collectionModal) return;
-  elements.collectionModal.classList.remove('hidden');
-  // Reset scroll position to top
-  const modalBody = elements.collectionModal.querySelector('.modal-body');
+  // Open the Preact-managed shell. cached refs may be stale because Preact
+  // owns the modal subtree now — re-resolve via getElementById.
+  state.collectionModalState = { open: true };
+  const modalEl = document.getElementById('collection-modal');
+  const modalBody = modalEl?.querySelector('.modal-body');
   if (modalBody) modalBody.scrollTop = 0;
-  // Bind search
-  if (elements.collectionSearch) {
-    (elements.collectionSearch as HTMLInputElement).value = '';
-    (elements.collectionSearch as HTMLInputElement).oninput = () => {
-      loadCollection((elements.collectionSearch as HTMLInputElement).value.trim());
+  // Bind search input. The input lives inside the Preact subtree; use a
+  // fresh lookup so we don't grab a detached reference from cacheElements().
+  const searchInput = document.getElementById('collection-search') as HTMLInputElement | null;
+  if (searchInput) {
+    searchInput.value = '';
+    searchInput.oninput = () => {
+      loadCollection(searchInput.value.trim());
     };
   }
   loadCollection();
 }
 
 export function closeCollectionModal(): void {
-  if (elements.collectionModal) elements.collectionModal.classList.add('hidden');
+  state.collectionModalState = { open: false };
 }
 
 export async function loadCollection(searchQuery = ''): Promise<void> {
@@ -293,11 +300,12 @@ export async function loadCollection(searchQuery = ''): Promise<void> {
     // Filter by search query
     if (searchQuery) {
       const lowerQuery = searchQuery.toLowerCase();
-      items = items.filter(item =>
-        (item.url && item.url.toLowerCase().includes(lowerQuery)) ||
-        (item.sourceTitle && item.sourceTitle.toLowerCase().includes(lowerQuery)) ||
-        (item.sourceUrl && item.sourceUrl.toLowerCase().includes(lowerQuery)) ||
-        (item.tags && item.tags.some((tag: string) => tag.toLowerCase().includes(lowerQuery)))
+      items = items.filter(
+        (item) =>
+          (item.url && item.url.toLowerCase().includes(lowerQuery)) ||
+          (item.sourceTitle && item.sourceTitle.toLowerCase().includes(lowerQuery)) ||
+          (item.sourceUrl && item.sourceUrl.toLowerCase().includes(lowerQuery)) ||
+          (item.tags && item.tags.some((tag: string) => tag.toLowerCase().includes(lowerQuery)))
       );
     }
 
@@ -316,11 +324,12 @@ export async function loadCollection(searchQuery = ''): Promise<void> {
 
     elements.collectionBody.innerHTML = `
       <div class="collection-grid">
-        ${items.map(item => {
-          const dims = (item.width && item.height) ? `${item.width}×${item.height}` : '';
-          const format = ((item.format as string | undefined) || 'unknown').toUpperCase();
-          const fileSize = item.fileSize ? formatBytes(item.fileSize as number) : '';
-          return `
+        ${items
+          .map((item) => {
+            const dims = item.width && item.height ? `${item.width}×${item.height}` : '';
+            const format = ((item.format as string | undefined) || 'unknown').toUpperCase();
+            const fileSize = item.fileSize ? formatBytes(item.fileSize as number) : '';
+            return `
           <div class="image-card collection-card" data-id="${item.id}">
             <div class="card-thumb checkerboard">
               <img src="${item.url}" alt="" loading="lazy">
@@ -355,32 +364,39 @@ export async function loadCollection(searchQuery = ''): Promise<void> {
               </div>
             </div>
           </div>`;
-        }).join('')}
+          })
+          .join('')}
       </div>`;
 
     // Bind action events
-    elements.collectionBody.querySelectorAll<HTMLElement>('.btn-remove-collection').forEach(btn => {
-      btn.addEventListener('click', async (e) => {
-        e.stopPropagation();
-        await removeFromCollection(btn.dataset.id!);
-        // Also update favorite button state in main grid
-        const mainCard = document.querySelector(`.image-card[data-id="${btn.dataset.id}"] .btn-favorite`);
-        if (mainCard) {
-          mainCard.classList.remove('favorited');
-          (mainCard as HTMLElement).title = 'Add to collection';
-        }
-        loadCollection((elements.collectionSearch as HTMLInputElement | null)?.value?.trim() || '');
+    elements.collectionBody
+      .querySelectorAll<HTMLElement>('.btn-remove-collection')
+      .forEach((btn) => {
+        btn.addEventListener('click', async (e) => {
+          e.stopPropagation();
+          await removeFromCollection(btn.dataset.id!);
+          // Also update favorite button state in main grid
+          const mainCard = document.querySelector(
+            `.image-card[data-id="${btn.dataset.id}"] .btn-favorite`
+          );
+          if (mainCard) {
+            mainCard.classList.remove('favorited');
+            (mainCard as HTMLElement).title = 'Add to collection';
+          }
+          loadCollection(
+            (elements.collectionSearch as HTMLInputElement | null)?.value?.trim() || ''
+          );
+        });
       });
-    });
 
-    elements.collectionBody.querySelectorAll<HTMLElement>('.btn-open-collection').forEach(btn => {
+    elements.collectionBody.querySelectorAll<HTMLElement>('.btn-open-collection').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
         openInNewTab(btn.dataset.url!);
       });
     });
 
-    elements.collectionBody.querySelectorAll<HTMLElement>('.btn-copy-collection').forEach(btn => {
+    elements.collectionBody.querySelectorAll<HTMLElement>('.btn-copy-collection').forEach((btn) => {
       btn.addEventListener('click', async (e) => {
         e.stopPropagation();
         try {
@@ -392,23 +408,28 @@ export async function loadCollection(searchQuery = ''): Promise<void> {
       });
     });
 
-    elements.collectionBody.querySelectorAll<HTMLElement>('.btn-dl-collection').forEach(btn => {
+    elements.collectionBody.querySelectorAll<HTMLElement>('.btn-dl-collection').forEach((btn) => {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        const imgObj = { url: btn.dataset.url!, format: btn.dataset.format || 'unknown' } as unknown as ImageItem;
+        const imgObj = {
+          url: btn.dataset.url!,
+          format: btn.dataset.format || 'unknown',
+        } as unknown as ImageItem;
         downloadSingle(imgObj, null);
       });
     });
 
-    elements.collectionBody.querySelectorAll<HTMLElement>('.btn-search-collection').forEach(btn => {
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        showReverseSearchMenu(btn.dataset.url!, e.currentTarget as HTMLElement);
+    elements.collectionBody
+      .querySelectorAll<HTMLElement>('.btn-search-collection')
+      .forEach((btn) => {
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          showReverseSearchMenu(btn.dataset.url!, e.currentTarget as HTMLElement);
+        });
       });
-    });
 
     // Handle broken images
-    elements.collectionBody.querySelectorAll<HTMLImageElement>('.card-thumb img').forEach(img => {
+    elements.collectionBody.querySelectorAll<HTMLImageElement>('.card-thumb img').forEach((img) => {
       img.addEventListener('load', () => {
         img.classList.add('loaded');
         img.parentElement?.classList.add('loaded');
@@ -435,7 +456,10 @@ export async function exportCollection(): Promise<void> {
   try {
     const items: CollectionItem[] = await collectionGetAll();
 
-    if (items.length === 0) { showToast('Collection is empty', 'info'); return; }
+    if (items.length === 0) {
+      showToast('Collection is empty', 'info');
+      return;
+    }
 
     showProgress('Exporting collection...', () => {
       aborted = true;
@@ -456,7 +480,9 @@ export async function exportCollection(): Promise<void> {
           const blob = await resp.blob();
           folder.file(generateFilename(items[i] as unknown as ImageItem, i, null, pageInfo), blob);
         }
-      } catch { /* skip */ }
+      } catch {
+        /* skip */
+      }
     }
 
     if (aborted) return;
@@ -464,7 +490,11 @@ export async function exportCollection(): Promise<void> {
     const content = await zip.generateAsync({ type: 'blob' });
     const blobUrl = URL.createObjectURL(content);
     const ts = formatTimestamp(new Date());
-    await chrome.downloads.download({ url: blobUrl, filename: `collection-${ts}.zip`, saveAs: false });
+    await chrome.downloads.download({
+      url: blobUrl,
+      filename: `collection-${ts}.zip`,
+      saveAs: false,
+    });
     URL.revokeObjectURL(blobUrl);
     showToast('Collection exported', 'success');
   } catch {
@@ -479,9 +509,12 @@ export async function exportCollection(): Promise<void> {
 // ============================================
 export function renderColorBar(colors: string[] | undefined | null): string {
   if (!colors || colors.length === 0) return renderTransparentBar();
-  return `<div class="card-colors">${colors.map(c =>
-    `<div class="card-color-bar" style="background:${c}" data-color="${c}" title="${state.isProUser ? 'Click to copy ' + c : 'Upgrade to Pro to copy colors'}"></div>`
-  ).join('')}</div>`;
+  return `<div class="card-colors">${colors
+    .map(
+      (c) =>
+        `<div class="card-color-bar" style="background:${c}" data-color="${c}" title="${state.isProUser ? 'Click to copy ' + c : 'Upgrade to Pro to copy colors'}"></div>`
+    )
+    .join('')}</div>`;
 }
 
 export function renderTransparentBar(): string {
@@ -501,16 +534,17 @@ export async function copyColor(hex: string): Promise<void> {
 // Multi-Tab Extract (Pro)
 // ============================================
 export function showMultiTabModal(): void {
-  if (!elements.multitabModal) return;
-  elements.multitabModal.classList.remove('hidden');
-  // Reset scroll position to top
-  const modalBody = elements.multitabModal.querySelector('.modal-body');
+  // Open the Preact-managed shell. modal element ref is re-resolved because
+  // Preact owns the subtree now (cached elements.multitabModal would be stale).
+  state.multitabModalState = { open: true };
+  const modalEl = document.getElementById('multitab-modal');
+  const modalBody = modalEl?.querySelector('.modal-body');
   if (modalBody) modalBody.scrollTop = 0;
   loadTabList();
 }
 
 export function closeMultiTabModal(): void {
-  if (elements.multitabModal) elements.multitabModal.classList.add('hidden');
+  state.multitabModalState = { open: false };
 }
 
 export function getFallbackFaviconUrl(pageUrl: string): string {
@@ -526,12 +560,13 @@ export async function loadTabList(): Promise<void> {
   if (!elements.multitabList) return;
   try {
     const tabs = await chrome.tabs.query({ currentWindow: true });
-    const validTabs = tabs.filter(tab => !isRestrictedUrl(tab.url));
+    const validTabs = tabs.filter((tab) => !isRestrictedUrl(tab.url));
     // Sort: current (active) tab first
     validTabs.sort((a, b) => (b.active ? 1 : 0) - (a.active ? 1 : 0));
-    elements.multitabList.innerHTML = validTabs.map(tab => {
-      const faviconUrl = tab.favIconUrl || getFallbackFaviconUrl(tab.url || '');
-      return `
+    elements.multitabList.innerHTML = validTabs
+      .map((tab) => {
+        const faviconUrl = tab.favIconUrl || getFallbackFaviconUrl(tab.url || '');
+        return `
       <div class="tab-item${tab.active ? ' tab-current' : ''}" data-tab-id="${tab.id}">
         <label class="tab-checkbox" data-tab-id="${tab.id}">
           <input type="checkbox" value="${tab.id}">
@@ -546,10 +581,11 @@ export async function loadTabList(): Promise<void> {
         </div>
       </div>
     `;
-    }).join('');
+      })
+      .join('');
 
     // Click entire tab-item row to toggle checkbox
-    elements.multitabList.querySelectorAll<HTMLElement>('.tab-item').forEach(item => {
+    elements.multitabList.querySelectorAll<HTMLElement>('.tab-item').forEach((item) => {
       item.addEventListener('click', (e) => {
         if ((e.target as HTMLElement).closest('.tab-checkbox')) return;
         const checkbox = item.querySelector<HTMLInputElement>('.tab-checkbox input');
@@ -562,15 +598,17 @@ export async function loadTabList(): Promise<void> {
     });
 
     // Update select-all state when individual checkboxes change
-    elements.multitabList.querySelectorAll<HTMLInputElement>('.tab-checkbox input').forEach(cb => {
-      cb.addEventListener('change', () => {
-        toggleTabCheckboxVisual(cb.closest('.tab-item') as HTMLElement);
-        updateMultitabSelectAllState();
+    elements.multitabList
+      .querySelectorAll<HTMLInputElement>('.tab-checkbox input')
+      .forEach((cb) => {
+        cb.addEventListener('change', () => {
+          toggleTabCheckboxVisual(cb.closest('.tab-item') as HTMLElement);
+          updateMultitabSelectAllState();
+        });
       });
-    });
 
     // When favicon fails to load, try resolving from the page's <link> tags
-    elements.multitabList.querySelectorAll<HTMLImageElement>('.tab-favicon').forEach(favicon => {
+    elements.multitabList.querySelectorAll<HTMLImageElement>('.tab-favicon').forEach((favicon) => {
       favicon.addEventListener('error', () => {
         favicon.style.visibility = 'hidden';
         const tabItem = favicon.closest('.tab-item') as HTMLElement | null;
@@ -593,7 +631,7 @@ export async function loadTabList(): Promise<void> {
  * <link rel="icon"> via chrome.scripting.executeScript, then update the img src.
  */
 export async function resolveTabFavicons(tabs: chrome.tabs.Tab[]): Promise<void> {
-  const tabsMissingFavicon = tabs.filter(tab => !tab.favIconUrl);
+  const tabsMissingFavicon = tabs.filter((tab) => !tab.favIconUrl);
   if (tabsMissingFavicon.length === 0) return;
 
   for (const tab of tabsMissingFavicon) {
@@ -615,13 +653,17 @@ export async function resolveTabFavicons(tabs: chrome.tabs.Tab[]): Promise<void>
           ];
           const linkEl = document.querySelector(selectors.join(','));
           return linkEl ? (linkEl as HTMLLinkElement).href : null;
-        }
+        },
       });
       const resolvedUrl = results?.[0]?.result as string | null | undefined;
       if (resolvedUrl) {
-        faviconImg.addEventListener('error', () => {
-          tryGoogleFaviconFallback(tab.id!, faviconImg);
-        }, { once: true });
+        faviconImg.addEventListener(
+          'error',
+          () => {
+            tryGoogleFaviconFallback(tab.id!, faviconImg);
+          },
+          { once: true }
+        );
         faviconImg.src = resolvedUrl;
         faviconImg.style.visibility = '';
         resolved = true;
@@ -641,7 +683,10 @@ export async function resolveTabFavicons(tabs: chrome.tabs.Tab[]): Promise<void>
  * Resolve favicon for a single tab by ID (used when an img fails to load).
  * Tries: 1) page's <link rel="icon">, 2) Google favicon service as fallback.
  */
-export async function resolveTabFaviconById(tabId: number, faviconImg: HTMLImageElement): Promise<void> {
+export async function resolveTabFaviconById(
+  tabId: number,
+  faviconImg: HTMLImageElement
+): Promise<void> {
   const previousSrc = faviconImg.src;
 
   // Step 1: try to get real favicon from the page's <link> tags
@@ -657,15 +702,19 @@ export async function resolveTabFaviconById(tabId: number, faviconImg: HTMLImage
         ];
         const linkEl = document.querySelector(selectors.join(','));
         return linkEl ? (linkEl as HTMLLinkElement).href : null;
-      }
+      },
     });
     const resolvedUrl = results?.[0]?.result as string | null | undefined;
     // Only try the resolved URL if it's different from what already failed
     if (resolvedUrl && resolvedUrl !== previousSrc && faviconImg) {
-      faviconImg.addEventListener('error', () => {
-        // Step 2: resolved URL also failed — fall back to Google favicon service
-        tryGoogleFaviconFallback(tabId, faviconImg);
-      }, { once: true });
+      faviconImg.addEventListener(
+        'error',
+        () => {
+          // Step 2: resolved URL also failed — fall back to Google favicon service
+          tryGoogleFaviconFallback(tabId, faviconImg);
+        },
+        { once: true }
+      );
       faviconImg.src = resolvedUrl;
       faviconImg.style.visibility = '';
       return;
@@ -681,15 +730,22 @@ export async function resolveTabFaviconById(tabId: number, faviconImg: HTMLImage
 /**
  * Use Google's favicon service as the final fallback.
  */
-export async function tryGoogleFaviconFallback(tabId: number, faviconImg: HTMLImageElement): Promise<void> {
+export async function tryGoogleFaviconFallback(
+  tabId: number,
+  faviconImg: HTMLImageElement
+): Promise<void> {
   try {
     const tab = await chrome.tabs.get(tabId);
     if (!tab?.url) return;
     const origin = new URL(tab.url).origin;
     const googleFaviconUrl = `https://www.google.com/s2/favicons?sz=32&domain_url=${encodeURIComponent(origin)}`;
-    faviconImg.addEventListener('error', () => {
-      faviconImg.style.visibility = 'hidden';
-    }, { once: true });
+    faviconImg.addEventListener(
+      'error',
+      () => {
+        faviconImg.style.visibility = 'hidden';
+      },
+      { once: true }
+    );
     faviconImg.src = googleFaviconUrl;
     faviconImg.style.visibility = '';
   } catch {
@@ -708,7 +764,7 @@ export function updateMultitabSelectAllState(): void {
   const selectAllBtn = document.getElementById('multitab-select-all');
   if (!selectAllBtn) return;
   const checkboxes = document.querySelectorAll<HTMLInputElement>('.tab-checkbox input');
-  const checkedCount = Array.from(checkboxes).filter(cb => cb.checked).length;
+  const checkedCount = Array.from(checkboxes).filter((cb) => cb.checked).length;
   const totalCount = checkboxes.length;
 
   const textEl = selectAllBtn.querySelector('.select-all-text');
@@ -732,9 +788,13 @@ export function updateMultitabSelectAllState(): void {
 
 export function toggleMultitabSelectAll(): void {
   const checkboxes = document.querySelectorAll<HTMLInputElement>('.tab-checkbox input');
-  const allChecked = checkboxes.length > 0 && Array.from(checkboxes).every(cb => cb.checked);
-  checkboxes.forEach(cb => { cb.checked = !allChecked; });
-  document.querySelectorAll<HTMLElement>('.tab-item').forEach(item => toggleTabCheckboxVisual(item));
+  const allChecked = checkboxes.length > 0 && Array.from(checkboxes).every((cb) => cb.checked);
+  checkboxes.forEach((cb) => {
+    cb.checked = !allChecked;
+  });
+  document
+    .querySelectorAll<HTMLElement>('.tab-item')
+    .forEach((item) => toggleTabCheckboxVisual(item));
   updateMultitabSelectAllState();
 }
 
@@ -752,7 +812,7 @@ export async function startMultiTabExtract(tabIds: number[]): Promise<void> {
   try {
     const response = await chrome.runtime.sendMessage({
       type: 'MULTI_TAB_EXTRACT',
-      tabIds: tabIds
+      tabIds: tabIds,
     });
 
     if (aborted) return;
@@ -762,27 +822,33 @@ export async function startMultiTabExtract(tabIds: number[]): Promise<void> {
         ...img,
         id: img.id || generateId(img.url),
         colors: undefined,
-        phash: null
+        phash: null,
       }));
 
-      newImages.forEach(newImg => {
-        if (!state.allImages.find(img => img.url === newImg.url)) {
+      newImages.forEach((newImg) => {
+        if (!state.allImages.find((img) => img.url === newImg.url)) {
           state.allImages.push(newImg);
         }
       });
 
       state.currentGroupMode = 'tab';
       if (elements.groupMode) (elements.groupMode as HTMLSelectElement).value = 'tab';
-      document.querySelectorAll<HTMLElement>('[data-group-filter]').forEach(o => {
+      document.querySelectorAll<HTMLElement>('[data-group-filter]').forEach((o) => {
         o.classList.toggle('active', o.dataset.groupFilter === 'tab');
       });
       updateFilterButtonLabels();
 
       applyFilters();
       closeMultiTabModal();
-      showToast(`Extracted ${newImages.length} images from ${response.tabCount || tabIds.length} tabs`, 'success');
+      showToast(
+        `Extracted ${newImages.length} images from ${response.tabCount || tabIds.length} tabs`,
+        'success'
+      );
 
-      if (state.appSettings.enableSimilarDetection !== false || state.appSettings.enableColorExtraction !== false) {
+      if (
+        state.appSettings.enableSimilarDetection !== false ||
+        state.appSettings.enableColorExtraction !== false
+      ) {
         processImageExtras(newImages);
       }
     } else {

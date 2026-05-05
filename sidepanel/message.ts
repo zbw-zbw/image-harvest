@@ -2,28 +2,14 @@
 
 import { MESSAGE_TYPES } from '../shared/constants';
 import type { ImageItem } from '../shared/types';
-import {
-  clearSelection,
-  downloadSelectedAsZip,
-  hideDownloadDropdown,
-  selectAll
-} from './actions';
+import { clearSelection, downloadSelectedAsZip, hideDownloadDropdown, selectAll } from './actions';
 import { applyFilters } from './filter';
 import { processImageExtras, updateScanProgress } from './scan';
 import { renderImages } from './render';
-import {
-  applyProFeatureVisibility,
-  closeAllFilterDropdowns,
-  closeSettings
-} from './settings';
+import { applyProFeatureVisibility, closeAllFilterDropdowns, closeSettings } from './settings';
 import { closeCollectionModal, closeDedupModal, closeMultiTabModal } from './pro-features';
 import { elements, state } from './state';
-import {
-  hideProgress,
-  showToast,
-  updateFilterButtonLabels,
-  updateProgress
-} from './ui';
+import { hideProgress, showToast, updateFilterButtonLabels, updateProgress } from './ui';
 import { generateId } from './utils';
 
 // ============================================
@@ -82,7 +68,11 @@ export function handleMessage(message: IncomingMessage): void {
 
       // During silent rescan, fetch-only, or multi-tab extraction, ignore
       // discoveries entirely — the final response is the authoritative result.
-      if (state.isSilentScanning || (state.isFetching && !state.isScanning) || state.isMultiTabExtracting) {
+      if (
+        state.isSilentScanning ||
+        (state.isFetching && !state.isScanning) ||
+        state.isMultiTabExtracting
+      ) {
         break;
       }
 
@@ -91,17 +81,20 @@ export function handleMessage(message: IncomingMessage): void {
       // URL). Only render images into the grid up to the skeleton card limit
       // to avoid constant re-rendering flicker on image-heavy pages.
       if (state.isScanning && message.images) {
-        const newImgs = message.images.map(img => ({
-          ...img,
-          id: img.id || generateId(img.url),
-          colors: undefined,
-          phash: null
-        } as ImageItem));
+        const newImgs = message.images.map(
+          (img) =>
+            ({
+              ...img,
+              id: img.id || generateId(img.url),
+              colors: undefined,
+              phash: null,
+            }) as ImageItem
+        );
 
         const prevCount = state.allImages.length;
         let addedCount = 0;
-        newImgs.forEach(ni => {
-          if (!state.allImages.find(img => img.url === ni.url)) {
+        newImgs.forEach((ni) => {
+          if (!state.allImages.find((img) => img.url === ni.url)) {
             state.allImages.push(ni);
             addedCount++;
           }
@@ -114,10 +107,17 @@ export function handleMessage(message: IncomingMessage): void {
           // Always update scan overlay with real-time progress
           const lastUrl = newImgs[newImgs.length - 1]?.url || '';
           const truncatedUrl = lastUrl.length > 60 ? lastUrl.substring(0, 57) + '...' : lastUrl;
+          // updateScanProgress already pushes current/total into the store;
+          // the "found N images" copy lives directly on scanProgress so the
+          // <ScanProgressOverlay> can derive the right string.
           updateScanProgress(state.allImages.length, 0, truncatedUrl);
-          if (elements.scanProgressText) {
-            elements.scanProgressText.textContent = `found ${state.allImages.length} images`;
-          }
+          // Override the overlay's text by stuffing a non-zero "fake total"
+          // would be misleading; instead encode the discovery message in the
+          // title so it stays distinct from "scanning for images...".
+          state.scanProgress = {
+            ...state.scanProgress,
+            title: `Found ${state.allImages.length} images`,
+          };
 
           // Always keep the bottom status bar count in sync
           if (elements.foundCount) {
@@ -136,15 +136,18 @@ export function handleMessage(message: IncomingMessage): void {
 
       if (message.images && state.isInitialized) {
         // Live monitoring (only after init completes and no scan in progress)
-        const newImgs = message.images.map(img => ({
-          ...img,
-          id: img.id || generateId(img.url),
-          colors: undefined,
-          phash: null
-        } as ImageItem));
+        const newImgs = message.images.map(
+          (img) =>
+            ({
+              ...img,
+              id: img.id || generateId(img.url),
+              colors: undefined,
+              phash: null,
+            }) as ImageItem
+        );
         let addedCount = 0;
-        newImgs.forEach(ni => {
-          if (!state.allImages.find(img => img.url === ni.url)) {
+        newImgs.forEach((ni) => {
+          if (!state.allImages.find((img) => img.url === ni.url)) {
             state.allImages.push(ni);
             addedCount++;
           }
@@ -157,7 +160,12 @@ export function handleMessage(message: IncomingMessage): void {
       break;
 
     case MESSAGE_TYPES.DOWNLOAD_PROGRESS:
-      updateProgress(message.completed || 0, message.total || 0, message.current, message.imageCount);
+      updateProgress(
+        message.completed || 0,
+        message.total || 0,
+        message.current,
+        message.imageCount
+      );
       break;
 
     case MESSAGE_TYPES.DOWNLOAD_COMPLETE:
@@ -187,22 +195,25 @@ export function handleMessage(message: IncomingMessage): void {
     case MESSAGE_TYPES.MULTI_TAB_EXTRACT_COMPLETE:
       hideProgress();
       if (message.success && message.images) {
-        const newImages = message.images.map(img => ({
-          ...img,
-          id: img.id || generateId(img.url),
-          colors: undefined,
-          phash: null
-        } as ImageItem));
+        const newImages = message.images.map(
+          (img) =>
+            ({
+              ...img,
+              id: img.id || generateId(img.url),
+              colors: undefined,
+              phash: null,
+            }) as ImageItem
+        );
 
-        newImages.forEach(newImg => {
-          if (!state.allImages.find(img => img.url === newImg.url)) {
+        newImages.forEach((newImg) => {
+          if (!state.allImages.find((img) => img.url === newImg.url)) {
             state.allImages.push(newImg);
           }
         });
 
         state.currentGroupMode = 'tab';
         if (elements.groupMode) (elements.groupMode as HTMLSelectElement).value = 'tab';
-        document.querySelectorAll<HTMLElement>('[data-group-filter]').forEach(o => {
+        document.querySelectorAll<HTMLElement>('[data-group-filter]').forEach((o) => {
           o.classList.toggle('active', o.dataset.groupFilter === 'tab');
         });
         updateFilterButtonLabels();
@@ -211,7 +222,10 @@ export function handleMessage(message: IncomingMessage): void {
         closeMultiTabModal();
         showToast(`Extracted ${newImages.length} images from ${message.tabCount} tabs`, 'success');
 
-        if (state.appSettings.enableSimilarDetection !== false || state.appSettings.enableColorExtraction !== false) {
+        if (
+          state.appSettings.enableSimilarDetection !== false ||
+          state.appSettings.enableColorExtraction !== false
+        ) {
           processImageExtras(newImages);
         }
       } else {
@@ -231,10 +245,26 @@ export function handleMessage(message: IncomingMessage): void {
 // ============================================
 export function handleKeyDown(e: KeyboardEvent): void {
   if (e.key === 'Escape') {
-    if (elements.settingsModal && !elements.settingsModal.classList.contains('hidden')) { closeSettings(); return; }
-    if (elements.dedupModal && !elements.dedupModal.classList.contains('hidden')) { closeDedupModal(); return; }
-    if (elements.collectionModal && !elements.collectionModal.classList.contains('hidden')) { closeCollectionModal(); return; }
-    if (elements.multitabModal && !elements.multitabModal.classList.contains('hidden')) { closeMultiTabModal(); return; }
+    // Settings modal visibility is driven by store state — read it directly
+    // instead of probing classList on a (now stale) cached ref.
+    if (state.settingsModalState.open) {
+      closeSettings();
+      return;
+    }
+    // Modal visibility is now driven by store state — read it directly
+    // instead of probing classList on cached (potentially stale) refs.
+    if (state.dedupModalState.open) {
+      closeDedupModal();
+      return;
+    }
+    if (state.collectionModalState.open) {
+      closeCollectionModal();
+      return;
+    }
+    if (state.multitabModalState.open) {
+      closeMultiTabModal();
+      return;
+    }
     hideDownloadDropdown();
     closeAllFilterDropdowns();
     // Clear selection and remove page highlights
@@ -246,7 +276,11 @@ export function handleKeyDown(e: KeyboardEvent): void {
 
   // Don't handle shortcuts when typing in inputs
   const target = e.target as HTMLElement | null;
-  if (target && (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT')) return;
+  if (
+    target &&
+    (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.tagName === 'SELECT')
+  )
+    return;
 
   if ((e.ctrlKey || e.metaKey) && e.key === 'a') {
     e.preventDefault();

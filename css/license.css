@@ -25,7 +25,9 @@
   background: var(--bg-color);
   color: var(--text-primary);
   outline: none;
-  transition: border-color 0.2s, box-shadow 0.2s;
+  transition:
+    border-color 0.2s,
+    box-shadow 0.2s;
 }
 
 .license-input:hover {
@@ -105,7 +107,7 @@
   padding: 3px 10px;
   border-radius: 20px;
   color: #5a3e00;
-  text-shadow: 0 0.5px 0 rgba(255,255,255,0.3);
+  text-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.3);
 }
 
 .license-status-badge.active {
@@ -187,6 +189,11 @@
 }
 
 @keyframes pulse-badge {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.6; }
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
 }

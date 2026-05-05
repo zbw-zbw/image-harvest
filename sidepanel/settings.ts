@@ -4,13 +4,8 @@ import { MESSAGE_TYPES, PRICING_PAGE_URL } from '../shared/constants';
 import { applyFilters, renderColorSwatches, syncCustomSizeInputsFromSettings } from './filter';
 import { detectSimilarImages } from './pro-features';
 import { fetchImages, processImageExtras } from './scan';
-import { elements, state } from './state';
-import {
-  checkNarrowMode,
-  showConfirmDialog,
-  showToast,
-  updateFilterButtonLabels
-} from './ui';
+import { state } from './state';
+import { checkNarrowMode, showConfirmDialog, showToast, updateFilterButtonLabels } from './ui';
 
 // ============================================
 // Hotkey Display
@@ -21,7 +16,7 @@ const MODIFIER_SYMBOLS: Record<string, string> = {
   Alt: '⌥',
   Shift: '⇧',
   Command: '⌘',
-  MacCtrl: '⌃'
+  MacCtrl: '⌃',
 };
 
 function formatShortcutKey(key: string): string {
@@ -35,7 +30,7 @@ export async function renderHotkeyDisplay(): Promise<void> {
   let shortcut = '';
   try {
     const commands = await chrome.commands.getAll();
-    const actionCommand = commands.find(cmd => cmd.name === '_execute_action');
+    const actionCommand = commands.find((cmd) => cmd.name === '_execute_action');
     if (actionCommand && actionCommand.shortcut) {
       shortcut = actionCommand.shortcut;
     }
@@ -70,10 +65,14 @@ export function openShortcutSettings(): void {
 // Settings
 // ============================================
 export function showSettings(): void {
-  if (!elements.settingsModal) return;
-  elements.settingsModal.classList.remove('hidden');
-  // Reset scroll position to top
-  const modalBody = elements.settingsModal.querySelector('.modal-body');
+  // Visibility is now driven by the Preact <SettingsModal> shell. The modal
+  // body subtree was moved into the Preact-rendered slot at mount time, so
+  // all the getElementById('setting-xxx') calls below continue to work.
+  state.settingsModalState = { open: true };
+  // Re-resolve the modal element (cached ref is stale post-mount) and scroll
+  // its body to the top for a fresh entry experience.
+  const modalEl = document.getElementById('settings-modal');
+  const modalBody = modalEl?.querySelector('.modal-body');
   if (modalBody) modalBody.scrollTop = 0;
 
   // Render hotkey display
@@ -86,25 +85,40 @@ export function showSettings(): void {
   setSelect('setting-default-group', (state.appSettings.defaultGroup as string) || 'none');
   setToggle('setting-download-options', state.appSettings.specifyDownload !== false);
   setInput('setting-subfolder', (state.appSettings.subfolder as string) || '{domain}');
-  setInput('setting-filename', (state.appSettings.filenameTemplate as string) || 'img_{index}_{original}.{format}');
+  setInput(
+    'setting-filename',
+    (state.appSettings.filenameTemplate as string) || 'img_{index}_{original}.{format}'
+  );
   setSelect('setting-convert-format', (state.appSettings.convertFormat as string) || 'none');
   setToggle('setting-all-frames', !!state.appSettings.searchAllFrames);
-  setToggle('setting-live-monitor', state.isProUser ? (state.appSettings.liveMonitoring !== false) : false);
+  setToggle(
+    'setting-live-monitor',
+    state.isProUser ? state.appSettings.liveMonitoring !== false : false
+  );
   setToggle('setting-min-size', !!state.appSettings.enableMinSize);
   setInput('setting-min-width', String((state.appSettings.minWidth as number | undefined) || 50));
   setInput('setting-min-height', String((state.appSettings.minHeight as number | undefined) || 50));
   setToggle('setting-max-size', !!state.appSettings.enableMaxSize);
   setInput('setting-max-width', String((state.appSettings.maxWidth as number | undefined) || 8000));
-  setInput('setting-max-height', String((state.appSettings.maxHeight as number | undefined) || 8000));
-  setToggle('setting-similar-detection', state.isProUser ? (state.appSettings.enableSimilarDetection !== false) : false);
-  setToggle('setting-color-extract', state.isProUser ? (state.appSettings.enableColorExtraction !== false) : false);
+  setInput(
+    'setting-max-height',
+    String((state.appSettings.maxHeight as number | undefined) || 8000)
+  );
+  setToggle(
+    'setting-similar-detection',
+    state.isProUser ? state.appSettings.enableSimilarDetection !== false : false
+  );
+  setToggle(
+    'setting-color-extract',
+    state.isProUser ? state.appSettings.enableColorExtraction !== false : false
+  );
   setToggle('setting-no-warning', !!state.appSettings.noManyFilesWarning);
 
   // Sync setting-inputs sub-panel visibility
   const togglePanelPairs: Array<[string, string]> = [
     ['setting-download-options', 'download-options-inputs'],
     ['setting-min-size', 'min-size-inputs'],
-    ['setting-max-size', 'max-size-inputs']
+    ['setting-max-size', 'max-size-inputs'],
   ];
   togglePanelPairs.forEach(([checkboxId, panelId]) => {
     const checkbox = document.getElementById(checkboxId) as HTMLInputElement | null;
@@ -116,7 +130,7 @@ export function showSettings(): void {
 }
 
 export function closeSettings(): void {
-  if (elements.settingsModal) elements.settingsModal.classList.add('hidden');
+  state.settingsModalState = { open: false };
 }
 
 export async function saveSettings(): Promise<void> {
@@ -125,13 +139,27 @@ export async function saveSettings(): Promise<void> {
   const prevSearchAllFrames = state.appSettings.searchAllFrames;
 
   state.appSettings.useSidePanel = getToggle('setting-side-panel');
-  state.appSettings.density = (getRadio('layout-density') || 'standard') as 'compact' | 'standard' | 'comfortable';
+  state.appSettings.density = (getRadio('layout-density') || 'standard') as
+    | 'compact'
+    | 'standard'
+    | 'comfortable';
   state.appSettings.theme = (getRadio('theme') || 'system') as 'system' | 'light' | 'dark';
-  state.appSettings.defaultGroup = (getSelect('setting-default-group') || 'none') as 'none' | 'domain' | 'format' | 'size' | 'tab';
+  state.appSettings.defaultGroup = (getSelect('setting-default-group') || 'none') as
+    | 'none'
+    | 'domain'
+    | 'format'
+    | 'size'
+    | 'tab';
   state.appSettings.specifyDownload = getToggle('setting-download-options');
   state.appSettings.subfolder = getInput('setting-subfolder') || '{domain}';
-  state.appSettings.filenameTemplate = getInput('setting-filename') || 'img_{index}_{original}.{format}';
-  state.appSettings.convertFormat = (getSelect('setting-convert-format') || 'none') as 'none' | 'png' | 'jpg' | 'jpeg' | 'webp';
+  state.appSettings.filenameTemplate =
+    getInput('setting-filename') || 'img_{index}_{original}.{format}';
+  state.appSettings.convertFormat = (getSelect('setting-convert-format') || 'none') as
+    | 'none'
+    | 'png'
+    | 'jpg'
+    | 'jpeg'
+    | 'webp';
   state.appSettings.searchAllFrames = getToggle('setting-all-frames');
   // Free tier: Live Monitoring requires Pro
   state.appSettings.liveMonitoring = state.isProUser ? getToggle('setting-live-monitor') : false;
@@ -147,15 +175,16 @@ export async function saveSettings(): Promise<void> {
 
   try {
     const stored = await chrome.storage.local.get('appSettings');
-    const previousUseSidePanel = (stored.appSettings as { useSidePanel?: boolean } | undefined)?.useSidePanel;
+    const previousUseSidePanel = (stored.appSettings as { useSidePanel?: boolean } | undefined)
+      ?.useSidePanel;
     await chrome.storage.local.set({ appSettings: state.appSettings });
     applyTheme(state.appSettings.theme as string);
     applyDensity(state.appSettings.density as string);
     updateLiveIndicator();
 
     // Only switch display mode and show mode toast if it actually changed
-    const displayModeChanged = previousUseSidePanel !== undefined
-      && previousUseSidePanel !== state.appSettings.useSidePanel;
+    const displayModeChanged =
+      previousUseSidePanel !== undefined && previousUseSidePanel !== state.appSettings.useSidePanel;
     if (displayModeChanged) {
       await switchDisplayMode(!!state.appSettings.useSidePanel);
     }
@@ -199,25 +228,43 @@ export async function saveSettings(): Promise<void> {
 
 export function resetSettings(): void {
   state.appSettings = {
-    useSidePanel: true, density: 'standard', theme: 'system',
-    defaultGroup: 'none', specifyDownload: true, subfolder: '{domain}',
-    filenameTemplate: 'img_{index}_{original}.{format}', convertFormat: 'none',
-    searchAllFrames: false, liveMonitoring: false,
-    enableMinSize: false, minWidth: 50, minHeight: 50,
-    enableMaxSize: false, maxWidth: 8000, maxHeight: 8000,
-    enableSimilarDetection: false, enableColorExtraction: false,
-    noManyFilesWarning: false
+    useSidePanel: true,
+    density: 'standard',
+    theme: 'system',
+    defaultGroup: 'none',
+    specifyDownload: true,
+    subfolder: '{domain}',
+    filenameTemplate: 'img_{index}_{original}.{format}',
+    convertFormat: 'none',
+    searchAllFrames: false,
+    liveMonitoring: false,
+    enableMinSize: false,
+    minWidth: 50,
+    minHeight: 50,
+    enableMaxSize: false,
+    maxWidth: 8000,
+    maxHeight: 8000,
+    enableSimilarDetection: false,
+    enableColorExtraction: false,
+    noManyFilesWarning: false,
   };
   showSettings();
   updateLiveIndicator();
   showToast('Settings reset to defaults', 'success');
 }
 
+/**
+ * Legacy entry point retained for back-compat with existing call sites.
+ *
+ * The visible badge is now a Preact component (`LiveIndicator`) mounted by
+ * `mountLiveIndicator()` during init. The component subscribes directly to
+ * `store` via `useStoreSelector`, so any mutation that affects its inputs
+ * (`state.isProUser`, `state.appSettings.liveMonitoring`) re-renders
+ * automatically — this function is a no-op kept to avoid ripping out the
+ * dozens of `updateLiveIndicator()` call sites in one go.
+ */
 export function updateLiveIndicator(): void {
-  if (elements.liveIndicator) {
-    const isActive = state.isProUser && state.appSettings.liveMonitoring !== false;
-    elements.liveIndicator.classList.toggle('hidden', !isActive);
-  }
+  // Intentionally empty — Preact handles re-rendering reactively.
 }
 
 export function applyTheme(theme: string): void {
@@ -235,7 +282,11 @@ export function applyDensity(density: string): void {
     app.classList.add(`density-${density}`);
   }
   // Also apply to html/body for popup mode compatibility
-  document.documentElement.classList.remove('density-compact', 'density-standard', 'density-comfortable');
+  document.documentElement.classList.remove(
+    'density-compact',
+    'density-standard',
+    'density-comfortable'
+  );
   document.documentElement.classList.add(`density-${density}`);
   checkNarrowMode();
 }
@@ -247,7 +298,7 @@ export async function switchDisplayMode(useSidePanel: boolean): Promise<void> {
       type: 'SET_DISPLAY_MODE',
       useSidePanel,
       openSidePanel: useSidePanel && state.isPopupMode,
-      tabId: activeTab?.id
+      tabId: activeTab?.id,
     });
 
     // popup → side panel: window.close() reliably closes the popup window.
@@ -277,7 +328,7 @@ export function setSelect(id: string, value: string): void {
   el.dataset.value = value;
   const textEl = el.querySelector('.setting-select-text');
   const options = el.querySelectorAll<HTMLElement>('.setting-select-option');
-  options.forEach(opt => {
+  options.forEach((opt) => {
     const isActive = opt.dataset.value === value;
     opt.classList.toggle('active', isActive);
     if (isActive && textEl) textEl.textContent = opt.textContent;
@@ -285,14 +336,18 @@ export function setSelect(id: string, value: string): void {
 }
 export function getSelect(id: string): string {
   const el = document.getElementById(id) as HTMLElement | null;
-  return el ? (el.dataset.value || '') : '';
+  return el ? el.dataset.value || '' : '';
 }
 export function setRadio(name: string, value: string): void {
-  const radio = document.querySelector<HTMLInputElement>(`input[type="radio"][name="${name}"][value="${value}"]`);
+  const radio = document.querySelector<HTMLInputElement>(
+    `input[type="radio"][name="${name}"][value="${value}"]`
+  );
   if (radio) radio.checked = true;
 }
 export function getRadio(name: string): string {
-  const checked = document.querySelector<HTMLInputElement>(`input[type="radio"][name="${name}"]:checked`);
+  const checked = document.querySelector<HTMLInputElement>(
+    `input[type="radio"][name="${name}"]:checked`
+  );
   return checked ? checked.value : '';
 }
 export function setInput(id: string, value: string | number): void {
@@ -333,8 +388,8 @@ export function toggleFilterDropdown(filterType: string): void {
       dropdown.classList.add('hidden');
       dropdown.style.visibility = '';
 
-      const wouldOverflowRight = (btnRect.left + dropdownWidth) > viewportWidth;
-      const wouldOverflowLeft = (btnRect.left + dropdownLeft) < 0;
+      const wouldOverflowRight = btnRect.left + dropdownWidth > viewportWidth;
+      const wouldOverflowLeft = btnRect.left + dropdownLeft < 0;
 
       if (wouldOverflowRight && !wouldOverflowLeft) {
         // Align dropdown right edge to viewport right with some padding
@@ -351,7 +406,7 @@ export function toggleFilterDropdown(filterType: string): void {
         // But also check if it would overflow the left side of viewport
         const absoluteLeft = containerRect.left + dropdownLeft;
         if (absoluteLeft < 4) {
-          dropdown.style.left = (4 - containerRect.left) + 'px';
+          dropdown.style.left = 4 - containerRect.left + 'px';
         } else {
           dropdown.style.left = dropdownLeft + 'px';
         }
@@ -363,7 +418,7 @@ export function toggleFilterDropdown(filterType: string): void {
 }
 
 export function closeAllFilterDropdowns(): void {
-  document.querySelectorAll('.filter-dropdown').forEach(d => d.classList.add('hidden'));
+  document.querySelectorAll('.filter-dropdown').forEach((d) => d.classList.add('hidden'));
 }
 
 // ============================================
@@ -398,7 +453,8 @@ export async function applyProFeatureVisibility(): Promise<void> {
 
   // Similar Detection: dedup button & info in status bar
   const dedupInfo = document.getElementById('dedup-info');
-  if (dedupInfo) dedupInfo.classList.toggle('hidden', !similarEnabled || state.similarGroups.length === 0);
+  if (dedupInfo)
+    dedupInfo.classList.toggle('hidden', !similarEnabled || state.similarGroups.length === 0);
 
   // Color Extraction: color bars always visible for all users (visual appeal)
   // But copy HEX and color filter require Pro (handled in click events)
@@ -419,9 +475,9 @@ export async function applyProFeatureVisibility(): Promise<void> {
   const proToggles: Array<HTMLInputElement | null> = [
     document.getElementById('setting-similar-detection') as HTMLInputElement | null,
     document.getElementById('setting-color-extract') as HTMLInputElement | null,
-    document.getElementById('setting-live-monitor') as HTMLInputElement | null
+    document.getElementById('setting-live-monitor') as HTMLInputElement | null,
   ];
-  proToggles.forEach(toggle => {
+  proToggles.forEach((toggle) => {
     if (!toggle) return;
     if (!state.isProUser) {
       toggle.checked = false;
@@ -497,48 +553,35 @@ export function maskLicenseKey(key: string): string {
 type BoundButton = HTMLElement & { _bound?: boolean };
 
 export async function updateTopProStatus(): Promise<void> {
-  const freeSection = document.getElementById('pro-status-free');
-  const activeSection = document.getElementById('pro-status-active');
-  if (!freeSection || !activeSection) return;
-
+  // The free/active toggle and the plan/expiry strings are now driven by
+  // <ProStatusBadge> via two store fields: state.isProUser (already present)
+  // and state.proLicenseInfo (pushed below). This function only needs to
+  // refresh the license payload + bind the deactivate handler exactly once.
   if (state.isProUser) {
-    freeSection.classList.add('hidden');
-    activeSection.classList.remove('hidden');
-
     try {
       const info = await chrome.runtime.sendMessage({ type: MESSAGE_TYPES.GET_LICENSE_STATUS });
-
-      const planLabel = document.getElementById('pro-plan-label');
-      if (planLabel && info?.plan) {
-        const planLabels: Record<string, string> = { monthly: 'Monthly', yearly: 'Yearly', lifetime: 'Lifetime' };
-        planLabel.textContent = planLabels[info.plan] || info.plan;
-      }
-
-      const expiryLabel = document.getElementById('pro-expiry-label');
-      if (expiryLabel) {
-        if (info?.plan === 'lifetime') {
-          expiryLabel.textContent = 'Never expires';
-        } else if (info?.expiresAt) {
-          expiryLabel.textContent = `Expires: ${formatDateYMD(info.expiresAt)}`;
-        } else {
-          expiryLabel.textContent = '';
-        }
-      }
+      state.proLicenseInfo = info?.plan
+        ? { plan: info.plan, expiresAt: info.expiresAt }
+        : state.proLicenseInfo;
     } catch {
-      // Ignore errors, keep badge visible
+      // Ignore errors — keep whatever info we already have so the badge
+      // doesn't flicker between states on transient network failures.
     }
 
-    // Bind deactivate button
+    // Bind deactivate button. The button is rendered by Preact, so we look
+    // it up after each call (it may have been re-mounted) but flip a flag on
+    // the DOM node to prevent duplicate listeners.
     const deactivateBtn = document.getElementById('btn-top-deactivate') as BoundButton | null;
     if (deactivateBtn && !deactivateBtn._bound) {
       deactivateBtn._bound = true;
       deactivateBtn.addEventListener('click', async () => {
         const confirmed = await showConfirmDialog({
           title: 'Deactivate License',
-          message: 'Are you sure you want to deactivate your license on this device? You can activate it on another device after deactivation.',
+          message:
+            'Are you sure you want to deactivate your license on this device? You can activate it on another device after deactivation.',
           confirmText: 'Deactivate',
           cancelText: 'Cancel',
-          type: 'danger'
+          type: 'danger',
         });
         if (!confirmed) return;
         try {
@@ -551,29 +594,28 @@ export async function updateTopProStatus(): Promise<void> {
       });
     }
   } else {
-    freeSection.classList.remove('hidden');
-    activeSection.classList.add('hidden');
+    // Pro user → free transition: clear stale plan/expiry so the badge
+    // doesn't keep them around on the next reactivation.
+    state.proLicenseInfo = null;
   }
 }
 
 /**
- * Open the Pro upgrade modal
+ * Open the Pro upgrade modal. Visibility is now driven by store state; the
+ * input focus + scroll-reset still happen here because they're imperative
+ * UX touches that don't fit the declarative store pattern.
  */
 export function showProUpgradeModal(): void {
+  state.proUpgradeModalState = { open: true, errorText: '' };
   const modal = document.getElementById('pro-upgrade-modal');
-  if (modal) {
-    modal.classList.remove('hidden');
-    // Reset scroll position to top
-    const modalBody = modal.querySelector('.modal-body');
-    if (modalBody) modalBody.scrollTop = 0;
-    const input = document.getElementById('pro-modal-key-input') as HTMLInputElement | null;
-    if (input) input.focus();
-  }
+  const modalBody = modal?.querySelector('.modal-body');
+  if (modalBody) modalBody.scrollTop = 0;
+  const input = document.getElementById('pro-modal-key-input') as HTMLInputElement | null;
+  if (input) input.focus();
 }
 
 export function closeProUpgradeModal(): void {
-  const modal = document.getElementById('pro-upgrade-modal');
-  if (modal) modal.classList.add('hidden');
+  state.proUpgradeModalState = { open: false, errorText: '' };
 }
 
 /**
@@ -595,15 +637,20 @@ export async function updateLicenseUI(): Promise<void> {
       const keyMasked = document.getElementById('license-key-masked');
       if (keyMasked && info.licenseKey) {
         const key: string = info.licenseKey;
-        keyMasked.textContent = key.length > 8
-          ? key.substring(0, 4) + '-****-****-' + key.substring(key.length - 4)
-          : key;
+        keyMasked.textContent =
+          key.length > 8
+            ? key.substring(0, 4) + '-****-****-' + key.substring(key.length - 4)
+            : key;
       }
 
       // Plan badge
       const planBadge = document.getElementById('license-plan-badge');
       if (planBadge && info.plan) {
-        const planLabels: Record<string, string> = { monthly: 'Monthly', yearly: 'Yearly', lifetime: 'Lifetime' };
+        const planLabels: Record<string, string> = {
+          monthly: 'Monthly',
+          yearly: 'Yearly',
+          lifetime: 'Lifetime',
+        };
         planBadge.textContent = planLabels[info.plan] || info.plan;
       }
 
@@ -634,25 +681,32 @@ export async function updateLicenseUI(): Promise<void> {
 export function bindLicenseEvents(): void {
   // ---- Settings modal: License activation ----
   const activateBtn = document.getElementById('btn-activate-license') as HTMLButtonElement | null;
-  const deactivateBtn = document.getElementById('btn-deactivate-license') as HTMLButtonElement | null;
+  const deactivateBtn = document.getElementById(
+    'btn-deactivate-license'
+  ) as HTMLButtonElement | null;
   const licenseInput = document.getElementById('license-key-input') as HTMLInputElement | null;
   const licenseError = document.getElementById('license-error');
   const getProLink = document.getElementById('link-get-pro');
 
   if (activateBtn && licenseInput) {
-    activateBtn.addEventListener('click', () => activateLicenseFromInput(licenseInput, licenseError, activateBtn));
+    activateBtn.addEventListener('click', () =>
+      activateLicenseFromInput(licenseInput, licenseError, activateBtn)
+    );
     bindLicenseKeyFormatter(licenseInput);
-    licenseInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') activateBtn.click(); });
+    licenseInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') activateBtn.click();
+    });
   }
 
   if (deactivateBtn) {
     deactivateBtn.addEventListener('click', async () => {
       const confirmed = await showConfirmDialog({
         title: 'Deactivate License',
-        message: 'Are you sure you want to deactivate your license on this device? You can reactivate it later.',
+        message:
+          'Are you sure you want to deactivate your license on this device? You can reactivate it later.',
         confirmText: 'Deactivate',
         cancelText: 'Cancel',
-        type: 'danger'
+        type: 'danger',
       });
       if (!confirmed) return;
       deactivateBtn.disabled = true;
@@ -695,15 +749,21 @@ export function bindLicenseEvents(): void {
     if (overlay) overlay.addEventListener('click', closeProUpgradeModal);
   }
 
-  const proModalActivateBtn = document.getElementById('btn-pro-modal-activate') as HTMLButtonElement | null;
+  const proModalActivateBtn = document.getElementById(
+    'btn-pro-modal-activate'
+  ) as HTMLButtonElement | null;
   const proModalInput = document.getElementById('pro-modal-key-input') as HTMLInputElement | null;
   const proModalError = document.getElementById('pro-modal-error');
   const proModalGetLink = document.getElementById('link-pro-modal-get');
 
   if (proModalActivateBtn && proModalInput) {
-    proModalActivateBtn.addEventListener('click', () => activateLicenseFromInput(proModalInput, proModalError, proModalActivateBtn, true));
+    proModalActivateBtn.addEventListener('click', () =>
+      activateLicenseFromInput(proModalInput, proModalError, proModalActivateBtn, true)
+    );
     bindLicenseKeyFormatter(proModalInput);
-    proModalInput.addEventListener('keydown', (e) => { if (e.key === 'Enter') proModalActivateBtn.click(); });
+    proModalInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') proModalActivateBtn.click();
+    });
   }
 
   if (proModalGetLink) {
@@ -717,19 +777,23 @@ export function bindLicenseEvents(): void {
   // Pro feature buttons: open upgrade modal + toast
   const proLockedButtons: Array<{ id: string; label: string }> = [
     { id: 'btn-collection', label: 'Collection' },
-    { id: 'btn-multitab', label: 'Multi-Tab Extract' }
+    { id: 'btn-multitab', label: 'Multi-Tab Extract' },
   ];
   proLockedButtons.forEach(({ id, label }) => {
     const btn = document.getElementById(id);
     if (!btn) return;
-    btn.addEventListener('click', (e) => {
-      if (!state.isProUser) {
-        e.stopImmediatePropagation();
-        e.preventDefault();
-        showToast(`${label} is a Pro feature. Upgrade to unlock!`, 'warning');
-        showProUpgradeModal();
-      }
-    }, true);
+    btn.addEventListener(
+      'click',
+      (e) => {
+        if (!state.isProUser) {
+          e.stopImmediatePropagation();
+          e.preventDefault();
+          showToast(`${label} is a Pro feature. Upgrade to unlock!`, 'warning');
+          showProUpgradeModal();
+        }
+      },
+      true
+    );
   });
 
   // Color filter: free users can open dropdown to see colors, but clicking a swatch triggers Pro upgrade
@@ -739,23 +803,27 @@ export function bindLicenseEvents(): void {
   const proSettingToggles: Array<HTMLElement | null> = [
     document.getElementById('setting-similar-detection'),
     document.getElementById('setting-color-extract'),
-    document.getElementById('setting-live-monitor')
+    document.getElementById('setting-live-monitor'),
   ];
-  proSettingToggles.forEach(toggle => {
+  proSettingToggles.forEach((toggle) => {
     if (!toggle) return;
-    toggle.addEventListener('click', (e) => {
-      if (!state.isProUser) {
-        e.preventDefault();
-        e.stopImmediatePropagation();
-        closeSettings();
-        showToast('This setting requires Pro. Upgrade to unlock!', 'warning');
-        showProUpgradeModal();
-      }
-    }, true);
+    toggle.addEventListener(
+      'click',
+      (e) => {
+        if (!state.isProUser) {
+          e.preventDefault();
+          e.stopImmediatePropagation();
+          closeSettings();
+          showToast('This setting requires Pro. Upgrade to unlock!', 'warning');
+          showProUpgradeModal();
+        }
+      },
+      true
+    );
   });
 
   // Settings: Pro input fields interception (Subfolder, Filename Template)
-  ['setting-subfolder', 'setting-filename'].forEach(id => {
+  ['setting-subfolder', 'setting-filename'].forEach((id) => {
     const input = document.getElementById(id) as HTMLInputElement | null;
     if (!input) return;
     input.addEventListener('focus', (e) => {
@@ -796,7 +864,7 @@ export async function activateLicenseFromInput(
   try {
     const result = await chrome.runtime.sendMessage({
       type: MESSAGE_TYPES.ACTIVATE_LICENSE,
-      licenseKey: key
+      licenseKey: key,
     });
 
     if (result?.success) {

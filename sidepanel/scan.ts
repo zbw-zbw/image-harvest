@@ -10,13 +10,7 @@ import { applyFilters, renderColorSwatches } from './filter';
 import { detectSimilarImages, renderColorBar } from './pro-features';
 import { saveTabImageCache } from '../shared/storage';
 import { elements, state } from './state';
-import {
-  hideLoading,
-  showEmpty,
-  showError,
-  showLoading,
-  showToast
-} from './ui';
+import { hideLoading, showEmpty, showError, showLoading, showToast } from './ui';
 import { fetchImageMeta, formatBytes, generateId } from './utils';
 
 // ============================================
@@ -45,39 +39,45 @@ export function handleScanCancel(): void {
 }
 
 export function showScanOverlay(current: number, total: number): void {
-  if (elements.scanOverlay) elements.scanOverlay.classList.remove('hidden');
-  // Disable toolbar and status bar during scan
-  document.querySelectorAll('.toolbar, .status-bar').forEach(el => el.classList.add('scanning-disabled'));
-  updateScanProgress(current, total);
+  // <ScanProgressOverlay> reads the entire scanProgress object — flipping
+  // visible: true is enough to show the overlay. Title / indeterminate are
+  // set by the caller (showLoading / rescanWithProgress) before this call.
+  state.scanProgress = {
+    ...state.scanProgress,
+    visible: true,
+    current,
+    total,
+  };
+  // Disable toolbar and status bar during scan (still purely DOM CSS state).
+  document
+    .querySelectorAll('.toolbar, .status-bar')
+    .forEach((el) => el.classList.add('scanning-disabled'));
 }
 
 export function hideScanOverlay(): void {
-  if (elements.scanOverlay) {
-    elements.scanOverlay.classList.add('hidden');
-  }
-  // Re-enable toolbar and status bar
-  document.querySelectorAll('.toolbar, .status-bar').forEach(el => el.classList.remove('scanning-disabled'));
-  // Restore progress bar visibility for next scan
-  const scanProgressBar = elements.scanOverlay?.querySelector('.progress-bar');
-  if (scanProgressBar) scanProgressBar.classList.remove('hidden');
+  // Reset to non-visible + clear indeterminate flag so the next scan starts
+  // from a known state (next showLoading will set indeterminate again).
+  state.scanProgress = {
+    ...state.scanProgress,
+    visible: false,
+    indeterminate: false,
+    currentUrl: '',
+  };
+  document
+    .querySelectorAll('.toolbar, .status-bar')
+    .forEach((el) => el.classList.remove('scanning-disabled'));
 }
 
 export function updateScanProgress(current: number, total: number, currentUrl = ''): void {
-  if (elements.scanProgressFill) {
-    const percent = total > 0 ? Math.round((current / total) * 100) : 0;
-    (elements.scanProgressFill as HTMLElement).style.width = percent + '%';
-  }
-  if (elements.scanProgressText) {
-    if (total === 0) {
-      elements.scanProgressText.textContent = 'scanning for images...';
-    } else {
-      elements.scanProgressText.textContent = `${current} / ${total} images`;
-    }
-  }
-  if (elements.scanProgressCurrent) {
-    elements.scanProgressCurrent.textContent = currentUrl || '\u00A0';
-    elements.scanProgressCurrent.title = currentUrl;
-  }
+  // Receiving a real total flips us out of indeterminate mode (the percent
+  // bar should appear). The component re-derives the percent string itself.
+  state.scanProgress = {
+    ...state.scanProgress,
+    current,
+    total,
+    currentUrl,
+    indeterminate: total === 0 ? state.scanProgress.indeterminate : false,
+  };
 }
 
 // ============================================
@@ -112,7 +112,7 @@ export async function silentRescan(tabId: number, tabUrl: string): Promise<void>
     const response = await chrome.runtime.sendMessage({
       type: MESSAGE_TYPES.GET_IMAGES,
       searchAllFrames: state.appSettings.searchAllFrames || false,
-      liveMonitoring: state.appSettings.liveMonitoring !== false
+      liveMonitoring: state.appSettings.liveMonitoring !== false,
     });
 
     // Abort if the user switched tabs while we were scanning
@@ -130,15 +130,16 @@ export async function silentRescan(tabId: number, tabUrl: string): Promise<void>
         tabIndex: img.tabIndex ?? currentTabIndex,
         isCurrentTab: !img.tabTitle,
         colors: undefined,
-        phash: null
+        phash: null,
       }));
 
       // Compare against the pre-rescan snapshot
-      const preRescanUrls = new Set(preRescanImages.map(img => img.url));
-      const freshUrls = new Set(freshImages.map(img => img.url));
-      const hasChanges = freshImages.length !== preRescanImages.length
-        || freshImages.some(img => !preRescanUrls.has(img.url))
-        || preRescanImages.some(img => !freshUrls.has(img.url));
+      const preRescanUrls = new Set(preRescanImages.map((img) => img.url));
+      const freshUrls = new Set(freshImages.map((img) => img.url));
+      const hasChanges =
+        freshImages.length !== preRescanImages.length ||
+        freshImages.some((img) => !preRescanUrls.has(img.url)) ||
+        preRescanImages.some((img) => !freshUrls.has(img.url));
 
       // Double-check tab hasn't changed before updating UI
       if (state.currentTabId !== tabId) {
@@ -150,15 +151,15 @@ export async function silentRescan(tabId: number, tabUrl: string): Promise<void>
       // Always replace allImages with the authoritative fresh result
       const previousSelection = new Set(state.selectedImages);
       state.allImages = freshImages;
-      state.selectedImages = new Set([...previousSelection].filter(id =>
-        freshImages.some(img => img.id === id)
-      ));
+      state.selectedImages = new Set(
+        [...previousSelection].filter((id) => freshImages.some((img) => img.id === id))
+      );
       applyFilters();
       updateSelectionUI();
 
       if (hasChanges) {
-        const added = freshImages.filter(img => !preRescanUrls.has(img.url)).length;
-        const removed = [...preRescanUrls].filter(url => !freshUrls.has(url)).length;
+        const added = freshImages.filter((img) => !preRescanUrls.has(img.url)).length;
+        const removed = [...preRescanUrls].filter((url) => !freshUrls.has(url)).length;
         const parts: string[] = [];
         if (added > 0) parts.push(`${added} new`);
         if (removed > 0) parts.push(`${removed} removed`);
@@ -169,7 +170,7 @@ export async function silentRescan(tabId: number, tabUrl: string): Promise<void>
       state.tabCache.set(tabId, {
         url: tabUrl,
         images: state.allImages,
-        selectedImages: new Set(state.selectedImages)
+        selectedImages: new Set(state.selectedImages),
       });
       saveTabImageCache(tabId, tabUrl, state.allImages);
 
@@ -198,12 +199,14 @@ export async function rescanWithProgress(tabId: number, tabUrl: string): Promise
   state.scanDiscoveredImages = [];
   state.scanAborted = false;
 
-  // Show scan overlay on top of the existing image grid (don't replace with skeletons)
-  if (elements.scanProgressTitle) {
-    elements.scanProgressTitle.textContent = 'Updating...';
-  }
-  const scanProgressBar = elements.scanOverlay?.querySelector('.progress-bar');
-  if (scanProgressBar) scanProgressBar.classList.add('hidden');
+  // Show scan overlay on top of the existing image grid (don't replace with skeletons).
+  // Title flips to "Updating..." (vs. the default "Scanning...") and we go
+  // back into indeterminate mode because we don't know the total yet.
+  state.scanProgress = {
+    ...state.scanProgress,
+    title: 'Updating...',
+    indeterminate: true,
+  };
   showScanOverlay(0, 0);
 
   try {
@@ -221,7 +224,7 @@ export async function rescanWithProgress(tabId: number, tabUrl: string): Promise
     const response = await chrome.runtime.sendMessage({
       type: MESSAGE_TYPES.GET_IMAGES,
       searchAllFrames: state.appSettings.searchAllFrames || false,
-      liveMonitoring: state.appSettings.liveMonitoring !== false
+      liveMonitoring: state.appSettings.liveMonitoring !== false,
     });
 
     state.isScanning = false;
@@ -247,30 +250,30 @@ export async function rescanWithProgress(tabId: number, tabUrl: string): Promise
         tabIndex: img.tabIndex ?? currentTabIndex,
         isCurrentTab: !img.tabTitle,
         colors: undefined,
-        phash: null
+        phash: null,
       }));
 
       // Merge images discovered by live monitoring during the scan that
       // were not included in the final GET_IMAGES result.
-      const freshUrls = new Set(freshImages.map(img => img.url));
+      const freshUrls = new Set(freshImages.map((img) => img.url));
       const extraDiscovered: ImageItem[] = state.scanDiscoveredImages
-        .filter(img => !freshUrls.has(img.url))
-        .map(img => ({
+        .filter((img) => !freshUrls.has(img.url))
+        .map((img) => ({
           ...img,
           id: img.id || generateId(img.url),
           tabTitle: img.tabTitle || currentTabTitle,
           tabIndex: img.tabIndex ?? currentTabIndex,
           isCurrentTab: !img.tabTitle,
           colors: undefined,
-          phash: null
+          phash: null,
         }));
       const mergedImages = [...freshImages, ...extraDiscovered];
 
       const previousSelection = new Set(state.selectedImages);
       state.allImages = mergedImages;
-      state.selectedImages = new Set([...previousSelection].filter(id =>
-        mergedImages.some(img => img.id === id)
-      ));
+      state.selectedImages = new Set(
+        [...previousSelection].filter((id) => mergedImages.some((img) => img.id === id))
+      );
 
       hideScanOverlay();
       applyFilters();
@@ -281,7 +284,7 @@ export async function rescanWithProgress(tabId: number, tabUrl: string): Promise
       state.tabCache.set(tabId, {
         url: tabUrl,
         images: state.allImages,
-        selectedImages: new Set(state.selectedImages)
+        selectedImages: new Set(state.selectedImages),
       });
       saveTabImageCache(tabId, tabUrl, state.allImages);
 
@@ -297,7 +300,10 @@ export async function rescanWithProgress(tabId: number, tabUrl: string): Promise
     }
   } catch (error) {
     state.isScanning = false;
-    if (state.scanAborted) { state.isFetching = false; return; }
+    if (state.scanAborted) {
+      state.isFetching = false;
+      return;
+    }
     console.warn('Rescan with progress failed:', error);
     hideScanOverlay();
   }
@@ -329,7 +335,7 @@ export async function fetchImages(): Promise<void> {
     const response = await chrome.runtime.sendMessage({
       type: MESSAGE_TYPES.GET_IMAGES,
       searchAllFrames: state.appSettings.searchAllFrames || false,
-      liveMonitoring: state.appSettings.liveMonitoring !== false
+      liveMonitoring: state.appSettings.liveMonitoring !== false,
     });
 
     state.isScanning = false;
@@ -349,24 +355,24 @@ export async function fetchImages(): Promise<void> {
         tabIndex: img.tabIndex ?? currentTabIndex,
         isCurrentTab: !img.tabTitle,
         colors: undefined,
-        phash: null
+        phash: null,
       }));
 
       // Merge images discovered by live monitoring during the scan that
       // were not included in the final GET_IMAGES result. This handles
       // pages where images are loaded dynamically after extractImages()
       // has already finished scanning the DOM.
-      const responseUrls = new Set(responseImages.map(img => img.url));
+      const responseUrls = new Set(responseImages.map((img) => img.url));
       const extraDiscovered: ImageItem[] = state.scanDiscoveredImages
-        .filter(img => !responseUrls.has(img.url))
-        .map(img => ({
+        .filter((img) => !responseUrls.has(img.url))
+        .map((img) => ({
           ...img,
           id: img.id || generateId(img.url),
           tabTitle: img.tabTitle || currentTabTitle,
           tabIndex: img.tabIndex ?? currentTabIndex,
           isCurrentTab: !img.tabTitle,
           colors: undefined,
-          phash: null
+          phash: null,
         }));
       state.allImages = [...responseImages, ...extraDiscovered];
 
@@ -381,14 +387,15 @@ export async function fetchImages(): Promise<void> {
 
       // Persist to session storage so reopening the panel restores instantly
       if (state.currentTabId != null) {
-        const currentTab = await chrome.tabs.query({ active: true, currentWindow: true })
-          .then(t => t[0])
+        const currentTab = await chrome.tabs
+          .query({ active: true, currentWindow: true })
+          .then((t) => t[0])
           .catch(() => null);
         const currentUrl = currentTab?.url || '';
         state.tabCache.set(state.currentTabId, {
           url: currentUrl,
           images: state.allImages,
-          selectedImages: new Set(state.selectedImages)
+          selectedImages: new Set(state.selectedImages),
         });
         saveTabImageCache(state.currentTabId, currentUrl, state.allImages);
       }
@@ -401,7 +408,10 @@ export async function fetchImages(): Promise<void> {
     }
   } catch (error) {
     state.isScanning = false;
-    if (state.scanAborted) { state.isFetching = false; return; }
+    if (state.scanAborted) {
+      state.isFetching = false;
+      return;
+    }
     console.error('Fetch images error:', error);
     hideLoading();
     const msg = error instanceof Error ? error.message : String(error);
@@ -414,7 +424,7 @@ export async function fetchImageDataUrl(imageUrl: string): Promise<string | null
   try {
     const response = await chrome.runtime.sendMessage({
       type: MESSAGE_TYPES.FETCH_IMAGE_DATA,
-      url: imageUrl
+      url: imageUrl,
     });
     if (response && response.success) return response.dataUrl;
   } catch {
@@ -425,7 +435,7 @@ export async function fetchImageDataUrl(imageUrl: string): Promise<string | null
 
 export async function processImageExtras(images: ImageItem[]): Promise<void> {
   const metaPromises: Array<Promise<unknown>> = [];
-  images.forEach(img => {
+  images.forEach((img) => {
     // For data: URLs, calculate size directly from the base64 string
     // instead of making an HTTP HEAD request (which would fail).
     if (img.url && img.url.startsWith('data:')) {
@@ -446,13 +456,17 @@ export async function processImageExtras(images: ImageItem[]): Promise<void> {
       }
     } else if (!img.estimatedSize || img.format === 'unknown') {
       metaPromises.push(
-        fetchImageMeta(img.url).then(meta => {
-          if (meta.size && !img.estimatedSize) img.estimatedSize = meta.size;
-          if (img.format === 'unknown' && meta.contentType) {
-            const detected = getFileFormat(img.url, meta.contentType);
-            if (detected !== 'unknown') img.format = detected;
-          }
-        }).catch(() => { /* ignore */ })
+        fetchImageMeta(img.url)
+          .then((meta) => {
+            if (meta.size && !img.estimatedSize) img.estimatedSize = meta.size;
+            if (img.format === 'unknown' && meta.contentType) {
+              const detected = getFileFormat(img.url, meta.contentType);
+              if (detected !== 'unknown') img.format = detected;
+            }
+          })
+          .catch(() => {
+            /* ignore */
+          })
       );
     }
 
@@ -496,8 +510,8 @@ export async function processImageExtras(images: ImageItem[]): Promise<void> {
 
   // Process images in batches with scan overlay progress
   const batchSize = 5;
-  const imagesToProcess = images.filter(img =>
-    (needsPHash && !img.phash) || (needsColors && !img.colors)
+  const imagesToProcess = images.filter(
+    (img) => (needsPHash && !img.phash) || (needsColors && !img.colors)
   );
 
   for (let i = 0; i < imagesToProcess.length; i += batchSize) {
@@ -509,12 +523,24 @@ export async function processImageExtras(images: ImageItem[]): Promise<void> {
       const extraPromises: Array<Promise<unknown>> = [];
       if (needsPHash && !img.phash) {
         extraPromises.push(
-          calculatePHash(dataUrl).then(hash => { img.phash = hash; }).catch(() => { /* ignore */ })
+          calculatePHash(dataUrl)
+            .then((hash) => {
+              img.phash = hash;
+            })
+            .catch(() => {
+              /* ignore */
+            })
         );
       }
       if (needsColors && !img.colors) {
         extraPromises.push(
-          extractColorsFromUrl(dataUrl, 10).then(colors => { img.colors = colors; }).catch(() => { /* ignore */ })
+          extractColorsFromUrl(dataUrl, 10)
+            .then((colors) => {
+              img.colors = colors;
+            })
+            .catch(() => {
+              /* ignore */
+            })
         );
       }
       await Promise.allSettled(extraPromises);
@@ -544,7 +570,7 @@ export function patchCardExtras(images: ImageItem[]): void {
   if (!elements.imageGrid) return;
   const colorExtractionEnabled = state.appSettings.enableColorExtraction !== false;
 
-  images.forEach(img => {
+  images.forEach((img) => {
     const card = elements.imageGrid!.querySelector(`.image-card[data-id="${img.id}"]`);
     if (!card) return;
 

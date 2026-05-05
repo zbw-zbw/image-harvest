@@ -21,19 +21,26 @@ const filterLabelDefaults = {
   url: 'URL',
   color: 'Color',
   group: 'Group',
-  sort: 'Sort'
+  sort: 'Sort',
 } as const;
 
 export function updateFilterButtonLabels(): void {
   // Size button
   const sizeBtn = document.querySelector<HTMLElement>('.filter-btn[data-filter="size"]');
   if (sizeBtn) {
-    const hasSizeFilter = state.activeFilters.size !== 'all'
-      || state.activeFilters.sizeMin > 0
-      || state.activeFilters.sizeMax !== Infinity;
+    const hasSizeFilter =
+      state.activeFilters.size !== 'all' ||
+      state.activeFilters.sizeMin > 0 ||
+      state.activeFilters.sizeMax !== Infinity;
     let label: string = filterLabelDefaults.size;
     if (state.activeFilters.size !== 'all') {
-      const sizeLabels: Record<string, string> = { small: 'Small', medium: 'Medium', large: 'Large', xl: 'XL', custom: 'Custom' };
+      const sizeLabels: Record<string, string> = {
+        small: 'Small',
+        medium: 'Medium',
+        large: 'Large',
+        xl: 'XL',
+        custom: 'Custom',
+      };
       label = sizeLabels[state.activeFilters.size] || label;
     }
     sizeBtn.textContent = label + '▾';
@@ -46,8 +53,17 @@ export function updateFilterButtonLabels(): void {
     const hasTypeFilter = state.activeFilters.types.length > 0;
     let label: string = filterLabelDefaults.types;
     if (hasTypeFilter) {
-      const typeLabels: Record<string, string> = { png: 'PNG', jpg: 'JPG', jpeg: 'JPEG', webp: 'WebP', gif: 'GIF', svg: 'SVG', ico: 'ICO', bmp: 'BMP' };
-      label = state.activeFilters.types.map(t => typeLabels[t] || t).join(', ');
+      const typeLabels: Record<string, string> = {
+        png: 'PNG',
+        jpg: 'JPG',
+        jpeg: 'JPEG',
+        webp: 'WebP',
+        gif: 'GIF',
+        svg: 'SVG',
+        ico: 'ICO',
+        bmp: 'BMP',
+      };
+      label = state.activeFilters.types.map((t) => typeLabels[t] || t).join(', ');
     }
     typeBtn.textContent = label + '▾';
     typeBtn.classList.toggle('active', hasTypeFilter);
@@ -59,7 +75,12 @@ export function updateFilterButtonLabels(): void {
     const hasLayoutFilter = state.activeFilters.layout !== 'all';
     let label: string = filterLabelDefaults.layout;
     if (hasLayoutFilter) {
-      const layoutLabels: Record<string, string> = { square: 'Square', landscape: 'Landscape', portrait: 'Portrait', panorama: 'Panorama' };
+      const layoutLabels: Record<string, string> = {
+        square: 'Square',
+        landscape: 'Landscape',
+        portrait: 'Portrait',
+        panorama: 'Panorama',
+      };
       label = layoutLabels[state.activeFilters.layout] || label;
     }
     layoutBtn.textContent = label + '▾';
@@ -116,7 +137,7 @@ export function applyViewMode(mode: 'grid' | 'list'): void {
     elements.imageGrid.classList.toggle('list-view', mode === 'list');
   }
   // Sync group-content elements with the current view mode
-  document.querySelectorAll('.group-content').forEach(groupContent => {
+  document.querySelectorAll('.group-content').forEach((groupContent) => {
     groupContent.classList.toggle('list-view', mode === 'list');
   });
   if (elements.btnViewToggle) {
@@ -159,7 +180,7 @@ export function checkNarrowMode(): void {
   const gridPadding = gridPaddingLeft + gridPaddingRight;
   const minCardWidth = getMinCardWidth();
   const availableWidth = elements.imageGrid.clientWidth - gridPadding;
-  const canFitTwoColumns = availableWidth >= (minCardWidth * 2 + gridGap);
+  const canFitTwoColumns = availableWidth >= minCardWidth * 2 + gridGap;
 
   // Compact mode: when panel is narrow (can't fit two columns, or each card < 310px)
   const compactThreshold = 310;
@@ -212,12 +233,7 @@ export function initResizeObserver(): void {
 // ============================================
 // Confirm Dialog (reusable)
 // ============================================
-const CONFIRM_ICONS: Record<string, string> = {
-  warning: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
-  danger: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>`,
-  info: `<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>`
-};
-
+// SVG icons moved into <ConfirmDialog> component (sidepanel/components/ConfirmDialog.tsx).
 export interface ConfirmDialogOptions {
   title: string;
   message: string;
@@ -228,6 +244,16 @@ export interface ConfirmDialogOptions {
 
 /**
  * Show a custom confirm dialog, replacing native confirm().
+ *
+ * Implementation: pushes the dialog config + a Promise resolver into the
+ * store; the <ConfirmDialog> Preact component reads the store and invokes
+ * the resolver from its button handlers. The promise pattern is preserved
+ * so existing call sites (`await showConfirmDialog({...})`) work unchanged.
+ *
+ * If a previous dialog is still open when this is called we resolve it to
+ * `false` first — there's only one slot in state, and silently dropping the
+ * old promise would leak an unresolved awaiter.
+ *
  * @returns Promise that resolves to true if confirmed, false if cancelled
  */
 export function showConfirmDialog({
@@ -235,84 +261,52 @@ export function showConfirmDialog({
   message,
   confirmText = 'Confirm',
   cancelText = 'Cancel',
-  type = 'warning'
+  type = 'warning',
 }: ConfirmDialogOptions): Promise<boolean> {
   return new Promise((resolve) => {
-    const dialog = document.getElementById('confirm-dialog');
-    const iconEl = document.getElementById('confirm-dialog-icon');
-    const titleEl = document.getElementById('confirm-dialog-title');
-    const messageEl = document.getElementById('confirm-dialog-message');
-    const confirmBtn = document.getElementById('confirm-dialog-confirm');
-    const cancelBtn = document.getElementById('confirm-dialog-cancel');
-
-    if (!dialog || !confirmBtn || !cancelBtn || !iconEl || !titleEl || !messageEl) {
-      resolve(false);
-      return;
-    }
-
-    titleEl.textContent = title;
-    messageEl.textContent = message;
-    confirmBtn.textContent = confirmText;
-    cancelBtn.textContent = cancelText;
-
-    iconEl.className = 'confirm-dialog-icon';
-    iconEl.innerHTML = CONFIRM_ICONS[type] || CONFIRM_ICONS.warning;
-    if (type === 'danger') {
-      iconEl.classList.add('icon-danger');
-    } else if (type === 'info') {
-      iconEl.classList.add('icon-info');
-    } else {
-      iconEl.classList.add('icon-warning');
-    }
-
-    confirmBtn.className = type === 'danger' ? 'btn btn-danger' : 'btn btn-primary';
-
-    dialog.classList.remove('hidden');
-
-    const overlay = dialog.querySelector('.modal-overlay');
-
-    function cleanup() {
-      dialog!.classList.add('hidden');
-      confirmBtn!.removeEventListener('click', onConfirm);
-      cancelBtn!.removeEventListener('click', onCancel);
-      if (overlay) overlay.removeEventListener('click', onCancel);
-    }
-
-    function onConfirm() {
-      cleanup();
-      resolve(true);
-    }
-
-    function onCancel() {
-      cleanup();
-      resolve(false);
-    }
-
-    confirmBtn.addEventListener('click', onConfirm);
-    cancelBtn.addEventListener('click', onCancel);
-
-    if (overlay) overlay.addEventListener('click', onCancel);
-
-    const closeBtn = document.getElementById('btn-confirm-dialog-close');
-    if (closeBtn) closeBtn.addEventListener('click', onCancel);
+    const prev = state.confirmDialog;
+    if (prev.open && prev.resolve) prev.resolve(false);
+    state.confirmDialog = {
+      open: true,
+      config: { title, message, confirmText, cancelText, type },
+      resolve,
+    };
   });
 }
 
 // ============================================
 // Toast Notifications
 // ============================================
-export type ToastType = 'success' | 'error' | 'warning' | 'info';
+// Re-exported from state.ts so existing imports `import { ToastType } from
+// './ui'` continue to work without changing call sites.
+export type { ToastType } from './state';
 
-export function showToast(message: string, type?: ToastType): void {
-  if (!elements.toastContainer) return;
-  // Remove any existing toasts to ensure only one is visible at a time
-  elements.toastContainer.innerHTML = '';
-  const toast = document.createElement('div');
-  toast.className = `toast ${type || 'info'}`;
-  toast.textContent = message;
-  elements.toastContainer.appendChild(toast);
-  setTimeout(() => { toast.classList.add('fade-out'); }, 2500);
-  setTimeout(() => { toast.remove(); }, 3000);
+let toastIdCounter = 0;
+
+export function showToast(message: string, type?: import('./state').ToastType): void {
+  // Match legacy "only one toast visible at a time" behavior by replacing
+  // the entire list. The `id` ensures Preact's keyed reconciliation treats
+  // each push as a fresh node (so the fade-in animation re-runs).
+  const id = ++toastIdCounter;
+  const toast: import('./state').ToastItem = {
+    id,
+    message,
+    type: type || 'info',
+    fadingOut: false,
+  };
+  state.toasts = [toast];
+
+  setTimeout(() => {
+    // Mark for fade-out only if this exact toast is still on screen — a
+    // newer toast may have replaced it already.
+    const cur = state.toasts.find((t) => t.id === id);
+    if (cur) {
+      state.toasts = state.toasts.map((t) => (t.id === id ? { ...t, fadingOut: true } : t));
+    }
+  }, 2500);
+  setTimeout(() => {
+    state.toasts = state.toasts.filter((t) => t.id !== id);
+  }, 3000);
 }
 
 // ============================================
@@ -322,16 +316,23 @@ let progressAbortCallback: (() => void) | null = null;
 
 export function showProgress(title: string, onAbort?: () => void): void {
   progressAbortCallback = onAbort || null;
-  if (elements.progressModal) {
-    const titleEl = document.getElementById('progress-title');
-    if (titleEl) titleEl.textContent = title || 'Downloading...';
-    elements.progressModal.classList.remove('hidden');
-  }
+  // Mutating a single field on the .downloadProgress object would not be
+  // observed by the Proxy (it watches top-level state.* assignments only),
+  // so we replace the whole object to trigger the <DownloadProgressModal>
+  // re-render. Same pattern used in updateProgress / hideProgress.
+  state.downloadProgress = {
+    ...state.downloadProgress,
+    visible: true,
+    title: title || 'Downloading...',
+  };
 }
 
 export function hideProgress(): void {
   progressAbortCallback = null;
-  if (elements.progressModal) elements.progressModal.classList.add('hidden');
+  state.downloadProgress = {
+    ...state.downloadProgress,
+    visible: false,
+  };
 }
 
 export function handleProgressClose(): void {
@@ -347,16 +348,13 @@ export function updateProgress(
   currentFile?: string,
   imageCount?: number | null
 ): void {
-  const pct = total > 0 ? Math.round((current / total) * 100) : 0;
-  if (elements.progressFill) (elements.progressFill as HTMLElement).style.width = `${pct}%`;
-  if (elements.progressText) {
-    if (imageCount != null) {
-      elements.progressText.textContent = `${current} / ${total} tabs · ${imageCount} images found`;
-    } else {
-      elements.progressText.textContent = `${current} / ${total}`;
-    }
-  }
-  if (elements.progressCurrent) elements.progressCurrent.textContent = currentFile || '';
+  state.downloadProgress = {
+    ...state.downloadProgress,
+    current,
+    total,
+    currentFile: currentFile || '',
+    imageCount: imageCount ?? null,
+  };
 }
 
 // ============================================
@@ -364,15 +362,14 @@ export function updateProgress(
 // ============================================
 export function showError(code: string, message: string, workaround?: string): void {
   hideAll();
-  if (elements.errorState) {
-    elements.errorState.classList.remove('hidden');
-    const t = elements.errorState.querySelector('.error-title');
-    const m = elements.errorState.querySelector('.error-message');
-    const w = elements.errorState.querySelector('.error-workaround') as HTMLElement | null;
-    if (t) t.textContent = code || 'Error';
-    if (m) m.textContent = message || 'An error occurred';
-    if (w) { w.textContent = workaround || ''; w.style.display = workaround ? '' : 'none'; }
-  }
+  // <ErrorScreen> reads errorInfo for code/message/workaround; uiScreen
+  // controls visibility (mutually exclusive with empty/restricted).
+  state.errorInfo = {
+    code: code || 'Error',
+    message: message || 'An error occurred',
+    workaround,
+  };
+  state.uiScreen = 'error';
 }
 
 export function showEmpty(isNoResults?: boolean): void {
@@ -380,23 +377,10 @@ export function showEmpty(isNoResults?: boolean): void {
   // Hide image-grid-wrapper so empty-state can take full flex space and center vertically
   const gridWrapper = document.querySelector('.image-grid-wrapper');
   if (gridWrapper) gridWrapper.classList.add('hidden');
-
-  if (elements.emptyState) {
-    elements.emptyState.classList.remove('hidden');
-    const resetBtn = document.getElementById('btn-reset-filters');
-    const title = elements.emptyState.querySelector('.empty-state-title');
-    const desc = elements.emptyState.querySelector('.empty-state-desc');
-    const resetBtnLabel = resetBtn?.querySelector('span');
-    if (isNoResults) {
-      if (title) title.textContent = 'No images found';
-      if (desc) desc.textContent = 'Try adjusting your filter criteria or visit a different page.';
-      if (resetBtnLabel) resetBtnLabel.textContent = 'Reset Filters';
-    } else {
-      if (title) title.textContent = 'No images found';
-      if (desc) desc.textContent = 'No images were detected on this page. Try refreshing or visiting a different page.';
-      if (resetBtnLabel) resetBtnLabel.textContent = 'Rescan Images';
-    }
-  }
+  // <EmptyScreen> derives its title / description / button label from
+  // emptyInfo.isNoResults — see StateScreens.tsx.
+  state.emptyInfo = { isNoResults: !!isNoResults };
+  state.uiScreen = 'empty';
 }
 
 export function showRestricted(): void {
@@ -410,20 +394,22 @@ export function showRestricted(): void {
   hideDownloadDropdown();
   hideScanOverlay();
   // Hide toolbar, status-bar and image-grid-wrapper that are irrelevant on restricted pages
-  document.querySelectorAll('.toolbar, .status-bar, .image-grid-wrapper').forEach(el => {
+  document.querySelectorAll('.toolbar, .status-bar, .image-grid-wrapper').forEach((el) => {
     el.classList.add('hidden');
   });
-  if (elements.restrictedState) elements.restrictedState.classList.remove('hidden');
+  state.uiScreen = 'restricted';
 }
 
 export function hideRestricted(): void {
-  if (elements.restrictedState) elements.restrictedState.classList.add('hidden');
+  // Setting uiScreen to 'images' tears down the restricted screen (and any
+  // empty/error sibling) via the <StateScreens> component.
+  if (state.uiScreen === 'restricted') state.uiScreen = 'images';
   // Clean up any scanning-disabled state that may have been left over from a
   // previous showLoading() → showRestricted() transition (e.g. switching to a
   // restricted tab and back).
   hideScanOverlay();
   // Restore toolbar, status-bar and image-grid-wrapper
-  document.querySelectorAll('.toolbar, .status-bar, .image-grid-wrapper').forEach(el => {
+  document.querySelectorAll('.toolbar, .status-bar, .image-grid-wrapper').forEach((el) => {
     el.classList.remove('hidden');
   });
 }
@@ -436,30 +422,12 @@ export function clearCurrentImages(): void {
   if (elements.imageGrid) elements.imageGrid.innerHTML = '';
 }
 
-export function buildSkeletonCard(): string {
-  return '<div class="skeleton-card">'
-    + '<div class="skeleton-thumb"></div>'
-    + '<div class="skeleton-info-bar">'
-    + '<div class="skeleton-tags">'
-    + '<span class="skeleton-tag"></span>'
-    + '<span class="skeleton-tag"></span>'
-    + '<span class="skeleton-tag"></span>'
-    + '</div>'
-    + '<div class="skeleton-actions">'
-    + '<span class="skeleton-action"></span>'
-    + '<span class="skeleton-action"></span>'
-    + '<span class="skeleton-action"></span>'
-    + '</div>'
-    + '</div>'
-    + '<div class="skeleton-url-row">'
-    + '<div class="skeleton-url-bar"></div>'
-    + '<div class="skeleton-url-actions">'
-    + '<span class="skeleton-action small"></span>'
-    + '<span class="skeleton-action small"></span>'
-    + '</div>'
-    + '</div>'
-    + '</div>';
-}
+// buildSkeletonCard() lived here in the legacy imperative-render flow.
+// It was used by ui.ts > showLoading() to inject skeleton placeholders as
+// raw HTML into #image-grid. The Preact migration replaced it with the
+// <SkeletonCard> component (sidepanel/components/SkeletonCard.tsx), which
+// <ImageGrid> renders via state.scanSkeletonsToShow. The string-template
+// version is no longer referenced and has been removed.
 
 export function calcSkeletonCount(containerHeight: number, isListView: boolean): number {
   const app = document.getElementById('app');
@@ -470,8 +438,13 @@ export function calcSkeletonCount(containerHeight: number, isListView: boolean):
   // Determine gap and padding based on density
   let gap = 10;
   let padding = 10;
-  if (isCompact) { gap = 6; padding = 6; }
-  else if (isComfortable) { gap = 14; padding = 14; }
+  if (isCompact) {
+    gap = 6;
+    padding = 6;
+  } else if (isComfortable) {
+    gap = 14;
+    padding = 14;
+  }
 
   // Determine thumb height based on density and view mode
   let thumbHeight: number;
@@ -527,7 +500,9 @@ export function showLoading(): void {
   const gridWrapper = document.querySelector('.image-grid-wrapper');
   if (gridWrapper) gridWrapper.classList.remove('hidden');
 
-  // Render skeleton cards directly into image-grid
+  // Drive skeleton rendering through the store: <ImageGrid> reads
+  // scanSkeletonsToShow and renders that many <SkeletonCard> nodes after
+  // (zero) real cards. No imperative innerHTML write needed here.
   if (elements.imageGrid) {
     // Restore visibility in case it was hidden during a tab switch
     (elements.imageGrid as HTMLElement).style.visibility = '';
@@ -535,21 +510,28 @@ export function showLoading(): void {
     const isListView = elements.imageGrid.classList.contains('list-view');
     const containerHeight = (gridWrapper as HTMLElement | null)?.clientHeight || 600;
     const skeletonCount = calcSkeletonCount(containerHeight, isListView);
+    // scanSkeletonLimit gates incremental render in message.ts (stop after we
+    // fill the visible skeleton slots); scanSkeletonsToShow drives the
+    // Preact-rendered placeholders.
     state.scanSkeletonLimit = skeletonCount;
-    elements.imageGrid.innerHTML = Array(skeletonCount).fill(buildSkeletonCard()).join('');
+    state.scanSkeletonsToShow = skeletonCount;
   }
-  if (elements.emptyState) elements.emptyState.classList.add('hidden');
-  if (elements.errorState) elements.errorState.classList.add('hidden');
+  // The empty/error/restricted screens are now managed by <StateScreens>
+  // — bouncing uiScreen back to 'images' clears whichever was visible.
+  state.uiScreen = 'images';
   if (elements.loadingState) elements.loadingState.classList.add('hidden');
-  if (elements.restrictedState) elements.restrictedState.classList.add('hidden');
 
-  // Show scan overlay (semi-transparent backdrop + floating progress card)
-  if (elements.scanProgressTitle) {
-    elements.scanProgressTitle.textContent = 'Scanning...';
-  }
-  // Hide progress bar during discovery phase (spinner is sufficient)
-  const scanProgressBar = elements.scanOverlay?.querySelector('.progress-bar');
-  if (scanProgressBar) scanProgressBar.classList.add('hidden');
+  // Show scan overlay in indeterminate mode (no percent bar yet) — the
+  // discovery phase has no known total. <ScanProgressOverlay> reads these
+  // fields directly.
+  state.scanProgress = {
+    visible: true,
+    indeterminate: true,
+    title: 'Scanning...',
+    current: 0,
+    total: 0,
+    currentUrl: '',
+  };
   showScanOverlay(0, 0);
 
   // Reset status bar counts to avoid stale data from previous tab
@@ -561,12 +543,13 @@ export function hideLoading(): void {
 }
 
 export function resetStatusBar(): void {
-  if (elements.foundActionCount) elements.foundActionCount.textContent = '0';
+  // foundActionCount / downloadLabel are Preact-managed; resetting state
+  // triggers their re-render automatically. Only the still-imperative
+  // foundCount widget needs an explicit clear here.
   if (elements.foundCount) elements.foundCount.textContent = '0';
-  if (elements.downloadLabel) elements.downloadLabel.textContent = 'Download All';
   // Reset similar groups state and UI
   state.similarGroups = [];
-  if (elements.similarCount) elements.similarCount.textContent = '0';
+  // similarCount is Preact-managed (StatusCounts.SimilarCount).
   if (elements.btnDedup) (elements.btnDedup as HTMLElement).style.display = 'none';
   const dedupInfo = document.getElementById('dedup-info');
   if (dedupInfo) dedupInfo.classList.add('hidden');
@@ -574,8 +557,7 @@ export function resetStatusBar(): void {
 
 export function hideAll(): void {
   if (elements.imageGrid) elements.imageGrid.classList.add('hidden');
-  if (elements.emptyState) elements.emptyState.classList.add('hidden');
-  if (elements.errorState) elements.errorState.classList.add('hidden');
   if (elements.loadingState) elements.loadingState.classList.add('hidden');
-  if (elements.restrictedState) elements.restrictedState.classList.add('hidden');
+  // empty/error/restricted are Preact-managed; resetting uiScreen hides them.
+  state.uiScreen = 'images';
 }

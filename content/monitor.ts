@@ -11,7 +11,7 @@ import {
   isImageDataUri,
   generateDataUriKey,
   extractBackgroundUrls,
-  isGradient
+  isGradient,
 } from '../shared/utils';
 import type { ImageItem } from '../shared/types';
 import { state, isExtensionContextValid } from './state';
@@ -63,9 +63,10 @@ export function startLiveMonitoring(config: LiveMonitorConfig = {}): void {
         }
 
         // Watch for lazy-loaded <img> elements that haven't loaded yet
-        const lazyImgs = el.tagName === 'IMG'
-          ? [el as HTMLImageElement]
-          : Array.from(el.querySelectorAll?.<HTMLImageElement>('img') || []);
+        const lazyImgs =
+          el.tagName === 'IMG'
+            ? [el as HTMLImageElement]
+            : Array.from(el.querySelectorAll?.<HTMLImageElement>('img') || []);
         for (const img of lazyImgs) {
           if (!img.complete || img.naturalWidth === 0) {
             img.addEventListener('load', handleLazyImageLoad, { once: true });
@@ -76,7 +77,10 @@ export function startLiveMonitoring(config: LiveMonitorConfig = {}): void {
       // Check attribute changes
       if (mutation.type === 'attributes') {
         const target = mutation.target as Element;
-        if ((mutation.attributeName === 'src' || mutation.attributeName === 'srcset') && target.tagName === 'IMG') {
+        if (
+          (mutation.attributeName === 'src' || mutation.attributeName === 'srcset') &&
+          target.tagName === 'IMG'
+        ) {
           const images = extractFromNode(target);
           newImages.push(...images);
         }
@@ -109,7 +113,7 @@ export function startLiveMonitoring(config: LiveMonitorConfig = {}): void {
     childList: true,
     subtree: true,
     attributes: true,
-    attributeFilter: ['src', 'style', 'srcset']
+    attributeFilter: ['src', 'style', 'srcset'],
   });
 }
 
@@ -171,7 +175,7 @@ export function extractFromNode(node: Element): ImageItem[] {
           format: getFileFormat(url),
           sourceDomain: window.location.hostname,
           checked: false,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         } as ImageItem);
         continue;
       }
@@ -189,7 +193,7 @@ export function extractFromNode(node: Element): ImageItem[] {
         format: getFileFormat(resolvedUrl),
         sourceDomain: getDomain(resolvedUrl),
         checked: false,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       } as ImageItem);
     }
   }
@@ -213,7 +217,7 @@ export function extractFromNode(node: Element): ImageItem[] {
               format: getFileFormat(posterUrl),
               sourceDomain: window.location.hostname,
               checked: false,
-              timestamp: Date.now()
+              timestamp: Date.now(),
             } as ImageItem);
           }
         }
@@ -230,7 +234,7 @@ export function extractFromNode(node: Element): ImageItem[] {
             format: getFileFormat(resolvedUrl),
             sourceDomain: getDomain(resolvedUrl),
             checked: false,
-            timestamp: Date.now()
+            timestamp: Date.now(),
           } as ImageItem);
         }
       }
@@ -256,7 +260,7 @@ export function extractFromNode(node: Element): ImageItem[] {
               format: getFileFormat(url),
               sourceDomain: window.location.hostname,
               checked: false,
-              timestamp: Date.now()
+              timestamp: Date.now(),
             } as ImageItem);
           }
         }
@@ -273,7 +277,7 @@ export function extractFromNode(node: Element): ImageItem[] {
             format: getFileFormat(resolvedUrl),
             sourceDomain: getDomain(resolvedUrl),
             checked: false,
-            timestamp: Date.now()
+            timestamp: Date.now(),
           } as ImageItem);
         }
       }
@@ -299,10 +303,14 @@ export function extractFromNode(node: Element): ImageItem[] {
             displayWidth: Math.round(rect.width),
             displayHeight: Math.round(rect.height),
             type: 'object',
-            format: isDataUri(dataUrl) ? getFileFormat(dataUrl) : getFileFormat(resolvedUrl as string),
-            sourceDomain: isDataUri(dataUrl) ? window.location.hostname : getDomain(resolvedUrl as string),
+            format: isDataUri(dataUrl)
+              ? getFileFormat(dataUrl)
+              : getFileFormat(resolvedUrl as string),
+            sourceDomain: isDataUri(dataUrl)
+              ? window.location.hostname
+              : getDomain(resolvedUrl as string),
             checked: false,
-            timestamp: Date.now()
+            timestamp: Date.now(),
           } as ImageItem);
         }
       }
@@ -327,10 +335,14 @@ export function extractFromNode(node: Element): ImageItem[] {
             displayWidth: Math.round(rect.width),
             displayHeight: Math.round(rect.height),
             type: 'embed',
-            format: isDataUri(srcUrl) ? getFileFormat(srcUrl) : getFileFormat(resolvedUrl as string),
-            sourceDomain: isDataUri(srcUrl) ? window.location.hostname : getDomain(resolvedUrl as string),
+            format: isDataUri(srcUrl)
+              ? getFileFormat(srcUrl)
+              : getFileFormat(resolvedUrl as string),
+            sourceDomain: isDataUri(srcUrl)
+              ? window.location.hostname
+              : getDomain(resolvedUrl as string),
             checked: false,
-            timestamp: Date.now()
+            timestamp: Date.now(),
           } as ImageItem);
         }
       }
@@ -404,7 +416,7 @@ export function extractBackgroundFromNode(node: Element): ImageItem[] {
             format: getFileFormat(url),
             sourceDomain: window.location.hostname,
             checked: false,
-            timestamp: Date.now()
+            timestamp: Date.now(),
           } as ImageItem);
           continue;
         }
@@ -423,7 +435,7 @@ export function extractBackgroundFromNode(node: Element): ImageItem[] {
           format: getFileFormat(resolvedUrl),
           sourceDomain: getDomain(resolvedUrl),
           checked: false,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         } as ImageItem);
       }
     }

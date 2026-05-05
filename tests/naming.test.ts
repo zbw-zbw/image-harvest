@@ -5,7 +5,7 @@ import {
   getOriginalName,
   sanitizeFilename,
   buildVariables,
-  applyNamingTemplate
+  applyNamingTemplate,
 } from '../shared/naming';
 
 describe('getOriginalName', () => {
@@ -61,7 +61,7 @@ describe('buildVariables', () => {
       timestamp: '0',
       year: '',
       month: '',
-      day: ''
+      day: '',
     });
   });
 
@@ -74,7 +74,9 @@ describe('buildVariables', () => {
 
   it('strips the leading subdomain from pageDomain', () => {
     expect(buildVariables({ pageDomain: 'www.example.com' }).pageDomain).toBe('example.com');
-    expect(buildVariables({ pageDomain: 'cdn.images.example.com' }).pageDomain).toBe('images.example.com');
+    expect(buildVariables({ pageDomain: 'cdn.images.example.com' }).pageDomain).toBe(
+      'images.example.com'
+    );
   });
 
   it('extracts and sanitizes original name from URL', () => {
@@ -91,12 +93,11 @@ describe('applyNamingTemplate', () => {
     width: '800',
     height: '600',
     format: 'webp',
-    date: '2026-04-30'
+    date: '2026-04-30',
   };
 
   it('substitutes all matching {placeholders}', () => {
-    expect(applyNamingTemplate('img_{index}_{original}.{format}', vars))
-      .toBe('img_5_photo.webp');
+    expect(applyNamingTemplate('img_{index}_{original}.{format}', vars)).toBe('img_5_photo.webp');
   });
 
   it('leaves unknown placeholders empty (substituted with empty string)', () => {
@@ -118,7 +119,7 @@ describe('applyNamingTemplate', () => {
   it('sanitizes forbidden characters from substituted output', () => {
     const result = applyNamingTemplate('{original}.{format}', {
       ...vars,
-      original: 'bad/name:here'
+      original: 'bad/name:here',
     });
     expect(result).toBe('bad_name_here.webp');
   });

@@ -11,17 +11,11 @@ import { isRestrictedUrl } from '../shared/utils';
 import { renderImages } from './render';
 import { showProUpgradeModal } from './settings';
 import { elements, state } from './state';
-import {
-  hideProgress,
-  showConfirmDialog,
-  showProgress,
-  showToast,
-  updateProgress
-} from './ui';
+import { hideProgress, showConfirmDialog, showProgress, showToast, updateProgress } from './ui';
 import { generateFilename, truncateUrl } from './utils';
 
 export async function toggleSelection(imageId: string): Promise<void> {
-  const img = state.allImages.find(i => i.id === imageId);
+  const img = state.allImages.find((i) => i.id === imageId);
 
   if (state.selectedImages.has(imageId)) {
     state.selectedImages.delete(imageId);
@@ -61,7 +55,7 @@ export function updateCardSelectionState(imageId: string): void {
 }
 
 export function selectAll(): void {
-  state.filteredImages.forEach(img => state.selectedImages.add(img.id));
+  state.filteredImages.forEach((img) => state.selectedImages.add(img.id));
   renderImages();
   updateSelectionUI();
 }
@@ -75,23 +69,15 @@ export function clearSelection(): void {
 
 export function updateSelectionUI(): void {
   const hasSelection = state.selectedImages.size > 0;
-  const isAllSelected = state.filteredImages.length > 0
-    && state.filteredImages.every(img => state.selectedImages.has(img.id));
+  const isAllSelected =
+    state.filteredImages.length > 0 &&
+    state.filteredImages.every((img) => state.selectedImages.has(img.id));
 
   // Found info is always visible
-  if (elements.foundActionCount) {
-    elements.foundActionCount.textContent = String(state.filteredImages.length);
-  }
-
-  // Download button label: show "Download All" when nothing selected, "Download (N)" when selected
-  if (elements.downloadLabel) {
-    if (hasSelection) {
-      elements.downloadLabel.textContent = `Download (${state.selectedImages.size})`;
-    } else {
-      elements.downloadLabel.textContent = 'Download All';
-    }
-  }
-
+  // foundActionCount is now a Preact component — re-renders automatically
+  // when state.filteredImages changes.
+  // downloadLabel is now a Preact component (StatusCounts.DownloadLabel)
+  // that derives its text from state.selectedImages.size automatically.
   // Disable download buttons when no images available
   const noImages = state.filteredImages.length === 0;
   if (elements.btnDownload) {
@@ -139,7 +125,8 @@ export function safeSendMessageToTab<T = unknown>(message: unknown): Promise<T |
         resolve(null);
         return;
       }
-      chrome.tabs.sendMessage(tab.id, message)
+      chrome.tabs
+        .sendMessage(tab.id, message)
         .then((resp) => resolve(resp as T))
         .catch(() => resolve(null));
     });
@@ -149,7 +136,7 @@ export function safeSendMessageToTab<T = unknown>(message: unknown): Promise<T |
 export async function highlightImageOnPage(imageUrl: string): Promise<boolean> {
   const response = await safeSendMessageToTab<{ found?: boolean }>({
     type: 'HIGHLIGHT_IMAGE',
-    imageUrl
+    imageUrl,
   });
   return response?.found ?? false;
 }
@@ -161,7 +148,7 @@ export function unhighlightImageOnPage(imageUrl: string): void {
 export function syncHighlightsWithSelection(): void {
   const selectedUrls: string[] = [];
   for (const imgId of state.selectedImages) {
-    const img = state.allImages.find(i => i.id === imgId);
+    const img = state.allImages.find((i) => i.id === imgId);
     if (img) selectedUrls.push(img.url);
   }
   // Free tier: only highlight the first selected image
@@ -197,7 +184,7 @@ export async function getActivePageInfo(): Promise<PageInfo> {
       if (tabUrl.protocol === 'http:' || tabUrl.protocol === 'https:') {
         return {
           domain: tabUrl.hostname,
-          title: tab.title || 'untitled'
+          title: tab.title || 'untitled',
         };
       }
     }
@@ -250,18 +237,17 @@ export async function fetchImageBlobWithFallback(url: string): Promise<Blob> {
   }
 
   // Slow path: ask background to fetch (bypasses CORS via host_permissions)
-  const response = await new Promise<{ success: boolean; dataUrl?: string; error?: string }>((resolve) => {
-    chrome.runtime.sendMessage(
-      { type: MESSAGE_TYPES.FETCH_IMAGE_DATA, url },
-      (resp) => {
+  const response = await new Promise<{ success: boolean; dataUrl?: string; error?: string }>(
+    (resolve) => {
+      chrome.runtime.sendMessage({ type: MESSAGE_TYPES.FETCH_IMAGE_DATA, url }, (resp) => {
         if (chrome.runtime.lastError) {
           resolve({ success: false, error: chrome.runtime.lastError.message });
         } else {
           resolve(resp || { success: false, error: 'No response from background' });
         }
-      }
-    );
-  });
+      });
+    }
+  );
 
   if (!response.success || !response.dataUrl) {
     throw new Error(response.error || 'Background fetch failed');
@@ -282,9 +268,10 @@ export async function downloadSingle(img: ImageItem, format: string | null): Pro
 
   let downloadUrl = img.url;
   const pageInfo = await getActivePageInfo();
-  let filename = state.appSettings.specifyDownload !== false
-    ? generateFilename(img, 0, format, pageInfo)
-    : getOriginalFilename(img);
+  let filename =
+    state.appSettings.specifyDownload !== false
+      ? generateFilename(img, 0, format, pageInfo)
+      : getOriginalFilename(img);
 
   if (format && format !== img.format && typeof convertImageFormat === 'function') {
     try {
@@ -306,8 +293,11 @@ export async function downloadSingle(img: ImageItem, format: string | null): Pro
 }
 
 export async function downloadSelectedAsZip(targetFormat: string | null): Promise<void> {
-  const selected = state.filteredImages.filter(img => state.selectedImages.has(img.id));
-  if (selected.length === 0) { showToast('No images selected', 'error'); return; }
+  const selected = state.filteredImages.filter((img) => state.selectedImages.has(img.id));
+  if (selected.length === 0) {
+    showToast('No images selected', 'error');
+    return;
+  }
 
   // Pro check: format conversion requires Pro
   if (targetFormat && !state.isProUser) {
@@ -318,7 +308,10 @@ export async function downloadSelectedAsZip(targetFormat: string | null): Promis
 
   // Free tier: limit ZIP to FREE_LIMITS.MAX_ZIP_IMAGES images
   if (!state.isProUser && selected.length > FREE_LIMITS.MAX_ZIP_IMAGES) {
-    showToast(`Free plan allows up to ${FREE_LIMITS.MAX_ZIP_IMAGES} images per ZIP. Upgrade to Pro for unlimited!`, 'warning');
+    showToast(
+      `Free plan allows up to ${FREE_LIMITS.MAX_ZIP_IMAGES} images per ZIP. Upgrade to Pro for unlimited!`,
+      'warning'
+    );
     showProUpgradeModal();
     return;
   }
@@ -329,7 +322,7 @@ export async function downloadSelectedAsZip(targetFormat: string | null): Promis
       message: `You are about to download ${selected.length} images. Continue?`,
       confirmText: 'Download',
       cancelText: 'Cancel',
-      type: 'info'
+      type: 'info',
     });
     if (!confirmed) return;
   }
@@ -365,9 +358,16 @@ export async function downloadSelectedAsZip(targetFormat: string | null): Promis
 
       try {
         let blob: Blob;
-        if (targetFormat && targetFormat !== img.format && typeof convertImageFormat === 'function') {
-          const result = await convertImageFormat(img.url, targetFormat as 'png' | 'jpg' | 'jpeg' | 'webp');
-          blob = await fetch(result.dataUrl).then(r => r.blob());
+        if (
+          targetFormat &&
+          targetFormat !== img.format &&
+          typeof convertImageFormat === 'function'
+        ) {
+          const result = await convertImageFormat(
+            img.url,
+            targetFormat as 'png' | 'jpg' | 'jpeg' | 'webp'
+          );
+          blob = await fetch(result.dataUrl).then((r) => r.blob());
         } else {
           // Use background fallback so cross-origin images without CORS headers
           // can still be packaged (background uses host_permissions to bypass CORS).
@@ -393,7 +393,7 @@ export async function downloadSelectedAsZip(targetFormat: string | null): Promis
     await chrome.downloads.download({
       url: blobUrl,
       filename: `${pageInfo.domain}-${ts}.zip`,
-      saveAs: false
+      saveAs: false,
     });
 
     URL.revokeObjectURL(blobUrl);
@@ -437,7 +437,7 @@ export function toggleDownloadDropdown(): void {
         // Constrain to viewport with padding
         const parentRect = dropdown.parentElement?.getBoundingClientRect();
         if (parentRect) {
-          dropdown.style.left = (4 - parentRect.left) + 'px';
+          dropdown.style.left = 4 - parentRect.left + 'px';
           dropdown.style.right = 'auto';
         }
       }
@@ -532,8 +532,9 @@ export function reverseSearch(imageUrl: string, engine: string): void {
 
   // Open the intermediate page which downloads the image via background script
   // and submits it as a form upload to the search engine
-  const searchPageUrl = chrome.runtime.getURL('pages/reverse-search.html')
-    + `?engine=${encodeURIComponent(engine)}`
-    + `&imageUrl=${encodeURIComponent(imageUrl)}`;
+  const searchPageUrl =
+    chrome.runtime.getURL('pages/reverse-search.html') +
+    `?engine=${encodeURIComponent(engine)}` +
+    `&imageUrl=${encodeURIComponent(imageUrl)}`;
   chrome.tabs.create({ url: searchPageUrl, active: true });
 }

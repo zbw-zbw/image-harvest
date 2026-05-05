@@ -16,10 +16,30 @@
 import { defineConfig } from 'vite';
 import { crx } from '@crxjs/vite-plugin';
 import manifest from './manifest.config';
+import { htmlIncludePlugin } from './vite-html-include';
 
 export default defineConfig({
+  // Preact JSX automatic runtime — matches the tsconfig "jsxImportSource":
+  // "preact" setting so `.tsx` files compile without an explicit `h` import.
+  esbuild: {
+    jsx: 'automatic',
+    jsxImportSource: 'preact',
+  },
+  resolve: {
+    // Reroute any `react` / `react-dom` imports to Preact's compat layer.
+    // Lets us pull in third-party React-typed components later without a
+    // bundler-level rewrite pass. Pure Preact code still imports from
+    // `preact` directly and bypasses this alias.
+    alias: {
+      react: 'preact/compat',
+      'react-dom': 'preact/compat',
+    },
+  },
   plugins: [
-    crx({ manifest })
+    // Run the include/conditional pass BEFORE crxjs sees the HTML so the
+    // crxjs entry-point analyzer parses a fully-expanded document.
+    htmlIncludePlugin(),
+    crx({ manifest }),
   ],
   build: {
     outDir: 'dist',
@@ -32,9 +52,9 @@ export default defineConfig({
         // crxjs sets these per-input, but we keep an explicit hint for any
         // additional shared chunks Rollup decides to extract.
         chunkFileNames: 'assets/[name]-[hash].js',
-        assetFileNames: 'assets/[name]-[hash][extname]'
-      }
-    }
+        assetFileNames: 'assets/[name]-[hash][extname]',
+      },
+    },
   },
   // Vite copies anything in `publicDir` verbatim into `dist/`. We don't
   // need it during the Stage 0 POC (the dummy entries pull in their own CSS
@@ -46,7 +66,7 @@ export default defineConfig({
     port: 5173,
     strictPort: true,
     hmr: {
-      port: 5173
-    }
-  }
+      port: 5173,
+    },
+  },
 });

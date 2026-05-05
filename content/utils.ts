@@ -45,15 +45,23 @@ export function ensureImageLoaded(img: HTMLImageElement): Promise<void> {
   return new Promise((resolve) => {
     const timeout = setTimeout(() => resolve(), 2000);
 
-    img.addEventListener('load', () => {
-      clearTimeout(timeout);
-      resolve();
-    }, { once: true });
+    img.addEventListener(
+      'load',
+      () => {
+        clearTimeout(timeout);
+        resolve();
+      },
+      { once: true }
+    );
 
-    img.addEventListener('error', () => {
-      clearTimeout(timeout);
-      resolve();
-    }, { once: true });
+    img.addEventListener(
+      'error',
+      () => {
+        clearTimeout(timeout);
+        resolve();
+      },
+      { once: true }
+    );
   });
 }
 
@@ -87,10 +95,14 @@ export function skipElement(el: Element): boolean {
 export function sendDiscoveredImages(images: ImageItem[]): void {
   try {
     if (!isExtensionContextValid()) return;
-    chrome.runtime.sendMessage({
-      type: MESSAGE_TYPES.IMAGES_DISCOVERED,
-      images
-    }).catch(() => { /* ignore */ });
+    chrome.runtime
+      .sendMessage({
+        type: MESSAGE_TYPES.IMAGES_DISCOVERED,
+        images,
+      })
+      .catch(() => {
+        /* ignore */
+      });
   } catch {
     if (state.liveObserver) {
       state.liveObserver.disconnect();

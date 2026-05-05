@@ -10,7 +10,7 @@ import {
   isImageDataUri,
   generateDataUriKey,
   extractBackgroundUrls,
-  isGradient
+  isGradient,
 } from '../shared/utils';
 import type { ImageItem } from '../shared/types';
 import { state } from './state';
@@ -42,7 +42,7 @@ export function extractInlineSvg(svgElement: SVGElement): ImageItem | null {
       format: 'svg',
       sourceDomain: window.location.hostname,
       checked: false,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     } as ImageItem;
   } catch {
     return null;
@@ -74,7 +74,7 @@ export function extractCanvasImage(canvasElement: HTMLCanvasElement): ImageItem 
       format: 'png',
       sourceDomain: window.location.hostname,
       checked: false,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     } as ImageItem;
   } catch {
     // Canvas is tainted (cross-origin content drawn on it)
@@ -136,7 +136,7 @@ export async function extractVideoPosterImages(images: Map<string, ImageItem>): 
         format: getFileFormat(posterUrl),
         sourceDomain: window.location.hostname,
         checked: false,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       } as ImageItem);
       continue;
     }
@@ -154,7 +154,7 @@ export async function extractVideoPosterImages(images: Map<string, ImageItem>): 
       format: getFileFormat(resolvedUrl),
       sourceDomain: getDomain(resolvedUrl),
       checked: false,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     } as ImageItem);
   }
 }
@@ -180,7 +180,7 @@ export async function extractInputImages(images: Map<string, ImageItem>): Promis
         format: getFileFormat(url),
         sourceDomain: window.location.hostname,
         checked: false,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       } as ImageItem);
       continue;
     }
@@ -198,7 +198,7 @@ export async function extractInputImages(images: Map<string, ImageItem>): Promis
       format: getFileFormat(resolvedUrl),
       sourceDomain: getDomain(resolvedUrl),
       checked: false,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     } as ImageItem);
   }
 }
@@ -229,9 +229,11 @@ export async function extractObjectEmbedImages(images: Map<string, ImageItem>): 
       displayHeight: Math.round(rect.height),
       type: 'object',
       format: isDataUri(dataUrl) ? getFileFormat(dataUrl) : getFileFormat(resolvedUrl as string),
-      sourceDomain: isDataUri(dataUrl) ? window.location.hostname : getDomain(resolvedUrl as string),
+      sourceDomain: isDataUri(dataUrl)
+        ? window.location.hostname
+        : getDomain(resolvedUrl as string),
       checked: false,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     } as ImageItem);
   }
 
@@ -258,7 +260,7 @@ export async function extractObjectEmbedImages(images: Map<string, ImageItem>): 
       format: isDataUri(srcUrl) ? getFileFormat(srcUrl) : getFileFormat(resolvedUrl as string),
       sourceDomain: isDataUri(srcUrl) ? window.location.hostname : getDomain(resolvedUrl as string),
       checked: false,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     } as ImageItem);
   }
 }
@@ -302,7 +304,7 @@ export async function extractMetaAndLinkImages(images: Map<string, ImageItem>): 
       format: getFileFormat(resolvedUrl),
       sourceDomain: getDomain(resolvedUrl),
       checked: false,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     } as ImageItem);
   }
 
@@ -332,7 +334,7 @@ export async function extractMetaAndLinkImages(images: Map<string, ImageItem>): 
       format: getFileFormat(resolvedUrl),
       sourceDomain: getDomain(resolvedUrl),
       checked: false,
-      timestamp: Date.now()
+      timestamp: Date.now(),
     } as ImageItem);
   }
 }
@@ -341,19 +343,24 @@ export async function extractMetaAndLinkImages(images: Map<string, ImageItem>): 
 export async function extractLazyLoadImages(images: Map<string, ImageItem>): Promise<void> {
   // Common lazy-load attribute names used by popular libraries
   const lazyAttributes = [
-    'data-src', 'data-original', 'data-lazy', 'data-lazy-src',
-    'data-hi-res-src', 'data-image', 'data-full-src',
-    'data-bg', 'data-bg-src', 'data-background',
+    'data-src',
+    'data-original',
+    'data-lazy',
+    'data-lazy-src',
+    'data-hi-res-src',
+    'data-image',
+    'data-full-src',
+    'data-bg',
+    'data-bg-src',
+    'data-background',
     'data-poster',
   ];
-  const lazySrcsetAttributes = [
-    'data-srcset', 'data-lazy-srcset',
-  ];
+  const lazySrcsetAttributes = ['data-srcset', 'data-lazy-srcset'];
 
   // Build a selector that matches any element with at least one of these attributes
   const selectorParts = [
-    ...lazyAttributes.map(attr => `[${attr}]`),
-    ...lazySrcsetAttributes.map(attr => `[${attr}]`),
+    ...lazyAttributes.map((attr) => `[${attr}]`),
+    ...lazySrcsetAttributes.map((attr) => `[${attr}]`),
   ];
   const elements = document.querySelectorAll(selectorParts.join(','));
 
@@ -384,7 +391,7 @@ export async function extractLazyLoadImages(images: Map<string, ImageItem>): Pro
           format: getFileFormat(rawUrl),
           sourceDomain: window.location.hostname,
           checked: false,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         } as ImageItem);
         continue;
       }
@@ -413,7 +420,7 @@ export async function extractLazyLoadImages(images: Map<string, ImageItem>): Pro
         format: format,
         sourceDomain: getDomain(resolvedUrl),
         checked: false,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       } as ImageItem);
     }
 
@@ -443,7 +450,7 @@ export async function extractLazyLoadImages(images: Map<string, ImageItem>): Pro
             format: getFileFormat(url),
             sourceDomain: window.location.hostname,
             checked: false,
-            timestamp: Date.now()
+            timestamp: Date.now(),
           } as ImageItem);
           continue;
         }
@@ -464,7 +471,7 @@ export async function extractLazyLoadImages(images: Map<string, ImageItem>): Pro
           format: getFileFormat(resolvedUrl),
           sourceDomain: getDomain(resolvedUrl),
           checked: false,
-          timestamp: Date.now()
+          timestamp: Date.now(),
         } as ImageItem);
       }
     }
@@ -484,7 +491,13 @@ export async function extractCssContentImages(images: Map<string, ImageItem>): P
       try {
         const style = window.getComputedStyle(el, pseudo);
         const contentValue = style.content;
-        if (!contentValue || contentValue === 'none' || contentValue === 'normal' || contentValue === '""') continue;
+        if (
+          !contentValue ||
+          contentValue === 'none' ||
+          contentValue === 'normal' ||
+          contentValue === '""'
+        )
+          continue;
 
         const urls = extractBackgroundUrls(contentValue);
         for (const url of urls) {
@@ -505,7 +518,7 @@ export async function extractCssContentImages(images: Map<string, ImageItem>): P
               format: getFileFormat(url),
               sourceDomain: window.location.hostname,
               checked: false,
-              timestamp: Date.now()
+              timestamp: Date.now(),
             } as ImageItem);
             continue;
           }
@@ -524,7 +537,7 @@ export async function extractCssContentImages(images: Map<string, ImageItem>): P
             format: getFileFormat(resolvedUrl),
             sourceDomain: getDomain(resolvedUrl),
             checked: false,
-            timestamp: Date.now()
+            timestamp: Date.now(),
           } as ImageItem);
         }
       } catch {

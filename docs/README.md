@@ -42,10 +42,10 @@ docs/
 
 提交到 Chrome Web Store 商品详情页时直接复制使用。
 
-| 文件 | 用途 | 对应字段 |
-|---|---|---|
+| 文件                                                           | 用途                                     | 对应字段               |
+| -------------------------------------------------------------- | ---------------------------------------- | ---------------------- |
 | [`chrome-store/description.md`](./chrome-store/description.md) | 完整功能描述（带 emoji + Free/Pro 对比） | "Detailed description" |
-| [`chrome-store/summary.md`](./chrome-store/summary.md) | 132 字符短描述 + 3 个 A/B 测试备选 | "Summary" |
+| [`chrome-store/summary.md`](./chrome-store/summary.md)         | 132 字符短描述 + 3 个 A/B 测试备选       | "Summary"              |
 
 ---
 
@@ -53,12 +53,12 @@ docs/
 
 以下内容**不包含**在本开源仓库中（已被 `.gitignore` 排除）：
 
-| 目录 | 内容 |
-|---|---|
-| `launch/` | 推广策略、34 中文 + 34 英文平台文案、YouTube SEO、bio 模板、追踪表 |
-| `ads/` | Google Ads 投放方案（后续可能扩展 Facebook / Twitter Ads） |
-| `release/` | GitHub Release 粘贴版笔记、Social Preview 设计方案 |
-| `product/` | 产品需求文档（PRD）、未来功能路线图 |
+| 目录       | 内容                                                               |
+| ---------- | ------------------------------------------------------------------ |
+| `launch/`  | 推广策略、34 中文 + 34 英文平台文案、YouTube SEO、bio 模板、追踪表 |
+| `ads/`     | Google Ads 投放方案（后续可能扩展 Facebook / Twitter Ads）         |
+| `release/` | GitHub Release 粘贴版笔记、Social Preview 设计方案                 |
+| `product/` | 产品需求文档（PRD）、未来功能路线图                                |
 
 这些文档属于**商业运营资产**，仅本地保留。如果你是用户或贡献者，无需访问这些文档即可理解和使用本项目。
 
@@ -66,10 +66,10 @@ docs/
 
 ## 🚀 快速上手
 
-| 我想... | 去哪里 |
-|---|---|
-| 安装产品 | [Chrome Web Store](https://chromewebstore.google.com/detail/iecgnjidmogebokcfnejncgnelcepffo) |
-| 查看功能说明 | 官网 [image-harvest.kyriewen.cn](https://image-harvest.kyriewen.cn) |
-| 贡献代码 | 根目录 [`CONTRIBUTING.md`](../CONTRIBUTING.md) |
-| 报告问题 | [GitHub Issues](https://github.com/zbw-zbw/image-harvest/issues/new/choose) |
-| 提交 Chrome Store | [`chrome-store/description.md`](./chrome-store/description.md) |
+| 我想...           | 去哪里                                                                                        |
+| ----------------- | --------------------------------------------------------------------------------------------- |
+| 安装产品          | [Chrome Web Store](https://chromewebstore.google.com/detail/iecgnjidmogebokcfnejncgnelcepffo) |
+| 查看功能说明      | 官网 [image-harvest.kyriewen.cn](https://image-harvest.kyriewen.cn)                           |
+| 贡献代码          | 根目录 [`CONTRIBUTING.md`](../CONTRIBUTING.md)                                                |
+| 报告问题          | [GitHub Issues](https://github.com/zbw-zbw/image-harvest/issues/new/choose)                   |
+| 提交 Chrome Store | [`chrome-store/description.md`](./chrome-store/description.md)                                |

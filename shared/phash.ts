@@ -114,11 +114,7 @@ function dct2d(matrix: number[], size: number): number[] {
   return result;
 }
 
-function imageToGrayscale(
-  imageData: Uint8ClampedArray,
-  width: number,
-  height: number
-): number[] {
+function imageToGrayscale(imageData: Uint8ClampedArray, width: number, height: number): number[] {
   const grayscale = new Array(width * height);
   for (let i = 0; i < width * height; i++) {
     const r = imageData[i * 4];

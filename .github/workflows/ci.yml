@@ -1,0 +1,101 @@
+# CI for Image Harvest
+#
+# Four lightweight jobs run in parallel on every push/PR. Each one is small
+# enough that splitting them gives faster feedback than a single mega-job:
+#   - lint:       eslint over the whole tree (fast, no compile)
+#   - typecheck:  tsc --noEmit (catches the most regressions, run alone so
+#                 the log is easy to read)
+#   - test:       vitest unit suite + coverage
+#   - build:      vite build, plus uploads dist/ as an artifact so reviewers
+#                 can sideload the unpacked extension into Chrome.
+#
+# `npm ci --legacy-peer-deps` mirrors what we do locally — @crxjs/vite-plugin
+# (beta) declares a peer dep range Vite 5 doesn't satisfy, but the runtime
+# combination is fine in practice.
+name: CI
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+    branches: [main]
+
+# Cancel obsolete runs when new commits land on the same ref to save minutes.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  NODE_VERSION: '22'
+
+jobs:
+  lint:
+    name: Lint
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - run: npm ci --legacy-peer-deps
+      - run: npm run lint
+      - run: npm run format:check
+
+  typecheck:
+    name: Typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - run: npm ci --legacy-peer-deps
+      - run: npm run typecheck
+
+  test:
+    name: Test
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - run: npm ci --legacy-peer-deps
+      - run: npm test
+      # Coverage is best-effort: don't fail the run if the optional reporter
+      # has trouble installing on a fresh CI box (it pulls in v8-coverage
+      # native bits that occasionally flake on first install).
+      - name: Coverage report
+        run: npm run test:coverage
+        continue-on-error: true
+      - name: Upload coverage
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage
+          path: coverage/
+          if-no-files-found: ignore
+          retention-days: 7
+
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+      - run: npm ci --legacy-peer-deps
+      - run: npm run build
+      # The artifact lets reviewers download dist/ and sideload the extension
+      # without checking out the branch locally — useful for design-review PRs.
+      - name: Upload extension build
+        uses: actions/upload-artifact@v4
+        with:
+          name: image-harvest-dist-${{ github.sha }}
+          path: dist/
+          retention-days: 14

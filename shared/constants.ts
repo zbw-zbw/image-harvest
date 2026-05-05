@@ -24,18 +24,26 @@ export const DEFAULT_FILTER_CONFIG: FilterConfig = {
 
   // Live monitoring
   enableLiveMonitoring: true,
-  liveDebounceMs: 500
+  liveDebounceMs: 500,
 };
 
 export const ASPECT_RATIOS = {
   square: { min: 0.9, max: 1.1, label: 'Square' },
   landscape: { min: 1.1, max: 2.5, label: 'Landscape' },
   portrait: { min: 0.4, max: 0.9, label: 'Portrait' },
-  panorama: { min: 2.5, max: 10, label: 'Panorama' }
+  panorama: { min: 2.5, max: 10, label: 'Panorama' },
 } as const;
 
 export const SUPPORTED_FORMATS = [
-  'jpg', 'jpeg', 'png', 'webp', 'gif', 'svg', 'bmp', 'ico', 'avif'
+  'jpg',
+  'jpeg',
+  'png',
+  'webp',
+  'gif',
+  'svg',
+  'bmp',
+  'ico',
+  'avif',
 ] as const;
 
 export const STORAGE_KEYS = {
@@ -45,7 +53,7 @@ export const STORAGE_KEYS = {
   APP_SETTINGS: 'appSettings',
   COLLECTION: 'collection',
   LICENSE_DATA: 'licenseData',
-  INSTANCE_ID: 'instanceId'
+  INSTANCE_ID: 'instanceId',
 } as const;
 
 export const MESSAGE_TYPES = {
@@ -103,7 +111,7 @@ export const MESSAGE_TYPES = {
   DEACTIVATE_LICENSE: 'DEACTIVATE_LICENSE',
   VALIDATE_LICENSE: 'VALIDATE_LICENSE',
   GET_LICENSE_STATUS: 'GET_LICENSE_STATUS',
-  LICENSE_STATUS_CHANGED: 'LICENSE_STATUS_CHANGED'
+  LICENSE_STATUS_CHANGED: 'LICENSE_STATUS_CHANGED',
 } as const;
 
 export type MessageType = (typeof MESSAGE_TYPES)[keyof typeof MESSAGE_TYPES];
@@ -114,7 +122,7 @@ export const ERROR_CODES = {
   CORS_DENIED: 'CORS_DENIED',
   MEMORY_LIMIT: 'MEMORY_LIMIT',
   NO_IMAGES: 'NO_IMAGES',
-  INJECTION_FAILED: 'INJECTION_FAILED'
+  INJECTION_FAILED: 'INJECTION_FAILED',
 } as const;
 
 export const LIMITS = {
@@ -124,7 +132,7 @@ export const LIMITS = {
   MAX_DOWNLOAD_HISTORY: 20,
   CONCURRENT_FETCHES: 3,
   FETCH_TIMEOUT_MS: 10000,
-  THUMBNAIL_MAX_SIZE: 200
+  THUMBNAIL_MAX_SIZE: 200,
 } as const;
 
 // V2.0 Group modes
@@ -133,21 +141,21 @@ export const GROUP_MODES = {
   DOMAIN: 'domain',
   FORMAT: 'format',
   SIZE: 'size',
-  TAB: 'tab'
+  TAB: 'tab',
 } as const;
 
 // V2.0 Layout density
 export const DENSITY = {
   COMPACT: 'compact',
   STANDARD: 'standard',
-  COMFORTABLE: 'comfortable'
+  COMFORTABLE: 'comfortable',
 } as const;
 
 // V2.0 Theme
 export const THEME = {
   SYSTEM: 'system',
   LIGHT: 'light',
-  DARK: 'dark'
+  DARK: 'dark',
 } as const;
 
 // V2.0 Pro features
@@ -164,7 +172,7 @@ export const PRO_FEATURES = [
   'advancedPreview',
   'liveMonitoring',
   'imageDelete',
-  'unlimitedZip'
+  'unlimitedZip',
 ] as const;
 
 // Free tier limits (degraded functionality for non-Pro users)
@@ -179,21 +187,32 @@ export const FREE_LIMITS = {
   LIVE_MONITORING: false,
   IMAGE_DELETE: false,
   FORMAT_CONVERSION: false,
-  CUSTOM_NAMING: false
+  CUSTOM_NAMING: false,
 } as const;
 
 // V2.0 Reverse search engines
 export const SEARCH_ENGINES = {
   google: { name: 'Google Images', url: 'https://lens.google.com/uploadbyurl?url={imageUrl}' },
   tineye: { name: 'TinEye', url: 'https://tineye.com/search?url={imageUrl}' },
-  baidu: { name: 'Baidu', url: 'https://graph.baidu.com/details?isfromtusdk=1&tn=pc&image={imageUrl}' },
-  yandex: { name: 'Yandex', url: 'https://yandex.com/images/search?rpt=imageview&url={imageUrl}' }
+  baidu: {
+    name: 'Baidu',
+    url: 'https://graph.baidu.com/details?isfromtusdk=1&tn=pc&image={imageUrl}',
+  },
+  yandex: { name: 'Yandex', url: 'https://yandex.com/images/search?rpt=imageview&url={imageUrl}' },
 } as const;
 
 // V2.0 Naming template variables
 export const NAMING_VARIABLES = [
-  '{index}', '{number}', '{original}', '{title}', '{domain}',
-  '{width}', '{height}', '{format}', '{date}', '{timestamp}'
+  '{index}',
+  '{number}',
+  '{original}',
+  '{title}',
+  '{domain}',
+  '{width}',
+  '{height}',
+  '{format}',
+  '{date}',
+  '{timestamp}',
 ] as const;
 
 // License & Payment
@@ -202,12 +221,12 @@ export const PRICING_PAGE_URL = 'https://image-harvest.kyriewen.cn/pricing';
 export const PRICING = {
   MONTHLY: 2.99,
   YEARLY: 19.99,
-  LIFETIME: 39.99
+  LIFETIME: 39.99,
 } as const;
 export const LICENSE_STATUS = {
   ACTIVE: 'active',
   EXPIRED: 'expired',
-  INACTIVE: 'inactive'
+  INACTIVE: 'inactive',
 } as const;
 export const LICENSE_CHECK_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours
 export const LICENSE_GRACE_PERIOD = 7 * 24 * 60 * 60 * 1000; // 7 days offline grace
@@ -232,5 +251,5 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   maxHeight: 8000,
   enableSimilarDetection: true,
   enableColorExtraction: true,
-  noManyFilesWarning: false
+  noManyFilesWarning: false,
 };

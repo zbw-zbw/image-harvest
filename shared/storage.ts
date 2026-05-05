@@ -1,17 +1,12 @@
 // Storage management for Image Harvest.
-import {
-  DEFAULT_FILTER_CONFIG,
-  STORAGE_KEYS,
-  LIMITS,
-  DEFAULT_APP_SETTINGS
-} from './constants';
+import { DEFAULT_FILTER_CONFIG, STORAGE_KEYS, LIMITS, DEFAULT_APP_SETTINGS } from './constants';
 import { deepMerge } from './utils';
 import type {
   AppSettings,
   FilterConfig,
   ImageItem,
   LicenseData,
-  TabImageCacheEntry
+  TabImageCacheEntry,
 } from './types';
 
 interface DownloadRecord {
@@ -32,7 +27,7 @@ export async function getFilterConfig(): Promise<FilterConfig> {
 export async function saveFilterConfig(config: FilterConfig): Promise<boolean> {
   try {
     await chrome.storage.sync.set({
-      [STORAGE_KEYS.FILTER_CONFIG]: config
+      [STORAGE_KEYS.FILTER_CONFIG]: config,
     });
     return true;
   } catch (error) {
@@ -61,7 +56,7 @@ export async function addDownloadRecord(record: DownloadRecord): Promise<boolean
     }
 
     await chrome.storage.local.set({
-      [STORAGE_KEYS.DOWNLOAD_HISTORY]: history
+      [STORAGE_KEYS.DOWNLOAD_HISTORY]: history,
     });
     return true;
   } catch (error) {
@@ -85,7 +80,7 @@ export async function removeDownloadRecord(recordId: string): Promise<boolean> {
     const history = await getDownloadHistory();
     const filtered = history.filter((r) => r.id !== recordId);
     await chrome.storage.local.set({
-      [STORAGE_KEYS.DOWNLOAD_HISTORY]: filtered
+      [STORAGE_KEYS.DOWNLOAD_HISTORY]: filtered,
     });
     return true;
   } catch (error) {
@@ -97,7 +92,7 @@ export async function removeDownloadRecord(recordId: string): Promise<boolean> {
 export async function saveSessionState(state: unknown): Promise<boolean> {
   try {
     await chrome.storage.session.set({
-      [STORAGE_KEYS.SESSION_STATE]: state
+      [STORAGE_KEYS.SESSION_STATE]: state,
     });
     return true;
   } catch (error) {
@@ -151,7 +146,7 @@ function slimImageForCache(img: ImageItem): ImageItem {
     tabIndex: img.tabIndex,
     isCurrentTab: img.isCurrentTab,
     colors: img.colors,
-    phash: img.phash
+    phash: img.phash,
   };
 }
 
@@ -166,8 +161,8 @@ export async function saveTabImageCache(
       [key]: {
         url: tabUrl,
         timestamp: Date.now(),
-        images: images.map(slimImageForCache)
-      } satisfies TabImageCacheEntry
+        images: images.map(slimImageForCache),
+      } satisfies TabImageCacheEntry,
     });
     return true;
   } catch (error) {

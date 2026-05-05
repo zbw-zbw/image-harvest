@@ -43,7 +43,9 @@
   border-radius: 10px;
   cursor: pointer;
   white-space: nowrap;
-  transition: box-shadow 0.2s, filter 0.2s;
+  transition:
+    box-shadow 0.2s,
+    filter 0.2s;
 }
 
 .btn-upgrade-pro:hover {
@@ -78,7 +80,7 @@
   background: linear-gradient(135deg, #ffd700, #ffb800);
   border-radius: 10px;
   white-space: nowrap;
-  text-shadow: 0 0.5px 0 rgba(255,255,255,0.3);
+  text-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.3);
   flex-shrink: 0;
 }
 
@@ -244,8 +246,8 @@
   pointer-events: none;
 }
 
-.pro-setting-disabled input[type="checkbox"],
-.pro-setting-disabled input[type="text"],
+.pro-setting-disabled input[type='checkbox'],
+.pro-setting-disabled input[type='text'],
 .pro-setting-disabled textarea {
   pointer-events: none;
   cursor: not-allowed;
@@ -372,6 +374,10 @@
 }
 
 @keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
 }

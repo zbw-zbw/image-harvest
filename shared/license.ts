@@ -3,13 +3,13 @@ import {
   LICENSE_API_URL,
   LICENSE_STATUS,
   LICENSE_CHECK_INTERVAL,
-  LICENSE_GRACE_PERIOD
+  LICENSE_GRACE_PERIOD,
 } from './constants';
 import type {
   LicenseActivationResult,
   LicenseData,
   LicenseValidationResult,
-  ProUserInfo
+  ProUserInfo,
 } from './types';
 
 interface DeactivationResult {
@@ -24,10 +24,7 @@ export async function getOrCreateInstanceId(): Promise<string> {
     if (result.instanceId) return result.instanceId as string;
 
     const id =
-      'inst_' +
-      Date.now().toString(36) +
-      '_' +
-      Math.random().toString(36).substring(2, 10);
+      'inst_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 10);
     await chrome.storage.local.set({ instanceId: id });
     return id;
   } catch (error) {
@@ -66,19 +63,40 @@ export async function clearLicenseData(): Promise<boolean> {
   }
 }
 
+/**
+ * Hit the verify endpoint.
+ *
+ * Contract:
+ *   - Resolves with the parsed `LicenseValidationResult` only when the server
+ *     returned a well-formed response. The license may still be invalid, but
+ *     the *answer* came from the source of truth.
+ *   - Throws on transport-level failures (offline, DNS, TLS, 5xx, malformed
+ *     JSON). This distinction matters: callers like `isProUser()` use the
+ *     thrown case to engage the offline grace period instead of immediately
+ *     marking a paying customer as expired.
+ */
 export async function validateLicenseRemote(licenseKey: string): Promise<LicenseValidationResult> {
+  const response = await fetch(LICENSE_API_URL + '/verify', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ licenseKey }),
+  });
+
+  if (!response.ok) {
+    throw new Error('License verify failed: HTTP ' + response.status);
+  }
+
+  return (await response.json()) as LicenseValidationResult;
+}
+
+/**
+ * Same as `validateLicenseRemote` but never throws — used by the activation
+ * flow where the user is actively waiting for a UI message and a network
+ * error should surface as a friendly result, not an exception.
+ */
+async function validateLicenseRemoteSafe(licenseKey: string): Promise<LicenseValidationResult> {
   try {
-    const response = await fetch(LICENSE_API_URL + '/verify', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ licenseKey })
-    });
-
-    if (!response.ok) {
-      throw new Error('API request failed: ' + response.status);
-    }
-
-    return (await response.json()) as LicenseValidationResult;
+    return await validateLicenseRemote(licenseKey);
   } catch (error) {
     console.error('Failed to validate license remotely:', error);
     return { valid: false, error: 'Network error. Please check your connection.' };
@@ -103,8 +121,8 @@ export async function activateLicenseRemote(
       body: JSON.stringify({
         licenseKey,
         instanceId,
-        action: 'activate'
-      })
+        action: 'activate',
+      }),
     });
 
     if (!response.ok) {
@@ -129,8 +147,8 @@ export async function deactivateLicenseRemote(
       body: JSON.stringify({
         licenseKey,
         instanceId,
-        action: 'deactivate'
-      })
+        action: 'deactivate',
+      }),
     });
 
     if (!response.ok) {
@@ -151,11 +169,13 @@ export async function activateLicense(licenseKey: string): Promise<LicenseActiva
   const normalizedKey = licenseKey.trim().toUpperCase();
   const instanceId = await getOrCreateInstanceId();
 
-  const validation = await validateLicenseRemote(normalizedKey);
+  // Activation is user-initiated; surface network errors as friendly results
+  // instead of letting them bubble out as unhandled rejections.
+  const validation = await validateLicenseRemoteSafe(normalizedKey);
   if (!validation.valid) {
     return {
       success: false,
-      error: validation.error || validation.status || 'Invalid license key'
+      error: validation.error || validation.status || 'Invalid license key',
     };
   }
 
@@ -163,7 +183,7 @@ export async function activateLicense(licenseKey: string): Promise<LicenseActiva
   if (!activation.success) {
     return {
       success: false,
-      error: activation.error || 'Activation failed'
+      error: activation.error || 'Activation failed',
     };
   }
 
@@ -173,7 +193,7 @@ export async function activateLicense(licenseKey: string): Promise<LicenseActiva
     plan: activation.plan ?? validation.plan ?? null,
     expiresAt: activation.expiresAt ?? validation.expiresAt ?? null,
     lastVerified: Date.now(),
-    instanceId
+    instanceId,
   };
 
   await saveLicenseData(licenseData);
@@ -181,7 +201,7 @@ export async function activateLicense(licenseKey: string): Promise<LicenseActiva
   return {
     success: true,
     plan: licenseData.plan,
-    expiresAt: licenseData.expiresAt
+    expiresAt: licenseData.expiresAt,
   };
 }
 
@@ -214,10 +234,14 @@ export async function isProUser(): Promise<ProUserInfo> {
       isPro: true,
       plan: licenseData.plan,
       expiresAt: licenseData.expiresAt,
-      status: LICENSE_STATUS.ACTIVE
+      status: LICENSE_STATUS.ACTIVE,
     };
   }
 
+  // Remote verify path. We deliberately let `validateLicenseRemote` throw on
+  // transport-level failures (offline / 5xx / malformed JSON) so the catch
+  // block below can engage the offline grace period instead of treating an
+  // outage as proof of cancellation.
   try {
     const validation = await validateLicenseRemote(licenseData.licenseKey);
 
@@ -233,20 +257,28 @@ export async function isProUser(): Promise<ProUserInfo> {
         isPro: true,
         plan: licenseData.plan,
         expiresAt: licenseData.expiresAt,
-        status: LICENSE_STATUS.ACTIVE
-      };
-    } else {
-      licenseData.status = LICENSE_STATUS.EXPIRED;
-      licenseData.lastVerified = Date.now();
-      await saveLicenseData(licenseData);
-
-      return {
-        isPro: false,
-        plan: licenseData.plan,
-        status: LICENSE_STATUS.EXPIRED
+        status: LICENSE_STATUS.ACTIVE,
       };
     }
-  } catch {
+
+    // Server reachable AND said "not valid" → license really is expired.
+    // Persist so we don't keep re-asking the network on every check.
+    licenseData.status = LICENSE_STATUS.EXPIRED;
+    licenseData.lastVerified = Date.now();
+    await saveLicenseData(licenseData);
+
+    return {
+      isPro: false,
+      plan: licenseData.plan,
+      status: LICENSE_STATUS.EXPIRED,
+    };
+  } catch (error) {
+    // Network/transport error. Fall back to the offline grace period: as long
+    // as we previously saw the license as ACTIVE within the last
+    // LICENSE_GRACE_PERIOD, keep treating the user as Pro. Crucially we do
+    // NOT bump `lastVerified` here — that would silently extend the grace
+    // window forever during a long outage.
+    console.warn('License verify unreachable, falling back to grace period:', error);
     if (licenseData.status === LICENSE_STATUS.ACTIVE) {
       const isWithinGracePeriod = timeSinceLastCheck < LICENSE_GRACE_PERIOD;
       if (isWithinGracePeriod) {
@@ -254,7 +286,7 @@ export async function isProUser(): Promise<ProUserInfo> {
           isPro: true,
           plan: licenseData.plan,
           expiresAt: licenseData.expiresAt,
-          status: LICENSE_STATUS.ACTIVE
+          status: LICENSE_STATUS.ACTIVE,
         };
       }
     }
@@ -262,14 +294,15 @@ export async function isProUser(): Promise<ProUserInfo> {
     return {
       isPro: false,
       plan: licenseData.plan,
-      status: LICENSE_STATUS.EXPIRED
+      status: LICENSE_STATUS.EXPIRED,
     };
   }
 }
 
 /** Get the cached license info without re-validating against the server. */
 export async function getLicenseInfo(): Promise<
-  { hasLicense: false } | (Omit<LicenseData, 'status'> & { hasLicense: true; status: LicenseData['status'] })
+  | { hasLicense: false }
+  | (Omit<LicenseData, 'status'> & { hasLicense: true; status: LicenseData['status'] })
 > {
   const licenseData = await getLicenseData();
   if (!licenseData) return { hasLicense: false };
@@ -281,7 +314,7 @@ export async function getLicenseInfo(): Promise<
     plan: licenseData.plan,
     expiresAt: licenseData.expiresAt,
     lastVerified: licenseData.lastVerified,
-    instanceId: licenseData.instanceId
+    instanceId: licenseData.instanceId,
   };
 }
 

@@ -11,11 +11,8 @@
 // sidepanel.html. ESM modules don't share globals, so every consumer now
 // imports `state` / `elements` explicitly.
 
-import type {
-  AppSettings,
-  FilterConfig,
-  ImageItem
-} from '../shared/types';
+import type { AppSettings, FilterConfig, ImageItem } from '../shared/types';
+import { DEFAULT_APP_SETTINGS, DEFAULT_FILTER_CONFIG } from '../shared/constants';
 
 // ── Filter UI state ─────────────────────────────────────────────────────────
 export interface ActiveFilters {
@@ -42,9 +39,120 @@ export interface TabCacheEntry {
 export type SimilarGroup = ImageItem[];
 
 // ── DOM element refs (populated by cacheElements()) ─────────────────────────
-// Loose typing: every entry is HTMLElement | null until accessed. Consumers
-// null-check before use.
-export type ElementsMap = Record<string, HTMLElement | null>;
+// Each key is the camelCase form of the underlying element id (e.g. 'btn-refresh'
+// → 'btnRefresh'). Refs are populated once in init.ts > cacheElements() and
+// remain stable for the life of the panel. Consumers MUST null-check because
+// markup variants (e.g. popup vs side-panel) may omit some elements.
+export interface ElementsMap {
+  // Layout & state containers
+  imageGrid: HTMLElement | null;
+  loadingState: HTMLElement | null;
+  emptyState: HTMLElement | null;
+  errorState: HTMLElement | null;
+  restrictedState: HTMLElement | null;
+
+  // Modals
+  settingsModal: HTMLElement | null;
+  progressModal: HTMLElement | null;
+  dedupModal: HTMLElement | null;
+  collectionModal: HTMLElement | null;
+  multitabModal: HTMLElement | null;
+  scanOverlay: HTMLElement | null;
+
+  // Toast
+  toastContainer: HTMLElement | null;
+
+  // Status bar (counts)
+  selectedCount: HTMLElement | null;
+  totalCount: HTMLElement | null;
+  foundInfo: HTMLElement | null;
+  foundActionCount: HTMLElement | null;
+  foundCount: HTMLElement | null;
+  similarCount: HTMLElement | null;
+  downloadCount: HTMLElement | null;
+  downloadLabel: HTMLElement | null;
+
+  // Toolbar buttons
+  btnDownload: HTMLElement | null;
+  btnDownloadToggle: HTMLElement | null;
+  btnSelectAll: HTMLElement | null;
+  btnRefresh: HTMLElement | null;
+  btnViewToggle: HTMLElement | null;
+  btnSettings: HTMLElement | null;
+  btnCollection: HTMLElement | null;
+  btnDedup: HTMLElement | null;
+  btnMultitab: HTMLElement | null;
+
+  // Download dropdown
+  downloadDropdown: HTMLElement | null;
+  downloadGroup: HTMLElement | null;
+
+  // Group / view / filter controls
+  groupMode: HTMLElement | null;
+  filterUrlInput: HTMLElement | null;
+  reverseSearchMenu: HTMLElement | null;
+  liveIndicator: HTMLElement | null;
+
+  // Modal bodies / sub-content
+  dedupBody: HTMLElement | null;
+  collectionBody: HTMLElement | null;
+  multitabList: HTMLElement | null;
+  collectionSearch: HTMLElement | null;
+
+  // Settings modal: action buttons
+  btnSaveSettings: HTMLElement | null;
+  btnResetDefaults: HTMLElement | null;
+  btnSettingsClose: HTMLElement | null;
+
+  // Settings modal: per-row controls
+  settingSidePanel: HTMLElement | null;
+  settingDensity: HTMLElement | null;
+  settingTheme: HTMLElement | null;
+  settingDefaultGroup: HTMLElement | null;
+  settingDownloadOptions: HTMLElement | null;
+  settingSubfolder: HTMLElement | null;
+  settingFilename: HTMLElement | null;
+  settingConvert: HTMLElement | null;
+  settingAllFrames: HTMLElement | null;
+  settingLiveMonitor: HTMLElement | null;
+  settingMinSize: HTMLElement | null;
+  settingMinWidth: HTMLElement | null;
+  settingMinHeight: HTMLElement | null;
+  settingMaxSize: HTMLElement | null;
+  settingMaxWidth: HTMLElement | null;
+  settingMaxHeight: HTMLElement | null;
+  settingSimilarDetection: HTMLElement | null;
+  settingColorExtract: HTMLElement | null;
+  settingNoWarning: HTMLElement | null;
+
+  // Modal close / cancel buttons
+  btnDedupClose: HTMLElement | null;
+  btnCancelDedup: HTMLElement | null;
+  btnRemoveDuplicates: HTMLElement | null;
+  btnMultitabClose: HTMLElement | null;
+  btnCancelMultitab: HTMLElement | null;
+  btnStartExtraction: HTMLElement | null;
+  btnCollectionBack: HTMLElement | null;
+  btnCollectionExport: HTMLElement | null;
+  btnProgressClose: HTMLElement | null;
+
+  // Progress modal
+  progressFill: HTMLElement | null;
+  progressText: HTMLElement | null;
+  progressCurrent: HTMLElement | null;
+
+  // Scan overlay
+  scanProgressFill: HTMLElement | null;
+  scanProgressText: HTMLElement | null;
+  scanProgressTitle: HTMLElement | null;
+  scanProgressCurrent: HTMLElement | null;
+  btnScanCancel: HTMLElement | null;
+
+  // Escape hatch for late-bound elements not yet listed above. Avoids forcing
+  // a state.ts edit for every new id; should be removed once all consumers
+  // are migrated to the typed keys.
+  [key: string]: HTMLElement | null;
+}
 
 // ── Sort / view / group enums ───────────────────────────────────────────────
 export type SortMode =
@@ -58,6 +166,101 @@ export type SortMode =
 export type ViewMode = 'grid' | 'list';
 export type GroupMode = 'none' | 'domain' | 'format' | 'size' | 'tab';
 
+// ── UI screen / overlay state ───────────────────────────────────────────────
+// Modeled after the four mutually-exclusive "main area" states the previous
+// imperative `showEmpty / showError / showRestricted / showLoading` toggled.
+// A single discriminator field lets the Preact <StateScreens> render the
+// correct view without us having to coordinate four classList toggles.
+export type UiScreen = 'images' | 'empty' | 'error' | 'restricted';
+
+export interface ErrorScreenInfo {
+  code: string;
+  message: string;
+  workaround?: string;
+}
+
+export interface EmptyScreenInfo {
+  /** "no results after filtering" vs "no images on this page at all". */
+  isNoResults: boolean;
+}
+
+export interface ScanProgressState {
+  visible: boolean;
+  /** When true, hide the percentage progress bar (still shows spinner). */
+  indeterminate: boolean;
+  title: string;
+  current: number;
+  total: number;
+  /** URL of the tab/frame currently being scanned, shown as a tooltip. */
+  currentUrl: string;
+}
+
+export interface DownloadProgressState {
+  visible: boolean;
+  title: string;
+  current: number;
+  total: number;
+  currentFile: string;
+  /**
+   * For multi-tab scans we want to surface "X tabs · Y images found"; for
+   * single-list downloads it's just "X / Y". `null` toggles between the two.
+   */
+  imageCount: number | null;
+}
+
+// ── Toast notifications ─────────────────────────────────────────────────────
+export type ToastType = 'success' | 'error' | 'warning' | 'info';
+export interface ToastItem {
+  /** Stable id for Preact's reconciliation key; auto-generated on push. */
+  id: number;
+  message: string;
+  type: ToastType;
+  /** When true the component should add a `fade-out` class for CSS animation. */
+  fadingOut: boolean;
+}
+
+// ── Generic modal visibility ────────────────────────────────────────────────
+// The four "independent" modals (Dedup / Collection / Multitab / ProUpgrade)
+// each have inner contents that are still rendered imperatively (innerHTML +
+// querySelector) for now. The Preact migration here only takes ownership of
+// the modal *shell*: the wrapper div, the modal-content, header + close
+// button. The inner `.modal-body` contents stay as a static slot that the
+// existing imperative renderers continue to populate.
+//
+// `errorText` is included on ProUpgradeModal because the activation flow
+// surfaces a one-line error under the input — moving it into the store lets
+// us drive the visibility class declaratively.
+export interface ModalState {
+  open: boolean;
+}
+export interface ProUpgradeModalState extends ModalState {
+  errorText: string;
+}
+
+// ── Confirm dialog ──────────────────────────────────────────────────────────
+// The previous `showConfirmDialog` directly bound DOM listeners and resolved
+// a Promise via closure. We keep the Promise pattern but move the dialog
+// config + resolver into the store so a single Preact <ConfirmDialog> can
+// render any active prompt declaratively.
+export type ConfirmDialogType = 'warning' | 'danger' | 'info';
+export interface ConfirmDialogConfig {
+  title: string;
+  message: string;
+  confirmText: string;
+  cancelText: string;
+  type: ConfirmDialogType;
+}
+export interface ConfirmDialogState {
+  open: boolean;
+  config: ConfirmDialogConfig | null;
+  /**
+   * Resolver kept on the state object (not closed-over) so the component
+   * click handlers can resolve regardless of which call originated the
+   * dialog. Cleared on close.
+   */
+  resolve: ((ok: boolean) => void) | null;
+}
+
 // ── The single mutable state object ─────────────────────────────────────────
 export interface SidepanelState {
   // Image data
@@ -69,8 +272,8 @@ export interface SidepanelState {
   lastRenderedFilteredIds: string | null;
 
   // Settings & filters
-  filterConfig: FilterConfig | Record<string, unknown>;
-  appSettings: Partial<AppSettings> & Record<string, unknown>;
+  filterConfig: FilterConfig;
+  appSettings: AppSettings;
   activeFilters: ActiveFilters;
 
   // Grouping / sorting / view
@@ -98,6 +301,13 @@ export interface SidepanelState {
   scanDiscoveredImages: ImageItem[];
   /** Max images to incrementally render (= skeleton card count) */
   scanSkeletonLimit: number;
+  /**
+   * Number of skeleton placeholders to append after real cards in <ImageGrid>.
+   * Set by showLoading() and cleared when a real render completes. Drives
+   * the Preact-managed grid's "loading" state without needing imperative
+   * innerHTML writes.
+   */
+  scanSkeletonsToShow: number;
   scanAborted: boolean;
 
   // Multi-tab extract lifecycle
@@ -105,51 +315,327 @@ export interface SidepanelState {
 
   // License
   isProUser: boolean;
+
+  // ── Preact-managed UI screens (replaces classList toggles) ───────────────
+  /** Which "main area" view is active. Mutually exclusive with itself. */
+  uiScreen: UiScreen;
+  /** Payload for <ErrorScreen>; null means use the static fallback markup. */
+  errorInfo: ErrorScreenInfo | null;
+  /** Payload for <EmptyScreen>; controls title + reset button label. */
+  emptyInfo: EmptyScreenInfo;
+  /** Reactive replacement for showScanOverlay/updateScanProgress. */
+  scanProgress: ScanProgressState;
+  /** Reactive replacement for showProgress/updateProgress (download modal). */
+  downloadProgress: DownloadProgressState;
+  /**
+   * License plan + expiry returned by GET_LICENSE_STATUS. Used by the
+   * <ProStatusBadge> to render the "Monthly / Yearly / Lifetime" label and
+   * the expiry date. Imported here as a structural type to avoid a circular
+   * dependency with the component file.
+   */
+  proLicenseInfo: {
+    plan: string;
+    expiresAt?: number;
+  } | null;
+
+  /** Active toast notifications rendered by <ToastContainer>. */
+  toasts: ToastItem[];
+  /** Active confirm dialog (or `open: false` when nothing is showing). */
+  confirmDialog: ConfirmDialogState;
+
+  // ── Independent modals (shell visibility only — body still imperative) ───
+  dedupModalState: ModalState;
+  collectionModalState: ModalState;
+  multitabModalState: ModalState;
+  proUpgradeModalState: ProUpgradeModalState;
+  /**
+   * Settings modal — shell-only migration. The body subtree is moved
+   * verbatim from the legacy HTML into the Preact-rendered shell at mount
+   * time so the existing 47 imperative getElementById call sites in
+   * settings.ts continue to work unchanged.
+   */
+  settingsModalState: ModalState;
 }
 
-export const state: SidepanelState = {
-  allImages: [],
-  filteredImages: [],
-  selectedImages: new Set<string>(),
-  lastRenderedFilteredIds: null,
+// ── Initial state value ─────────────────────────────────────────────────────
+// Kept as a separate const so tests / future hot-reload can re-create a
+// pristine state object without re-importing the whole module.
+function createInitialState(): SidepanelState {
+  return {
+    allImages: [],
+    filteredImages: [],
+    selectedImages: new Set<string>(),
+    lastRenderedFilteredIds: null,
 
-  filterConfig: {},
-  appSettings: {},
-  activeFilters: {
-    size: 'all',
-    sizeMin: 0,
-    sizeMax: Infinity,
-    types: [],
-    layout: 'all',
-    urlKeyword: '',
-    color: null
-  },
+    // Typed defaults — real values are layered on top once chrome.storage
+    // resolves in init.ts > loadSettings().
+    filterConfig: { ...DEFAULT_FILTER_CONFIG },
+    appSettings: { ...DEFAULT_APP_SETTINGS },
+    activeFilters: {
+      size: 'all',
+      sizeMin: 0,
+      sizeMax: Infinity,
+      types: [],
+      layout: 'all',
+      urlKeyword: '',
+      color: null,
+    },
 
-  collapsedGroups: new Set<string>(),
-  similarGroups: [],
-  currentSortMode: 'size-desc',
-  currentViewMode: 'list',
-  currentGroupMode: 'none',
+    collapsedGroups: new Set<string>(),
+    similarGroups: [],
+    currentSortMode: 'size-desc',
+    currentViewMode: 'list',
+    currentGroupMode: 'none',
 
-  isPopupMode: false,
+    isPopupMode: false,
 
-  tabCache: new Map<number, TabCacheEntry>(),
-  currentTabId: null,
+    tabCache: new Map<number, TabCacheEntry>(),
+    currentTabId: null,
 
-  isFetching: false,
-  isScanning: false,
-  isSilentScanning: false,
-  isInitialized: false,
-  isTabSwitching: false,
-  scanDiscoveredCount: 0,
-  scanDiscoveredImages: [],
-  scanSkeletonLimit: 0,
-  scanAborted: false,
+    isFetching: false,
+    isScanning: false,
+    isSilentScanning: false,
+    isInitialized: false,
+    isTabSwitching: false,
+    scanDiscoveredCount: 0,
+    scanDiscoveredImages: [],
+    scanSkeletonLimit: 0,
+    scanSkeletonsToShow: 0,
+    scanAborted: false,
 
-  isMultiTabExtracting: false,
+    isMultiTabExtracting: false,
 
-  isProUser: false
-};
+    isProUser: false,
 
-// DOM refs — populated by init.ts > cacheElements()
-export const elements: ElementsMap = {};
+    uiScreen: 'images',
+    errorInfo: null,
+    emptyInfo: { isNoResults: false },
+    scanProgress: {
+      visible: false,
+      indeterminate: false,
+      title: 'Scanning...',
+      current: 0,
+      total: 0,
+      currentUrl: '',
+    },
+    downloadProgress: {
+      visible: false,
+      title: 'Downloading...',
+      current: 0,
+      total: 0,
+      currentFile: '',
+      imageCount: null,
+    },
+    proLicenseInfo: null,
+    toasts: [],
+    confirmDialog: { open: false, config: null, resolve: null },
+    dedupModalState: { open: false },
+    collectionModalState: { open: false },
+    multitabModalState: { open: false },
+    proUpgradeModalState: { open: false, errorText: '' },
+    settingsModalState: { open: false },
+  };
+}
+
+// ============================================================================
+// Reactive store
+// ============================================================================
+// We can't drop a real flux/zustand store in here — the codebase has 100+
+// direct `state.foo = bar` mutations spread across sidepanel/*.ts that we
+// don't want to rewrite in one go. Instead we wrap the plain state object in
+// a Proxy that:
+//   1. Lets every existing `state.foo = bar` keep working unchanged.
+//   2. Notifies subscribers registered on that field.
+//   3. Notifies "all-changes" subscribers used by debug overlays / devtools.
+//   4. Powers selector-based subscriptions (zustand-style) for new code.
+//
+// New code should prefer `store.set('foo', bar)` for explicit intent and
+// `store.subscribe('foo', cb)` / `store.subscribeSelector(sel, cb)` to react.
+
+export type Listener<T> = (value: T, prev: T) => void;
+export type Unsubscribe = () => void;
+export type Selector<T> = (s: SidepanelState) => T;
+export type EqualityFn<T> = (a: T, b: T) => boolean;
+
+const defaultEquality = <T>(a: T, b: T): boolean => Object.is(a, b);
+
+interface StoreApi {
+  /** The reactive state object — same shape as before, mutations are tracked. */
+  state: SidepanelState;
+  /** Read a single field. */
+  get<K extends keyof SidepanelState>(key: K): SidepanelState[K];
+  /** Write a single field; equivalent to `state[key] = value` but explicit. */
+  set<K extends keyof SidepanelState>(key: K, value: SidepanelState[K]): void;
+  /**
+   * Patch multiple fields atomically. All field-level subscribers fire after
+   * every assignment is applied; the all-changes subscribers fire once.
+   */
+  setMany(patch: Partial<SidepanelState>): void;
+  /** Subscribe to a single field's changes. Returns an unsubscribe fn. */
+  subscribe<K extends keyof SidepanelState>(
+    key: K,
+    listener: Listener<SidepanelState[K]>
+  ): Unsubscribe;
+  /**
+   * Subscribe to a derived value. Listener fires only when the selector
+   * output changes (Object.is by default; pass a custom comparator for
+   * deep-equality on objects/arrays).
+   */
+  subscribeSelector<T>(
+    selector: Selector<T>,
+    listener: Listener<T>,
+    equalityFn?: EqualityFn<T>
+  ): Unsubscribe;
+  /** Subscribe to *any* field change. Useful for devtools / logging. */
+  subscribeAll(
+    listener: (key: keyof SidepanelState, value: unknown, prev: unknown) => void
+  ): Unsubscribe;
+  /** Reset to the initial value. Mainly used in tests. */
+  reset(): void;
+}
+
+function createStore(): StoreApi {
+  // Per-key subscribers, plus a wildcard set for "anything changed".
+  // We use Set<unknown> internally to avoid the maintenance cost of a
+  // 30-entry per-key typed map; the public API still types each listener.
+  const fieldSubs = new Map<keyof SidepanelState, Set<Listener<unknown>>>();
+  const allSubs = new Set<(key: keyof SidepanelState, value: unknown, prev: unknown) => void>();
+  const selectorSubs = new Set<() => void>();
+
+  // The raw object that the Proxy wraps. Keeping it inside the closure means
+  // outside code can only reach it through the Proxy.
+  const raw = createInitialState();
+
+  // Suppress notifications during setMany so we batch.
+  let batching = false;
+
+  function notifyField<K extends keyof SidepanelState>(
+    key: K,
+    value: SidepanelState[K],
+    prev: SidepanelState[K]
+  ): void {
+    const subs = fieldSubs.get(key);
+    if (subs) {
+      for (const fn of subs) (fn as Listener<SidepanelState[K]>)(value, prev);
+    }
+    for (const fn of allSubs) fn(key, value, prev);
+  }
+
+  function notifySelectors(): void {
+    for (const fn of selectorSubs) fn();
+  }
+
+  const proxy = new Proxy(raw, {
+    set(target, prop, value, receiver) {
+      const key = prop as keyof SidepanelState;
+      const prev = target[key];
+      const ok = Reflect.set(target, prop, value, receiver);
+      if (ok && !batching) {
+        notifyField(key, value as SidepanelState[typeof key], prev);
+        notifySelectors();
+      }
+      return ok;
+    },
+  }) as SidepanelState;
+
+  function subscribe<K extends keyof SidepanelState>(
+    key: K,
+    listener: Listener<SidepanelState[K]>
+  ): Unsubscribe {
+    let set = fieldSubs.get(key);
+    if (!set) {
+      set = new Set();
+      fieldSubs.set(key, set);
+    }
+    set.add(listener as Listener<unknown>);
+    return () => {
+      set!.delete(listener as Listener<unknown>);
+    };
+  }
+
+  function subscribeSelector<T>(
+    selector: Selector<T>,
+    listener: Listener<T>,
+    equalityFn: EqualityFn<T> = defaultEquality
+  ): Unsubscribe {
+    let last = selector(proxy);
+    const wrapped = (): void => {
+      const next = selector(proxy);
+      if (!equalityFn(next, last)) {
+        const prev = last;
+        last = next;
+        listener(next, prev);
+      }
+    };
+    selectorSubs.add(wrapped);
+    return () => {
+      selectorSubs.delete(wrapped);
+    };
+  }
+
+  function subscribeAll(
+    listener: (key: keyof SidepanelState, value: unknown, prev: unknown) => void
+  ): Unsubscribe {
+    allSubs.add(listener);
+    return () => {
+      allSubs.delete(listener);
+    };
+  }
+
+  function get<K extends keyof SidepanelState>(key: K): SidepanelState[K] {
+    return proxy[key];
+  }
+
+  function setField<K extends keyof SidepanelState>(key: K, value: SidepanelState[K]): void {
+    proxy[key] = value;
+  }
+
+  function setMany(patch: Partial<SidepanelState>): void {
+    batching = true;
+    const prevValues = new Map<keyof SidepanelState, unknown>();
+    try {
+      for (const k of Object.keys(patch) as (keyof SidepanelState)[]) {
+        prevValues.set(k, proxy[k]);
+        // Cast through unknown: TS can't see through Partial<> per-key narrow,
+        // and Proxy mutations always go via the same trap regardless of type.
+        (proxy as unknown as Record<string, unknown>)[k as string] = patch[k];
+      }
+    } finally {
+      batching = false;
+    }
+    // Fire all field-level notifications now that every value is in place.
+    for (const [k, prev] of prevValues) {
+      notifyField(k, proxy[k] as never, prev as never);
+    }
+    notifySelectors();
+  }
+
+  function reset(): void {
+    setMany(createInitialState());
+  }
+
+  return {
+    state: proxy,
+    get,
+    set: setField,
+    setMany,
+    subscribe,
+    subscribeSelector,
+    subscribeAll,
+    reset,
+  };
+}
+
+export const store: StoreApi = createStore();
+
+/**
+ * The mutable state object. Direct assignment (`state.foo = bar`) still works
+ * for backwards compatibility with the 100+ existing call sites; behind the
+ * scenes a Proxy notifies any subscribers registered via `store.subscribe`.
+ */
+export const state: SidepanelState = store.state;
+
+// DOM refs — populated by init.ts > cacheElements().
+// We assert the empty literal to ElementsMap; cacheElements() is responsible
+// for actually filling every key. Until that runs, all accessors return null.
+export const elements: ElementsMap = {} as ElementsMap;

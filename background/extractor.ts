@@ -49,7 +49,9 @@ export async function getImagesFromTab(
   const injectionResult = await injectContentScript(tabId, { allFrames: searchAllFrames });
 
   if (injectionResult.success === false) {
-    const error: InjectionError = new Error(injectionResult.message || 'Failed to inject content script');
+    const error: InjectionError = new Error(
+      injectionResult.message || 'Failed to inject content script'
+    );
     error.code = injectionResult.error;
     error.workaround = injectionResult.workaround;
     throw error;
@@ -59,7 +61,7 @@ export async function getImagesFromTab(
     tabId,
     {
       type: MESSAGE_TYPES.EXTRACT_IMAGES,
-      skipIframes: searchAllFrames
+      skipIframes: searchAllFrames,
     },
     { frameId: 0 }
   );
@@ -84,7 +86,7 @@ export async function getImagesFromTab(
             const frameImages = frameResponse.images.map((img) => ({
               ...img,
               fromFrame: true,
-              frameUrl: frame.url
+              frameUrl: frame.url,
             }));
             allImages.push(...frameImages);
           }
@@ -110,7 +112,7 @@ export async function getImagesFromTab(
         tabId,
         {
           type: MESSAGE_TYPES.START_LIVE_MONITOR,
-          config: { debounceMs: 500 }
+          config: { debounceMs: 500 },
         },
         { frameId: 0 }
       );
@@ -160,7 +162,7 @@ export async function processMultiTabExtract(tabIds: number[]): Promise<MultiTab
         extractFromSingleTab(tid, tid === currentTabId),
         new Promise<SingleTabExtractResult>((_, reject) =>
           setTimeout(() => reject(new Error('Per-tab timeout')), perTabTimeoutMs)
-        )
+        ),
       ]);
       tabTitle = tabImages.tabTitle || tabTitle;
       allTabImages.push(...tabImages.images);
@@ -173,7 +175,7 @@ export async function processMultiTabExtract(tabIds: number[]): Promise<MultiTab
       completed: i + 1,
       total: tabIds.length,
       current: tabTitle,
-      imageCount: allTabImages.length
+      imageCount: allTabImages.length,
     });
   }
 
@@ -197,11 +199,11 @@ async function extractFromSingleTab(
       setTimeout(
         () =>
           resolve({
-            success: false
+            success: false,
           }),
         10000
       )
-    )
+    ),
   ]);
   if (!injResult.success) {
     return { images: [], tabTitle };
@@ -219,7 +221,7 @@ async function extractFromSingleTab(
     tabTitle: tabInfo.title || '',
     tabUrl: tabInfo.url || '',
     tabIndex: tabInfo.index ?? 0,
-    isCurrentTab
+    isCurrentTab,
   }));
 
   return { images, tabTitle };

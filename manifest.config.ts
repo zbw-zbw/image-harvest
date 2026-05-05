@@ -32,7 +32,7 @@ export default defineManifest({
     'tabs',
     'sidePanel',
     'webNavigation',
-    'alarms'
+    'alarms',
   ],
 
   host_permissions: ['<all_urls>'],
@@ -43,8 +43,8 @@ export default defineManifest({
       16: 'icons/icon16.png',
       32: 'icons/icon32.png',
       48: 'icons/icon48.png',
-      128: 'icons/icon128.png'
-    }
+      128: 'icons/icon128.png',
+    },
   },
 
   // reverse-search.html is opened programmatically via chrome.tabs.create —
@@ -53,12 +53,12 @@ export default defineManifest({
   // page explicitly here makes the dependency obvious.)
 
   side_panel: {
-    default_path: 'pages/sidepanel.html'
+    default_path: 'pages/sidepanel.html',
   },
 
   background: {
     service_worker: 'background/index.ts',
-    type: 'module'
+    type: 'module',
   },
 
   content_scripts: [
@@ -66,21 +66,21 @@ export default defineManifest({
       matches: ['http://*/*', 'https://*/*'],
       js: ['content/main.ts'],
       run_at: 'document_idle',
-      all_frames: false
-    }
+      all_frames: false,
+    },
   ],
 
   icons: {
     16: 'icons/icon16.png',
     32: 'icons/icon32.png',
     48: 'icons/icon48.png',
-    128: 'icons/icon128.png'
+    128: 'icons/icon128.png',
   },
 
   web_accessible_resources: [
     {
       resources: ['assets/*'],
-      matches: ['<all_urls>']
-    }
-  ]
+      matches: ['<all_urls>'],
+    },
+  ],
 });

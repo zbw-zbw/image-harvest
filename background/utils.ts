@@ -19,8 +19,7 @@ export { isRestrictedUrl };
 export async function getAccessibleTabId(explicitTabId?: number | null): Promise<number | null> {
   try {
     const tabId =
-      explicitTabId ||
-      (await chrome.tabs.query({ active: true, currentWindow: true }))[0]?.id;
+      explicitTabId || (await chrome.tabs.query({ active: true, currentWindow: true }))[0]?.id;
     if (!tabId) return null;
     const tabInfo = await chrome.tabs.get(tabId);
     if (isRestrictedUrl(tabInfo.url)) return null;

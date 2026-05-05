@@ -4,7 +4,7 @@ export function generateId(url: string): string {
   let hash = 0;
   for (let i = 0; i < url.length; i++) {
     const char = url.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
+    hash = (hash << 5) - hash + char;
     hash = hash & hash;
   }
   return Math.abs(hash).toString(36) + Date.now().toString(36);
@@ -33,23 +33,33 @@ function normalizeFormat(ext: string): string {
     tif: 'tiff',
     heif: 'heic',
     svgz: 'svg',
-    cur: 'ico'
+    cur: 'ico',
   };
   const lower = ext.toLowerCase();
   return formatAliases[lower] || lower;
 }
 
 const IMAGE_EXTENSIONS = [
-  'jpg', 'jpeg', 'jfif', 'pjpeg', 'pjp',
-  'png', 'apng',
-  'webp', 'awebp',
+  'jpg',
+  'jpeg',
+  'jfif',
+  'pjpeg',
+  'pjp',
+  'png',
+  'apng',
+  'webp',
+  'awebp',
   'gif',
-  'svg', 'svgz',
+  'svg',
+  'svgz',
   'bmp',
-  'ico', 'cur',
+  'ico',
+  'cur',
   'avif',
-  'tiff', 'tif',
-  'heic', 'heif'
+  'tiff',
+  'tif',
+  'heic',
+  'heif',
 ] as const;
 
 function buildExtensionPattern(): string {
@@ -74,7 +84,7 @@ export function getFileFormat(url: string, contentType: string = ''): string {
       'image/tiff': 'tiff',
       'image/heic': 'heic',
       'image/heif': 'heic',
-      'image/apng': 'png'
+      'image/apng': 'png',
     };
     for (const [mime, ext] of Object.entries(mimeMap)) {
       if (contentType.includes(mime)) return ext;
@@ -147,19 +157,17 @@ export function getDataUriFormat(dataUri: string): string {
     'image/tiff': 'tiff',
     'image/heic': 'heic',
     'image/heif': 'heic',
-    'image/apng': 'png'
+    'image/apng': 'png',
   };
   return mimeToFormat[mime] || 'unknown';
 }
 
 export function generateDataUriKey(dataUri: string): string {
-  const sample = dataUri.length > 300
-    ? dataUri.slice(0, 200) + dataUri.slice(-100)
-    : dataUri;
+  const sample = dataUri.length > 300 ? dataUri.slice(0, 200) + dataUri.slice(-100) : dataUri;
   let hash = 0;
   for (let i = 0; i < sample.length; i++) {
     const char = sample.charCodeAt(i);
-    hash = ((hash << 5) - hash) + char;
+    hash = (hash << 5) - hash + char;
     hash = hash & hash;
   }
   return 'datauri_' + Math.abs(hash).toString(36) + '_' + dataUri.length.toString(36);
@@ -291,7 +299,7 @@ const RESTRICTED_URL_PATTERNS: RegExp[] = [
   /^https?:\/\/chrome\.google\.com\/webstore/,
   /^https?:\/\/chromewebstore\.google\.com/,
   /^https?:\/\/microsoftedge\.microsoft\.com\/addons/,
-  /^https?:\/\/addons\.mozilla\.org/
+  /^https?:\/\/addons\.mozilla\.org/,
 ];
 
 export function isRestrictedUrl(url: string | null | undefined): boolean {

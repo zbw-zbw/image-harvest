@@ -1,20 +1,30 @@
 // ESLint flat config for Image Harvest (post-migration: TypeScript + Vite + crxjs).
 //
-// All sources are .ts ES modules. Build/test config files (vite.config.ts,
-// vitest.config.ts, prettier.config.ts, manifest.config.ts) are also .ts.
+// All sources are .ts/.tsx ES modules. Build/test config files
+// (vite.config.ts, vitest.config.ts, prettier.config.ts, manifest.config.ts)
+// are also .ts.
 //
 // Run:
 //   npm run lint           # report
 //   npm run lint:fix       # auto-fix where possible
-//
-// To enable @typescript-eslint rules, install:
-//   npm i -D typescript-eslint --legacy-peer-deps
-// then uncomment the typescript-eslint preset block below.
 
 import globals from 'globals';
+import tseslint from 'typescript-eslint';
 import type { Linter } from 'eslint';
 
+// typescript-eslint's `configs.recommended` is an array of flat-config objects
+// that brings in the parser, plugin, and a curated rule set. Spread it inline
+// so we keep our project-specific tweaks below as overrides.
 const config: Linter.Config[] = [
+  // Don't flag historical `// eslint-disable-next-line @typescript-eslint/no-explicit-any`
+  // pragmas: the rule is now off project-wide, but ripping out 16 perfectly
+  // valid escape-hatch comments adds noise without value.
+  {
+    linterOptions: {
+      reportUnusedDisableDirectives: false,
+    },
+  },
+  ...(tseslint.configs.recommended as Linter.Config[]),
   // Global ignores
   {
     ignores: [
@@ -32,7 +42,7 @@ const config: Linter.Config[] = [
 
   // Default rules for all sources
   {
-    files: ['**/*.{ts,js}'],
+    files: ['**/*.{ts,tsx,js,mjs,cjs}'],
     languageOptions: {
       ecmaVersion: 2022,
       sourceType: 'module',
@@ -58,8 +68,12 @@ const config: Linter.Config[] = [
       'no-var': 'error',
       'prefer-const': ['warn', { destructuring: 'all' }],
 
-      // Style soft warnings
-      'no-unused-vars': [
+      // Style soft warnings.
+      // Disable the core rule in favor of the TS-aware version below; the
+      // core rule has many false positives on TS-only constructs (type
+      // imports, declaration files, decorators, etc).
+      'no-unused-vars': 'off',
+      '@typescript-eslint/no-unused-vars': [
         'warn',
         {
           argsIgnorePattern: '^_',
@@ -67,12 +81,15 @@ const config: Linter.Config[] = [
           caughtErrors: 'none',
         },
       ],
+      // We sometimes need `any` as an escape hatch for chrome.* mocks and
+      // legacy-script interop. Don't make it a hard error.
+      '@typescript-eslint/no-explicit-any': 'off',
     },
   },
 
   // Background service worker — service worker globals
   {
-    files: ['background/**/*.ts'],
+    files: ['background/**/*.{ts,tsx}'],
     languageOptions: {
       globals: {
         ...globals.serviceworker,
@@ -83,7 +100,7 @@ const config: Linter.Config[] = [
 
   // Node-only build/test config files
   {
-    files: ['*.config.ts', 'tests/**/*.ts'],
+    files: ['*.config.ts', 'tests/**/*.{ts,tsx}', 'vite-html-include.ts'],
     languageOptions: {
       globals: {
         ...globals.node,
@@ -93,7 +110,7 @@ const config: Linter.Config[] = [
 
   // Vitest tests get its globals (describe / it / expect / ...)
   {
-    files: ['tests/**/*.ts'],
+    files: ['tests/**/*.{ts,tsx}'],
     languageOptions: {
       globals: {
         ...globals.node,

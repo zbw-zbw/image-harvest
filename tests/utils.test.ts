@@ -24,7 +24,7 @@ import {
   generateFilename,
   EventEmitter,
   isRestrictedUrl,
-  deepMerge
+  deepMerge,
 } from '../shared/utils';
 
 describe('generateId', () => {
@@ -46,13 +46,11 @@ describe('generateId', () => {
 
 describe('resolveUrl', () => {
   it('resolves a relative path against the given base', () => {
-    expect(resolveUrl('/foo.png', 'https://example.com/page'))
-      .toBe('https://example.com/foo.png');
+    expect(resolveUrl('/foo.png', 'https://example.com/page')).toBe('https://example.com/foo.png');
   });
 
   it('returns the absolute URL untouched', () => {
-    expect(resolveUrl('https://x.com/y.png', 'https://example.com'))
-      .toBe('https://x.com/y.png');
+    expect(resolveUrl('https://x.com/y.png', 'https://example.com')).toBe('https://x.com/y.png');
   });
 
   it('returns the original input on parse failure', () => {
@@ -160,13 +158,11 @@ describe('data URI helpers', () => {
 
 describe('extractBackgroundUrls', () => {
   it('extracts a single url()', () => {
-    expect(extractBackgroundUrls('url("https://x.com/a.png")'))
-      .toEqual(['https://x.com/a.png']);
+    expect(extractBackgroundUrls('url("https://x.com/a.png")')).toEqual(['https://x.com/a.png']);
   });
 
   it('extracts multiple urls()', () => {
-    expect(extractBackgroundUrls("url('a.png'), url(b.jpg)"))
-      .toEqual(['a.png', 'b.jpg']);
+    expect(extractBackgroundUrls("url('a.png'), url(b.jpg)")).toEqual(['a.png', 'b.jpg']);
   });
 
   it('handles "none" and empty input', () => {

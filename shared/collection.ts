@@ -53,7 +53,7 @@ export function collectionAdd(item: Partial<CollectionItem>): Promise<string> {
       const newItem: CollectionItem = {
         ...(item as CollectionItem),
         id: item.id || generateId(),
-        createdAt: item.createdAt || Date.now()
+        createdAt: item.createdAt || Date.now(),
       };
 
       const request = store.add(newItem);
@@ -101,7 +101,7 @@ export function collectionUpdate(id: string, updates: Partial<CollectionItem>): 
         const updatedItem: CollectionItem = {
           ...existingItem,
           ...updates,
-          id: existingItem.id // Never let updates clobber the ID.
+          id: existingItem.id, // Never let updates clobber the ID.
         };
 
         const putRequest = store.put(updatedItem);
@@ -189,7 +189,9 @@ export function collectionSearch(query: string): Promise<CollectionItem[]> {
 }
 
 /** Export all collection items as plain JSON (Blob fields stripped). */
-export function collectionExport(): Promise<Array<Omit<CollectionItem, 'thumbnail' | 'fullImage'>>> {
+export function collectionExport(): Promise<
+  Array<Omit<CollectionItem, 'thumbnail' | 'fullImage'>>
+> {
   return new Promise(async (resolve, reject) => {
     try {
       const allItems = await collectionGetAll();

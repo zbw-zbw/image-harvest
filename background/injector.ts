@@ -68,7 +68,7 @@ export async function injectContentScript(
         return {
           success: false,
           error: ERROR_CODES.INJECTION_FAILED,
-          message: 'Cannot access this page: browser internal or error pages are not supported'
+          message: 'Cannot access this page: browser internal or error pages are not supported',
         };
       }
     } catch {
@@ -81,7 +81,7 @@ export async function injectContentScript(
         target: { tabId, frameIds: [0] },
         // `isExtracting` is a global declared by the legacy content script;
         // the function runs in the page world so a string-based typeof is safe.
-        func: () => typeof (globalThis as Record<string, unknown>).isExtracting !== 'undefined'
+        func: () => typeof (globalThis as Record<string, unknown>).isExtracting !== 'undefined',
       });
       if (probeResult?.[0]?.result === true) {
         await new Promise((resolve) => setTimeout(resolve, 200));
@@ -99,7 +99,7 @@ export async function injectContentScript(
         return {
           success: false,
           error: ERROR_CODES.INJECTION_FAILED,
-          message: 'Cannot access this page: the page failed to load or is showing an error'
+          message: 'Cannot access this page: the page failed to load or is showing an error',
         };
       }
     }
@@ -107,7 +107,7 @@ export async function injectContentScript(
     // 4) Standard injection into the main frame.
     await chrome.scripting.executeScript({
       target: { tabId },
-      files: getContentScriptFiles()
+      files: getContentScriptFiles(),
     });
 
     if (allFrames) await injectIntoAllFrames(tabId);
@@ -127,7 +127,7 @@ export async function injectContentScript(
       return {
         success: false,
         error: ERROR_CODES.INJECTION_FAILED,
-        message: 'Cannot access this page: browser internal or error pages are not supported'
+        message: 'Cannot access this page: browser internal or error pages are not supported',
       };
     }
 
@@ -136,15 +136,14 @@ export async function injectContentScript(
         success: false,
         error: ERROR_CODES.CSP_BLOCKED,
         message: 'Page security policy prevents extension access',
-        workaround:
-          'Right-click images and select "Open in new tab" to download manually'
+        workaround: 'Right-click images and select "Open in new tab" to download manually',
       };
     }
 
     return {
       success: false,
       error: ERROR_CODES.INJECTION_FAILED,
-      message
+      message,
     };
   }
 }
@@ -154,9 +153,7 @@ export async function injectIntoAllFrames(tabId: number): Promise<void> {
   try {
     const frames = await chrome.webNavigation.getAllFrames({ tabId });
     if (!frames) return;
-    const subFrames = frames.filter(
-      (frame) => frame.frameId !== 0 && !isRestrictedUrl(frame.url)
-    );
+    const subFrames = frames.filter((frame) => frame.frameId !== 0 && !isRestrictedUrl(frame.url));
 
     for (const frame of subFrames) {
       try {
@@ -169,7 +166,7 @@ export async function injectIntoAllFrames(tabId: number): Promise<void> {
         try {
           await chrome.scripting.executeScript({
             target: { tabId, frameIds: [frame.frameId] },
-            files: getContentScriptFiles()
+            files: getContentScriptFiles(),
           });
         } catch (injError) {
           console.warn(

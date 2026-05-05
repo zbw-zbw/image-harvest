@@ -14,30 +14,34 @@
     "isolatedModules": true,
     "verbatimModuleSyntax": false,
 
-    // ── Migration mode (intentionally permissive) ──────────────────────
-    // We are gradually moving JS → TS. allowJs + checkJs:false lets
-    // un-migrated .js files keep working alongside .ts. Tighten over time.
+    // ── Strictness (Phase 3: full strict + extras) ─────────────────────
     "allowJs": true,
     "checkJs": false,
-    "strict": false,
-    "noImplicitAny": false,
-    "noImplicitThis": false,
-    "strictNullChecks": false,
+    "strict": true,
     "useUnknownInCatchVariables": false,
+    "noUncheckedIndexedAccess": false,
+    "exactOptionalPropertyTypes": false,
 
     // ── Quality of life ────────────────────────────────────────────────
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
-    "jsx": "preserve",
+
+    // ── JSX (Preact) ───────────────────────────────────────────────────
+    // We use Preact's automatic JSX runtime: no `import { h }` boilerplate,
+    // and TypeScript pulls types from `preact` so `JSX.IntrinsicElements`
+    // matches Preact's HTML attribute shape rather than React's.
+    "jsx": "react-jsx",
+    "jsxImportSource": "preact",
 
     // ── Path aliases (optional, makes refactors easier) ────────────────
-    "baseUrl": ".",
+    // baseUrl is deprecated in TS 7.0; "paths" without baseUrl resolves
+    // relative to the tsconfig file itself, which is exactly what we want.
     "paths": {
-      "@shared/*": ["shared/*"],
-      "@background/*": ["background/*"],
-      "@sidepanel/*": ["sidepanel/*"],
-      "@content/*": ["content/*"]
+      "@shared/*": ["./shared/*"],
+      "@background/*": ["./background/*"],
+      "@sidepanel/*": ["./sidepanel/*"],
+      "@content/*": ["./content/*"]
     }
   },
   "include": [
@@ -52,14 +56,5 @@
     "src/**/*",
     "vite-env.d.ts"
   ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "lib",
-    "website",
-    "docs",
-    "icons",
-    "assets",
-    "scripts/icons"
-  ]
+  "exclude": ["node_modules", "dist", "lib", "website", "docs", "icons", "assets", "scripts/icons"]
 }

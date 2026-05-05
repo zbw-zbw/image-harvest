@@ -7,21 +7,11 @@ import {
   clearDownloadHistory,
   saveFilterConfig,
   getAppSettings,
-  saveAppSettings
+  saveAppSettings,
 } from '../shared/storage';
-import {
-  activateLicense,
-  deactivateLicense,
-  isProUser,
-  getLicenseInfo
-} from '../shared/license';
+import { activateLicense, deactivateLicense, isProUser, getLicenseInfo } from '../shared/license';
 
-import {
-  uiPorts,
-  sidePanelOpenedTabs,
-  getAccessibleTabId,
-  broadcastToPopup
-} from './utils';
+import { uiPorts, sidePanelOpenedTabs, getAccessibleTabId, broadcastToPopup } from './utils';
 import { initLicenseAlarm } from './license';
 import { initDisplayMode, initTabActivationListener } from './display-mode';
 import { getImagesFromTab, processMultiTabExtract } from './extractor';
@@ -89,7 +79,7 @@ async function handleMessage(
       case MESSAGE_TYPES.GET_IMAGES: {
         const images = await getImagesFromTab(message.tabId as number | undefined, {
           searchAllFrames: (message.searchAllFrames as boolean) || false,
-          liveMonitoring: message.liveMonitoring !== false
+          liveMonitoring: message.liveMonitoring !== false,
         });
         sendResponse({ success: true, images });
         break;
@@ -120,7 +110,7 @@ async function handleMessage(
       case MESSAGE_TYPES.IMAGES_DISCOVERED:
         broadcastToPopup({
           ...message,
-          fromTabId: sender.tab?.id ?? null
+          fromTabId: sender.tab?.id ?? null,
         });
         sendResponse({ success: true });
         break;
@@ -128,7 +118,7 @@ async function handleMessage(
       case MESSAGE_TYPES.TOGGLE_SIDEBAR:
         sendResponse({
           success: false,
-          error: 'Use toolbar icon or shortcut to open side panel'
+          error: 'Use toolbar icon or shortcut to open side panel',
         });
         break;
 
@@ -138,7 +128,7 @@ async function handleMessage(
           if (tabId) {
             const response = await chrome.tabs.sendMessage(tabId, {
               type: MESSAGE_TYPES.HIGHLIGHT_IMAGE,
-              imageUrl: message.imageUrl
+              imageUrl: message.imageUrl,
             });
             sendResponse({ success: true, found: response?.found ?? false });
           } else {
@@ -156,7 +146,7 @@ async function handleMessage(
           if (tabId) {
             await chrome.tabs.sendMessage(tabId, {
               type: MESSAGE_TYPES.UNHIGHLIGHT_IMAGE,
-              imageUrl: message.imageUrl
+              imageUrl: message.imageUrl,
             });
           }
           sendResponse({ success: true });
@@ -172,7 +162,7 @@ async function handleMessage(
           if (tabId) {
             await chrome.tabs.sendMessage(tabId, {
               type: MESSAGE_TYPES.HIGHLIGHT_IMAGES,
-              imageUrls: message.imageUrls
+              imageUrls: message.imageUrls,
             });
           }
           sendResponse({ success: true });
@@ -220,7 +210,7 @@ async function handleMessage(
                 await chrome.sidePanel.setOptions({
                   tabId: message.tabId as number,
                   path: 'pages/sidepanel.html',
-                  enabled: true
+                  enabled: true,
                 });
                 await chrome.sidePanel.open({ tabId: message.tabId as number });
               } catch {
@@ -327,7 +317,7 @@ async function handleMessage(
               type: MESSAGE_TYPES.LICENSE_STATUS_CHANGED,
               isPro: true,
               plan: activateResult.plan,
-              status: 'active'
+              status: 'active',
             });
           }
           sendResponse(activateResult);
@@ -343,7 +333,7 @@ async function handleMessage(
           broadcastToPopup({
             type: MESSAGE_TYPES.LICENSE_STATUS_CHANGED,
             isPro: false,
-            status: 'inactive'
+            status: 'inactive',
           });
           sendResponse(deactivateResult);
         } catch (error) {
@@ -374,9 +364,7 @@ async function handleMessage(
 
       case MESSAGE_TYPES.MULTI_TAB_EXTRACT: {
         try {
-          const multiTabResult = await processMultiTabExtract(
-            (message.tabIds as number[]) || []
-          );
+          const multiTabResult = await processMultiTabExtract((message.tabIds as number[]) || []);
           sendResponse(multiTabResult);
         } catch (multiTabError) {
           sendResponse({ success: false, error: (multiTabError as Error).message });
@@ -417,7 +405,7 @@ async function handleMessage(
       success: false,
       error: errorCode,
       message: errorMessage,
-      workaround
+      workaround,
     });
   }
 }

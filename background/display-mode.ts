@@ -18,7 +18,7 @@ export async function initDisplayMode(): Promise<void> {
           await chrome.sidePanel.setOptions({
             tabId: activeTab.id,
             path: 'pages/sidepanel.html',
-            enabled: true
+            enabled: true,
           });
         }
       } catch {
@@ -49,7 +49,7 @@ export function initTabActivationListener(): void {
         await chrome.sidePanel.setOptions({
           tabId: activeInfo.tabId,
           path: 'pages/sidepanel.html',
-          enabled: true
+          enabled: true,
         });
       }
     } catch {

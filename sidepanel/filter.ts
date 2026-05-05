@@ -13,9 +13,16 @@ import { updateFilterButtonLabels } from './ui';
 import { getAspectRatioCategory } from './utils';
 
 export function applyFilters(): void {
-  state.filteredImages = state.allImages.filter(img => {
-    return filterBySize(img) && filterByType(img) && filterByLayout(img) && filterByUrl(img)
-      && filterByColor(img) && filterBySettingsMinSize(img) && filterBySettingsMaxSize(img);
+  state.filteredImages = state.allImages.filter((img) => {
+    return (
+      filterBySize(img) &&
+      filterByType(img) &&
+      filterByLayout(img) &&
+      filterByUrl(img) &&
+      filterByColor(img) &&
+      filterBySettingsMinSize(img) &&
+      filterBySettingsMaxSize(img)
+    );
   });
 
   sortImages();
@@ -23,7 +30,7 @@ export function applyFilters(): void {
   // Skip DOM re-render if the filtered image list is identical to the last render.
   // This avoids unnecessary innerHTML rebuilds that cause image flicker (grey
   // placeholder → real image) when switching between cached tabs.
-  const currentFilteredIds = state.filteredImages.map(img => img.id).join(',');
+  const currentFilteredIds = state.filteredImages.map((img) => img.id).join(',');
   if (currentFilteredIds === state.lastRenderedFilteredIds) {
     // Still update selection UI in case selection state changed
     updateSelectionUI();
@@ -45,13 +52,19 @@ export function sortImages(): void {
     const bPixels = bW * bH;
 
     switch (state.currentSortMode) {
-      case 'size-asc': return aPixels - bPixels;
-      case 'filesize-desc': return (b.estimatedSize || 0) - (a.estimatedSize || 0);
-      case 'filesize-asc': return (a.estimatedSize || 0) - (b.estimatedSize || 0);
-      case 'type': return (a.format || '').localeCompare(b.format || '');
-      case 'natural': return 0;
+      case 'size-asc':
+        return aPixels - bPixels;
+      case 'filesize-desc':
+        return (b.estimatedSize || 0) - (a.estimatedSize || 0);
+      case 'filesize-asc':
+        return (a.estimatedSize || 0) - (b.estimatedSize || 0);
+      case 'type':
+        return (a.format || '').localeCompare(b.format || '');
+      case 'natural':
+        return 0;
       case 'size-desc':
-      default: return bPixels - aPixels;
+      default:
+        return bPixels - aPixels;
     }
   });
 }
@@ -86,7 +99,7 @@ export function filterByColor(img: ImageItem): boolean {
   if (!state.activeFilters.color) return true;
   if (!img.colors || img.colors.length === 0) return false;
   // Check if any of the image's colors is close to the selected color
-  return img.colors.some(c => colorDistance(c, state.activeFilters.color!) < 60);
+  return img.colors.some((c) => colorDistance(c, state.activeFilters.color!) < 60);
 }
 
 export function colorDistance(hex1: string, hex2: string): number {
@@ -105,9 +118,9 @@ export function renderColorSwatches(): void {
 
   // Collect all unique colors from images
   const colorMap = new Map<string, number>();
-  state.allImages.forEach(img => {
+  state.allImages.forEach((img) => {
     if (img.colors && img.colors.length > 0) {
-      img.colors.forEach(c => {
+      img.colors.forEach((c) => {
         const hex = c.toLowerCase();
         colorMap.set(hex, (colorMap.get(hex) || 0) + 1);
       });
@@ -121,16 +134,20 @@ export function renderColorSwatches(): void {
     .map(([hex]) => hex);
 
   if (sortedColors.length === 0) {
-    container.innerHTML = '<p style="font-size:11px;color:var(--text-tertiary);padding:4px 0;">No colors extracted yet</p>';
+    container.innerHTML =
+      '<p style="font-size:11px;color:var(--text-tertiary);padding:4px 0;">No colors extracted yet</p>';
     return;
   }
 
-  container.innerHTML = sortedColors.map(hex =>
-    `<div class="color-swatch${state.activeFilters.color === hex ? ' active' : ''}" style="background:${hex}" data-color-value="${hex}" title="${hex}"></div>`
-  ).join('');
+  container.innerHTML = sortedColors
+    .map(
+      (hex) =>
+        `<div class="color-swatch${state.activeFilters.color === hex ? ' active' : ''}" style="background:${hex}" data-color-value="${hex}" title="${hex}"></div>`
+    )
+    .join('');
 
   // Bind click events
-  container.querySelectorAll<HTMLElement>('.color-swatch').forEach(swatch => {
+  container.querySelectorAll<HTMLElement>('.color-swatch').forEach((swatch) => {
     swatch.addEventListener('click', (e) => {
       e.stopPropagation();
       if (!state.isProUser) {
@@ -145,7 +162,7 @@ export function renderColorSwatches(): void {
         swatch.classList.remove('active');
       } else {
         state.activeFilters.color = color;
-        container.querySelectorAll('.color-swatch').forEach(s => s.classList.remove('active'));
+        container.querySelectorAll('.color-swatch').forEach((s) => s.classList.remove('active'));
         swatch.classList.add('active');
       }
       // Update "All Colors" option state
@@ -162,31 +179,49 @@ export function filterBySettingsMinSize(img: ImageItem): boolean {
   if (!state.appSettings.enableMinSize) return true;
   const w = img.naturalWidth || img.displayWidth || 0;
   const h = img.naturalHeight || img.displayHeight || 0;
-  return w >= ((state.appSettings.minWidth as number | undefined) || 0)
-    && h >= ((state.appSettings.minHeight as number | undefined) || 0);
+  return (
+    w >= ((state.appSettings.minWidth as number | undefined) || 0) &&
+    h >= ((state.appSettings.minHeight as number | undefined) || 0)
+  );
 }
 
 export function filterBySettingsMaxSize(img: ImageItem): boolean {
   if (!state.appSettings.enableMaxSize) return true;
   const w = img.naturalWidth || img.displayWidth || 0;
   const h = img.naturalHeight || img.displayHeight || 0;
-  return w <= ((state.appSettings.maxWidth as number | undefined) || Infinity)
-    && h <= ((state.appSettings.maxHeight as number | undefined) || Infinity);
+  return (
+    w <= ((state.appSettings.maxWidth as number | undefined) || Infinity) &&
+    h <= ((state.appSettings.maxHeight as number | undefined) || Infinity)
+  );
 }
 
 // Custom size inputs helpers
 export function clearCustomSizeInputs(): void {
-  ['filter-min-width', 'filter-min-height', 'filter-max-width', 'filter-max-height'].forEach(id => {
-    const input = document.getElementById(id) as HTMLInputElement | null;
-    if (input) input.value = '';
-  });
+  ['filter-min-width', 'filter-min-height', 'filter-max-width', 'filter-max-height'].forEach(
+    (id) => {
+      const input = document.getElementById(id) as HTMLInputElement | null;
+      if (input) input.value = '';
+    }
+  );
 }
 
 export function applyCustomSizeInputs(): void {
-  const minW = parseInt((document.getElementById('filter-min-width') as HTMLInputElement | null)?.value || '') || 0;
-  const minH = parseInt((document.getElementById('filter-min-height') as HTMLInputElement | null)?.value || '') || 0;
-  const maxW = parseInt((document.getElementById('filter-max-width') as HTMLInputElement | null)?.value || '') || 0;
-  const maxH = parseInt((document.getElementById('filter-max-height') as HTMLInputElement | null)?.value || '') || 0;
+  const minW =
+    parseInt(
+      (document.getElementById('filter-min-width') as HTMLInputElement | null)?.value || ''
+    ) || 0;
+  const minH =
+    parseInt(
+      (document.getElementById('filter-min-height') as HTMLInputElement | null)?.value || ''
+    ) || 0;
+  const maxW =
+    parseInt(
+      (document.getElementById('filter-max-width') as HTMLInputElement | null)?.value || ''
+    ) || 0;
+  const maxH =
+    parseInt(
+      (document.getElementById('filter-max-height') as HTMLInputElement | null)?.value || ''
+    ) || 0;
 
   const hasMin = minW > 0 || minH > 0;
   const hasMax = maxW > 0 || maxH > 0;
@@ -203,7 +238,7 @@ export function applyCustomSizeInputs(): void {
     state.activeFilters.size = 'all';
     state.activeFilters.sizeMin = 0;
     state.activeFilters.sizeMax = Infinity;
-    document.querySelectorAll('[data-size-filter]').forEach(o => o.classList.remove('active'));
+    document.querySelectorAll('[data-size-filter]').forEach((o) => o.classList.remove('active'));
   }
 
   updateFilterButtonLabels();
@@ -220,8 +255,10 @@ export function syncCustomSizeInputsFromSettings(): void {
   const maxHInput = document.getElementById('filter-max-height') as HTMLInputElement | null;
 
   if (state.appSettings.enableMinSize) {
-    if (minWInput && state.appSettings.minWidth) minWInput.value = String(state.appSettings.minWidth);
-    if (minHInput && state.appSettings.minHeight) minHInput.value = String(state.appSettings.minHeight);
+    if (minWInput && state.appSettings.minWidth)
+      minWInput.value = String(state.appSettings.minWidth);
+    if (minHInput && state.appSettings.minHeight)
+      minHInput.value = String(state.appSettings.minHeight);
   }
   if (state.appSettings.enableMaxSize) {
     const maxW = state.appSettings.maxWidth as number | undefined;

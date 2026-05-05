@@ -15,9 +15,13 @@
   if (document.body) {
     document.body.classList.add('popup-mode');
   } else {
-    document.addEventListener('DOMContentLoaded', () => {
-      document.body.classList.add('popup-mode');
-    }, { once: true });
+    document.addEventListener(
+      'DOMContentLoaded',
+      () => {
+        document.body.classList.add('popup-mode');
+      },
+      { once: true }
+    );
   }
 
   // Dynamically load popup.css
@@ -90,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
     childList: true,
     subtree: true,
     attributes: true,
-    attributeFilter: ['class', 'style']
+    attributeFilter: ['class', 'style'],
   });
 
   // Also run on multiple delays to catch async rendering from sidepanel init()

@@ -46,7 +46,12 @@ describe('hexToRgb', () => {
 
 describe('rgbToHex/hexToRgb roundtrip', () => {
   it('round-trips integer RGB values', () => {
-    for (const [r, g, b] of [[12, 34, 56], [200, 150, 100], [0, 0, 1], [255, 254, 253]]) {
+    for (const [r, g, b] of [
+      [12, 34, 56],
+      [200, 150, 100],
+      [0, 0, 1],
+      [255, 254, 253],
+    ]) {
       expect(hexToRgb(rgbToHex(r, g, b))).toEqual({ r, g, b });
     }
   });

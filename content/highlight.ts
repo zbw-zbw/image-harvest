@@ -2,12 +2,7 @@
 // Handles image highlighting and locating functionality
 
 import { MESSAGE_TYPES } from '../shared/constants';
-import {
-  resolveUrl,
-  isDataUri,
-  generateDataUriKey,
-  extractBackgroundUrls
-} from '../shared/utils';
+import { resolveUrl, isDataUri, generateDataUriKey, extractBackgroundUrls } from '../shared/utils';
 import { parseSrcset } from './utils';
 import { collectShadowRoots } from './shadow-iframe';
 
@@ -16,11 +11,13 @@ import { collectShadowRoots } from './shadow-iframe';
 // Users should use toolbar icon or Cmd+Shift+S shortcut
 
 // Stub functions to maintain message handler compatibility
-export function toggleFAB(): void { /* removed */ }
+export function toggleFAB(): void {
+  /* removed */
+}
 export function removeFAB(): void {
   // Clean up any stale FAB elements from previous versions
   const staleFabs = document.querySelectorAll('#image-snatcher-fab-host');
-  staleFabs.forEach(el => el.remove());
+  staleFabs.forEach((el) => el.remove());
 }
 
 interface HighlightEntry {
@@ -113,7 +110,9 @@ function dismissAllHighlights(): void {
   // Notify sidepanel/popup to clear selection
   try {
     chrome.runtime.sendMessage({ type: MESSAGE_TYPES.CLEAR_SELECTION });
-  } catch { /* extension context may be invalid */ }
+  } catch {
+    /* extension context may be invalid */
+  }
 }
 
 function removeOverlay(): void {
@@ -158,7 +157,14 @@ function findImageElement(url: string): Element | null {
     }
 
     // Check lazy-load attributes
-    for (const attr of ['data-src', 'data-original', 'data-lazy', 'data-lazy-src', 'data-srcset', 'data-lazy-srcset']) {
+    for (const attr of [
+      'data-src',
+      'data-original',
+      'data-lazy',
+      'data-lazy-src',
+      'data-srcset',
+      'data-lazy-srcset',
+    ]) {
       const val = img.getAttribute(attr);
       if (!val) continue;
       if (attr.includes('srcset')) {
@@ -221,9 +227,12 @@ function findImageElement(url: string): Element | null {
       try {
         const serializer = new XMLSerializer();
         const svgString = serializer.serializeToString(svg);
-        const dataUri = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+        const dataUri =
+          'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
         if (generateDataUriKey(dataUri) === targetDataKey) return svg;
-      } catch { /* skip */ }
+      } catch {
+        /* skip */
+      }
     }
   }
 
@@ -234,7 +243,9 @@ function findImageElement(url: string): Element | null {
       try {
         const canvasDataUri = canvas.toDataURL('image/png');
         if (generateDataUriKey(canvasDataUri) === targetDataKey) return canvas;
-      } catch { /* tainted canvas */ }
+      } catch {
+        /* tainted canvas */
+      }
     }
   }
 
@@ -262,11 +273,20 @@ function findImageElement(url: string): Element | null {
           }
         }
       }
-    } catch { /* skip */ }
+    } catch {
+      /* skip */
+    }
   }
 
   // 9. Check lazy-load data-* attributes on non-img elements (divs, spans, etc.)
-  const lazyAttrs = ['data-src', 'data-original', 'data-bg', 'data-bg-src', 'data-background', 'data-image'];
+  const lazyAttrs = [
+    'data-src',
+    'data-original',
+    'data-bg',
+    'data-bg-src',
+    'data-background',
+    'data-image',
+  ];
   for (const el of allElements) {
     for (const attr of lazyAttrs) {
       const val = el.getAttribute(attr);
@@ -336,7 +356,9 @@ function findImageElement(url: string): Element | null {
             if (urlMatches(u)) return el;
           }
         }
-      } catch { /* skip */ }
+      } catch {
+        /* skip */
+      }
     }
 
     // Check inline SVGs in shadow DOM
@@ -345,9 +367,12 @@ function findImageElement(url: string): Element | null {
         try {
           const serializer = new XMLSerializer();
           const svgString = serializer.serializeToString(svg);
-          const dataUri = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+          const dataUri =
+            'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
           if (generateDataUriKey(dataUri) === targetDataKey) return svg;
-        } catch { /* skip */ }
+        } catch {
+          /* skip */
+        }
       }
     }
   }
@@ -454,15 +479,15 @@ function createSingleHighlight(imageUrl: string, target: Element): void {
     const viewportHeight = window.innerHeight;
 
     // Hide highlight when element is completely outside the viewport
-    const isOutOfView = r.bottom < 0 || r.top > viewportHeight ||
-                        r.right < 0 || r.left > viewportWidth;
+    const isOutOfView =
+      r.bottom < 0 || r.top > viewportHeight || r.right < 0 || r.left > viewportWidth;
     border.style.display = isOutOfView ? 'none' : '';
 
     if (!isOutOfView) {
-      border.style.top = (r.top - gap) + 'px';
-      border.style.left = (r.left - gap) + 'px';
-      border.style.width = (r.width + gap * 2) + 'px';
-      border.style.height = (r.height + gap * 2) + 'px';
+      border.style.top = r.top - gap + 'px';
+      border.style.left = r.left - gap + 'px';
+      border.style.width = r.width + gap * 2 + 'px';
+      border.style.height = r.height + gap * 2 + 'px';
     }
 
     rafId = requestAnimationFrame(trackPosition);

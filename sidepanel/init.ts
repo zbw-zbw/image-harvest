@@ -13,14 +13,15 @@ import {
   reverseSearch,
   selectAll,
   toggleDownloadDropdown,
-  updateSelectionUI
+  updateSelectionUI,
 } from './actions';
 import {
   applyCustomSizeInputs,
   applyFilters,
   clearCustomSizeInputs,
-  syncCustomSizeInputsFromSettings
+  syncCustomSizeInputsFromSettings,
 } from './filter';
+import { mountPreactComponents } from './components/mount';
 import { handleKeyDown, handleMessage } from './message';
 import {
   closeCollectionModal,
@@ -32,13 +33,10 @@ import {
   showDedupModal,
   showMultiTabModal,
   startMultiTabExtract,
-  toggleMultitabSelectAll
+  toggleMultitabSelectAll,
 } from './pro-features';
 import { renderImages } from './render';
-import {
-  fetchImages,
-  handleScanCancel
-} from './scan';
+import { fetchImages, handleScanCancel } from './scan';
 import {
   applyDensity,
   applyProFeatureVisibility,
@@ -53,13 +51,9 @@ import {
   showProUpgradeModal,
   showSettings,
   toggleFilterDropdown,
-  updateLiveIndicator
+  updateLiveIndicator,
 } from './settings';
-import {
-  clearTabImageCache,
-  getTabImageCache,
-  saveTabImageCache
-} from '../shared/storage';
+import { clearTabImageCache, getTabImageCache, saveTabImageCache } from '../shared/storage';
 import { elements, state } from './state';
 import {
   checkNarrowMode,
@@ -72,7 +66,7 @@ import {
   showRestricted,
   showToast,
   toggleViewMode,
-  updateFilterButtonLabels
+  updateFilterButtonLabels,
 } from './ui';
 import { debounce, generateId, loadSettings } from './utils';
 
@@ -84,6 +78,12 @@ let tabUpdatedTimer: ReturnType<typeof setTimeout> | null = null;
 // ============================================
 async function init(): Promise<void> {
   state.isPopupMode = window.location.pathname.endsWith('popup.html');
+
+  // Mount Preact components first: this swaps legacy DOM nodes for fresh
+  // mount points so that cacheElements() (which still runs for the rest of
+  // the imperative UI) does not cache stale references to nodes Preact has
+  // since taken ownership of.
+  mountPreactComponents();
 
   cacheElements();
   await loadSettings();
@@ -123,10 +123,14 @@ async function init(): Promise<void> {
     removeAllHighlightsOnPage();
     // Notify background to stop tracking this tab's side panel
     if (!state.isPopupMode && state.currentTabId != null) {
-      chrome.runtime.sendMessage({
-        type: MESSAGE_TYPES.SIDE_PANEL_CLOSED,
-        tabId: state.currentTabId
-      }).catch(() => { /* ignore */ });
+      chrome.runtime
+        .sendMessage({
+          type: MESSAGE_TYPES.SIDE_PANEL_CLOSED,
+          tabId: state.currentTabId,
+        })
+        .catch(() => {
+          /* ignore */
+        });
     }
   });
 
@@ -143,7 +147,7 @@ async function init(): Promise<void> {
           return;
         }
         // Only trigger rescan if the panel was hidden for more than 1 second
-        const wasHiddenLong = (Date.now() - lastHiddenTime) > 1000;
+        const wasHiddenLong = Date.now() - lastHiddenTime > 1000;
         if (!wasHiddenLong) return;
 
         lastHiddenTime = 0;
@@ -191,10 +195,14 @@ async function loadCurrentTab(forceRescan = false, showCacheToast = false): Prom
 
   // Notify background that the side panel is open on this tab
   if (!state.isPopupMode) {
-    chrome.runtime.sendMessage({
-      type: MESSAGE_TYPES.SIDE_PANEL_OPENED,
-      tabId
-    }).catch(() => { /* ignore */ });
+    chrome.runtime
+      .sendMessage({
+        type: MESSAGE_TYPES.SIDE_PANEL_OPENED,
+        tabId,
+      })
+      .catch(() => {
+        /* ignore */
+      });
   }
 
   // Normal page — make sure the main UI is visible
@@ -221,11 +229,11 @@ async function loadCurrentTab(forceRescan = false, showCacheToast = false): Prom
   if (!forceRescan) {
     const sessionCached = await getTabImageCache(tabId, tabUrl);
     if (sessionCached && sessionCached.images && sessionCached.images.length > 0) {
-      state.allImages = sessionCached.images.map(img => ({
+      state.allImages = sessionCached.images.map((img) => ({
         ...img,
         id: img.id || generateId(img.url),
         colors: undefined,
-        phash: null
+        phash: null,
       }));
       state.selectedImages = new Set();
       hideLoading();
@@ -246,7 +254,7 @@ async function loadCurrentTab(forceRescan = false, showCacheToast = false): Prom
   state.tabCache.set(tabId, {
     url: tabUrl,
     images: state.allImages,
-    selectedImages: new Set(state.selectedImages)
+    selectedImages: new Set(state.selectedImages),
   });
   saveTabImageCache(tabId, tabUrl, state.allImages);
 
@@ -272,7 +280,7 @@ async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Promise<v
     state.tabCache.set(state.currentTabId, {
       url: cachedUrl,
       images: [...state.allImages],
-      selectedImages: new Set(state.selectedImages)
+      selectedImages: new Set(state.selectedImages),
     });
     if (cachedUrl) {
       saveTabImageCache(state.currentTabId, cachedUrl, state.allImages);
@@ -326,10 +334,14 @@ async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Promise<v
       }
 
       if (!state.isPopupMode) {
-        chrome.runtime.sendMessage({
-          type: MESSAGE_TYPES.SIDE_PANEL_OPENED,
-          tabId: newTabId
-        }).catch(() => { /* ignore */ });
+        chrome.runtime
+          .sendMessage({
+            type: MESSAGE_TYPES.SIDE_PANEL_OPENED,
+            tabId: newTabId,
+          })
+          .catch(() => {
+            /* ignore */
+          });
       }
     } finally {
       state.isTabSwitching = false;
@@ -360,10 +372,14 @@ async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Promise<v
 
     // Notify background that the side panel is open on this tab
     if (!state.isPopupMode) {
-      chrome.runtime.sendMessage({
-        type: MESSAGE_TYPES.SIDE_PANEL_OPENED,
-        tabId: newTabId
-      }).catch(() => { /* ignore */ });
+      chrome.runtime
+        .sendMessage({
+          type: MESSAGE_TYPES.SIDE_PANEL_OPENED,
+          tabId: newTabId,
+        })
+        .catch(() => {
+          /* ignore */
+        });
     }
 
     await loadCurrentTab(true);
@@ -438,35 +454,87 @@ function handleTabUpdated(
 
 function cacheElements(): void {
   const ids = [
-    'image-grid', 'loading-state', 'empty-state', 'error-state', 'restricted-state',
-    'settings-modal', 'progress-modal', 'progress-fill',
-    'progress-text', 'progress-current', 'toast-container',
-    'selected-count', 'total-count', 'btn-download', 'btn-download-toggle', 'btn-select-all',
-    'download-dropdown', 'download-group', 'group-mode', 'btn-view-toggle',
-    'found-info', 'found-action-count', 'btn-refresh',
-    'filter-url-input', 'reverse-search-menu',
-    'dedup-modal', 'dedup-body', 'collection-modal', 'collection-body',
-    'multitab-modal', 'multitab-list', 'btn-multitab', 'btn-settings',
-    'btn-collection', 'btn-dedup', 'similar-count',
-    'btn-save-settings', 'btn-reset-defaults',
-    'btn-settings-close', 'btn-start-extraction', 'btn-remove-duplicates',
-    'btn-collection-export', 'collection-search',
-    'btn-dedup-close', 'btn-cancel-dedup', 'btn-multitab-close', 'btn-cancel-multitab', 'btn-collection-back', 'btn-progress-close',
+    'image-grid',
+    'loading-state',
+    'empty-state',
+    'error-state',
+    'restricted-state',
+    'settings-modal',
+    'progress-modal',
+    'progress-fill',
+    'progress-text',
+    'progress-current',
+    'toast-container',
+    'selected-count',
+    'total-count',
+    'btn-download',
+    'btn-download-toggle',
+    'btn-select-all',
+    'download-dropdown',
+    'download-group',
+    'group-mode',
+    'btn-view-toggle',
+    'found-info',
+    'found-action-count',
+    'btn-refresh',
+    'filter-url-input',
+    'reverse-search-menu',
+    'dedup-modal',
+    'dedup-body',
+    'collection-modal',
+    'collection-body',
+    'multitab-modal',
+    'multitab-list',
+    'btn-multitab',
+    'btn-settings',
+    'btn-collection',
+    'btn-dedup',
+    'similar-count',
+    'btn-save-settings',
+    'btn-reset-defaults',
+    'btn-settings-close',
+    'btn-start-extraction',
+    'btn-remove-duplicates',
+    'btn-collection-export',
+    'collection-search',
+    'btn-dedup-close',
+    'btn-cancel-dedup',
+    'btn-multitab-close',
+    'btn-cancel-multitab',
+    'btn-collection-back',
+    'btn-progress-close',
     'found-count',
-    'setting-side-panel', 'setting-density', 'setting-theme',
-    'setting-default-group', 'setting-download-options',
-    'setting-subfolder', 'setting-filename', 'setting-convert',
+    'setting-side-panel',
+    'setting-density',
+    'setting-theme',
+    'setting-default-group',
+    'setting-download-options',
+    'setting-subfolder',
+    'setting-filename',
+    'setting-convert',
     'live-indicator',
-    'setting-all-frames', 'setting-live-monitor',
-    'setting-min-size', 'setting-min-width', 'setting-min-height',
-    'setting-max-size', 'setting-max-width', 'setting-max-height',
-    'setting-similar-detection', 'setting-color-extract',
-    'setting-no-warning', 'download-count', 'download-label',
-    'scan-overlay', 'scan-progress-fill', 'scan-progress-text', 'scan-progress-title',
-    'scan-progress-current', 'btn-scan-cancel'
+    'setting-all-frames',
+    'setting-live-monitor',
+    'setting-min-size',
+    'setting-min-width',
+    'setting-min-height',
+    'setting-max-size',
+    'setting-max-width',
+    'setting-max-height',
+    'setting-similar-detection',
+    'setting-color-extract',
+    'setting-no-warning',
+    'download-count',
+    'download-label',
+    'scan-overlay',
+    'scan-progress-fill',
+    'scan-progress-text',
+    'scan-progress-title',
+    'scan-progress-current',
+    'btn-scan-cancel',
   ];
 
-  ids.forEach(id => {
+  ids.forEach((id) => {
     const camelCase = id.replace(/-([a-z])/g, (_, c: string) => c.toUpperCase());
     elements[camelCase] = document.getElementById(id);
   });
@@ -491,8 +559,9 @@ function bindEvents(): void {
   // Select all / clear
   if (elements.btnSelectAll) {
     elements.btnSelectAll.addEventListener('click', () => {
-      const allFilteredSelected = state.filteredImages.length > 0
-        && state.filteredImages.every(img => state.selectedImages.has(img.id));
+      const allFilteredSelected =
+        state.filteredImages.length > 0 &&
+        state.filteredImages.every((img) => state.selectedImages.has(img.id));
       if (allFilteredSelected) {
         clearSelection();
       } else {
@@ -508,14 +577,14 @@ function bindEvents(): void {
       hideDownloadDropdown();
       const hasSelection = state.selectedImages.size > 0;
       const imagesToDownload = hasSelection
-        ? state.filteredImages.filter(img => state.selectedImages.has(img.id))
+        ? state.filteredImages.filter((img) => state.selectedImages.has(img.id))
         : state.filteredImages;
       if (imagesToDownload.length === 0) return;
       if (imagesToDownload.length === 1) {
         downloadSingle(imagesToDownload[0], null);
       } else {
         if (!hasSelection) {
-          state.filteredImages.forEach(img => state.selectedImages.add(img.id));
+          state.filteredImages.forEach((img) => state.selectedImages.add(img.id));
           updateSelectionUI();
         }
         downloadSelectedAsZip(null);
@@ -544,24 +613,26 @@ function bindEvents(): void {
           hideDownloadDropdown();
           return;
         }
-        elements.downloadDropdown!.querySelectorAll('.dropdown-item').forEach(el => el.classList.remove('active'));
+        elements
+          .downloadDropdown!.querySelectorAll('.dropdown-item')
+          .forEach((el) => el.classList.remove('active'));
         item.classList.add('active');
         const convertFormat = format === 'original' ? null : (format ?? null);
         const isZip = item.dataset.zip === 'true';
         if (isZip) {
           if (state.selectedImages.size === 0) {
-            state.filteredImages.forEach(img => state.selectedImages.add(img.id));
+            state.filteredImages.forEach((img) => state.selectedImages.add(img.id));
             updateSelectionUI();
           }
           downloadSelectedAsZip(convertFormat);
         } else {
           const hasSelection = state.selectedImages.size > 0;
           const imagesToDownload = hasSelection
-            ? state.filteredImages.filter(img => state.selectedImages.has(img.id))
+            ? state.filteredImages.filter((img) => state.selectedImages.has(img.id))
             : state.filteredImages;
           if (imagesToDownload.length === 0) return;
           if (!hasSelection) {
-            state.filteredImages.forEach(img => state.selectedImages.add(img.id));
+            state.filteredImages.forEach((img) => state.selectedImages.add(img.id));
             updateSelectionUI();
           }
           if (imagesToDownload.length === 1) {
@@ -583,13 +654,14 @@ function bindEvents(): void {
   // Group mode
   if (elements.groupMode) {
     elements.groupMode.addEventListener('change', (e) => {
-      state.currentGroupMode = (e.target as HTMLSelectElement).value as typeof state.currentGroupMode;
+      state.currentGroupMode = (e.target as HTMLSelectElement)
+        .value as typeof state.currentGroupMode;
       renderImages();
     });
   }
 
   // Filter buttons
-  document.querySelectorAll<HTMLElement>('.filter-btn[data-filter]').forEach(btn => {
+  document.querySelectorAll<HTMLElement>('.filter-btn[data-filter]').forEach((btn) => {
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const type = btn.dataset.filter;
@@ -598,23 +670,38 @@ function bindEvents(): void {
   });
 
   // Size filter options
-  document.querySelectorAll<HTMLElement>('[data-size-filter]').forEach(opt => {
+  document.querySelectorAll<HTMLElement>('[data-size-filter]').forEach((opt) => {
     opt.addEventListener('click', () => {
       const val = opt.dataset.sizeFilter || 'all';
       state.activeFilters.size = val;
       switch (val) {
-        case 'all': state.activeFilters.sizeMin = 0; state.activeFilters.sizeMax = Infinity; break;
-        case 'small': state.activeFilters.sizeMin = 0; state.activeFilters.sizeMax = 100; break;
-        case 'medium': state.activeFilters.sizeMin = 100; state.activeFilters.sizeMax = 500; break;
-        case 'large': state.activeFilters.sizeMin = 500; state.activeFilters.sizeMax = 1000; break;
-        case 'xl': state.activeFilters.sizeMin = 1000; state.activeFilters.sizeMax = Infinity; break;
+        case 'all':
+          state.activeFilters.sizeMin = 0;
+          state.activeFilters.sizeMax = Infinity;
+          break;
+        case 'small':
+          state.activeFilters.sizeMin = 0;
+          state.activeFilters.sizeMax = 100;
+          break;
+        case 'medium':
+          state.activeFilters.sizeMin = 100;
+          state.activeFilters.sizeMax = 500;
+          break;
+        case 'large':
+          state.activeFilters.sizeMin = 500;
+          state.activeFilters.sizeMax = 1000;
+          break;
+        case 'xl':
+          state.activeFilters.sizeMin = 1000;
+          state.activeFilters.sizeMax = Infinity;
+          break;
       }
       // Clear custom size inputs when selecting a preset
       clearCustomSizeInputs();
       state.appSettings.enableMinSize = false;
       state.appSettings.enableMaxSize = false;
 
-      document.querySelectorAll('[data-size-filter]').forEach(o => o.classList.remove('active'));
+      document.querySelectorAll('[data-size-filter]').forEach((o) => o.classList.remove('active'));
       opt.classList.add('active');
       updateFilterButtonLabels();
       applyFilters();
@@ -623,30 +710,36 @@ function bindEvents(): void {
   });
 
   // Custom size inputs in Size dropdown
-  ['filter-min-width', 'filter-min-height', 'filter-max-width', 'filter-max-height'].forEach(inputId => {
-    const input = document.getElementById(inputId);
-    if (input) {
-      input.addEventListener('click', (e) => e.stopPropagation());
-      input.addEventListener('input', () => applyCustomSizeInputs());
+  ['filter-min-width', 'filter-min-height', 'filter-max-width', 'filter-max-height'].forEach(
+    (inputId) => {
+      const input = document.getElementById(inputId);
+      if (input) {
+        input.addEventListener('click', (e) => e.stopPropagation());
+        input.addEventListener('input', () => applyCustomSizeInputs());
+      }
     }
-  });
+  );
 
   // Type filter checkboxes
-  document.querySelectorAll<HTMLInputElement>('.type-checkbox').forEach(cb => {
+  document.querySelectorAll<HTMLInputElement>('.type-checkbox').forEach((cb) => {
     cb.addEventListener('change', () => {
       const allCheckbox = document.querySelector<HTMLInputElement>('.type-checkbox[value="all"]');
-      const typeCheckboxes = document.querySelectorAll<HTMLInputElement>('.type-checkbox:not([value="all"])');
+      const typeCheckboxes = document.querySelectorAll<HTMLInputElement>(
+        '.type-checkbox:not([value="all"])'
+      );
 
       if (cb.value === 'all') {
-        typeCheckboxes.forEach(tc => { tc.checked = cb.checked; });
+        typeCheckboxes.forEach((tc) => {
+          tc.checked = cb.checked;
+        });
       } else {
-        const allTypesChecked = Array.from(typeCheckboxes).every(tc => tc.checked);
+        const allTypesChecked = Array.from(typeCheckboxes).every((tc) => tc.checked);
         if (allCheckbox) allCheckbox.checked = allTypesChecked;
       }
 
       const checkedTypes = Array.from(
         document.querySelectorAll<HTMLInputElement>('.type-checkbox:not([value="all"]):checked')
-      ).map(c => c.value);
+      ).map((c) => c.value);
       const allChecked = !!(allCheckbox && allCheckbox.checked);
       state.activeFilters.types = allChecked ? [] : checkedTypes;
       updateFilterButtonLabels();
@@ -655,10 +748,12 @@ function bindEvents(): void {
   });
 
   // Layout filter options
-  document.querySelectorAll<HTMLElement>('[data-layout-filter]').forEach(opt => {
+  document.querySelectorAll<HTMLElement>('[data-layout-filter]').forEach((opt) => {
     opt.addEventListener('click', () => {
       state.activeFilters.layout = opt.dataset.layoutFilter || 'all';
-      document.querySelectorAll('[data-layout-filter]').forEach(o => o.classList.remove('active'));
+      document
+        .querySelectorAll('[data-layout-filter]')
+        .forEach((o) => o.classList.remove('active'));
       opt.classList.add('active');
       updateFilterButtonLabels();
       applyFilters();
@@ -667,7 +762,7 @@ function bindEvents(): void {
   });
 
   // Group filter options
-  document.querySelectorAll<HTMLElement>('[data-group-filter]').forEach(opt => {
+  document.querySelectorAll<HTMLElement>('[data-group-filter]').forEach((opt) => {
     opt.addEventListener('click', () => {
       const val = opt.dataset.groupFilter || 'none';
       // Free tier: only 'none' and 'format' grouping allowed
@@ -679,7 +774,7 @@ function bindEvents(): void {
       }
       state.currentGroupMode = val as typeof state.currentGroupMode;
       if (elements.groupMode) (elements.groupMode as HTMLSelectElement).value = val;
-      document.querySelectorAll('[data-group-filter]').forEach(o => o.classList.remove('active'));
+      document.querySelectorAll('[data-group-filter]').forEach((o) => o.classList.remove('active'));
       opt.classList.add('active');
       updateFilterButtonLabels();
       renderImages();
@@ -688,10 +783,11 @@ function bindEvents(): void {
   });
 
   // Sort filter options
-  document.querySelectorAll<HTMLElement>('[data-sort-filter]').forEach(opt => {
+  document.querySelectorAll<HTMLElement>('[data-sort-filter]').forEach((opt) => {
     opt.addEventListener('click', () => {
-      state.currentSortMode = (opt.dataset.sortFilter || 'size-desc') as typeof state.currentSortMode;
-      document.querySelectorAll('[data-sort-filter]').forEach(o => o.classList.remove('active'));
+      state.currentSortMode = (opt.dataset.sortFilter ||
+        'size-desc') as typeof state.currentSortMode;
+      document.querySelectorAll('[data-sort-filter]').forEach((o) => o.classList.remove('active'));
       opt.classList.add('active');
       updateFilterButtonLabels();
       applyFilters();
@@ -722,12 +818,14 @@ function bindEvents(): void {
   }
 
   // Color filter - "All Colors" option
-  document.querySelectorAll<HTMLElement>('[data-color-filter]').forEach(opt => {
+  document.querySelectorAll<HTMLElement>('[data-color-filter]').forEach((opt) => {
     opt.addEventListener('click', (e) => {
       e.stopPropagation();
       if (opt.dataset.colorFilter === 'all') {
         state.activeFilters.color = null;
-        document.querySelectorAll('#color-swatches .color-swatch').forEach(s => s.classList.remove('active'));
+        document
+          .querySelectorAll('#color-swatches .color-swatch')
+          .forEach((s) => s.classList.remove('active'));
         opt.classList.add('active');
         updateFilterButtonLabels();
         applyFilters();
@@ -738,7 +836,8 @@ function bindEvents(): void {
 
   // Settings
   if (elements.btnSettings) elements.btnSettings.addEventListener('click', showSettings);
-  if (elements.btnSettingsClose) elements.btnSettingsClose.addEventListener('click', closeSettings);
+  // btn-settings-close is now owned by the <SettingsModal> Preact shell —
+  // its onClick directly mutates the store, so no addEventListener needed.
   if (elements.btnSaveSettings) elements.btnSaveSettings.addEventListener('click', saveSettings);
   if (elements.btnResetDefaults) elements.btnResetDefaults.addEventListener('click', resetSettings);
 
@@ -746,7 +845,7 @@ function bindEvents(): void {
   const settingTogglePairs: Array<[string, string]> = [
     ['setting-download-options', 'download-options-inputs'],
     ['setting-min-size', 'min-size-inputs'],
-    ['setting-max-size', 'max-size-inputs']
+    ['setting-max-size', 'max-size-inputs'],
   ];
   settingTogglePairs.forEach(([checkboxId, panelId]) => {
     const checkbox = document.getElementById(checkboxId) as HTMLInputElement | null;
@@ -759,23 +858,27 @@ function bindEvents(): void {
   });
 
   // Custom setting-select dropdowns
-  document.querySelectorAll<HTMLElement>('.setting-select').forEach(selectEl => {
+  document.querySelectorAll<HTMLElement>('.setting-select').forEach((selectEl) => {
     const btn = selectEl.querySelector('.setting-select-btn');
     const dropdown = selectEl.querySelector('.setting-select-dropdown');
     if (btn && dropdown) {
       btn.addEventListener('click', (e) => {
         e.stopPropagation();
-        document.querySelectorAll('.setting-select-dropdown').forEach(d => {
+        document.querySelectorAll('.setting-select-dropdown').forEach((d) => {
           if (d !== dropdown) d.classList.add('hidden');
         });
         dropdown.classList.toggle('hidden');
       });
-      dropdown.querySelectorAll<HTMLElement>('.setting-select-option').forEach(opt => {
+      dropdown.querySelectorAll<HTMLElement>('.setting-select-option').forEach((opt) => {
         opt.addEventListener('click', (e) => {
           e.stopPropagation();
           const value = opt.dataset.value || '';
           // Pro check for setting-default-group: Domain/Size/Tab require Pro
-          if (selectEl.id === 'setting-default-group' && !state.isProUser && ['domain', 'size', 'tab'].includes(value)) {
+          if (
+            selectEl.id === 'setting-default-group' &&
+            !state.isProUser &&
+            ['domain', 'size', 'tab'].includes(value)
+          ) {
             dropdown.classList.add('hidden');
             closeSettings();
             showToast('Advanced grouping is a Pro feature. Upgrade to unlock!', 'warning');
@@ -783,7 +886,11 @@ function bindEvents(): void {
             return;
           }
           // Pro check for setting-convert-format: PNG/JPG/WebP require Pro
-          if (selectEl.id === 'setting-convert-format' && !state.isProUser && ['png', 'jpg', 'webp'].includes(value)) {
+          if (
+            selectEl.id === 'setting-convert-format' &&
+            !state.isProUser &&
+            ['png', 'jpg', 'webp'].includes(value)
+          ) {
             dropdown.classList.add('hidden');
             closeSettings();
             showToast('Format conversion is a Pro feature. Upgrade to unlock!', 'warning');
@@ -799,7 +906,7 @@ function bindEvents(): void {
 
   // Close setting-select dropdowns on outside click
   document.addEventListener('click', () => {
-    document.querySelectorAll('.setting-select-dropdown').forEach(d => d.classList.add('hidden'));
+    document.querySelectorAll('.setting-select-dropdown').forEach((d) => d.classList.add('hidden'));
   });
 
   // Hotkey link - open browser shortcut settings
@@ -808,32 +915,23 @@ function bindEvents(): void {
 
   // Pro features
   if (elements.btnCollection) elements.btnCollection.addEventListener('click', showCollectionModal);
-  if (elements.btnCollectionBack) {
-    elements.btnCollectionBack.addEventListener('click', () => {
-      if (elements.collectionModal) elements.collectionModal.classList.add('hidden');
-    });
-  }
   if (elements.btnDedup) elements.btnDedup.addEventListener('click', showDedupModal);
-  if (elements.btnDedupClose) elements.btnDedupClose.addEventListener('click', closeDedupModal);
-  if (elements.btnCancelDedup) elements.btnCancelDedup.addEventListener('click', closeDedupModal);
   if (elements.btnMultitab) elements.btnMultitab.addEventListener('click', showMultiTabModal);
-  if (elements.btnMultitabClose) {
-    elements.btnMultitabClose.addEventListener('click', () => {
-      if (elements.multitabModal) elements.multitabModal.classList.add('hidden');
-    });
-  }
-  if (elements.btnCancelMultitab) {
-    elements.btnCancelMultitab.addEventListener('click', () => {
-      if (elements.multitabModal) elements.multitabModal.classList.add('hidden');
-    });
-  }
-  if (elements.btnProgressClose) elements.btnProgressClose.addEventListener('click', handleProgressClose);
+  // The DedupModal / CollectionModal / MultitabModal Preact shells own their
+  // close/cancel/back buttons (each calls the corresponding store-mutation
+  // directly via onClick), so no addEventListener needed for those any more.
+  // Cached refs (elements.btnDedupClose / btnCancelDedup / btnCollectionBack /
+  // btnMultitabClose / btnCancelMultitab) are intentionally left dangling —
+  // they would point to detached nodes anyway after Preact mount, and no
+  // remaining code dereferences them.
+  if (elements.btnProgressClose)
+    elements.btnProgressClose.addEventListener('click', handleProgressClose);
   if (elements.btnScanCancel) elements.btnScanCancel.addEventListener('click', handleScanCancel);
   if (elements.btnStartExtraction) {
     elements.btnStartExtraction.addEventListener('click', () => {
       const checked = Array.from(
         document.querySelectorAll<HTMLInputElement>('.tab-checkbox input:checked')
-      ).map(c => parseInt(c.value));
+      ).map((c) => parseInt(c.value));
       if (checked.length > 0) {
         startMultiTabExtract(checked);
       } else {
@@ -846,17 +944,22 @@ function bindEvents(): void {
   const multitabSelectAll = document.getElementById('multitab-select-all');
   if (multitabSelectAll) multitabSelectAll.addEventListener('click', toggleMultitabSelectAll);
 
-  if (elements.btnRemoveDuplicates) elements.btnRemoveDuplicates.addEventListener('click', removeDuplicates);
-  if (elements.btnCollectionExport) elements.btnCollectionExport.addEventListener('click', exportCollection);
+  if (elements.btnRemoveDuplicates)
+    elements.btnRemoveDuplicates.addEventListener('click', removeDuplicates);
+  if (elements.btnCollectionExport)
+    elements.btnCollectionExport.addEventListener('click', exportCollection);
 
   // Reverse search menu items
-  document.querySelectorAll<HTMLElement>('[data-engine]').forEach(item => {
+  document.querySelectorAll<HTMLElement>('[data-engine]').forEach((item) => {
     item.addEventListener('click', (e) => {
       e.stopPropagation();
       const engine = item.dataset.engine || '';
       // Free tier: only engines in FREE_LIMITS.REVERSE_SEARCH_ENGINES are allowed
       if (!state.isProUser && !FREE_LIMITS.REVERSE_SEARCH_ENGINES.includes(engine as 'google')) {
-        showToast(`${engine.charAt(0).toUpperCase() + engine.slice(1)} search requires Pro. Upgrade to unlock!`, 'warning');
+        showToast(
+          `${engine.charAt(0).toUpperCase() + engine.slice(1)} search requires Pro. Upgrade to unlock!`,
+          'warning'
+        );
         showProUpgradeModal();
         if (elements.reverseSearchMenu) elements.reverseSearchMenu.classList.add('hidden');
         return;
@@ -868,7 +971,7 @@ function bindEvents(): void {
   });
 
   // Close modals on overlay click
-  document.querySelectorAll('.modal-overlay').forEach(overlay => {
+  document.querySelectorAll('.modal-overlay').forEach((overlay) => {
     overlay.addEventListener('click', () => {
       const modal = overlay.closest('.modal');
       if (modal) modal.classList.add('hidden');
@@ -881,7 +984,11 @@ function bindEvents(): void {
   // Close dropdowns on outside click
   document.addEventListener('click', (e) => {
     const target = e.target as HTMLElement;
-    if (!target.closest('.download-group') && !target.closest('#download-dropdown') && !target.closest('#btn-download-toggle')) {
+    if (
+      !target.closest('.download-group') &&
+      !target.closest('#download-dropdown') &&
+      !target.closest('#btn-download-toggle')
+    ) {
       hideDownloadDropdown();
     }
     if (!target.closest('.filter-btn') && !target.closest('.filter-dropdown')) {
@@ -912,17 +1019,23 @@ function bindEvents(): void {
         types: [],
         layout: 'all',
         urlKeyword: '',
-        color: null
+        color: null,
       };
       if (elements.filterUrlInput) (elements.filterUrlInput as HTMLInputElement).value = '';
-      document.querySelectorAll<HTMLInputElement>('.type-checkbox').forEach(cb => { cb.checked = true; });
-      document.querySelectorAll('[data-size-filter]').forEach(o => o.classList.remove('active'));
-      document.querySelectorAll('[data-layout-filter]').forEach(o => o.classList.remove('active'));
+      document.querySelectorAll<HTMLInputElement>('.type-checkbox').forEach((cb) => {
+        cb.checked = true;
+      });
+      document.querySelectorAll('[data-size-filter]').forEach((o) => o.classList.remove('active'));
+      document
+        .querySelectorAll('[data-layout-filter]')
+        .forEach((o) => o.classList.remove('active'));
       const defaultSizeOption = document.querySelector('[data-size-filter="all"]');
       if (defaultSizeOption) defaultSizeOption.classList.add('active');
       const defaultLayoutOption = document.querySelector('[data-layout-filter="all"]');
       if (defaultLayoutOption) defaultLayoutOption.classList.add('active');
-      document.querySelectorAll('#color-swatches .color-swatch').forEach(s => s.classList.remove('active'));
+      document
+        .querySelectorAll('#color-swatches .color-swatch')
+        .forEach((s) => s.classList.remove('active'));
       const allColorOption = document.querySelector('[data-color-filter="all"]');
       if (allColorOption) allColorOption.classList.add('active');
       updateFilterButtonLabels();

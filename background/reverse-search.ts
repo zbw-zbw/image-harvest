@@ -12,7 +12,7 @@ export type ReverseSearchResult = ReverseSearchSuccess;
 /** Fetch an image and return it as a `data:` URL (used to bypass CORS in UI). */
 export async function fetchImageData(url: string): Promise<string> {
   const imageResponse = await fetch(url, {
-    headers: { Accept: 'image/*' }
+    headers: { Accept: 'image/*' },
   });
   if (!imageResponse.ok) {
     throw new Error(`HTTP ${imageResponse.status}`);
@@ -42,7 +42,7 @@ export async function reverseSearchUpload(
     'image/jpeg': '.jpg',
     'image/png': '.png',
     'image/webp': '.webp',
-    'image/gif': '.gif'
+    'image/gif': '.gif',
   };
   const ext = extMap[mimeType] || '.jpg';
   const uploadFileName = `image${ext}`;
@@ -109,7 +109,7 @@ async function uploadToBaidu(
       } else {
         console.error('[ImageSnatcher] Baidu: input[type=file] not found');
       }
-    }
+    },
   });
 
   return { success: true, injected: true };
@@ -143,8 +143,8 @@ async function uploadToYandex(
     body: yandexForm,
     headers: {
       'X-Requested-With': 'XMLHttpRequest',
-      Accept: 'application/json, text/javascript, */*; q=0.01'
-    }
+      Accept: 'application/json, text/javascript, */*; q=0.01',
+    },
   });
 
   console.log('[ReverseSearch] Yandex response status:', yandexResp.status);
@@ -160,13 +160,13 @@ async function uploadToYandex(
   if (cbirParams?.cbirId) {
     return {
       success: true,
-      redirectUrl: `https://yandex.ru/images/search?cbir_id=${cbirParams.cbirId}&rpt=imageview`
+      redirectUrl: `https://yandex.ru/images/search?cbir_id=${cbirParams.cbirId}&rpt=imageview`,
     };
   }
   if (yandexResult?.cbir_id) {
     return {
       success: true,
-      redirectUrl: `https://yandex.ru/images/search?rpt=imageview&cbir_id=${yandexResult.cbir_id}`
+      redirectUrl: `https://yandex.ru/images/search?rpt=imageview&cbir_id=${yandexResult.cbir_id}`,
     };
   }
   throw new Error('Yandex returned no cbir_id');

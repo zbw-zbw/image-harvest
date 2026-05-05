@@ -15,7 +15,7 @@ export interface ContentState {
 export const state: ContentState = {
   isExtracting: false,
   liveObserver: null,
-  seenUrls: new Set<string>()
+  seenUrls: new Set<string>(),
 };
 
 /**

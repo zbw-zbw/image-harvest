@@ -9,7 +9,7 @@ export function getMimeType(format: string): string {
     jpg: 'image/jpeg',
     jpeg: 'image/jpeg',
     png: 'image/png',
-    webp: 'image/webp'
+    webp: 'image/webp',
   };
   return mimeTypes[format.toLowerCase()] || 'image/png';
 }
@@ -63,7 +63,7 @@ export function convertImageFormat(
             resolve({
               dataUrl,
               blob,
-              format: targetFormat.toLowerCase()
+              format: targetFormat.toLowerCase(),
             });
           },
           mimeType,
@@ -122,7 +122,7 @@ export function convertBlobFormat(
             resolve({
               dataUrl,
               blob: newBlob,
-              format: targetFormat.toLowerCase()
+              format: targetFormat.toLowerCase(),
             });
           },
           mimeType,

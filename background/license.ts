@@ -9,7 +9,7 @@ export function initLicenseAlarm(): void {
   chrome.alarms.get(LICENSE_ALARM_NAME, (alarm) => {
     if (!alarm) {
       chrome.alarms.create(LICENSE_ALARM_NAME, {
-        periodInMinutes: LICENSE_CHECK_INTERVAL / 60000
+        periodInMinutes: LICENSE_CHECK_INTERVAL / 60000,
       });
     }
   });
@@ -25,7 +25,7 @@ export function initLicenseAlarm(): void {
       type: MESSAGE_TYPES.LICENSE_STATUS_CHANGED,
       isPro: result.isPro,
       plan: 'plan' in result ? result.plan : undefined,
-      status: 'status' in result ? result.status : undefined
+      status: 'status' in result ? result.status : undefined,
     });
   });
 }

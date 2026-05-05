@@ -26,14 +26,14 @@ export async function fetchImageMeta(url: string): Promise<ImageMeta> {
       method: 'HEAD',
       mode: 'cors',
       credentials: 'omit',
-      signal: controller.signal
+      signal: controller.signal,
     });
     clearTimeout(timeoutId);
     const contentLength = response.headers.get('content-length');
     const contentType = response.headers.get('content-type') || '';
     return {
       size: contentLength ? parseInt(contentLength, 10) : null,
-      contentType
+      contentType,
     };
   } catch {
     // HEAD request failed or timed out, skip
@@ -85,7 +85,7 @@ export function truncateUrl(url: string, maxLen: number): string {
 export function generateId(str: string): string {
   let hash = 0;
   for (let i = 0; i < str.length; i++) {
-    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash = (hash << 5) - hash + str.charCodeAt(i);
     hash = hash & hash;
   }
   return 'img_' + Math.abs(hash).toString(36) + '_' + Date.now().toString(36);
@@ -100,7 +100,7 @@ export function generateFilename(
   // Free tier: force default naming template
   const defaultTemplate = 'img_{index}_{original}.{format}';
   const template = state.isProUser
-    ? ((state.appSettings.filenameTemplate as string | undefined) || defaultTemplate)
+    ? (state.appSettings.filenameTemplate as string | undefined) || defaultTemplate
     : defaultTemplate;
   const originalName = getFilenameFromUrl(img.url || '');
   const ext = format || img.format || getExtFromUrl(img.url || '') || 'png';
@@ -120,7 +120,7 @@ export function generateFilename(
       height: String(h),
       format: ext,
       date: new Date().toISOString().slice(0, 10),
-      timestamp: String(Date.now())
+      timestamp: String(Date.now()),
     });
   }
 
@@ -142,7 +142,12 @@ export function getFilenameFromUrl(url: string): string {
     const pathname = new URL(url).pathname;
     const parts = pathname.split('/');
     const last = parts[parts.length - 1] || 'image';
-    return last.replace(/\.[^.]+$/, '').replace(/[^a-zA-Z0-9_-]/g, '_').substring(0, 50) || 'image';
+    return (
+      last
+        .replace(/\.[^.]+$/, '')
+        .replace(/[^a-zA-Z0-9_-]/g, '_')
+        .substring(0, 50) || 'image'
+    );
   } catch {
     return 'image';
   }
@@ -198,10 +203,16 @@ export async function loadSettings(): Promise<void> {
   try {
     const result = await chrome.storage.local.get(['appSettings', 'filterConfig']);
     if (result.appSettings) {
-      state.appSettings = { ...state.appSettings, ...(result.appSettings as Record<string, unknown>) };
+      state.appSettings = {
+        ...state.appSettings,
+        ...(result.appSettings as Record<string, unknown>),
+      };
     }
     if (result.filterConfig) {
-      state.filterConfig = { ...DEFAULT_FILTER_CONFIG, ...(result.filterConfig as Record<string, unknown>) } as FilterConfig;
+      state.filterConfig = {
+        ...DEFAULT_FILTER_CONFIG,
+        ...(result.filterConfig as Record<string, unknown>),
+      } as FilterConfig;
     } else {
       state.filterConfig = { ...DEFAULT_FILTER_CONFIG } as FilterConfig;
     }

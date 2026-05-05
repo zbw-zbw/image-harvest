@@ -9,7 +9,7 @@ html {
 
 /* CSS Variables - Light Theme */
 :root {
-  --primary-color: #60B557;
+  --primary-color: #60b557;
   --primary-hover: #4a9a42;
   --secondary-color: #6b7280;
   --success-color: #10b981;
@@ -22,29 +22,29 @@ html {
   --text-secondary: #6b7280;
   --text-tertiary: #9ca3af;
   --border-color: #d1d5db;
-  --shadow-sm: 0 1px 2px rgba(0,0,0,0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.1);
-  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.1);
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 8px;
   --card-bg: #ffffff;
   --card-border: #e5e7eb;
-  --card-hover-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  --card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   --selected-bg: #f0f9ef;
-  --selected-border: #60B557;
+  --selected-border: #60b557;
   --checkerboard-color: #f0f0f0;
-  --card-action-bg: rgba(255,255,255,0.85);
+  --card-action-bg: rgba(255, 255, 255, 0.85);
   --card-action-bg-hover: #ffffff;
   --tag-format-bg: #4a9a42;
   --tag-info-bg: #4b5563;
-  --pro-badge-bg: linear-gradient(135deg, #60B557, #3d8b35);
+  --pro-badge-bg: linear-gradient(135deg, #60b557, #3d8b35);
 }
 
 /* Dark Theme - Manual override via data-theme attribute */
-:root[data-theme="dark"] {
+:root[data-theme='dark'] {
   --primary-color: #7cc975;
-  --primary-hover: #60B557;
+  --primary-hover: #60b557;
   --secondary-color: #9ca3af;
   --success-color: #34d399;
   --warning-color: #fbbf24;
@@ -60,18 +60,18 @@ html {
   --card-border: #3a3a3a;
   --selected-bg: #2a3a2a;
   --checkerboard-color: #2a2a2a;
-  --card-action-bg: rgba(40,40,40,0.85);
+  --card-action-bg: rgba(40, 40, 40, 0.85);
   --card-action-bg-hover: #444444;
   --tag-format-bg: #6bc963;
   --tag-info-bg: #6b7280;
-  --pro-badge-bg: linear-gradient(135deg, #7cc975, #60B557);
+  --pro-badge-bg: linear-gradient(135deg, #7cc975, #60b557);
 }
 
 /* Dark Theme - System preference auto-detection (only when no manual override) */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
     --primary-color: #7cc975;
-    --primary-hover: #60B557;
+    --primary-hover: #60b557;
     --secondary-color: #9ca3af;
     --success-color: #34d399;
     --warning-color: #fbbf24;
@@ -87,11 +87,11 @@ html {
     --card-border: #3a3a3a;
     --selected-bg: #2a3a2a;
     --checkerboard-color: #2a2a2a;
-    --card-action-bg: rgba(40,40,40,0.85);
+    --card-action-bg: rgba(40, 40, 40, 0.85);
     --card-action-bg-hover: #444444;
     --tag-format-bg: #6bc963;
     --tag-info-bg: #6b7280;
-    --pro-badge-bg: linear-gradient(135deg, #7cc975, #60B557);
+    --pro-badge-bg: linear-gradient(135deg, #7cc975, #60b557);
   }
 }
 
@@ -108,7 +108,8 @@ html {
 }
 
 body {
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family:
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
   font-size: 13px;
   width: 100%;
   height: 100vh;
