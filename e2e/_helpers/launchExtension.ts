@@ -138,6 +138,14 @@ export interface OpenSidepanelOptions {
    * unset (default false).
    */
   enablePro?: boolean;
+  /**
+   * If true, replaces chrome.tabs.create with a stub that records each
+   * call into `window.__IH_TABS_CREATE_CALLS__` instead of actually
+   * opening a tab (which would steal focus + break the fixture's role
+   * as the "active tab" and cascade into flaky chrome.tabs.query
+   * results in subsequent assertions). Use `readTabsCreateCalls`.
+   */
+  stubTabs?: boolean;
 }
 
 /** Shape of a recorded chrome.downloads.download call. */
@@ -152,6 +160,21 @@ export async function readDownloadCalls(sidepanel: Page): Promise<RecordedDownlo
   return sidepanel.evaluate(() => {
     const w = window as unknown as { __IH_DOWNLOAD_CALLS__?: RecordedDownloadCall[] };
     return w.__IH_DOWNLOAD_CALLS__ ?? [];
+  });
+}
+
+/** Shape of a recorded chrome.tabs.create call. */
+export interface RecordedTabsCreateCall {
+  url?: string;
+  active?: boolean;
+  index?: number;
+}
+
+/** Read recorded chrome.tabs.create calls from a sidepanel launched with stubTabs:true. */
+export async function readTabsCreateCalls(sidepanel: Page): Promise<RecordedTabsCreateCall[]> {
+  return sidepanel.evaluate(() => {
+    const w = window as unknown as { __IH_TABS_CREATE_CALLS__?: RecordedTabsCreateCall[] };
+    return w.__IH_TABS_CREATE_CALLS__ ?? [];
   });
 }
 
@@ -178,53 +201,97 @@ export async function openSidepanelWithImages(
   // window.__IH_E2E__ inside its top-level guard and only then attaches
   // the window.__IH__ accessors that drive deterministic test scenarios.
   const stubDownloads = options.stubDownloads ?? false;
-  await sidepanel.addInitScript((stub: boolean) => {
-    (window as unknown as { __IH_E2E__?: boolean }).__IH_E2E__ = true;
+  const stubTabs = options.stubTabs ?? false;
+  await sidepanel.addInitScript(
+    ({ stub, tabs }: { stub: boolean; tabs: boolean }) => {
+      (window as unknown as { __IH_E2E__?: boolean }).__IH_E2E__ = true;
 
-    if (stub) {
-      // Wrap chrome.downloads.download so test cases can assert that the
-      // app tried to download something without polluting the user's
-      // Downloads folder with synthetic blob URLs. Init scripts run at
-      // document_start; chrome APIs are already defined on extension
-      // pages at that point, but we guard with a tiny retry loop in case
-      // the install order differs across Chromium versions.
-      const calls: RecordedDownloadCall[] = [];
-      (
-        window as unknown as { __IH_DOWNLOAD_CALLS__: RecordedDownloadCall[] }
-      ).__IH_DOWNLOAD_CALLS__ = calls;
-      const install = (): boolean => {
-        const c = (
-          window as unknown as {
-            chrome?: { downloads?: { download?: (...args: unknown[]) => unknown } };
-          }
-        ).chrome;
-        if (!c?.downloads) return false;
-        c.downloads.download = (
-          opts: RecordedDownloadCall,
-          cb?: (id: number) => void
-        ): Promise<number> => {
-          calls.push(opts);
-          if (cb) cb(0);
-          return Promise.resolve(0);
+      if (tabs) {
+        // Wrap chrome.tabs.create so test cases can assert that the app
+        // tried to open a new tab without actually opening one (which
+        // would steal focus from the fixture and cascade into flaky
+        // chrome.tabs.query results in subsequent assertions).
+        interface RecordedTabsCreateCall {
+          url?: string;
+          active?: boolean;
+          index?: number;
+        }
+        const tabCalls: RecordedTabsCreateCall[] = [];
+        (
+          window as unknown as { __IH_TABS_CREATE_CALLS__: RecordedTabsCreateCall[] }
+        ).__IH_TABS_CREATE_CALLS__ = tabCalls;
+        const installTabs = (): boolean => {
+          const c = (
+            window as unknown as {
+              chrome?: { tabs?: { create?: (...args: unknown[]) => unknown } };
+            }
+          ).chrome;
+          if (!c?.tabs) return false;
+          c.tabs.create = (
+            opts: RecordedTabsCreateCall,
+            cb?: (tab: { id: number }) => void
+          ): Promise<{ id: number }> => {
+            tabCalls.push(opts);
+            const fakeTab = { id: 0 };
+            if (cb) cb(fakeTab);
+            return Promise.resolve(fakeTab);
+          };
+          return true;
         };
-        return true;
-      };
-      if (!install()) {
-        const t = setInterval(() => {
-          if (install()) clearInterval(t);
-        }, 10);
-        // Give up quietly after 2s — the test will fail later when the
-        // assertion runs, with a clearer message than "interval forever".
-        setTimeout(() => clearInterval(t), 2000);
+        if (!installTabs()) {
+          const t = setInterval(() => {
+            if (installTabs()) clearInterval(t);
+          }, 10);
+          setTimeout(() => clearInterval(t), 2000);
+        }
       }
-    }
 
-    interface RecordedDownloadCall {
-      url: string;
-      filename?: string;
-      saveAs?: boolean;
-    }
-  }, stubDownloads);
+      if (stub) {
+        // Wrap chrome.downloads.download so test cases can assert that the
+        // app tried to download something without polluting the user's
+        // Downloads folder with synthetic blob URLs. Init scripts run at
+        // document_start; chrome APIs are already defined on extension
+        // pages at that point, but we guard with a tiny retry loop in case
+        // the install order differs across Chromium versions.
+        const calls: RecordedDownloadCall[] = [];
+        (
+          window as unknown as { __IH_DOWNLOAD_CALLS__: RecordedDownloadCall[] }
+        ).__IH_DOWNLOAD_CALLS__ = calls;
+        const install = (): boolean => {
+          const c = (
+            window as unknown as {
+              chrome?: { downloads?: { download?: (...args: unknown[]) => unknown } };
+            }
+          ).chrome;
+          if (!c?.downloads) return false;
+          c.downloads.download = (
+            opts: RecordedDownloadCall,
+            cb?: (id: number) => void
+          ): Promise<number> => {
+            calls.push(opts);
+            if (cb) cb(0);
+            return Promise.resolve(0);
+          };
+          return true;
+        };
+        if (!install()) {
+          const t = setInterval(() => {
+            if (install()) clearInterval(t);
+          }, 10);
+          // Give up quietly after 2s — the test will fail later when the
+          // assertion runs, with a clearer message than "interval forever".
+          setTimeout(() => clearInterval(t), 2000);
+        }
+      }
+
+      interface RecordedDownloadCall {
+        url: string;
+        filename?: string;
+        saveAs?: boolean;
+      }
+    },
+    { stub: stubDownloads, tabs: stubTabs }
+  );
   await sidepanel.goto(extensionUrl(extensionId, 'pages/sidepanel.html'));
 
   // Re-focus fixture so chrome.tabs.query({active:true, currentWindow:true})
