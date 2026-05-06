@@ -397,7 +397,9 @@
   border: 1px solid color-mix(in srgb, var(--primary-color) 25%, var(--border-color));
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 10px;
+  width: fit-content;
 }
 
 .pro-upgrade-trial-badge {

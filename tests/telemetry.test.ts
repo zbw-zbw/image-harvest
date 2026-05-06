@@ -192,7 +192,7 @@ describe('batch + throttle', () => {
   //   queue, so all `await`s in `track()` resolve normally. The explicit
   //   drainMicrotasks() below is a belt-and-suspenders guarantee that
   //   scheduleFlush() has already armed the timer before we advance it.
-  async function drainMicrotasks(rounds = 3): Promise<void> {
+  async function drainMicrotasks(rounds = 10): Promise<void> {
     for (let i = 0; i < rounds; i++) {
       await Promise.resolve();
     }

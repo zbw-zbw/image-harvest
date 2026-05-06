@@ -161,6 +161,10 @@ HTML document — it omits the surrounding
             </span>
             <span class="select-all-text">Select all</span>
           </button>
+          <!-- Sprint 3.4 batch URL copy mount. Sits right of "Select all"
+               so the two selection-driven CTAs share visual grouping.
+               The Preact component owns the disabled state and label. -->
+          <span id="batch-url-copy-mount" data-preact-mount="batch-url-copy-mount"></span>
           <div class="filter-buttons filter-actions-right">
             <button class="filter-btn" data-filter="sort" title="Sort">
               <svg
