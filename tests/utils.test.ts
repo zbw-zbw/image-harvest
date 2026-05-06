@@ -82,6 +82,61 @@ describe('getFileFormat', () => {
     expect(getFileFormat('data:image/png;base64,abc')).toBe('png');
     expect(getFileFormat('data:image/svg+xml;utf8,<svg/>')).toBe('svg');
   });
+
+  // ── MIME map coverage: heic / heif / apng ──
+  // Pin: the uncommon content-type branches (shared/utils L103-105).
+  // heic/heif are Apple's modern photo format — any regression that drops
+  // them would silently mis-label every iOS photo as "unknown" and break
+  // the filename template engine's {format} placeholder downstream.
+  it('maps image/heic content-type to "heic"', () => {
+    expect(getFileFormat('https://example.com/photo.bin', 'image/heic')).toBe('heic');
+  });
+
+  it('maps image/heif content-type to "heic" (HEIF shares the heic extension)', () => {
+    // Pin: heif → 'heic' aliasing. The file extension is .heic even for
+    // HEIF-encoded files per Apple's convention; collapsing both to 'heic'
+    // keeps the downstream filename pipeline simple.
+    expect(getFileFormat('https://example.com/photo.bin', 'image/heif')).toBe('heic');
+  });
+
+  it('maps image/apng content-type to "png" (APNG shares the png extension)', () => {
+    // Pin: apng → 'png' aliasing — animated PNGs use the .png extension.
+    // Without this the filename pipeline would emit a nonexistent .apng
+    // file extension that most viewers don't register.
+    expect(getFileFormat('https://example.com/anim.bin', 'image/apng')).toBe('png');
+  });
+
+  // ── MIME map fall-through (shared/utils L92) ──
+  // Every existing content-type test hits the map and early-returns,
+  // so the "map exhausted, no match" exit path (for-loop normal exit +
+  // fall-through to URL-pattern extraction) was never covered.
+  it('unknown content-type → falls through MIME map to URL-extension extraction', () => {
+    // Pin: an unrecognized content-type (e.g. generic octet-stream) must
+    // NOT cause a crash or a wrong mapping — the code should fall through
+    // to the URL extension heuristic. If a refactor breaks the for-loop
+    // exit (e.g. by moving `return 'unknown'` inside the if-contentType
+    // block), this case would flip from 'png' → 'unknown'.
+    expect(getFileFormat('https://example.com/photo.png', 'application/octet-stream')).toBe('png');
+  });
+
+  // ── URL parse failure catch-branch (shared/utils L103-105) ──
+  // A bare relative path (no scheme) makes `new URL(url)` throw. The
+  // catch branch then falls back to a loose regex match on the raw string.
+  it('invalid URL with extension → catch branch returns the extension via loose regex', () => {
+    // Pin: `foo/bar.png` is not a valid absolute URL (new URL() throws).
+    // The catch block's fallback regex still extracts `.png`. Without
+    // this branch, any content-script callsite that receives a
+    // relative-path `src` (common on legacy sites) would silently get
+    // back "unknown" and downstream filtering by format would drop it.
+    expect(getFileFormat('foo/bar.png')).toBe('png');
+  });
+
+  it('invalid URL WITHOUT any extension → catch branch yields "unknown"', () => {
+    // Pin the negative half of the same catch: if neither the URL parser
+    // nor the loose regex finds an extension, the function must still
+    // return 'unknown' rather than crashing or returning undefined.
+    expect(getFileFormat('not-a-url-at-all')).toBe('unknown');
+  });
 });
 
 describe('getDomain', () => {
@@ -187,6 +242,31 @@ describe('getAspectRatio', () => {
     expect(getAspectRatio(200, 100)).toBe('landscape');
     expect(getAspectRatio(100, 200)).toBe('portrait');
     expect(getAspectRatio(1000, 100)).toBe('panorama');
+  });
+
+  // ── Threshold pinning (shared/utils L216-217) ──
+  // The 0.4 / 0.9 / 1.1 / 2.5 breakpoints are a product decision — any
+  // refactor that nudges them would quietly re-bucket every filtered
+  // image. Pin exact boundary behavior so regressions surface immediately.
+  it('portrait upper-bound: ratio=0.899 is "portrait", ratio=0.9 is "square"', () => {
+    // Pin the 0.9 strict-less-than / inclusive-greater-than boundary.
+    expect(getAspectRatio(899, 1000)).toBe('portrait');
+    expect(getAspectRatio(900, 1000)).toBe('square');
+  });
+
+  it('portrait lower-bound: ratio=0.4 is "portrait", ratio=0.399 is null', () => {
+    // Pin: ratio < 0.4 falls through all branches and returns null
+    // (very-tall-skinny sliver images aren't a meaningful aspect bucket).
+    expect(getAspectRatio(400, 1000)).toBe('portrait');
+    expect(getAspectRatio(399, 1000)).toBeNull();
+  });
+
+  it('panorama lower-bound: ratio=2.5 is "landscape", ratio=2.501 is "panorama"', () => {
+    // Pin: ratio > 2.5 (strict), ratio <= 2.5 stays "landscape". A
+    // regression flipping to >= 2.5 would silently re-label every
+    // 2.5:1 cinematic crop as "panorama".
+    expect(getAspectRatio(2500, 1000)).toBe('landscape');
+    expect(getAspectRatio(2501, 1000)).toBe('panorama');
   });
 
   it('returns null for invalid dimensions', () => {
