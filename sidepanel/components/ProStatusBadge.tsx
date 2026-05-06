@@ -107,8 +107,10 @@ export function ProStatusBadge() {
             {expiryLabel}
           </span>
         )}
-        <button id="btn-top-deactivate" class="btn-top-deactivate" title="Deactivate license">
-          Deactivate
+        <button id="btn-top-deactivate" class="btn-deactivate-inline" title="Deactivate license" aria-label="Deactivate license">
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
         </button>
       </div>
     </div>

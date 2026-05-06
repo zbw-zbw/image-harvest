@@ -94,6 +94,11 @@ export function renderImages(): void {
   const gridWrapper = document.querySelector('.image-grid-wrapper');
   if (gridWrapper) gridWrapper.classList.remove('hidden');
 
+  // Reset uiScreen so Preact's <StateScreens> hides any visible
+  // empty/error/restricted screen — prevents the "images + empty state
+  // both visible" bug that occurs after a tab switch restores cached images.
+  state.uiScreen = 'images';
+
   elements.imageGrid.classList.remove('hidden');
 
   // Always scroll to top on re-render so the user sees images from the beginning

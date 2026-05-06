@@ -36,6 +36,7 @@ import { getProUpsellBucket, type AbBucket } from '../../shared/ab-experiment';
 import { getState as getPaywallState, markResolved } from '../../shared/paywall-state';
 import { PRICING_PAGE_URL, MESSAGE_TYPES } from '../../shared/constants';
 import { showToast } from '../ui';
+import { applyProFeatureVisibility } from '../settings';
 
 function close(): void {
   // Clear errorText on close so the next open starts clean.
@@ -74,14 +75,12 @@ function variantSubline(bucket: AbBucket): string {
 // (so funnel data starts accruing immediately) and surfaces a friendly
 // "coming soon" toast. As soon as the trial module ships, the body of
 // `handleStartTrial` swaps to the real call without touching call sites.
-async function handleStartTrial(setError: (msg: string) => void): Promise<void> {
-  // Telemetry FIRST so the funnel sees the click even if the call below
-  // throws. abBucket auto-injects from envelopeMeta — we don't need to
-  // pass it here (the sanitizer reads it from telemetry.ts).
+async function handleStartTrial(
+  setError: (msg: string) => void,
+  setLoading: (loading: boolean) => void,
+): Promise<void> {
   void track(EVENTS.PRO_UPSELL_CTA_CLICKED, { trigger: 'modal', cta: 'trial' });
 
-  // Lazy-load to avoid pulling shared/trial.ts (and its background-message
-  // surface) into the modal's import graph for non-trial-clickers.
   let startTrial: typeof import('../../shared/trial').startTrial;
   try {
     ({ startTrial } = await import('../../shared/trial'));
@@ -91,25 +90,28 @@ async function handleStartTrial(setError: (msg: string) => void): Promise<void> 
   }
 
   setError('');
-  const result = await startTrial();
-  if (!result.success) {
-    setError(result.error || 'Could not start your trial. Please try again.');
-    return;
-  }
-  // Success path: telemetry, mark soft paywall resolved, broadcast
-  // license refresh so badges + Pro guards re-evaluate immediately.
-  void track(EVENTS.TRIAL_STARTED);
-  void flushNow();
-  await markResolved();
-  showToast('Your 7-day Pro trial is active!', 'success');
-  // Ask background to re-validate so state.isProUser flips and the
-  // Pro feature visibility refreshes without a panel reload.
+  setLoading(true);
+
   try {
-    await chrome.runtime.sendMessage({ type: MESSAGE_TYPES.VALIDATE_LICENSE });
-  } catch {
-    /* best-effort — settings reopen will re-sync regardless */
+    const result = await startTrial();
+    if (!result.success) {
+      setError(result.error || 'Could not start your trial. Please try again.');
+      return;
+    }
+    void track(EVENTS.TRIAL_STARTED);
+    void flushNow();
+    await markResolved();
+    showToast('Your 7-day Pro trial is active!', 'success');
+    try {
+      await chrome.runtime.sendMessage({ type: MESSAGE_TYPES.VALIDATE_LICENSE });
+    } catch {
+      /* best-effort — settings reopen will re-sync regardless */
+    }
+    applyProFeatureVisibility();
+    state.proUpgradeModalState = { open: false, errorText: '' };
+  } finally {
+    setLoading(false);
   }
-  state.proUpgradeModalState = { open: false, errorText: '' };
 }
 
 function handlePricingClick(e: MouseEvent): void {
@@ -133,6 +135,7 @@ export function ProUpgradeModal() {
   const [bucket, setBucket] = useState<AbBucket>('a');
   const [downloadCount, setDownloadCount] = useState(0);
   const [trialError, setTrialError] = useState('');
+  const [trialLoading, setTrialLoading] = useState(false);
 
   // Resolve A/B bucket + paywall download count once on mount. Both are
   // cheap (cache-hit after first call) and feed the variant copy. We
@@ -236,11 +239,12 @@ export function ProUpgradeModal() {
                 id="btn-pro-modal-trial"
                 type="button"
                 class="btn btn-primary btn-block"
+                disabled={trialLoading}
                 onClick={() => {
-                  void handleStartTrial(setTrialError);
+                  void handleStartTrial(setTrialError, setTrialLoading);
                 }}
               >
-                Start Free Trial
+                {trialLoading ? 'Starting…' : 'Start Free Trial'}
               </button>
               <button
                 id="btn-pro-modal-pricing"
