@@ -7,6 +7,33 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ---
 
+## [Unreleased]
+
+### 🧪 Test Coverage Expansion
+
+No production code changed in this entry — purely additive test hardening.
+
+#### Added — Unit Tests (Vitest)
+
+Final coverage push closes the last high-ROI gaps in the unit test suite. Total now stands at **35 test files / 847 cases** (all green) + tsc + eslint clean.
+
+- `tests/sidepanel-init.test.tsx` (**NEW**, 11 cases) — the 1115-line `sidepanel/init.ts` IIFE has zero exports, so every function is private. Strategy: mock 14 sidepanel/\* + shared/\* dependencies, then drive the module via dynamic import + `DOMContentLoaded` dispatch and assert mock call orchestration. Pins: init() chain order (mountPreact → loadSettings → applyTheme/Density → bindEvents → applyProFeatureVisibility → initResizeObserver → showLoading → port connect), `chrome.runtime.connect({ name: 'image-snatcher-ui' })` long-lived port contract, `handleMessage` wired as the broadcast handler, `isPopupMode` detection (sidepanel.html ↔ popup.html decides whether tab listeners register), `__IH_E2E__` test hook production-safety guard + the 5 hook exposures (`store` / `applyFilters` / `loadMultitab` / `applyTheme` / `handleMessage`), `beforeunload` highlight cleanup + `SIDE_PANEL_CLOSED` notify-on-close (sidepanel mode only).
+- `tests/pages-popup.test.tsx` (**NEW**, 15 cases) — pins the 111-line popup-mode bootstrap. `setupPopupMode` IIFE (popup-mode class on html+body / popup.css link injection / sidepanel.html early-return guard / `{once: true}` DOMContentLoaded body fallback). `DOMContentLoaded` listener (MutationObserver with pinned `{childList, subtree, attributes, attributeFilter: ['class','style']}` options / missing-#app early return / 3 setTimeout fallbacks at exact 200/600/1500 ms / window resize listener). `adjustImageGridHeight` driven via captured MutationObserver callback (style writes on visible grid / skip when `grid.hidden` / arithmetic verification with explicit `offsetHeight` stubs / 4-class skip predicates `.hidden` / `.modal` / `.toast-container` / `position: fixed|absolute` via stubbed `getComputedStyle` / `clientHeight=0` → 600-px default popup height fallback). jsdom CSS-shorthand serialization quirks worked around: `flex:none → '0 0 auto'`, `'0' → '0px'`.
+- `tests/sidepanel-settings.test.tsx` (**+5 cases**) — `toggleFilterDropdown` simplified paths (non-existent dropdown id → no-op / hidden→visible open path / visible→hidden close path / mutual exclusion — opening one closes others / `color` filter type → `renderColorSwatches` dynamic prep). Layout-positioning branches (`wouldOverflowRight` / `wouldOverflowLeft`) are deliberately deferred to e2e — jsdom does not compute `getBoundingClientRect()` or `offsetWidth`.
+
+#### Changed — Documentation
+
+- `CONTRIBUTING.md` — replaced the 3-line "Tests" paragraph with a complete two-layer testing guide: Vitest/Playwright scope matrix, current coverage stats, mocking conventions (`installChromeMock()` helper, `fake-indexeddb`, `vi.mock()` patterns), documented jsdom limits (no layout computation, CSS shorthand normalization), Playwright deterministic-state pattern (`window.__IH_E2E__` + `window.__IH__.store`), smoke-tier vs full-suite guidance.
+
+#### Verified
+
+- `npm run typecheck` ✅
+- `npm run lint` ✅
+- `npm test` → 35 files / 847 cases ✅
+- `npx playwright test e2e/smoke.e2e.ts` → 3/3 ✅ (5s)
+
+---
+
 ## [1.0.1][1.0.1] - 2026-04-29
 
 ### 🎨 Polish & Discoverability Update

@@ -186,11 +186,37 @@ There is **no longer a `.js` / `.mjs` dual-build dance** or a `sync-shared` scri
 
 ### Tests
 
-Pure helpers under `shared/*.ts` are unit-tested with Vitest. When you add or change a pure function:
+Image Harvest ships with **two layers of automated tests**:
 
-- Add a matching test in `tests/<module>.test.ts`
-- Run `npm test` to make sure everything still passes
-- Canvas / Image / `chrome.*` / IndexedDB-dependent code is intentionally not unit-tested (it would require heavy mocking with little benefit); test those manually in the browser.
+| Layer | Runner          | Env                                | Scope                                                                                | Command            |
+| ----- | --------------- | ---------------------------------- | ------------------------------------------------------------------------------------ | ------------------ |
+| Unit  | Vitest 2        | node + jsdom                       | `shared/*`, `background/*`, `content/*`, `sidepanel/*`, `pages/*`, Preact components | `npm test`         |
+| E2E   | Playwright 1.59 | headed Chromium + unpacked `dist/` | User-facing flows (scan → filter → download, Pro gates, etc.)                        | `npm run test:e2e` |
+
+**Current coverage**: 35 unit test files / 847 cases + 38 e2e specs, all green.
+
+#### Unit tests (Vitest)
+
+- File naming: `tests/<module>.test.ts` for node-environment specs, `tests/<module>.test.tsx` for anything that renders Preact or touches the DOM (jsdom env).
+- **What to test**: pure functions, reactive store mutations, render-side effects you can verify via the a11y tree, module-level IIFE boot orchestration.
+- **What to stub**:
+  - `chrome.*` APIs — each test that needs Chrome mocks re-installs via a local `installChromeMock()` helper; see `tests/sidepanel-settings.test.tsx` for the canonical shape.
+  - `indexedDB` — use `fake-indexeddb` (already a devDependency).
+  - Heavy sibling modules — use `vi.mock('../sidepanel/xxx', () => ({ ... }))` at the top of the file to isolate the unit under test; see `tests/sidepanel-init.test.tsx` for the 14-module mock pattern used to isolate the 1115-line IIFE entry point.
+- **jsdom limits (do NOT try to test around these)**:
+  - Layout is not computed — `offsetWidth`, `offsetHeight`, `getBoundingClientRect()` all return `0` unless you `Object.defineProperty` them manually. Branches that depend on real layout (e.g. dropdown overflow repositioning in `toggleFilterDropdown`) are **deferred to e2e**.
+  - CSS shorthand is serialized — `element.style.flex = 'none'` round-trips as `'0 0 auto'`, `'0'` as `'0px'`. Assert semantic intent (`toMatch(/...)` / `not.toBe('')`) instead of exact strings.
+- Run `npm test` before opening a PR. Use `npm run test:watch` while iterating.
+- Coverage report: `npm run test:coverage` → `coverage/index.html`.
+
+#### E2E tests (Playwright)
+
+- Specs live under `e2e/*.e2e.ts`; helpers under `e2e/_helpers/`.
+- The extension is loaded via `launchPersistentContext` against `dist/` (**you must `npm run build` first** — e2e does not rebuild automatically).
+- Headed Chromium + `workers: 1` (MV3 service workers don't boot reliably headless; parallel headed windows fight for the macOS display socket). CI uses `xvfb-run`.
+- **Deterministic state pattern**: tests flip `window.__IH_E2E__ = true` via Playwright's `addInitScript`, which causes `sidepanel/init.ts` to expose `window.__IH__ = { store, applyFilters, loadMultitab, applyTheme, handleMessage }`. Prefer `__IH__.store.set(...)` over clicking through 4-deep dropdown menus.
+- Smoke-only tier: `npx playwright test e2e/smoke.e2e.ts` (~5s, 3 cases) — run this before every commit; full suite before every release.
+- When you land a UI change, add or extend a matching e2e spec; don't just rely on unit coverage for click-wiring.
 
 ### CSS
 
