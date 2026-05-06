@@ -124,7 +124,7 @@ export function removeImageById(imageId: string): void {
   }
   applyFilters();
   detectSimilarImages();
-  showToast(t('toast.image_removed'), 'success');
+  showToast(t('toast_image_removed'), 'success');
 }
 
 // ============================================
@@ -146,7 +146,7 @@ export async function addToCollection(img: ImageItem): Promise<void> {
       // proceed; collectionAdd is idempotent on { id }.
       const alreadyIn = existing.some((c: CollectionItem) => c.id === img.id);
       if (!alreadyIn && existing.length >= FREE_LIMITS.MAX_COLLECTION_ITEMS) {
-        showToast(t('pro.collection_limit', { max: FREE_LIMITS.MAX_COLLECTION_ITEMS }), 'warning');
+        showToast(t('pro_collection_limit', { max: FREE_LIMITS.MAX_COLLECTION_ITEMS }), 'warning');
         showProUpgradeModal();
         return;
       }
@@ -181,9 +181,9 @@ export async function addToCollection(img: ImageItem): Promise<void> {
       notes: '',
       createdAt: Date.now(),
     } as CollectionItem);
-    showToast(t('toast.collection.added'), 'success');
+    showToast(t('toast_collection_added'), 'success');
   } catch {
-    showToast(t('toast.collection.add_failed'), 'error');
+    showToast(t('toast_collection_add_failed'), 'error');
   }
 }
 
@@ -199,9 +199,9 @@ export async function isImageInCollection(imgUrl: string): Promise<boolean> {
 export async function removeFromCollection(imgId: string): Promise<void> {
   try {
     await collectionRemove(imgId);
-    showToast(t('toast.collection.removed'), 'success');
+    showToast(t('toast_collection_removed'), 'success');
   } catch {
-    showToast(t('toast.collection.remove_failed'), 'error');
+    showToast(t('toast_collection_remove_failed'), 'error');
   }
 }
 
@@ -245,9 +245,9 @@ export function renderTransparentBar(): string {
 export async function copyColor(hex: string): Promise<void> {
   try {
     await navigator.clipboard.writeText(hex);
-    showToast(t('toast.color_copied', { hex }), 'success');
+    showToast(t('toast_color_copied', { hex }), 'success');
   } catch {
-    showToast(t('toast.color_copy_failed'), 'error');
+    showToast(t('toast_color_copy_failed'), 'error');
   }
 }
 

@@ -23,6 +23,7 @@ export default defineManifest({
   version: pkg.version,
   description:
     'Batch download images. Multi-tab extract, similar detection, reverse image search, batch highlight, collections, color extract.',
+  default_locale: 'en',
 
   permissions: [
     'activeTab',

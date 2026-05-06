@@ -64,10 +64,10 @@ export function BatchUrlCopyButton() {
   // BEFORE clicking that they're about to copy what they expect.
   const label =
     selectedSize > 0
-      ? t('toolbar.copy_urls') + ` (${selectedSize})`
-      : t('toolbar.copy_urls');
+      ? t('toolbar_copy_urls') + ` (${selectedSize})`
+      : t('toolbar_copy_urls');
 
-  const title = disabled ? t('toolbar.copy_urls.empty') : t('toolbar.copy_urls.tooltip');
+  const title = disabled ? t('toolbar_copy_urls_empty') : t('toolbar_copy_urls_tooltip');
 
   function handleClick(): void {
     if (disabled) return;

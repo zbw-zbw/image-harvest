@@ -1,92 +1,92 @@
 {
-  "app.name": {
+  "app_name": {
     "message": "Image Harvest",
     "description": "Extension display name"
   },
-  "app.tagline": {
+  "app_tagline": {
     "message": "Download Any Image from Any Webpage",
     "description": "Short tagline shown in headers and chrome store listing"
   },
 
-  "common.cancel": { "message": "Cancel" },
-  "common.confirm": { "message": "Confirm" },
-  "common.close": { "message": "Close" },
-  "common.save": { "message": "Save" },
-  "common.delete": { "message": "Delete" },
-  "common.copy": { "message": "Copy" },
-  "common.download": { "message": "Download" },
-  "common.upgrade": { "message": "Upgrade to Pro" },
-  "common.maybe_later": { "message": "Maybe later" },
+  "common_cancel": { "message": "Cancel" },
+  "common_confirm": { "message": "Confirm" },
+  "common_close": { "message": "Close" },
+  "common_save": { "message": "Save" },
+  "common_delete": { "message": "Delete" },
+  "common_copy": { "message": "Copy" },
+  "common_download": { "message": "Download" },
+  "common_upgrade": { "message": "Upgrade to Pro" },
+  "common_maybe_later": { "message": "Maybe later" },
 
-  "settings.title": { "message": "Settings" },
-  "settings.section.appearance": { "message": "Appearance" },
-  "settings.section.experience": { "message": "Experience" },
-  "settings.section.scan": { "message": "Scan" },
-  "settings.section.download": { "message": "Download" },
-  "settings.section.language": { "message": "Language" },
-  "settings.language.label": { "message": "Display Language" },
-  "settings.language.desc": {
+  "settings_title": { "message": "Settings" },
+  "settings_section_appearance": { "message": "Appearance" },
+  "settings_section_experience": { "message": "Experience" },
+  "settings_section_scan": { "message": "Scan" },
+  "settings_section_download": { "message": "Download" },
+  "settings_section_language": { "message": "Language" },
+  "settings_language_label": { "message": "Display Language" },
+  "settings_language_desc": {
     "message": "Choose the interface language. Restart the panel to apply everywhere."
   },
 
-  "toolbar.select_all": { "message": "Select all" },
-  "toolbar.deselect_all": { "message": "Deselect all" },
-  "toolbar.copy_urls": { "message": "Copy URLs" },
-  "toolbar.copy_urls.tooltip": { "message": "Copy selected image URLs to clipboard" },
-  "toolbar.copy_urls.empty": { "message": "Select images first" },
+  "toolbar_select_all": { "message": "Select all" },
+  "toolbar_deselect_all": { "message": "Deselect all" },
+  "toolbar_copy_urls": { "message": "Copy URLs" },
+  "toolbar_copy_urls_tooltip": { "message": "Copy selected image URLs to clipboard" },
+  "toolbar_copy_urls_empty": { "message": "Select images first" },
 
-  "toast.url_copied.single": { "message": "URL copied!" },
-  "toast.url_copied.batch": {
+  "toast_url_copied_single": { "message": "URL copied!" },
+  "toast_url_copied_batch": {
     "message": "{count} URLs copied to clipboard",
     "description": "{count} = number of URLs copied"
   },
-  "toast.url_copy_failed": { "message": "Failed to copy URL" },
-  "toast.download.started": { "message": "Download started" },
-  "toast.download.failed": { "message": "Download failed" },
-  "toast.download.cancelled": { "message": "Download cancelled" },
-  "toast.download.completed": {
+  "toast_url_copy_failed": { "message": "Failed to copy URL" },
+  "toast_download_started": { "message": "Download started" },
+  "toast_download_failed": { "message": "Download failed" },
+  "toast_download_cancelled": { "message": "Download cancelled" },
+  "toast_download_completed": {
     "message": "Downloaded {count} images",
     "description": "{count} = number of images successfully downloaded"
   },
-  "toast.no_images_selected": { "message": "No images selected" },
-  "toast.image_removed": { "message": "Image removed" },
-  "toast.collection.added": { "message": "Added to collection" },
-  "toast.collection.add_failed": { "message": "Failed to add to collection" },
-  "toast.collection.removed": { "message": "Removed from collection" },
-  "toast.collection.remove_failed": { "message": "Failed to remove" },
-  "toast.color_copied": { "message": "Color {hex} copied" },
-  "toast.color_copy_failed": { "message": "Failed to copy color" },
+  "toast_no_images_selected": { "message": "No images selected" },
+  "toast_image_removed": { "message": "Image removed" },
+  "toast_collection_added": { "message": "Added to collection" },
+  "toast_collection_add_failed": { "message": "Failed to add to collection" },
+  "toast_collection_removed": { "message": "Removed from collection" },
+  "toast_collection_remove_failed": { "message": "Failed to remove" },
+  "toast_color_copied": { "message": "Color {hex} copied" },
+  "toast_color_copy_failed": { "message": "Failed to copy color" },
 
-  "pro.feature_blocked.format_conversion": {
+  "pro_feature_blocked_format_conversion": {
     "message": "Format conversion is a Pro feature. Upgrade to unlock!"
   },
-  "pro.feature_blocked.advanced_grouping": {
+  "pro_feature_blocked_advanced_grouping": {
     "message": "Advanced grouping is a Pro feature. Upgrade to unlock!"
   },
-  "pro.feature_blocked.collection": { "message": "Collection is a Pro feature" },
-  "pro.feature_blocked.image_delete": {
+  "pro_feature_blocked_collection": { "message": "Collection is a Pro feature" },
+  "pro_feature_blocked_image_delete": {
     "message": "Image removal is a Pro feature. Upgrade to unlock!"
   },
-  "pro.feature_blocked.color_copy": { "message": "Color copy is a Pro feature" },
-  "pro.feature_blocked.reverse_search": {
+  "pro_feature_blocked_color_copy": { "message": "Color copy is a Pro feature" },
+  "pro_feature_blocked_reverse_search": {
     "message": "{engine} search requires Pro. Upgrade to unlock!"
   },
-  "pro.zip_limit": {
+  "pro_zip_limit": {
     "message": "Free plan allows up to {max} images per ZIP. Upgrade to Pro for unlimited!"
   },
-  "pro.copy_urls_limit": {
+  "pro_copy_urls_limit": {
     "message": "Free plan allows up to {max} URLs at once. Upgrade to Pro for unlimited!"
   },
-  "pro.collection_limit": {
+  "pro_collection_limit": {
     "message": "Free plan allows up to {max} favorites. Upgrade to Pro for unlimited!"
   },
 
-  "rating.title": { "message": "Enjoying Image Harvest?" },
-  "rating.desc": {
+  "rating_title": { "message": "Enjoying Image Harvest?" },
+  "rating_desc": {
     "message": "If we've saved you some time, a quick 5-star review on the Chrome Web Store would mean the world to us."
   },
-  "rating.rate_now": { "message": "⭐ Rate on Chrome Store" },
-  "rating.later": { "message": "Maybe later" },
-  "rating.never": { "message": "Don't ask again" },
-  "rating.close": { "message": "Close" }
+  "rating_rate_now": { "message": "⭐ Rate on Chrome Store" },
+  "rating_later": { "message": "Maybe later" },
+  "rating_never": { "message": "Don't ask again" },
+  "rating_close": { "message": "Close" }
 }

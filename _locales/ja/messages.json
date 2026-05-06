@@ -1,74 +1,74 @@
 {
-  "app.name": { "message": "Image Harvest" },
-  "app.tagline": { "message": "あらゆるウェブページから画像を一括ダウンロード" },
+  "app_name": { "message": "Image Harvest" },
+  "app_tagline": { "message": "あらゆるウェブページから画像を一括ダウンロード" },
 
-  "common.cancel": { "message": "キャンセル" },
-  "common.confirm": { "message": "確認" },
-  "common.close": { "message": "閉じる" },
-  "common.save": { "message": "保存" },
-  "common.delete": { "message": "削除" },
-  "common.copy": { "message": "コピー" },
-  "common.download": { "message": "ダウンロード" },
-  "common.upgrade": { "message": "Pro にアップグレード" },
-  "common.maybe_later": { "message": "後で" },
+  "common_cancel": { "message": "キャンセル" },
+  "common_confirm": { "message": "確認" },
+  "common_close": { "message": "閉じる" },
+  "common_save": { "message": "保存" },
+  "common_delete": { "message": "削除" },
+  "common_copy": { "message": "コピー" },
+  "common_download": { "message": "ダウンロード" },
+  "common_upgrade": { "message": "Pro にアップグレード" },
+  "common_maybe_later": { "message": "後で" },
 
-  "settings.title": { "message": "設定" },
-  "settings.section.appearance": { "message": "外観" },
-  "settings.section.experience": { "message": "エクスペリエンス" },
-  "settings.section.scan": { "message": "スキャン" },
-  "settings.section.download": { "message": "ダウンロード" },
-  "settings.section.language": { "message": "言語" },
-  "settings.language.label": { "message": "表示言語" },
-  "settings.language.desc": {
+  "settings_title": { "message": "設定" },
+  "settings_section_appearance": { "message": "外観" },
+  "settings_section_experience": { "message": "エクスペリエンス" },
+  "settings_section_scan": { "message": "スキャン" },
+  "settings_section_download": { "message": "ダウンロード" },
+  "settings_section_language": { "message": "言語" },
+  "settings_language_label": { "message": "表示言語" },
+  "settings_language_desc": {
     "message": "インターフェース言語を選択。パネルを再起動するとすべて反映されます。"
   },
 
-  "toolbar.select_all": { "message": "すべて選択" },
-  "toolbar.deselect_all": { "message": "選択解除" },
-  "toolbar.copy_urls": { "message": "URL をコピー" },
-  "toolbar.copy_urls.tooltip": { "message": "選択した画像の URL をクリップボードにコピー" },
-  "toolbar.copy_urls.empty": { "message": "先に画像を選択してください" },
+  "toolbar_select_all": { "message": "すべて選択" },
+  "toolbar_deselect_all": { "message": "選択解除" },
+  "toolbar_copy_urls": { "message": "URL をコピー" },
+  "toolbar_copy_urls_tooltip": { "message": "選択した画像の URL をクリップボードにコピー" },
+  "toolbar_copy_urls_empty": { "message": "先に画像を選択してください" },
 
-  "toast.url_copied.single": { "message": "URL をコピーしました!" },
-  "toast.url_copied.batch": { "message": "{count} 件の URL をクリップボードにコピーしました" },
-  "toast.url_copy_failed": { "message": "URL のコピーに失敗しました" },
-  "toast.download.started": { "message": "ダウンロードを開始しました" },
-  "toast.download.failed": { "message": "ダウンロードに失敗しました" },
-  "toast.download.cancelled": { "message": "ダウンロードをキャンセルしました" },
-  "toast.download.completed": { "message": "{count} 枚の画像をダウンロードしました" },
-  "toast.no_images_selected": { "message": "画像が選択されていません" },
-  "toast.image_removed": { "message": "画像を削除しました" },
-  "toast.collection.added": { "message": "コレクションに追加しました" },
-  "toast.collection.add_failed": { "message": "コレクションへの追加に失敗しました" },
-  "toast.collection.removed": { "message": "コレクションから削除しました" },
-  "toast.collection.remove_failed": { "message": "削除に失敗しました" },
-  "toast.color_copied": { "message": "カラー {hex} をコピーしました" },
-  "toast.color_copy_failed": { "message": "カラーのコピーに失敗しました" },
+  "toast_url_copied_single": { "message": "URL をコピーしました!" },
+  "toast_url_copied_batch": { "message": "{count} 件の URL をクリップボードにコピーしました" },
+  "toast_url_copy_failed": { "message": "URL のコピーに失敗しました" },
+  "toast_download_started": { "message": "ダウンロードを開始しました" },
+  "toast_download_failed": { "message": "ダウンロードに失敗しました" },
+  "toast_download_cancelled": { "message": "ダウンロードをキャンセルしました" },
+  "toast_download_completed": { "message": "{count} 枚の画像をダウンロードしました" },
+  "toast_no_images_selected": { "message": "画像が選択されていません" },
+  "toast_image_removed": { "message": "画像を削除しました" },
+  "toast_collection_added": { "message": "コレクションに追加しました" },
+  "toast_collection_add_failed": { "message": "コレクションへの追加に失敗しました" },
+  "toast_collection_removed": { "message": "コレクションから削除しました" },
+  "toast_collection_remove_failed": { "message": "削除に失敗しました" },
+  "toast_color_copied": { "message": "カラー {hex} をコピーしました" },
+  "toast_color_copy_failed": { "message": "カラーのコピーに失敗しました" },
 
-  "pro.feature_blocked.format_conversion": {
+  "pro_feature_blocked_format_conversion": {
     "message": "形式変換は Pro 機能です。アップグレードで解放!"
   },
-  "pro.feature_blocked.advanced_grouping": {
+  "pro_feature_blocked_advanced_grouping": {
     "message": "高度なグループ化は Pro 機能です。アップグレードで解放!"
   },
-  "pro.feature_blocked.collection": { "message": "コレクションは Pro 機能です" },
-  "pro.feature_blocked.image_delete": {
+  "pro_feature_blocked_collection": { "message": "コレクションは Pro 機能です" },
+  "pro_feature_blocked_image_delete": {
     "message": "画像削除は Pro 機能です。アップグレードで解放!"
   },
-  "pro.feature_blocked.color_copy": { "message": "カラーコピーは Pro 機能です" },
-  "pro.feature_blocked.reverse_search": {
+  "pro_feature_blocked_color_copy": { "message": "カラーコピーは Pro 機能です" },
+  "pro_feature_blocked_reverse_search": {
     "message": "{engine} 検索は Pro が必要です。アップグレードで解放!"
   },
-  "pro.zip_limit": { "message": "無料版は ZIP あたり最大 {max} 枚まで。Pro で無制限に!" },
-  "pro.copy_urls_limit": { "message": "無料版は一度に最大 {max} 件の URL まで。Pro で無制限に!" },
-  "pro.collection_limit": { "message": "無料版はお気に入り最大 {max} 件まで。Pro で無制限に!" },
+  "pro_zip_limit": { "message": "無料版は ZIP あたり最大 {max} 枚まで。Pro で無制限に!" },
+  "pro_copy_urls_limit": { "message": "無料版は一度に最大 {max} 件の URL まで。Pro で無制限に!" },
+  "pro_collection_limit": { "message": "無料版はお気に入り最大 {max} 件まで。Pro で無制限に!" },
 
-  "rating.title": { "message": "Image Harvest はいかがですか?" },
-  "rating.desc": {
+  "rating_title": { "message": "Image Harvest はいかがですか?" },
+  "rating_desc": {
     "message": "お役に立てたなら、Chrome ウェブストアでの 5 つ星レビューが大きな励みになります。"
   },
-  "rating.rate_now": { "message": "⭐ Chrome ストアで評価" },
-  "rating.later": { "message": "後で" },
-  "rating.never": { "message": "今後表示しない" },
-  "rating.close": { "message": "閉じる" }
+  "rating_rate_now": { "message": "⭐ Chrome ストアで評価" },
+  "rating_later": { "message": "後で" },
+  "rating_never": { "message": "今後表示しない" },
+  "rating_close": { "message": "閉じる" }
 }

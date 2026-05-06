@@ -83,8 +83,12 @@ export function SettingsModal() {
         </div>
         {/* Slot for the legacy body. Plain ref-mounted div — Preact never
             touches its children after the initial appendChild because we
-            don't render any JSX children here. */}
-        <div ref={slotRef as preact.RefObject<HTMLDivElement>} />
+            don't render any JSX children here. Must flex:1 + overflow:hidden
+            so the inner .modal-body's overflow-y:auto works correctly. */}
+        <div
+          ref={slotRef as preact.RefObject<HTMLDivElement>}
+          style={{ flex: '1 1 auto', overflow: 'hidden', display: 'flex', flexDirection: 'column', minHeight: 0 }}
+        />
       </div>
     </div>
   );

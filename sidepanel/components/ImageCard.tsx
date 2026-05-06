@@ -218,7 +218,7 @@ export function ImageCard({ img, index }: Props) {
     // the handleFavorite pattern above and matches the fast-fail UX
     // of the toolbar Pro guards in settings.bindProGuards.
     if (!isProUser) {
-      showToast(t('pro.feature_blocked.image_delete'), 'warning');
+      showToast(t('pro_feature_blocked_image_delete'), 'warning');
       showProUpgradeModal();
       return;
     }
@@ -246,7 +246,7 @@ export function ImageCard({ img, index }: Props) {
   const handleColorClick = (color: string) => (e: MouseEvent) => {
     e.stopPropagation();
     if (!isProUser) {
-      showToast(t('pro.feature_blocked.color_copy'), 'warning');
+      showToast(t('pro_feature_blocked_color_copy'), 'warning');
       showProUpgradeModal();
       return;
     }

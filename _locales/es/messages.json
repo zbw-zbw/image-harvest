@@ -1,80 +1,80 @@
 {
-  "app.name": { "message": "Image Harvest" },
-  "app.tagline": { "message": "Descarga cualquier imagen de cualquier página web" },
+  "app_name": { "message": "Image Harvest" },
+  "app_tagline": { "message": "Descarga cualquier imagen de cualquier página web" },
 
-  "common.cancel": { "message": "Cancelar" },
-  "common.confirm": { "message": "Confirmar" },
-  "common.close": { "message": "Cerrar" },
-  "common.save": { "message": "Guardar" },
-  "common.delete": { "message": "Eliminar" },
-  "common.copy": { "message": "Copiar" },
-  "common.download": { "message": "Descargar" },
-  "common.upgrade": { "message": "Actualizar a Pro" },
-  "common.maybe_later": { "message": "Quizás más tarde" },
+  "common_cancel": { "message": "Cancelar" },
+  "common_confirm": { "message": "Confirmar" },
+  "common_close": { "message": "Cerrar" },
+  "common_save": { "message": "Guardar" },
+  "common_delete": { "message": "Eliminar" },
+  "common_copy": { "message": "Copiar" },
+  "common_download": { "message": "Descargar" },
+  "common_upgrade": { "message": "Actualizar a Pro" },
+  "common_maybe_later": { "message": "Quizás más tarde" },
 
-  "settings.title": { "message": "Ajustes" },
-  "settings.section.appearance": { "message": "Apariencia" },
-  "settings.section.experience": { "message": "Experiencia" },
-  "settings.section.scan": { "message": "Escaneo" },
-  "settings.section.download": { "message": "Descarga" },
-  "settings.section.language": { "message": "Idioma" },
-  "settings.language.label": { "message": "Idioma de la interfaz" },
-  "settings.language.desc": {
+  "settings_title": { "message": "Ajustes" },
+  "settings_section_appearance": { "message": "Apariencia" },
+  "settings_section_experience": { "message": "Experiencia" },
+  "settings_section_scan": { "message": "Escaneo" },
+  "settings_section_download": { "message": "Descarga" },
+  "settings_section_language": { "message": "Idioma" },
+  "settings_language_label": { "message": "Idioma de la interfaz" },
+  "settings_language_desc": {
     "message": "Elige el idioma de la interfaz. Reinicia el panel para aplicar en todas partes."
   },
 
-  "toolbar.select_all": { "message": "Seleccionar todo" },
-  "toolbar.deselect_all": { "message": "Deseleccionar todo" },
-  "toolbar.copy_urls": { "message": "Copiar URLs" },
-  "toolbar.copy_urls.tooltip": { "message": "Copiar las URLs seleccionadas al portapapeles" },
-  "toolbar.copy_urls.empty": { "message": "Selecciona imágenes primero" },
+  "toolbar_select_all": { "message": "Seleccionar todo" },
+  "toolbar_deselect_all": { "message": "Deseleccionar todo" },
+  "toolbar_copy_urls": { "message": "Copiar URLs" },
+  "toolbar_copy_urls_tooltip": { "message": "Copiar las URLs seleccionadas al portapapeles" },
+  "toolbar_copy_urls_empty": { "message": "Selecciona imágenes primero" },
 
-  "toast.url_copied.single": { "message": "¡URL copiada!" },
-  "toast.url_copied.batch": { "message": "{count} URLs copiadas al portapapeles" },
-  "toast.url_copy_failed": { "message": "No se pudo copiar la URL" },
-  "toast.download.started": { "message": "Descarga iniciada" },
-  "toast.download.failed": { "message": "Descarga fallida" },
-  "toast.download.cancelled": { "message": "Descarga cancelada" },
-  "toast.download.completed": { "message": "Descargadas {count} imágenes" },
-  "toast.no_images_selected": { "message": "No hay imágenes seleccionadas" },
-  "toast.image_removed": { "message": "Imagen eliminada" },
-  "toast.collection.added": { "message": "Añadido a la colección" },
-  "toast.collection.add_failed": { "message": "No se pudo añadir a la colección" },
-  "toast.collection.removed": { "message": "Eliminado de la colección" },
-  "toast.collection.remove_failed": { "message": "No se pudo eliminar" },
-  "toast.color_copied": { "message": "Color {hex} copiado" },
-  "toast.color_copy_failed": { "message": "No se pudo copiar el color" },
+  "toast_url_copied_single": { "message": "¡URL copiada!" },
+  "toast_url_copied_batch": { "message": "{count} URLs copiadas al portapapeles" },
+  "toast_url_copy_failed": { "message": "No se pudo copiar la URL" },
+  "toast_download_started": { "message": "Descarga iniciada" },
+  "toast_download_failed": { "message": "Descarga fallida" },
+  "toast_download_cancelled": { "message": "Descarga cancelada" },
+  "toast_download_completed": { "message": "Descargadas {count} imágenes" },
+  "toast_no_images_selected": { "message": "No hay imágenes seleccionadas" },
+  "toast_image_removed": { "message": "Imagen eliminada" },
+  "toast_collection_added": { "message": "Añadido a la colección" },
+  "toast_collection_add_failed": { "message": "No se pudo añadir a la colección" },
+  "toast_collection_removed": { "message": "Eliminado de la colección" },
+  "toast_collection_remove_failed": { "message": "No se pudo eliminar" },
+  "toast_color_copied": { "message": "Color {hex} copiado" },
+  "toast_color_copy_failed": { "message": "No se pudo copiar el color" },
 
-  "pro.feature_blocked.format_conversion": {
+  "pro_feature_blocked_format_conversion": {
     "message": "La conversión de formato es una función Pro. ¡Actualiza para desbloquear!"
   },
-  "pro.feature_blocked.advanced_grouping": {
+  "pro_feature_blocked_advanced_grouping": {
     "message": "La agrupación avanzada es una función Pro. ¡Actualiza para desbloquear!"
   },
-  "pro.feature_blocked.collection": { "message": "La colección es una función Pro" },
-  "pro.feature_blocked.image_delete": {
+  "pro_feature_blocked_collection": { "message": "La colección es una función Pro" },
+  "pro_feature_blocked_image_delete": {
     "message": "Eliminar imágenes es una función Pro. ¡Actualiza para desbloquear!"
   },
-  "pro.feature_blocked.color_copy": { "message": "Copiar colores es una función Pro" },
-  "pro.feature_blocked.reverse_search": {
+  "pro_feature_blocked_color_copy": { "message": "Copiar colores es una función Pro" },
+  "pro_feature_blocked_reverse_search": {
     "message": "La búsqueda en {engine} requiere Pro. ¡Actualiza para desbloquear!"
   },
-  "pro.zip_limit": {
+  "pro_zip_limit": {
     "message": "El plan gratuito permite hasta {max} imágenes por ZIP. ¡Actualiza a Pro para ilimitadas!"
   },
-  "pro.copy_urls_limit": {
+  "pro_copy_urls_limit": {
     "message": "El plan gratuito permite copiar hasta {max} URLs a la vez. ¡Actualiza a Pro para ilimitadas!"
   },
-  "pro.collection_limit": {
+  "pro_collection_limit": {
     "message": "El plan gratuito permite hasta {max} favoritos. ¡Actualiza a Pro para ilimitados!"
   },
 
-  "rating.title": { "message": "¿Te gusta Image Harvest?" },
-  "rating.desc": {
+  "rating_title": { "message": "¿Te gusta Image Harvest?" },
+  "rating_desc": {
     "message": "Si te hemos ahorrado tiempo, una reseña de 5 estrellas en Chrome Web Store significaría mucho para nosotros."
   },
-  "rating.rate_now": { "message": "⭐ Calificar en Chrome Store" },
-  "rating.later": { "message": "Quizás más tarde" },
-  "rating.never": { "message": "No volver a preguntar" },
-  "rating.close": { "message": "Cerrar" }
+  "rating_rate_now": { "message": "⭐ Calificar en Chrome Store" },
+  "rating_later": { "message": "Quizás más tarde" },
+  "rating_never": { "message": "No volver a preguntar" },
+  "rating_close": { "message": "Cerrar" }
 }

@@ -87,7 +87,7 @@ test('toolbar "Copy URLs" copies all filtered URLs newline-joined and toasts the
     )
     .toEqual([allUrls.join('\n')]);
 
-  // The success toast surfaces the count — same wording as t('toast.url_copied.batch').
+  // The success toast surfaces the count — same wording as t('toast_url_copied_batch').
   await expect
     .poll(
       () =>

@@ -118,7 +118,7 @@ describe('normalizeLocale', () => {
 describe('t()', () => {
   it('returns the primary-locale message when present', () => {
     __test.setActiveLocale('zh-CN');
-    expect(t('common.cancel')).toBe('取消');
+    expect(t('common_cancel')).toBe('取消');
   });
 
   it('falls back to en when the key is missing in the active locale', () => {
@@ -126,16 +126,16 @@ describe('t()', () => {
     // fact that 'app.tagline' has different copy in every locale, so we
     // assert by switching active and verifying en still wins for missing.
     __test.setActiveLocale('zh-CN');
-    expect(t('app.tagline')).toBe('从任意网页批量下载图片'); // exists in zh-CN
+    expect(t('app_tagline')).toBe('从任意网页批量下载图片'); // exists in zh-CN
 
     // For a guaranteed-missing key we expect the raw key back.
-    expect(t('this.key.definitely.does.not.exist')).toBe('this.key.definitely.does.not.exist');
+    expect(t('this_key_definitely_does_not_exist')).toBe('this_key_definitely_does_not_exist');
   });
 
   it('substitutes {var} placeholders with provided params', () => {
     __test.setActiveLocale('en');
-    expect(t('toast.url_copied.batch', { count: 42 })).toBe('42 URLs copied to clipboard');
-    expect(t('pro.zip_limit', { max: 30 })).toBe(
+    expect(t('toast_url_copied_batch', { count: 42 })).toBe('42 URLs copied to clipboard');
+    expect(t('pro_zip_limit', { max: 30 })).toBe(
       'Free plan allows up to 30 images per ZIP. Upgrade to Pro for unlimited!'
     );
   });
@@ -143,21 +143,21 @@ describe('t()', () => {
   it('leaves unmatched placeholders untouched (so QA notices missing params)', () => {
     __test.setActiveLocale('en');
     // No params at all.
-    expect(t('toast.color_copied')).toBe('Color {hex} copied');
+    expect(t('toast_color_copied')).toBe('Color {hex} copied');
     // Param name does not match.
-    expect(t('toast.color_copied', { wrong: '#fff' })).toBe('Color {hex} copied');
+    expect(t('toast_color_copied', { wrong: '#fff' })).toBe('Color {hex} copied');
   });
 
   it('replaces every occurrence of the same placeholder', () => {
     // Inject a transient catalogue entry by stubbing a key the test owns.
     // We verify global substitution behavior by adding {x} twice.
     const cat = en as Record<string, { message: string }>;
-    cat['__test.repeat'] = { message: 'a {x} b {x} c' };
+    cat['__test_repeat'] = { message: 'a {x} b {x} c' };
     try {
       __test.setActiveLocale('en');
-      expect(t('__test.repeat', { x: 'Y' })).toBe('a Y b Y c');
+      expect(t('__test_repeat', { x: 'Y' })).toBe('a Y b Y c');
     } finally {
-      delete cat['__test.repeat'];
+      delete cat['__test_repeat'];
     }
   });
 });

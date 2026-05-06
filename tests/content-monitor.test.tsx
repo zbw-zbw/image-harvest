@@ -292,7 +292,7 @@ describe('extractFromNode — <object> / <embed>', () => {
     stubRect(obj, 50, 50);
     document.body.appendChild(obj);
 
-    // No explicit type, but getFileFormat('graphic.png') → 'png' ≠ 'unknown'
+    // No explicit type, but getFileFormat('graphic_png') → 'png' ≠ 'unknown'
     expect(extractFromNode(obj)).toHaveLength(1);
   });
 

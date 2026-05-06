@@ -270,7 +270,7 @@ export async function fetchImageBlobWithFallback(url: string): Promise<Blob> {
 export async function downloadSingle(img: ImageItem, format: string | null): Promise<void> {
   // Pro check: format conversion requires Pro
   if (format && !state.isProUser) {
-    showToast(t('pro.feature_blocked.format_conversion'), 'warning');
+    showToast(t('pro_feature_blocked_format_conversion'), 'warning');
     showProUpgradeModal();
     return;
   }
@@ -294,7 +294,7 @@ export async function downloadSingle(img: ImageItem, format: string | null): Pro
 
   try {
     await chrome.downloads.download({ url: downloadUrl, filename: filename, saveAs: false });
-    showToast(t('toast.download.started'), 'success');
+    showToast(t('toast_download_started'), 'success');
     // Telemetry: format prop reveals which conversions are popular (helps
     // decide whether to push WebP / JPG conversion as a Pro selling point).
     void track(EVENTS.DOWNLOAD_SINGLE, { format: format || 'original' });
@@ -311,27 +311,27 @@ export async function downloadSingle(img: ImageItem, format: string | null): Pro
     void recordDownloadForRating(1);
   } catch (error) {
     console.error('Download error:', error);
-    showToast(t('toast.download.failed'), 'error');
+    showToast(t('toast_download_failed'), 'error');
   }
 }
 
 export async function downloadSelectedAsZip(targetFormat: string | null): Promise<void> {
   const selected = state.filteredImages.filter((img) => state.selectedImages.has(img.id));
   if (selected.length === 0) {
-    showToast(t('toast.no_images_selected'), 'error');
+    showToast(t('toast_no_images_selected'), 'error');
     return;
   }
 
   // Pro check: format conversion requires Pro
   if (targetFormat && !state.isProUser) {
-    showToast(t('pro.feature_blocked.format_conversion'), 'warning');
+    showToast(t('pro_feature_blocked_format_conversion'), 'warning');
     showProUpgradeModal();
     return;
   }
 
   // Free tier: limit ZIP to FREE_LIMITS.MAX_ZIP_IMAGES images
   if (!state.isProUser && selected.length > FREE_LIMITS.MAX_ZIP_IMAGES) {
-    showToast(t('pro.zip_limit', { max: FREE_LIMITS.MAX_ZIP_IMAGES }), 'warning');
+    showToast(t('pro_zip_limit', { max: FREE_LIMITS.MAX_ZIP_IMAGES }), 'warning');
     showProUpgradeModal();
     return;
   }
@@ -351,7 +351,7 @@ export async function downloadSelectedAsZip(targetFormat: string | null): Promis
 
   showProgress('Downloading...', () => {
     aborted = true;
-    showToast(t('toast.download.cancelled'), 'info');
+    showToast(t('toast_download_cancelled'), 'info');
   });
 
   try {
@@ -419,7 +419,7 @@ export async function downloadSelectedAsZip(targetFormat: string | null): Promis
 
     URL.revokeObjectURL(blobUrl);
     const successCount = selected.length - failed.length;
-    showToast(t('toast.download.completed', { count: successCount }), 'success');
+    showToast(t('toast_download_completed', { count: successCount }), 'success');
     // Telemetry: count is the SUCCESSFUL count, not selected.length —
     // failures are inferred via (selected.length - count). Funnels care
     // about user-perceived success.
@@ -434,7 +434,7 @@ export async function downloadSelectedAsZip(targetFormat: string | null): Promis
   } catch (error) {
     if (!aborted) {
       console.error('ZIP download error:', error);
-      showToast(t('toast.download.failed') + ': ' + (error as Error).message, 'error');
+      showToast(t('toast_download_failed') + ': ' + (error as Error).message, 'error');
     }
   } finally {
     hideProgress();
@@ -499,11 +499,11 @@ export function hideDownloadDropdown(): void {
 export async function copyImageUrl(url: string): Promise<void> {
   try {
     await navigator.clipboard.writeText(url);
-    showToast(t('toast.url_copied.single'), 'success');
+    showToast(t('toast_url_copied_single'), 'success');
     // Telemetry: no url payload — privacy contract forbids it. Just count.
     void track(EVENTS.COPY_URL_SINGLE);
   } catch {
-    showToast(t('toast.url_copy_failed'), 'error');
+    showToast(t('toast_url_copy_failed'), 'error');
   }
 }
 
@@ -533,12 +533,12 @@ export async function copyImageUrl(url: string): Promise<void> {
  */
 export async function copyImageUrls(urls: string[]): Promise<boolean> {
   if (urls.length === 0) {
-    showToast(t('toolbar.copy_urls.empty'), 'error');
+    showToast(t('toolbar_copy_urls_empty'), 'error');
     return false;
   }
   // Free-tier copy cap — same guard pattern as downloadSelectedAsZip.
   if (!state.isProUser && urls.length > FREE_LIMITS.MAX_BATCH_COPY_URLS) {
-    showToast(t('pro.copy_urls_limit', { max: FREE_LIMITS.MAX_BATCH_COPY_URLS }), 'warning');
+    showToast(t('pro_copy_urls_limit', { max: FREE_LIMITS.MAX_BATCH_COPY_URLS }), 'warning');
     showProUpgradeModal();
     return false;
   }
@@ -547,11 +547,11 @@ export async function copyImageUrls(urls: string[]): Promise<boolean> {
     // any line-oriented downloader. Trailing newline omitted to match
     // platform clipboard conventions.
     await navigator.clipboard.writeText(urls.join('\n'));
-    showToast(t('toast.url_copied.batch', { count: urls.length }), 'success');
+    showToast(t('toast_url_copied_batch', { count: urls.length }), 'success');
     void track(EVENTS.COPY_URL_BATCH, { count: urls.length });
     return true;
   } catch {
-    showToast(t('toast.url_copy_failed'), 'error');
+    showToast(t('toast_url_copy_failed'), 'error');
     return false;
   }
 }

@@ -13,11 +13,29 @@
 //
 // See `manifest.config.ts` for the typed MV3 manifest used by crxjs.
 
-import { defineConfig } from 'vite';
+import { cpSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { defineConfig, type Plugin } from 'vite';
 import { crx } from '@crxjs/vite-plugin';
 import { visualizer } from 'rollup-plugin-visualizer';
 import manifest from './manifest.config';
 import { htmlIncludePlugin } from './vite-html-include';
+
+/** Copy static directories that crxjs doesn't handle into dist/. */
+function copyStaticAssetsPlugin(): Plugin {
+  const staticDirs = ['_locales'];
+  return {
+    name: 'copy-static-assets',
+    closeBundle() {
+      for (const dir of staticDirs) {
+        cpSync(resolve(__dirname, dir), resolve(__dirname, 'dist', dir), {
+          recursive: true,
+          force: true,
+        });
+      }
+    },
+  };
+}
 
 // Toggle bundle-size analysis with `ANALYZE=1 npm run build`. The visualizer
 // emits dist/stats.html (treemap) — useful for spotting which deps dominate
@@ -49,6 +67,8 @@ export default defineConfig({
     // crxjs entry-point analyzer parses a fully-expanded document.
     htmlIncludePlugin(),
     crx({ manifest }),
+    // Copy _locales and other static dirs that crxjs doesn't handle.
+    copyStaticAssetsPlugin(),
     ...(analyze
       ? [
           // Treemap for human eyeballing.

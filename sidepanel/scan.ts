@@ -36,10 +36,10 @@ export function handleScanCancel(): void {
     applyFilters();
     // Toast keeps the legacy English wording for the count suffix until
     // a dedicated i18n key is added; the prefix is translated.
-    showToast(`${t('toast.download.cancelled')} · ${state.allImages.length} images found`, 'info');
+    showToast(`${t('toast_download_cancelled')} · ${state.allImages.length} images found`, 'info');
   } else {
     showEmpty();
-    showToast(t('toast.download.cancelled'), 'info');
+    showToast(t('toast_download_cancelled'), 'info');
   }
 }
 

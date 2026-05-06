@@ -222,7 +222,7 @@ describe('initTabActivationListener', () => {
     });
   });
 
-  it('onActivated is a no-op for tabs the user never opened the panel on (no port)', async () => {
+  it('onActivated enables sidePanel for any tab (even without a prior port)', async () => {
     chromeStub = installChromeStub({ useSidePanel: true });
     initTabActivationListener();
 
@@ -232,7 +232,11 @@ describe('initTabActivationListener', () => {
 
     await onActivated({ tabId: 555 });
 
-    expect(chromeStub.sidePanel.setOptions).not.toHaveBeenCalled();
+    expect(chromeStub.sidePanel.setOptions).toHaveBeenCalledWith({
+      tabId: 555,
+      path: 'pages/sidepanel.html',
+      enabled: true,
+    });
   });
 
   it('onActivated is a no-op when popup mode is configured', async () => {

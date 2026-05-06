@@ -45,13 +45,14 @@ export function initTabActivationListener(): void {
       const settings = await getAppSettings();
       if (!settings.useSidePanel) return;
 
-      if (sidePanelOpenedTabs.has(activeInfo.tabId) || uiPorts.size > 0) {
-        await chrome.sidePanel.setOptions({
-          tabId: activeInfo.tabId,
-          path: 'pages/sidepanel.html',
-          enabled: true,
-        });
-      }
+      // Always enable sidePanel for the newly activated tab so the user
+      // can open it by clicking the extension icon on any tab — not only
+      // the ones already tracked in sidePanelOpenedTabs.
+      await chrome.sidePanel.setOptions({
+        tabId: activeInfo.tabId,
+        path: 'pages/sidepanel.html',
+        enabled: true,
+      });
     } catch {
       // ignore
     }

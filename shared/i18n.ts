@@ -15,7 +15,8 @@
 //    options pages need MV3 polyfills, content scripts need extra perms).
 //
 // Catalogue format mirrors Chrome's _locales/<locale>/messages.json:
-//   { "key.name": { "message": "Hello {name}", "description": "..." } }
+//   { "key_name": { "message": "Hello {name}", "description": "..." } }
+// Keys use underscores only (Chrome forbids dots in message keys).
 // `description` is for translators only; we ignore it at runtime.
 
 import en from '../_locales/en/messages.json';

@@ -83,8 +83,8 @@ export function RatingPromptModal() {
         <button
           type="button"
           class="modal-close icon-btn"
-          aria-label={t('rating.close')}
-          title={t('rating.close')}
+          aria-label={t('rating_close')}
+          title={t('rating_close')}
           onClick={handleLater}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -111,9 +111,9 @@ export function RatingPromptModal() {
         </div>
 
         <h2 id="rating-prompt-title" class="rating-prompt-title">
-          {t('rating.title')}
+          {t('rating_title')}
         </h2>
-        <p class="rating-prompt-desc">{t('rating.desc')}</p>
+        <p class="rating-prompt-desc">{t('rating_desc')}</p>
 
         <div class="rating-prompt-actions">
           <button
@@ -122,7 +122,7 @@ export function RatingPromptModal() {
             class="btn btn-primary"
             onClick={handleRateNow}
           >
-            {t('rating.rate_now')}
+            {t('rating_rate_now')}
           </button>
           <button
             id="btn-rating-later"
@@ -130,7 +130,7 @@ export function RatingPromptModal() {
             class="btn btn-secondary"
             onClick={handleLater}
           >
-            {t('rating.later')}
+            {t('rating_later')}
           </button>
           <button
             id="btn-rating-never"
@@ -138,7 +138,7 @@ export function RatingPromptModal() {
             class="btn btn-text rating-prompt-never"
             onClick={handleNever}
           >
-            {t('rating.never')}
+            {t('rating_never')}
           </button>
         </div>
       </div>

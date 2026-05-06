@@ -674,7 +674,7 @@ function bindEvents(): void {
         const format = item.dataset.format;
         // Pro check: non-original formats require Pro
         if (!state.isProUser && format !== 'original') {
-          showToast(t('pro.feature_blocked.format_conversion'), 'warning');
+          showToast(t('pro_feature_blocked_format_conversion'), 'warning');
           showProUpgradeModal();
           hideDownloadDropdown();
           return;
@@ -833,7 +833,7 @@ function bindEvents(): void {
       const val = opt.dataset.groupFilter || 'none';
       // Free tier: only 'none' and 'format' grouping allowed
       if (!state.isProUser && !FREE_LIMITS.ALLOWED_GROUP_MODES.includes(val as 'none' | 'format')) {
-        showToast(t('pro.feature_blocked.advanced_grouping'), 'warning');
+        showToast(t('pro_feature_blocked_advanced_grouping'), 'warning');
         showProUpgradeModal();
         closeAllFilterDropdowns();
         return;
@@ -947,7 +947,7 @@ function bindEvents(): void {
           ) {
             dropdown.classList.add('hidden');
             closeSettings();
-            showToast(t('pro.feature_blocked.advanced_grouping'), 'warning');
+            showToast(t('pro_feature_blocked_advanced_grouping'), 'warning');
             showProUpgradeModal();
             return;
           }
@@ -959,7 +959,7 @@ function bindEvents(): void {
           ) {
             dropdown.classList.add('hidden');
             closeSettings();
-            showToast(t('pro.feature_blocked.format_conversion'), 'warning');
+            showToast(t('pro_feature_blocked_format_conversion'), 'warning');
             showProUpgradeModal();
             return;
           }
@@ -1028,7 +1028,7 @@ function bindEvents(): void {
         )
       ) {
         const engineLabel = engine.charAt(0).toUpperCase() + engine.slice(1);
-        showToast(t('pro.feature_blocked.reverse_search', { engine: engineLabel }), 'warning');
+        showToast(t('pro_feature_blocked_reverse_search', { engine: engineLabel }), 'warning');
         showProUpgradeModal();
         if (elements.reverseSearchMenu) elements.reverseSearchMenu.classList.add('hidden');
         return;
@@ -1042,7 +1042,7 @@ function bindEvents(): void {
   // Close modals on overlay click
   document.querySelectorAll('.modal-overlay').forEach((overlay) => {
     overlay.addEventListener('click', () => {
-      const modal = overlay.closest('.modal');
+      const modal = overlay.closest('_modal');
       if (modal) modal.classList.add('hidden');
     });
   });
