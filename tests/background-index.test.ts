@@ -94,12 +94,12 @@ beforeAll(async () => {
       query: vi.fn(),
     },
     sidePanel: {
-      setPanelBehavior: vi.fn(),
-      setOptions: vi.fn(),
-      open: vi.fn(),
+      setPanelBehavior: vi.fn(() => Promise.resolve()),
+      setOptions: vi.fn(() => Promise.resolve()),
+      open: vi.fn(() => Promise.resolve()),
     },
     action: {
-      setPopup: vi.fn(),
+      setPopup: vi.fn(() => Promise.resolve()),
     },
   };
 
@@ -402,6 +402,198 @@ describe('handleMessage — highlight routes', () => {
 });
 
 // ─────────────────────────────────────────────────────────────────────
+// SET_DISPLAY_MODE — the 76-line side-panel / popup mode switch case.
+// Covers the single largest uncovered block (L194-269) in the router.
+// ─────────────────────────────────────────────────────────────────────
+
+describe('handleMessage — SET_DISPLAY_MODE (popup ↔ side-panel switch)', () => {
+  // Typed alias for the chrome global mock to keep the type assertions
+  // out of each test body.
+  const chromeMock = () =>
+    (globalThis as unknown as { chrome: typeof chrome }).chrome as unknown as {
+      action: { setPopup: ReturnType<typeof vi.fn> };
+      sidePanel: {
+        setPanelBehavior: ReturnType<typeof vi.fn>;
+        setOptions: ReturnType<typeof vi.fn>;
+        open: ReturnType<typeof vi.fn>;
+      };
+      tabs: { query: ReturnType<typeof vi.fn> };
+    };
+
+  beforeEach(() => {
+    vi.mocked(storage.getAppSettings).mockResolvedValue({} as never);
+    vi.mocked(storage.saveAppSettings).mockResolvedValue(undefined as never);
+    (bgUtils.sidePanelOpenedTabs as Set<number>).clear();
+  });
+
+  it('switch TO side-panel (useSidePanel=true) → clears action popup + enables panel behavior', async () => {
+    const c = chromeMock();
+    const result = await dispatch({
+      type: MESSAGE_TYPES.SET_DISPLAY_MODE,
+      useSidePanel: true,
+    });
+
+    // Pin: useSidePanel=true MUST clear the popup (setPopup({popup:''})).
+    // A regression passing the wrong popup value would make clicking the
+    // extension icon silently open the popup instead of the side panel
+    // that the user just enabled — the #1 user-reported "mode switch
+    // does nothing" bug shape.
+    expect(c.action.setPopup).toHaveBeenCalledWith({ popup: '' });
+    expect(c.sidePanel.setPanelBehavior).toHaveBeenCalledWith({
+      openPanelOnActionClick: true,
+    });
+    // Persists the new mode to storage BEFORE the Chrome API writes so
+    // reload-during-switch can't leave storage and Chrome state
+    // disagreeing.
+    expect(storage.saveAppSettings).toHaveBeenCalledWith(
+      expect.objectContaining({ useSidePanel: true })
+    );
+    expect(result).toEqual({ success: true });
+  });
+
+  it('switch TO side-panel WITH openSidePanel=true + tabId → opens panel + records tabId in bookkeeping', async () => {
+    const c = chromeMock();
+    const result = await dispatch({
+      type: MESSAGE_TYPES.SET_DISPLAY_MODE,
+      useSidePanel: true,
+      openSidePanel: true,
+      tabId: 77,
+    });
+
+    // Pin: when openSidePanel+tabId are provided, setOptions must be
+    // called with BOTH tabId AND path — leaving path empty causes
+    // Chrome to serve the last-used path which may be stale.
+    expect(c.sidePanel.setOptions).toHaveBeenCalledWith({
+      tabId: 77,
+      path: 'pages/sidepanel.html',
+      enabled: true,
+    });
+    expect(c.sidePanel.open).toHaveBeenCalledWith({ tabId: 77 });
+    // Bookkeeping: tab must be tracked so a later mode-switch-back
+    // can disable the side panel for it.
+    expect((bgUtils.sidePanelOpenedTabs as Set<number>).has(77)).toBe(true);
+    expect(result).toEqual({ success: true });
+  });
+
+  it('switch TO side-panel with open() throwing (no user gesture) → swallows error, still succeeds', async () => {
+    const c = chromeMock();
+    c.sidePanel.open.mockRejectedValueOnce(new Error('user gesture required'));
+
+    const result = await dispatch({
+      type: MESSAGE_TYPES.SET_DISPLAY_MODE,
+      useSidePanel: true,
+      openSidePanel: true,
+      tabId: 88,
+    });
+
+    // Pin: the inner try/catch around sidePanel.open. The "no user
+    // gesture" error is expected during programmatic mode switches
+    // (e.g., from a settings toggle that's not counted as a gesture)
+    // and must NOT fail the whole SET_DISPLAY_MODE round-trip.
+    expect(result).toEqual({ success: true });
+  });
+
+  it('switch TO popup (useSidePanel=false) → disables panel behavior + restores popup path', async () => {
+    const c = chromeMock();
+    c.tabs.query.mockResolvedValueOnce([{ id: 999 } as chrome.tabs.Tab]);
+
+    const result = await dispatch({
+      type: MESSAGE_TYPES.SET_DISPLAY_MODE,
+      useSidePanel: false,
+    });
+
+    expect(c.sidePanel.setPanelBehavior).toHaveBeenCalledWith({
+      openPanelOnActionClick: false,
+    });
+    // Pin: popup path restore is the LAST side effect — if Chrome
+    // action-click fires between the setPanelBehavior call and the
+    // setPopup call, the icon briefly does nothing. setPopup with
+    // the real path must follow the disable-loop, not precede it.
+    expect(c.action.setPopup).toHaveBeenCalledWith({ popup: 'pages/popup.html' });
+    expect(result).toEqual({ success: true });
+  });
+
+  it('switch TO popup with tracked tabs → disables side panel for EACH tracked tab + clears bookkeeping', async () => {
+    const c = chromeMock();
+    const tracked = bgUtils.sidePanelOpenedTabs as Set<number>;
+    tracked.add(11);
+    tracked.add(22);
+    tracked.add(33);
+    c.tabs.query.mockResolvedValueOnce([{ id: 22 } as chrome.tabs.Tab]); // active tab already tracked
+
+    await dispatch({
+      type: MESSAGE_TYPES.SET_DISPLAY_MODE,
+      useSidePanel: false,
+    });
+
+    // Pin: every tracked tab must get setOptions({enabled:false}).
+    // Without this, the side panel UI stays visibly on-screen for
+    // any tab that had it open — Chrome does NOT auto-close it
+    // when panel behavior is globally disabled.
+    const setOptionsCalls = c.sidePanel.setOptions.mock.calls.map((args) => args[0]);
+    expect(setOptionsCalls).toEqual(
+      expect.arrayContaining([
+        { enabled: false }, // global disable first
+        { tabId: 11, enabled: false },
+        { tabId: 22, enabled: false },
+        { tabId: 33, enabled: false },
+      ])
+    );
+    // Bookkeeping reset so the next switch-to-sidepanel starts fresh.
+    expect(tracked.size).toBe(0);
+  });
+
+  it('switch TO popup + active tab NOT already tracked → ALSO disables side panel for it (catches background.initDisplayMode case)', async () => {
+    const c = chromeMock();
+    const tracked = bgUtils.sidePanelOpenedTabs as Set<number>;
+    tracked.clear();
+    c.tabs.query.mockResolvedValueOnce([{ id: 555 } as chrome.tabs.Tab]);
+
+    await dispatch({
+      type: MESSAGE_TYPES.SET_DISPLAY_MODE,
+      useSidePanel: false,
+    });
+
+    // Pin: the `!sidePanelOpenedTabs.has(activeTab.id)` branch. Without
+    // this fallback, a side panel opened by background.initDisplayMode
+    // (which bypasses SIDE_PANEL_OPENED bookkeeping) would stay open
+    // forever after a popup-mode switch.
+    expect(c.sidePanel.setOptions).toHaveBeenCalledWith({ tabId: 555, enabled: false });
+  });
+
+  it('switch TO popup + chrome.tabs.query throws → swallows error, still succeeds (resilient path)', async () => {
+    const c = chromeMock();
+    c.tabs.query.mockRejectedValueOnce(new Error('no active tab'));
+
+    const result = await dispatch({
+      type: MESSAGE_TYPES.SET_DISPLAY_MODE,
+      useSidePanel: false,
+    });
+
+    // Pin: the final try/catch around chrome.tabs.query + the "also
+    // disable active tab" branch. A regression removing it would
+    // fail the entire SET_DISPLAY_MODE operation just because no
+    // window was focused at the moment of the switch.
+    expect(result).toEqual({ success: true });
+  });
+
+  it('SET_DISPLAY_MODE top-level throw (saveAppSettings fails) → catches and returns {success:false, error}', async () => {
+    vi.mocked(storage.saveAppSettings).mockRejectedValueOnce(new Error('quota exceeded'));
+
+    const result = await dispatch({
+      type: MESSAGE_TYPES.SET_DISPLAY_MODE,
+      useSidePanel: true,
+    });
+
+    // Pin: the OUTER try/catch on SET_DISPLAY_MODE. A regression
+    // omitting it would let the error bubble to the outer handleMessage
+    // catch which reports INJECTION_FAILED — misleading when the true
+    // cause is a local storage quota problem.
+    expect(result).toEqual({ success: false, error: 'quota exceeded' });
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
 // Side-panel bookkeeping
 // ─────────────────────────────────────────────────────────────────────
 
@@ -500,6 +692,21 @@ describe('handleMessage — license', () => {
     expect(result).toEqual({ success: false, error: 'invalid' });
   });
 
+  it('ACTIVATE_LICENSE when activateLicense throws → local try/catch returns {success:false, error}', async () => {
+    // Pin: the inner try/catch around activateLicense. Without it the
+    // error would bubble to the outer handleMessage catch and be
+    // reported as INJECTION_FAILED instead of a clean license-layer
+    // error — users would see a misleading "scripting injection
+    // failed" toast when the real cause is a license-server outage.
+    vi.mocked(license.activateLicense).mockRejectedValue(new Error('license server down'));
+    const result = await dispatch({
+      type: MESSAGE_TYPES.ACTIVATE_LICENSE,
+      licenseKey: 'KEY-123',
+    });
+    expect(bgUtils.broadcastToPopup).not.toHaveBeenCalled();
+    expect(result).toEqual({ success: false, error: 'license server down' });
+  });
+
   it('DEACTIVATE_LICENSE → broadcasts inactive status THEN responds', async () => {
     vi.mocked(license.deactivateLicense).mockResolvedValue({ success: true } as never);
     const result = await dispatch({ type: MESSAGE_TYPES.DEACTIVATE_LICENSE });
@@ -509,6 +716,17 @@ describe('handleMessage — license', () => {
       status: 'inactive',
     });
     expect(result).toEqual({ success: true });
+  });
+
+  it('DEACTIVATE_LICENSE when deactivateLicense throws → local try/catch returns {success:false, error} and NO broadcast', async () => {
+    // Pin: broadcast-before-respond order is also try/catch guarded.
+    // Without the wrapping try/catch, a storage exception mid-
+    // deactivation would simultaneously skip the broadcast AND
+    // surface a misleading INJECTION_FAILED code to the UI.
+    vi.mocked(license.deactivateLicense).mockRejectedValue(new Error('storage write denied'));
+    const result = await dispatch({ type: MESSAGE_TYPES.DEACTIVATE_LICENSE });
+    expect(bgUtils.broadcastToPopup).not.toHaveBeenCalled();
+    expect(result).toEqual({ success: false, error: 'storage write denied' });
   });
 
   it('VALIDATE_LICENSE → returns proStatus directly (no envelope)', async () => {
@@ -566,6 +784,23 @@ describe('handleMessage — multi-tab extract', () => {
     } as never);
     await dispatch({ type: MESSAGE_TYPES.MULTI_TAB_EXTRACT });
     expect(bgExtractor.processMultiTabExtract).toHaveBeenCalledWith([]);
+  });
+
+  it('MULTI_TAB_EXTRACT when processMultiTabExtract throws → local try/catch returns {success:false, error}', async () => {
+    // Pin: the MULTI_TAB error path has its OWN try/catch wrapping
+    // processMultiTabExtract. A regression removing it would promote
+    // per-tab scripting failures to the outer handleMessage catch
+    // which emits INJECTION_FAILED — losing the specific error detail
+    // the sidepanel needs to render "Extracted 0 images from N tabs"
+    // vs. "Extraction failed: <reason>".
+    vi.mocked(bgExtractor.processMultiTabExtract).mockRejectedValue(
+      new Error('all tabs are restricted')
+    );
+    const result = await dispatch({
+      type: MESSAGE_TYPES.MULTI_TAB_EXTRACT,
+      tabIds: [1, 2, 3],
+    });
+    expect(result).toEqual({ success: false, error: 'all tabs are restricted' });
   });
 });
 

@@ -814,6 +814,90 @@ describe('extractLazyLoadImages', () => {
     await extractLazyLoadImages(images);
     expect(images.size).toBe(1);
   });
+
+  it('data-srcset with an image data-uri candidate → extracts as lazy via data-uri branch (uses generateDataUriKey)', async () => {
+    // Pin: the lazy-load srcset parser has a separate data-uri branch
+    // (L437-456) that bypasses resolveUrl + uses generateDataUriKey
+    // for dedupe. Without the `isImageDataUri` guard, a `data:text/html`
+    // URI embedded in a srcset would be added as a lazy image —
+    // silently exfiltrating page HTML into the scan results.
+    //
+    // Implementation detail: real `parseSrcset` uses split(',') which
+    // miss-splits `data:image/png;base64,ABC` at the internal comma.
+    // To hit the data-uri branch cleanly we mock parseSrcset to yield
+    // a pre-parsed candidate list — this is the same strategy the
+    // source uses in production because callers never build srcsets
+    // manually; the browser always produces a whitespace-only-
+    // separated descriptor form.
+    const { parseSrcset } = await import('../content/utils');
+    vi.mocked(parseSrcset).mockImplementationOnce(() => [
+      { url: 'data:image/png;base64,iVBORw0KGgoAAAA', width: 0 },
+      { url: 'https://example.com/real.jpg', width: 2000 },
+    ]);
+
+    const img = document.createElement('img');
+    img.setAttribute('data-srcset', 'placeholder-gets-mocked-away');
+    stubElementRect(img, 100, 50);
+    Object.defineProperty(img, 'naturalWidth', { value: 100 });
+    Object.defineProperty(img, 'naturalHeight', { value: 50 });
+    document.body.appendChild(img);
+
+    const images = new Map();
+    await extractLazyLoadImages(images);
+    const items = Array.from(images.values());
+    const dataItem = items.find((i) => i.url.startsWith('data:image/'));
+    expect(dataItem).toBeDefined();
+    // Pin: type is still 'lazy' (not 'data-uri' or 'svg') because the
+    // data-uri came through the lazy-load attribute path — the type
+    // reflects the DISCOVERY site, not the URL scheme.
+    expect(dataItem!.type).toBe('lazy');
+    // sourceDomain falls back to window.location.hostname for data-uris
+    // (no `getDomain` call) — pinned because getDomain('data:...')
+    // returns '' which would hide the item from domain-filter UI.
+    expect(dataItem!.sourceDomain).toBe(window.location.hostname);
+    // naturalWidth preferred over rect.width when non-zero.
+    expect(dataItem!.displayWidth).toBe(100);
+    expect(dataItem!.displayHeight).toBe(50);
+  });
+
+  it('data-srcset: non-image data-uri (data:text/html) is REJECTED by isImageDataUri guard', async () => {
+    // Defensive pin: the exact check that stops text/html data-uris
+    // from being exfiltrated. Without `isImageDataUri`, a malicious
+    // site could smuggle scripts into the sidepanel via the extractor.
+    const { parseSrcset } = await import('../content/utils');
+    vi.mocked(parseSrcset).mockImplementationOnce(() => [
+      { url: 'data:text/html;base64,PHNjcmlwdD4=', width: 0 },
+    ]);
+
+    const img = document.createElement('img');
+    img.setAttribute('data-srcset', 'placeholder');
+    document.body.appendChild(img);
+
+    const images = new Map();
+    await extractLazyLoadImages(images);
+    expect(images.size).toBe(0);
+  });
+
+  it('data-srcset: duplicate data-uri across descriptors is de-duped via seenUrls', async () => {
+    // Pin: the `state.seenUrls.has(dataKey)` guard inside the data-uri
+    // branch. Without it, identical URIs at two descriptors would
+    // create two items with the same url string but different ids —
+    // breaking downstream dedup-by-url checks.
+    const dataUri = 'data:image/png;base64,AAAA';
+    const { parseSrcset } = await import('../content/utils');
+    vi.mocked(parseSrcset).mockImplementationOnce(() => [
+      { url: dataUri, width: 0 },
+      { url: dataUri, width: 2000 },
+    ]);
+
+    const img = document.createElement('img');
+    img.setAttribute('data-srcset', 'placeholder');
+    document.body.appendChild(img);
+
+    const images = new Map();
+    await extractLazyLoadImages(images);
+    expect(images.size).toBe(1);
+  });
 });
 
 // ─────────────────────────────────────────────────────────────────────
@@ -884,6 +968,76 @@ describe('extractCssContentImages', () => {
 
     const images = new Map();
     await expect(extractCssContentImages(images)).resolves.toBeUndefined();
+    expect(images.size).toBe(0);
+  });
+
+  it('::before content: url(data:image/png;base64,...) → type=css-content + data-uri dedup key', async () => {
+    // Pin: the data-uri branch (L507-524) of extractCssContentImages.
+    // This path uses generateDataUriKey for dedup, sourceDomain =
+    // window.location.hostname fallback, and format from
+    // getFileFormat(url). Without it, a ::before content: url(data:...)
+    // would flow into the resolveUrl branch and silently fail because
+    // resolveUrl treats the data-uri as an invalid relative path.
+    const div = document.createElement('div');
+    div.id = 'target-div';
+    stubElementRect(div, 50, 50);
+    document.body.appendChild(div);
+
+    const realGCS = window.getComputedStyle.bind(window);
+    vi.spyOn(window, 'getComputedStyle').mockImplementation(
+      (el: Element, pseudo?: string | null) => {
+        // Only the TARGET div gets the real content — body and
+        // everything else gets 'none'. Without this per-element
+        // isolation, the body element also receives a content: url()
+        // but its rect is 0×0 (never stubbed), creating a phantom
+        // item with displayWidth=0 that shadows the real test.
+        if (pseudo === '::before' && (el as HTMLElement).id === 'target-div') {
+          return {
+            content: 'url("data:image/png;base64,iVBORw0KGgo")',
+          } as CSSStyleDeclaration;
+        }
+        if (pseudo === '::before' || pseudo === '::after') {
+          return { content: 'none' } as CSSStyleDeclaration;
+        }
+        return realGCS(el);
+      }
+    );
+
+    const images = new Map();
+    await extractCssContentImages(images);
+    const items = Array.from(images.values());
+    expect(items).toHaveLength(1);
+    expect(items[0].type).toBe('css-content');
+    expect(items[0].url.startsWith('data:image/png')).toBe(true);
+    // Dimensions come from getBoundingClientRect (NOT naturalWidth —
+    // pseudo-elements have no intrinsic size), stubbed at 50×50.
+    expect(items[0].displayWidth).toBe(50);
+    expect(items[0].displayHeight).toBe(50);
+    // sourceDomain falls back to hostname (data-uri has no domain).
+    expect(items[0].sourceDomain).toBe(window.location.hostname);
+  });
+
+  it('::before content: non-image data-uri rejected by isImageDataUri guard', async () => {
+    // Pin: the same security guard as lazy-srcset. A crafted CSS
+    // `content: url(data:text/html,<script>)` must NOT leak into
+    // scan results even if a stylesheet wanted it to.
+    const div = document.createElement('div');
+    div.id = 'target-div';
+    document.body.appendChild(div);
+
+    vi.spyOn(window, 'getComputedStyle').mockImplementation(
+      (el: Element, pseudo?: string | null) => {
+        if (pseudo === '::before' && (el as HTMLElement).id === 'target-div') {
+          return {
+            content: 'url("data:text/html;base64,PHNjcmlwdD4=")',
+          } as CSSStyleDeclaration;
+        }
+        return { content: 'none' } as CSSStyleDeclaration;
+      }
+    );
+
+    const images = new Map();
+    await extractCssContentImages(images);
     expect(images.size).toBe(0);
   });
 });

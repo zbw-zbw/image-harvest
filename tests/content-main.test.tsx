@@ -212,6 +212,68 @@ describe('module bootstrap', () => {
     expect(vi.isMockFunction(highlight.removeAllHighlights)).toBe(true);
     expect(vi.isMockFunction(monitor.startLiveMonitoring)).toBe(true);
   });
+
+  it('initContentScript on chrome-extension:// page → early-return, NO listener registration', async () => {
+    // Pin: the protocol guard at the top of initContentScript. Without
+    // it, injecting our content script into our own pages (popup,
+    // reverse-search results) would wire duplicate onConnect listeners
+    // that confuse port-disconnect cleanup — every UI close would
+    // trigger removeAllHighlights on a page that never had highlights.
+    vi.resetModules();
+    const addListenerSpy = vi.fn();
+    (globalThis as unknown as { chrome: unknown }).chrome = {
+      runtime: {
+        onMessage: { addListener: vi.fn() },
+        onConnect: { addListener: addListenerSpy },
+      },
+    };
+    // Override location.protocol BEFORE import so the guard short-
+    // circuits. jsdom allows re-defining window.location via
+    // Object.defineProperty.
+    const originalLocation = window.location;
+    Object.defineProperty(window, 'location', {
+      value: { ...originalLocation, protocol: 'chrome-extension:', hostname: '' },
+      configurable: true,
+      writable: true,
+    });
+
+    try {
+      await import('../content/main');
+      // The onMessage listener IS still registered (it's at module
+      // top-level, not inside initContentScript). But onConnect IS
+      // inside the function, so it must NOT be wired when the
+      // protocol guard trips.
+      expect(addListenerSpy).not.toHaveBeenCalled();
+    } finally {
+      Object.defineProperty(window, 'location', {
+        value: originalLocation,
+        configurable: true,
+        writable: true,
+      });
+    }
+  });
+
+  it('initContentScript: onConnect.addListener throwing (extension context invalidated) → silently swallowed', async () => {
+    // Pin: the outer try/catch around chrome.runtime.onConnect.addListener.
+    // After an extension reload/update, stale content scripts can still
+    // run briefly but chrome.runtime API throws "Extension context
+    // invalidated". The init MUST NOT fail loudly or the page console
+    // would fill with confusing errors during every auto-update.
+    vi.resetModules();
+    (globalThis as unknown as { chrome: unknown }).chrome = {
+      runtime: {
+        onMessage: { addListener: vi.fn() },
+        onConnect: {
+          addListener: vi.fn(() => {
+            throw new Error('Extension context invalidated');
+          }),
+        },
+      },
+    };
+
+    // Must NOT throw — import should complete normally.
+    await expect(import('../content/main')).resolves.toBeDefined();
+  });
 });
 
 // ─────────────────────────────────────────────────────────────────────
@@ -707,5 +769,58 @@ describe('extractFromStylesheets (via extractImages)', () => {
 
     const extractImages = await getExtractImages();
     await expect(extractImages()).resolves.toBeDefined();
+  });
+
+  it('outer document.styleSheets access throwing → console.warn + continues pipeline', async () => {
+    // Pin: the OUTER try/catch at the top of extractFromStylesheets.
+    // The inner `for (const sheet of ...)` is guarded by its own try,
+    // but `document.styleSheets` itself can throw (iframe contexts,
+    // restricted origins). Without the outer catch the error would
+    // reject the whole extractImages() Promise and surface as "scan
+    // failed" toast to the user.
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    // Make the ENTIRE styleSheets collection throw on iteration.
+    Object.defineProperty(document, 'styleSheets', {
+      get() {
+        throw new Error('restricted context');
+      },
+      configurable: true,
+    });
+
+    const extractImages = await getExtractImages();
+    await expect(extractImages()).resolves.toBeDefined();
+    // Console warn fired with the documented prefix so debugging is
+    // possible without failing the user-facing operation.
+    expect(warnSpy).toHaveBeenCalledWith('Failed to extract from stylesheets:', expect.any(Error));
+    warnSpy.mockRestore();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// seenUrls dedupe — cross-function dedupe across <picture><source>
+// ─────────────────────────────────────────────────────────────────────
+
+describe('extractPictureSources seenUrls dedupe', () => {
+  it('skip branch: same resolved URL already in seenUrls is NOT re-added (continue-on-seen)', async () => {
+    // Pin: the `if (state.seenUrls.has(resolvedUrl)) continue` guard
+    // inside the <picture><source> srcset parser. Without it, a
+    // <source srcset="img.jpg 1x, img.jpg 2x"> (duplicate URL across
+    // descriptors, which is valid markup) would create two ImageItems
+    // with identical IDs — breaking the sidepanel's dedup-by-id.
+    const picture = document.createElement('picture');
+    const source = document.createElement('source');
+    // Duplicate URL at different descriptors — realistic in lazy-loaded
+    // markup where JS overrides srcset with a static placeholder.
+    source.setAttribute(
+      'srcset',
+      'https://example.com/samefile.jpg 1x, https://example.com/samefile.jpg 2x'
+    );
+    picture.appendChild(source);
+    document.body.appendChild(picture);
+
+    const result = await (await getExtractImages())();
+    const matches = result.filter((r) => r.url.includes('samefile.jpg'));
+    // Dedupe pinned — exactly ONE entry survives.
+    expect(matches).toHaveLength(1);
   });
 });
