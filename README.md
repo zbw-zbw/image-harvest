@@ -34,7 +34,7 @@
   <img src="https://img.shields.io/badge/Manifest-V3-blue" alt="Manifest V3">
   <img src="https://img.shields.io/badge/Chrome-88%2B-brightgreen?logo=googlechrome&logoColor=white" alt="Chrome 88+">
   <img src="https://img.shields.io/badge/Privacy-First-success" alt="Privacy First">
-  <img src="https://img.shields.io/badge/Zero-Tracking-success" alt="Zero Tracking">
+  <img src="https://img.shields.io/badge/Telemetry-Anonymous%20%26%20Opt--in-success" alt="Anonymous Opt-in Telemetry">
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen" alt="PRs welcome">
 </p>
 
@@ -66,6 +66,19 @@
 > Product roadmap, marketing strategy, and platform-specific launch content are maintained in a separate private repository and not distributed with this open-source release.
 >
 > 👉 **Documentation index:** [`docs/README.md`](./docs/README.md)
+
+---
+
+## 🆕 What's New
+
+> The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
+
+- **🎯 Anonymous opt-in telemetry** — understand which features matter most while keeping every URL, image, and identifier strictly local. One toggle in **Settings → Help Improve**, off by default until you opt in.
+- **🌍 5-language UI** — English, 简体中文, 繁體中文, 日本語, Español. Auto-detects browser language; switchable in Settings.
+- **🆓 7-day free trial for Pro** — try every Pro feature with no upfront charge. Cancel during the trial = no bill.
+- **💰 30-day money-back guarantee** — every paid plan refundable for 30 days, no questions asked. See the [Refund Policy](https://image-harvest.kyriewen.cn/refund).
+- **🔍 Reverse image search** — Google + TinEye built into the right-click menu (Free); Baidu + Yandex unlocked with Pro.
+- **📚 Long-form guides** — see the new [Image Harvest Blog](https://image-harvest.kyriewen.cn/blog) for tutorials, comparisons, and the honest "best image extractor for Chrome 2026" review.
 
 ---
 
@@ -118,7 +131,8 @@
 ### 🔎 Reverse Image Search
 
 - **Google Images** (free)
-- **TinEye / Baidu / Yandex** _(Pro)_
+- **TinEye** (free)
+- **Baidu / Yandex** _(Pro)_
 
 ### 🖥️ Dual Display Mode
 
@@ -282,23 +296,25 @@ To install in Chrome: `chrome://extensions/` → Developer mode → **Load unpac
 
 ## 💎 Free vs Pro
 
-| Feature                                | Free             | Pro                        |
-| -------------------------------------- | ---------------- | -------------------------- |
-| Smart image extraction                 | ✅ Full          | ✅ Full                    |
-| Filters (size / format / layout / URL) | ✅ Full          | ✅ Full                    |
-| Sorting & view modes                   | ✅ Full          | ✅ Full                    |
-| Single download                        | ✅ Full          | ✅ Full                    |
-| Side Panel / Popup modes               | ✅ Full          | ✅ Full                    |
-| Batch ZIP download                     | ⚡ Up to 20      | ✅ Unlimited               |
-| Format conversion                      | ❌               | ✅ PNG / JPG / WebP        |
-| Custom naming templates                | ⚡ Default only  | ✅ Full template variables |
-| Page highlight                         | ⚡ Single only   | ✅ Batch + auto-scroll     |
-| Smart grouping                         | ⚡ None / Format | ✅ All 5 modes             |
-| Live monitoring                        | ❌               | ✅ Real-time               |
-| Similar image detection                | ❌               | ✅ pHash-based             |
-| Image collection                       | ❌               | ✅ Full collection system  |
-| Multi-tab extraction                   | ❌               | ✅ Cross-tab               |
-| Reverse image search                   | ⚡ Google only   | ✅ 4 engines               |
+| Feature                                | Free               | Pro                        |
+| -------------------------------------- | ------------------ | -------------------------- |
+| Smart image extraction                 | ✅ Full            | ✅ Full                    |
+| Filters (size / format / layout / URL) | ✅ Full            | ✅ Full                    |
+| Sorting & view modes                   | ✅ Full            | ✅ Full                    |
+| Single download                        | ✅ Full            | ✅ Full                    |
+| Side Panel / Popup modes               | ✅ Full            | ✅ Full                    |
+| Batch ZIP download                     | ⚡ Up to 30        | ✅ Unlimited               |
+| Batch URL copy                         | ⚡ Up to 20        | ✅ Unlimited               |
+| Format conversion                      | ❌                 | ✅ PNG / JPG / WebP        |
+| Custom naming templates                | ⚡ Default only    | ✅ Full template variables |
+| Page highlight                         | ⚡ Single only     | ✅ Batch + auto-scroll     |
+| Smart grouping                         | ⚡ None / Format   | ✅ All 5 modes             |
+| Live monitoring                        | ❌                 | ✅ Real-time               |
+| Similar image detection                | ❌                 | ✅ pHash-based             |
+| Image collection                       | ⚡ Up to 5         | ✅ Unlimited               |
+| Multi-tab extraction                   | ❌                 | ✅ Cross-tab               |
+| Reverse image search                   | ⚡ Google + TinEye | ✅ 4 engines               |
+| Interface languages                    | ✅ EN/中/繁/日/Es  | ✅ EN/中/繁/日/Es          |
 
 ---
 
@@ -314,6 +330,30 @@ Image Harvest is **free to use** with optional Pro plans for power users.
 | **Lifetime** | $39.99 | one-time            | Pay once, use forever — no subscription         |
 
 > 💡 All Pro plans unlock the same features. View the full feature comparison on the [Pricing page](https://image-harvest.kyriewen.cn/pricing).
+
+---
+
+## ⚖️ Why Image Harvest
+
+The Chrome Web Store has dozens of "image downloader" extensions, most released in 2014–2018 and abandoned. Here's how Image Harvest stacks up against the most-installed alternatives — written honestly, including where we lose. The full benchmark methodology is on the [comparison blog post](https://image-harvest.kyriewen.cn/blog/best-image-extractor-chrome).
+
+| Capability                                        | Image Harvest      | Image Downloader (2014) | Imageye            | Fatkun Batch   |
+| ------------------------------------------------- | ------------------ | ----------------------- | ------------------ | -------------- |
+| Modern lazy-loaded sites (`IntersectionObserver`) | ✅ Yes             | ❌ Static DOM only      | ✅ Yes             | ✅ Yes         |
+| Batch ZIP download                                | ✅ 30 free / ∞ Pro | ❌ Single file only     | ✅ With ads        | ✅ Yes         |
+| Side Panel + Popup dual mode                      | ✅ Both            | ❌ Popup only           | ❌ Popup only      | ❌ Popup only  |
+| Smart filtering (size / format / domain)          | ✅ Full            | ⚡ Size only            | ⚡ Limited         | ✅ Full        |
+| Perceptual-hash deduplication                     | ✅ Pro             | ❌                      | ❌                 | ❌             |
+| Live monitoring (`MutationObserver`)              | ✅ Pro             | ❌                      | ❌                 | ❌             |
+| Multi-tab batch extraction                        | ✅ Pro             | ❌                      | ❌                 | ❌             |
+| Custom naming templates                           | ✅ Pro             | ❌                      | ❌                 | ⚡ Limited     |
+| Reverse image search (Google + TinEye built-in)   | ✅ Free            | ❌                      | ❌                 | ❌             |
+| Anonymous, opt-in telemetry only                  | ✅ One toggle      | n/a (unmaintained)      | ⚠️ Ad network      | ✅ Yes         |
+| Active maintenance (2026)                         | ✅ Yes             | ❌ Abandoned            | ⚠️ Sporadic        | ⚠️ Sporadic    |
+| Free tier                                         | ✅ Permanent       | ✅ Permanent            | ⚡ Ad-supported    | ✅ Permanent   |
+| Pro tier with 7-day trial + 30-day refund         | ✅ Yes             | ❌ No Pro tier          | ⚡ No clear refund | ❌ No Pro tier |
+
+**Where we currently lose**: no Firefox port (yet), no video extraction, free-tier ZIP capped at 30 images. Trade-offs we made deliberately so the experience for the 95% use case stays fast and clean.
 
 ---
 
@@ -335,9 +375,12 @@ Image Harvest is **free to use** with optional Pro plans for power users.
 
 ## 🔒 Privacy & Security
 
-- **No data collection** — the extension does not collect or transmit any user data
-- **No URL tracking** — no analytics or telemetry
-- **All processing is local** — image extraction, hashing, color analysis, and format conversion happen entirely in the browser
+- **All processing is local** — image extraction, hashing, color analysis, and format conversion happen entirely in your browser
+- **Anonymous, opt-in telemetry** — to understand which features matter most we ship a small amount of usage data **only after you click "Sure, help improve" on first launch**. You can change your mind anytime in **Settings → Help Improve (Anonymous Usage Data)**
+  - **Collected**: button clicks, scan/download counts, feature usage events
+  - **Never collected**: URLs, page titles, image URLs, image data, IP addresses, email, license keys, or anything that could identify you
+  - **Anonymity**: every event carries only a 16-char hashed install id (never your raw id) and is sent to our own endpoint — no Google Analytics, no Mixpanel, no third parties
+- **You're always in control** — telemetry is one toggle and your decision is honored across sessions; uninstalling the extension wipes every locally-stored byte
 
 ---
 
