@@ -1,0 +1,74 @@
+{
+  "app.name": { "message": "Image Harvest" },
+  "app.tagline": { "message": "あらゆるウェブページから画像を一括ダウンロード" },
+
+  "common.cancel": { "message": "キャンセル" },
+  "common.confirm": { "message": "確認" },
+  "common.close": { "message": "閉じる" },
+  "common.save": { "message": "保存" },
+  "common.delete": { "message": "削除" },
+  "common.copy": { "message": "コピー" },
+  "common.download": { "message": "ダウンロード" },
+  "common.upgrade": { "message": "Pro にアップグレード" },
+  "common.maybe_later": { "message": "後で" },
+
+  "settings.title": { "message": "設定" },
+  "settings.section.appearance": { "message": "外観" },
+  "settings.section.experience": { "message": "エクスペリエンス" },
+  "settings.section.scan": { "message": "スキャン" },
+  "settings.section.download": { "message": "ダウンロード" },
+  "settings.section.language": { "message": "言語" },
+  "settings.language.label": { "message": "表示言語" },
+  "settings.language.desc": {
+    "message": "インターフェース言語を選択。パネルを再起動するとすべて反映されます。"
+  },
+
+  "toolbar.select_all": { "message": "すべて選択" },
+  "toolbar.deselect_all": { "message": "選択解除" },
+  "toolbar.copy_urls": { "message": "URL をコピー" },
+  "toolbar.copy_urls.tooltip": { "message": "選択した画像の URL をクリップボードにコピー" },
+  "toolbar.copy_urls.empty": { "message": "先に画像を選択してください" },
+
+  "toast.url_copied.single": { "message": "URL をコピーしました!" },
+  "toast.url_copied.batch": { "message": "{count} 件の URL をクリップボードにコピーしました" },
+  "toast.url_copy_failed": { "message": "URL のコピーに失敗しました" },
+  "toast.download.started": { "message": "ダウンロードを開始しました" },
+  "toast.download.failed": { "message": "ダウンロードに失敗しました" },
+  "toast.download.cancelled": { "message": "ダウンロードをキャンセルしました" },
+  "toast.download.completed": { "message": "{count} 枚の画像をダウンロードしました" },
+  "toast.no_images_selected": { "message": "画像が選択されていません" },
+  "toast.image_removed": { "message": "画像を削除しました" },
+  "toast.collection.added": { "message": "コレクションに追加しました" },
+  "toast.collection.add_failed": { "message": "コレクションへの追加に失敗しました" },
+  "toast.collection.removed": { "message": "コレクションから削除しました" },
+  "toast.collection.remove_failed": { "message": "削除に失敗しました" },
+  "toast.color_copied": { "message": "カラー {hex} をコピーしました" },
+  "toast.color_copy_failed": { "message": "カラーのコピーに失敗しました" },
+
+  "pro.feature_blocked.format_conversion": {
+    "message": "形式変換は Pro 機能です。アップグレードで解放!"
+  },
+  "pro.feature_blocked.advanced_grouping": {
+    "message": "高度なグループ化は Pro 機能です。アップグレードで解放!"
+  },
+  "pro.feature_blocked.collection": { "message": "コレクションは Pro 機能です" },
+  "pro.feature_blocked.image_delete": {
+    "message": "画像削除は Pro 機能です。アップグレードで解放!"
+  },
+  "pro.feature_blocked.color_copy": { "message": "カラーコピーは Pro 機能です" },
+  "pro.feature_blocked.reverse_search": {
+    "message": "{engine} 検索は Pro が必要です。アップグレードで解放!"
+  },
+  "pro.zip_limit": { "message": "無料版は ZIP あたり最大 {max} 枚まで。Pro で無制限に!" },
+  "pro.copy_urls_limit": { "message": "無料版は一度に最大 {max} 件の URL まで。Pro で無制限に!" },
+  "pro.collection_limit": { "message": "無料版はお気に入り最大 {max} 件まで。Pro で無制限に!" },
+
+  "rating.title": { "message": "Image Harvest はいかがですか?" },
+  "rating.desc": {
+    "message": "お役に立てたなら、Chrome ウェブストアでの 5 つ星レビューが大きな励みになります。"
+  },
+  "rating.rate_now": { "message": "⭐ Chrome ストアで評価" },
+  "rating.later": { "message": "後で" },
+  "rating.never": { "message": "今後表示しない" },
+  "rating.close": { "message": "閉じる" }
+}

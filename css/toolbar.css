@@ -624,3 +624,50 @@
 .filter-group-by {
   display: none;
 }
+
+/* ────────────────────────────────────────────────────────────────────
+ * Batch URL Copy Button (Sprint 3.4)
+ *
+ * Inherits .select-all-btn for size + border + colors, then adds:
+ *   - disabled state (greyed out + cursor not-allowed)
+ *   - hover only when enabled
+ *   - icon container shrinks gracefully on narrow viewports so the
+ *     button still fits next to "Select all" at the 280px sidepanel
+ *     min-width
+ *
+ * Day/night themes are inherited from CSS variables — no override
+ * needed because we only reuse existing tokens (--bg-color,
+ * --text-secondary, --primary-color).
+ * ────────────────────────────────────────────────────────────────── */
+.batch-url-copy-btn {
+  /* Tighter gap so the icon + label don't push out of the toolbar
+     row when the count badge ("Copy URLs (12)") is visible. */
+  gap: 4px;
+}
+
+.batch-url-copy-btn:disabled,
+.batch-url-copy-btn[disabled] {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.batch-url-copy-btn:not([disabled]):hover .select-all-checkbox {
+  /* Mirror .select-all-btn.partial visual feedback so users get the
+     same affordance for both selection-driven CTAs. */
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: white;
+}
+
+.batch-url-copy-btn:not([disabled]):hover .select-all-checkbox svg {
+  color: white;
+}
+
+/* Below 320px (cramped sidepanel), drop the label and keep just the
+   icon. Container is still keyboard-focusable + tooltip-readable. */
+@media (max-width: 320px) {
+  .batch-url-copy-btn .select-all-text {
+    display: none;
+  }
+}

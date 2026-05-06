@@ -381,3 +381,109 @@
     transform: rotate(360deg);
   }
 }
+
+/* ============================================
+   ProUpgradeModal — Sprint 2.2 redesign
+   ============================================ */
+/* New CTA section: trial badge + primary "Start Free Trial" + secondary
+   "View Pricing". Sits between the value-prop feature list and the
+   legacy already-have-a-key activation form. */
+
+.pro-upgrade-cta-section {
+  margin-top: 18px;
+  padding: 14px 14px 12px;
+  border-radius: var(--radius-md);
+  background: color-mix(in srgb, var(--primary-color) 8%, var(--bg-secondary));
+  border: 1px solid color-mix(in srgb, var(--primary-color) 25%, var(--border-color));
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.pro-upgrade-trial-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--bg-color);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.pro-upgrade-cta-row {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pro-upgrade-cta-row .btn {
+  justify-content: center;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.pro-upgrade-cta-row .btn-primary {
+  padding: 10px 14px;
+}
+
+.pro-upgrade-cta-row .btn-secondary {
+  padding: 8px 14px;
+}
+
+/* Block-level button utility used by the CTA row and any future
+   full-width modal buttons. Width:100% inside an inline-flex .btn
+   needs justify-content:center to keep label + icon centered. */
+.btn-block {
+  width: 100%;
+  display: flex;
+  justify-content: center;
+}
+
+/* "Already have a key?" divider between CTA section and legacy
+   activation form. Pure CSS rule — no extra DOM nodes. */
+.pro-upgrade-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0 10px;
+  color: var(--text-tertiary);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.pro-upgrade-divider::before,
+.pro-upgrade-divider::after {
+  content: '';
+  flex: 1 1 auto;
+  height: 1px;
+  background: var(--border-color);
+}
+
+.pro-upgrade-divider span {
+  flex-shrink: 0;
+}
+
+/* The redesigned modal is significantly taller (CTA + features + form);
+   give it more breathing room and let the body scroll on short panels. */
+.pro-upgrade-content .modal-body {
+  max-height: 70vh;
+  overflow-y: auto;
+}
+
+/* Removed the h4 "Pro Features" heading from the markup; kept the styles
+   above intact for backwards-compat in case any other modal reuses them. */
+
+/* Narrow viewport: keep the badge label readable when the panel is at
+   minimum width, and avoid the trial badge wrapping awkwardly. */
+@media (max-width: 380px) {
+  .pro-upgrade-trial-badge {
+    font-size: 10.5px;
+    padding: 3px 8px;
+  }
+}

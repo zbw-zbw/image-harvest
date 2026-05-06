@@ -159,15 +159,26 @@ describe('ImageCard – click handlers', () => {
     );
   });
 
-  it('shows the upgrade modal when a free user clicks favorite', async () => {
+  it('lets a free user click favorite — the cap is now enforced inside addToCollection (Sprint 3.5)', async () => {
+    // Sprint 3.5 removed the component-level Pro guard from
+    // handleFavorite. Free users now get MAX_COLLECTION_ITEMS slots
+    // before the paywall trips, and the gating moved into
+    // pro-features.addToCollection so every entry point inherits the
+    // same cap. The component therefore just calls addToCollection and
+    // re-checks isImageInCollection to keep the heart icon honest.
     state.isProUser = false;
-    const { container } = render(<ImageCard img={makeImage()} index={0} />);
+    const img = makeImage({ id: 'fav-free' });
+    const { container } = render(<ImageCard img={img} index={0} />);
     fireEvent.click(container.querySelector('.btn-favorite')!);
     await waitFor(() => {
-      expect(mocks.ui.showToast).toHaveBeenCalledWith('Collection is a Pro feature', 'warning');
-      expect(mocks.settings.showProUpgradeModal).toHaveBeenCalled();
-      expect(mocks.pro.addToCollection).not.toHaveBeenCalled();
+      expect(mocks.pro.addToCollection).toHaveBeenCalledWith(img);
     });
+    // The legacy "Collection is a Pro feature" pre-block toast must NOT fire.
+    expect(mocks.ui.showToast).not.toHaveBeenCalledWith(
+      'Collection is a Pro feature',
+      'warning'
+    );
+    expect(mocks.settings.showProUpgradeModal).not.toHaveBeenCalled();
   });
 
   it('adds to collection when a Pro user clicks favorite', async () => {

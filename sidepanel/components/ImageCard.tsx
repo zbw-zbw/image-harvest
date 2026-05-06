@@ -12,6 +12,7 @@
 // can't live in the store cheaply (one IndexedDB lookup per image), so we
 // resolve it locally with useEffect and keep it in component state.
 import { useEffect, useRef, useState } from 'preact/hooks';
+import { t } from '../../shared/i18n';
 import type { ImageItem } from '../../shared/types';
 import {
   copyImageUrl,
@@ -192,17 +193,21 @@ export function ImageCard({ img, index }: Props) {
 
   const handleFavorite = async (e: MouseEvent) => {
     e.stopPropagation();
-    if (!isProUser) {
-      showToast('Collection is a Pro feature', 'warning');
-      showProUpgradeModal();
-      return;
-    }
+    // Sprint 3.5: Free users get MAX_COLLECTION_ITEMS "tasting" slots.
+    // The cap check moved into addToCollection so we don't need to
+    // duplicate the threshold here; we just optimistically flip the
+    // local "favorited" state AFTER addToCollection resolves successfully.
+    // We can't tell from the void return whether the cap blocked the add,
+    // so we re-check by querying the collection afterwards via
+    // isImageInCollection — cheap (IndexedDB get-all) and keeps the
+    // optimistic UX honest when the Pro guard fires.
     if (isFavorited) {
       await removeFromCollection(img.id);
       setIsFavorited(false);
     } else {
       await addToCollection(img);
-      setIsFavorited(true);
+      const stillIn = await isImageInCollection(img.url);
+      setIsFavorited(stillIn);
     }
   };
 
@@ -213,7 +218,7 @@ export function ImageCard({ img, index }: Props) {
     // the handleFavorite pattern above and matches the fast-fail UX
     // of the toolbar Pro guards in settings.bindProGuards.
     if (!isProUser) {
-      showToast('Image removal is a Pro feature. Upgrade to unlock!', 'warning');
+      showToast(t('pro.feature_blocked.image_delete'), 'warning');
       showProUpgradeModal();
       return;
     }
@@ -241,7 +246,7 @@ export function ImageCard({ img, index }: Props) {
   const handleColorClick = (color: string) => (e: MouseEvent) => {
     e.stopPropagation();
     if (!isProUser) {
-      showToast('Color copy is a Pro feature', 'warning');
+      showToast(t('pro.feature_blocked.color_copy'), 'warning');
       showProUpgradeModal();
       return;
     }
