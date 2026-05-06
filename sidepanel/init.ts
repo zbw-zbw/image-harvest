@@ -4,6 +4,11 @@
 
 import { FREE_LIMITS, MESSAGE_TYPES } from '../shared/constants';
 import { isRestrictedUrl } from '../shared/utils';
+import { setEnvelopeMeta, track, flushNow } from '../shared/telemetry';
+import { EVENTS } from '../shared/telemetry-events';
+import { isProUser } from '../shared/license';
+import { getProUpsellBucket } from '../shared/ab-experiment';
+import { detectLocale, t } from '../shared/i18n';
 import {
   clearSelection,
   downloadSelectedAsZip,
@@ -74,6 +79,72 @@ let tabUpdatedTimer: ReturnType<typeof setTimeout> | null = null;
 async function init(): Promise<void> {
   state.isPopupMode = window.location.pathname.endsWith('popup.html');
 
+  // ── i18n: resolve user / browser locale before any UI text is rendered ──
+  // Catalogue lookup is sync once detectLocale() resolves, so subsequent
+  // t() calls inside mountPreactComponents / cacheElements / loadSettings
+  // see the right language. Failure here must not block init — t() falls
+  // back to English when activeLocale stays at its module default.
+  try {
+    await detectLocale();
+  } catch {
+    /* keep fallback locale */
+  }
+
+  // ── Telemetry envelope sync ─────────────────────────────────────────────
+  // Background SW seeds {version, plan} but lives in a different runtime,
+  // so the sidepanel must re-seed for its own SDK instance. lang is
+  // sidepanel-only because chrome.i18n returns the UI locale here.
+  try {
+    const lang = chrome.i18n?.getUILanguage?.() || 'unknown';
+    setEnvelopeMeta({ lang });
+    isProUser()
+      .then((info) => setEnvelopeMeta({ plan: info.isPro ? info.plan || 'pro' : 'free' }))
+      .catch(() => {
+        /* keep default */
+      });
+    // Resolve the install's A/B bucket once and stamp it onto the envelope
+    // so every conversion event whose schema declares `abBucket` ships
+    // with the right variant. Sync after this initial await — the SDK
+    // reads it from envelopeMeta on every track() call.
+    getProUpsellBucket()
+      .then((bucket) => setEnvelopeMeta({ abBucket: bucket }))
+      .catch(() => {
+        /* fall back to no bucket — the funnel collapses A+B for that user */
+      });
+
+    // Fire EXTENSION_FIRST_OPEN exactly once per install, gated by a
+    // storage flag so subsequent opens stay silent. We deliberately do
+    // NOT await this — the funnel doesn't care about ordering vs init.
+    void (async () => {
+      const { _telemetry_first_open_at } = await chrome.storage.local.get(
+        '_telemetry_first_open_at'
+      );
+      if (!_telemetry_first_open_at) {
+        await chrome.storage.local.set({ _telemetry_first_open_at: Date.now() });
+        await track(EVENTS.EXTENSION_FIRST_OPEN);
+        await flushNow();
+      }
+    })();
+
+    // First-run privacy opt-in. Show the modal only when the user has
+    // never made a choice before; otherwise honor their stored decision.
+    // We deliberately delay by one tick so mountPreactComponents() can
+    // attach the modal mount point before we flip the visibility flag.
+    void (async () => {
+      const { _telemetry_opt_in_decided } = await chrome.storage.local.get(
+        '_telemetry_opt_in_decided'
+      );
+      if (!_telemetry_opt_in_decided) {
+        // setTimeout puts the state mutation after the current task so
+        // Preact has finished its initial mount pass.
+        setTimeout(() => {
+          state.privacyOptInModalState = { open: true };
+        }, 50);
+      }
+    })();
+  } catch {
+    /* telemetry must never break init */
+  }
   // Mount Preact components first: this swaps legacy DOM nodes for fresh
   // mount points so that cacheElements() (which still runs for the rest of
   // the imperative UI) does not cache stale references to nodes Preact has
@@ -603,7 +674,7 @@ function bindEvents(): void {
         const format = item.dataset.format;
         // Pro check: non-original formats require Pro
         if (!state.isProUser && format !== 'original') {
-          showToast('Format conversion is a Pro feature. Upgrade to unlock!', 'warning');
+          showToast(t('pro.feature_blocked.format_conversion'), 'warning');
           showProUpgradeModal();
           hideDownloadDropdown();
           return;
@@ -762,7 +833,7 @@ function bindEvents(): void {
       const val = opt.dataset.groupFilter || 'none';
       // Free tier: only 'none' and 'format' grouping allowed
       if (!state.isProUser && !FREE_LIMITS.ALLOWED_GROUP_MODES.includes(val as 'none' | 'format')) {
-        showToast('Advanced grouping is a Pro feature. Upgrade to unlock!', 'warning');
+        showToast(t('pro.feature_blocked.advanced_grouping'), 'warning');
         showProUpgradeModal();
         closeAllFilterDropdowns();
         return;
@@ -876,7 +947,7 @@ function bindEvents(): void {
           ) {
             dropdown.classList.add('hidden');
             closeSettings();
-            showToast('Advanced grouping is a Pro feature. Upgrade to unlock!', 'warning');
+            showToast(t('pro.feature_blocked.advanced_grouping'), 'warning');
             showProUpgradeModal();
             return;
           }
@@ -888,7 +959,7 @@ function bindEvents(): void {
           ) {
             dropdown.classList.add('hidden');
             closeSettings();
-            showToast('Format conversion is a Pro feature. Upgrade to unlock!', 'warning');
+            showToast(t('pro.feature_blocked.format_conversion'), 'warning');
             showProUpgradeModal();
             return;
           }
@@ -950,11 +1021,14 @@ function bindEvents(): void {
       e.stopPropagation();
       const engine = item.dataset.engine || '';
       // Free tier: only engines in FREE_LIMITS.REVERSE_SEARCH_ENGINES are allowed
-      if (!state.isProUser && !FREE_LIMITS.REVERSE_SEARCH_ENGINES.includes(engine as 'google')) {
-        showToast(
-          `${engine.charAt(0).toUpperCase() + engine.slice(1)} search requires Pro. Upgrade to unlock!`,
-          'warning'
-        );
+      if (
+        !state.isProUser &&
+        !FREE_LIMITS.REVERSE_SEARCH_ENGINES.includes(
+          engine as (typeof FREE_LIMITS.REVERSE_SEARCH_ENGINES)[number]
+        )
+      ) {
+        const engineLabel = engine.charAt(0).toUpperCase() + engine.slice(1);
+        showToast(t('pro.feature_blocked.reverse_search', { engine: engineLabel }), 'warning');
         showProUpgradeModal();
         if (elements.reverseSearchMenu) elements.reverseSearchMenu.classList.add('hidden');
         return;

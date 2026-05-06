@@ -157,3 +157,57 @@ export interface TabImageCacheEntry {
   timestamp: number;
   images: ImageItem[];
 }
+
+// ── Telemetry (anonymous, opt-in) ──────────────────────────────────────────
+//
+// Design constraints (see implementation_plan.md → "User Review Required"):
+//   - Completely anonymous: NO url / page title / image url / IP / user-id.
+//   - `instanceIdHash` is a one-way digest of the per-installation id created
+//     by getOrCreateInstanceId() — used only for de-duplication.
+//   - Props are a small whitelisted bag of primitives (string | number |
+//     boolean). Avoid nested objects so the receiver can flatten cheaply.
+//   - The event NAME is a plain string here (not a union) so the SDK stays
+//     decoupled from the constants module — `EVENTS` in
+//     shared/telemetry-events.ts is the source of truth callers should import.
+
+export type TelemetryPropValue = string | number | boolean;
+export type TelemetryProps = Record<string, TelemetryPropValue>;
+
+/** A single event captured locally before it ships. */
+export interface TelemetryEvent {
+  /** Event name. MUST match a key in shared/telemetry-events.ts EVENTS. */
+  event: string;
+  /** Unix epoch ms at the moment the event was emitted (client clock). */
+  ts: number;
+  /** Optional per-event payload. Shape constrained by EVENT_PROP_SCHEMAS. */
+  props?: TelemetryProps;
+}
+
+/**
+ * The on-the-wire envelope: a batch of events plus the small set of stable
+ * dimensions that apply to all events in the batch. The server enriches this
+ * with `received_at` (and discards IP after country lookup).
+ */
+export interface TelemetryEnvelope {
+  /** SHA-256(instanceId) truncated to 16 hex chars. Stable per install. */
+  instanceIdHash: string;
+  /** Extension version, e.g. "1.0.1". */
+  version: string;
+  /** UI locale at send time, e.g. "en", "zh-CN". */
+  lang: string;
+  /** Pro plan tag at send time: "free" | "monthly" | "yearly" | "lifetime" | "trial". */
+  plan: string;
+  /** Schema version of the envelope itself; bump when this shape changes. */
+  schemaVersion: 1;
+  /** Batch of events (max ~50 per request after batching). */
+  events: TelemetryEvent[];
+}
+
+/** Server-side ack. Kept tiny on purpose. */
+export interface TelemetryAck {
+  ok: boolean;
+  /** Number of events the server actually persisted (after whitelist drop). */
+  accepted?: number;
+  /** Optional human-readable error for client logs. */
+  error?: string;
+}

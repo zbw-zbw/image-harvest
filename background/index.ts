@@ -10,6 +10,8 @@ import {
   saveAppSettings,
 } from '../shared/storage';
 import { activateLicense, deactivateLicense, isProUser, getLicenseInfo } from '../shared/license';
+import { setEnvelopeMeta, track, flushNow } from '../shared/telemetry';
+import { EVENTS } from '../shared/telemetry-events';
 
 import { uiPorts, sidePanelOpenedTabs, getAccessibleTabId, broadcastToPopup } from './utils';
 import { initLicenseAlarm } from './license';
@@ -20,6 +22,49 @@ import { fetchImageData, reverseSearchUpload } from './reverse-search';
 // ── Initialization ──────────────────────────────────────────────────────────
 
 initLicenseAlarm();
+
+// ── Telemetry initialization ────────────────────────────────────────────────
+// Two responsibilities:
+//   1. Seed the envelope meta (version + plan) so sidepanel/popup don't have
+//      to re-derive it on every load. lang is filled in lazily by the UI
+//      side at boot via setEnvelopeMeta().
+//   2. Capture EXT_INSTALLED / EXT_UPDATED at the only place chrome lets
+//      us — the onInstalled hook, which is only invoked in the SW.
+function initTelemetry(): void {
+  // Seed `version` synchronously from the manifest. Plan defaults to
+  // 'free'; the sidepanel will overwrite once isProUser() resolves.
+  const version = chrome.runtime.getManifest().version || '0.0.0';
+  setEnvelopeMeta({ version, plan: 'free' });
+
+  // Late-bind plan after license check completes. Failure is non-fatal —
+  // we just keep the 'free' default.
+  isProUser()
+    .then((info) => {
+      const plan = info.isPro ? info.plan || 'pro' : 'free';
+      setEnvelopeMeta({ plan });
+    })
+    .catch(() => {
+      /* keep default */
+    });
+}
+
+initTelemetry();
+
+// onInstalled fires exactly once per install/update event. We use it to
+// distinguish brand-new installs (the most valuable signal in the funnel)
+// from version updates of existing installs.
+chrome.runtime.onInstalled.addListener((details) => {
+  if (details.reason === 'install') {
+    void track(EVENTS.EXTENSION_INSTALLED);
+  } else if (details.reason === 'update') {
+    void track(EVENTS.EXTENSION_UPDATED, {
+      fromVersion: details.previousVersion || 'unknown',
+      toVersion: chrome.runtime.getManifest().version || 'unknown',
+    });
+  }
+  // SW may go dormant before the 5s flush window — ship immediately.
+  void flushNow();
+});
 
 chrome.runtime.onConnect.addListener((port) => {
   if (port.name !== 'image-snatcher-ui') return;

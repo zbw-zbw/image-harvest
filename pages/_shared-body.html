@@ -16,6 +16,11 @@ HTML document — it omits the surrounding
       wrapper because each entry brings its own. -->
 
       <div id="app">
+        <!-- Soft paywall banner mount (Sprint 2.1).
+             Permanent layout slot above the toolbar; the Preact component
+             short-circuits to null when not eligible, so the slot is a no-op
+             height-zero div in the common case. -->
+        <div id="soft-paywall-banner-mount" data-preact-mount="soft-paywall-banner-mount"></div>
         <!-- Toolbar Row 1: Pro status (left) + Live + PRO actions + Settings (right) -->
         <div class="toolbar toolbar-actions">
           <!-- Pro Status Area (left side) -->
@@ -140,6 +145,10 @@ HTML document — it omits the surrounding
 
         <!-- Toolbar Row 2: Select All (left) + Sort/Group (right) -->
         <div class="toolbar toolbar-select-row">
+          <!-- Sprint 3.4 batch URL copy mount. Sits next to "Select all"
+               so the two selection-driven CTAs share visual grouping.
+               The Preact component owns the disabled state and label. -->
+          <span id="batch-url-copy-mount" data-preact-mount="batch-url-copy-mount"></span>
           <button id="btn-select-all" class="select-all-btn" title="Select all">
             <span class="select-all-checkbox">
               <svg
@@ -1352,6 +1361,41 @@ HTML document — it omits the surrounding
                 </div>
               </div>
 
+              <!-- Language Settings (Sprint 3.3) -->
+              <div class="settings-section">
+                <h3>Language</h3>
+                <div class="setting-group">
+                  <label>Display Language</label>
+                  <p class="setting-desc">
+                    Choose the interface language. Restart the panel to apply everywhere.
+                  </p>
+                  <div class="setting-format-row">
+                    <div class="setting-select" id="setting-language" data-value="en">
+                      <button class="setting-select-btn" type="button">
+                        <span class="setting-select-text">English</span>
+                        <svg
+                          width="12"
+                          height="12"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-width="2"
+                        >
+                          <polyline points="6 9 12 15 18 9" />
+                        </svg>
+                      </button>
+                      <div class="setting-select-dropdown hidden">
+                        <div class="setting-select-option active" data-value="en">English</div>
+                        <div class="setting-select-option" data-value="zh-CN">简体中文</div>
+                        <div class="setting-select-option" data-value="zh-TW">繁體中文</div>
+                        <div class="setting-select-option" data-value="ja">日本語</div>
+                        <div class="setting-select-option" data-value="es">Español</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <!-- Experience Settings -->
               <div class="settings-section">
                 <h3>Experience</h3>
@@ -1374,6 +1418,28 @@ HTML document — it omits the surrounding
                   </label>
                   <p class="setting-desc">
                     Skip the confirmation dialog when downloading many files
+                  </p>
+                </div>
+                <div class="setting-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="setting-telemetry" />
+                    <span class="settings-checkbox"
+                      ><svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="3"
+                        class="check-icon"
+                      >
+                        <polyline points="20 6 9 17 4 12" /></svg
+                    ></span>
+                    <span>Help Improve (Anonymous Usage Data)</span>
+                  </label>
+                  <p class="setting-desc">
+                    Send anonymous feature-usage events. No URLs, no images, no personal info.
+                    Off-by-default; you can change this anytime.
                   </p>
                 </div>
                 <div class="setting-group">
@@ -1653,9 +1719,11 @@ HTML document — it omits the surrounding
           <div class="context-menu-item" data-engine="yandex">
             Yandex <span class="pro-badge pro-badge-mini">PRO</span>
           </div>
-          <div class="context-menu-item" data-engine="tineye">
-            TinEye <span class="pro-badge pro-badge-mini">PRO</span>
-          </div>
+          <!-- Sprint 3.5: TinEye is now free (FREE_LIMITS.REVERSE_SEARCH_ENGINES
+               includes 'tineye'). Keeping it ungated lifts our reverse-search
+               coverage from 1 to 2 free engines without weakening the Pro
+               value prop, since Pro still owns Baidu + Yandex. -->
+          <div class="context-menu-item" data-engine="tineye">TinEye</div>
           <div class="context-menu-item" data-engine="baidu">
             Baidu <span class="pro-badge pro-badge-mini">PRO</span>
           </div>

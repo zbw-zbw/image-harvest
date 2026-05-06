@@ -6,6 +6,9 @@ import { applyFilters, renderColorSwatches, syncCustomSizeInputsFromSettings } f
 import { detectSimilarImages } from './pro-features';
 import { fetchImages, processImageExtras } from './scan';
 import { state } from './state';
+import { track, isOptedIn, setOptIn } from '../shared/telemetry';
+import { EVENTS } from '../shared/telemetry-events';
+import { getLocale, setLocale, type Locale } from '../shared/i18n';
 import { checkNarrowMode, showConfirmDialog, showToast, updateFilterButtonLabels } from './ui';
 
 // ============================================
@@ -114,6 +117,18 @@ export function showSettings(): void {
     state.isProUser ? state.appSettings.enableColorExtraction !== false : false
   );
   setToggle('setting-no-warning', !!state.appSettings.noManyFilesWarning);
+  // Language: source of truth is `getLocale()` (resolved by detectLocale()
+  // at init time), not appSettings — i18n state lives in its own
+  // chrome.storage key managed by shared/i18n.ts. This mirrors the
+  // setting-telemetry pattern below: a single SDK owns the value, the
+  // toggle is just a one-way mirror of current state at modal-open time.
+  setSelect('setting-language', getLocale());
+  // Telemetry opt-in lives in its OWN chrome.storage key (managed by the
+  // SDK), not in appSettings. This avoids two sources of truth and lets
+  // the SDK be reused outside the sidepanel context (background SW).
+  // The toggle reflects current SDK state at modal-open time; it is not
+  // re-synced on background changes (none expected in normal use).
+  void isOptedIn().then((enabled) => setToggle('setting-telemetry', enabled));
 
   // Sync setting-inputs sub-panel visibility
   const togglePanelPairs: Array<[string, string]> = [
@@ -173,6 +188,25 @@ export async function saveSettings(): Promise<void> {
   state.appSettings.enableSimilarDetection = getToggle('setting-similar-detection');
   state.appSettings.enableColorExtraction = getToggle('setting-color-extract');
   state.appSettings.noManyFilesWarning = getToggle('setting-no-warning');
+  // Telemetry opt-in is intentionally NOT a member of appSettings (see
+  // loadSettings comment). Forward the toggle's current value to the SDK,
+  // which persists it under its own storage key. Failure here must not
+  // prevent the rest of the settings from being saved.
+  void setOptIn(getToggle('setting-telemetry')).catch(() => {
+    /* best-effort */
+  });
+  // Language: same one-way persistence pattern as telemetry above. The
+  // dropdown's data-value is a normalized Locale (en | zh-CN | zh-TW |
+  // ja | es) populated from the `data-value` attribute on the active
+  // .setting-select-option. setLocale() persists to chrome.storage and
+  // fires onLocaleChange listeners so any subscribed Preact components
+  // re-render in the new language without a panel reload.
+  const nextLocale = getSelect('setting-language') as Locale;
+  if (nextLocale) {
+    void setLocale(nextLocale).catch(() => {
+      /* best-effort */
+    });
+  }
 
   try {
     const stored = await chrome.storage.local.get('appSettings');
@@ -611,6 +645,13 @@ export function showProUpgradeModal(): void {
   if (modalBody) modalBody.scrollTop = 0;
   const input = document.getElementById('pro-modal-key-input') as HTMLInputElement | null;
   if (input) input.focus();
+  // Telemetry: this is THE conversion-funnel waypoint — every modal open
+  // counts. Trigger source defaults to 'modal_open' here because the modal
+  // can be reached from many paths; the bindProGuards listeners below
+  // call track(PRO_FEATURE_BLOCKED, ...) BEFORE this fn so we always
+  // know which feature drove the upsell. abBucket auto-injects from the
+  // telemetry envelope (Sprint 2.4) — no need to pass it manually.
+  void track(EVENTS.PRO_UPSELL_SHOWN, { trigger: 'modal_open' });
 }
 
 export function closeProUpgradeModal(): void {
@@ -662,6 +703,13 @@ export function bindProGuards(): void {
           e.stopImmediatePropagation();
           e.preventDefault();
           showToast(`${label} is a Pro feature. Upgrade to unlock!`, 'warning');
+          // Telemetry: emit BEFORE showProUpgradeModal so the dashboard
+          // can answer "which feature drives the most upsells".
+          // Map id → stable feature key (do not use display label; that
+          // would couple analytics to copy changes).
+          void track(EVENTS.PRO_FEATURE_BLOCKED, {
+            feature: id === 'btn-collection' ? 'collection' : 'multitab',
+          });
           showProUpgradeModal();
         }
       },
@@ -688,6 +736,16 @@ export function bindProGuards(): void {
           e.stopImmediatePropagation();
           closeSettings();
           showToast('This setting requires Pro. Upgrade to unlock!', 'warning');
+          // Telemetry: distinguish the three Pro toggles. Use stable
+          // feature keys so the dashboard can group correctly.
+          const featureMap: Record<string, string> = {
+            'setting-similar-detection': 'similar_detection',
+            'setting-color-extract': 'color_extract',
+            'setting-live-monitor': 'live_monitor',
+          };
+          void track(EVENTS.PRO_FEATURE_BLOCKED, {
+            feature: featureMap[toggle.id] || 'unknown_setting',
+          });
           showProUpgradeModal();
         }
       },
@@ -705,6 +763,9 @@ export function bindProGuards(): void {
         input.blur();
         closeSettings();
         showToast('Custom naming is a Pro feature. Upgrade to unlock!', 'warning');
+        // Telemetry: subfolder + filename templates share the same Pro
+        // gate so we group them under 'custom_naming' in the funnel.
+        void track(EVENTS.PRO_FEATURE_BLOCKED, { feature: 'custom_naming' });
         showProUpgradeModal();
       }
     });

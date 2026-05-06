@@ -10,8 +10,13 @@
 import type JSZipType from 'jszip';
 import { FREE_LIMITS, MESSAGE_TYPES } from '../shared/constants';
 import { convertImageFormat } from '../shared/converter';
+import { t } from '../shared/i18n';
 import type { ImageItem } from '../shared/types';
 import { isRestrictedUrl } from '../shared/utils';
+import { track } from '../shared/telemetry';
+import { EVENTS } from '../shared/telemetry-events';
+import { recordDownloads } from '../shared/paywall-state';
+import { recordDownloadForRating } from '../shared/rating-prompt-state';
 import { renderImages } from './render';
 import { showProUpgradeModal } from './settings';
 import { elements, state } from './state';
@@ -265,7 +270,7 @@ export async function fetchImageBlobWithFallback(url: string): Promise<Blob> {
 export async function downloadSingle(img: ImageItem, format: string | null): Promise<void> {
   // Pro check: format conversion requires Pro
   if (format && !state.isProUser) {
-    showToast('Format conversion is a Pro feature. Upgrade to unlock!', 'warning');
+    showToast(t('pro.feature_blocked.format_conversion'), 'warning');
     showProUpgradeModal();
     return;
   }
@@ -289,33 +294,44 @@ export async function downloadSingle(img: ImageItem, format: string | null): Pro
 
   try {
     await chrome.downloads.download({ url: downloadUrl, filename: filename, saveAs: false });
-    showToast('Download started', 'success');
+    showToast(t('toast.download.started'), 'success');
+    // Telemetry: format prop reveals which conversions are popular (helps
+    // decide whether to push WebP / JPG conversion as a Pro selling point).
+    void track(EVENTS.DOWNLOAD_SINGLE, { format: format || 'original' });
+    // Soft paywall (Sprint 2.1): count this toward the threshold that
+    // arms the upgrade banner. Pro users still get counted — the banner
+    // gate in shared/paywall-state.ts is purely behavioral; the
+    // SoftPaywallBanner component does the actual `state.isProUser`
+    // short-circuit on render.
+    void recordDownloads(1);
+    // Rating prompt (Sprint 3.6): independent counter so the rating
+    // modal arms at its own threshold (50) regardless of upsell state.
+    // Pro and Free users both contribute — happy Pro users are exactly
+    // who we want leaving 5-star reviews.
+    void recordDownloadForRating(1);
   } catch (error) {
     console.error('Download error:', error);
-    showToast('Download failed', 'error');
+    showToast(t('toast.download.failed'), 'error');
   }
 }
 
 export async function downloadSelectedAsZip(targetFormat: string | null): Promise<void> {
   const selected = state.filteredImages.filter((img) => state.selectedImages.has(img.id));
   if (selected.length === 0) {
-    showToast('No images selected', 'error');
+    showToast(t('toast.no_images_selected'), 'error');
     return;
   }
 
   // Pro check: format conversion requires Pro
   if (targetFormat && !state.isProUser) {
-    showToast('Format conversion is a Pro feature. Upgrade to unlock!', 'warning');
+    showToast(t('pro.feature_blocked.format_conversion'), 'warning');
     showProUpgradeModal();
     return;
   }
 
   // Free tier: limit ZIP to FREE_LIMITS.MAX_ZIP_IMAGES images
   if (!state.isProUser && selected.length > FREE_LIMITS.MAX_ZIP_IMAGES) {
-    showToast(
-      `Free plan allows up to ${FREE_LIMITS.MAX_ZIP_IMAGES} images per ZIP. Upgrade to Pro for unlimited!`,
-      'warning'
-    );
+    showToast(t('pro.zip_limit', { max: FREE_LIMITS.MAX_ZIP_IMAGES }), 'warning');
     showProUpgradeModal();
     return;
   }
@@ -335,7 +351,7 @@ export async function downloadSelectedAsZip(targetFormat: string | null): Promis
 
   showProgress('Downloading...', () => {
     aborted = true;
-    showToast('Download cancelled', 'info');
+    showToast(t('toast.download.cancelled'), 'info');
   });
 
   try {
@@ -402,12 +418,23 @@ export async function downloadSelectedAsZip(targetFormat: string | null): Promis
     });
 
     URL.revokeObjectURL(blobUrl);
-    showToast(`Downloaded ${selected.length - failed.length} images`, 'success');
+    const successCount = selected.length - failed.length;
+    showToast(t('toast.download.completed', { count: successCount }), 'success');
+    // Telemetry: count is the SUCCESSFUL count, not selected.length —
+    // failures are inferred via (selected.length - count). Funnels care
+    // about user-perceived success.
+    void track(EVENTS.DOWNLOAD_BATCH, { count: successCount });
+    // Soft paywall: a 30-image batch counts as 30 toward the threshold.
+    // Same intent as DOWNLOAD_SINGLE above — see comment there.
+    if (successCount > 0) void recordDownloads(successCount);
+    // Rating prompt — same batch contribution rule (success count, not
+    // selected count). See DOWNLOAD_SINGLE call above for rationale.
+    if (successCount > 0) void recordDownloadForRating(successCount);
     clearSelection();
   } catch (error) {
     if (!aborted) {
       console.error('ZIP download error:', error);
-      showToast('Download failed: ' + (error as Error).message, 'error');
+      showToast(t('toast.download.failed') + ': ' + (error as Error).message, 'error');
     }
   } finally {
     hideProgress();
@@ -472,10 +499,78 @@ export function hideDownloadDropdown(): void {
 export async function copyImageUrl(url: string): Promise<void> {
   try {
     await navigator.clipboard.writeText(url);
-    showToast('URL copied!', 'success');
+    showToast(t('toast.url_copied.single'), 'success');
+    // Telemetry: no url payload — privacy contract forbids it. Just count.
+    void track(EVENTS.COPY_URL_SINGLE);
   } catch {
-    showToast('Failed to copy URL', 'error');
+    showToast(t('toast.url_copy_failed'), 'error');
   }
+}
+
+/**
+ * Copy a batch of image URLs to the clipboard, one per line.
+ *
+ * Sprint 3.4 — most-requested feature from the only 5-star user. Builds on
+ * top of the single-URL `copyImageUrl` above so the privacy/telemetry
+ * contract stays identical: never log the URL payload itself, only the
+ * count.
+ *
+ * Free-tier guard: an additional Pro touchpoint. We cap at
+ * FREE_LIMITS.MAX_BATCH_COPY_URLS (currently 20) to leave headroom for the
+ * "select 30 → upgrade" funnel without making the feature feel useless on
+ * Free. Pro users bypass the cap entirely.
+ *
+ * Why a separate function rather than overloading copyImageUrl(string |
+ * string[])? The single-URL path is called from per-card click handlers
+ * with hot subscriptions — overloading would force a runtime branch on
+ * every call. Splitting also keeps the telemetry events distinct
+ * (COPY_URL_SINGLE vs COPY_URL_BATCH), which the funnel needs.
+ *
+ * Returns true when at least one URL was copied; false on early exit
+ * (empty input, Pro guard tripped) or clipboard failure. Callers that need
+ * to chain UI state (e.g. clear selection on success) should branch on the
+ * return value rather than inferring success from the toast.
+ */
+export async function copyImageUrls(urls: string[]): Promise<boolean> {
+  if (urls.length === 0) {
+    showToast(t('toolbar.copy_urls.empty'), 'error');
+    return false;
+  }
+  // Free-tier copy cap — same guard pattern as downloadSelectedAsZip.
+  if (!state.isProUser && urls.length > FREE_LIMITS.MAX_BATCH_COPY_URLS) {
+    showToast(t('pro.copy_urls_limit', { max: FREE_LIMITS.MAX_BATCH_COPY_URLS }), 'warning');
+    showProUpgradeModal();
+    return false;
+  }
+  try {
+    // Newline-separated so users can paste straight into a CSV / wget /
+    // any line-oriented downloader. Trailing newline omitted to match
+    // platform clipboard conventions.
+    await navigator.clipboard.writeText(urls.join('\n'));
+    showToast(t('toast.url_copied.batch', { count: urls.length }), 'success');
+    void track(EVENTS.COPY_URL_BATCH, { count: urls.length });
+    return true;
+  } catch {
+    showToast(t('toast.url_copy_failed'), 'error');
+    return false;
+  }
+}
+
+/**
+ * Read the currently-selected (or, when nothing is selected, all-filtered)
+ * image URLs in the order they appear in the grid. Used by the toolbar
+ * "Copy URLs" button so the same selection model that powers Download
+ * Selected As ZIP also drives the copy.
+ *
+ * Lives in actions.ts (not state.ts) because it consumes both
+ * state.selectedImages and state.filteredImages — those are state.ts's
+ * concern, but the orchestration ("which one wins when both are set") is
+ * a feature decision better expressed alongside the consumers.
+ */
+export function getSelectedOrFilteredUrls(): string[] {
+  const selected = state.filteredImages.filter((img) => state.selectedImages.has(img.id));
+  const source = selected.length > 0 ? selected : state.filteredImages;
+  return source.map((img) => img.url);
 }
 
 // ============================================

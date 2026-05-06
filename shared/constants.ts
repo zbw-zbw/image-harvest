@@ -175,11 +175,25 @@ export const PRO_FEATURES = [
   'unlimitedZip',
 ] as const;
 
-// Free tier limits (degraded functionality for non-Pro users)
+// Free tier limits (degraded functionality for non-Pro users).
+//
+// Sprint 3.5 — relax certain caps so users get to "first wow" before the
+// Pro paywall trips. The thesis (from /付费转化率拉升方案-从0到1-3): a user
+// who has experienced the feature once is 5-10x more likely to convert
+// than one who only saw it greyed out. Specifically:
+//   - MAX_ZIP_IMAGES: 20 → 30  (covers the long tail of "single page download")
+//   - REVERSE_SEARCH_ENGINES: + 'tineye'  (most useful free engine after Google)
+//   - MAX_COLLECTION_ITEMS: 5  (was: collection fully Pro; now 5 free favorites)
 export const FREE_LIMITS = {
-  MAX_ZIP_IMAGES: 20,
+  MAX_ZIP_IMAGES: 30,
+  // Sprint 3.4 — batch URL copy. Capped on Free to leave a Pro touchpoint;
+  // Pro users bypass entirely (see actions.ts > copyImageUrls).
+  MAX_BATCH_COPY_URLS: 20,
+  // Sprint 3.5 — Free users now get a "tasting" amount of favorites (5)
+  // before the Pro paywall trips. See pro-features.ts > addToCollection.
+  MAX_COLLECTION_ITEMS: 5,
   ALLOWED_GROUP_MODES: ['none', 'format'] as const,
-  REVERSE_SEARCH_ENGINES: ['google'] as const,
+  REVERSE_SEARCH_ENGINES: ['google', 'tineye'] as const,
   COLOR_EXTRACT_COPY: false,
   COLOR_EXTRACT_FILTER: false,
   HIGHLIGHT_BATCH: false,
@@ -218,6 +232,19 @@ export const NAMING_VARIABLES = [
 // License & Payment
 export const LICENSE_API_URL = 'https://image-harvest.kyriewen.cn/api/license';
 export const PRICING_PAGE_URL = 'https://image-harvest.kyriewen.cn/pricing';
+
+// Telemetry (anonymous, opt-in). See shared/telemetry.ts.
+//   - FLUSH_INTERVAL_MS: max time a single event waits in the queue before
+//     being shipped. 5s balances battery drain vs. dashboard freshness.
+//   - BATCH_SIZE: high-water mark that forces an early flush. Keeps a single
+//     POST body small enough that `keepalive: true` does not exceed the
+//     ~64KB Chrome cap on unload-time fetches.
+//   - MAX_QUEUE: hard cap on persisted retry events. Prevents a long server
+//     outage from filling chrome.storage.local indefinitely.
+export const TELEMETRY_API_URL = 'https://image-harvest.kyriewen.cn/api/telemetry';
+export const TELEMETRY_FLUSH_INTERVAL_MS = 5_000;
+export const TELEMETRY_BATCH_SIZE = 20;
+export const TELEMETRY_MAX_QUEUE = 100;
 export const PRICING = {
   MONTHLY: 2.99,
   YEARLY: 19.99,

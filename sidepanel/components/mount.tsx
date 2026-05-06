@@ -19,6 +19,10 @@ import { DedupModal } from './DedupModal';
 import { CollectionModal } from './CollectionModal';
 import { MultitabModal } from './MultitabModal';
 import { ProUpgradeModal } from './ProUpgradeModal';
+import { PrivacyOptInModal } from './PrivacyOptInModal';
+import { SoftPaywallBanner } from './SoftPaywallBanner';
+import { BatchUrlCopyButton } from './BatchUrlCopyButton';
+import { RatingPromptModal } from './RatingPromptModal';
 import { SettingsModal, setSavedSettingsBody } from './SettingsModal';
 import { ImageGrid } from './ImageGrid';
 
@@ -137,4 +141,68 @@ export function mountPreactComponents(): void {
   mountSettingsModal();
   mountImageGrid();
   mountStateScreens();
+  // Privacy opt-in modal has no legacy slot — it's a brand-new component
+  // added in Sprint 1.4. Append a fresh container to <body> and render
+  // there. The modal short-circuits to null when state.open is false, so
+  // the cost of always-mounting it is one render of a hidden subtree.
+  mountFreshComponent('privacy-opt-in-modal-mount', PrivacyOptInModal);
+
+  // Soft paywall banner (Sprint 2.1). Has a legacy slot in
+  // pages/_shared-body.html (#soft-paywall-banner-mount) sitting just
+  // above the toolbar so the banner renders ABOVE the action row when
+  // it pops in, not below it. Falls back to a body append if the slot
+  // is missing (popup variant or hot-reload race).
+  mountSoftPaywallBanner();
+
+  // Batch URL copy button (Sprint 3.4). Renders into the
+  // `#batch-url-copy-mount` slot in toolbar row 2. The slot is a
+  // permanent layout anchor; the component handles its own
+  // enabled/disabled state via store subscriptions.
+  mountAt('batch-url-copy-mount', BatchUrlCopyButton);
+
+  // Rating prompt modal (Sprint 3.6). Has no legacy slot — append a
+  // fresh container to <body>. The component decides visibility via
+  // shouldShowRatingPrompt() at mount time and short-circuits to null
+  // for users below the threshold or in the cooldown window.
+  mountFreshComponent('rating-prompt-modal-mount', RatingPromptModal);
+}
+
+/**
+ * Soft paywall banner mount. The legacy slot is an empty `<div>` because
+ * the banner needs block layout (its own row), not the inline span the
+ * generic mountAt() helper provides. Renders the component into the slot
+ * directly without replacing it — the slot is a permanent layout anchor
+ * even when the banner short-circuits to null.
+ */
+function mountSoftPaywallBanner(): void {
+  const slot = document.getElementById('soft-paywall-banner-mount');
+  if (slot) {
+    render(<SoftPaywallBanner />, slot);
+    return;
+  }
+  // Fallback: no slot in this HTML variant. Stitch one onto the top of
+  // #app so the banner still appears above the toolbar.
+  const app = document.getElementById('app');
+  if (!app) return;
+  const mount = document.createElement('div');
+  mount.id = 'soft-paywall-banner-mount';
+  mount.dataset.preactMount = 'soft-paywall-banner-mount';
+  app.insertBefore(mount, app.firstChild);
+  render(<SoftPaywallBanner />, mount);
+}
+
+/**
+ * Mount a brand-new Preact component that has no legacy DOM slot. Idempotent:
+ * if a previous mount with the same id exists (hot reload, popup re-init)
+ * we replace its contents rather than stacking duplicates.
+ */
+function mountFreshComponent(mountId: string, Component: ComponentType): void {
+  let mount = document.getElementById(mountId);
+  if (!mount) {
+    mount = document.createElement('div');
+    mount.id = mountId;
+    mount.dataset.preactMount = mountId;
+    document.body.appendChild(mount);
+  }
+  render(<Component />, mount);
 }

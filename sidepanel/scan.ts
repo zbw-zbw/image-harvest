@@ -2,9 +2,12 @@
 
 import { MESSAGE_TYPES } from '../shared/constants';
 import { extractColorsFromUrl } from '../shared/color-extract';
+import { t } from '../shared/i18n';
 import { calculatePHash } from '../shared/phash';
 import type { ImageItem } from '../shared/types';
 import { getFileFormat } from '../shared/utils';
+import { track } from '../shared/telemetry';
+import { EVENTS } from '../shared/telemetry-events';
 import { updateSelectionUI } from './actions';
 import { applyFilters, renderColorSwatches } from './filter';
 import { detectSimilarImages, renderColorBar } from './pro-features';
@@ -31,10 +34,12 @@ export function handleScanCancel(): void {
 
   if (state.allImages.length > 0) {
     applyFilters();
-    showToast(`Scan cancelled · ${state.allImages.length} images found`, 'info');
+    // Toast keeps the legacy English wording for the count suffix until
+    // a dedicated i18n key is added; the prefix is translated.
+    showToast(`${t('toast.download.cancelled')} · ${state.allImages.length} images found`, 'info');
   } else {
     showEmpty();
-    showToast('Scan cancelled', 'info');
+    showToast(t('toast.download.cancelled'), 'info');
   }
 }
 
@@ -324,6 +329,15 @@ export async function fetchImages(): Promise<void> {
   state.allImages = [];
   showLoading();
 
+  // Telemetry: scan_triggered fires at intent (not completion) so the
+  // funnel can distinguish "user wanted to scan" from "scan returned N".
+  // The matching scan_completed / images_shown are emitted in the success
+  // branch below. Mode tells us which surface user is on.
+  const _scanStartedAt = Date.now();
+  void track(EVENTS.SCAN_TRIGGERED, {
+    mode: state.isPopupMode ? 'popup' : 'sidepanel',
+  });
+
   try {
     // Get current tab info to assign tabTitle and tabIndex to images
     const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -384,6 +398,15 @@ export async function fetchImages(): Promise<void> {
 
       // Notify the user how many images were found
       showToast(`Found ${state.allImages.length} images`, 'success');
+
+      // Telemetry: pair with scan_triggered above. images_shown is the
+      // immediate render signal; scan_completed carries duration so we
+      // can spot regression in scan latency over time.
+      void track(EVENTS.SCAN_COMPLETED, {
+        count: state.allImages.length,
+        durationMs: Date.now() - _scanStartedAt,
+      });
+      void track(EVENTS.IMAGES_SHOWN, { count: state.allImages.length });
 
       // Persist to session storage so reopening the panel restores instantly
       if (state.currentTabId != null) {

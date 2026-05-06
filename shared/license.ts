@@ -11,6 +11,8 @@ import type {
   LicenseValidationResult,
   ProUserInfo,
 } from './types';
+import { track, setEnvelopeMeta, flushNow } from './telemetry';
+import { EVENTS } from './telemetry-events';
 
 interface DeactivationResult {
   success: boolean;
@@ -198,6 +200,19 @@ export async function activateLicense(licenseKey: string): Promise<LicenseActiva
 
   await saveLicenseData(licenseData);
 
+  // Telemetry: this is the FINAL conversion event in the funnel — every
+  // success here is a real paid customer. Update envelope plan first so
+  // downstream events in this session carry the correct plan, then fire
+  // the activation event and flush immediately (don't wait for the 5s
+  // batch window — the user may close the panel right after).
+  try {
+    setEnvelopeMeta({ plan: licenseData.plan || 'pro' });
+    await track(EVENTS.LICENSE_ACTIVATED, { plan: licenseData.plan || 'pro' });
+    await flushNow();
+  } catch {
+    /* telemetry must never block activation success */
+  }
+
   return {
     success: true,
     plan: licenseData.plan,
@@ -209,7 +224,16 @@ export async function deactivateLicense(): Promise<{ success: true }> {
   const licenseData = await getLicenseData();
   if (!licenseData) return { success: true };
 
-  await deactivateLicenseRemote(licenseData.licenseKey, licenseData.instanceId);
+  // Trial licenses live in a separate `trials` table on the server
+  // (see website/migrations/trials.sql). The /api/license/activate
+  // endpoint only knows about paid licenses; routing a trial key
+  // through it would 404 and surface a confusing error to the user
+  // who's just trying to revoke their own trial. Skip the remote
+  // call — the local sentinel in shared/trial.ts already prevents
+  // re-redemption, and the trial expires server-side regardless.
+  if (licenseData.plan !== 'trial') {
+    await deactivateLicenseRemote(licenseData.licenseKey, licenseData.instanceId);
+  }
   await clearLicenseData();
 
   return { success: true };
