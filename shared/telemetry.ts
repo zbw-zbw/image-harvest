@@ -70,7 +70,7 @@ const defaultStorage: StorageAdapter = {
   async get<T = unknown>(key: string): Promise<T | undefined> {
     if (typeof chrome === 'undefined' || !chrome.storage?.local) return undefined;
     const r = await chrome.storage.local.get(key);
-    return r[key] as T | undefined;
+    return r?.[key] as T | undefined;
   },
   async set(key, value) {
     if (typeof chrome === 'undefined' || !chrome.storage?.local) return;
