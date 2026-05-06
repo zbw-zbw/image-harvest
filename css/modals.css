@@ -1048,3 +1048,192 @@
   animation: spin 0.8s linear infinite;
   margin-bottom: 4px;
 }
+
+/* ============================================
+   Soft Paywall Banner (Sprint 2.1)
+   ============================================ */
+/* Sits in #soft-paywall-banner-mount above .toolbar-actions. The mount
+   slot is permanent (zero height when component renders null) so the
+   layout doesn't jump when the banner pops in. */
+.soft-paywall-banner {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--primary-color) 12%, var(--bg-color)) 0%,
+    var(--bg-secondary) 100%
+  );
+  border-bottom: 1px solid var(--border-color);
+  color: var(--text-primary);
+  font-size: 12.5px;
+  flex-wrap: wrap;
+  position: relative;
+}
+
+.soft-paywall-banner-icon {
+  flex-shrink: 0;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  background: var(--pro-badge-bg);
+  color: #fff;
+}
+
+.soft-paywall-banner-text {
+  flex: 1 1 200px;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  line-height: 1.35;
+}
+
+.soft-paywall-banner-text strong {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+.soft-paywall-banner-text span {
+  color: var(--text-secondary);
+}
+
+.soft-paywall-banner-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.soft-paywall-banner-close {
+  flex-shrink: 0;
+  width: 24px;
+  height: 24px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-tertiary);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  border-radius: var(--radius-sm);
+}
+
+.soft-paywall-banner-close:hover {
+  color: var(--text-primary);
+  background: var(--bg-tertiary);
+}
+
+/* Narrow viewport: stack actions under text so the banner doesn't push
+   the close X off-screen on the minimum sidebar width. */
+@media (max-width: 380px) {
+  .soft-paywall-banner-text {
+    flex: 1 1 100%;
+  }
+  .soft-paywall-banner-actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
+/* ────────────────────────────────────────────────────────────────────
+ * Rating Prompt Modal (Sprint 3.6)
+ *
+ * Inherits .modal-overlay + .modal-content for the standard backdrop +
+ * rounded card chrome. Adds:
+ *   - tighter max-width so the small CTA stack doesn't look stranded
+ *     in the wide default 720px shell
+ *   - centered star illustration + title/desc
+ *   - vertical CTA stack (3 buttons) that collapses well at the
+ *     280px sidepanel min-width
+ *
+ * Day/night themes are inherited via CSS variables; .btn / .btn-primary
+ * / .btn-secondary already adapt globally so we only style the
+ * rating-prompt-specific bits below.
+ * ────────────────────────────────────────────────────────────────── */
+.rating-prompt-overlay {
+  /* Reuse modal-overlay positioning; we only sit on top of the rest of
+     the modal stack via z-index because both this and ProUpgradeModal
+     mount at body level. */
+  z-index: 1100;
+}
+
+.rating-prompt-content {
+  max-width: 380px;
+  width: calc(100% - 32px);
+  padding: 28px 24px 20px;
+  text-align: center;
+  align-items: stretch;
+  /* Override .modal-content's overflow:hidden so the close button's
+     focus ring doesn't get clipped at the corner. */
+  overflow: visible;
+}
+
+.rating-prompt-content .modal-close {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+}
+
+.rating-prompt-stars {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  color: #f5b400; /* Star yellow — same swatch the Web Store uses */
+  margin-bottom: 12px;
+}
+
+.rating-prompt-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 8px;
+  color: var(--text-color);
+}
+
+.rating-prompt-desc {
+  font-size: 13px;
+  line-height: 1.5;
+  color: var(--text-secondary);
+  margin: 0 0 20px;
+}
+
+.rating-prompt-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.rating-prompt-actions .btn {
+  width: 100%;
+}
+
+.rating-prompt-never {
+  /* Subdued tertiary action — visually de-emphasized but still clickable.
+     We don't use display:none because users who really don't want the
+     prompt need a clear way to opt out forever. */
+  color: var(--text-tertiary);
+  font-size: 12px;
+  padding: 4px 0;
+  background: transparent;
+  border: none;
+}
+
+.rating-prompt-never:hover {
+  color: var(--text-secondary);
+  text-decoration: underline;
+}
+
+/* Cramped sidepanel — keep the modal usable at 280px. */
+@media (max-width: 320px) {
+  .rating-prompt-content {
+    padding: 20px 16px 16px;
+  }
+  .rating-prompt-stars svg {
+    width: 20px;
+    height: 20px;
+  }
+}
