@@ -246,7 +246,9 @@ describe('handleScanCancel', () => {
     const ui = await import('../sidepanel/ui');
     expect(filterMod.applyFilters).toHaveBeenCalledTimes(1);
     expect(ui.showEmpty).not.toHaveBeenCalled();
-    expect(ui.showToast).toHaveBeenCalledWith('Scan cancelled · 3 images found', 'info');
+    // Prefix comes from i18n key 'toast.download.cancelled' → "Download cancelled";
+    // the " · N images found" suffix is appended in scan.ts L33-40 without translation.
+    expect(ui.showToast).toHaveBeenCalledWith('Download cancelled · 3 images found', 'info');
   });
 
   it('without discovered images → calls showEmpty + emits bare "Scan cancelled" toast (no applyFilters)', async () => {
@@ -258,6 +260,8 @@ describe('handleScanCancel', () => {
     const ui = await import('../sidepanel/ui');
     expect(ui.showEmpty).toHaveBeenCalledTimes(1);
     expect(filterMod.applyFilters).not.toHaveBeenCalled();
-    expect(ui.showToast).toHaveBeenCalledWith('Scan cancelled', 'info');
+    // Same i18n key as the populated-branch test above — English resolves to
+    // "Download cancelled" without the count suffix.
+    expect(ui.showToast).toHaveBeenCalledWith('Download cancelled', 'info');
   });
 });
