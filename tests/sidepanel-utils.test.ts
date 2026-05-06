@@ -9,10 +9,27 @@
 //     plus the variable-substitution contract that downstream filename
 //     sanitization relies on.
 //
-// What this file deliberately skips:
-//   - fetchImageMeta (HEAD request — exercise via e2e network mock)
-//   - loadSettings (chrome.storage — already covered by storage.test.ts)
+// Also covered (previously deferred):
+//   - fetchImageMeta: HEAD request + AbortController 5s timeout + swallow
+//     on network failure. Important because the whole card "size" badge
+//     depends on it and a regression re-throwing would break the scan
+//     pipeline.
+//   - loadSettings: chrome.storage.local.get hydration (previously deferred
+//     to storage.test.ts but that file tests the shared/storage wrapper,
+//     not the sidepanel DEFAULT_FILTER_CONFIG merging path).
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+// Mock shared/naming so we can force the fallback branch in generateFilename.
+// The production module always exports applyNamingTemplate as a function, so
+// the `typeof ... !== 'function'` branch is otherwise unreachable in tests.
+// Import the ACTUAL implementation here so the standard happy-path tests
+// keep exercising real behaviour — we only flip to `undefined` inside a
+// single focused test via vi.doMock + dynamic import.
+vi.mock('../shared/naming', async () => {
+  const actual = await vi.importActual<typeof import('../shared/naming')>('../shared/naming');
+  return { ...actual };
+});
+
 import {
   formatBytes,
   getAspectRatioCategory,
@@ -24,8 +41,11 @@ import {
   getExtFromUrl,
   debounce,
   throttle,
+  loadSettings,
+  fetchImageMeta,
 } from '../sidepanel/utils';
 import { state, store } from '../sidepanel/state';
+import { DEFAULT_FILTER_CONFIG } from '../shared/constants';
 import type { ImageItem } from '../shared/types';
 
 beforeEach(() => {
@@ -272,5 +292,203 @@ describe('generateFilename', () => {
     };
     const name = generateFilename(makeImg(), 0, null, {});
     expect(name).toBe('unknown_untitled.jpg');
+  });
+
+  it('falls back to the inline replace chain when applyNamingTemplate is not a function', async () => {
+    // Pin: generateFilename has a belt-and-suspenders fallback (L127-138
+    // of sidepanel/utils.ts) for the defensive case where the naming
+    // module was tree-shaken or monkey-patched away. The fallback must
+    // still sanitize `title` via the /[^a-zA-Z0-9_-]/g → '_' regex and
+    // cap at 50 chars (the real applyNamingTemplate does this too but
+    // the sites of truth must NOT diverge). Without this test a refactor
+    // that drops the fallback replace chain could silently break file
+    // systems that reject special chars, because the happy-path above
+    // only exercises the real applyNamingTemplate.
+    vi.resetModules();
+    vi.doMock('../shared/naming', () => ({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      applyNamingTemplate: undefined as any,
+    }));
+    const utilsMod = await import('../sidepanel/utils');
+    const stateMod = await import('../sidepanel/state');
+    stateMod.state.isProUser = true;
+    stateMod.state.appSettings = {
+      ...stateMod.state.appSettings,
+      filenameTemplate: '{domain}_{title}_{number}.{format}',
+    };
+
+    const img = {
+      id: 'x',
+      url: 'https://x.com/photo.jpg',
+      naturalWidth: 800,
+      naturalHeight: 600,
+      format: 'jpg',
+    } as ImageItem;
+    const name = utilsMod.generateFilename(img, 2, null, {
+      domain: 'x.com',
+      title: 'Hello World!',
+    });
+
+    // Title "Hello World!" → sanitized to "Hello_World_" via the regex.
+    expect(name).toBe('x.com_Hello_World__3.jpg');
+
+    vi.doUnmock('../shared/naming');
+    vi.resetModules();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// loadSettings — chrome.storage.local.get hydration + DEFAULT merging
+// ─────────────────────────────────────────────────────────────────────
+// Pin: loadSettings is the SINGLE entry that hydrates state.appSettings
+// and state.filterConfig on sidepanel boot (called from init.ts). Three
+// contracts each test pins a real regression shape:
+//   1. Stored appSettings must MERGE onto existing state (spread order
+//      matters — stored keys win over in-memory defaults).
+//   2. Missing filterConfig must default to DEFAULT_FILTER_CONFIG (NOT
+//      `undefined` — every filter-bar selector relies on the shape
+//      being present at first render).
+//   3. chrome.storage rejection must still leave filterConfig as
+//      DEFAULT_FILTER_CONFIG, otherwise the whole filter bar crashes
+//      trying to read `state.filterConfig.minWidth` at mount time.
+
+describe('loadSettings', () => {
+  beforeEach(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (globalThis as any).chrome = {
+      storage: {
+        local: {
+          get: vi.fn(),
+        },
+      },
+    };
+  });
+
+  it('merges stored appSettings onto defaults AND hydrates filterConfig onto DEFAULT_FILTER_CONFIG', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ((globalThis as any).chrome.storage.local.get as any).mockResolvedValueOnce({
+      appSettings: { filenameTemplate: '{number}.{format}', enableColorExtraction: false },
+      filterConfig: { minWidth: 200, minHeight: 150 },
+    });
+
+    await loadSettings();
+
+    // Stored key wins over in-memory default.
+    expect(state.appSettings.filenameTemplate).toBe('{number}.{format}');
+    expect(state.appSettings.enableColorExtraction).toBe(false);
+    // DEFAULT_FILTER_CONFIG keys that were not stored must remain present.
+    expect(state.filterConfig).toMatchObject({
+      ...DEFAULT_FILTER_CONFIG,
+      minWidth: 200,
+      minHeight: 150,
+    });
+  });
+
+  it('installs DEFAULT_FILTER_CONFIG verbatim when the stored filterConfig key is missing', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ((globalThis as any).chrome.storage.local.get as any).mockResolvedValueOnce({
+      appSettings: { enableColorExtraction: true },
+      // no filterConfig key
+    });
+
+    await loadSettings();
+
+    expect(state.filterConfig).toEqual(DEFAULT_FILTER_CONFIG);
+  });
+
+  it('keeps filterConfig at DEFAULT when chrome.storage.local.get rejects (error-recovery)', async () => {
+    const consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {});
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ((globalThis as any).chrome.storage.local.get as any).mockRejectedValueOnce(
+      new Error('IDB closed')
+    );
+
+    await expect(loadSettings()).resolves.toBeUndefined();
+
+    // filterConfig MUST still be a usable shape — filter bar would crash otherwise.
+    expect(state.filterConfig).toEqual(DEFAULT_FILTER_CONFIG);
+    expect(consoleErrorSpy).toHaveBeenCalledWith('Load settings error:', expect.any(Error));
+    consoleErrorSpy.mockRestore();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// fetchImageMeta — HEAD request + AbortController + silent fallback
+// ─────────────────────────────────────────────────────────────────────
+// Pin: fetchImageMeta is called per-image during scan result enrichment
+// (scan.ts). It MUST NEVER throw — a rejected fetch would bubble into
+// the scan loop and stop card rendering. The contract is:
+//   - parse content-length → number, content-type → string on success
+//   - any failure (timeout, CORS, DNS) → { size: null, contentType: '' }
+//   - AbortController.abort() scheduled at 5000ms
+
+describe('fetchImageMeta', () => {
+  let originalFetch: typeof globalThis.fetch;
+  beforeEach(() => {
+    originalFetch = globalThis.fetch;
+  });
+  afterEach(() => {
+    globalThis.fetch = originalFetch;
+  });
+
+  it('parses content-length and content-type from a successful HEAD response', async () => {
+    const headers = new Map<string, string>([
+      ['content-length', '12345'],
+      ['content-type', 'image/png'],
+    ]);
+    const mockFetch = vi.fn(() =>
+      Promise.resolve({
+        headers: { get: (k: string) => headers.get(k.toLowerCase()) ?? null },
+      })
+    );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    globalThis.fetch = mockFetch as any;
+
+    const meta = await fetchImageMeta('https://cdn.example.com/pic.png');
+
+    expect(meta).toEqual({ size: 12345, contentType: 'image/png' });
+    expect(mockFetch).toHaveBeenCalledWith(
+      'https://cdn.example.com/pic.png',
+      expect.objectContaining({
+        method: 'HEAD',
+        mode: 'cors',
+        credentials: 'omit',
+        signal: expect.any(AbortSignal),
+      })
+    );
+  });
+
+  it('returns size:null when the content-length header is missing', async () => {
+    // Servers frequently drop content-length for chunked transfers —
+    // we must return null (not NaN from parseInt) so downstream
+    // formatBytes() can render "0 B" instead of "NaN B".
+    const mockFetch = vi.fn(() =>
+      Promise.resolve({
+        headers: {
+          get: (k: string) => (k.toLowerCase() === 'content-type' ? 'image/jpeg' : null),
+        },
+      })
+    );
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    globalThis.fetch = mockFetch as any;
+
+    const meta = await fetchImageMeta('https://cdn.example.com/pic.jpg');
+
+    expect(meta.size).toBeNull();
+    expect(meta.contentType).toBe('image/jpeg');
+  });
+
+  it('silently returns {size:null, contentType:""} when the HEAD request rejects', async () => {
+    // CORS-blocked / DNS-failed / offline — none of these must throw
+    // to the caller. scan.ts iterates this for every image and would
+    // halt on the first rejection if we let the error propagate.
+    const mockFetch = vi.fn(() => Promise.reject(new Error('Failed to fetch')));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    globalThis.fetch = mockFetch as any;
+
+    await expect(fetchImageMeta('https://cdn.example.com/pic.png')).resolves.toEqual({
+      size: null,
+      contentType: '',
+    });
   });
 });

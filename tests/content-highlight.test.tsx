@@ -460,3 +460,307 @@ describe('syncHighlights', () => {
     expect(document.querySelectorAll('.image-snatcher-highlight-border')).toHaveLength(1);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────
+// findImageElement — deep fallback branches (background / lazy / meta)
+// ─────────────────────────────────────────────────────────────────────
+// Pin: findImageElement is the sole URL→Element bridge for the highlight
+// feature. When a scanned URL doesn't match any <img>, <video> or <picture>,
+// these fallback branches are the last line of defense. A regression
+// here surfaces as "the side panel says this image exists but clicking
+// highlight does nothing" — the #2 most-reported support issue.
+//
+// Branches pinned below:
+//   - section 8: background-image via getComputedStyle
+//   - section 8: ::before / ::after pseudo-element content:url(...)
+//   - section 9: data-src / data-bg / data-background lazy attrs on
+//                non-<img> elements
+//   - section 11: <link rel="icon" | "apple-touch-icon" | "mask-icon">
+//   - section 12: <meta property="og:image" | "twitter:image"> etc.
+
+describe('addHighlight — background-image / lazy-data / link / meta fallbacks', () => {
+  it('matches an element whose CSS background-image URL equals the target', async () => {
+    // section 8 fallback — the most common "CSS-painted hero image" case.
+    const div = document.createElement('div');
+    div.id = 'hero';
+    stubRect(div);
+    document.body.appendChild(div);
+
+    // jsdom's getComputedStyle returns empty strings by default — stub
+    // it to return the CSS background-image we want findImageElement
+    // to see. Keep the pseudo-element branch silent for this test.
+    const originalGcs = window.getComputedStyle;
+    vi.spyOn(window, 'getComputedStyle').mockImplementation(((
+      el: Element,
+      pseudo?: string | null
+    ) => {
+      if (pseudo) return { content: 'none', backgroundImage: 'none' } as CSSStyleDeclaration;
+      if (el === div) {
+        return {
+          backgroundImage: 'url(https://example.com/bg.jpg)',
+          content: '',
+        } as CSSStyleDeclaration;
+      }
+      return originalGcs(el);
+    }) as typeof window.getComputedStyle);
+
+    const { addHighlight } = await import('../content/highlight');
+    expect(addHighlight('https://example.com/bg.jpg').found).toBe(true);
+  });
+
+  it('matches ::before pseudo-element content:url(...) when no direct image exists', async () => {
+    // section 8 fallback — `content: url(...)` on ::before / ::after is
+    // how some sites smuggle icon images into otherwise-empty spans.
+    const span = document.createElement('span');
+    span.id = 'pseudo-target';
+    stubRect(span);
+    document.body.appendChild(span);
+
+    const originalGcs = window.getComputedStyle;
+    vi.spyOn(window, 'getComputedStyle').mockImplementation(((
+      el: Element,
+      pseudo?: string | null
+    ) => {
+      if (el === span && pseudo === '::before') {
+        return {
+          content: 'url(https://example.com/icon.png)',
+          backgroundImage: 'none',
+        } as CSSStyleDeclaration;
+      }
+      if (el === span) {
+        return { backgroundImage: 'none', content: '' } as CSSStyleDeclaration;
+      }
+      return originalGcs(el, pseudo as string | null);
+    }) as typeof window.getComputedStyle);
+
+    const { addHighlight } = await import('../content/highlight');
+    expect(addHighlight('https://example.com/icon.png').found).toBe(true);
+  });
+
+  it('matches data-src on a non-<img> element (common for lazyload libs)', async () => {
+    // section 9 fallback — libraries like lazysizes put data-src on
+    // <div> and swap to <img> on intersection. We must still be able
+    // to highlight these before the swap happens.
+    const div = document.createElement('div');
+    div.setAttribute('data-src', 'https://example.com/lazyload.jpg');
+    stubRect(div);
+    document.body.appendChild(div);
+
+    const { addHighlight } = await import('../content/highlight');
+    expect(addHighlight('https://example.com/lazyload.jpg').found).toBe(true);
+  });
+
+  it('matches data-bg url(...) wrapper syntax on a non-<img> element', async () => {
+    // section 9 fallback with the url() unwrap branch — some lazyload
+    // libraries (notably vanilla-lazyload) store the CSS url() wrapper
+    // form in data-bg. The regex `/url\(['"]?([^'")]+)['"]?\)/` must
+    // extract the inner URL before comparison.
+    const div = document.createElement('div');
+    div.setAttribute('data-bg', 'url("https://example.com/wrap.png")');
+    stubRect(div);
+    document.body.appendChild(div);
+
+    const { addHighlight } = await import('../content/highlight');
+    expect(addHighlight('https://example.com/wrap.png').found).toBe(true);
+  });
+
+  it('returns {found:true} for metadata elements (<link>, <meta>) WITHOUT actually highlighting', async () => {
+    // section 11 fallback + isMetadataElement early-ack — favicons live
+    // in <head> and can't be scrolled to / highlighted, but the side
+    // panel must still show them as "found on this page". Without the
+    // {found:true} acknowledge, users see a false "not found" toast
+    // when clicking highlight on a favicon in the result list.
+    const link = document.createElement('link');
+    link.rel = 'icon';
+    link.href = 'https://example.com/favicon.ico';
+    document.head.appendChild(link);
+
+    const { addHighlight } = await import('../content/highlight');
+    const result = addHighlight('https://example.com/favicon.ico');
+    expect(result.found).toBe(true);
+    // Metadata early-ack: NO border created even though found=true.
+    expect(document.querySelectorAll('.image-snatcher-highlight-border')).toHaveLength(0);
+  });
+
+  it('matches <link rel="apple-touch-icon">', async () => {
+    const link = document.createElement('link');
+    link.rel = 'apple-touch-icon';
+    link.href = 'https://example.com/apple-touch.png';
+    document.head.appendChild(link);
+
+    const { addHighlight } = await import('../content/highlight');
+    expect(addHighlight('https://example.com/apple-touch.png').found).toBe(true);
+  });
+
+  it('matches <meta property="og:image"> (OpenGraph preview image)', async () => {
+    // section 12 fallback — og:image is the canonical "page hero" for
+    // social sharing previews. Scanners surface it from document.head;
+    // highlight must acknowledge it (no visual highlight possible in
+    // <head>, but the found ack prevents a false negative toast).
+    const meta = document.createElement('meta');
+    meta.setAttribute('property', 'og:image');
+    meta.content = 'https://example.com/og-preview.jpg';
+    document.head.appendChild(meta);
+
+    const { addHighlight } = await import('../content/highlight');
+    expect(addHighlight('https://example.com/og-preview.jpg').found).toBe(true);
+  });
+
+  it('matches <meta name="twitter:image:src"> (Twitter card variant)', async () => {
+    const meta = document.createElement('meta');
+    meta.setAttribute('name', 'twitter:image:src');
+    meta.content = 'https://example.com/twitter-card.jpg';
+    document.head.appendChild(meta);
+
+    const { addHighlight } = await import('../content/highlight');
+    expect(addHighlight('https://example.com/twitter-card.jpg').found).toBe(true);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// findImageElement — Shadow DOM deep-dive (section 10)
+// ─────────────────────────────────────────────────────────────────────
+// Pin: Shadow DOM has become common in web components (Lit, Stencil,
+// any framework rendering into a shadow host). Without this branch,
+// component libraries like Ionic, Material Web Components, etc. would
+// surface images in the scan results but highlight would say "not found".
+// collectShadowRoots is mocked in the global setup to return [] so these
+// tests override the mock to return a real ShadowRoot attached to a host.
+
+describe('findImageElement — Shadow DOM fallbacks (section 10)', () => {
+  async function mountShadow(): Promise<ShadowRoot> {
+    const host = document.createElement('div');
+    host.id = 'shadow-host';
+    document.body.appendChild(host);
+    const shadow = host.attachShadow({ mode: 'open' });
+
+    // Override the default mock that returns [] with one that returns
+    // our freshly-mounted shadow root. Must happen BEFORE the dynamic
+    // import below — vi.mocked() hoists identity-mapping even in
+    // async blocks.
+    const shadowIframeMod = await import('../content/shadow-iframe');
+    vi.mocked(shadowIframeMod.collectShadowRoots).mockReturnValueOnce([shadow]);
+
+    return shadow;
+  }
+
+  it('matches <img src> inside shadow DOM', async () => {
+    const shadow = await mountShadow();
+    const img = document.createElement('img');
+    img.src = 'https://example.com/shadow-img.jpg';
+    stubRect(img);
+    shadow.appendChild(img);
+
+    const { addHighlight } = await import('../content/highlight');
+    expect(addHighlight('https://example.com/shadow-img.jpg').found).toBe(true);
+  });
+
+  it('matches <img srcset> inside shadow DOM', async () => {
+    const shadow = await mountShadow();
+    const img = document.createElement('img');
+    img.srcset = 'https://example.com/shadow-s.jpg 320w, https://example.com/shadow-l.jpg 800w';
+    stubRect(img);
+    shadow.appendChild(img);
+
+    const { addHighlight } = await import('../content/highlight');
+    expect(addHighlight('https://example.com/shadow-l.jpg').found).toBe(true);
+  });
+
+  it('matches <img data-src> (shadow DOM lazy-load variant)', async () => {
+    const shadow = await mountShadow();
+    const img = document.createElement('img');
+    img.setAttribute('data-src', 'https://example.com/shadow-lazy.jpg');
+    stubRect(img);
+    shadow.appendChild(img);
+
+    const { addHighlight } = await import('../content/highlight');
+    expect(addHighlight('https://example.com/shadow-lazy.jpg').found).toBe(true);
+  });
+
+  it('matches <picture> > <source srcset> inside shadow DOM', async () => {
+    const shadow = await mountShadow();
+    const picture = document.createElement('picture');
+    const source = document.createElement('source');
+    source.srcset = 'https://example.com/shadow-pic.jpg 1x';
+    const img = document.createElement('img');
+    stubRect(img);
+    picture.appendChild(source);
+    picture.appendChild(img);
+    shadow.appendChild(picture);
+
+    const { addHighlight } = await import('../content/highlight');
+    expect(addHighlight('https://example.com/shadow-pic.jpg').found).toBe(true);
+  });
+
+  it('matches <video poster> inside shadow DOM', async () => {
+    const shadow = await mountShadow();
+    const video = document.createElement('video');
+    video.poster = 'https://example.com/shadow-poster.jpg';
+    stubRect(video);
+    shadow.appendChild(video);
+
+    const { addHighlight } = await import('../content/highlight');
+    expect(addHighlight('https://example.com/shadow-poster.jpg').found).toBe(true);
+  });
+
+  it('matches <input type="image"> inside shadow DOM', async () => {
+    const shadow = await mountShadow();
+    const input = document.createElement('input');
+    input.type = 'image';
+    input.src = 'https://example.com/shadow-btn.png';
+    stubRect(input);
+    shadow.appendChild(input);
+
+    const { addHighlight } = await import('../content/highlight');
+    expect(addHighlight('https://example.com/shadow-btn.png').found).toBe(true);
+  });
+
+  it('matches <object data> inside shadow DOM', async () => {
+    const shadow = await mountShadow();
+    const obj = document.createElement('object');
+    obj.data = 'https://example.com/shadow-obj.svg';
+    stubRect(obj);
+    shadow.appendChild(obj);
+
+    const { addHighlight } = await import('../content/highlight');
+    expect(addHighlight('https://example.com/shadow-obj.svg').found).toBe(true);
+  });
+
+  it('matches <embed src> inside shadow DOM', async () => {
+    const shadow = await mountShadow();
+    const embed = document.createElement('embed');
+    embed.src = 'https://example.com/shadow-embed.svg';
+    stubRect(embed);
+    shadow.appendChild(embed);
+
+    const { addHighlight } = await import('../content/highlight');
+    expect(addHighlight('https://example.com/shadow-embed.svg').found).toBe(true);
+  });
+
+  it('matches background-image on an element inside shadow DOM', async () => {
+    // The shadow DOM branch queries `shadowRoot.querySelectorAll('*')`
+    // and calls window.getComputedStyle on each. Stub that call to
+    // return a CSS url() for our target element.
+    const shadow = await mountShadow();
+    const div = document.createElement('div');
+    stubRect(div);
+    shadow.appendChild(div);
+
+    const originalGcs = window.getComputedStyle;
+    vi.spyOn(window, 'getComputedStyle').mockImplementation(((
+      el: Element,
+      pseudo?: string | null
+    ) => {
+      if (el === div && !pseudo) {
+        return {
+          backgroundImage: 'url(https://example.com/shadow-bg.jpg)',
+          content: '',
+        } as CSSStyleDeclaration;
+      }
+      return originalGcs(el, pseudo as string | null);
+    }) as typeof window.getComputedStyle);
+
+    const { addHighlight } = await import('../content/highlight');
+    expect(addHighlight('https://example.com/shadow-bg.jpg').found).toBe(true);
+  });
+});

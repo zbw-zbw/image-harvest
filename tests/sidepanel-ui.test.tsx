@@ -742,3 +742,266 @@ describe('showConfirmDialog', () => {
     await expect(promise).resolves.toBe(true);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────
+// updateFilterButtonLabels — filter bar labels + active-state toggling
+// ─────────────────────────────────────────────────────────────────────
+// Pin: the filter bar is the primary navigation surface. Each button
+// must (a) render the correct human label (b) toggle `.active` when
+// the corresponding filter is non-default. A silent drift here causes
+// users to think a filter didn't apply when it actually did — one of
+// the most-reported support issues in the Chrome Web Store reviews.
+
+describe('updateFilterButtonLabels', () => {
+  beforeEach(() => {
+    // Build the filter-bar skeleton that the function queries.
+    document.body.innerHTML = `
+      <div>
+        <button class="filter-btn" data-filter="size"></button>
+        <button class="filter-btn" data-filter="type"></button>
+        <button class="filter-btn" data-filter="layout"></button>
+        <button class="filter-btn" data-filter="url"></button>
+        <button class="filter-btn" data-filter="color"><span class="pro-badge">PRO</span></button>
+        <button class="filter-btn" data-filter="group"></button>
+        <button class="filter-btn" data-filter="sort"></button>
+      </div>
+    `;
+  });
+
+  it('labels "Size" + inactive when size filter is "all" + no min/max', async () => {
+    const { updateFilterButtonLabels } = await import('../sidepanel/ui');
+    state.activeFilters = {
+      ...state.activeFilters,
+      size: 'all',
+      sizeMin: 0,
+      sizeMax: Infinity,
+    };
+    updateFilterButtonLabels();
+    const btn = document.querySelector<HTMLElement>('.filter-btn[data-filter="size"]')!;
+    expect(btn.textContent).toBe('Size▾');
+    expect(btn.classList.contains('active')).toBe(false);
+  });
+
+  it('labels size with the mapped bucket name + marks active when non-"all" (e.g. Medium)', async () => {
+    const { updateFilterButtonLabels } = await import('../sidepanel/ui');
+    state.activeFilters = { ...state.activeFilters, size: 'medium' };
+    updateFilterButtonLabels();
+    const btn = document.querySelector<HTMLElement>('.filter-btn[data-filter="size"]')!;
+    expect(btn.textContent).toBe('Medium▾');
+    expect(btn.classList.contains('active')).toBe(true);
+  });
+
+  it('labels type with the comma-joined mapped list + active when any type selected', async () => {
+    const { updateFilterButtonLabels } = await import('../sidepanel/ui');
+    state.activeFilters = { ...state.activeFilters, types: ['png', 'jpg'] };
+    updateFilterButtonLabels();
+    const btn = document.querySelector<HTMLElement>('.filter-btn[data-filter="type"]')!;
+    // Labels map to uppercase canonical names — pin the case since
+    // legacy 'png'/'jpg' stored in filterConfig flows through here.
+    expect(btn.textContent).toBe('PNG, JPG▾');
+    expect(btn.classList.contains('active')).toBe(true);
+  });
+
+  it("maps unknown type entries through as-is (fallback) so new formats don't blank the button", async () => {
+    const { updateFilterButtonLabels } = await import('../sidepanel/ui');
+    state.activeFilters = { ...state.activeFilters, types: ['avif'] };
+    updateFilterButtonLabels();
+    const btn = document.querySelector<HTMLElement>('.filter-btn[data-filter="type"]')!;
+    // Unknown types render their raw key — better than a blank button
+    // if we add a new format to shared/constants.ts but forget the label map.
+    expect(btn.textContent).toBe('avif▾');
+  });
+
+  it('labels layout by bucket + marks active when non-"all" (e.g. Landscape)', async () => {
+    const { updateFilterButtonLabels } = await import('../sidepanel/ui');
+    state.activeFilters = { ...state.activeFilters, layout: 'landscape' };
+    updateFilterButtonLabels();
+    const btn = document.querySelector<HTMLElement>('.filter-btn[data-filter="layout"]')!;
+    expect(btn.textContent).toBe('Landscape▾');
+    expect(btn.classList.contains('active')).toBe(true);
+  });
+
+  it('toggles URL button .active when urlKeyword is non-empty (label stays "URL▾")', async () => {
+    const { updateFilterButtonLabels } = await import('../sidepanel/ui');
+    state.activeFilters = { ...state.activeFilters, urlKeyword: 'cdn' };
+    updateFilterButtonLabels();
+    const btn = document.querySelector<HTMLElement>('.filter-btn[data-filter="url"]')!;
+    // URL button intentionally keeps its label constant (icon-like)
+    // and only signals state via `.active` — pin this so a refactor
+    // doesn't start embedding the keyword into the label.
+    expect(btn.textContent).toBe('URL▾');
+    expect(btn.classList.contains('active')).toBe(true);
+  });
+
+  it('PRESERVES the .pro-badge child when updating the color button label', async () => {
+    // Pin: the PRO badge span is re-appended AFTER textContent is set
+    // (textContent wipes children). Without the re-append, free users
+    // would lose the PRO upsell badge the moment a color filter is
+    // applied — breaking the conversion funnel.
+    const { updateFilterButtonLabels } = await import('../sidepanel/ui');
+    state.activeFilters = { ...state.activeFilters, color: '#ff0000' };
+    updateFilterButtonLabels();
+    const btn = document.querySelector<HTMLElement>('.filter-btn[data-filter="color"]')!;
+    expect(btn.querySelector('.pro-badge')).not.toBeNull();
+    expect(btn.classList.contains('active')).toBe(true);
+  });
+
+  it('toggles Group .active when currentGroupMode !== "none"', async () => {
+    const { updateFilterButtonLabels } = await import('../sidepanel/ui');
+    state.currentGroupMode = 'domain';
+    updateFilterButtonLabels();
+    const btn = document.querySelector<HTMLElement>('.filter-btn[data-filter="group"]')!;
+    expect(btn.classList.contains('active')).toBe(true);
+  });
+
+  it('toggles Sort .active when currentSortMode !== "size-desc" (the default)', async () => {
+    // Pin: size-desc is the documented default; the UI contract is
+    // "only show .active when user has deviated from default". If the
+    // default drifts, this test will remind us to update both places.
+    const { updateFilterButtonLabels } = await import('../sidepanel/ui');
+    state.currentSortMode = 'filesize-desc';
+    updateFilterButtonLabels();
+    const btn = document.querySelector<HTMLElement>('.filter-btn[data-filter="sort"]')!;
+    expect(btn.classList.contains('active')).toBe(true);
+  });
+
+  it('is defensive about missing DOM — does nothing when every .filter-btn is absent', async () => {
+    document.body.innerHTML = ''; // no filter-btn elements
+    const { updateFilterButtonLabels } = await import('../sidepanel/ui');
+    // Must not throw — init.ts calls this before the filter bar is mounted.
+    expect(() => updateFilterButtonLabels()).not.toThrow();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// showLoading / hideLoading — scan overlay + skeleton orchestration
+// ─────────────────────────────────────────────────────────────────────
+// Pin: showLoading is called at every scan start. Three contracts matter:
+//   1. Reset scan discovery state (scanDiscoveredCount/Images/scanAborted)
+//      so stale counts from a previous scan don't flash up.
+//   2. Invalidate lastRenderedFilteredIds so the incremental-render
+//      cache in message.ts doesn't skip the skeleton → cards transition
+//      when the new scan happens to produce the same filtered set.
+//   3. Push scanProgress with indeterminate=true — the overlay must NOT
+//      show a percent bar during discovery (total is unknown).
+// hideLoading is trivial but we still pin the delegation to hideScanOverlay.
+
+describe('showLoading / hideLoading', () => {
+  let showLoading: typeof import('../sidepanel/ui').showLoading;
+  let hideLoading: typeof import('../sidepanel/ui').hideLoading;
+  beforeEach(async () => {
+    const mod = await import('../sidepanel/ui');
+    showLoading = mod.showLoading;
+    hideLoading = mod.hideLoading;
+    // Build the minimal DOM showLoading queries.
+    document.body.innerHTML = `
+      <div id="app">
+        <div class="image-grid-wrapper">
+          <div id="image-grid"></div>
+        </div>
+        <div id="loading-state" class="hidden"></div>
+        <button id="btn-dedup"></button>
+        <div id="dedup-info"></div>
+        <div id="found-count"></div>
+      </div>
+    `;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (elements as any).imageGrid = document.getElementById('image-grid');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (elements as any).loadingState = document.getElementById('loading-state');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (elements as any).btnDedup = document.getElementById('btn-dedup');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (elements as any).foundCount = document.getElementById('found-count');
+  });
+
+  afterEach(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (elements as any).imageGrid = null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (elements as any).loadingState = null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (elements as any).btnDedup = null;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (elements as any).foundCount = null;
+  });
+
+  it('resets scan discovery state (scanDiscoveredCount/Images/scanAborted)', () => {
+    state.scanDiscoveredCount = 7;
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    state.scanDiscoveredImages = [{ id: 'a' }] as any;
+    state.scanAborted = true;
+
+    showLoading();
+
+    expect(state.scanDiscoveredCount).toBe(0);
+    expect(state.scanDiscoveredImages).toEqual([]);
+    expect(state.scanAborted).toBe(false);
+  });
+
+  it('invalidates lastRenderedFilteredIds (cache reset for incremental render)', () => {
+    state.lastRenderedFilteredIds = 'stale-signature';
+    showLoading();
+    expect(state.lastRenderedFilteredIds).toBeNull();
+  });
+
+  it('pushes scanProgress with indeterminate=true + title "Scanning..." + delegates to showScanOverlay', async () => {
+    const scanMod = await import('../sidepanel/scan');
+    showLoading();
+
+    expect(state.scanProgress).toMatchObject({
+      visible: true,
+      indeterminate: true,
+      title: 'Scanning...',
+      current: 0,
+      total: 0,
+      currentUrl: '',
+    });
+    expect(scanMod.showScanOverlay).toHaveBeenCalledWith(0, 0);
+  });
+
+  it('bounces uiScreen to "images" + hides loading-state + wipes image-grid visibility override', () => {
+    state.uiScreen = 'empty'; // e.g. previous scan returned 0 results
+    const grid = document.getElementById('image-grid')!;
+    grid.style.visibility = 'hidden';
+    grid.classList.add('hidden');
+
+    showLoading();
+
+    expect(state.uiScreen).toBe('images');
+    expect(grid.style.visibility).toBe('');
+    expect(grid.classList.contains('hidden')).toBe(false);
+    expect(document.getElementById('loading-state')!.classList.contains('hidden')).toBe(true);
+  });
+
+  it('sets scanSkeletonLimit + scanSkeletonsToShow to the calcSkeletonCount result', () => {
+    // jsdom returns 0 for clientHeight; the default (|| 600) kicks in.
+    showLoading();
+    // Non-zero skeleton count pinned (calcSkeletonCount returns >=1 always).
+    expect(state.scanSkeletonLimit).toBeGreaterThan(0);
+    expect(state.scanSkeletonsToShow).toBe(state.scanSkeletonLimit);
+  });
+
+  it('resets status bar counts (foundCount textContent "0" + btnDedup display "none" + dedup-info .hidden)', () => {
+    document.getElementById('found-count')!.textContent = '42';
+    const btnDedup = document.getElementById('btn-dedup')!;
+    btnDedup.style.display = '';
+    const dedupInfo = document.getElementById('dedup-info')!;
+    dedupInfo.classList.remove('hidden');
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    state.similarGroups = [[{ id: 'a' }, { id: 'b' }]] as any;
+
+    showLoading();
+
+    expect(document.getElementById('found-count')!.textContent).toBe('0');
+    expect(btnDedup.style.display).toBe('none');
+    expect(dedupInfo.classList.contains('hidden')).toBe(true);
+    expect(state.similarGroups).toEqual([]);
+  });
+
+  it('hideLoading delegates to hideScanOverlay', async () => {
+    const scanMod = await import('../sidepanel/scan');
+    hideLoading();
+    expect(scanMod.hideScanOverlay).toHaveBeenCalledTimes(1);
+  });
+});

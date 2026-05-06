@@ -31,6 +31,27 @@ vi.mock('../sidepanel/ui', () => ({
   showToast: vi.fn(),
   updateFilterButtonLabels: vi.fn(),
 }));
+// The lazy-split chunks are mocked at module level. We assert the
+// facade DELEGATES to them (the production contract) without loading
+// the real heavyweight dependencies (JSZip, modal markup).
+vi.mock('../sidepanel/multitab', () => ({
+  showMultiTabModal: vi.fn(),
+  startMultiTabExtract: vi.fn(() => Promise.resolve()),
+  toggleMultitabSelectAll: vi.fn(),
+}));
+vi.mock('../sidepanel/dedup-ui', () => ({
+  showDedupModal: vi.fn(),
+  removeDuplicates: vi.fn(() => Promise.resolve()),
+}));
+vi.mock('../sidepanel/collection-ui', () => ({
+  showCollectionModal: vi.fn(),
+  exportCollection: vi.fn(() => Promise.resolve()),
+}));
+vi.mock('../shared/collection', () => ({
+  collectionAdd: vi.fn(() => Promise.resolve()),
+  collectionGetAll: vi.fn(() => Promise.resolve([])),
+  collectionRemove: vi.fn(() => Promise.resolve()),
+}));
 
 import {
   detectSimilarImages,
@@ -39,6 +60,18 @@ import {
   removeImageById,
   closeDedupModal,
   closeMultiTabModal,
+  closeCollectionModal,
+  copyColor,
+  addToCollection,
+  isImageInCollection,
+  removeFromCollection,
+  showMultiTabModal,
+  startMultiTabExtract,
+  toggleMultitabSelectAll,
+  showCollectionModal,
+  exportCollection,
+  showDedupModal,
+  removeDuplicates,
 } from '../sidepanel/pro-features';
 import { state, store, elements } from '../sidepanel/state';
 import type { ImageItem } from '../shared/types';
@@ -308,5 +341,262 @@ describe('close*Modal — ESC handlers', () => {
     state.multitabModalState = { open: true };
     closeMultiTabModal();
     expect(state.multitabModalState.open).toBe(false);
+  });
+
+  it('closeCollectionModal flips collectionModalState.open to false', () => {
+    state.collectionModalState = { open: true };
+    closeCollectionModal();
+    expect(state.collectionModalState.open).toBe(false);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// copyColor — navigator.clipboard integration
+// ─────────────────────────────────────────────────────────────────────
+// Pin: on success we toast the copied hex (so users get positive
+// feedback), on rejection we must NOT let the clipboard API's
+// DOMException bubble up — it would unmount any open modal and
+// surface a raw console error. The try/catch is the contract.
+
+describe('copyColor', () => {
+  it('toasts success with the exact hex value after clipboard.writeText resolves', async () => {
+    const writeText = vi.fn(() => Promise.resolve());
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (navigator as any).clipboard = { writeText };
+    const uiMod = await import('../sidepanel/ui');
+
+    await copyColor('#abcdef');
+
+    expect(writeText).toHaveBeenCalledWith('#abcdef');
+    expect(uiMod.showToast).toHaveBeenCalledWith('Color #abcdef copied', 'success');
+  });
+
+  it('toasts an error (instead of bubbling the DOMException) when clipboard rejects', async () => {
+    const writeText = vi.fn(() => Promise.reject(new Error('NotAllowedError')));
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (navigator as any).clipboard = { writeText };
+    const uiMod = await import('../sidepanel/ui');
+
+    // Must not throw — the facade owns the catch.
+    await expect(copyColor('#123456')).resolves.toBeUndefined();
+    expect(uiMod.showToast).toHaveBeenCalledWith('Failed to copy color', 'error');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// Collection CRUD — addToCollection / isImageInCollection / removeFromCollection
+// ─────────────────────────────────────────────────────────────────────
+// Pin: addToCollection must read the ACTIVE tab's url/title (not the
+// sidepanel's own URL). A regression dropping the chrome.tabs.query()
+// call would tag every saved item with the extension URL, breaking
+// the "Open source page" link in the collection modal.
+
+describe('addToCollection', () => {
+  beforeEach(() => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (globalThis as any).chrome = {
+      tabs: {
+        query: vi.fn(() =>
+          Promise.resolve([{ id: 42, url: 'https://example.com/gallery', title: 'Gallery Page' }])
+        ),
+      },
+    };
+  });
+
+  it('persists the image PLUS the active page url/title + createdAt timestamp', async () => {
+    const now = 1_700_000_000_000;
+    vi.spyOn(Date, 'now').mockReturnValue(now);
+    const collectionMod = await import('../shared/collection');
+    const uiMod = await import('../sidepanel/ui');
+
+    await addToCollection(
+      makeImg({
+        id: 'img-1',
+        url: 'https://cdn.example.com/pic.jpg',
+        naturalWidth: 800,
+        naturalHeight: 600,
+        format: 'jpg',
+        estimatedSize: 12345,
+        colors: ['#ff0000'],
+      })
+    );
+
+    expect(collectionMod.collectionAdd).toHaveBeenCalledTimes(1);
+    const payload = vi.mocked(collectionMod.collectionAdd).mock.calls[0][0];
+    expect(payload).toMatchObject({
+      id: 'img-1',
+      url: 'https://cdn.example.com/pic.jpg',
+      width: 800,
+      height: 600,
+      format: 'jpg',
+      fileSize: 12345,
+      colors: ['#ff0000'],
+      sourceUrl: 'https://example.com/gallery',
+      sourceTitle: 'Gallery Page',
+      tags: [],
+      notes: '',
+      createdAt: now,
+    });
+    expect(uiMod.showToast).toHaveBeenCalledWith('Added to collection', 'success');
+  });
+
+  it('falls back to img.tabUrl/tabTitle when chrome.tabs.query throws (multi-tab mode)', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ((globalThis as any).chrome.tabs.query as any).mockRejectedValueOnce(
+      new Error('No access to tab')
+    );
+    const collectionMod = await import('../shared/collection');
+
+    await addToCollection(
+      makeImg({
+        id: 'img-2',
+        url: 'https://cdn.example.com/pic.jpg',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        tabUrl: 'https://other-tab.example.com/page',
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        tabTitle: 'Other Tab',
+      } as any)
+    );
+
+    const payload = vi.mocked(collectionMod.collectionAdd).mock.calls[0][0];
+    expect(payload.sourceUrl).toBe('https://other-tab.example.com/page');
+    expect(payload.sourceTitle).toBe('Other Tab');
+  });
+
+  it('falls back to empty strings when chrome.tabs.query returns [] (no active tab)', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ((globalThis as any).chrome.tabs.query as any).mockResolvedValueOnce([]);
+    const collectionMod = await import('../shared/collection');
+
+    await addToCollection(makeImg({ id: 'img-3', url: 'https://cdn.example.com/pic.jpg' }));
+
+    const payload = vi.mocked(collectionMod.collectionAdd).mock.calls[0][0];
+    expect(payload.sourceUrl).toBe('');
+    expect(payload.sourceTitle).toBe('');
+  });
+
+  it('toasts an error AND swallows when collectionAdd rejects (no uncaught promise)', async () => {
+    const collectionMod = await import('../shared/collection');
+    vi.mocked(collectionMod.collectionAdd).mockRejectedValueOnce(new Error('QuotaExceeded'));
+    const uiMod = await import('../sidepanel/ui');
+
+    await expect(addToCollection(makeImg({ id: 'img-4' }))).resolves.toBeUndefined();
+    expect(uiMod.showToast).toHaveBeenCalledWith('Failed to add to collection', 'error');
+  });
+});
+
+describe('isImageInCollection', () => {
+  it('returns true when the url matches any item in the collection', async () => {
+    const collectionMod = await import('../shared/collection');
+    vi.mocked(collectionMod.collectionGetAll).mockResolvedValueOnce([
+      { id: 'a', url: 'https://cdn.example.com/pic.jpg' },
+      { id: 'b', url: 'https://cdn.example.com/other.png' },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ] as any);
+
+    await expect(isImageInCollection('https://cdn.example.com/pic.jpg')).resolves.toBe(true);
+  });
+
+  it('returns false when no item has that url', async () => {
+    const collectionMod = await import('../shared/collection');
+    vi.mocked(collectionMod.collectionGetAll).mockResolvedValueOnce([
+      { id: 'a', url: 'https://cdn.example.com/other.jpg' },
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ] as any);
+
+    await expect(isImageInCollection('https://cdn.example.com/missing.jpg')).resolves.toBe(false);
+  });
+
+  it('returns false when collectionGetAll rejects (never throws to caller)', async () => {
+    // Pin: ImageCard.isCollectionHighlighted() calls this on every
+    // render. If rejection propagated, the IndexedDB failure mode
+    // would blank every card's favorite star.
+    const collectionMod = await import('../shared/collection');
+    vi.mocked(collectionMod.collectionGetAll).mockRejectedValueOnce(new Error('IDB closed'));
+
+    await expect(isImageInCollection('https://cdn.example.com/pic.jpg')).resolves.toBe(false);
+  });
+});
+
+describe('removeFromCollection', () => {
+  it('delegates to collectionRemove(id) and toasts success', async () => {
+    const collectionMod = await import('../shared/collection');
+    const uiMod = await import('../sidepanel/ui');
+
+    await removeFromCollection('img-xyz');
+
+    expect(collectionMod.collectionRemove).toHaveBeenCalledWith('img-xyz');
+    expect(uiMod.showToast).toHaveBeenCalledWith('Removed from collection', 'success');
+  });
+
+  it('toasts an error AND swallows when collectionRemove rejects', async () => {
+    const collectionMod = await import('../shared/collection');
+    vi.mocked(collectionMod.collectionRemove).mockRejectedValueOnce(new Error('Not found'));
+    const uiMod = await import('../sidepanel/ui');
+
+    await expect(removeFromCollection('missing')).resolves.toBeUndefined();
+    expect(uiMod.showToast).toHaveBeenCalledWith('Failed to remove', 'error');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// Lazy loaders — delegation to split chunks
+// ─────────────────────────────────────────────────────────────────────
+// The synchronous facade (what the toolbar buttons import at module
+// load time) must NOT reach into the implementation modules at
+// definition time — they are gated behind `await import(...)` so the
+// first paint doesn't pay for JSZip + modal markup. These tests pin
+// the delegation contract: each facade call fires the mocked split
+// chunk exactly once, with the arguments threaded unchanged.
+
+describe('lazy loaders — dedup-ui / multitab / collection-ui delegation', () => {
+  it('showDedupModal → ./dedup-ui.showDedupModal (no args)', async () => {
+    const dedupMod = await import('../sidepanel/dedup-ui');
+    await showDedupModal();
+    expect(dedupMod.showDedupModal).toHaveBeenCalledTimes(1);
+  });
+
+  it('removeDuplicates → ./dedup-ui.removeDuplicates + returns its promise', async () => {
+    const dedupMod = await import('../sidepanel/dedup-ui');
+    vi.mocked(dedupMod.removeDuplicates).mockResolvedValueOnce(undefined);
+
+    await expect(removeDuplicates()).resolves.toBeUndefined();
+    expect(dedupMod.removeDuplicates).toHaveBeenCalledTimes(1);
+  });
+
+  it('showMultiTabModal → ./multitab.showMultiTabModal (no args)', async () => {
+    const multitabMod = await import('../sidepanel/multitab');
+    await showMultiTabModal();
+    expect(multitabMod.showMultiTabModal).toHaveBeenCalledTimes(1);
+  });
+
+  it('startMultiTabExtract threads tabIds unchanged to ./multitab.startMultiTabExtract', async () => {
+    const multitabMod = await import('../sidepanel/multitab');
+    const tabIds = [11, 22, 33];
+
+    await startMultiTabExtract(tabIds);
+
+    expect(multitabMod.startMultiTabExtract).toHaveBeenCalledTimes(1);
+    expect(multitabMod.startMultiTabExtract).toHaveBeenCalledWith(tabIds);
+  });
+
+  it('toggleMultitabSelectAll → ./multitab.toggleMultitabSelectAll (no args)', async () => {
+    const multitabMod = await import('../sidepanel/multitab');
+    await toggleMultitabSelectAll();
+    expect(multitabMod.toggleMultitabSelectAll).toHaveBeenCalledTimes(1);
+  });
+
+  it('showCollectionModal → ./collection-ui.showCollectionModal (no args)', async () => {
+    const collectionUiMod = await import('../sidepanel/collection-ui');
+    await showCollectionModal();
+    expect(collectionUiMod.showCollectionModal).toHaveBeenCalledTimes(1);
+  });
+
+  it('exportCollection → ./collection-ui.exportCollection + returns its promise', async () => {
+    const collectionUiMod = await import('../sidepanel/collection-ui');
+    vi.mocked(collectionUiMod.exportCollection).mockResolvedValueOnce(undefined);
+
+    await expect(exportCollection()).resolves.toBeUndefined();
+    expect(collectionUiMod.exportCollection).toHaveBeenCalledTimes(1);
   });
 });

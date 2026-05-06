@@ -39,6 +39,7 @@ vi.mock('../sidepanel/ui', () => ({
 
 import {
   applyCustomSizeInputs,
+  applyFilters,
   clearCustomSizeInputs,
   colorDistance,
   filterByColor,
@@ -48,6 +49,8 @@ import {
   filterBySize,
   filterByType,
   filterByUrl,
+  renderColorSwatches,
+  sortImages,
   syncCustomSizeInputsFromSettings,
 } from '../sidepanel/filter';
 import { state, store } from '../sidepanel/state';
@@ -525,5 +528,331 @@ describe('syncCustomSizeInputsFromSettings', () => {
       maxHeight: 500,
     };
     expect(() => syncCustomSizeInputsFromSettings()).not.toThrow();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// applyFilters — AND chain + cache short-circuit + renderImages delegation
+// ─────────────────────────────────────────────────────────────────────
+// Pin: applyFilters is the single entry for every filter-bar change. Four
+// contracts matter here:
+//   1. AND-chain across 7 predicates (size/type/layout/url/color/min/max).
+//      Any predicate returning false must exclude the image.
+//   2. sortImages() MUST run after filtering (not before) so the displayed
+//      order honors the active sort mode.
+//   3. `lastRenderedFilteredIds` cache short-circuit skips renderImages()
+//      when the filtered set is identical to the last render — BUT still
+//      calls updateSelectionUI() because selection may have changed.
+//   4. When the set changes, the cache key is updated AND renderImages()
+//      is invoked exactly once (not twice from cache-miss + fallthrough).
+
+describe('applyFilters', () => {
+  beforeEach(() => {
+    // The spies accumulate across the whole file (the global beforeEach
+    // only calls store.reset()). Clear them so per-test assertions on
+    // toHaveBeenCalledTimes(N) are reliable.
+    vi.clearAllMocks();
+  });
+
+  it('retains only images that pass every predicate (AND semantics)', async () => {
+    const render = await import('../sidepanel/render');
+    state.allImages = [
+      makeImg({ id: 'pass', naturalWidth: 800, naturalHeight: 600, format: 'jpg' }),
+      makeImg({ id: 'fail-type', naturalWidth: 800, naturalHeight: 600, format: 'gif' }),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ] as any;
+    state.activeFilters = {
+      ...state.activeFilters,
+      size: 'all',
+      types: ['jpg'], // gif fails here
+      layout: 'all',
+      urlKeyword: '',
+      color: null,
+    };
+    state.lastRenderedFilteredIds = null;
+
+    applyFilters();
+
+    expect(state.filteredImages.map((i) => i.id)).toEqual(['pass']);
+    expect(render.renderImages).toHaveBeenCalledTimes(1);
+  });
+
+  it('SKIPS renderImages when the filtered id-list matches lastRenderedFilteredIds (cache hit)', async () => {
+    const render = await import('../sidepanel/render');
+    const actions = await import('../sidepanel/actions');
+    state.allImages = [
+      makeImg({ id: 'a', naturalWidth: 800, naturalHeight: 600, format: 'jpg' }),
+      makeImg({ id: 'b', naturalWidth: 800, naturalHeight: 600, format: 'jpg' }),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ] as any;
+    state.activeFilters = { ...state.activeFilters, size: 'all', types: [], layout: 'all' };
+    // Pre-populate cache key matching what applyFilters will compute
+    // (after sortImages rearranges; with equal pixels the order is preserved).
+    state.lastRenderedFilteredIds = 'a,b';
+
+    applyFilters();
+
+    // Cache hit — renderImages NOT called, but selection UI still refreshed.
+    expect(render.renderImages).not.toHaveBeenCalled();
+    expect(actions.updateSelectionUI).toHaveBeenCalledTimes(1);
+  });
+
+  it('updates lastRenderedFilteredIds + calls renderImages exactly once on cache miss', async () => {
+    const render = await import('../sidepanel/render');
+    const actions = await import('../sidepanel/actions');
+    state.allImages = [
+      makeImg({ id: 'a', naturalWidth: 800, naturalHeight: 600, format: 'jpg' }),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ] as any;
+    state.activeFilters = { ...state.activeFilters, size: 'all', types: [], layout: 'all' };
+    state.lastRenderedFilteredIds = 'stale-key';
+
+    applyFilters();
+
+    expect(state.lastRenderedFilteredIds).toBe('a');
+    expect(render.renderImages).toHaveBeenCalledTimes(1);
+    expect(actions.updateSelectionUI).toHaveBeenCalledTimes(1);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// sortImages — 6 sort modes + default fallthrough
+// ─────────────────────────────────────────────────────────────────────
+// Pin: sortImages mutates state.filteredImages in place (Array.sort).
+// Every branch must be covered because a subtle bug here (e.g. swapping
+// a-b → b-a) reverses the displayed order and is invisible in unit tests
+// that only check count.
+
+describe('sortImages', () => {
+  // Use distinct pixel counts so ordering is unambiguous.
+  // small: 100*100=10k, medium: 400*300=120k, large: 800*600=480k
+  const small = () => makeImg({ id: 's', naturalWidth: 100, naturalHeight: 100 });
+  const medium = () =>
+    makeImg({
+      id: 'm',
+      naturalWidth: 400,
+      naturalHeight: 300,
+      format: 'png',
+      estimatedSize: 5000,
+    });
+  const large = () =>
+    makeImg({
+      id: 'l',
+      naturalWidth: 800,
+      naturalHeight: 600,
+      format: 'jpg',
+      estimatedSize: 20000,
+    });
+
+  it('size-desc (default branch): largest pixels first', () => {
+    state.currentSortMode = 'size-desc';
+    state.filteredImages = [small(), large(), medium()];
+    sortImages();
+    expect(state.filteredImages.map((i) => i.id)).toEqual(['l', 'm', 's']);
+  });
+
+  it('size-asc: smallest pixels first', () => {
+    state.currentSortMode = 'size-asc';
+    state.filteredImages = [large(), small(), medium()];
+    sortImages();
+    expect(state.filteredImages.map((i) => i.id)).toEqual(['s', 'm', 'l']);
+  });
+
+  it('filesize-desc: largest estimatedSize first (missing estimatedSize treated as 0)', () => {
+    state.currentSortMode = 'filesize-desc';
+    state.filteredImages = [small(), large(), medium()];
+    sortImages();
+    // small has no estimatedSize → 0, ranks last.
+    expect(state.filteredImages.map((i) => i.id)).toEqual(['l', 'm', 's']);
+  });
+
+  it('filesize-asc: smallest estimatedSize first', () => {
+    state.currentSortMode = 'filesize-asc';
+    state.filteredImages = [large(), small(), medium()];
+    sortImages();
+    expect(state.filteredImages.map((i) => i.id)).toEqual(['s', 'm', 'l']);
+  });
+
+  it('type: alphabetical by format via localeCompare (missing format treated as "")', () => {
+    state.currentSortMode = 'type';
+    // Explicitly override small to have NO format (makeImg defaults to 'jpg',
+    // which would collide with `large` and make the test ambiguous).
+    const noFormat = makeImg({
+      id: 's',
+      naturalWidth: 100,
+      naturalHeight: 100,
+      format: undefined,
+    });
+    state.filteredImages = [large() /* jpg */, medium() /* png */, noFormat /* '' */];
+    sortImages();
+    // '' < 'jpg' < 'png' in localeCompare → [s, l, m]
+    expect(state.filteredImages.map((i) => i.id)).toEqual(['s', 'l', 'm']);
+  });
+
+  it('natural: returns 0 for every comparator → original input order preserved', () => {
+    state.currentSortMode = 'natural';
+    state.filteredImages = [medium(), small(), large()];
+    sortImages();
+    // V8 Array.sort is stable — natural means "leave it alone".
+    expect(state.filteredImages.map((i) => i.id)).toEqual(['m', 's', 'l']);
+  });
+
+  it('unknown sort mode falls through to default (size-desc)', () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    state.currentSortMode = 'unknown-mode' as any;
+    state.filteredImages = [small(), large()];
+    sortImages();
+    // Default branch behaves like size-desc.
+    expect(state.filteredImages.map((i) => i.id)).toEqual(['l', 's']);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// renderColorSwatches — color palette DOM + click wiring
+// ─────────────────────────────────────────────────────────────────────
+// Pin: renderColorSwatches drives the color filter palette in the Settings
+// sheet. Three contracts:
+//   1. Missing #color-swatches container → silent no-op (lazy-init path).
+//   2. Empty colorMap (no images have .colors) → "No colors extracted yet"
+//      placeholder HTML, not blank.
+//   3. Free users clicking a swatch → PRO upgrade modal (conversion funnel),
+//      state.activeFilters.color untouched. Pro users → toggle active
+//      class + update state + applyFilters + closeAllFilterDropdowns.
+
+describe('renderColorSwatches', () => {
+  function mountContainer() {
+    document.body.innerHTML = `
+      <div id="color-swatches"></div>
+      <div data-color-filter="all" class="active"></div>
+    `;
+    return document.getElementById('color-swatches')!;
+  }
+
+  it('is a silent no-op when #color-swatches is absent (lazy-init guard)', () => {
+    document.body.innerHTML = '';
+    expect(() => renderColorSwatches()).not.toThrow();
+  });
+
+  it('renders the "No colors extracted yet" placeholder when no image has .colors', () => {
+    const container = mountContainer();
+    state.allImages = [
+      makeImg({ id: 'a', colors: undefined }),
+      makeImg({ id: 'b', colors: [] }),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ] as any;
+    renderColorSwatches();
+    expect(container.innerHTML).toContain('No colors extracted yet');
+    expect(container.querySelectorAll('.color-swatch')).toHaveLength(0);
+  });
+
+  it('emits one .color-swatch per unique color, sorted by frequency DESC, capped at 30', () => {
+    const container = mountContainer();
+    // #ff0000 appears 3x, #00ff00 appears 2x, #0000ff appears 1x
+    state.allImages = [
+      makeImg({ id: 'a', colors: ['#FF0000', '#00FF00'] }),
+      makeImg({ id: 'b', colors: ['#ff0000', '#0000ff'] }),
+      makeImg({ id: 'c', colors: ['#ff0000', '#00ff00'] }),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ] as any;
+    renderColorSwatches();
+
+    const swatches = container.querySelectorAll<HTMLElement>('.color-swatch');
+    expect(swatches).toHaveLength(3);
+    // Hex lowercased + frequency order.
+    expect(swatches[0].dataset.colorValue).toBe('#ff0000');
+    expect(swatches[1].dataset.colorValue).toBe('#00ff00');
+    expect(swatches[2].dataset.colorValue).toBe('#0000ff');
+  });
+
+  it('marks the currently selected color swatch with .active', () => {
+    const container = mountContainer();
+    state.activeFilters = { ...state.activeFilters, color: '#ff0000' };
+    state.allImages = [
+      makeImg({ id: 'a', colors: ['#ff0000', '#00ff00'] }),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ] as any;
+    renderColorSwatches();
+
+    const redSwatch = container.querySelector<HTMLElement>('[data-color-value="#ff0000"]')!;
+    const greenSwatch = container.querySelector<HTMLElement>('[data-color-value="#00ff00"]')!;
+    expect(redSwatch.classList.contains('active')).toBe(true);
+    expect(greenSwatch.classList.contains('active')).toBe(false);
+  });
+
+  it('click by FREE user → Pro upgrade modal + activeFilters.color untouched', async () => {
+    const settingsMod = await import('../sidepanel/settings');
+    const uiMod = await import('../sidepanel/ui');
+    const container = mountContainer();
+    state.isProUser = false;
+    state.activeFilters = { ...state.activeFilters, color: null };
+    state.allImages = [
+      makeImg({ id: 'a', colors: ['#ff0000'] }),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ] as any;
+    renderColorSwatches();
+
+    container.querySelector<HTMLElement>('.color-swatch')!.click();
+
+    // Pro upsell fired; filter state NOT mutated (pin: conversion funnel).
+    expect(uiMod.showToast).toHaveBeenCalledWith(expect.stringContaining('Pro feature'), 'warning');
+    expect(settingsMod.showProUpgradeModal).toHaveBeenCalledTimes(1);
+    expect(state.activeFilters.color).toBeNull();
+  });
+
+  it('click by PRO user → activates swatch + updates state + triggers applyFilters pipeline', async () => {
+    const renderMod = await import('../sidepanel/render');
+    const settingsMod = await import('../sidepanel/settings');
+    const container = mountContainer();
+    state.isProUser = true;
+    state.activeFilters = {
+      ...state.activeFilters,
+      color: null,
+      size: 'all',
+      types: [],
+      layout: 'all',
+    };
+    state.allImages = [
+      makeImg({ id: 'a', colors: ['#ff0000'] }),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ] as any;
+    state.lastRenderedFilteredIds = null;
+    renderColorSwatches();
+
+    container.querySelector<HTMLElement>('.color-swatch')!.click();
+
+    expect(state.activeFilters.color).toBe('#ff0000');
+    expect(
+      container.querySelector<HTMLElement>('.color-swatch')!.classList.contains('active')
+    ).toBe(true);
+    // "All Colors" option deselected.
+    expect(
+      document.querySelector<HTMLElement>('[data-color-filter="all"]')!.classList.contains('active')
+    ).toBe(false);
+    expect(updateFilterButtonLabels).toHaveBeenCalled();
+    expect(renderMod.renderImages).toHaveBeenCalled();
+    expect(settingsMod.closeAllFilterDropdowns).toHaveBeenCalled();
+  });
+
+  it('PRO user clicking the ACTIVE swatch deselects (color → null)', async () => {
+    const container = mountContainer();
+    state.isProUser = true;
+    state.activeFilters = { ...state.activeFilters, color: '#ff0000' };
+    state.allImages = [
+      makeImg({ id: 'a', colors: ['#ff0000'] }),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ] as any;
+    renderColorSwatches();
+
+    // The swatch is pre-rendered with .active; clicking it again should
+    // flip the state back to `null` via the "deselect" branch.
+    const swatch = container.querySelector<HTMLElement>('.color-swatch')!;
+    swatch.click();
+
+    expect(state.activeFilters.color).toBeNull();
+    expect(swatch.classList.contains('active')).toBe(false);
+    // "All Colors" option re-activated via the toggle('active', !color).
+    expect(
+      document.querySelector<HTMLElement>('[data-color-filter="all"]')!.classList.contains('active')
+    ).toBe(true);
   });
 });

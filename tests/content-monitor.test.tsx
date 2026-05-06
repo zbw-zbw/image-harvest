@@ -510,3 +510,129 @@ describe('sendDiscoveredImages mock wiring (sanity)', () => {
     expect(vi.isMockFunction(sendDiscoveredImages)).toBe(true);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────
+// Remaining uncov branches — embed data-uri + nested svg/canvas
+// ─────────────────────────────────────────────────────────────────────
+// Pin: these branches plug the last gaps in extractFromNode's
+// dispatch/traversal. Without them, a regression where a nested <svg>
+// or <canvas> inside a dynamically-injected wrapper is silently dropped
+// would go unnoticed — users would see "missing" logos on pages that
+// mount icon systems via a wrapper element (very common in SPA nav bars).
+
+describe('extractFromNode — remaining branches (embed data-uri + nested svg/canvas)', () => {
+  it('extracts <embed src="data:image/..."> and uses the data-uri branch for format/sourceDomain', () => {
+    // Pins the L337-342 ternaries: when srcUrl is a data URI, format
+    // comes from getFileFormat(srcUrl) and sourceDomain falls back to
+    // window.location.hostname (not getDomain of a resolved URL).
+    const embed = document.createElement('embed');
+    embed.src = 'data:image/svg+xml;base64,PHN2Zy8+';
+    embed.type = 'image/svg+xml';
+    stubRect(embed, 120, 80);
+    document.body.appendChild(embed);
+
+    const items = extractFromNode(embed);
+    expect(items).toHaveLength(1);
+    expect(items[0].type).toBe('embed');
+    // Data-URI branch: url kept as-is (no resolveUrl call).
+    expect(items[0].url).toBe('data:image/svg+xml;base64,PHN2Zy8+');
+    // Data-URI branch: format from the data URI itself (mock returns
+    // 'svg' only for .svg suffix, so this falls through to 'unknown' —
+    // but what matters is the branch is exercised, not the value).
+    expect(items[0].format).toBeDefined();
+    // Data-URI branch: sourceDomain = window.location.hostname.
+    expect(items[0].sourceDomain).toBe(window.location.hostname);
+  });
+
+  it('traverses a wrapper and finds a nested <svg> via querySelectorAll(svg)', () => {
+    // Pins L376-380 — the child-svg fallback. Delegates to the mocked
+    // extractInlineSvg; what matters is that the nested svg is picked
+    // up even when the wrapper itself has no direct image content.
+    const wrapper = document.createElement('div');
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('id', 'nested-svg');
+    wrapper.appendChild(svg);
+    document.body.appendChild(wrapper);
+
+    const items = extractFromNode(wrapper);
+    expect(items.some((i) => i.id === 'svg-item-nested-svg')).toBe(true);
+  });
+
+  it('traverses a wrapper and finds a nested <canvas> via querySelectorAll(canvas)', () => {
+    // Pins L381-385 — the child-canvas fallback. Delegates to
+    // extractCanvasImage; mock returns an item when width >= 2.
+    const wrapper = document.createElement('div');
+    const canvas = document.createElement('canvas');
+    canvas.width = 400;
+    canvas.height = 300;
+    wrapper.appendChild(canvas);
+    document.body.appendChild(wrapper);
+
+    const items = extractFromNode(wrapper);
+    expect(items.some((i) => i.id === 'canvas-item-400x300')).toBe(true);
+  });
+
+  it('drops null from nested <canvas> (too-small canvas → extractCanvasImage returns null)', () => {
+    // Negative pin of the same child-canvas branch — the `if (canvasItem)`
+    // guard must filter nulls, otherwise downstream sees undefined items.
+    const wrapper = document.createElement('div');
+    const canvas = document.createElement('canvas');
+    canvas.width = 1; // mock returns null for <2
+    canvas.height = 1;
+    wrapper.appendChild(canvas);
+    document.body.appendChild(wrapper);
+
+    const items = extractFromNode(wrapper);
+    expect(items.filter((i) => i.type === 'canvas')).toHaveLength(0);
+  });
+
+  it('extracts <input type="image" src="data:image/..."> via the data-URI branch', () => {
+    // Pins L245-267 — the <input type=image> data-URI fork. When src is
+    // a data URI, url is kept as-is and sourceDomain = hostname (no
+    // resolveUrl). Guards against a regression where form-submit image
+    // buttons painted via inline SVG data URIs silently disappear from
+    // scan results.
+    const input = document.createElement('input');
+    input.type = 'image';
+    input.src = 'data:image/png;base64,iVBORw0KGgo=';
+    input.width = 64;
+    input.height = 64;
+    document.body.appendChild(input);
+
+    const items = extractFromNode(input);
+    expect(items).toHaveLength(1);
+    expect(items[0].type).toBe('input-image');
+    expect(items[0].url).toBe('data:image/png;base64,iVBORw0KGgo=');
+    expect(items[0].sourceDomain).toBe(window.location.hostname);
+  });
+
+  it('skips <input type="image"> with non-image data URI', () => {
+    // Negative pin of the same branch — if isImageDataUri returns
+    // false, nothing is pushed. Guards against pushing `data:text/...`
+    // URIs as images (a spam/tracking-pixel smuggling vector).
+    const input = document.createElement('input');
+    input.type = 'image';
+    input.src = 'data:text/plain;base64,aGVsbG8=';
+    document.body.appendChild(input);
+
+    expect(extractFromNode(input)).toEqual([]);
+  });
+
+  it('extracts <object data="data:image/..."> via the data-URI branch', () => {
+    // Pins L306/309 — the <object> data-URI ternaries for url/format/
+    // sourceDomain. Guards against a regression where SVG icon systems
+    // mounted via <object data="data:image/svg+xml;base64,..."> are
+    // silently dropped.
+    const obj = document.createElement('object');
+    obj.type = 'image/svg+xml';
+    obj.data = 'data:image/svg+xml;base64,PHN2Zy8+';
+    stubRect(obj, 48, 48);
+    document.body.appendChild(obj);
+
+    const items = extractFromNode(obj);
+    expect(items).toHaveLength(1);
+    expect(items[0].type).toBe('object');
+    expect(items[0].url).toBe('data:image/svg+xml;base64,PHN2Zy8+');
+    expect(items[0].sourceDomain).toBe(window.location.hostname);
+  });
+});

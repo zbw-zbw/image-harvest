@@ -26,7 +26,10 @@ vi.mock('../shared/storage', () => ({
 vi.mock('../shared/license', () => ({
   activateLicense: vi.fn(),
   deactivateLicense: vi.fn(),
-  isProUser: vi.fn(),
+  // initTelemetry() at module top-level calls isProUser().then(...).
+  // A bare vi.fn() returns undefined and crashes the bootstrap import,
+  // so seed a resolved default; individual tests can override via mockResolvedValueOnce.
+  isProUser: vi.fn(() => Promise.resolve({ isPro: false, plan: 'free' })),
   getLicenseInfo: vi.fn(),
 }));
 
@@ -56,6 +59,23 @@ vi.mock('../background/reverse-search', () => ({
   reverseSearchUpload: vi.fn(),
 }));
 
+// Telemetry is invoked at module top-level via initTelemetry() — mock to
+// no-op so the bootstrap import doesn't hit chrome.runtime.getManifest
+// failures or start the 5s flush timer. We don't assert on telemetry
+// calls here; those live in tests/telemetry.test.ts.
+vi.mock('../shared/telemetry', () => ({
+  setEnvelopeMeta: vi.fn(),
+  track: vi.fn(() => Promise.resolve()),
+  flushNow: vi.fn(() => Promise.resolve()),
+}));
+
+vi.mock('../shared/telemetry-events', () => ({
+  EVENTS: {
+    EXTENSION_INSTALLED: 'ext_installed',
+    EXTENSION_UPDATED: 'ext_updated',
+  },
+}));
+
 // ── chrome global mock ──────────────────────────────────────────────
 // Capture the onMessage listener so tests can invoke it directly.
 let onMessageListener:
@@ -81,6 +101,11 @@ beforeAll(async () => {
           onConnectListener = fn;
         }),
       },
+      onInstalled: {
+        addListener: vi.fn(),
+      },
+      // initTelemetry() reads version from here at module init time.
+      getManifest: vi.fn(() => ({ version: '1.0.1' })),
     },
     downloads: {
       onChanged: {

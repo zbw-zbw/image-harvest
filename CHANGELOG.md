@@ -170,6 +170,47 @@ Stage-2 of the 80%+ All-files-Lines push. Target: five files that cover the **se
 - `npm run test:coverage` → `All files` Lines **75.48%** ✅ (see hotspot table above)
 - `npx playwright test e2e/smoke.e2e.ts` → **3/3** ✅ (5.7s)
 
+#### Added — Stage-3 Coverage Push to 80%
+
+Follow-up sweep lifting `All files` Lines from **75.48% → 80.00%** (+4.52pp, user-requested hard floor). +90 cases across 6 sidepanel/content hotspots; zero production code changed. Each file targeted by descending ROI — sidepanel/\* business-logic hotspots first, content/\* DOM-traversal second; `sidepanel/actions.ts` + `sidepanel/init.ts` + `sidepanel/scan.ts` (the remaining sub-40% lines) are deferred to e2e because their IPC/port/scan-loop plumbing needs real chrome runtime timing rather than mocks.
+
+- `tests/sidepanel-pro-features.test.tsx` (**+19 cases**, 20→39) — **47.90% → 100%** Lines. Closes every lazy-loader and downstream-integration gap:
+  - `copyColor` (2) — `navigator.clipboard.writeText` success + rejection branches pinning: the toast ("Color copied") fires on resolve, an error toast fires on reject. Without both, a clipboard-blocked Firefox user would see a silent success and wonder why paste does nothing.
+  - `addToCollection` / `isImageInCollection` / `removeFromCollection` (9) — pins the full `chrome.tabs.query({active:true, currentWindow:true})` → collection payload shape: `{url, sourceUrl, sourceTitle, createdAt}` — a regression dropping `sourceUrl`/`sourceTitle` would make the collection view show images without their origin page, which is the entire point of the feature.
+  - `lazy loaders` (7) — `showMultiTabModal` / `startMultiTabExtract` / `toggleMultitabSelectAll` / `showCollectionModal` / `exportCollection` / `showDedupModal` / `removeDuplicates` all verified to delegate to the right sibling module via `vi.mock('./multitab' | './dedup-ui' | './collection-ui')` assertions. Pins the dynamic-import lazy-load contract that keeps the initial bundle under the 500 KB target.
+- `tests/sidepanel-utils.test.ts` (**+13 cases**, 20→33) — **70.10% → 100%** Lines. Closes `loadSettings` (3 — merges `appSettings` + `filterConfig`), `fetchImageMeta` (3 — HEAD request via `fetch` + `AbortController` 5s timeout + Content-Length/Content-Type extraction; pin: `AbortController.abort()` runs on timeout **not** on 4xx since 4xx already returns a response), `generateFilename` fallback path (1 — when `applyNamingTemplate` is `undefined`, falls back to sanitized filename from URL). Pins regressions where a broken settings file would silently use `DEFAULT_APP_SETTINGS` without warning, or a slow server (>5s) would block download forever.
+- `tests/sidepanel-ui.test.tsx` (**+17 cases**, 52→69) — **67.67% → 97.53%** Lines. Two new describe blocks:
+  - `updateFilterButtonLabels` (10) — pins every filter-chip state calc: active vs idle (`.pro-badge` preservation when toggling `.active`, without this the Pro badge disappears from the filter button as soon as user activates it), multi-value count rendering (`"3 types"` not `"3 undefined"`), sort-mode active detection (`currentSortMode !== 'size-desc'` default), defensive no-DOM fallback (pre-mount `init.ts` calls this before filter bar renders).
+  - `showLoading` / `hideLoading` (7) — state reset invariants (`scanDiscoveredCount=0` + `scanDiscoveredImages=[]` + `scanAborted=false` — pin: if reset was partial, a cancel-mid-scan followed by new-scan would carry stale counts and the UI would display them as new discoveries), `lastRenderedFilteredIds=null` cache invalidation, `scanProgress.indeterminate=true` + `title='Scanning...'` contract with `showScanOverlay`.
+- `tests/sidepanel-filter.test.tsx` (**+17 cases**, 37→54) — **64.62% → 100%** Lines. Three new describe blocks:
+  - `applyFilters` (3) — AND-chain of 7 predicates (size / type / layout / format / color / url-keyword / custom-size) pinned in isolation: every filter must pass independently or the image is dropped. Also pins the `lastRenderedFilteredIds` short-circuit cache (second identical render skips re-DOM-diff work — without this, 500-img panels dropped frames on every scroll tick).
+  - `sortImages` (7) — pins the 6 sort modes (`size-desc` / `size-asc` / `filesize-desc` / `filesize-asc` / `type` / `natural`): `natural` preserves insertion order as scanned; `type` uses `localeCompare` (stable across locales, not raw `<` char-compare); filesize ties break by width. Missing field resilience tested — `filesize: undefined` sorts to one end, not crashes.
+  - `renderColorSwatches` (7) — DOM generation of color chips from `state.discoveredColors`, click → filter application dispatch, Pro-only upsell modal branch (free user click → `showProUpsell('color-filter')`), empty-state fallback message, idempotent re-render (calling twice doesn't duplicate chips).
+- `tests/content-highlight.test.tsx` (**+17 cases**, 28→45) — **64.15% → 78.96%** Lines (+14.81pp; did not hit the 85% aspirational target, but the remaining ~21% is entirely inside the shadow-DOM `SVG → base64` branch which requires real `btoa` + `XMLSerializer` roundtrip — ROI too low for unit test). Two new describe blocks:
+  - `findImageElement` background-image / lazy-data / link / meta fallbacks (8) — pins section 8/9/11/12 of the 12-section URL→element matcher: CSS `background-image: url(...)` match via stubbed `getComputedStyle`, `::before` pseudo-element `content: url(...)` match (how some icon libraries smuggle images), `data-src` / `data-bg url()` on non-`<img>` elements (common for lazyload libs like lazysizes/vanilla-lazyload), `<link rel="icon" | "apple-touch-icon">` + `<meta property="og:image" | name="twitter:image:src">` — all return `{found:true}` but deliberately skip border creation (metadata elements live in `<head>` and can't be visually highlighted; pinning `isMetadataElement` early-ack prevents a false "not found" toast when users click highlight on a favicon in the scan results).
+  - `findImageElement` Shadow DOM fallbacks (9) — pins section 10 of the matcher via real `attachShadow({mode:'open'})` hosts + `vi.mocked(collectShadowRoots).mockReturnValueOnce([shadow])` override: `<img src>` / `<img srcset>` / `<img data-src>` / `<picture><source>` / `<video poster>` / `<input type=image>` / `<object data>` / `<embed src>` / `getComputedStyle.backgroundImage` all inside shadow trees. A regression dropping the shadow-DOM recursion would make component libraries (Ionic, Material Web Components, any Lit/Stencil app) silently fail highlight for 100% of their icons.
+- `tests/content-monitor.test.tsx` (**+7 cases**, 33→40) — **75.06% → 82.38%** Lines (+7.32pp; did not hit the 90% aspirational target — remaining uncov lines are entirely inside the `flushMutations` debounce callback, which requires triggering real `MutationObserver` with fake-timer-advanced microtask draining and is in e2e territory). Four new cases pinning the last `extractFromNode` dispatch gaps:
+  - `<embed src="data:image/svg+xml;base64,...">` (1) — pins the embed data-URI branch (`url` kept as-is with no `resolveUrl`, `sourceDomain` = `window.location.hostname`). Without this, SVG icon systems mounted via `<embed>` (rare but real) would be silently dropped.
+  - Nested `<svg>` + `<canvas>` via wrapper `querySelectorAll` (3) — pins child-traversal fallback for SVG icon wrappers (common in SPA nav bars) and `<canvas>` guards (too-small canvas returning `null` from `extractCanvasImage` must be filtered, not pushed as `undefined`).
+  - `<input type="image" src="data:...">` (2) — pins the input data-URI branch + non-image-data-URI negative guard (`data:text/plain` must NOT be pushed — it would poison the scan results with spam/tracking-pixel smuggling).
+  - `<object data="data:image/...">` (1) — pins the object data-URI ternaries for `url` / `format` / `sourceDomain`.
+- `tests/background-index.test.ts` (**mock fixes**) — fixed bootstrap-import crash: the module-top-level `initTelemetry()` call reads `chrome.runtime.getManifest().version` and invokes `isProUser().then(...)`, both of which were un-mocked. Added `chrome.runtime.onInstalled.addListener` + `chrome.runtime.getManifest` stubs, seeded `isProUser` with `Promise.resolve({isPro:false, plan:'free'})` default, and module-mocked `../shared/telemetry` + `../shared/telemetry-events` to no-op. Without these fixes, every `background/*` test file that transitively imports `background/index.ts` would fail to load.
+
+#### Final Stage-3 validation (2026-05)
+
+- `npm run typecheck` ✅ (fixed 2 pre-existing `SortMode` / `lastRenderedFilteredIds` type drifts in `sidepanel-ui.test.tsx`)
+- `npm run lint` ✅ (0 errors; 1 unrelated pre-existing warning in `shared/telemetry.ts`)
+- `npx prettier --check` ✅ (all files formatted)
+- `npm test` → **46 files / 1,258 cases** ✅ (0 failed; 1 pre-existing flaky `telemetry.test.ts` timer case tracked separately)
+- `npm run test:coverage` → `All files` Lines **80.00%** ✅ (Branch 87.26% / Funcs 88.54%)
+- Per-file Stage-3 final coverage:
+  - `sidepanel/pro-features.ts` **100%** (was 47.90%)
+  - `sidepanel/utils.ts` **100%** (was 70.10%)
+  - `sidepanel/filter.ts` **100%** (was 64.62%)
+  - `sidepanel/ui.ts` **97.53%** (was 67.67%)
+  - `content/monitor.ts` **82.38%** (was 75.06%)
+  - `content/highlight.ts` **78.96%** (was 64.15%)
+
 ---
 
 ## [1.0.1][1.0.1] - 2026-04-29
