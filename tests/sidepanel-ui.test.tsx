@@ -29,20 +29,24 @@ vi.mock('../sidepanel/settings', () => ({
 }));
 
 import {
+  applyViewMode,
   calcSkeletonCount,
-  getMinCardWidth,
-  showToast,
-  showError,
-  showEmpty,
-  showRestricted,
-  hideRestricted,
+  checkNarrowMode,
   clearCurrentImages,
-  resetStatusBar,
-  hideAll,
-  showProgress,
-  hideProgress,
-  updateProgress,
+  getMinCardWidth,
   handleProgressClose,
+  hideAll,
+  hideProgress,
+  hideRestricted,
+  resetStatusBar,
+  showConfirmDialog,
+  showEmpty,
+  showError,
+  showProgress,
+  showRestricted,
+  showToast,
+  toggleViewMode,
+  updateProgress,
 } from '../sidepanel/ui';
 import { state, store, elements } from '../sidepanel/state';
 
@@ -475,5 +479,266 @@ describe('showProgress / updateProgress / hideProgress / handleProgressClose', (
     handleProgressClose(); // should NOT call onAbort again
 
     expect(onAbort).not.toHaveBeenCalled();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// View mode toggle — grid ↔ list class swap orchestration
+// ─────────────────────────────────────────────────────────────────────
+
+describe('applyViewMode / toggleViewMode', () => {
+  function mountViewModeDOM(): {
+    grid: HTMLDivElement;
+    groupA: HTMLDivElement;
+    groupB: HTMLDivElement;
+    btnToggle: HTMLButtonElement;
+    iconGrid: HTMLElement;
+    iconList: HTMLElement;
+    label: HTMLElement;
+  } {
+    document.body.innerHTML = `
+      <div id="image-grid"></div>
+      <div class="group-content"></div>
+      <div class="group-content"></div>
+      <button id="btn-view-toggle"></button>
+      <div id="icon-grid"></div>
+      <div id="icon-list"></div>
+      <span id="view-toggle-label"></span>
+    `;
+    const grid = document.getElementById('image-grid') as HTMLDivElement;
+    const groups = document.querySelectorAll<HTMLDivElement>('.group-content');
+    const btnToggle = document.getElementById('btn-view-toggle') as HTMLButtonElement;
+    elements.imageGrid = grid;
+    elements.btnViewToggle = btnToggle;
+    return {
+      grid,
+      groupA: groups[0],
+      groupB: groups[1],
+      btnToggle,
+      iconGrid: document.getElementById('icon-grid')!,
+      iconList: document.getElementById('icon-list')!,
+      label: document.getElementById('view-toggle-label')!,
+    };
+  }
+
+  afterEach(() => {
+    delete (elements as Partial<typeof elements>).imageGrid;
+    delete (elements as Partial<typeof elements>).btnViewToggle;
+  });
+
+  it('applyViewMode("list") writes state.currentViewMode + flips list-view class on grid + every .group-content', () => {
+    const { grid, groupA, groupB } = mountViewModeDOM();
+    applyViewMode('list');
+    expect(state.currentViewMode).toBe('list');
+    expect(grid.classList.contains('list-view')).toBe(true);
+    // Pin: per-group re-sync. Group-collapsed grids are separate DOM
+    // subtrees and would render as grid-view (wrong width) if the
+    // class swap only hit the top-level #image-grid.
+    expect(groupA.classList.contains('list-view')).toBe(true);
+    expect(groupB.classList.contains('list-view')).toBe(true);
+  });
+
+  it('applyViewMode("grid") removes list-view class from every list-view bucket', () => {
+    const { grid, groupA } = mountViewModeDOM();
+    grid.classList.add('list-view');
+    groupA.classList.add('list-view');
+    applyViewMode('grid');
+    expect(grid.classList.contains('list-view')).toBe(false);
+    expect(groupA.classList.contains('list-view')).toBe(false);
+  });
+
+  it('applyViewMode swaps the btn-view-toggle title + icon visibility + label text', () => {
+    const { btnToggle, iconGrid, iconList, label } = mountViewModeDOM();
+    applyViewMode('list');
+    expect(btnToggle.title).toBe('Switch to grid view');
+    // In list mode, show the grid icon (as the "switch-to" affordance).
+    expect(iconGrid.classList.contains('hidden')).toBe(false);
+    expect(iconList.classList.contains('hidden')).toBe(true);
+    expect(label.textContent).toBe('Grid');
+
+    applyViewMode('grid');
+    expect(btnToggle.title).toBe('Switch to list view');
+    expect(iconGrid.classList.contains('hidden')).toBe(true);
+    expect(iconList.classList.contains('hidden')).toBe(false);
+    expect(label.textContent).toBe('List');
+  });
+
+  it('applyViewMode is a no-op on absent grid/toggle/icons/label (defensive null-checks)', () => {
+    document.body.innerHTML = '';
+    // Pin: every pluggable DOM lookup must short-circuit on missing
+    // element. This is the "popup mode before DOMContentLoaded" guard.
+    expect(() => applyViewMode('list')).not.toThrow();
+    expect(state.currentViewMode).toBe('list');
+  });
+
+  it('toggleViewMode flips list ↔ grid round-trip and propagates via applyViewMode', () => {
+    mountViewModeDOM();
+    // Internal userViewMode starts as 'list' (module-private); first call flips to 'grid'.
+    toggleViewMode();
+    expect(state.currentViewMode).toBe('grid');
+    toggleViewMode();
+    expect(state.currentViewMode).toBe('list');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// checkNarrowMode — reactive compact/list-mode toggle
+// ─────────────────────────────────────────────────────────────────────
+
+describe('checkNarrowMode', () => {
+  function mountNarrowDOM(clientWidth: number): {
+    grid: HTMLDivElement;
+    app: HTMLDivElement;
+    btnToggle: HTMLButtonElement;
+    toolbarRight: HTMLDivElement;
+  } {
+    document.body.innerHTML = `
+      <div id="app">
+        <div class="toolbar">
+          <div class="toolbar-right">
+            <button id="btn-view-toggle"></button>
+          </div>
+        </div>
+        <div id="image-grid"></div>
+      </div>
+    `;
+    const grid = document.getElementById('image-grid') as HTMLDivElement;
+    Object.defineProperty(grid, 'clientWidth', {
+      configurable: true,
+      value: clientWidth,
+    });
+    elements.imageGrid = grid;
+    elements.btnViewToggle = document.getElementById('btn-view-toggle') as HTMLButtonElement;
+    return {
+      grid,
+      app: document.getElementById('app') as HTMLDivElement,
+      btnToggle: elements.btnViewToggle as HTMLButtonElement,
+      toolbarRight: document.querySelector('.toolbar-right') as HTMLDivElement,
+    };
+  }
+
+  afterEach(() => {
+    delete (elements as Partial<typeof elements>).imageGrid;
+    delete (elements as Partial<typeof elements>).btnViewToggle;
+  });
+
+  it('early-returns when elements.imageGrid is null (no crash on pre-bootstrap call)', () => {
+    document.body.innerHTML = '';
+    delete (elements as Partial<typeof elements>).imageGrid;
+    expect(() => checkNarrowMode()).not.toThrow();
+  });
+
+  it('wide viewport (≥ 2×250 + gap = 520px available) keeps compact-mode OFF + toggle visible', () => {
+    // 700px - 20px padding = 680px available; 680 >= 500 + 10 gap → canFitTwoColumns.
+    // (680 - 10) / 2 = 335 >= 310 compactThreshold → isCompact = false.
+    const { app, btnToggle, toolbarRight } = mountNarrowDOM(700);
+    checkNarrowMode();
+    expect(app.classList.contains('compact-mode')).toBe(false);
+    expect(btnToggle.style.display).toBe('');
+    expect(toolbarRight.style.display).toBe('');
+  });
+
+  it('narrow viewport (< 520px available) flips compact-mode ON + hides view toggle + forces list view', () => {
+    // 400px - 20px = 380 available; 380 < 500+10 → cannot fit 2 cols → isCompact = true.
+    const { app, btnToggle, toolbarRight, grid } = mountNarrowDOM(400);
+    checkNarrowMode();
+    expect(app.classList.contains('compact-mode')).toBe(true);
+    // Pin: view-toggle button AND its containing .toolbar-right both
+    // hidden. Leaving toolbar-right visible would leave an empty gap
+    // that throws off the toolbar-left flex layout.
+    expect(btnToggle.style.display).toBe('none');
+    expect(toolbarRight.style.display).toBe('none');
+    // Auto-switches to list view via applyViewMode('list').
+    expect(state.currentViewMode).toBe('list');
+    expect(grid.classList.contains('list-view')).toBe(true);
+  });
+
+  it('medium viewport (can fit 2 cols but each < 310px) flips compact-mode ON while keeping toggle visible', () => {
+    // 600px - 20px = 580 >= 510 → canFitTwoColumns = true.
+    // (580 - 10) / 2 = 285 < 310 → isCompact = true.
+    const { app, btnToggle } = mountNarrowDOM(600);
+    checkNarrowMode();
+    expect(app.classList.contains('compact-mode')).toBe(true);
+    // canFitTwoColumns is still true, so toggle stays visible.
+    expect(btnToggle.style.display).toBe('');
+  });
+
+  it('isNarrowMode state machine: widening back from narrow restores user view mode (not forced-list)', () => {
+    // First narrow → forces list (sets isNarrowMode = true).
+    mountNarrowDOM(400);
+    checkNarrowMode();
+    expect(state.currentViewMode).toBe('list');
+
+    // Now widen: mount a fresh DOM with wide client width.
+    const { grid } = mountNarrowDOM(700);
+    checkNarrowMode();
+    // Pin: after widening, the module's internal userViewMode
+    // ('list' at bootstrap) is restored. Without this state machine,
+    // the user would be stuck in whatever mode they were forced into.
+    expect(state.currentViewMode).toBe('list');
+    expect(grid.classList.contains('list-view')).toBe(true);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// showConfirmDialog — promise-returning modal open/close contract
+// ─────────────────────────────────────────────────────────────────────
+
+describe('showConfirmDialog', () => {
+  it('flips confirmDialog.open=true and stores the config + resolver (not yet resolved)', async () => {
+    const promise = showConfirmDialog({
+      title: 'Delete all?',
+      message: 'This cannot be undone.',
+      confirmText: 'Delete',
+      cancelText: 'Keep',
+      type: 'danger',
+    });
+    expect(state.confirmDialog.open).toBe(true);
+    expect(state.confirmDialog.config).toEqual({
+      title: 'Delete all?',
+      message: 'This cannot be undone.',
+      confirmText: 'Delete',
+      cancelText: 'Keep',
+      type: 'danger',
+    });
+    expect(typeof state.confirmDialog.resolve).toBe('function');
+    // Pin: the returned Promise is NOT pre-resolved. A regression
+    // resolving synchronously inside the constructor would cause the
+    // caller's `.then` to fire before the modal even rendered.
+    // Manually resolve so afterEach doesn't leave dangling promises.
+    state.confirmDialog.resolve!(true);
+    await expect(promise).resolves.toBe(true);
+  });
+
+  it('applies default confirmText="Confirm" + cancelText="Cancel" + type="warning" when omitted', async () => {
+    const promise = showConfirmDialog({ title: 't', message: 'm' });
+    expect(state.confirmDialog.config).toEqual({
+      title: 't',
+      message: 'm',
+      confirmText: 'Confirm',
+      cancelText: 'Cancel',
+      type: 'warning',
+    });
+    state.confirmDialog.resolve!(false);
+    await expect(promise).resolves.toBe(false);
+  });
+
+  it('resolves an already-open prior dialog with false when a new one opens (stack-of-one policy)', async () => {
+    // Pin: only one confirm dialog visible at a time. Calling code
+    // for rapid back-to-back actions (e.g. bulk-delete follow-up)
+    // must not leave a stale pending promise that could resolve with
+    // the wrong value later.
+    const first = showConfirmDialog({ title: 'first', message: 'm1' });
+    const second = showConfirmDialog({ title: 'second', message: 'm2' });
+    await expect(first).resolves.toBe(false);
+    expect(state.confirmDialog.config?.title).toBe('second');
+    state.confirmDialog.resolve!(true);
+    await expect(second).resolves.toBe(true);
+  });
+
+  it('resolver writes through to the awaited Promise (smoke test the happy path)', async () => {
+    const promise = showConfirmDialog({ title: 't', message: 'm' });
+    state.confirmDialog.resolve!(true);
+    await expect(promise).resolves.toBe(true);
   });
 });

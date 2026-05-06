@@ -41,34 +41,69 @@ Strategy: new `.test.tsx` files under jsdom, with test-scoped stubs for `globalT
 - Migrated `tests/sidepanel-init.test.tsx` + `tests/sidepanel-settings.test.tsx` to the shared helper, net **-55 LoC of duplication removed** across the two touched files.
 - NOT migrated (intentionally): 7 `background-*` / `content-*` / `sidepanel-actions` test files inline bespoke single-API stubs (e.g. `chrome.tabs.sendMessage` only) whose shapes are too heterogeneous to unify without adding more conditionals than the current code.
 
+#### Added — Unit Tests (sidepanel hotspots)
+
+Follow-up sweep after `vitest.config.ts` `coverage.include` was widened from `shared/**` only to also include `background/** + content/** + sidepanel/** + pages/**`. The new denominator surfaced four low-coverage hotspots in business code that the prior shared-only denominator was hiding. This pass closes three of them; the fourth (`sidepanel/scan.ts`) is explicitly scoped to e2e — see below.
+
+- `tests/sidepanel-filter.test.tsx` (renamed from `.ts` + **+13 cases**) — file renamed so jsdom environment routing (`environmentMatchGlobs: tests/**/*.test.tsx → jsdom`) makes `document` available; adding `vi.mock('../sidepanel/{actions,render,settings,ui}')` so the filter module can `import` its transitive DOM deps without pulling the real init IIFE. New cases pin the custom-size-input sub-module (`clearCustomSizeInputs` / `applyCustomSizeInputs` / `syncCustomSizeInputsFromSettings`, previously 0% covered): empty-input clear (2), apply with trimmed values + invalid-number sanitization + min/max bidirectional swap (7), and roundtrip sync from settings including the `min === 0` / `max === Infinity` sentinel handling (4). A regression forgetting the `Number.isFinite` guard would let `"abc"` leak into `state.filter.customSize.min` and silently filter out every image.
+- `tests/sidepanel-ui.test.tsx` (**+16 cases**) — adds 4 describe blocks for the previously-out-of-scope mid-file functions:
+  - **`applyViewMode` / `toggleViewMode`** (5 cases) — grid↔list class swap orchestration across `#image-grid` + every `.group-content` (pinned: per-group re-sync is required because collapsed groups are separate DOM subtrees and would render at the wrong width if only the top-level grid was toggled), `btn-view-toggle` title + icon visibility + label text round-trip, missing-DOM no-throw guard, `toggleViewMode` flip through the internal `userViewMode` state machine.
+  - **`checkNarrowMode`** (5 cases) — reactive compact/list-mode toggle driven by `elements.imageGrid.clientWidth`. Stubbed via `Object.defineProperty(grid, 'clientWidth', ...)`. Pinned thresholds: wide (≥ 520px available → compact OFF + toggle visible), narrow (< 520px → compact ON + toggle **AND** `.toolbar-right` both hidden + forced list view), medium (can fit 2 cols but each < 310px → compact ON while toggle stays visible), and the `isNarrowMode` state-machine restoring `userViewMode` when widening back (without this, a user forced into list mode at a narrow size would be stuck there forever).
+  - **`showConfirmDialog`** (4 cases) — Promise-returning modal contract: open=true + config + resolver stored (pinned: promise is **NOT** pre-resolved — a regression resolving synchronously inside the constructor would fire `.then` before the modal rendered), default `confirmText='Confirm'` / `cancelText='Cancel'` / `type='warning'` when omitted, stack-of-one policy (calling `showConfirmDialog` while one is already open resolves the prior dialog with `false` — rapid back-to-back actions must not leave stale pending promises that resolve with wrong values later), happy-path resolver → awaited promise smoke.
+  - **`calcSkeletonCount`** (2 cases, topping up prior coverage) — list-view 1-row clamp, no-`#app` fall-through to defaults.
+- `tests/pages-reverse-search.test.tsx` (**NEW**, 18 cases) — pins the 226-line `pages/reverse-search.ts` IIFE (0% → covered). The entire file is a single top-level `(async function () { ... })()` with no exports, so the strategy mirrors `pages-popup.test.tsx` + `sidepanel-init.test.tsx`: `vi.resetModules()` + dynamic `import('../pages/reverse-search')` per scenario, with `chrome.runtime.sendMessage` + `window.location.{search,href}` + `window.close` + `HTMLFormElement.prototype.submit` + a `DataTransfer` class stub all installed in `beforeEach`. Key cases:
+  - **4 bootstrap guards** — missing `#status` → silent return (no crash), missing `engine` → "Missing search parameters" error, missing `imageUrl` → same error, close-tab anchor click calls `window.close()`.
+  - **3 form-upload engine dispatches** (google / tineye / unknown) — pins the per-engine form-upload contract: google uses `encoded_image` field against `lens.google.com/v3/upload`, tineye uses `image` field against `tineye.com/search` — swapping these would cause silent upload ignores. Pinned: `enctype: multipart/form-data` + `method: post`. Unknown engine after successful fetch → `"Unknown search engine: bing"` error.
+  - **5 background-bridge engine dispatches** (yandex / baidu) — REVERSE_SEARCH_UPLOAD round-trip: yandex success with `redirectUrl` → `window.location.href` set (pinned: redirect the tab rather than open a new one, since the intermediate tab becomes the results tab), yandex `{success:false}` → fallback to `yandex.com/images/search` (pinned: `.com` not `.ru` — the public URL-based endpoint), yandex throw → warn-only fallback (never re-throw), baidu success → `window.close()` (background already opened the results tab separately via `scripting.executeScript`), baidu fail → `graph.baidu.com/details` fallback.
+  - **4 FETCH_IMAGE_DATA failure paths** — undefined response / `{success:false}` / `{success:true, dataUrl:undefined}` all correctly cascade into `fallbackUrlSearch` for known engines; unknown engine on fallback path → "Fallback search not available" error (not a runtime throw).
+  - **2 top-level try/catch** — `sendMessage` rejection → `"Search failed: network down"` user-readable message, non-Error string throw → stringified via `String(error)` (pinning the `error instanceof Error ? .message : String(error)` fallback — legacy `throw "..."` code still renders a readable message).
+  - **jsdom quirk worked around**: `HTMLInputElement.files` setter strictly requires a `FileList` instance, and a plain array from a custom `DataTransfer` stub throws `TypeError: Failed to set the 'files' property`. Fix: override `HTMLInputElement.prototype.files` getter/setter via `Object.defineProperty` to accept anything.
+
+#### Not Added — Deliberate e2e Deferral
+
+- `sidepanel/scan.ts` (10.28% line coverage) — the head-of-file overlay state machine (`showScanOverlay` / `hideScanOverlay` / `updateScanProgress` / `handleScanCancel`) already has a full `tests/sidepanel-scan.test.tsx` (4 describe blocks / indeterminate-flag handoff + abort-with-images vs. abort-empty split pinned). The remaining 530+ uncovered lines (L92-622) are `silentRescan` / `rescanWithProgress` / `fetchImages` / `fetchImageDataUrl` / `processImageExtras` / `patchCardExtras` — all `chrome.runtime.sendMessage` long chains against the background service worker. Adding 200+ LoC of IPC mock scaffolding to reach them would be brittle and pin implementation details rather than behavior; the actual contract (scan → results render → dedup → download) is already covered by `e2e/smoke.e2e.ts` + `e2e/scan.e2e.ts` under a real Chrome. Explicitly out of unit-test scope.
+
+#### Changed — Test Infrastructure (coverage include expansion)
+
+- `vitest.config.ts` — `coverage.include` widened from `['shared/**/*.ts']` to `['shared/**/*.ts', 'background/**/*.ts', 'content/**/*.ts', 'sidepanel/**/*.ts', 'pages/**/*.ts']`. The prior shared-only denominator was hiding that popular user-code paths like `pages/reverse-search.ts` (0%) and `pages/popup.ts` (0% before unit tests landed) were completely unmeasured. `coverage.exclude` grew by **15 Preact component paths** + `**/types.ts` — these are pure render components (`SkeletonCard.tsx`, `ImageGrid.tsx`, etc.) with zero logic branches; attempting to cover them via unit test would require full Preact mount + snapshot infra which is already handled by `e2e/` visual smoke.
+- `tests/sidepanel-filter.test.ts` → `tests/sidepanel-filter.test.tsx` via `git mv` — the `.ts → .tsx` rename routes the file through the jsdom environment via `environmentMatchGlobs`, making `document` available for the new custom-size-input DOM tests.
+
 #### Changed — Documentation
 
-- `CONTRIBUTING.md` — replaced the 3-line "Tests" paragraph with a complete two-layer testing guide: Vitest/Playwright scope matrix, current coverage stats, mocking conventions (`installChromeMock()` helper, `fake-indexeddb`, `vi.mock()` patterns), documented jsdom limits (no layout computation, CSS shorthand normalization), Playwright deterministic-state pattern (`window.__IH_E2E__` + `window.__IH__.store`), smoke-tier vs full-suite guidance.
+- `CONTRIBUTING.md` — replaced the 3-line "Tests" paragraph with a complete two-layer testing guide: Vitest/Playwright scope matrix, current coverage stats, mocking conventions (`installChromeMock()` helper, `fake-indexeddb`, `vi.mock()` patterns), documented jsdom limits (no layout computation, CSS shorthand normalization, strict `HTMLInputElement.files` typing), Playwright deterministic-state pattern (`window.__IH_E2E__` + `window.__IH__.store`), smoke-tier vs full-suite guidance.
 
 #### Chore
 
 - `.gitignore` — added `/coverage/` (vitest v8 `test:coverage` output — local dev only, never committed).
 
-#### Coverage Metrics (before → after)
+#### Coverage Metrics (cumulative across the whole [Unreleased] section)
 
-| Target                             | Before | After    | Δ        |
-| ---------------------------------- | ------ | -------- | -------- |
-| `shared/*` aggregate line coverage | 66.95% | **100%** | +33.05pp |
-| `shared/color-extract.ts`          | 11.04% | **100%** | +88.96pp |
-| `shared/phash.ts`                  | 17.89% | **100%** | +82.11pp |
-| `shared/converter.ts`              | 36.52% | **100%** | +63.48pp |
-| `shared/utils.ts`                  | 97.85% | **100%** | +2.15pp  |
-| Vitest test files                  | 35     | **39**   | +4       |
-| Vitest test cases                  | 847    | **889**  | +42      |
+| Target                             | Before  | After      | Δ                                     |
+| ---------------------------------- | ------- | ---------- | ------------------------------------- |
+| All-files aggregate Lines          | _n/a_   | **65.10%** | new metric + hotspot sweep            |
+| `shared/*` aggregate line coverage | 66.95%  | **100%**   | +33.05pp                              |
+| `shared/color-extract.ts`          | 11.04%  | **100%**   | +88.96pp                              |
+| `shared/phash.ts`                  | 17.89%  | **100%**   | +82.11pp                              |
+| `shared/converter.ts`              | 36.52%  | **100%**   | +63.48pp                              |
+| `shared/utils.ts`                  | 97.85%  | **100%**   | +2.15pp                               |
+| `content/state.ts`                 | partial | **100%**   | —                                     |
+| `content/utils.ts`                 | partial | **100%**   | —                                     |
+| `sidepanel/render.ts`              | partial | **100%**   | —                                     |
+| `sidepanel/filter.ts`              | 37.26%  | **64.62%** | +27.36pp                              |
+| `sidepanel/ui.ts`                  | 47.12%  | **67.67%** | +20.55pp                              |
+| `pages/reverse-search.ts`          | **0%**  | **87.86%** | +87.86pp                              |
+| `sidepanel/scan.ts` (e2e-scoped)   | 10.28%  | 10.28%     | 0 (by design — see "Not Added" above) |
+| Vitest test files                  | 35      | **40**     | +5                                    |
+| Vitest test cases                  | 847     | **978**    | +131                                  |
 
 #### Verified
 
 - `npm run typecheck` ✅
 - `npm run lint` ✅
-- `npx prettier --check` ✅
-- `npm test` → **39 files / 889 cases** ✅
-- `npm run test:coverage` → **`shared/*` all 6 files at 100% Lines** ✅
-- `npx playwright test e2e/smoke.e2e.ts` → **3/3** ✅ (4.7s)
+- `npx prettier --check` ✅ (3 format-fixed in the touched set)
+- `npm test` → **40 files / 978 cases** ✅
+- `npm run test:coverage` → `All files` Lines **65.10%** ✅ (see hotspot table above)
+- `npx playwright test e2e/smoke.e2e.ts` → **3/3** ✅ (8.7s)
 
 ---
 

@@ -224,3 +224,11 @@ interface FetchImageDataResult {
     }
   }
 })();
+
+// This file is a top-level IIFE with no value exports, but unit tests
+// (tests/pages-reverse-search.test.tsx) need to drive it via dynamic
+// `import('../pages/reverse-search')`. Without at least one export, TS
+// 5.x treats it as a script and emits TS2306 "not a module" at every
+// import site. An empty type-only export is zero-cost at runtime and
+// satisfies the isolatedModules compilation contract.
+export {};
