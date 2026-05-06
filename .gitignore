@@ -20,6 +20,9 @@ image-harvest-v*.zip
 /playwright-report/
 /.playwright-user-data/
 
+# Vitest v8 coverage reports (local dev only)
+/coverage/
+
 # Temporary files
 *.tmp
 *.swp
