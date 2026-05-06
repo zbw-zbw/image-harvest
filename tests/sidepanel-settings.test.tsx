@@ -128,9 +128,7 @@ describe('setSelect / getSelect', () => {
       `<div id="${id}" data-value="">` +
       `<span class="setting-select-text"></span>` +
       options
-        .map(
-          (o) => `<div class="setting-select-option" data-value="${o.value}">${o.label}</div>`
-        )
+        .map((o) => `<div class="setting-select-option" data-value="${o.value}">${o.label}</div>`)
         .join('') +
       `</div>`;
     document.body.innerHTML = html;
@@ -200,9 +198,7 @@ describe('setRadio / getRadio', () => {
     buildRadios('density', ['compact', 'standard', 'comfortable']);
     setRadio('density', 'standard');
 
-    const checked = document.querySelector<HTMLInputElement>(
-      'input[name="density"]:checked'
-    );
+    const checked = document.querySelector<HTMLInputElement>('input[name="density"]:checked');
     expect(checked?.value).toBe('standard');
   });
 
@@ -454,10 +450,7 @@ describe('bindProGuards — Pro paywall interceptor', () => {
 
       expect(state.proUpgradeModalState.open).toBe(true);
       const ui = await import('../sidepanel/ui');
-      expect(ui.showToast).toHaveBeenCalledWith(
-        expect.stringMatching(/Pro feature/),
-        'warning'
-      );
+      expect(ui.showToast).toHaveBeenCalledWith(expect.stringMatching(/Pro feature/), 'warning');
       expect(downstream).not.toHaveBeenCalled();
     }
   );
@@ -567,33 +560,10 @@ import {
   updateTopProStatus,
 } from '../sidepanel/settings';
 
-type ChromeMock = {
-  runtime: { sendMessage: ReturnType<typeof vi.fn> };
-  tabs: { create: ReturnType<typeof vi.fn>; query: ReturnType<typeof vi.fn> };
-  storage: {
-    local: { get: ReturnType<typeof vi.fn>; set: ReturnType<typeof vi.fn> };
-  };
-  commands: { getAll: ReturnType<typeof vi.fn> };
-};
-
-function installChromeMock(): ChromeMock {
-  const chromeMock: ChromeMock = {
-    runtime: { sendMessage: vi.fn().mockResolvedValue({}) },
-    tabs: {
-      create: vi.fn().mockResolvedValue(undefined),
-      query: vi.fn().mockResolvedValue([{ id: 99 }]),
-    },
-    storage: {
-      local: {
-        get: vi.fn().mockResolvedValue({}),
-        set: vi.fn().mockResolvedValue(undefined),
-      },
-    },
-    commands: { getAll: vi.fn().mockResolvedValue([]) },
-  };
-  (globalThis as unknown as { chrome: unknown }).chrome = chromeMock;
-  return chromeMock;
-}
+// Chrome API mock — delegated to the shared tests/_helpers/chromeApiMock
+// helper. Every call to installChromeMock() returns a fresh mock so per-case
+// mockResolvedValue overrides never leak across cases.
+import { installChromeMock, type ChromeMock } from './_helpers/chromeApiMock';
 
 // Mock license-ui as a virtual module — applyProFeatureVisibility
 // dynamically imports it. Without this, the real module is loaded and
@@ -636,9 +606,7 @@ describe('renderHotkeyDisplay', () => {
 
   it('renders "Not set" when no _execute_action shortcut configured', async () => {
     document.body.innerHTML = '<div id="hotkey-keys"></div>';
-    chromeMock.commands.getAll.mockResolvedValue([
-      { name: 'other-cmd', shortcut: 'Ctrl+X' },
-    ]);
+    chromeMock.commands.getAll.mockResolvedValue([{ name: 'other-cmd', shortcut: 'Ctrl+X' }]);
 
     await renderHotkeyDisplay();
     const container = document.getElementById('hotkey-keys')!;
@@ -848,9 +816,7 @@ describe('showSettings', () => {
     document.body.innerHTML = '<input type="checkbox" id="setting-side-panel" />';
     state.appSettings.useSidePanel = true;
     showSettings();
-    expect((document.getElementById('setting-side-panel') as HTMLInputElement).checked).toBe(
-      true
-    );
+    expect((document.getElementById('setting-side-panel') as HTMLInputElement).checked).toBe(true);
   });
 
   it('forces Pro-only toggles to false for free users (live-monitor + similar + color)', () => {
@@ -869,15 +835,15 @@ describe('showSettings', () => {
     // Pin: free users see Pro toggles as OFF in the form, regardless of
     // the underlying state value. Otherwise free users could see "ON"
     // in the UI but the feature wouldn't actually work — confusing UX.
-    expect(
-      (document.getElementById('setting-live-monitor') as HTMLInputElement).checked
-    ).toBe(false);
-    expect(
-      (document.getElementById('setting-similar-detection') as HTMLInputElement).checked
-    ).toBe(false);
-    expect(
-      (document.getElementById('setting-color-extract') as HTMLInputElement).checked
-    ).toBe(false);
+    expect((document.getElementById('setting-live-monitor') as HTMLInputElement).checked).toBe(
+      false
+    );
+    expect((document.getElementById('setting-similar-detection') as HTMLInputElement).checked).toBe(
+      false
+    );
+    expect((document.getElementById('setting-color-extract') as HTMLInputElement).checked).toBe(
+      false
+    );
   });
 
   it('toggles sub-panel visibility based on parent checkbox state', () => {
@@ -899,8 +865,9 @@ describe('showSettings', () => {
     // time. After init, runtime toggle handlers update the .hidden class
     // separately, but on Settings open the form must reflect persisted
     // state.
-    expect(document.getElementById('download-options-inputs')!.classList.contains('hidden'))
-      .toBe(false);
+    expect(document.getElementById('download-options-inputs')!.classList.contains('hidden')).toBe(
+      false
+    );
     expect(document.getElementById('min-size-inputs')!.classList.contains('hidden')).toBe(true);
     expect(document.getElementById('max-size-inputs')!.classList.contains('hidden')).toBe(false);
   });
@@ -960,10 +927,7 @@ describe('applyProFeatureVisibility', () => {
   it('newly-Pro + allImages.length > 0 → triggers processImageExtras for retroactive Pro processing', async () => {
     chromeMock.runtime.sendMessage.mockResolvedValue({ isPro: true });
     state.isProUser = false;
-    state.allImages = [
-      { id: 'a', url: 'a.jpg' } as never,
-      { id: 'b', url: 'b.jpg' } as never,
-    ];
+    state.allImages = [{ id: 'a', url: 'a.jpg' } as never, { id: 'b', url: 'b.jpg' } as never];
 
     await applyProFeatureVisibility();
     const scan = await import('../sidepanel/scan');
@@ -1035,15 +999,15 @@ describe('applyProFeatureVisibility', () => {
     // the actual capability. Showing "ON" while the underlying state is
     // disabled would mislead users (the click handler intercepts and
     // shows the upgrade modal, but the visual mismatch is still bad UX).
-    expect(
-      (document.getElementById('setting-similar-detection') as HTMLInputElement).checked
-    ).toBe(false);
-    expect(
-      (document.getElementById('setting-color-extract') as HTMLInputElement).checked
-    ).toBe(false);
-    expect(
-      (document.getElementById('setting-live-monitor') as HTMLInputElement).checked
-    ).toBe(false);
+    expect((document.getElementById('setting-similar-detection') as HTMLInputElement).checked).toBe(
+      false
+    );
+    expect((document.getElementById('setting-color-extract') as HTMLInputElement).checked).toBe(
+      false
+    );
+    expect((document.getElementById('setting-live-monitor') as HTMLInputElement).checked).toBe(
+      false
+    );
   });
 
   it('forces convertFormat → "none" for free users', async () => {
@@ -1060,9 +1024,9 @@ describe('applyProFeatureVisibility', () => {
     // Pin: force-reset to 'none' for free users. Without this, a user
     // who used Pro features then let their license expire would still
     // have convertFormat='webp' silently bricking their downloads.
-    expect(
-      (document.getElementById('setting-convert-format') as HTMLElement).dataset.value
-    ).toBe('none');
+    expect((document.getElementById('setting-convert-format') as HTMLElement).dataset.value).toBe(
+      'none'
+    );
   });
 
   it('disables filename + subfolder inputs + adds .pro-locked for free users', async () => {
@@ -1529,7 +1493,7 @@ describe('toggleFilterDropdown', () => {
     expect(document.getElementById('filter-format')!.classList.contains('hidden')).toBe(false);
   });
 
-  it("color filter type → calls renderColorSwatches before measuring (dynamic content prep)", async () => {
+  it('color filter type → calls renderColorSwatches before measuring (dynamic content prep)', async () => {
     document.body.innerHTML = `
       <div class="filter-container">
         <button class="filter-btn" data-filter="color"></button>

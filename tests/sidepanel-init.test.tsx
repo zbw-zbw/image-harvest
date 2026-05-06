@@ -16,6 +16,11 @@
 // so we can isolate init's orchestration logic.
 
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest';
+import {
+  installChromeMock,
+  type PortListenerBuckets,
+  type TabListenerBuckets,
+} from './_helpers/chromeApiMock';
 
 // ─────────────────────────────────────────────────────────────────────
 // Mock all sidepanel/* + shared/* dependencies
@@ -111,62 +116,27 @@ vi.mock('../sidepanel/utils', () => ({
 
 // ─────────────────────────────────────────────────────────────────────
 // Chrome API mocks (capture listeners for later invocation)
+//
+// Shared buckets are reset in-place on every installChromeMock() call
+// (see tests/_helpers/chromeApiMock.ts), so passing the same object
+// across a beforeEach is safe.
 // ─────────────────────────────────────────────────────────────────────
 
-type Listener = (...args: unknown[]) => unknown;
-const tabListeners: {
-  onActivated: Listener[];
-  onUpdated: Listener[];
-  onRemoved: Listener[];
-} = {
+const tabListeners: TabListenerBuckets = {
   onActivated: [],
   onUpdated: [],
   onRemoved: [],
 };
-const portListeners: {
-  message: Listener[];
-  disconnect: Listener[];
-} = { message: [], disconnect: [] };
+const portListeners: PortListenerBuckets = {
+  message: [],
+  disconnect: [],
+};
 
-function installChromeMock(): void {
-  tabListeners.onActivated = [];
-  tabListeners.onUpdated = [];
-  tabListeners.onRemoved = [];
-  portListeners.message = [];
-  portListeners.disconnect = [];
-
-  (globalThis as unknown as { chrome: unknown }).chrome = {
-    runtime: {
-      sendMessage: vi.fn().mockResolvedValue({}),
-      connect: vi.fn(() => ({
-        name: 'image-snatcher-ui',
-        onMessage: { addListener: vi.fn((fn) => portListeners.message.push(fn)) },
-        onDisconnect: { addListener: vi.fn((fn) => portListeners.disconnect.push(fn)) },
-        disconnect: vi.fn(),
-        postMessage: vi.fn(),
-      })),
-      lastError: null,
-    },
-    tabs: {
-      query: vi.fn().mockResolvedValue([{ id: 1, url: 'https://example.com' }]),
-      get: vi.fn().mockResolvedValue({ id: 1, url: 'https://example.com' }),
-      connect: vi.fn(() => ({
-        name: 'image-snatcher-ui',
-        onDisconnect: { addListener: vi.fn() },
-        disconnect: vi.fn(),
-      })),
-      onActivated: { addListener: vi.fn((fn) => tabListeners.onActivated.push(fn)) },
-      onUpdated: { addListener: vi.fn((fn) => tabListeners.onUpdated.push(fn)) },
-      onRemoved: { addListener: vi.fn((fn) => tabListeners.onRemoved.push(fn)) },
-    },
-    storage: {
-      local: {
-        get: vi.fn().mockResolvedValue({}),
-        set: vi.fn().mockResolvedValue(undefined),
-      },
-    },
-    commands: { getAll: vi.fn().mockResolvedValue([]) },
-  };
+function installMock(): void {
+  installChromeMock({
+    captureTabListeners: tabListeners,
+    capturePortListeners: portListeners,
+  });
 }
 
 // ─────────────────────────────────────────────────────────────────────
@@ -197,11 +167,11 @@ async function loadInitModule(): Promise<void> {
 }
 
 beforeAll(() => {
-  installChromeMock();
+  installMock();
 });
 
 beforeEach(() => {
-  installChromeMock();
+  installMock();
   document.body.innerHTML = '';
   delete document.documentElement.dataset.theme;
   document.documentElement.className = '';
@@ -253,8 +223,9 @@ describe('sidepanel/init.ts module bootstrap', () => {
 
   it('chrome.runtime.connect is called with name "image-snatcher-ui" (long-lived port)', async () => {
     await loadInitModule();
-    const chromeMock = (globalThis as unknown as { chrome: { runtime: { connect: ReturnType<typeof vi.fn> } } })
-      .chrome;
+    const chromeMock = (
+      globalThis as unknown as { chrome: { runtime: { connect: ReturnType<typeof vi.fn> } } }
+    ).chrome;
     // Pin: the long-lived port is named "image-snatcher-ui" — content
     // script's onConnect listener uses this exact name to drive the
     // highlight-cleanup safety net.
@@ -318,7 +289,17 @@ describe('__IH_E2E__ test hook', () => {
     (window as unknown as { __IH_E2E__: boolean }).__IH_E2E__ = true;
     await loadInitModule();
 
-    const ih = (window as unknown as { __IH__?: { store: unknown; applyFilters: unknown; loadMultitab: unknown; applyTheme: unknown; handleMessage: unknown } }).__IH__;
+    const ih = (
+      window as unknown as {
+        __IH__?: {
+          store: unknown;
+          applyFilters: unknown;
+          loadMultitab: unknown;
+          applyTheme: unknown;
+          handleMessage: unknown;
+        };
+      }
+    ).__IH__;
     // Pin: e2e tests rely on these 5 hooks. Removing or renaming any
     // would silently break e2e_helpers and Playwright specs that drive
     // store/state directly without going through 4-deep dropdown menus.
@@ -353,8 +334,9 @@ describe('beforeunload cleanup', () => {
     const { state } = await import('../sidepanel/state');
     state.currentTabId = 42;
 
-    const chromeMock = (globalThis as unknown as { chrome: { runtime: { sendMessage: ReturnType<typeof vi.fn> } } })
-      .chrome;
+    const chromeMock = (
+      globalThis as unknown as { chrome: { runtime: { sendMessage: ReturnType<typeof vi.fn> } } }
+    ).chrome;
     chromeMock.runtime.sendMessage.mockClear();
     window.dispatchEvent(new Event('beforeunload'));
 
@@ -371,8 +353,9 @@ describe('beforeunload cleanup', () => {
     setLocationPathname('/popup.html');
     await loadInitModule();
 
-    const chromeMock = (globalThis as unknown as { chrome: { runtime: { sendMessage: ReturnType<typeof vi.fn> } } })
-      .chrome;
+    const chromeMock = (
+      globalThis as unknown as { chrome: { runtime: { sendMessage: ReturnType<typeof vi.fn> } } }
+    ).chrome;
     chromeMock.runtime.sendMessage.mockClear();
     window.dispatchEvent(new Event('beforeunload'));
 
@@ -381,9 +364,7 @@ describe('beforeunload cleanup', () => {
     // bg's tab-tracking state machine.
     const sidePanelClosedCalls = chromeMock.runtime.sendMessage.mock.calls.filter(
       (call: unknown[]) =>
-        typeof call[0] === 'object' &&
-        call[0] !== null &&
-        'tabId' in (call[0] as object)
+        typeof call[0] === 'object' && call[0] !== null && 'tabId' in (call[0] as object)
     );
     expect(sidePanelClosedCalls.length).toBe(0);
   });
