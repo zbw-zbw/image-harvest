@@ -174,20 +174,49 @@ describe('input validation', () => {
 // ── batching + throttling ─────────────────────────────────────────────────
 
 describe('batch + throttle', () => {
+  // Why `toFake: ['setTimeout', 'clearTimeout']` instead of the default
+  // useFakeTimers()?
+  //
+  //   The default fakes the *entire* timer surface, including queueMicrotask
+  //   and Promise resolution scheduling under some vitest configurations.
+  //   `track()` internally awaits isOptedIn() → storage.get() → sha256Hex()
+  //   → storage.set() before it ever calls scheduleFlush(). Under the
+  //   default fake-timer regime — and only when the full ~1.4k-test suite
+  //   runs under load — those awaited microtasks can stall, so the 5s
+  //   setTimeout is never registered before advanceTimersByTimeAsync()
+  //   runs. The result: the timer we wait on doesn't exist yet, and the
+  //   later-registered timer never fires. End state: mockFetch.calls.length
+  //   stays at 0, the assertion fails, the test was "flaky" in CI.
+  //
+  //   Faking only setTimeout + clearTimeout leaves microtasks on the real
+  //   queue, so all `await`s in `track()` resolve normally. The explicit
+  //   drainMicrotasks() below is a belt-and-suspenders guarantee that
+  //   scheduleFlush() has already armed the timer before we advance it.
+  async function drainMicrotasks(rounds = 3): Promise<void> {
+    for (let i = 0; i < rounds; i++) {
+      await Promise.resolve();
+    }
+  }
+
   test('does not flush before the 5s window when queue is small', async () => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
     await track(EVENTS.SCAN_TRIGGERED);
+    await drainMicrotasks();
     // Just under the interval — no flush yet.
     vi.advanceTimersByTime(TELEMETRY_FLUSH_INTERVAL_MS - 1);
     expect(mockFetch.calls).toHaveLength(0);
   });
 
   test('flushes once the 5s window elapses', async () => {
-    vi.useFakeTimers();
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
     await track(EVENTS.SCAN_TRIGGERED);
-    // Advance past the timer; flushNow runs async so we must let
-    // microtasks drain before asserting.
+    // Drain microtasks so scheduleFlush() definitely armed the setTimeout
+    // before we advance fake time. See the long comment above this block.
+    await drainMicrotasks();
     await vi.advanceTimersByTimeAsync(TELEMETRY_FLUSH_INTERVAL_MS + 10);
+    // The setTimeout callback fires `void flushNow()` — give the resulting
+    // sendBatch promise a chance to resolve before we assert.
+    await drainMicrotasks();
     expect(mockFetch.calls).toHaveLength(1);
   });
 
