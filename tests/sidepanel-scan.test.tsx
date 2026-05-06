@@ -159,12 +159,10 @@ describe('hideScanOverlay', () => {
 
     hideScanOverlay();
 
-    expect(document.querySelector('.toolbar')?.classList.contains('scanning-disabled')).toBe(
+    expect(document.querySelector('.toolbar')?.classList.contains('scanning-disabled')).toBe(false);
+    expect(document.querySelector('.status-bar')?.classList.contains('scanning-disabled')).toBe(
       false
     );
-    expect(
-      document.querySelector('.status-bar')?.classList.contains('scanning-disabled')
-    ).toBe(false);
   });
 });
 
@@ -248,10 +246,7 @@ describe('handleScanCancel', () => {
     const ui = await import('../sidepanel/ui');
     expect(filterMod.applyFilters).toHaveBeenCalledTimes(1);
     expect(ui.showEmpty).not.toHaveBeenCalled();
-    expect(ui.showToast).toHaveBeenCalledWith(
-      'Scan cancelled · 3 images found',
-      'info'
-    );
+    expect(ui.showToast).toHaveBeenCalledWith('Scan cancelled · 3 images found', 'info');
   });
 
   it('without discovered images → calls showEmpty + emits bare "Scan cancelled" toast (no applyFilters)', async () => {

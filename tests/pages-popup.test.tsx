@@ -140,11 +140,11 @@ describe('DOMContentLoaded listener', () => {
     document.body.innerHTML = '<div id="app"></div>';
     const observeSpy = vi.fn();
     const originalMO = globalThis.MutationObserver;
-    (globalThis as unknown as { MutationObserver: unknown }).MutationObserver = vi.fn(
-      function (this: unknown) {
-        return { observe: observeSpy, disconnect: vi.fn(), takeRecords: vi.fn() };
-      }
-    );
+    (globalThis as unknown as { MutationObserver: unknown }).MutationObserver = vi.fn(function (
+      this: unknown
+    ) {
+      return { observe: observeSpy, disconnect: vi.fn(), takeRecords: vi.fn() };
+    });
 
     await loadPopupModule();
     document.dispatchEvent(new Event('DOMContentLoaded'));
@@ -236,24 +236,28 @@ describe('adjustImageGridHeight (via MutationObserver callback)', () => {
     originalMO = globalThis.MutationObserver;
     originalRAF = globalThis.requestAnimationFrame;
 
-    (globalThis as unknown as { MutationObserver: unknown }).MutationObserver = vi.fn(
-      function (this: unknown, cb: MutationCallback) {
-        capturedCallback = cb;
-        return { observe: vi.fn(), disconnect: vi.fn(), takeRecords: vi.fn() };
-      }
-    );
+    (globalThis as unknown as { MutationObserver: unknown }).MutationObserver = vi.fn(function (
+      this: unknown,
+      cb: MutationCallback
+    ) {
+      capturedCallback = cb;
+      return { observe: vi.fn(), disconnect: vi.fn(), takeRecords: vi.fn() };
+    });
     // Run RAF callbacks synchronously so we can assert in-line.
-    (globalThis as unknown as { requestAnimationFrame: (cb: () => void) => number }).requestAnimationFrame =
-      (cb: () => void) => {
-        cb();
-        return 0;
-      };
+    (
+      globalThis as unknown as { requestAnimationFrame: (cb: () => void) => number }
+    ).requestAnimationFrame = (cb: () => void) => {
+      cb();
+      return 0;
+    };
   });
 
   afterEach(() => {
-    (globalThis as unknown as { MutationObserver: typeof MutationObserver }).MutationObserver = originalMO;
-    (globalThis as unknown as { requestAnimationFrame: typeof requestAnimationFrame }).requestAnimationFrame =
-      originalRAF;
+    (globalThis as unknown as { MutationObserver: typeof MutationObserver }).MutationObserver =
+      originalMO;
+    (
+      globalThis as unknown as { requestAnimationFrame: typeof requestAnimationFrame }
+    ).requestAnimationFrame = originalRAF;
   });
 
   function fireMutation(): void {

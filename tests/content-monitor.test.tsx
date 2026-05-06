@@ -427,10 +427,7 @@ describe('extractBackgroundFromNode', () => {
 
   it('skips gradient() values (filtered by isGradient mock)', () => {
     const div = document.createElement('div');
-    div.setAttribute(
-      'style',
-      'background-image: linear-gradient(red, blue)'
-    );
+    div.setAttribute('style', 'background-image: linear-gradient(red, blue)');
     document.body.appendChild(div);
 
     // extractBackgroundUrls returns nothing for pure gradients in our mock
@@ -440,10 +437,7 @@ describe('extractBackgroundFromNode', () => {
 
   it('handles data: URI in background-image', () => {
     const div = document.createElement('div');
-    div.setAttribute(
-      'style',
-      "background-image: url('data:image/png;base64,AAAA')"
-    );
+    div.setAttribute('style', "background-image: url('data:image/png;base64,AAAA')");
     stubRect(div, 100, 100);
     document.body.appendChild(div);
 

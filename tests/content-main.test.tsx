@@ -139,10 +139,8 @@ import * as monitor from '../content/monitor';
 function dispatch(message: Record<string, unknown>): Promise<unknown> {
   if (!onMessageListener) throw new Error('listener not registered');
   return new Promise((resolve) => {
-    onMessageListener!(
-      message,
-      {} as chrome.runtime.MessageSender,
-      (response: unknown) => resolve(response)
+    onMessageListener!(message, {} as chrome.runtime.MessageSender, (response: unknown) =>
+      resolve(response)
     );
   });
 }
@@ -272,9 +270,7 @@ describe('handleMessage', () => {
   });
 
   it('HIGHLIGHT_IMAGE → defaults found=false when addHighlight returns null', async () => {
-    vi.mocked(highlight.addHighlight).mockReturnValue(
-      null as unknown as { found: boolean }
-    );
+    vi.mocked(highlight.addHighlight).mockReturnValue(null as unknown as { found: boolean });
     const result = await dispatch({
       type: MESSAGE_TYPES.HIGHLIGHT_IMAGE,
       imageUrl: 'x.jpg',
@@ -366,7 +362,9 @@ describe('extractImages — main pipeline', () => {
     });
 
     expect(state.isExtracting).toBe(false);
-    await (await getExtractImages())();
+    await (
+      await getExtractImages()
+    )();
     expect(snapshotDuringRun).toBe(true);
     expect(state.isExtracting).toBe(false); // finally restores
   });
@@ -375,7 +373,9 @@ describe('extractImages — main pipeline', () => {
     seenUrls.add('stale-from-previous-scan');
     expect(seenUrls.has('stale-from-previous-scan')).toBe(true);
 
-    await (await getExtractImages())();
+    await (
+      await getExtractImages()
+    )();
     expect(seenUrls.has('stale-from-previous-scan')).toBe(false);
   });
 
@@ -383,7 +383,9 @@ describe('extractImages — main pipeline', () => {
     const ea = await import('../content/extract-advanced');
     const si = await import('../content/shadow-iframe');
 
-    await (await getExtractImages())();
+    await (
+      await getExtractImages()
+    )();
 
     expect(ea.extractInlineSvgs).toHaveBeenCalled();
     expect(ea.extractCanvasElements).toHaveBeenCalled();
@@ -399,7 +401,9 @@ describe('extractImages — main pipeline', () => {
 
   it('skipIframes:true → extractFromIframes NOT called, but everything else still runs', async () => {
     const si = await import('../content/shadow-iframe');
-    await (await getExtractImages())({ skipIframes: true });
+    await (
+      await getExtractImages()
+    )({ skipIframes: true });
     expect(si.extractFromShadowDom).toHaveBeenCalled();
     expect(si.extractFromIframes).not.toHaveBeenCalled();
   });
@@ -449,7 +453,9 @@ describe('extractImages — main pipeline', () => {
       callOrder.push('iframes');
     });
 
-    await (await getExtractImages())();
+    await (
+      await getExtractImages()
+    )();
 
     // svgs (step 5) runs before canvas (step 6); shadow (step 13)
     // before iframes (step 14). Pin SEQUENTIAL await order — a refactor
@@ -511,7 +517,9 @@ describe('extractImgTags (via extractImages)', () => {
     img.src = 'https://example.com/streamed.jpg';
     document.body.appendChild(img);
 
-    await (await getExtractImages())();
+    await (
+      await getExtractImages()
+    )();
     // Pin: extractImgTags streams progressively rather than batching at end —
     // sidepanel can render incrementally instead of waiting for full scan.
     expect(sendDiscoveredImages).toHaveBeenCalled();
@@ -673,8 +681,7 @@ describe('extractFromStylesheets (via extractImages)', () => {
     // actually applied. Adding them here would produce orphan ImageItems
     // with no element context (no rect → 0×0 dimensions → bad UX).
     const styleEl = document.createElement('style');
-    styleEl.textContent =
-      ".x { background-image: url('https://example.com/sheet-only.jpg'); }";
+    styleEl.textContent = ".x { background-image: url('https://example.com/sheet-only.jpg'); }";
     document.head.appendChild(styleEl);
 
     const result = await (await getExtractImages())();

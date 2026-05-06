@@ -337,10 +337,7 @@ describe('extractFromShadowDom', () => {
     document.body.appendChild(host);
     const shadow = attachShadowWithHTML(host, '');
     const styled = document.createElement('div');
-    styled.setAttribute(
-      'style',
-      "background-image: url('https://example.com/shadow-bg.jpg')"
-    );
+    styled.setAttribute('style', "background-image: url('https://example.com/shadow-bg.jpg')");
     stubRect(styled, 600, 400);
     shadow.appendChild(styled);
 

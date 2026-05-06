@@ -412,9 +412,7 @@ describe('syncHighlights', () => {
     syncHighlights(['https://example.com/keep.jpg']);
     const remaining = document.querySelectorAll('.image-snatcher-highlight-border');
     expect(remaining).toHaveLength(1);
-    expect((remaining[0] as HTMLElement).dataset.highlightUrl).toBe(
-      'https://example.com/keep.jpg'
-    );
+    expect((remaining[0] as HTMLElement).dataset.highlightUrl).toBe('https://example.com/keep.jpg');
   });
 
   it('does NOT re-create borders for URLs that are already highlighted (idempotent intersection)', async () => {
@@ -457,10 +455,7 @@ describe('syncHighlights', () => {
     document.body.appendChild(img);
 
     const { syncHighlights } = await import('../content/highlight');
-    syncHighlights([
-      'https://example.com/exists.jpg',
-      'https://example.com/ghost.jpg',
-    ]);
+    syncHighlights(['https://example.com/exists.jpg', 'https://example.com/ghost.jpg']);
     // Only ONE border (for the existing img); ghost URL contributes nothing.
     expect(document.querySelectorAll('.image-snatcher-highlight-border')).toHaveLength(1);
   });

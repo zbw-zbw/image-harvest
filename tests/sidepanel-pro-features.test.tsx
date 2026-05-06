@@ -75,7 +75,7 @@ function makeImg(overrides: Partial<ImageItem> = {}): ImageItem {
 
 describe('detectSimilarImages — algorithm', () => {
   it('is a no-op when fewer than 2 images carry a phash', () => {
-    state.allImages = [makeImg({ id: 'a', phash: '0' .repeat(16) })];
+    state.allImages = [makeImg({ id: 'a', phash: '0'.repeat(16) })];
     detectSimilarImages();
     expect(state.similarGroups).toEqual([]);
   });
@@ -120,7 +120,14 @@ describe('detectSimilarImages — algorithm', () => {
     const phashA = 'a'.repeat(16);
     state.allImages = [
       makeImg({ id: 'a', phash: phashA, naturalWidth: 800, naturalHeight: 600 }),
-      makeImg({ id: 'b', phash: phashA, naturalWidth: 0, naturalHeight: 0, displayWidth: 0, displayHeight: 0 }),
+      makeImg({
+        id: 'b',
+        phash: phashA,
+        naturalWidth: 0,
+        naturalHeight: 0,
+        displayWidth: 0,
+        displayHeight: 0,
+      }),
     ];
     detectSimilarImages();
     expect(state.similarGroups).toHaveLength(1);
@@ -146,10 +153,7 @@ describe('detectSimilarImages — UI side effects', () => {
     (elements as any).btnDedup = btn;
 
     const phashA = 'a'.repeat(16);
-    state.allImages = [
-      makeImg({ id: 'a', phash: phashA }),
-      makeImg({ id: 'b', phash: phashA }),
-    ];
+    state.allImages = [makeImg({ id: 'a', phash: phashA }), makeImg({ id: 'b', phash: phashA })];
     detectSimilarImages();
 
     expect(btn.style.display).toBe('');
@@ -163,10 +167,7 @@ describe('detectSimilarImages — UI side effects', () => {
     state.appSettings = { ...state.appSettings, enableSimilarDetection: false };
 
     const phashA = 'a'.repeat(16);
-    state.allImages = [
-      makeImg({ id: 'a', phash: phashA }),
-      makeImg({ id: 'b', phash: phashA }),
-    ];
+    state.allImages = [makeImg({ id: 'a', phash: phashA }), makeImg({ id: 'b', phash: phashA })];
     detectSimilarImages();
 
     expect(btn.style.display).toBe('none');
@@ -190,10 +191,7 @@ describe('detectSimilarImages — UI side effects', () => {
 
     // Two duplicates → visible.
     const phashA = 'a'.repeat(16);
-    state.allImages = [
-      makeImg({ id: 'a', phash: phashA }),
-      makeImg({ id: 'b', phash: phashA }),
-    ];
+    state.allImages = [makeImg({ id: 'a', phash: phashA }), makeImg({ id: 'b', phash: phashA })];
     detectSimilarImages();
     expect(banner.classList.contains('hidden')).toBe(false);
   });
@@ -259,11 +257,7 @@ describe('renderColorBar / renderTransparentBar', () => {
 
 describe('removeImageById', () => {
   it('drops the image from state.allImages and re-runs filters + similar detection', async () => {
-    state.allImages = [
-      makeImg({ id: 'a' }),
-      makeImg({ id: 'b' }),
-      makeImg({ id: 'c' }),
-    ];
+    state.allImages = [makeImg({ id: 'a' }), makeImg({ id: 'b' }), makeImg({ id: 'c' })];
     const filterMod = await import('../sidepanel/filter');
 
     removeImageById('b');

@@ -41,13 +41,46 @@ export default defineConfig({
     reporters: ['default'],
     coverage: {
       provider: 'v8',
-      include: ['shared/**/*.ts'],
+      // Widen the surface to all first-party production code. The former
+      // shared/**-only setup was a convenient lie — it showed 100% while
+      // background/content/sidepanel (the bulk of the extension) were
+      // silently unmeasured.
+      include: [
+        'shared/**/*.ts',
+        'background/**/*.ts',
+        'content/**/*.ts',
+        'pages/**/*.ts',
+        'sidepanel/**/*.{ts,tsx}',
+      ],
       exclude: [
         // Pulls in chrome.* / fetch / IndexedDB — needs heavy mocking, skip
         'shared/storage.ts',
         'shared/license.ts',
         'shared/collection.ts',
         'shared/types.ts',
+        // Type-only modules (no executable statements, v8 treats them as
+        // 0/0 and the tooling sometimes reports NaN% which poisons the
+        // aggregate).
+        '**/types.ts',
+        // Preact components without a dedicated .test.tsx are currently
+        // covered by e2e only. Including them here would drag the overall
+        // percentage down with zero signal value — revisit per-component
+        // as unit tests are added.
+        'sidepanel/components/CollectionModal.tsx',
+        'sidepanel/components/ConfirmDialog.tsx',
+        'sidepanel/components/DedupModal.tsx',
+        'sidepanel/components/DownloadProgressModal.tsx',
+        'sidepanel/components/LiveIndicator.tsx',
+        'sidepanel/components/MultitabModal.tsx',
+        'sidepanel/components/ProStatusBadge.tsx',
+        'sidepanel/components/ProUpgradeModal.tsx',
+        'sidepanel/components/ScanProgressOverlay.tsx',
+        'sidepanel/components/SettingsModal.tsx',
+        'sidepanel/components/SkeletonCard.tsx',
+        'sidepanel/components/StateScreens.tsx',
+        'sidepanel/components/StatusCounts.tsx',
+        'sidepanel/components/ToastContainer.tsx',
+        'sidepanel/components/mount.tsx',
       ],
       reporter: ['text', 'html'],
       reportsDirectory: 'coverage',

@@ -115,10 +115,7 @@ describe('extractInlineSvg', () => {
   // child + id so the serialized string differs across cases.
   let svgUniqueCounter = 0;
   function makeSvg(width: number, height: number): SVGElement {
-    const svg = document.createElementNS(
-      'http://www.w3.org/2000/svg',
-      'svg'
-    ) as SVGElement;
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg') as SVGElement;
     svg.setAttribute('id', `svg-${++svgUniqueCounter}-${width}x${height}`);
     const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
     rect.setAttribute('width', String(width));
@@ -207,7 +204,7 @@ describe('extractInlineSvg', () => {
   it('sets timestamp to roughly Date.now() (within 5s of test execution)', () => {
     seenUrls.clear();
     const before = Date.now();
-    const item = extractInlineSvg(makeSvg(103, 97)) as ({ timestamp: number } | null);
+    const item = extractInlineSvg(makeSvg(103, 97)) as { timestamp: number } | null;
     const after = Date.now();
     expect(item).not.toBeNull();
     expect(item!.timestamp).toBeGreaterThanOrEqual(before);
@@ -257,8 +254,7 @@ describe('extractCanvasImage', () => {
 
   it('emits ImageItem with type="canvas" / format="png" + canvas-derived data URI', () => {
     // Stub a long-enough fake PNG data URI.
-    const fakeDataUri =
-      'data:image/png;base64,' + 'A'.repeat(200);
+    const fakeDataUri = 'data:image/png;base64,' + 'A'.repeat(200);
     const canvas = makeCanvas(150, 75, fakeDataUri);
 
     const item = extractCanvasImage(canvas);
@@ -273,8 +269,7 @@ describe('extractCanvasImage', () => {
   it('uses canvas.width/height directly (NOT rect — canvas backing store ≠ rendered size)', () => {
     // Pin the contract: we want the BACKING STORE dimensions because
     // that's what toDataURL captures, not the CSS-rendered size.
-    const fakeDataUri =
-      'data:image/png;base64,' + 'A'.repeat(200);
+    const fakeDataUri = 'data:image/png;base64,' + 'A'.repeat(200);
     const canvas = makeCanvas(800, 600, fakeDataUri);
 
     const item = extractCanvasImage(canvas);
@@ -283,8 +278,7 @@ describe('extractCanvasImage', () => {
   });
 
   it('dedups via state.seenUrls — second call on the same canvas returns null', () => {
-    const fakeDataUri =
-      'data:image/png;base64,' + 'A'.repeat(200);
+    const fakeDataUri = 'data:image/png;base64,' + 'A'.repeat(200);
     const canvas = makeCanvas(100, 100, fakeDataUri);
 
     expect(extractCanvasImage(canvas)).not.toBeNull();
@@ -292,8 +286,7 @@ describe('extractCanvasImage', () => {
   });
 
   it('does NOT skip an exactly 2×2 canvas (boundary is < 2, not <= 2)', () => {
-    const fakeDataUri =
-      'data:image/png;base64,' + 'A'.repeat(200);
+    const fakeDataUri = 'data:image/png;base64,' + 'A'.repeat(200);
     const canvas = makeCanvas(2, 2, fakeDataUri);
 
     const item = extractCanvasImage(canvas);
@@ -303,8 +296,7 @@ describe('extractCanvasImage', () => {
   });
 
   it('uses window.location.hostname as sourceDomain', () => {
-    const fakeDataUri =
-      'data:image/png;base64,' + 'A'.repeat(200);
+    const fakeDataUri = 'data:image/png;base64,' + 'A'.repeat(200);
     const canvas = makeCanvas(100, 100, fakeDataUri);
 
     const item = extractCanvasImage(canvas);

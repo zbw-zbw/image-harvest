@@ -36,6 +36,8 @@ import {
   selectAll,
   clearSelection,
   reverseSearch,
+  openInNewTab,
+  setupDragAndDrop,
 } from '../sidepanel/actions';
 import { state, store } from '../sidepanel/state';
 import type { ImageItem } from '../shared/types';
@@ -121,15 +123,13 @@ describe('formatTimestamp', () => {
 
 describe('getOriginalFilename', () => {
   it('returns the URL pathname tail when it already has an extension', () => {
-    expect(getOriginalFilename(makeImg({ url: 'https://x.com/dir/photo.png' }))).toBe(
-      'photo.png'
-    );
+    expect(getOriginalFilename(makeImg({ url: 'https://x.com/dir/photo.png' }))).toBe('photo.png');
   });
 
   it('appends img.format when the pathname tail has no extension', () => {
-    expect(
-      getOriginalFilename(makeImg({ url: 'https://x.com/dir/photo', format: 'webp' }))
-    ).toBe('photo.webp');
+    expect(getOriginalFilename(makeImg({ url: 'https://x.com/dir/photo', format: 'webp' }))).toBe(
+      'photo.webp'
+    );
   });
 
   it('falls back to .png when both URL extension AND img.format are missing', () => {
@@ -143,12 +143,8 @@ describe('getOriginalFilename', () => {
   });
 
   it('returns "image.<format>" for unparseable URLs (catch branch)', () => {
-    expect(getOriginalFilename(makeImg({ url: 'not a url', format: 'gif' }))).toBe(
-      'image.gif'
-    );
-    expect(getOriginalFilename(makeImg({ url: 'not a url', format: undefined }))).toBe(
-      'image.png'
-    );
+    expect(getOriginalFilename(makeImg({ url: 'not a url', format: 'gif' }))).toBe('image.gif');
+    expect(getOriginalFilename(makeImg({ url: 'not a url', format: undefined }))).toBe('image.png');
   });
 });
 
@@ -248,5 +244,105 @@ describe('reverseSearch', () => {
     // un-escaped (would break query-string parsing on the receiving page).
     const imageUrlMatch = url.match(/imageUrl=([^&]+)/);
     expect(imageUrlMatch?.[1]).toBe(encodeURIComponent(tricky));
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// openInNewTab — tab-index-aware "open to the right of the active tab"
+// ─────────────────────────────────────────────────────────────────────
+
+describe('openInNewTab', () => {
+  const url = 'https://example.com/photo.jpg';
+
+  it('inserts the new tab immediately after the active tab (index+1)', async () => {
+    chromeStub.tabs.query.mockResolvedValueOnce([{ id: 7, index: 3 } as chrome.tabs.Tab]);
+    await openInNewTab(url);
+    expect(chromeStub.tabs.create).toHaveBeenCalledTimes(1);
+    const arg = chromeStub.tabs.create.mock.calls[0][0];
+    expect(arg).toEqual({ url, active: true, index: 4 });
+  });
+
+  it('omits the index option when no active tab is returned (empty query result)', async () => {
+    // Pin: Chrome sometimes returns [] if the window is transitioning
+    // (e.g. popup just opened). Falling back to "append at the end"
+    // (no index) is safer than crashing.
+    chromeStub.tabs.query.mockResolvedValueOnce([]);
+    await openInNewTab(url);
+    const arg = chromeStub.tabs.create.mock.calls[0][0];
+    expect(arg).toEqual({ url, active: true });
+    expect(arg).not.toHaveProperty('index');
+  });
+
+  it('omits the index option when activeTab.index is not a number (guard)', async () => {
+    // Pin the typeof-number guard. If Chrome ever returns a Tab object
+    // without `index` (undocumented edge case on some mobile builds),
+    // the fallback must still produce a valid create() call.
+    chromeStub.tabs.query.mockResolvedValueOnce([{ id: 7 } as unknown as chrome.tabs.Tab]);
+    await openInNewTab(url);
+    const arg = chromeStub.tabs.create.mock.calls[0][0];
+    expect(arg).toEqual({ url, active: true });
+    expect(arg).not.toHaveProperty('index');
+  });
+
+  it('catch branch: chrome.tabs.query throws → falls back to create({url, active})', async () => {
+    // Pin: any rejection from query() (permission revoked / extension
+    // context invalidated) must NOT propagate. User right-clicking a
+    // card should always get the image opened, even in degraded state.
+    chromeStub.tabs.query.mockRejectedValueOnce(new Error('permission denied'));
+    await expect(openInNewTab(url)).resolves.toBeUndefined();
+    expect(chromeStub.tabs.create).toHaveBeenCalledTimes(1);
+    expect(chromeStub.tabs.create).toHaveBeenCalledWith({ url, active: true });
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// setupDragAndDrop — HTML5 drag source wiring on an image card element
+// ─────────────────────────────────────────────────────────────────────
+
+describe('setupDragAndDrop', () => {
+  it('flips draggable="true" on the host element (so the browser initiates drag)', () => {
+    const el = document.createElement('div');
+    setupDragAndDrop(el, makeImg());
+    // Pin the draggable attribute contract. Without this the dragstart
+    // event never fires, silently breaking every "drag image out to
+    // desktop" UX.
+    expect(el.getAttribute('draggable')).toBe('true');
+  });
+
+  it('dragstart handler writes text/uri-list + text/plain + effectAllowed=copy', () => {
+    const el = document.createElement('div');
+    const img = makeImg({ url: 'https://cdn.example.com/x.png' });
+    setupDragAndDrop(el, img);
+
+    // Fabricate a dragstart event with a stub DataTransfer — jsdom's
+    // native DragEvent constructor is incomplete.
+    const setData = vi.fn();
+    const dataTransfer = {
+      setData,
+      effectAllowed: '',
+    } as unknown as DataTransfer;
+    const event = new Event('dragstart', { bubbles: true }) as unknown as DragEvent;
+    Object.defineProperty(event, 'dataTransfer', { value: dataTransfer });
+    el.dispatchEvent(event);
+
+    // Pin BOTH MIME flavors. Some file managers (Finder/Explorer) read
+    // text/uri-list; browsers/IDEs read text/plain. Dropping either
+    // would break a subset of drop targets.
+    expect(setData).toHaveBeenCalledWith('text/uri-list', img.url);
+    expect(setData).toHaveBeenCalledWith('text/plain', img.url);
+    expect(dataTransfer.effectAllowed).toBe('copy');
+  });
+
+  it('dragstart handler bails silently when dataTransfer is null', () => {
+    // Pin: the `if (!e.dataTransfer) return` guard. Some synthetic
+    // events (e.g. from automated tests) have a null dataTransfer;
+    // without this guard the handler would throw and Preact's event
+    // bridge would log a noisy error.
+    const el = document.createElement('div');
+    setupDragAndDrop(el, makeImg());
+
+    const event = new Event('dragstart', { bubbles: true }) as unknown as DragEvent;
+    Object.defineProperty(event, 'dataTransfer', { value: null });
+    expect(() => el.dispatchEvent(event)).not.toThrow();
   });
 });

@@ -168,9 +168,7 @@ describe('calcSkeletonCount — density × view × popup matrix', () => {
 
 describe('showToast', () => {
   it('replaces state.toasts with a single new toast (only-one-visible policy)', () => {
-    state.toasts = [
-      { id: 99, message: 'old', type: 'info', fadingOut: false },
-    ];
+    state.toasts = [{ id: 99, message: 'old', type: 'info', fadingOut: false }];
     showToast('new', 'success');
     expect(state.toasts).toHaveLength(1);
     expect(state.toasts[0].message).toBe('new');
@@ -275,9 +273,7 @@ describe('showError / showEmpty / showRestricted', () => {
   it('showEmpty hides the .image-grid-wrapper so empty-state can center-fill', () => {
     document.body.innerHTML = '<div class="image-grid-wrapper"></div>';
     showEmpty();
-    expect(
-      document.querySelector('.image-grid-wrapper')?.classList.contains('hidden')
-    ).toBe(true);
+    expect(document.querySelector('.image-grid-wrapper')?.classList.contains('hidden')).toBe(true);
   });
 
   it('showRestricted sets uiScreen="restricted" + invalidates render cache + hides chrome', async () => {
@@ -307,9 +303,7 @@ describe('showError / showEmpty / showRestricted', () => {
     // Chrome elements hidden.
     expect(document.querySelector('.toolbar')?.classList.contains('hidden')).toBe(true);
     expect(document.querySelector('.status-bar')?.classList.contains('hidden')).toBe(true);
-    expect(
-      document.querySelector('.image-grid-wrapper')?.classList.contains('hidden')
-    ).toBe(true);
+    expect(document.querySelector('.image-grid-wrapper')?.classList.contains('hidden')).toBe(true);
   });
 });
 
@@ -329,9 +323,7 @@ describe('hideRestricted', () => {
     expect(scanMod.hideScanOverlay).toHaveBeenCalledTimes(1);
     expect(document.querySelector('.toolbar')?.classList.contains('hidden')).toBe(false);
     expect(document.querySelector('.status-bar')?.classList.contains('hidden')).toBe(false);
-    expect(
-      document.querySelector('.image-grid-wrapper')?.classList.contains('hidden')
-    ).toBe(false);
+    expect(document.querySelector('.image-grid-wrapper')?.classList.contains('hidden')).toBe(false);
   });
 
   it('does NOT change uiScreen when not currently "restricted" (idempotent guard)', () => {

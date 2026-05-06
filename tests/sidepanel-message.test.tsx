@@ -57,11 +57,7 @@ vi.mock('../sidepanel/ui', () => ({
   updateProgress: vi.fn(),
 }));
 
-import {
-  showDiscoveredToastDebounced,
-  handleMessage,
-  handleKeyDown,
-} from '../sidepanel/message';
+import { showDiscoveredToastDebounced, handleMessage, handleKeyDown } from '../sidepanel/message';
 import { state, store, elements } from '../sidepanel/state';
 import type { ImageItem } from '../shared/types';
 
@@ -299,9 +295,9 @@ describe('handleMessage — IMAGES_DISCOVERED during active scan', () => {
   });
 
   it('only triggers applyFilters while under the skeleton limit (avoid mid-scan flicker)', async () => {
-    state.allImages = new Array(40).fill(0).map((_, i) =>
-      makeImg({ id: `e${i}`, url: `https://x.com/e${i}.jpg` })
-    );
+    state.allImages = new Array(40)
+      .fill(0)
+      .map((_, i) => makeImg({ id: `e${i}`, url: `https://x.com/e${i}.jpg` }));
     // prevCount = 40 ≥ scanSkeletonLimit=30 → applyFilters NOT called
     handleMessage({
       type: MESSAGE_TYPES.IMAGES_DISCOVERED,
@@ -486,10 +482,7 @@ describe('handleMessage — MULTI_TAB_EXTRACT', () => {
     expect(ui.hideProgress).toHaveBeenCalledTimes(1);
     expect(filterMod.applyFilters).toHaveBeenCalledTimes(1);
     expect(proMod.closeMultiTabModal).toHaveBeenCalledTimes(1);
-    expect(ui.showToast).toHaveBeenCalledWith(
-      'Extracted 2 images from 4 tabs',
-      'success'
-    );
+    expect(ui.showToast).toHaveBeenCalledWith('Extracted 2 images from 4 tabs', 'success');
   });
 
   it('success: dedups by URL when an extracted image already exists', () => {
@@ -538,10 +531,7 @@ describe('handleMessage — MULTI_TAB_EXTRACT', () => {
       error: 'tab dead',
     });
     const ui = await import('../sidepanel/ui');
-    expect(ui.showToast).toHaveBeenCalledWith(
-      'Multi-tab extraction failed: tab dead',
-      'error'
-    );
+    expect(ui.showToast).toHaveBeenCalledWith('Multi-tab extraction failed: tab dead', 'error');
 
     vi.clearAllMocks();
     handleMessage({ type: MESSAGE_TYPES.MULTI_TAB_EXTRACT_ERROR });

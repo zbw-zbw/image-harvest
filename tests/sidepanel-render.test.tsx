@@ -39,9 +39,39 @@ vi.mock('../sidepanel/ui', () => ({
   showEmpty: vi.fn(),
 }));
 
-import { groupImages, toggleGroupCollapse } from '../sidepanel/render';
-import { state, store } from '../sidepanel/state';
+import {
+  groupImages,
+  renderImages,
+  renderProgressiveImages,
+  toggleGroupCollapse,
+} from '../sidepanel/render';
+import { elements, state, store } from '../sidepanel/state';
+import { calcSkeletonCount, checkNarrowMode, showEmpty } from '../sidepanel/ui';
+import { updateSelectionUI } from '../sidepanel/actions';
+import {
+  filterByColor,
+  filterByLayout,
+  filterBySettingsMaxSize,
+  filterBySettingsMinSize,
+  filterBySize,
+  filterByType,
+  filterByUrl,
+  sortImages,
+} from '../sidepanel/filter';
 import type { ImageItem } from '../shared/types';
+
+// Helper: flip every filter mock to truthy so the 7-way conjunction
+// inside renderProgressiveImages resolves true for every input image.
+// Centralized so each case stays focused on the one axis it's pinning.
+function passAllFilters(): void {
+  vi.mocked(filterBySize).mockReturnValue(true);
+  vi.mocked(filterByType).mockReturnValue(true);
+  vi.mocked(filterByLayout).mockReturnValue(true);
+  vi.mocked(filterByUrl).mockReturnValue(true);
+  vi.mocked(filterByColor).mockReturnValue(true);
+  vi.mocked(filterBySettingsMinSize).mockReturnValue(true);
+  vi.mocked(filterBySettingsMaxSize).mockReturnValue(true);
+}
 
 beforeEach(() => {
   store.reset();
@@ -351,5 +381,262 @@ describe('toggleGroupCollapse', () => {
     toggleGroupCollapse('A');
     expect(state.collapsedGroups.has('A')).toBe(false);
     expect(state.collapsedGroups.has('B')).toBe(true);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// renderProgressiveImages — scan-time filter + skeleton slot computation
+// ─────────────────────────────────────────────────────────────────────
+//
+// The jsdom side of the job: we populate elements.imageGrid / foundCount
+// with real DOM nodes and assert the store mutations + mocked-module
+// call sequence. Pure Preact render is e2e territory; here we pin the
+// orchestration contract.
+
+describe('renderProgressiveImages', () => {
+  let imageGrid: HTMLDivElement;
+  let foundCount: HTMLSpanElement;
+  let gridWrapper: HTMLDivElement;
+
+  beforeEach(() => {
+    document.body.innerHTML = '';
+    gridWrapper = document.createElement('div');
+    gridWrapper.className = 'image-grid-wrapper';
+    Object.defineProperty(gridWrapper, 'clientHeight', {
+      configurable: true,
+      value: 800,
+    });
+    document.body.appendChild(gridWrapper);
+
+    imageGrid = document.createElement('div');
+    imageGrid.classList.add('hidden');
+    gridWrapper.appendChild(imageGrid);
+
+    foundCount = document.createElement('span');
+    document.body.appendChild(foundCount);
+
+    elements.imageGrid = imageGrid;
+    elements.foundCount = foundCount;
+
+    // Default: every filter accepts every image so state.filteredImages
+    // mirrors state.allImages 1:1 — per-filter dispatch is verified in
+    // tests/sidepanel-filter.test.ts.
+    vi.mocked(calcSkeletonCount).mockReturnValue(30);
+    [
+      'filterBySize',
+      'filterByType',
+      'filterByLayout',
+      'filterByUrl',
+      'filterByColor',
+      'filterBySettingsMinSize',
+      'filterBySettingsMaxSize',
+    ].forEach(() => {
+      // Mocks already created in the top-of-file vi.mock — reset to
+      // truthful defaults per-case via mockReturnValue.
+    });
+  });
+
+  afterEach(() => {
+    delete (elements as Partial<typeof elements>).imageGrid;
+    delete (elements as Partial<typeof elements>).foundCount;
+    document.body.innerHTML = '';
+  });
+
+  it('early-returns (no DOM writes, no filter calls) when elements.imageGrid is null', () => {
+    // Pin: every render path must short-circuit on missing imageGrid.
+    // Popup mode briefly has a null grid during bootstrap; a regression
+    // here would crash the first scan tick.
+    delete (elements as Partial<typeof elements>).imageGrid;
+    state.allImages = [{ id: 'a', url: 'https://x.com/a.png' } as ImageItem];
+    renderProgressiveImages();
+    expect(sortImages).not.toHaveBeenCalled();
+  });
+
+  it('writes filteredImages through every filter + calls sortImages + clears hidden class', () => {
+    const img = { id: 'a', url: 'https://x.com/a.png' } as ImageItem;
+    state.allImages = [img];
+    passAllFilters();
+
+    renderProgressiveImages();
+
+    expect(state.filteredImages).toEqual([img]);
+    expect(sortImages).toHaveBeenCalledTimes(1);
+    expect(imageGrid.classList.contains('hidden')).toBe(false);
+    expect(imageGrid.scrollTop).toBe(0);
+    expect(checkNarrowMode).toHaveBeenCalledTimes(1);
+    expect(updateSelectionUI).toHaveBeenCalledTimes(1);
+  });
+
+  it('writes count into elements.foundCount (imperative fallback for non-Preact counter)', () => {
+    state.allImages = [{ id: 'a', url: 'a' } as ImageItem, { id: 'b', url: 'b' } as ImageItem];
+    passAllFilters();
+    renderProgressiveImages();
+    expect(foundCount.textContent).toBe('2');
+  });
+
+  it('computes scanSkeletonsToShow = max(0, totalSlots - filteredImages.length)', () => {
+    vi.mocked(calcSkeletonCount).mockReturnValue(10);
+    state.allImages = Array.from({ length: 3 }, (_, i) => ({
+      id: String(i),
+      url: `https://x.com/${i}.png`,
+    })) as ImageItem[];
+    passAllFilters();
+    renderProgressiveImages();
+    // 10 slots - 3 real images = 7 skeleton placeholders.
+    expect(state.scanSkeletonsToShow).toBe(7);
+  });
+
+  it('clamps scanSkeletonsToShow to 0 when images outnumber slots (no negative skeletons)', () => {
+    vi.mocked(calcSkeletonCount).mockReturnValue(2);
+    state.allImages = Array.from({ length: 10 }, (_, i) => ({
+      id: String(i),
+      url: `https://x.com/${i}.png`,
+    })) as ImageItem[];
+    passAllFilters();
+    renderProgressiveImages();
+    // Pin: Math.max(0, ...) clamp. A regression dropping the clamp
+    // would write -8 into scanSkeletonsToShow and downstream arithmetic
+    // that assumes ≥0 would break silently.
+    expect(state.scanSkeletonsToShow).toBe(0);
+  });
+
+  it('falls back to 600px container height when .image-grid-wrapper is missing', () => {
+    gridWrapper.remove();
+    state.allImages = [];
+    passAllFilters();
+    renderProgressiveImages();
+    // Pin the 600 default. If the wrapper selector fails silently
+    // (common regression when renaming CSS classes), the skeleton-slot
+    // computation should still yield a reasonable number.
+    expect(vi.mocked(calcSkeletonCount)).toHaveBeenCalledWith(600, false);
+  });
+
+  it('detects list-view via classList.contains("list-view") and threads it into calcSkeletonCount', () => {
+    imageGrid.classList.add('list-view');
+    state.allImages = [];
+    passAllFilters();
+    renderProgressiveImages();
+    expect(vi.mocked(calcSkeletonCount)).toHaveBeenCalledWith(800, true);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// renderImages — final render pass (post-scan)
+// ─────────────────────────────────────────────────────────────────────
+
+describe('renderImages', () => {
+  let imageGrid: HTMLDivElement;
+  let foundCount: HTMLSpanElement;
+  let gridWrapper: HTMLDivElement;
+
+  beforeEach(() => {
+    document.body.innerHTML = '';
+    gridWrapper = document.createElement('div');
+    gridWrapper.className = 'image-grid-wrapper';
+    gridWrapper.classList.add('hidden');
+    document.body.appendChild(gridWrapper);
+
+    imageGrid = document.createElement('div');
+    gridWrapper.appendChild(imageGrid);
+
+    foundCount = document.createElement('span');
+    document.body.appendChild(foundCount);
+
+    elements.imageGrid = imageGrid;
+    elements.foundCount = foundCount;
+  });
+
+  afterEach(() => {
+    delete (elements as Partial<typeof elements>).imageGrid;
+    delete (elements as Partial<typeof elements>).foundCount;
+    document.body.innerHTML = '';
+  });
+
+  it('early-returns when elements.imageGrid is null (no showEmpty, no DOM writes)', () => {
+    delete (elements as Partial<typeof elements>).imageGrid;
+    state.filteredImages = [];
+    renderImages();
+    expect(showEmpty).not.toHaveBeenCalled();
+  });
+
+  it('always resets scanSkeletonsToShow to 0 first (no leftover skeletons in final render)', () => {
+    // Pin: final pass zeros skeletons unconditionally. If the scan
+    // overlay finished but filteredImages is non-empty, we still need
+    // the skeleton counter cleared so <ImageGrid> stops rendering
+    // trailing placeholders.
+    state.scanSkeletonsToShow = 10;
+    state.filteredImages = [{ id: 'a', url: 'x' } as ImageItem];
+    renderImages();
+    expect(state.scanSkeletonsToShow).toBe(0);
+  });
+
+  describe('empty filtered set', () => {
+    beforeEach(() => {
+      state.filteredImages = [];
+    });
+
+    it('hides grid + shows empty state when scan is NOT in progress', () => {
+      state.scanProgress.visible = false;
+      state.allImages = [];
+      renderImages();
+      expect(imageGrid.classList.contains('hidden')).toBe(true);
+      expect(showEmpty).toHaveBeenCalledWith(false);
+    });
+
+    it('passes allImages-had-some (true) vs all-empty (false) to showEmpty', () => {
+      // Pin: the "no images match filters" vs "truly empty page"
+      // distinction. showEmpty renders different copy based on the arg.
+      state.scanProgress.visible = false;
+      state.allImages = [{ id: 'a' } as ImageItem];
+      renderImages();
+      expect(showEmpty).toHaveBeenCalledWith(true);
+    });
+
+    it('does NOT hide grid when scan is still in progress (overlay remains)', () => {
+      // Pin: mid-scan transient empty state (no images discovered yet)
+      // must not flash the empty-state card on top of the scan overlay.
+      state.scanProgress.visible = true;
+      state.allImages = [];
+      imageGrid.classList.remove('hidden');
+      renderImages();
+      expect(imageGrid.classList.contains('hidden')).toBe(false);
+      expect(showEmpty).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('non-empty filtered set', () => {
+    beforeEach(() => {
+      state.filteredImages = [
+        { id: 'a', url: 'a' } as ImageItem,
+        { id: 'b', url: 'b' } as ImageItem,
+      ];
+    });
+
+    it('un-hides both .image-grid-wrapper AND the grid itself', () => {
+      renderImages();
+      expect(gridWrapper.classList.contains('hidden')).toBe(false);
+      expect(imageGrid.classList.contains('hidden')).toBe(false);
+    });
+
+    it('resets scrollTop to 0 (always scroll-to-top on re-render)', () => {
+      imageGrid.scrollTop = 500;
+      renderImages();
+      expect(imageGrid.scrollTop).toBe(0);
+    });
+
+    it('writes filteredImages.length into foundCount + calls checkNarrowMode + updateSelectionUI', () => {
+      renderImages();
+      expect(foundCount.textContent).toBe('2');
+      expect(checkNarrowMode).toHaveBeenCalledTimes(1);
+      expect(updateSelectionUI).toHaveBeenCalledTimes(1);
+    });
+
+    it('does not crash when .image-grid-wrapper is missing (defensive null-check)', () => {
+      gridWrapper.remove();
+      expect(() => renderImages()).not.toThrow();
+      // imageGrid itself was re-parented to body via our beforeEach
+      // cleanup and is no longer connected — the function should still
+      // perform its imperative writes without throwing.
+    });
   });
 });
