@@ -6,11 +6,13 @@
 //     baidu vs yandex routing) + MIME → file extension map
 //   - uploadToYandex (exercised through reverseSearchUpload):
 //     two cbir_id response shapes, HTTP failure, no-cbir_id throw
-//
-// Skipped on purpose:
-//   - uploadToBaidu — depends on chrome.tabs.onUpdated + 10s timeout
-//     + chrome.scripting.executeScript injecting into a real Baidu
-//     page. Already covered by e2e. ROI for unit-level mocking is low.
+//   - uploadToBaidu (exercised through reverseSearchUpload):
+//     tabs.create + onUpdated listener complete-event + 10s timeout
+//     fallback + scripting.executeScript injection pipeline.
+//     Originally skipped as "e2e-only" but the Chrome API surface is
+//     mockable with fake timers + a minimal chrome stub, and without
+//     it the module sits at ~59% line coverage which violates the
+//     Stage-5 85%+ floor.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { fetchImageData, reverseSearchUpload } from '../background/reverse-search';
 
@@ -200,5 +202,222 @@ describe('uploadToYandex — response shapes', () => {
     // Unknown MIME falls through to .jpg fallback — also exercised.
     const res = await reverseSearchUpload('yandex', 'data:image/avif;base64,QUJDRA==');
     expect(res.success).toBe(true);
+  });
+});
+
+// ── uploadToBaidu (via reverseSearchUpload) ────────────────────────────────
+// The Baidu flow is heavier than Yandex: we open a tab, wait for its
+// status='complete' event (with a 10s fallback timeout), sleep 1.5s
+// for the upload UI to settle, then inject a content script via
+// chrome.scripting.executeScript that programmatically builds a File
+// and fires a synthetic 'change' event on the page's file input.
+//
+// Every one of those Chrome APIs is mockable at the chrome.* global
+// level; fake timers let us collapse the 10s + 1.5s waits into
+// microtasks so the test runs in single-digit ms.
+describe('uploadToBaidu — tab-open + scripting.executeScript injection', () => {
+  // Helper: set up a chrome stub exposing exactly the surface
+  // uploadToBaidu touches. Returns the spies so each test can assert
+  // on them. The default behaviour simulates the happy path (tab
+  // opens, status flips to 'complete' asynchronously, executeScript
+  // succeeds).
+  interface BaiduChromeHarness {
+    tabsCreate: ReturnType<typeof vi.fn>;
+    onUpdatedAddListener: ReturnType<typeof vi.fn>;
+    onUpdatedRemoveListener: ReturnType<typeof vi.fn>;
+    executeScript: ReturnType<typeof vi.fn>;
+    /** Trigger whatever listener uploadToBaidu just registered with
+     * the given changeInfo. Used to simulate the tab load cycle. */
+    fireOnUpdated: (tabId: number, changeInfo: chrome.tabs.TabChangeInfo) => void;
+    registeredListeners: Array<(tabId: number, changeInfo: chrome.tabs.TabChangeInfo) => void>;
+  }
+
+  function installBaiduChrome(
+    opts: {
+      tabId?: number | undefined;
+      /** When true, tabs.create explicitly resolves with id:undefined
+       * to exercise the "no tab id" defensive branch. We can't use `??`
+       * on opts.tabId because its undefined value is meaningful, not a
+       * "not supplied" signal. */
+      simulateMissingTabId?: boolean;
+      executeScriptImpl?: () => Promise<unknown>;
+    } = {}
+  ): BaiduChromeHarness {
+    const registeredListeners: BaiduChromeHarness['registeredListeners'] = [];
+    const resolvedTabId = opts.simulateMissingTabId ? undefined : (opts.tabId ?? 77);
+    const tabsCreate = vi.fn(async () => ({ id: resolvedTabId }));
+    const onUpdatedAddListener = vi.fn(
+      (listener: (tabId: number, changeInfo: chrome.tabs.TabChangeInfo) => void) => {
+        registeredListeners.push(listener);
+      }
+    );
+    const onUpdatedRemoveListener = vi.fn(
+      (listener: (tabId: number, changeInfo: chrome.tabs.TabChangeInfo) => void) => {
+        const idx = registeredListeners.indexOf(listener);
+        if (idx !== -1) registeredListeners.splice(idx, 1);
+      }
+    );
+    const executeScript = vi.fn(opts.executeScriptImpl ?? (async () => [{ result: undefined }]));
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (globalThis as any).chrome = {
+      tabs: {
+        create: tabsCreate,
+        onUpdated: {
+          addListener: onUpdatedAddListener,
+          removeListener: onUpdatedRemoveListener,
+        },
+      },
+      scripting: { executeScript },
+    };
+
+    return {
+      tabsCreate,
+      onUpdatedAddListener,
+      onUpdatedRemoveListener,
+      executeScript,
+      registeredListeners,
+      fireOnUpdated(tabId, changeInfo) {
+        // Copy the list first — listeners that call removeListener
+        // during firing mutate registeredListeners mid-iteration.
+        for (const fn of [...registeredListeners]) {
+          fn(tabId, changeInfo);
+        }
+      },
+    };
+  }
+
+  it('opens the Baidu tab, awaits status=complete, injects the upload script, returns injected:true', async () => {
+    vi.useFakeTimers();
+    const harness = installBaiduChrome({ tabId: 42 });
+    const dataUrl = 'data:image/png;base64,QUJDRA==';
+
+    // Kick off the async call — we'll drive it forward in slices.
+    const promise = reverseSearchUpload('baidu', dataUrl);
+
+    // Let the microtasks chained after tabs.create() settle so the
+    // onUpdated listener has been registered before we fire it.
+    await vi.advanceTimersByTimeAsync(0);
+
+    // Simulate the tab finishing load — this resolves the
+    // waiter-promise inside uploadToBaidu.
+    expect(harness.registeredListeners.length).toBe(1);
+    harness.fireOnUpdated(42, { status: 'complete' });
+
+    // The 1.5s "let Baidu's uploader settle" sleep.
+    await vi.advanceTimersByTimeAsync(1500);
+
+    const result = await promise;
+
+    expect(result).toEqual({ success: true, injected: true });
+    expect(harness.tabsCreate).toHaveBeenCalledWith({
+      url: 'https://graph.baidu.com/pcpage/index?tpl_from=pc',
+      active: true,
+    });
+    // Pin: after onUpdated fires with status=complete, the listener
+    // must be removed — otherwise it would leak across subsequent
+    // Baidu searches and execute content scripts against tabs the
+    // user opened for unrelated reasons.
+    expect(harness.onUpdatedRemoveListener).toHaveBeenCalled();
+    // Script injection targets the right tab and forwards image bytes.
+    const scriptCall = harness.executeScript.mock.calls[0][0] as {
+      target: { tabId: number };
+      args: [string, string, string];
+    };
+    expect(scriptCall.target.tabId).toBe(42);
+    expect(scriptCall.args[0]).toBe(dataUrl);
+    expect(scriptCall.args[1]).toBe('image.png'); // png MIME → .png ext
+    expect(scriptCall.args[2]).toBe('image/png');
+
+    vi.useRealTimers();
+  });
+
+  it('falls back after the 10s tab-load timeout when status=complete never fires', async () => {
+    vi.useFakeTimers();
+    const harness = installBaiduChrome({ tabId: 7 });
+
+    const promise = reverseSearchUpload('baidu', 'data:image/jpeg;base64,QUJDRA==');
+
+    await vi.advanceTimersByTimeAsync(0);
+    expect(harness.registeredListeners.length).toBe(1);
+
+    // Do NOT fire onUpdated. Advance past the 10s timeout plus the
+    // 1.5s settle-sleep.
+    await vi.advanceTimersByTimeAsync(10_000);
+    await vi.advanceTimersByTimeAsync(1500);
+
+    const result = await promise;
+    // Pin: even on timeout we still attempt the script injection
+    // (Baidu's upload input frequently exists before the page
+    // reports 'complete' — bailing here would regress the happy path
+    // on slow networks).
+    expect(result).toEqual({ success: true, injected: true });
+    expect(harness.onUpdatedRemoveListener).toHaveBeenCalled();
+    expect(harness.executeScript).toHaveBeenCalledTimes(1);
+
+    vi.useRealTimers();
+  });
+
+  it('ignores onUpdated events for OTHER tab ids (listener is per-tab)', async () => {
+    vi.useFakeTimers();
+    const harness = installBaiduChrome({ tabId: 100 });
+
+    const promise = reverseSearchUpload('baidu', 'data:image/webp;base64,QUJDRA==');
+    await vi.advanceTimersByTimeAsync(0);
+
+    // Events for a different tab id must NOT unblock the waiter —
+    // otherwise an unrelated tab completing first would pull us past
+    // the load gate before Baidu is actually ready.
+    harness.fireOnUpdated(999, { status: 'complete' });
+    harness.fireOnUpdated(100, { status: 'loading' }); // wrong status
+    // Neither should have removed the listener.
+    expect(harness.onUpdatedRemoveListener).not.toHaveBeenCalled();
+
+    // The correct event finally arrives.
+    harness.fireOnUpdated(100, { status: 'complete' });
+    await vi.advanceTimersByTimeAsync(1500);
+
+    const result = await promise;
+    expect(result.success).toBe(true);
+    // Correct MIME → correct upload filename extension.
+    const scriptCall = harness.executeScript.mock.calls[0][0] as {
+      args: [string, string, string];
+    };
+    expect(scriptCall.args[1]).toBe('image.webp');
+
+    vi.useRealTimers();
+  });
+
+  it('throws "Failed to open Baidu reverse-search tab" when tabs.create returns no id', async () => {
+    // Defensive branch: MV3 can hand back a tab object with id===undefined
+    // if the user has certain tab-management extensions installed that
+    // cancel tab creation. Without this guard, the subsequent
+    // chrome.scripting.executeScript({target:{tabId:undefined}}) would
+    // throw a cryptic Chrome error.
+    installBaiduChrome({ simulateMissingTabId: true });
+
+    await expect(reverseSearchUpload('baidu', 'data:image/png;base64,QUJDRA==')).rejects.toThrow(
+      'Failed to open Baidu reverse-search tab'
+    );
+  });
+
+  it('handles unknown MIME by using the .jpg fallback in the upload filename', async () => {
+    vi.useFakeTimers();
+    const harness = installBaiduChrome({ tabId: 5 });
+
+    const promise = reverseSearchUpload('baidu', 'data:image/avif;base64,QUJDRA==');
+    await vi.advanceTimersByTimeAsync(0);
+    harness.fireOnUpdated(5, { status: 'complete' });
+    await vi.advanceTimersByTimeAsync(1500);
+
+    await promise;
+    const scriptCall = harness.executeScript.mock.calls[0][0] as {
+      args: [string, string, string];
+    };
+    // extMap has no 'image/avif' entry → default '.jpg' kicks in.
+    expect(scriptCall.args[1]).toBe('image.jpg');
+    expect(scriptCall.args[2]).toBe('image/avif');
+
+    vi.useRealTimers();
   });
 });

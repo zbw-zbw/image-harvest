@@ -764,3 +764,239 @@ describe('findImageElement — Shadow DOM fallbacks (section 10)', () => {
     expect(addHighlight('https://example.com/shadow-bg.jpg').found).toBe(true);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────
+// Overlay lifecycle — ESC key + click-to-dismiss + CLEAR_SELECTION notify
+// ─────────────────────────────────────────────────────────────────────
+// Pin: when highlights are visible, pressing ESC (capture-phase) or
+// clicking the dimmed overlay must both (a) remove every highlight and
+// (b) fire chrome.runtime.sendMessage({type:'CLEAR_SELECTION'}) so the
+// sidepanel can unsync its selected state. A regression that stops
+// forwarding the message would leave the sidepanel thinking everything
+// is still selected after the user bailed via ESC.
+
+describe('overlay lifecycle — ESC / click-to-dismiss', () => {
+  it('ESC key removes all highlights AND fires CLEAR_SELECTION', async () => {
+    // Arrange: add a highlight so the overlay + ESC handler get installed.
+    const img = document.createElement('img');
+    img.src = 'https://example.com/esc-target.jpg';
+    stubRect(img);
+    document.body.appendChild(img);
+
+    const { addHighlight } = await import('../content/highlight');
+    addHighlight('https://example.com/esc-target.jpg');
+    expect(document.querySelector('.image-snatcher-overlay')).not.toBeNull();
+
+    // Act: fire ESC in capture phase (the handler uses addEventListener
+    // with useCapture=true so we dispatch on document).
+    const escEvent = new KeyboardEvent('keydown', {
+      key: 'Escape',
+      bubbles: true,
+      cancelable: true,
+    });
+    document.dispatchEvent(escEvent);
+
+    // Assert: highlights + overlay gone, CLEAR_SELECTION fired exactly once.
+    expect(document.querySelector('.image-snatcher-overlay')).toBeNull();
+    expect(sendMessageSpy).toHaveBeenCalledTimes(1);
+    const msg = sendMessageSpy.mock.calls[0][0];
+    expect(msg.type).toBe('CLEAR_SELECTION');
+  });
+
+  it('non-ESC key on document does NOT tear down the overlay', async () => {
+    const img = document.createElement('img');
+    img.src = 'https://example.com/keep.jpg';
+    stubRect(img);
+    document.body.appendChild(img);
+
+    const { addHighlight } = await import('../content/highlight');
+    addHighlight('https://example.com/keep.jpg');
+
+    // A random key like Tab / Enter must be ignored. Otherwise any page
+    // keystroke would kill the highlight — regression-prone since the
+    // ESC check is one line inside a shared keydown listener.
+    document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
+    expect(document.querySelector('.image-snatcher-overlay')).not.toBeNull();
+    expect(sendMessageSpy).not.toHaveBeenCalled();
+  });
+
+  it('clicking the overlay dismisses all highlights AND fires CLEAR_SELECTION', async () => {
+    const img = document.createElement('img');
+    img.src = 'https://example.com/click-target.jpg';
+    stubRect(img);
+    document.body.appendChild(img);
+
+    const { addHighlight } = await import('../content/highlight');
+    addHighlight('https://example.com/click-target.jpg');
+    const overlay = document.querySelector('.image-snatcher-overlay') as HTMLDivElement;
+    expect(overlay).not.toBeNull();
+
+    overlay.click();
+
+    expect(document.querySelector('.image-snatcher-overlay')).toBeNull();
+    expect(sendMessageSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ type: 'CLEAR_SELECTION' })
+    );
+  });
+
+  it('dismiss swallows chrome.runtime.sendMessage exceptions (extension context invalidated)', async () => {
+    sendMessageSpy.mockImplementation(() => {
+      // Real MV3 throws "Extension context invalidated" after reload
+      // if the content script is still alive but chrome.* is gone.
+      throw new Error('Extension context invalidated');
+    });
+
+    const img = document.createElement('img');
+    img.src = 'https://example.com/ctx-invalid.jpg';
+    stubRect(img);
+    document.body.appendChild(img);
+
+    const { addHighlight } = await import('../content/highlight');
+    addHighlight('https://example.com/ctx-invalid.jpg');
+
+    // Must NOT bubble the throw into the keydown handler — if it did,
+    // the page's own ESC handler would swallow subsequent events and
+    // the user would never escape the highlight state cleanly.
+    expect(() => {
+      document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    }).not.toThrow();
+    expect(document.querySelector('.image-snatcher-overlay')).toBeNull();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// findImageElement — the remaining dispatch branches
+// ─────────────────────────────────────────────────────────────────────
+// Pin: each of these exotic sources (picture/source, inline SVG,
+// canvas.toDataURL, <link rel="icon">, og:image) is a real shape
+// observed in production DOMs. Dropping any branch would silently
+// refuse to locate/scroll to images that ARE visible in the sidepanel
+// grid (extracted by content/main.ts's scan) but then report
+// "not found" when the user clicks "Locate on page".
+
+describe('addHighlight — exotic source dispatch', () => {
+  it('matches <picture> > <source srcset> candidate URLs', async () => {
+    const picture = document.createElement('picture');
+    const source = document.createElement('source');
+    source.setAttribute('srcset', 'https://example.com/pic-480.webp 480w, https://example.com/pic-960.webp 960w');
+    picture.appendChild(source);
+    const fallbackImg = document.createElement('img');
+    fallbackImg.src = 'https://example.com/pic-fallback.jpg';
+    stubRect(fallbackImg);
+    picture.appendChild(fallbackImg);
+    stubRect(picture);
+    document.body.appendChild(picture);
+
+    const { addHighlight } = await import('../content/highlight');
+    // Matching the srcset URL should locate the picture (via its <img>).
+    expect(addHighlight('https://example.com/pic-960.webp').found).toBe(true);
+  });
+
+  it('matches <picture> > <source src> (non-srcset fallback)', async () => {
+    const picture = document.createElement('picture');
+    const source = document.createElement('source');
+    source.setAttribute('src', 'https://example.com/src-attr.webp');
+    picture.appendChild(source);
+    const fallbackImg = document.createElement('img');
+    stubRect(fallbackImg);
+    picture.appendChild(fallbackImg);
+    stubRect(picture);
+    document.body.appendChild(picture);
+
+    const { addHighlight } = await import('../content/highlight');
+    expect(addHighlight('https://example.com/src-attr.webp').found).toBe(true);
+  });
+
+  it('matches inline <svg> via data:image/svg+xml URI', async () => {
+    // Inline SVGs are serialized then data-URI encoded so the URL in
+    // the sidepanel grid is the CANONICAL form. We mount a real <svg>
+    // and derive its own data URI via the same btoa/encode chain the
+    // production code uses — this way we can't accidentally test the
+    // wrong hash.
+    const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    svg.setAttribute('width', '10');
+    svg.setAttribute('height', '10');
+    svg.setAttribute('xmlns', 'http://www.w3.org/2000/svg');
+    stubRect(svg);
+    document.body.appendChild(svg);
+
+    const serialized = new XMLSerializer().serializeToString(svg);
+    const dataUri = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(serialized)));
+
+    const { addHighlight } = await import('../content/highlight');
+    expect(addHighlight(dataUri).found).toBe(true);
+  });
+
+  it('matches <canvas> via data:image/png URI (toDataURL comparison)', async () => {
+    // jsdom does NOT implement HTMLCanvasElement.toDataURL out of the
+    // box (it requires the optional `canvas` npm peer). Stub it so the
+    // findImageElement canvas branch can actually run — this mirrors
+    // the production contract (any data:image/png URI the sidepanel
+    // grid extracted from this canvas must round-trip back to the
+    // same element when the user clicks "locate").
+    const fakeDataUri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAA=';
+    const canvas = document.createElement('canvas');
+    canvas.width = 2;
+    canvas.height = 2;
+    stubRect(canvas);
+    document.body.appendChild(canvas);
+    vi.spyOn(canvas, 'toDataURL').mockReturnValue(fakeDataUri);
+
+    const { addHighlight } = await import('../content/highlight');
+    expect(addHighlight(fakeDataUri).found).toBe(true);
+  });
+
+  it('silently skips tainted canvases (toDataURL throwing SecurityError)', async () => {
+    // Cross-origin canvases throw on toDataURL. The catch block keeps
+    // findImageElement scanning the remaining elements instead of
+    // aborting — regression here would make a single tainted canvas
+    // on the page break "locate" for every other image.
+    const fakeDataUri = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAA=';
+    const taintedCanvas = document.createElement('canvas');
+    stubRect(taintedCanvas);
+    document.body.appendChild(taintedCanvas);
+    vi.spyOn(taintedCanvas, 'toDataURL').mockImplementation(() => {
+      throw new Error('SecurityError: Tainted canvases may not be exported');
+    });
+
+    const { addHighlight } = await import('../content/highlight');
+    // No match anywhere → found:false, but crucially NO uncaught throw.
+    expect(addHighlight(fakeDataUri).found).toBe(false);
+  });
+
+  it('matches <link rel="apple-touch-icon"> in <head> (non-data URI)', async () => {
+    const link = document.createElement('link');
+    link.rel = 'apple-touch-icon';
+    link.href = 'https://example.com/apple-icon.png';
+    document.head.appendChild(link);
+
+    const { addHighlight } = await import('../content/highlight');
+    // <link> IS a metadata element so scroll is skipped but the
+    // "found" contract must still be true — that's how the sidepanel
+    // decides whether to show the "not on this page" tooltip.
+    expect(addHighlight('https://example.com/apple-icon.png').found).toBe(true);
+  });
+
+  it('matches <meta property="og:image"> in <head>', async () => {
+    const meta = document.createElement('meta');
+    meta.setAttribute('property', 'og:image');
+    meta.setAttribute('content', 'https://example.com/og.jpg');
+    document.head.appendChild(meta);
+
+    const { addHighlight } = await import('../content/highlight');
+    expect(addHighlight('https://example.com/og.jpg').found).toBe(true);
+  });
+
+  it('does NOT match <link> / <meta> when the search is for a data: URI', async () => {
+    // The link/meta branch is explicitly gated behind `!isTargetDataUri`
+    // because data: URIs can never appear as href/content on these
+    // elements in production — skipping the scan is a pure perf win.
+    const link = document.createElement('link');
+    link.rel = 'icon';
+    link.href = 'data:image/png;base64,iVBORw0KGgo=';
+    document.head.appendChild(link);
+
+    const { addHighlight } = await import('../content/highlight');
+    expect(addHighlight('data:image/png;base64,iVBORw0KGgo=').found).toBe(false);
+  });
+});
