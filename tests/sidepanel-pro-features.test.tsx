@@ -359,10 +359,33 @@ describe('close*Modal — ESC handlers', () => {
 // surface a raw console error. The try/catch is the contract.
 
 describe('copyColor', () => {
+  // Helper: install a clipboard stub that survives whatever the previous
+  // test file did to navigator.clipboard. sidepanel-collection-ui.test.tsx
+  // uses Object.defineProperty(...) with writable:false (data-descriptor
+  // default), which poisons plain assignment here under serial test runs.
+  // Object.defineProperty + configurable:true unconditionally wins over
+  // any prior descriptor, so this pattern is race-free across suite order.
+  function installClipboardStub(writeText: () => Promise<void>): void {
+    Object.defineProperty(navigator, 'clipboard', {
+      configurable: true,
+      writable: true,
+      value: { writeText },
+    });
+  }
+
+  afterEach(() => {
+    // Hand the clipboard back to jsdom so later tests in this file
+    // (and later test files in the suite) start from a clean slate.
+    try {
+      delete (navigator as unknown as { clipboard?: unknown }).clipboard;
+    } catch {
+      /* noop — see sibling comment in sidepanel-collection-ui.test.tsx */
+    }
+  });
+
   it('toasts success with the exact hex value after clipboard.writeText resolves', async () => {
     const writeText = vi.fn(() => Promise.resolve());
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (navigator as any).clipboard = { writeText };
+    installClipboardStub(writeText);
     const uiMod = await import('../sidepanel/ui');
 
     await copyColor('#abcdef');
@@ -373,8 +396,7 @@ describe('copyColor', () => {
 
   it('toasts an error (instead of bubbling the DOMException) when clipboard rejects', async () => {
     const writeText = vi.fn(() => Promise.reject(new Error('NotAllowedError')));
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (navigator as any).clipboard = { writeText };
+    installClipboardStub(writeText);
     const uiMod = await import('../sidepanel/ui');
 
     // Must not throw — the facade owns the catch.

@@ -93,6 +93,20 @@ afterEach(() => {
   document.body.innerHTML = '';
   delete (elements as Partial<typeof elements>).collectionBody;
   delete (elements as Partial<typeof elements>).collectionSearch;
+  // Restore navigator.clipboard — the copy-button tests below use
+  // Object.defineProperty(navigator, 'clipboard', { value: ... }) which
+  // defaults to writable:false. Without this restore, the next test
+  // file that tries a plain `navigator.clipboard = ...` assignment
+  // (e.g. sidepanel-pro-features.test.tsx > copyColor) hits a
+  // "Cannot assign to read only property" TypeError and fails under
+  // serial test runs. `delete` works even against readonly data
+  // descriptors as long as they stay configurable (we set configurable:true).
+  try {
+    delete (navigator as unknown as { clipboard?: unknown }).clipboard;
+  } catch {
+    // jsdom may disallow deletion on some Navigator builds; swallow so
+    // this afterEach can never be the proximate cause of a failure.
+  }
   vi.clearAllMocks();
 });
 

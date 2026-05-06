@@ -1,21 +1,12 @@
-// Pro Features facade: collects the synchronous Pro APIs (favorites,
-// dedup detection, color helpers) that the rest of the app imports
-// at module load time, plus thin lazy-loader entry points for the
-// modal UIs that have been split out (./multitab, ./collection-ui,
-// ./dedup-ui). Heavy code paths — JSZip, modal markup, bulk
-// operations — live in those split chunks.
-//
-// Earlier versions of this file housed the full implementations;
-// after the lazy-split refactor most of the legacy imports turned
-// into dead weight. Trimmed here to silence lint and make the
-// remaining surface area honest about what's actually used.
 import { collectionAdd, collectionGetAll, collectionRemove } from '../shared/collection';
+import { FREE_LIMITS } from '../shared/constants';
+import { t } from '../shared/i18n';
 import { hammingDistance } from '../shared/phash';
 import type { CollectionItem, ImageItem } from '../shared/types';
 import { applyFilters } from './filter';
+import { showProUpgradeModal } from './settings';
 import { elements, state } from './state';
 import { showToast } from './ui';
-
 // ============================================
 // Similar Image Detection (Pro)
 // ============================================
@@ -133,14 +124,34 @@ export function removeImageById(imageId: string): void {
   }
   applyFilters();
   detectSimilarImages();
-  showToast('Image removed', 'success');
+  showToast(t('toast.image_removed'), 'success');
 }
 
 // ============================================
-// Collection / Favorites (Pro)
+// Collection / Favorites — Sprint 3.5: Free users get 5 "tasting" slots,
+// Pro is unlimited. The Pro guard moved from ImageCard.handleFavorite to
+// here so the limit lives next to the data write — keeping the cap as a
+// pure-data concern means future entry points (drag-to-collection,
+// keyboard shortcut) automatically inherit the same gate.
 // ============================================
 export async function addToCollection(img: ImageItem): Promise<void> {
   try {
+    // Free-tier cap: count current items first; if at/over the cap, block
+    // and surface the upgrade modal. Pro users skip this entirely. We
+    // count before write to avoid race-y "added then immediately removed"
+    // UX when the user is exactly at the threshold.
+    if (!state.isProUser) {
+      const existing = await collectionGetAll();
+      // If this image is already collected (toggle case), let the write
+      // proceed; collectionAdd is idempotent on { id }.
+      const alreadyIn = existing.some((c: CollectionItem) => c.id === img.id);
+      if (!alreadyIn && existing.length >= FREE_LIMITS.MAX_COLLECTION_ITEMS) {
+        showToast(t('pro.collection_limit', { max: FREE_LIMITS.MAX_COLLECTION_ITEMS }), 'warning');
+        showProUpgradeModal();
+        return;
+      }
+    }
+
     // Get the actual page URL from the active tab (not the extension panel URL)
     let pageUrl = '';
     let pageTitle = '';
@@ -170,9 +181,9 @@ export async function addToCollection(img: ImageItem): Promise<void> {
       notes: '',
       createdAt: Date.now(),
     } as CollectionItem);
-    showToast('Added to collection', 'success');
+    showToast(t('toast.collection.added'), 'success');
   } catch {
-    showToast('Failed to add to collection', 'error');
+    showToast(t('toast.collection.add_failed'), 'error');
   }
 }
 
@@ -188,9 +199,9 @@ export async function isImageInCollection(imgUrl: string): Promise<boolean> {
 export async function removeFromCollection(imgId: string): Promise<void> {
   try {
     await collectionRemove(imgId);
-    showToast('Removed from collection', 'success');
+    showToast(t('toast.collection.removed'), 'success');
   } catch {
-    showToast('Failed to remove', 'error');
+    showToast(t('toast.collection.remove_failed'), 'error');
   }
 }
 
@@ -234,9 +245,9 @@ export function renderTransparentBar(): string {
 export async function copyColor(hex: string): Promise<void> {
   try {
     await navigator.clipboard.writeText(hex);
-    showToast(`Color ${hex} copied`, 'success');
+    showToast(t('toast.color_copied', { hex }), 'success');
   } catch {
-    showToast('Failed to copy color', 'error');
+    showToast(t('toast.color_copy_failed'), 'error');
   }
 }
 
