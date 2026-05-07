@@ -4,7 +4,7 @@
   "description": "Image Harvest - Download Any Image from Any Webpage (Chrome Extension)",
   "type": "module",
   "scripts": {
-    "dev": "vite",
+    "dev": "vite build --watch",
     "build": "vite build",
     "build:analyze": "ANALYZE=1 vite build",
     "size": "node scripts/check-bundle-size.mjs",

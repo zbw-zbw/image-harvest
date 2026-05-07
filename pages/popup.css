@@ -68,7 +68,7 @@ body.popup-mode {
 /* Card Colors - same as sidepanel */
 .popup-mode .card-colors {
   display: flex;
-  height: 6px;
+  height: 8px;
   flex-shrink: 0;
 }
 
@@ -79,7 +79,7 @@ body.popup-mode {
 }
 
 .popup-mode .card-colors .card-color-bar:hover {
-  transform: scaleY(2);
+  transform: scaleY(1.6);
   z-index: 1;
 }
 

@@ -604,13 +604,13 @@ describe('renderHotkeyDisplay', () => {
     expect(chromeMock.commands.getAll).not.toHaveBeenCalled();
   });
 
-  it('renders "Not set" when no _execute_action shortcut configured', async () => {
+  it('renders "Click to set" button when no _execute_action shortcut configured', async () => {
     document.body.innerHTML = '<div id="hotkey-keys"></div>';
     chromeMock.commands.getAll.mockResolvedValue([{ name: 'other-cmd', shortcut: 'Ctrl+X' }]);
 
     await renderHotkeyDisplay();
     const container = document.getElementById('hotkey-keys')!;
-    expect(container.querySelector('.hotkey-not-set')?.textContent).toBe('Not set');
+    expect(container.querySelector('.hotkey-set-btn')).toBeTruthy();
   });
 
   it('parses "Ctrl+Shift+S" into 3 <kbd> with modifier symbols (⌃ ⇧ S)', async () => {
@@ -644,12 +644,12 @@ describe('renderHotkeyDisplay', () => {
     expect(kbds[2].textContent).toBe('I');
   });
 
-  it('survives chrome.commands.getAll throwing (renders Not set fallback)', async () => {
+  it('survives chrome.commands.getAll throwing (renders "Click to set" fallback)', async () => {
     document.body.innerHTML = '<div id="hotkey-keys"></div>';
     chromeMock.commands.getAll.mockRejectedValue(new Error('API unavailable'));
 
     await renderHotkeyDisplay();
-    expect(document.querySelector('.hotkey-not-set')).toBeTruthy();
+    expect(document.querySelector('.hotkey-set-btn')).toBeTruthy();
   });
 });
 
@@ -951,13 +951,15 @@ describe('applyProFeatureVisibility', () => {
     expect(chromeMock.storage.local.set).not.toHaveBeenCalled();
   });
 
-  it('hides #dedup-info when similar detection disabled OR no similar groups', async () => {
+  it('does not crash when #dedup-info element is absent (removed from DOM)', async () => {
     chromeMock.runtime.sendMessage.mockResolvedValue({ isPro: false });
-    document.body.innerHTML = '<div id="dedup-info"></div>';
+    document.body.innerHTML = '';
     state.appSettings.enableSimilarDetection = false;
 
-    await applyProFeatureVisibility();
-    expect(document.getElementById('dedup-info')!.classList.contains('hidden')).toBe(true);
+    // applyProFeatureVisibility no longer manipulates #dedup-info directly;
+    // similar-detection visibility is driven by Preact components. Verify
+    // it completes without throwing when the element is missing.
+    await expect(applyProFeatureVisibility()).resolves.toBeUndefined();
   });
 
   it('hides color filter button + dropdown when colorExtraction disabled', async () => {

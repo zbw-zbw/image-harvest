@@ -17,6 +17,7 @@
 // dynamic import.
 
 import { isRestrictedUrl } from '../shared/utils';
+import { t } from '../shared/i18n';
 import type { ImageItem } from '../shared/types';
 import { applyFilters } from './filter';
 import { closeMultiTabModal } from './pro-features';
@@ -70,7 +71,7 @@ export async function loadTabList(): Promise<void> {
         </label>
         <img src="${faviconUrl}" alt="" class="tab-favicon">
         <div class="tab-info">
-          <div class="tab-title">${tab.title || 'Untitled'}${tab.active ? '<span class="tab-current-badge">Current</span>' : ''}</div>
+          <div class="tab-title">${tab.title || t('multitab_untitled')}${tab.active ? `<span class="tab-current-badge">${t('multitab_current')}</span>` : ''}</div>
           <div class="tab-url">${truncateUrl(tab.url || '', 50)}</div>
         </div>
       </div>
@@ -264,14 +265,14 @@ export function updateMultitabSelectAllState(): void {
   if (checkedCount === totalCount && totalCount > 0) {
     selectAllBtn.classList.add('checked');
     if (checkIcon) checkIcon.classList.remove('hidden');
-    if (textEl) textEl.textContent = `${checkedCount} selected`;
+    if (textEl) textEl.textContent = t('status_n_selected', { count: checkedCount });
   } else if (checkedCount > 0) {
     selectAllBtn.classList.add('partial');
     if (checkIcon) checkIcon.classList.remove('hidden');
-    if (textEl) textEl.textContent = `${checkedCount} selected`;
+    if (textEl) textEl.textContent = t('status_n_selected', { count: checkedCount });
   } else {
     if (checkIcon) checkIcon.classList.add('hidden');
-    if (textEl) textEl.textContent = 'Select all';
+    if (textEl) textEl.textContent = t('toolbar_select_all');
   }
 }
 
@@ -291,12 +292,12 @@ export async function startMultiTabExtract(tabIds: number[]): Promise<void> {
   let aborted = false;
   state.isMultiTabExtracting = true;
 
-  showProgress('Extracting...', () => {
+  showProgress(t('multitab_extracting'), () => {
     aborted = true;
     state.isMultiTabExtracting = false;
-    showToast('Extraction cancelled', 'info');
+    showToast(t('toast_extraction_cancelled'), 'info');
   });
-  updateProgress(0, tabIds.length, 'Starting extraction...', 0);
+  updateProgress(0, tabIds.length, t('multitab_starting'), 0);
 
   try {
     const response = await chrome.runtime.sendMessage({
@@ -314,37 +315,47 @@ export async function startMultiTabExtract(tabIds: number[]): Promise<void> {
         phash: null,
       }));
 
-      newImages.forEach((newImg) => {
-        if (!state.allImages.find((img) => img.url === newImg.url)) {
-          state.allImages.push(newImg);
-        }
-      });
+      // Replace allImages with only the multi-tab results.
+      // The user explicitly chose which tabs to extract from; showing images
+      // from tabs they did NOT select would be confusing.
+      state.allImages = newImages;
+      const addedCount = newImages.length;
 
-      state.currentGroupMode = 'tab';
-      if (elements.groupMode) (elements.groupMode as HTMLSelectElement).value = 'tab';
-      document.querySelectorAll<HTMLElement>('[data-group-filter]').forEach((o) => {
-        o.classList.toggle('active', o.dataset.groupFilter === 'tab');
-      });
-      updateFilterButtonLabels();
+      // Only switch to tab grouping when new images were actually added
+      if (addedCount > 0) {
+        state.currentGroupMode = 'tab';
+        if (elements.groupMode) (elements.groupMode as HTMLSelectElement).value = 'tab';
+        document.querySelectorAll<HTMLElement>('[data-group-filter]').forEach((o) => {
+          o.classList.toggle('active', o.dataset.groupFilter === 'tab');
+        });
+        updateFilterButtonLabels();
+        applyFilters();
+      }
 
-      applyFilters();
       closeMultiTabModal();
       showToast(
-        `Extracted ${newImages.length} images from ${response.tabCount || tabIds.length} tabs`,
-        'success'
+        t('toast_extraction_success', {
+          images: addedCount,
+          tabs: response.tabCount || tabIds.length,
+        }),
+        addedCount > 0 ? 'success' : 'info'
       );
 
       if (
-        state.appSettings.enableSimilarDetection !== false ||
-        state.appSettings.enableColorExtraction !== false
+        addedCount > 0 &&
+        (state.appSettings.enableSimilarDetection !== false ||
+          state.appSettings.enableColorExtraction !== false)
       ) {
         processImageExtras(newImages);
       }
     } else {
-      showToast('Extraction failed: ' + (response?.error || 'Unknown error'), 'error');
+      showToast(
+        t('toast_extraction_failed') + ': ' + (response?.error || t('error_default_message')),
+        'error'
+      );
     }
   } catch {
-    if (!aborted) showToast('Multi-tab extraction failed', 'error');
+    if (!aborted) showToast(t('toast_multitab_failed'), 'error');
   } finally {
     state.isMultiTabExtracting = false;
     hideProgress();

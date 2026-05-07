@@ -19,7 +19,7 @@ import { recordDownloads } from '../shared/paywall-state';
 import { recordDownloadForRating } from '../shared/rating-prompt-state';
 import { renderImages } from './render';
 import { showProUpgradeModal } from './settings';
-import { elements, state } from './state';
+import { elements, state, store } from './state';
 import { hideProgress, showConfirmDialog, showProgress, showToast, updateProgress } from './ui';
 import { generateFilename, truncateUrl } from './utils';
 
@@ -41,36 +41,23 @@ export async function toggleSelection(imageId: string): Promise<void> {
     }
   }
 
-  updateCardSelectionState(imageId);
+  // Trigger Proxy set trap so Preact components re-render with updated size
+  store.set('selectedImages', state.selectedImages);
   updateSelectionUI();
-}
-
-export function updateCardSelectionState(imageId: string): void {
-  const card = document.querySelector<HTMLElement>(`.image-card[data-id="${imageId}"]`);
-  if (card) {
-    const isSelected = state.selectedImages.has(imageId);
-    card.classList.toggle('selected', isSelected);
-    const cbLabel = card.querySelector('.card-checkbox');
-    if (cbLabel) cbLabel.classList.toggle('checked', isSelected);
-    const cb = card.querySelector<HTMLInputElement>('.card-checkbox input');
-    if (cb) cb.checked = isSelected;
-    const iconEl = card.querySelector('.checkbox-icon');
-    if (iconEl) {
-      iconEl.innerHTML = isSelected
-        ? '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>'
-        : '';
-    }
-  }
 }
 
 export function selectAll(): void {
   state.filteredImages.forEach((img) => state.selectedImages.add(img.id));
+  // Trigger Proxy set trap so Preact components re-render with updated size
+  store.set('selectedImages', state.selectedImages);
   renderImages();
   updateSelectionUI();
 }
 
 export function clearSelection(): void {
   state.selectedImages.clear();
+  // Trigger Proxy set trap so Preact components re-render with updated size
+  store.set('selectedImages', state.selectedImages);
   removeAllHighlightsOnPage();
   renderImages();
   updateSelectionUI();
@@ -104,19 +91,19 @@ export function updateSelectionUI(): void {
     if (isAllSelected) {
       elements.btnSelectAll.classList.add('checked');
       elements.btnSelectAll.classList.remove('partial');
-      elements.btnSelectAll.title = 'Deselect all';
-      if (textEl) textEl.textContent = 'Deselect all';
+      elements.btnSelectAll.title = t('toolbar_deselect_all');
+      if (textEl) textEl.textContent = t('toolbar_deselect_all');
       if (checkIcon) checkIcon.classList.remove('hidden');
     } else if (hasSelection) {
       elements.btnSelectAll.classList.remove('checked');
       elements.btnSelectAll.classList.add('partial');
-      elements.btnSelectAll.title = 'Click to select all';
-      if (textEl) textEl.textContent = `${state.selectedImages.size} selected`;
+      elements.btnSelectAll.title = t('title_select_all');
+      if (textEl) textEl.textContent = t('status_n_selected', { count: state.selectedImages.size });
       if (checkIcon) checkIcon.classList.remove('hidden');
     } else {
       elements.btnSelectAll.classList.remove('checked', 'partial');
-      elements.btnSelectAll.title = 'Select all';
-      if (textEl) textEl.textContent = 'Select all';
+      elements.btnSelectAll.title = t('toolbar_select_all');
+      if (textEl) textEl.textContent = t('toolbar_select_all');
       if (checkIcon) checkIcon.classList.add('hidden');
     }
   }
@@ -338,10 +325,10 @@ export async function downloadSelectedAsZip(targetFormat: string | null): Promis
 
   if (selected.length > 100 && !state.appSettings.noManyFilesWarning) {
     const confirmed = await showConfirmDialog({
-      title: 'Download Many Images',
-      message: `You are about to download ${selected.length} images. Continue?`,
-      confirmText: 'Download',
-      cancelText: 'Cancel',
+      title: t('dialog_download_many_title'),
+      message: t('dialog_download_many_message', { count: selected.length }),
+      confirmText: t('common_download'),
+      cancelText: t('common_cancel'),
       type: 'info',
     });
     if (!confirmed) return;
@@ -349,7 +336,7 @@ export async function downloadSelectedAsZip(targetFormat: string | null): Promis
 
   let aborted = false;
 
-  showProgress('Downloading...', () => {
+  showProgress(t('progress_downloading'), () => {
     aborted = true;
     showToast(t('toast_download_cancelled'), 'info');
   });
@@ -609,6 +596,15 @@ export function showReverseSearchMenu(imageUrl: string, anchor: HTMLElement): vo
   // Free tier: reverse search is available but limited to Google only
   // Menu still opens, but non-Google engines show Pro badge and are blocked
   if (!elements.reverseSearchMenu) return;
+
+  const menu = elements.reverseSearchMenu as HTMLElement;
+
+  // Toggle: if menu is already visible, close it and return
+  if (!menu.classList.contains('hidden')) {
+    menu.classList.add('hidden');
+    return;
+  }
+
   const rect = anchor.getBoundingClientRect();
   const menuWidth = 180;
   const viewportWidth = window.innerWidth;
@@ -619,7 +615,6 @@ export function showReverseSearchMenu(imageUrl: string, anchor: HTMLElement): vo
   }
   if (leftPos < 4) leftPos = 4;
 
-  const menu = elements.reverseSearchMenu as HTMLElement;
   menu.style.left = `${leftPos}px`;
   menu.style.top = `${rect.bottom + 4}px`;
   menu.dataset.imageUrl = imageUrl;

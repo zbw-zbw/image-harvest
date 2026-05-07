@@ -97,6 +97,12 @@ export default defineConfig({
     target: 'es2022',
     // Keep the bundle structure flat-ish so it's easy to inspect in dist/.
     rollupOptions: {
+      // reverse-search.html is opened programmatically via chrome.tabs.create
+      // and isn't declared in the manifest, so crxjs won't pick it up
+      // automatically. Adding it as an explicit input ensures Vite bundles it.
+      input: {
+        'reverse-search': resolve(__dirname, 'pages/reverse-search.html'),
+      },
       output: {
         // crxjs sets these per-input, but we keep an explicit hint for any
         // additional shared chunks Rollup decides to extract.

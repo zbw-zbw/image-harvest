@@ -8,6 +8,7 @@
 // showConfirmDialog({...})) keep working unchanged.
 import { useStoreSelector } from './storeHook';
 import { state, type ConfirmDialogType } from '../state';
+import { t } from '../../shared/i18n';
 
 // SVG icons reused from the original ui.ts. Kept inline so the component
 // has no external file dependency and the icons match the surrounding
@@ -89,7 +90,7 @@ export function ConfirmDialog() {
           <button
             id="btn-confirm-dialog-close"
             class="icon-btn confirm-dialog-close-btn"
-            title="Close"
+            title={t('common_close')}
             onClick={() => resolveDialog(false)}
           >
             <svg
@@ -121,14 +122,14 @@ export function ConfirmDialog() {
             class="btn btn-secondary"
             onClick={() => resolveDialog(false)}
           >
-            {cfg?.cancelText ?? 'Cancel'}
+            {cfg?.cancelText ?? t('common_cancel')}
           </button>
           <button
             id="confirm-dialog-confirm"
             class={confirmClass}
             onClick={() => resolveDialog(true)}
           >
-            {cfg?.confirmText ?? 'Confirm'}
+            {cfg?.confirmText ?? t('common_confirm')}
           </button>
         </div>
       </div>

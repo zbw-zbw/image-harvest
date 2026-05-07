@@ -50,12 +50,9 @@ test('dedup modal renders one group per SimilarGroup with correct image counts',
   const { sidepanel } = await openSidepanelWithImages(ext.context, fixtureServer, ext.extensionId);
   await waitForIHHook(sidepanel);
 
-  // Seed two similar-image groups (3 + 2 images) AND force the dedup-info
-  // span visible. The button is wrapped in <span id="dedup-info" class="hidden">
-  // which only un-hides for Pro users with non-empty similarGroups (see
-  // sidepanel/settings.ts > applyProFeatureVisibility). For e2e we
-  // un-hide manually so we can exercise the modal contract without
-  // mocking the entire Pro license dance.
+  // Seed two similar-image groups (3 + 2 images). The Similar button is
+  // now always visible in the status bar (no hidden wrapper), so we only
+  // need to populate the store — no manual class toggling required.
   await sidepanel.evaluate(() => {
     interface ImageItem {
       id: string;
@@ -76,15 +73,10 @@ test('dedup modal renders one group per SimilarGroup with correct image counts',
         { id: 'sim-b-2', url: 'https://example.com/b2.png' },
       ],
     ]);
-    document.getElementById('dedup-info')?.classList.remove('hidden');
   });
 
-  // Trigger the dedup button via direct DOM .click() instead of Playwright's
-  // locator.click(). The button is wrapped in #dedup-info which is hidden
-  // for non-Pro fixtures (display:none from the .hidden class) — even
-  // force:true can't dispatch through a display:none ancestor. We're
-  // testing the modal-rendering contract here, not the Pro visibility
-  // gating (which is covered by unit tests).
+  // Trigger the dedup button via direct DOM .click(). The Similar button
+  // is now always visible in the status bar — no hidden ancestor to bypass.
   await sidepanel.evaluate(() => {
     document.getElementById('btn-dedup')?.click();
   });
@@ -107,20 +99,17 @@ test('dedup modal shows empty message when similarGroups is empty', async () => 
   const { sidepanel } = await openSidepanelWithImages(ext.context, fixtureServer, ext.extensionId);
   await waitForIHHook(sidepanel);
 
-  // Make sure no similarGroups are seeded (default state is []) AND
-  // force-show the dedup button (see comment in the previous test about
-  // the dedup-info hidden gating).
+  // Make sure no similarGroups are seeded (default state is []). The
+  // Similar button is always visible — no hidden wrapper to toggle.
   await sidepanel.evaluate(() => {
     interface IH {
       store: { set: (key: 'similarGroups', value: unknown[]) => void };
     }
     const w = window as unknown as { __IH__: IH };
     w.__IH__.store.set('similarGroups', []);
-    document.getElementById('dedup-info')?.classList.remove('hidden');
   });
 
-  // Direct DOM click — see comment in the previous test about the
-  // display:none ancestor that defeats Playwright force:true.
+  // Direct DOM click on the always-visible Similar button.
   await sidepanel.evaluate(() => {
     document.getElementById('btn-dedup')?.click();
   });

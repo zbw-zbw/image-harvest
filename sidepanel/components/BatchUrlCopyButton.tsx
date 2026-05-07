@@ -51,6 +51,8 @@ export function BatchUrlCopyButton() {
   // the store's notifySelectors fires after every assignment.
   const selectedSize = useStoreSelector((s) => s.selectedImages.size);
   const filteredCount = useStoreSelector((s) => s.filteredImages.length);
+  // Subscribe to localeTick so a runtime language switch triggers re-render
+  useStoreSelector((s) => s.localeTick);
 
   // Effective copy count: prefer selection, fall back to all-filtered.
   // Matches the Download All / Download Selected dual-purpose behavior so
@@ -65,7 +67,7 @@ export function BatchUrlCopyButton() {
   const label =
     selectedSize > 0
       ? t('toolbar_copy_urls') + ` (${selectedSize})`
-      : t('toolbar_copy_urls');
+      : t('toolbar_copy_urls') + (filteredCount > 0 ? ` (${filteredCount})` : '');
 
   const title = disabled ? t('toolbar_copy_urls_empty') : t('toolbar_copy_urls_tooltip');
 
@@ -78,16 +80,14 @@ export function BatchUrlCopyButton() {
   return (
     <button
       id="btn-batch-copy-urls"
-      class="select-all-btn batch-url-copy-btn"
+      class="status-action-btn batch-url-copy-btn"
       type="button"
       title={title}
       disabled={disabled}
       onClick={handleClick}
     >
-      <span class="select-all-checkbox">
-        <IconCopy />
-      </span>
-      <span class="select-all-text">{label}</span>
+      <IconCopy />
+      <span class="btn-label">{label}</span>
     </button>
   );
 }

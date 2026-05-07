@@ -8,7 +8,7 @@ import { fetchImages, processImageExtras } from './scan';
 import { state } from './state';
 import { track, isOptedIn, setOptIn } from '../shared/telemetry';
 import { EVENTS } from '../shared/telemetry-events';
-import { getLocale, setLocale, type Locale } from '../shared/i18n';
+import { getLocale, setLocale, t, type Locale } from '../shared/i18n';
 import { checkNarrowMode, showConfirmDialog, showToast, updateFilterButtonLabels } from './ui';
 
 // ============================================
@@ -45,10 +45,14 @@ export async function renderHotkeyDisplay(): Promise<void> {
   container.innerHTML = '';
 
   if (!shortcut) {
-    const notSet = document.createElement('span');
-    notSet.className = 'hotkey-not-set';
-    notSet.textContent = 'Not set';
-    container.appendChild(notSet);
+    const setBtn = document.createElement('button');
+    setBtn.className = 'hotkey-set-btn';
+    setBtn.textContent = t('hotkey_click_to_set');
+    setBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      openShortcutSettings();
+    });
+    container.appendChild(setBtn);
     return;
   }
 
@@ -236,7 +240,7 @@ export async function saveSettings(): Promise<void> {
     updateFilterButtonLabels();
     closeSettings();
     if (!displayModeChanged) {
-      showToast('Settings saved', 'success');
+      showToast(t('settings_saved'), 'success');
     }
     // When display mode changed, switchDisplayMode() will close the current
     // window automatically. No toast needed — it would be invisible anyway.
@@ -257,7 +261,7 @@ export async function saveSettings(): Promise<void> {
       processImageExtras(state.allImages);
     }
   } catch {
-    showToast('Failed to save settings', 'error');
+    showToast(t('settings_save_failed'), 'error');
   }
 }
 
@@ -285,7 +289,7 @@ export function resetSettings(): void {
   };
   showSettings();
   updateLiveIndicator();
-  showToast('Settings reset to defaults', 'success');
+  showToast(t('toast_settings_reset'), 'success');
 }
 
 /**
@@ -486,10 +490,7 @@ export async function applyProFeatureVisibility(): Promise<void> {
 
   const similarEnabled = state.isProUser && state.appSettings.enableSimilarDetection !== false;
 
-  // Similar Detection: dedup button & info in status bar
-  const dedupInfo = document.getElementById('dedup-info');
-  if (dedupInfo)
-    dedupInfo.classList.toggle('hidden', !similarEnabled || state.similarGroups.length === 0);
+  // Similar button is always visible in status bar; badge auto-hides via Preact.
 
   // Color Extraction: color bars always visible for all users (visual appeal)
   // But copy HEX and color filter require Pro (handled in click events)
@@ -609,20 +610,19 @@ export async function updateTopProStatus(): Promise<void> {
       deactivateBtn._bound = true;
       deactivateBtn.addEventListener('click', async () => {
         const confirmed = await showConfirmDialog({
-          title: 'Deactivate License',
-          message:
-            'Are you sure you want to deactivate your license on this device? You can activate it on another device after deactivation.',
-          confirmText: 'Deactivate',
-          cancelText: 'Cancel',
+          title: t('dialog_deactivate_title'),
+          message: t('dialog_deactivate_message'),
+          confirmText: t('btn_deactivate'),
+          cancelText: t('common_cancel'),
           type: 'danger',
         });
         if (!confirmed) return;
         try {
           await chrome.runtime.sendMessage({ type: MESSAGE_TYPES.DEACTIVATE_LICENSE });
-          showToast('License deactivated', 'info');
+          showToast(t('toast_license_deactivated'), 'info');
           await applyProFeatureVisibility();
         } catch {
-          showToast('Failed to deactivate', 'error');
+          showToast(t('toast_deactivate_failed'), 'error');
         }
       });
     }
@@ -656,6 +656,15 @@ export function showProUpgradeModal(): void {
 
 export function closeProUpgradeModal(): void {
   state.proUpgradeModalState = { open: false, errorText: '' };
+
+  // Reset the license activation form inside the Pro modal
+  const proModalInput = document.getElementById('pro-modal-key-input') as HTMLInputElement | null;
+  const proModalError = document.getElementById('pro-modal-error') as HTMLElement | null;
+  if (proModalInput) proModalInput.value = '';
+  if (proModalError) {
+    proModalError.textContent = '';
+    proModalError.classList.add('hidden');
+  }
 }
 
 /**
@@ -735,7 +744,7 @@ export function bindProGuards(): void {
           e.preventDefault();
           e.stopImmediatePropagation();
           closeSettings();
-          showToast('This setting requires Pro. Upgrade to unlock!', 'warning');
+          showToast(t('toast_pro_setting_locked'), 'warning');
           // Telemetry: distinguish the three Pro toggles. Use stable
           // feature keys so the dashboard can group correctly.
           const featureMap: Record<string, string> = {
@@ -762,7 +771,7 @@ export function bindProGuards(): void {
         e.preventDefault();
         input.blur();
         closeSettings();
-        showToast('Custom naming is a Pro feature. Upgrade to unlock!', 'warning');
+        showToast(t('toast_pro_naming_locked'), 'warning');
         // Telemetry: subfolder + filename templates share the same Pro
         // gate so we group them under 'custom_naming' in the funnel.
         void track(EVENTS.PRO_FEATURE_BLOCKED, { feature: 'custom_naming' });

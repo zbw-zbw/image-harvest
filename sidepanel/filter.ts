@@ -8,6 +8,7 @@ import { updateSelectionUI } from './actions';
 import { renderImages } from './render';
 import { closeAllFilterDropdowns, showProUpgradeModal } from './settings';
 import { state } from './state';
+import { t } from '../shared/i18n';
 import { showToast } from './ui';
 import { updateFilterButtonLabels } from './ui';
 import { getAspectRatioCategory } from './utils';
@@ -27,9 +28,9 @@ export function applyFilters(): void {
 
   sortImages();
 
-  // Skip DOM re-render if the filtered image list is identical to the last render.
-  // This avoids unnecessary innerHTML rebuilds that cause image flicker (grey
-  // placeholder → real image) when switching between cached tabs.
+  // Skip renderImages() if the filtered image list is identical to the last
+  // render. This avoids unnecessary scrollTop resets and count updates when
+  // tab-switch cache restore produces the same filtered set.
   const currentFilteredIds = state.filteredImages.map((img) => img.id).join(',');
   if (currentFilteredIds === state.lastRenderedFilteredIds) {
     // Still update selection UI in case selection state changed
@@ -43,7 +44,12 @@ export function applyFilters(): void {
 }
 
 export function sortImages(): void {
-  state.filteredImages.sort((a, b) => {
+  sortImagesArray(state.filteredImages);
+}
+
+/** Sort an array of images in-place using the current sort mode. */
+export function sortImagesArray(images: ImageItem[]): void {
+  images.sort((a, b) => {
     const aW = a.naturalWidth || a.displayWidth || 0;
     const aH = a.naturalHeight || a.displayHeight || 0;
     const bW = b.naturalWidth || b.displayWidth || 0;
@@ -151,7 +157,7 @@ export function renderColorSwatches(): void {
     swatch.addEventListener('click', (e) => {
       e.stopPropagation();
       if (!state.isProUser) {
-        showToast('Color filtering is a Pro feature. Upgrade to filter by color!', 'warning');
+        showToast(t('toast_pro_color_filter'), 'warning');
         showProUpgradeModal();
         return;
       }

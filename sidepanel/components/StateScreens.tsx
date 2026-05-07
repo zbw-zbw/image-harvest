@@ -10,21 +10,45 @@
 // existing UX renders skeleton cards directly into the image grid (see
 // ui.ts > showLoading) instead of swapping to a separate placeholder. The
 // scan overlay is a separate component (ScanProgressOverlay).
+import { useEffect, useRef } from 'preact/hooks';
+import { t } from '../../shared/i18n';
 import { useStoreSelector } from './storeHook';
 
 /**
  * Renders whichever of the three "screens" matches `state.uiScreen`.
  * The image grid itself is left alone — it's a heavy DOM that we don't
  * want to tear down on every screen flip.
+ *
+ * The mount container created by mountStateScreens() has `flex: 1 1 auto`
+ * so empty/error/restricted screens fill the remaining vertical space.
+ * When `uiScreen === 'images'` none of the screens are visible, but the
+ * mount container's flex still claims space from `#app`'s flex layout,
+ * leaving `.image-grid-wrapper` with only ~50% of the available height.
+ * We fix this by toggling the mount container's display to 'none' when
+ * no screen is active.
  */
 export function StateScreens() {
   const screen = useStoreSelector((s) => s.uiScreen);
+  const rootRef = useRef<HTMLDivElement>(null);
+
+  // Toggle the mount container's display so it doesn't claim flex space
+  // when all screens are hidden (uiScreen === 'images').
+  useEffect(() => {
+    const mountContainer = rootRef.current?.parentElement;
+    if (!mountContainer) return;
+    if (screen === 'images') {
+      mountContainer.style.display = 'none';
+    } else {
+      mountContainer.style.display = 'flex';
+    }
+  }, [screen]);
+
   return (
-    <>
+    <div ref={rootRef}>
       <EmptyScreen visible={screen === 'empty'} />
       <ErrorScreen visible={screen === 'error'} />
       <RestrictedScreen visible={screen === 'restricted'} />
-    </>
+    </div>
   );
 }
 
@@ -38,9 +62,9 @@ function EmptyScreen({ visible }: ScreenProps) {
   // zero images". The button label shifts accordingly so users can tell
   // whether clicking will reset filters or rescan from scratch.
   const desc = info.isNoResults
-    ? 'Try adjusting your filter criteria or visit a different page.'
-    : 'No images were detected on this page. Try refreshing or visiting a different page.';
-  const buttonLabel = info.isNoResults ? 'Reset Filters' : 'Rescan Images';
+    ? t('empty_no_results_desc')
+    : t('empty_no_images_desc');
+  const buttonLabel = info.isNoResults ? t('empty_reset_filters') : t('empty_rescan_images');
   return (
     <div id="empty-state" class={`empty-state${visible ? '' : ' hidden'}`}>
       <div class="empty-state-visual">
@@ -68,7 +92,7 @@ function EmptyScreen({ visible }: ScreenProps) {
           />
         </svg>
       </div>
-      <h3 class="empty-state-title">No images found</h3>
+      <h3 class="empty-state-title">{t('empty_title')}</h3>
       <p class="empty-state-desc">{desc}</p>
       <button id="btn-reset-filters" class="rescan-btn rescan-btn-lg">
         <svg
@@ -94,8 +118,8 @@ function ErrorScreen({ visible }: ScreenProps) {
   // When no error has been pushed yet (initial load or after a recovery)
   // we still render the shell — the visibility flag dictates whether it's
   // shown — but with the original placeholder copy.
-  const code = info?.code || 'Error';
-  const message = info?.message || 'Something went wrong';
+  const code = info?.code || t('error_default_code');
+  const message = info?.message || t('error_default_message');
   const workaround = info?.workaround || '';
   return (
     <div id="error-state" class={`error-state${visible ? '' : ' hidden'}`}>
@@ -146,7 +170,7 @@ function RestrictedScreen({ visible }: ScreenProps) {
             Image Harvest <span class="restricted-version">v1.0.0</span>
           </h2>
           <p class="restricted-subtitle">
-            Intelligently capture, preview, and batch download all images from any webpage
+            {t('restricted_subtitle')}
           </p>
         </div>
       </div>

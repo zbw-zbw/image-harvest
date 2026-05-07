@@ -382,11 +382,15 @@
   opacity: 1;
 }
 
-/* Card Colors Bar */
+/* Card Colors Bar — height adapts to view mode and panel width */
 .card-colors {
   display: flex;
-  height: 6px;
+  height: 5px;
   flex-shrink: 0;
+}
+
+.compact-mode .card-colors {
+  height: 4px;
 }
 
 .card-colors .card-color-bar {
@@ -396,7 +400,7 @@
 }
 
 .card-colors .card-color-bar:hover {
-  transform: scaleY(2);
+  transform: scaleY(1.6);
   z-index: 1;
 }
 
@@ -518,6 +522,10 @@
 
 .list-view .card-colors {
   display: flex;
+  height: 7px;
+}
+
+.compact-mode .list-view .card-colors {
   height: 5px;
 }
 

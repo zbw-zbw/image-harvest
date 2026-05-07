@@ -60,16 +60,9 @@ export function detectSimilarImages(): void {
   // similarCount is now a Preact component (StatusCounts.SimilarCount)
   // subscribed to state.similarGroups.length.
 
-  const similarEnabled = state.appSettings.enableSimilarDetection !== false;
-  if (elements.btnDedup) {
-    elements.btnDedup.style.display =
-      similarEnabled && state.similarGroups.length > 0 ? '' : 'none';
-  }
-
-  const dedupInfo = document.getElementById('dedup-info');
-  if (dedupInfo) {
-    dedupInfo.classList.toggle('hidden', !similarEnabled || state.similarGroups.length === 0);
-  }
+  // Similar button is now always visible in the status bar. The badge
+  // count is Preact-managed (SimilarCount) and auto-hides when 0.
+  // No imperative DOM toggling needed.
 }
 
 // ── Dedup modal — lazy loaded ──────────────────────────────────────────────
@@ -233,13 +226,13 @@ export function renderColorBar(colors: string[] | undefined | null): string {
   return `<div class="card-colors">${colors
     .map(
       (c) =>
-        `<div class="card-color-bar" style="background:${c}" data-color="${c}" title="${state.isProUser ? 'Click to copy ' + c : 'Upgrade to Pro to copy colors'}"></div>`
+        `<div class="card-color-bar" style="background:${c}" data-color="${c}" title="${state.isProUser ? t('title_click_copy_color', { color: c }) : t('title_upgrade_copy_color')}"></div>`
     )
     .join('')}</div>`;
 }
 
 export function renderTransparentBar(): string {
-  return `<div class="card-colors"><div class="card-color-bar card-color-bar-transparent" data-transparent="true" title="Transparent image"></div></div>`;
+  return `<div class="card-colors"><div class="card-color-bar card-color-bar-transparent" data-transparent="true" title="${t('title_transparent_image')}"></div></div>`;
 }
 
 export async function copyColor(hex: string): Promise<void> {

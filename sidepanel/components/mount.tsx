@@ -8,7 +8,7 @@
 // Preact's reconciliation.
 import { render, type ComponentType } from 'preact';
 import { LiveIndicator } from './LiveIndicator';
-import { DownloadLabel, FoundActionCount, SimilarCount } from './StatusCounts';
+import { DownloadLabel, FoundActionCount, SimilarInline } from './StatusCounts';
 import { StateScreens } from './StateScreens';
 import { ScanProgressOverlay } from './ScanProgressOverlay';
 import { DownloadProgressModal } from './DownloadProgressModal';
@@ -23,7 +23,7 @@ import { PrivacyOptInModal } from './PrivacyOptInModal';
 import { SoftPaywallBanner } from './SoftPaywallBanner';
 import { BatchUrlCopyButton } from './BatchUrlCopyButton';
 import { RatingPromptModal } from './RatingPromptModal';
-import { SettingsModal, setSavedSettingsBody } from './SettingsModal';
+import { SettingsModal } from './SettingsModal';
 import { ImageGrid } from './ImageGrid';
 
 /**
@@ -52,32 +52,42 @@ function mountAt(legacyId: string, Component: ComponentType, tag: 'span' | 'div'
 }
 
 /**
- * Settings modal needs special handling: the legacy `.modal-body` subtree
- * is ~440 lines of static HTML containing 20+ controls bound by 47
- * imperative `getElementById` call sites in settings.ts. Recreating the
- * markup in Preact would require rewriting all those bindings.
+ * Settings modal needs special handling: the legacy `.modal-body` and
+ * `.modal-footer` subtrees contain 20+ controls bound by 47 imperative
+ * `getElementById` call sites in settings.ts. Recreating the markup in
+ * Preact would require rewriting all those bindings.
  *
  * Instead we:
- *   1. Detach the legacy `.modal-body` from the DOM (no children removed —
- *      the subtree's identity, ids, attached event listeners are all
- *      preserved).
- *   2. Hand the saved node to <SettingsModal> via a module-level setter so
- *      the component's useEffect can re-attach it inside its slot div.
- *   3. Replace the legacy `#settings-modal` shell with a Preact mount point
- *      and render <SettingsModal>.
+ *   1. Detach `.modal-body` and `.modal-footer` from the legacy DOM.
+ *   2. Replace the legacy `#settings-modal` shell with a Preact mount
+ *      point and render `<SettingsModal>`.
+ *   3. **Synchronously** re-attach the detached subtrees into the
+ *      data-slot containers rendered by `<SettingsModal>`, guaranteeing
+ *      they are back in the live DOM before `cacheElements()` and
+ *      `bindEvents()` run later in `init()`.
  */
 function mountSettingsModal(): void {
   const legacy = document.getElementById('settings-modal');
   if (!legacy) return;
   const body = legacy.querySelector<HTMLElement>('.modal-body');
-  if (body) {
-    body.remove();
-    setSavedSettingsBody(body);
-  }
+  const footer = legacy.querySelector<HTMLElement>('.modal-footer');
+  if (body) body.remove();
+  if (footer) footer.remove();
   const mount = document.createElement('div');
   mount.dataset.preactMount = 'settings-modal';
   legacy.replaceWith(mount);
   render(<SettingsModal />, mount);
+
+  // Synchronously plant the legacy body and footer into the Preact-rendered
+  // slot containers AFTER render() returns. This guarantees the subtrees
+  // (and their ids / event listeners) are back in the live DOM before
+  // cacheElements() and bindEvents() run later in init().
+  // We use data-slot attributes to locate the containers rendered by
+  // <SettingsModal> rather than relying on useEffect (which is async).
+  const bodySlot = mount.querySelector<HTMLElement>('[data-slot="settings-body"]');
+  const footerSlot = mount.querySelector<HTMLElement>('[data-slot="settings-footer"]');
+  if (bodySlot && body) bodySlot.appendChild(body);
+  if (footerSlot && footer) footerSlot.appendChild(footer);
 }
 
 /**
@@ -113,6 +123,14 @@ function mountStateScreens(): void {
   restricted?.remove();
   const mount = document.createElement('div');
   mount.dataset.preactMount = 'state-screens';
+  // The mount container must participate in the flex layout so that
+  // empty/error/restricted screens can fill the remaining vertical space
+  // between the toolbar and status bar. Without this, the empty-state
+  // cannot center vertically when image-grid-wrapper is hidden.
+  mount.style.display = 'flex';
+  mount.style.flexDirection = 'column';
+  mount.style.flex = '1 1 auto';
+  mount.style.minHeight = '0';
   empty.replaceWith(mount);
   render(<StateScreens />, mount);
 }
@@ -125,12 +143,22 @@ export function mountPreactComponents(): void {
   // Inline counters
   mountAt('live-indicator', LiveIndicator);
   mountAt('found-action-count', FoundActionCount);
-  mountAt('similar-count', SimilarCount);
+  mountAt('similar-inline-mount', SimilarInline);
   mountAt('download-label', DownloadLabel);
   // Block-level overlays / badges
   mountAt('scan-overlay', ScanProgressOverlay, 'div');
   mountAt('progress-modal', DownloadProgressModal, 'div');
-  mountAt('pro-status-area', ProStatusBadge, 'div');
+  // Pro badge mount needs margin-right:auto so it pushes the right-side
+  // buttons (Live, Collection, Multi-Tab, Settings) to the end of the
+  // toolbar. The original #pro-status-area had this via .pro-status-area
+  // CSS, but mountAt replaces the element with a bare <div>.
+  {
+    const proMount = replaceWithMountPoint('pro-status-area', 'div');
+    if (proMount) {
+      proMount.style.marginRight = 'auto';
+      render(<ProStatusBadge />, proMount);
+    }
+  }
   mountAt('toast-container', ToastContainer, 'div');
   mountAt('confirm-dialog', ConfirmDialog, 'div');
   // Independent modals (shells only — body content stays imperative).

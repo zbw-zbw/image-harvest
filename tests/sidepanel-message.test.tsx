@@ -24,6 +24,7 @@ import { MESSAGE_TYPES } from '../shared/constants';
 
 // Mock heavy neighbors so importing message.ts doesn't drag the whole
 // UI/render/IPC graph into the test.
+vi.mock('virtua', () => ({ Virtualizer: vi.fn() }));
 vi.mock('../sidepanel/actions', () => ({
   clearSelection: vi.fn(),
   downloadSelectedAsZip: vi.fn(),

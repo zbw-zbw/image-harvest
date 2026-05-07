@@ -27,7 +27,12 @@ HTML document — it omits the surrounding
           <div id="pro-status-area" class="pro-status-area">
             <!-- Free user: Upgrade Pro button -->
             <div id="pro-status-free" class="pro-status-free">
-              <button id="btn-upgrade-pro" class="btn-upgrade-pro" title="Upgrade to Pro">
+              <button
+                id="btn-upgrade-pro"
+                class="btn-upgrade-pro"
+                title="Upgrade to Pro"
+                data-i18n-title="common_upgrade"
+              >
                 <span class="icon-rocket"
                   ><svg
                     width="14"
@@ -46,7 +51,7 @@ HTML document — it omits the surrounding
                     <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
                     <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" /></svg
                 ></span>
-                <span>Upgrade to Pro</span>
+                <span data-i18n="common_upgrade">Upgrade to Pro</span>
               </button>
             </div>
             <!-- Pro user: inline status -->
@@ -93,7 +98,12 @@ HTML document — it omits the surrounding
             <span class="live-dot"></span>Live
           </span>
           <span class="icon-btn-wrapper">
-            <button id="btn-collection" class="icon-btn" title="Collection">
+            <button
+              id="btn-collection"
+              class="icon-btn"
+              title="Collection"
+              data-i18n-title="title_collection"
+            >
               <svg
                 width="18"
                 height="18"
@@ -110,7 +120,12 @@ HTML document — it omits the surrounding
             <span class="pro-badge pro-badge-mini">PRO</span>
           </span>
           <span class="icon-btn-wrapper">
-            <button id="btn-multitab" class="icon-btn" title="Multi-Tab Extract">
+            <button
+              id="btn-multitab"
+              class="icon-btn"
+              title="Multi-Tab Extract"
+              data-i18n-title="title_multitab"
+            >
               <svg
                 width="18"
                 height="18"
@@ -126,7 +141,12 @@ HTML document — it omits the surrounding
             </button>
             <span class="pro-badge pro-badge-mini">PRO</span>
           </span>
-          <button id="btn-settings" class="icon-btn" title="Settings">
+          <button
+            id="btn-settings"
+            class="icon-btn"
+            title="Settings"
+            data-i18n-title="title_settings"
+          >
             <svg
               width="18"
               height="18"
@@ -145,7 +165,12 @@ HTML document — it omits the surrounding
 
         <!-- Toolbar Row 2: Select All (left) + Sort/Group (right) -->
         <div class="toolbar toolbar-select-row">
-          <button id="btn-select-all" class="select-all-btn" title="Select all">
+          <button
+            id="btn-select-all"
+            class="select-all-btn"
+            title="Select all"
+            data-i18n-title="toolbar_select_all"
+          >
             <span class="select-all-checkbox">
               <svg
                 width="12"
@@ -159,14 +184,15 @@ HTML document — it omits the surrounding
                 <polyline points="20 6 9 17 4 12" />
               </svg>
             </span>
-            <span class="select-all-text">Select all</span>
+            <span class="select-all-text" data-i18n="toolbar_select_all">Select all</span>
           </button>
-          <!-- Sprint 3.4 batch URL copy mount. Sits right of "Select all"
-               so the two selection-driven CTAs share visual grouping.
-               The Preact component owns the disabled state and label. -->
-          <span id="batch-url-copy-mount" data-preact-mount="batch-url-copy-mount"></span>
           <div class="filter-buttons filter-actions-right">
-            <button class="filter-btn" data-filter="sort" title="Sort">
+            <button
+              class="filter-btn"
+              data-filter="sort"
+              title="Sort"
+              data-i18n-title="toolbar_sort"
+            >
               <svg
                 width="14"
                 height="14"
@@ -177,22 +203,42 @@ HTML document — it omits the surrounding
               >
                 <path d="M3 6h18M3 12h12M3 18h6" />
               </svg>
-              <span class="btn-label">Sort</span>
+              <span class="btn-label" data-i18n="toolbar_sort">Sort</span>
             </button>
             <div class="filter-dropdown hidden" id="filter-sort">
-              <div class="filter-option active" data-sort-filter="size-desc">
+              <div
+                class="filter-option active"
+                data-sort-filter="size-desc"
+                data-i18n="sort_size_desc"
+              >
                 Size ↓ (Large first)
               </div>
-              <div class="filter-option" data-sort-filter="size-asc">Size ↑ (Small first)</div>
-              <div class="filter-option" data-sort-filter="filesize-desc">
+              <div class="filter-option" data-sort-filter="size-asc" data-i18n="sort_size_asc">
+                Size ↑ (Small first)
+              </div>
+              <div
+                class="filter-option"
+                data-sort-filter="filesize-desc"
+                data-i18n="sort_filesize_desc"
+              >
                 File Size ↓ (Large first)
               </div>
-              <div class="filter-option" data-sort-filter="filesize-asc">
+              <div
+                class="filter-option"
+                data-sort-filter="filesize-asc"
+                data-i18n="sort_filesize_asc"
+              >
                 File Size ↑ (Small first)
               </div>
             </div>
 
-            <button class="filter-btn" data-filter="group" id="btn-group-toggle" title="Group">
+            <button
+              class="filter-btn"
+              data-filter="group"
+              id="btn-group-toggle"
+              title="Group"
+              data-i18n-title="toolbar_group"
+            >
               <svg
                 width="14"
                 height="14"
@@ -205,19 +251,26 @@ HTML document — it omits the surrounding
                 <rect x="14" y="3" width="7" height="7" rx="1" />
                 <rect x="3" y="14" width="18" height="7" rx="1" />
               </svg>
-              <span class="btn-label">Group</span>
+              <span class="btn-label" data-i18n="toolbar_group">Group</span>
             </button>
             <div class="filter-dropdown hidden" id="filter-group">
-              <div class="filter-option active" data-group-filter="none">None</div>
-              <div class="filter-option" data-group-filter="format">Format</div>
+              <div class="filter-option active" data-group-filter="none">
+                <span data-i18n="filter_none">None</span>
+              </div>
+              <div class="filter-option" data-group-filter="format">
+                <span data-i18n="filter_format">Format</span>
+              </div>
               <div class="filter-option" data-group-filter="domain">
-                Domain <span class="pro-badge pro-badge-mini">PRO</span>
+                <span data-i18n="filter_domain">Domain</span>
+                <span class="pro-badge pro-badge-mini">PRO</span>
               </div>
               <div class="filter-option" data-group-filter="size">
-                Size <span class="pro-badge pro-badge-mini">PRO</span>
+                <span data-i18n="filter_size">Size</span>
+                <span class="pro-badge pro-badge-mini">PRO</span>
               </div>
               <div class="filter-option" data-group-filter="tab">
-                Tab <span class="pro-badge pro-badge-mini">PRO</span>
+                <span data-i18n="filter_tab">Tab</span>
+                <span class="pro-badge pro-badge-mini">PRO</span>
               </div>
             </div>
             <!-- Hidden select to keep JS compatibility -->
@@ -237,23 +290,33 @@ HTML document — it omits the surrounding
             <div class="filter-buttons filter-row">
               <button class="filter-btn" data-filter="size">Size▾</button>
               <div class="filter-dropdown hidden" id="filter-size">
-                <div class="filter-option active" data-size-filter="all">All</div>
-                <div class="filter-option" data-size-filter="small">Small &lt; 100px</div>
-                <div class="filter-option" data-size-filter="medium">Medium 100-500px</div>
-                <div class="filter-option" data-size-filter="large">Large 500-1000px</div>
-                <div class="filter-option" data-size-filter="xl">XL &gt; 1000px</div>
+                <div class="filter-option active" data-size-filter="all" data-i18n="size_all">
+                  All
+                </div>
+                <div class="filter-option" data-size-filter="small" data-i18n="size_small">
+                  Small &lt; 100px
+                </div>
+                <div class="filter-option" data-size-filter="medium" data-i18n="size_medium">
+                  Medium 100-500px
+                </div>
+                <div class="filter-option" data-size-filter="large" data-i18n="size_large">
+                  Large 500-1000px
+                </div>
+                <div class="filter-option" data-size-filter="xl" data-i18n="size_xl">
+                  XL &gt; 1000px
+                </div>
                 <div class="filter-divider"></div>
                 <div class="filter-custom-size">
                   <div class="filter-custom-row">
-                    <label>Min W</label>
+                    <label data-i18n="filter_min_width">Min W</label>
                     <input type="number" id="filter-min-width" min="0" placeholder="0" />
-                    <label>H</label>
+                    <label data-i18n="filter_height">H</label>
                     <input type="number" id="filter-min-height" min="0" placeholder="0" />
                   </div>
                   <div class="filter-custom-row">
-                    <label>Max W</label>
+                    <label data-i18n="filter_max_width">Max W</label>
                     <input type="number" id="filter-max-width" min="0" placeholder="∞" />
-                    <label>H</label>
+                    <label data-i18n="filter_height">H</label>
                     <input type="number" id="filter-max-height" min="0" placeholder="∞" />
                   </div>
                 </div>
@@ -275,7 +338,7 @@ HTML document — it omits the surrounding
                     >
                       <polyline points="20 6 9 17 4 12" /></svg
                   ></span>
-                  All</label
+                  <span data-i18n="filter_all">All</span></label
                 >
                 <label class="checkbox-label"
                   ><input type="checkbox" class="type-checkbox" value="jpg" checked /><span
@@ -371,29 +434,60 @@ HTML document — it omits the surrounding
                     >
                       <polyline points="20 6 9 17 4 12" /></svg
                   ></span>
-                  Other</label
+                  <span data-i18n="filter_type_other">Other</span></label
                 >
               </div>
 
               <button class="filter-btn" data-filter="layout">Layout▾</button>
               <div class="filter-dropdown hidden" id="filter-layout">
-                <div class="filter-option active" data-layout-filter="all">All</div>
-                <div class="filter-option" data-layout-filter="square">Square (1:1)</div>
-                <div class="filter-option" data-layout-filter="landscape">Landscape (&gt;1:1)</div>
-                <div class="filter-option" data-layout-filter="portrait">Portrait (&lt;1:1)</div>
-                <div class="filter-option" data-layout-filter="panorama">Panorama (&gt;2:1)</div>
+                <div class="filter-option active" data-layout-filter="all" data-i18n="layout_all">
+                  All
+                </div>
+                <div class="filter-option" data-layout-filter="square" data-i18n="layout_square">
+                  Square (1:1)
+                </div>
+                <div
+                  class="filter-option"
+                  data-layout-filter="landscape"
+                  data-i18n="layout_landscape"
+                >
+                  Landscape (&gt;1:1)
+                </div>
+                <div
+                  class="filter-option"
+                  data-layout-filter="portrait"
+                  data-i18n="layout_portrait"
+                >
+                  Portrait (&lt;1:1)
+                </div>
+                <div
+                  class="filter-option"
+                  data-layout-filter="panorama"
+                  data-i18n="layout_panorama"
+                >
+                  Panorama (&gt;2:1)
+                </div>
               </div>
 
-              <button class="filter-btn" data-filter="url">URL▾</button>
+              <button class="filter-btn" data-filter="url">
+                <span data-i18n="filter_url">URL</span>▾
+              </button>
               <div class="filter-dropdown hidden" id="filter-url">
-                <input type="text" id="filter-url-input" placeholder="Filter by URL keyword..." />
+                <input
+                  type="text"
+                  id="filter-url-input"
+                  placeholder="Filter by URL keyword..."
+                  data-i18n-placeholder="filter_url_placeholder"
+                />
               </div>
 
               <button class="filter-btn" data-filter="color">
                 Color▾ <span class="pro-badge pro-badge-mini">PRO</span>
               </button>
               <div class="filter-dropdown hidden" id="filter-color">
-                <div class="filter-option active" data-color-filter="all">All Colors</div>
+                <div class="filter-option active" data-color-filter="all" data-i18n="color_all">
+                  All Colors
+                </div>
                 <div id="color-swatches" class="color-swatches">
                   <!-- Color swatches will be rendered dynamically -->
                 </div>
@@ -437,7 +531,7 @@ HTML document — it omits the surrounding
                 <line x1="3" y1="12" x2="3.01" y2="12" />
                 <line x1="3" y1="18" x2="3.01" y2="18" />
               </svg>
-              <span id="view-toggle-label">Grid</span>
+              <span id="view-toggle-label" data-i18n="view_grid">Grid</span>
             </button>
           </div>
         </div>
@@ -452,7 +546,12 @@ HTML document — it omits the surrounding
           <div id="scan-overlay" class="scan-overlay hidden">
             <div class="scan-overlay-float">
               <div class="scan-overlay-content">
-                <button id="btn-scan-cancel" class="icon-btn scan-cancel-btn" title="Cancel scan">
+                <button
+                  id="btn-scan-cancel"
+                  class="icon-btn scan-cancel-btn"
+                  title="Cancel scan"
+                  data-i18n-title="scan_cancel"
+                >
                   <svg
                     width="18"
                     height="18"
@@ -465,11 +564,11 @@ HTML document — it omits the surrounding
                   </svg>
                 </button>
                 <div class="progress-spinner"></div>
-                <h3 id="scan-progress-title">Scanning...</h3>
+                <h3 id="scan-progress-title" data-i18n="scan_scanning">Scanning...</h3>
                 <div class="progress-bar">
                   <div id="scan-progress-fill" class="progress-fill"></div>
                 </div>
-                <p id="scan-progress-text">scanning for images...</p>
+                <p id="scan-progress-text" data-i18n="scan_discovering">scanning for images...</p>
                 <p id="scan-progress-current" class="progress-current"></p>
               </div>
             </div>
@@ -709,7 +808,12 @@ HTML document — it omits the surrounding
         <!-- Status Bar -->
         <footer class="status-bar">
           <div class="status-left">
-            <button id="btn-refresh" class="rescan-btn" title="Rescan images">
+            <button
+              id="btn-refresh"
+              class="rescan-btn"
+              title="Rescan images"
+              data-i18n-title="title_rescan"
+            >
               <svg
                 width="12"
                 height="12"
@@ -722,32 +826,24 @@ HTML document — it omits the surrounding
                 <path d="M1 20v-6h6" />
                 <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
               </svg>
-              <span class="rescan-text">Rescan</span>
+              <span class="rescan-text" data-i18n="toolbar_rescan">Rescan</span>
             </button>
             <span id="found-info" class="found-info">
-              Found <span id="found-action-count">0</span> images
-            </span>
-            <span id="dedup-info" class="dedup-info hidden">
-              <button id="btn-dedup" class="dedup-btn" title="View similar images">
-                <svg
-                  width="12"
-                  height="12"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <circle cx="12" cy="12" r="10" />
-                  <path d="M8 12h8M12 8v8" />
-                </svg>
-                <span id="similar-count">0</span> Similar
-                <span class="pro-badge">PRO</span>
-              </button>
+              <span data-i18n="status_found_prefix">Found</span>
+              <span id="found-action-count">0</span>
+              <span data-i18n="status_found_suffix">images</span>
+              <span id="similar-inline-mount" data-preact-mount="similar-inline-mount"></span>
             </span>
           </div>
           <div class="status-right">
+            <span id="batch-url-copy-mount" data-preact-mount="batch-url-copy-mount"></span>
             <div id="download-group" class="download-group">
-              <button id="btn-download" class="btn btn-primary btn-small" title="Download images">
+              <button
+                id="btn-download"
+                class="btn btn-primary btn-small"
+                title="Download images"
+                data-i18n-title="title_download"
+              >
                 <svg
                   width="14"
                   height="14"
@@ -760,7 +856,7 @@ HTML document — it omits the surrounding
                   <polyline points="7 10 12 15 17 10" />
                   <line x1="12" y1="15" x2="12" y2="3" />
                 </svg>
-                <span id="download-label">Download All</span>
+                <span id="download-label" data-i18n="toolbar_download_all">Download All</span>
               </button>
               <button
                 id="btn-download-toggle"
@@ -779,7 +875,13 @@ HTML document — it omits the surrounding
                 </svg>
               </button>
               <div id="download-dropdown" class="dropdown-menu hidden">
-                <div class="dropdown-item active" data-format="original">Original</div>
+                <div
+                  class="dropdown-item active"
+                  data-format="original"
+                  data-i18n="format_original"
+                >
+                  Original
+                </div>
                 <div class="dropdown-item" data-format="png">
                   PNG <span class="pro-badge pro-badge-mini">PRO</span>
                 </div>
@@ -821,7 +923,7 @@ HTML document — it omits the surrounding
                   <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
                   <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
                 </svg>
-                Upgrade to Pro
+                <span data-i18n="common_upgrade">Upgrade to Pro</span>
               </h2>
               <button id="btn-pro-upgrade-close" class="icon-btn">
                 <svg
@@ -847,11 +949,16 @@ HTML document — it omits the surrounding
                     id="pro-modal-key-input"
                     class="license-input"
                     placeholder="XXXX-XXXX-XXXX-XXXX"
+                    data-i18n-placeholder="license_placeholder"
                     maxlength="19"
                     spellcheck="false"
                     autocomplete="off"
                   />
-                  <button id="btn-pro-modal-activate" class="btn btn-primary btn-sm">
+                  <button
+                    id="btn-pro-modal-activate"
+                    class="btn btn-primary btn-sm"
+                    data-i18n="pro_activate"
+                  >
                     Activate
                   </button>
                 </div>
@@ -979,7 +1086,7 @@ HTML document — it omits the surrounding
                     d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"
                   />
                 </svg>
-                Settings
+                <span data-i18n="settings_title">Settings</span>
               </h2>
               <button id="btn-settings-close" class="icon-btn">
                 <svg
@@ -997,7 +1104,7 @@ HTML document — it omits the surrounding
             <div class="modal-body">
               <!-- Pro & License (top of settings) -->
               <div class="settings-section settings-pro-section">
-                <h3>Pro</h3>
+                <h3 data-i18n="settings_section_account">Account</h3>
                 <div id="license-section">
                   <!-- Inactive state -->
                   <div id="license-inactive" class="setting-group">
@@ -1007,18 +1114,29 @@ HTML document — it omits the surrounding
                         id="license-key-input"
                         class="license-input"
                         placeholder="XXXX-XXXX-XXXX-XXXX"
+                        data-i18n-placeholder="license_placeholder"
                         maxlength="19"
                         spellcheck="false"
                         autocomplete="off"
                       />
-                      <button id="btn-activate-license" class="btn btn-primary btn-sm">
+                      <button
+                        id="btn-activate-license"
+                        class="btn btn-primary btn-sm"
+                        data-i18n="pro_activate"
+                      >
                         Activate
                       </button>
                     </div>
                     <p id="license-error" class="license-error hidden"></p>
                     <p class="setting-desc license-hint">
-                      Don't have a key?
-                      <a id="link-get-pro" href="#" class="license-link">Get Pro →</a>
+                      <span data-i18n="pro_no_key_hint">Don't have a key?</span>
+                      <a
+                        id="link-get-pro"
+                        href="#"
+                        class="license-link"
+                        data-i18n="pro_get_pro_link"
+                        >Get Pro →</a
+                      >
                     </p>
                   </div>
                   <!-- Active state -->
@@ -1036,7 +1154,7 @@ HTML document — it omits the surrounding
                           >
                             <polyline points="20 6 9 17 4 12" />
                           </svg>
-                          Pro Active
+                          <span data-i18n="pro_active_badge">Pro Active</span>
                         </span>
                         <span id="license-plan-badge" class="license-plan-badge">Lifetime</span>
                       </div>
@@ -1051,7 +1169,11 @@ HTML document — it omits the surrounding
                             <span id="license-expires" class="license-meta-item"></span>
                           </div>
                         </div>
-                        <button id="btn-deactivate-license" class="btn btn-secondary btn-sm">
+                        <button
+                          id="btn-deactivate-license"
+                          class="btn btn-secondary btn-sm"
+                          data-i18n="btn_deactivate"
+                        >
                           Deactivate
                         </button>
                       </div>
@@ -1062,314 +1184,11 @@ HTML document — it omits the surrounding
 
               <!-- Display Settings -->
               <div class="settings-section">
-                <h3>Display</h3>
+                <h3 data-i18n="settings_section_display">Display</h3>
+                <!-- Display Language (first - users need to switch language on first visit) -->
                 <div class="setting-group">
-                  <label class="checkbox-label">
-                    <input type="checkbox" id="setting-side-panel" checked />
-                    <span class="settings-checkbox"
-                      ><svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="3"
-                        class="check-icon"
-                      >
-                        <polyline points="20 6 9 17 4 12" /></svg
-                    ></span>
-                    <span>Display in Side Panel</span>
-                  </label>
-                  <p class="setting-desc">
-                    Open results in browser side panel instead of popup window
-                  </p>
-                </div>
-                <div class="setting-group">
-                  <label>Layout Density:</label>
-                  <div class="radio-group">
-                    <label
-                      ><input type="radio" name="layout-density" value="compact" /> Compact</label
-                    >
-                    <label
-                      ><input type="radio" name="layout-density" value="standard" checked />
-                      Standard</label
-                    >
-                    <label
-                      ><input type="radio" name="layout-density" value="comfortable" />
-                      Comfortable</label
-                    >
-                  </div>
-                </div>
-                <div class="setting-group">
-                  <label>Theme:</label>
-                  <div class="radio-group">
-                    <label><input type="radio" name="theme" value="system" checked /> System</label>
-                    <label><input type="radio" name="theme" value="light" /> Light</label>
-                    <label><input type="radio" name="theme" value="dark" /> Dark</label>
-                  </div>
-                </div>
-                <div class="setting-group">
-                  <label>Default Group By:</label>
-                  <div class="setting-select" id="setting-default-group" data-value="none">
-                    <button class="setting-select-btn" type="button">
-                      <span class="setting-select-text">None</span>
-                      <svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="2"
-                      >
-                        <polyline points="6 9 12 15 18 9" />
-                      </svg>
-                    </button>
-                    <div class="setting-select-dropdown hidden">
-                      <div class="setting-select-option active" data-value="none">None</div>
-                      <div class="setting-select-option" data-value="format">Format</div>
-                      <div class="setting-select-option" data-value="domain">
-                        Domain <span class="pro-badge pro-badge-mini">PRO</span>
-                      </div>
-                      <div class="setting-select-option" data-value="size">
-                        Size <span class="pro-badge pro-badge-mini">PRO</span>
-                      </div>
-                      <div class="setting-select-option" data-value="tab">
-                        Tab <span class="pro-badge pro-badge-mini">PRO</span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div class="setting-group">
-                  <label class="checkbox-label">
-                    <input type="checkbox" id="setting-similar-detection" />
-                    <span class="settings-checkbox"
-                      ><svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="3"
-                        class="check-icon"
-                      >
-                        <polyline points="20 6 9 17 4 12" /></svg
-                    ></span>
-                    <span>Enable Similar Detection</span>
-                    <span class="pro-badge pro-badge-mini">PRO</span>
-                  </label>
-                  <p class="setting-desc">Find and group visually similar or duplicate images</p>
-                </div>
-                <div class="setting-group">
-                  <label class="checkbox-label">
-                    <input type="checkbox" id="setting-color-extract" />
-                    <span class="settings-checkbox"
-                      ><svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="3"
-                        class="check-icon"
-                      >
-                        <polyline points="20 6 9 17 4 12" /></svg
-                    ></span>
-                    <span>Enable Color Extraction</span>
-                    <span class="pro-badge pro-badge-mini">PRO</span>
-                  </label>
-                  <p class="setting-desc">Extract dominant colors from each image for filtering</p>
-                </div>
-              </div>
-
-              <!-- Download Settings -->
-              <div class="settings-section">
-                <h3>Download</h3>
-                <div class="setting-group">
-                  <label class="checkbox-label">
-                    <input type="checkbox" id="setting-download-options" />
-                    <span class="settings-checkbox"
-                      ><svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="3"
-                        class="check-icon"
-                      >
-                        <polyline points="20 6 9 17 4 12" /></svg
-                    ></span>
-                    <span>Specify Download Options</span>
-                  </label>
-                  <p class="setting-desc">
-                    Customize subfolder, filename template, and format conversion
-                  </p>
-                  <div class="setting-inputs hidden" id="download-options-inputs">
-                    <label
-                      >Subfolder Name: <span class="pro-badge pro-badge-mini">PRO</span>
-                      <input type="text" id="setting-subfolder" value="{domain}"
-                    /></label>
-                    <label
-                      >File Name Template: <span class="pro-badge pro-badge-mini">PRO</span>
-                      <input
-                        type="text"
-                        id="setting-filename"
-                        value="img_{index}_{original}.{format}"
-                    /></label>
-                    <p class="setting-hint">
-                      Variables: {domain}, {index}, {original}, {format}, {width}, {height}
-                    </p>
-                    <div class="setting-format-row">
-                      <label
-                        >Convert Format: <span class="pro-badge pro-badge-mini">PRO</span></label
-                      >
-                      <div class="setting-select" id="setting-convert-format" data-value="none">
-                        <button class="setting-select-btn" type="button">
-                          <span class="setting-select-text">None</span>
-                          <svg
-                            width="12"
-                            height="12"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            stroke-width="2"
-                          >
-                            <polyline points="6 9 12 15 18 9" />
-                          </svg>
-                        </button>
-                        <div class="setting-select-dropdown hidden">
-                          <div class="setting-select-option active" data-value="none">None</div>
-                          <div class="setting-select-option" data-value="png">
-                            PNG <span class="pro-badge pro-badge-mini">PRO</span>
-                          </div>
-                          <div class="setting-select-option" data-value="jpg">
-                            JPG <span class="pro-badge pro-badge-mini">PRO</span>
-                          </div>
-                          <div class="setting-select-option" data-value="webp">
-                            WebP <span class="pro-badge pro-badge-mini">PRO</span>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Scan Settings -->
-              <div class="settings-section">
-                <h3>Scan</h3>
-                <div class="setting-group">
-                  <label class="checkbox-label">
-                    <input type="checkbox" id="setting-all-frames" />
-                    <span class="settings-checkbox"
-                      ><svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="3"
-                        class="check-icon"
-                      >
-                        <polyline points="20 6 9 17 4 12" /></svg
-                    ></span>
-                    <span>Search in All Frames</span>
-                  </label>
-                  <p class="setting-desc">Also scan images inside iframes and embedded frames</p>
-                </div>
-                <div class="setting-group">
-                  <label class="checkbox-label">
-                    <input type="checkbox" id="setting-live-monitor" checked />
-                    <span class="settings-checkbox"
-                      ><svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="3"
-                        class="check-icon"
-                      >
-                        <polyline points="20 6 9 17 4 12" /></svg
-                    ></span>
-                    <span
-                      >Enable Live Monitoring
-                      <span class="pro-badge pro-badge-mini">PRO</span></span
-                    >
-                  </label>
-                  <p class="setting-desc">
-                    Automatically detect new images as the page content changes
-                  </p>
-                </div>
-                <div class="setting-group">
-                  <label class="checkbox-label">
-                    <input type="checkbox" id="setting-min-size" />
-                    <span class="settings-checkbox"
-                      ><svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="3"
-                        class="check-icon"
-                      >
-                        <polyline points="20 6 9 17 4 12" /></svg
-                    ></span>
-                    <span>Enable Min Size Filter</span>
-                  </label>
-                  <p class="setting-desc">Hide images smaller than the specified dimensions</p>
-                  <div class="setting-inputs hidden" id="min-size-inputs">
-                    <label
-                      >Width ≥
-                      <input type="number" id="setting-min-width" value="50" min="1" /> px</label
-                    >
-                    <label
-                      >Height ≥
-                      <input type="number" id="setting-min-height" value="50" min="1" /> px</label
-                    >
-                  </div>
-                </div>
-                <div class="setting-group">
-                  <label class="checkbox-label">
-                    <input type="checkbox" id="setting-max-size" />
-                    <span class="settings-checkbox"
-                      ><svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="3"
-                        class="check-icon"
-                      >
-                        <polyline points="20 6 9 17 4 12" /></svg
-                    ></span>
-                    <span>Enable Max Size Filter</span>
-                  </label>
-                  <p class="setting-desc">Hide images larger than the specified dimensions</p>
-                  <div class="setting-inputs hidden" id="max-size-inputs">
-                    <label
-                      >Width ≤
-                      <input type="number" id="setting-max-width" value="4000" min="1" /> px</label
-                    >
-                    <label
-                      >Height ≤
-                      <input type="number" id="setting-max-height" value="4000" min="1" /> px</label
-                    >
-                  </div>
-                </div>
-              </div>
-
-              <!-- Language Settings (Sprint 3.3) -->
-              <div class="settings-section">
-                <h3>Language</h3>
-                <div class="setting-group">
-                  <label>Display Language</label>
-                  <p class="setting-desc">
-                    Choose the interface language. Restart the panel to apply everywhere.
-                  </p>
                   <div class="setting-format-row">
+                    <label data-i18n="settings_language_label">Display Language</label>
                     <div class="setting-select" id="setting-language" data-value="en">
                       <button class="setting-select-btn" type="button">
                         <span class="setting-select-text">English</span>
@@ -1394,11 +1213,357 @@ HTML document — it omits the surrounding
                     </div>
                   </div>
                 </div>
+                <!-- Theme -->
+                <div class="setting-group">
+                  <label data-i18n="settings_theme">Theme:</label>
+                  <div class="radio-group">
+                    <label
+                      ><input type="radio" name="theme" value="system" checked />
+                      <span data-i18n="settings_theme_system">System</span></label
+                    >
+                    <label
+                      ><input type="radio" name="theme" value="light" />
+                      <span data-i18n="settings_theme_light">Light</span></label
+                    >
+                    <label
+                      ><input type="radio" name="theme" value="dark" />
+                      <span data-i18n="settings_theme_dark">Dark</span></label
+                    >
+                  </div>
+                </div>
+                <!-- Layout Density -->
+                <div class="setting-group">
+                  <label data-i18n="settings_density">Layout Density:</label>
+                  <div class="radio-group">
+                    <label
+                      ><input type="radio" name="layout-density" value="compact" />
+                      <span data-i18n="settings_density_compact">Compact</span></label
+                    >
+                    <label
+                      ><input type="radio" name="layout-density" value="standard" checked />
+                      <span data-i18n="settings_density_standard">Standard</span></label
+                    >
+                    <label
+                      ><input type="radio" name="layout-density" value="comfortable" />
+                      <span data-i18n="settings_density_comfortable">Comfortable</span></label
+                    >
+                  </div>
+                </div>
+                <!-- Default Group By -->
+                <div class="setting-group">
+                  <label data-i18n="settings_default_group">Default Group By:</label>
+                  <div class="setting-select" id="setting-default-group" data-value="none">
+                    <button class="setting-select-btn" type="button">
+                      <span class="setting-select-text">None</span>
+                      <svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="2"
+                      >
+                        <polyline points="6 9 12 15 18 9" />
+                      </svg>
+                    </button>
+                    <div class="setting-select-dropdown hidden">
+                      <div
+                        class="setting-select-option active"
+                        data-value="none"
+                        data-i18n="filter_none"
+                      >
+                        None
+                      </div>
+                      <div
+                        class="setting-select-option"
+                        data-value="format"
+                        data-i18n="filter_format"
+                      >
+                        Format
+                      </div>
+                      <div class="setting-select-option" data-value="domain">
+                        <span data-i18n="filter_domain">Domain</span>
+                        <span class="pro-badge pro-badge-mini">PRO</span>
+                      </div>
+                      <div class="setting-select-option" data-value="size">
+                        <span data-i18n="filter_size">Size</span>
+                        <span class="pro-badge pro-badge-mini">PRO</span>
+                      </div>
+                      <div class="setting-select-option" data-value="tab">
+                        <span data-i18n="filter_tab">Tab</span>
+                        <span class="pro-badge pro-badge-mini">PRO</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <!-- Display in Side Panel -->
+                <div class="setting-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="setting-side-panel" checked />
+                    <span class="settings-checkbox"
+                      ><svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="3"
+                        class="check-icon"
+                      >
+                        <polyline points="20 6 9 17 4 12" /></svg
+                    ></span>
+                    <span data-i18n="settings_side_panel">Display in Side Panel</span>
+                  </label>
+                  <p class="setting-desc" data-i18n="settings_side_panel_desc">
+                    Open results in browser side panel instead of popup window
+                  </p>
+                </div>
+                <!-- Similar Detection (PRO) -->
+                <div class="setting-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="setting-similar-detection" />
+                    <span class="settings-checkbox"
+                      ><svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="3"
+                        class="check-icon"
+                      >
+                        <polyline points="20 6 9 17 4 12" /></svg
+                    ></span>
+                    <span data-i18n="settings_similar">Enable Similar Detection</span>
+                    <span class="pro-badge pro-badge-mini">PRO</span>
+                  </label>
+                  <p class="setting-desc" data-i18n="settings_similar_desc">
+                    Find and group visually similar or duplicate images
+                  </p>
+                </div>
+                <!-- Color Extraction (PRO) -->
+                <div class="setting-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="setting-color-extract" />
+                    <span class="settings-checkbox"
+                      ><svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="3"
+                        class="check-icon"
+                      >
+                        <polyline points="20 6 9 17 4 12" /></svg
+                    ></span>
+                    <span data-i18n="settings_color_extract">Enable Color Extraction</span>
+                    <span class="pro-badge pro-badge-mini">PRO</span>
+                  </label>
+                  <p class="setting-desc" data-i18n="settings_color_extract_desc">
+                    Extract dominant colors from each image for filtering
+                  </p>
+                </div>
+              </div>
+
+              <!-- Download Settings -->
+              <div class="settings-section">
+                <h3 data-i18n="settings_section_download">Download</h3>
+                <div class="setting-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="setting-download-options" />
+                    <span class="settings-checkbox"
+                      ><svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="3"
+                        class="check-icon"
+                      >
+                        <polyline points="20 6 9 17 4 12" /></svg
+                    ></span>
+                    <span data-i18n="settings_download_options">Specify Download Options</span>
+                  </label>
+                  <p class="setting-desc" data-i18n="settings_download_options_desc">
+                    Customize subfolder, filename template, and format conversion
+                  </p>
+                  <div class="setting-inputs hidden" id="download-options-inputs">
+                    <label
+                      ><span data-i18n="settings_subfolder">Subfolder Name:</span>
+                      <span class="pro-badge pro-badge-mini">PRO</span>
+                      <input type="text" id="setting-subfolder" value="{domain}"
+                    /></label>
+                    <label
+                      ><span data-i18n="settings_filename">File Name Template:</span>
+                      <span class="pro-badge pro-badge-mini">PRO</span>
+                      <input
+                        type="text"
+                        id="setting-filename"
+                        value="img_{index}_{original}.{format}"
+                    /></label>
+                    <p class="setting-hint" data-i18n="settings_variables_hint">
+                      Variables: {domain}, {index}, {original}, {format}, {width}, {height}
+                    </p>
+                    <div class="setting-format-row">
+                      <label
+                        ><span data-i18n="settings_convert_format">Convert Format:</span>
+                        <span class="pro-badge pro-badge-mini">PRO</span></label
+                      >
+                      <div class="setting-select" id="setting-convert-format" data-value="none">
+                        <button class="setting-select-btn" type="button">
+                          <span class="setting-select-text">None</span>
+                          <svg
+                            width="12"
+                            height="12"
+                            viewBox="0 0 24 24"
+                            fill="none"
+                            stroke="currentColor"
+                            stroke-width="2"
+                          >
+                            <polyline points="6 9 12 15 18 9" />
+                          </svg>
+                        </button>
+                        <div class="setting-select-dropdown hidden">
+                          <div
+                            class="setting-select-option active"
+                            data-value="none"
+                            data-i18n="filter_none"
+                          >
+                            None
+                          </div>
+                          <div class="setting-select-option" data-value="png">
+                            PNG <span class="pro-badge pro-badge-mini">PRO</span>
+                          </div>
+                          <div class="setting-select-option" data-value="jpg">
+                            JPG <span class="pro-badge pro-badge-mini">PRO</span>
+                          </div>
+                          <div class="setting-select-option" data-value="webp">
+                            WebP <span class="pro-badge pro-badge-mini">PRO</span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Scan Settings -->
+              <div class="settings-section">
+                <h3 data-i18n="settings_section_scan">Scan</h3>
+                <!-- Live Monitor (PRO, most commonly used) -->
+                <div class="setting-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="setting-live-monitor" checked />
+                    <span class="settings-checkbox"
+                      ><svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="3"
+                        class="check-icon"
+                      >
+                        <polyline points="20 6 9 17 4 12" /></svg
+                    ></span>
+                    <span data-i18n="settings_live_monitor">Enable Live Monitoring</span>
+                    <span class="pro-badge pro-badge-mini">PRO</span>
+                  </label>
+                  <p class="setting-desc" data-i18n="settings_live_monitor_desc">
+                    Automatically detect new images as the page content changes
+                  </p>
+                </div>
+                <!-- All Frames -->
+                <div class="setting-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="setting-all-frames" />
+                    <span class="settings-checkbox"
+                      ><svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="3"
+                        class="check-icon"
+                      >
+                        <polyline points="20 6 9 17 4 12" /></svg
+                    ></span>
+                    <span data-i18n="settings_all_frames">Search in All Frames</span>
+                  </label>
+                  <p class="setting-desc" data-i18n="settings_all_frames_desc">
+                    Also scan images inside iframes and embedded frames
+                  </p>
+                </div>
+                <div class="setting-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="setting-min-size" />
+                    <span class="settings-checkbox"
+                      ><svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="3"
+                        class="check-icon"
+                      >
+                        <polyline points="20 6 9 17 4 12" /></svg
+                    ></span>
+                    <span data-i18n="settings_min_size">Enable Min Size Filter</span>
+                  </label>
+                  <p class="setting-desc" data-i18n="settings_min_size_desc">
+                    Hide images smaller than the specified dimensions
+                  </p>
+                  <div class="setting-inputs hidden" id="min-size-inputs">
+                    <label
+                      ><span data-i18n="settings_width_gte">Width ≥</span>
+                      <input type="number" id="setting-min-width" value="50" min="1" /> px</label
+                    >
+                    <label
+                      ><span data-i18n="settings_height_gte">Height ≥</span>
+                      <input type="number" id="setting-min-height" value="50" min="1" /> px</label
+                    >
+                  </div>
+                </div>
+                <div class="setting-group">
+                  <label class="checkbox-label">
+                    <input type="checkbox" id="setting-max-size" />
+                    <span class="settings-checkbox"
+                      ><svg
+                        width="12"
+                        height="12"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-width="3"
+                        class="check-icon"
+                      >
+                        <polyline points="20 6 9 17 4 12" /></svg
+                    ></span>
+                    <span data-i18n="settings_max_size">Enable Max Size Filter</span>
+                  </label>
+                  <p class="setting-desc" data-i18n="settings_max_size_desc">
+                    Hide images larger than the specified dimensions
+                  </p>
+                  <div class="setting-inputs hidden" id="max-size-inputs">
+                    <label
+                      ><span data-i18n="settings_width_lte">Width ≤</span>
+                      <input type="number" id="setting-max-width" value="4000" min="1" /> px</label
+                    >
+                    <label
+                      ><span data-i18n="settings_height_lte">Height ≤</span>
+                      <input type="number" id="setting-max-height" value="4000" min="1" /> px</label
+                    >
+                  </div>
+                </div>
               </div>
 
               <!-- Experience Settings -->
               <div class="settings-section">
-                <h3>Experience</h3>
+                <h3 data-i18n="settings_section_experience">Experience</h3>
                 <div class="setting-group">
                   <label class="checkbox-label">
                     <input type="checkbox" id="setting-no-warning" />
@@ -1414,9 +1579,9 @@ HTML document — it omits the surrounding
                       >
                         <polyline points="20 6 9 17 4 12" /></svg
                     ></span>
-                    <span>Do Not Show Many Files Warning</span>
+                    <span data-i18n="settings_no_warning">Do Not Show Many Files Warning</span>
                   </label>
-                  <p class="setting-desc">
+                  <p class="setting-desc" data-i18n="settings_no_warning_desc">
                     Skip the confirmation dialog when downloading many files
                   </p>
                 </div>
@@ -1435,24 +1600,28 @@ HTML document — it omits the surrounding
                       >
                         <polyline points="20 6 9 17 4 12" /></svg
                     ></span>
-                    <span>Help Improve (Anonymous Usage Data)</span>
+                    <span data-i18n="settings_telemetry">Help Improve (Anonymous Usage Data)</span>
                   </label>
-                  <p class="setting-desc">
+                  <p class="setting-desc" data-i18n="settings_telemetry_desc">
                     Send anonymous feature-usage events. No URLs, no images, no personal info.
                     Off-by-default; you can change this anytime.
                   </p>
                 </div>
                 <div class="setting-group">
-                  <div class="hotkey-row" id="hotkey-link" title="Click to change shortcut">
-                    <label>Hotkey:</label>
+                  <div class="hotkey-row" id="hotkey-link">
+                    <label data-i18n="settings_hotkey">Hotkey:</label>
                     <span class="hotkey-keys" id="hotkey-keys"></span>
                   </div>
                 </div>
               </div>
             </div>
             <div class="modal-footer">
-              <button id="btn-reset-defaults" class="btn btn-secondary">Reset to Defaults</button>
-              <button id="btn-save-settings" class="btn btn-primary">Save & Apply</button>
+              <button id="btn-reset-defaults" class="btn btn-secondary" data-i18n="settings_reset">
+                Reset to Defaults
+              </button>
+              <button id="btn-save-settings" class="btn btn-primary" data-i18n="settings_save">
+                Save & Apply
+              </button>
             </div>
           </div>
         </div>
@@ -1544,7 +1713,8 @@ HTML document — it omits the surrounding
                   <rect x="14" y="14" width="8" height="8" rx="1" />
                   <path d="M12 2v8M2 12h8M14 12h8M12 14v8" />
                 </svg>
-                Similar Images <span class="pro-badge">PRO</span>
+                <span data-i18n="dedup_modal_title">Similar Images</span>
+                <span class="pro-badge">PRO</span>
               </h2>
               <button id="btn-dedup-close" class="icon-btn">
                 <svg
@@ -1714,16 +1884,16 @@ HTML document — it omits the surrounding
 
         <!-- Reverse Search Menu -->
         <div id="reverse-search-menu" class="context-menu hidden">
-          <div class="context-menu-header">Reverse Search</div>
+          <div class="context-menu-header" data-i18n="menu_reverse_search">Reverse Search</div>
           <div class="context-menu-item" data-engine="google">Google Images</div>
-          <div class="context-menu-item" data-engine="yandex">
-            Yandex <span class="pro-badge pro-badge-mini">PRO</span>
-          </div>
           <!-- Sprint 3.5: TinEye is now free (FREE_LIMITS.REVERSE_SEARCH_ENGINES
                includes 'tineye'). Keeping it ungated lifts our reverse-search
                coverage from 1 to 2 free engines without weakening the Pro
                value prop, since Pro still owns Baidu + Yandex. -->
           <div class="context-menu-item" data-engine="tineye">TinEye</div>
+          <div class="context-menu-item" data-engine="yandex">
+            Yandex <span class="pro-badge pro-badge-mini">PRO</span>
+          </div>
           <div class="context-menu-item" data-engine="baidu">
             Baidu <span class="pro-badge pro-badge-mini">PRO</span>
           </div>

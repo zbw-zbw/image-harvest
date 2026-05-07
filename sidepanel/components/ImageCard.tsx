@@ -223,10 +223,10 @@ export function ImageCard({ img, index }: Props) {
       return;
     }
     const confirmed = await showConfirmDialog({
-      title: 'Remove Image',
-      message: 'Are you sure you want to remove this image from the list?',
-      confirmText: 'Remove',
-      cancelText: 'Cancel',
+      title: t('confirm_remove_image_title'),
+      message: t('confirm_remove_image_message'),
+      confirmText: t('common_remove'),
+      cancelText: t('common_cancel'),
       type: 'danger',
     });
     if (!confirmed) return;
@@ -252,6 +252,12 @@ export function ImageCard({ img, index }: Props) {
     }
     copyColor(color);
   };
+
+  // When not scanning (e.g. restoring from cache on tab switch), skip the
+  // skeleton → image load animation by pre-setting the "loaded" class.
+  const isNotScanning = useStoreSelector(
+    (s) => !s.isScanning && s.scanSkeletonsToShow === 0
+  );
 
   // Image load handlers — keep the legacy `.loaded` class flow so existing
   // CSS transitions (fade-in, broken-image fallback) still work.
@@ -288,8 +294,18 @@ export function ImageCard({ img, index }: Props) {
           <span class="checkbox-icon">{isSelected && <IconCheck />}</span>
         </label>
       </div>
-      <div ref={thumbRef as preact.RefObject<HTMLDivElement>} class="card-thumb checkerboard">
-        <img src={img.url} alt="" loading="lazy" onLoad={handleImgLoad} onError={handleImgError} />
+      <div
+        ref={thumbRef as preact.RefObject<HTMLDivElement>}
+        class={`card-thumb checkerboard${isNotScanning ? ' loaded' : ''}`}
+      >
+        <img
+          src={img.url}
+          alt=""
+          loading="lazy"
+          class={isNotScanning ? 'loaded' : undefined}
+          onLoad={handleImgLoad}
+          onError={handleImgError}
+        />
       </div>
       {colorExtractionEnabled && <ColorBar colors={colors} onSwatchClick={handleColorClick} />}
       <div class="card-info-bar">
@@ -301,7 +317,7 @@ export function ImageCard({ img, index }: Props) {
         <div class="card-actions">
           <button
             class="card-action-btn btn-search"
-            title="Reverse search"
+            title={t('card_reverse_search')}
             data-url={img.url}
             onClick={handleSearch}
           >
@@ -309,7 +325,7 @@ export function ImageCard({ img, index }: Props) {
           </button>
           <button
             class="card-action-btn btn-dl"
-            title="Download"
+            title={t('common_download')}
             data-id={img.id}
             onClick={handleDownload}
           >
@@ -318,7 +334,7 @@ export function ImageCard({ img, index }: Props) {
           <span class="icon-btn-wrapper">
             <button
               class={`card-action-btn btn-favorite${isFavorited ? ' favorited' : ''}`}
-              title={isFavorited ? 'Remove from collection' : 'Add to collection'}
+              title={isFavorited ? t('card_remove_from_collection') : t('card_add_to_collection')}
               data-id={img.id}
               onClick={handleFavorite}
             >
@@ -329,7 +345,7 @@ export function ImageCard({ img, index }: Props) {
           <span class="icon-btn-wrapper">
             <button
               class="card-action-btn btn-delete"
-              title="Remove image"
+              title={t('card_remove_image')}
               data-id={img.id}
               onClick={handleDelete}
             >
@@ -346,7 +362,7 @@ export function ImageCard({ img, index }: Props) {
         <div class="card-url-actions">
           <button
             class="card-action-btn btn-copy-url"
-            title="Copy URL"
+            title={t('card_copy_url')}
             data-url={img.url}
             onClick={handleCopyUrl}
           >
@@ -354,7 +370,7 @@ export function ImageCard({ img, index }: Props) {
           </button>
           <button
             class="card-action-btn btn-open"
-            title="Open in new tab"
+            title={t('card_open_in_new_tab')}
             data-url={img.url}
             onClick={handleOpen}
           >
@@ -377,11 +393,15 @@ interface ColorBarProps {
 
 function ColorBar({ colors, onSwatchClick }: ColorBarProps) {
   if (colors.length === 0) {
-    // "Transparent" bar: just a flat strip; no swatches, no click target.
-    return <div class="card-color-bar-row card-color-bar-empty" />;
+    // Transparent checkerboard strip — matches .card-color-bar-transparent in cards.css
+    return (
+      <div class="card-colors">
+        <span class="card-color-bar card-color-bar-transparent" style="flex:1" />
+      </div>
+    );
   }
   return (
-    <div class="card-color-bar-row">
+    <div class="card-colors">
       {colors.map((color) => (
         <span
           key={color}
@@ -389,7 +409,7 @@ function ColorBar({ colors, onSwatchClick }: ColorBarProps) {
           data-color={color}
           style={`background-color:${color}`}
           onClick={onSwatchClick(color)}
-          title={color}
+          title={t('title_click_copy_color', { color })}
         />
       ))}
     </div>

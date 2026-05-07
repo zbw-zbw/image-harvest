@@ -69,13 +69,13 @@ describe('ImageGrid – flat mode (groupMode=none)', () => {
   });
 
   it('virtualizes above the threshold in list view', () => {
-    state.filteredImages = makeImages(60);
+    state.filteredImages = makeImages(501);
     state.currentGroupMode = 'none';
     state.currentViewMode = 'list';
     const { container } = render(<ImageGrid />);
     expect(container.querySelector('[data-testid=virtualizer]')).toBeInTheDocument();
     // All cards still rendered through the (stubbed) Virtualizer
-    expect(container.querySelectorAll('.mock-image-card').length).toBe(60);
+    expect(container.querySelectorAll('.mock-image-card').length).toBe(501);
   });
 
   it('does NOT virtualize in grid view even with many cards', () => {

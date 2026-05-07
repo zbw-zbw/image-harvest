@@ -16,6 +16,7 @@
 // existing event bindings in init.ts continue to work unchanged.
 import { useStoreSelector } from './storeHook';
 import { state } from '../state';
+import { t } from '../../shared/i18n';
 
 /**
  * Plan + expiry payload pushed by settings.ts after a license check.
@@ -27,10 +28,10 @@ export interface ProLicenseInfo {
   expiresAt?: number;
 }
 
-const PLAN_LABELS: Record<string, string> = {
-  monthly: 'Monthly',
-  yearly: 'Yearly',
-  lifetime: 'Lifetime',
+const PLAN_LABELS: Record<string, () => string> = {
+  monthly: () => t('plan_monthly'),
+  yearly: () => t('plan_yearly'),
+  lifetime: () => t('plan_lifetime'),
 };
 
 function formatDateYMD(timestamp: number): string {
@@ -54,17 +55,17 @@ export function setProLicenseInfo(info: ProLicenseInfo | null): void {
 export function ProStatusBadge() {
   const isPro = useStoreSelector((s) => s.isProUser);
   const info = useStoreSelector((s) => s.proLicenseInfo);
-  const planLabel = info?.plan ? PLAN_LABELS[info.plan] || info.plan : '';
+  // Subscribe to localeTick so a runtime language switch triggers re-render
+  useStoreSelector((s) => s.localeTick);
+  const planLabel = info?.plan ? (PLAN_LABELS[info.plan]?.() || info.plan) : '';
   let expiryLabel = '';
-  if (info?.plan === 'lifetime') {
-    expiryLabel = 'Never expires';
-  } else if (info?.expiresAt) {
-    expiryLabel = `Expires: ${formatDateYMD(info.expiresAt)}`;
+  if (info?.plan !== 'lifetime' && info?.expiresAt) {
+    expiryLabel = t('plan_expires_date', { date: formatDateYMD(info.expiresAt) });
   }
   return (
     <div id="pro-status-area" class="pro-status-area">
       <div id="pro-status-free" class={`pro-status-free${isPro ? ' hidden' : ''}`}>
-        <button id="btn-upgrade-pro" class="btn-upgrade-pro" title="Upgrade to Pro">
+        <button id="btn-upgrade-pro" class="btn-upgrade-pro" title={t('common_upgrade')}>
           <span class="icon-rocket">
             <svg
               width="14"
@@ -80,7 +81,7 @@ export function ProStatusBadge() {
               <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
             </svg>
           </span>
-          <span>Upgrade to Pro</span>
+          <span>{t('common_upgrade')}</span>
         </button>
       </div>
       <div id="pro-status-active" class={`pro-status-active${isPro ? '' : ' hidden'}`}>
@@ -95,7 +96,7 @@ export function ProStatusBadge() {
           >
             <polyline points="20 6 9 17 4 12" />
           </svg>
-          Pro Active
+          {t('pro_active_badge')}
         </span>
         {planLabel && (
           <span id="pro-plan-label" class="pro-plan-label">
@@ -107,8 +108,10 @@ export function ProStatusBadge() {
             {expiryLabel}
           </span>
         )}
-        <button id="btn-top-deactivate" class="btn-top-deactivate" title="Deactivate license">
-          Deactivate
+        <button id="btn-top-deactivate" class="btn-deactivate-inline" title={t('pro_deactivate_tooltip')} aria-label={t('pro_deactivate_tooltip')}>
+          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M18 6L6 18M6 6l12 12" />
+          </svg>
         </button>
       </div>
     </div>

@@ -4,6 +4,7 @@
 // pro-features.ts > showCollectionModal continue to work.
 import { useStoreSelector } from './storeHook';
 import { state } from '../state';
+import { t } from '../../shared/i18n';
 
 function close(): void {
   state.collectionModalState = { open: false };
@@ -28,10 +29,10 @@ export function CollectionModal() {
             >
               <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
             </svg>
-            Collection <span class="pro-badge">PRO</span>
+            {t('collection_modal_title')} <span class="pro-badge">PRO</span>
           </h2>
           <div class="modal-header-actions">
-            <button id="btn-collection-back" class="icon-btn" title="Close" onClick={close}>
+            <button id="btn-collection-back" class="icon-btn" title={t('common_close')} onClick={close}>
               <svg
                 width="20"
                 height="20"
@@ -49,10 +50,10 @@ export function CollectionModal() {
           <input
             type="text"
             id="collection-search"
-            placeholder="Search collection..."
+            placeholder={t('collection_search_placeholder')}
             class="collection-search-input"
           />
-          <button id="btn-collection-export" class="icon-btn" title="Export collection as ZIP">
+          <button id="btn-collection-export" class="icon-btn" title={t('collection_export_tooltip')}>
             <svg
               width="18"
               height="18"

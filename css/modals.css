@@ -42,33 +42,9 @@
    .dedup-btn / .rescan-btn rules defined later in this file. */
 
 @container statusbar (max-width: 600px) {
-  .status-left {
-    gap: 6px;
-  }
-
-  .status-bar .rescan-btn {
+  .status-bar .status-action-btn {
     padding: 4px 6px;
     font-size: 11px;
-  }
-
-  .found-info {
-    font-size: 11px;
-  }
-
-  .status-bar .dedup-btn {
-    padding: 3px 6px;
-    font-size: 10px;
-  }
-
-  .status-bar .dedup-btn svg {
-    width: 10px;
-    height: 10px;
-  }
-
-  .status-bar .dedup-btn .pro-badge {
-    font-size: 8px;
-    padding: 1px 4px;
-    margin-left: 3px;
   }
 
   .status-bar .btn-small {
@@ -82,29 +58,8 @@
 }
 
 @container statusbar (max-width: 520px) {
-  .status-bar .rescan-btn .rescan-text {
+  .status-bar .status-action-btn .btn-label {
     display: none;
-  }
-
-  .status-bar .rescan-btn svg {
-    width: 12px;
-    height: 12px;
-  }
-
-  .status-bar .dedup-btn {
-    padding: 3px 6px;
-    font-size: 10px;
-    gap: 3px;
-  }
-
-  .status-bar .dedup-btn svg {
-    display: none;
-  }
-
-  .status-bar .dedup-btn .pro-badge {
-    font-size: 8px;
-    padding: 1px 4px;
-    margin-left: 2px;
   }
 
   .status-bar .btn-small {
@@ -118,37 +73,6 @@
 }
 
 @container statusbar (max-width: 440px) {
-  .status-left {
-    gap: 4px;
-  }
-
-  .found-info {
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .status-bar .dedup-btn {
-    padding: 2px 5px;
-    font-size: 9px;
-    gap: 2px;
-  }
-
-  .status-bar .dedup-btn .pro-badge {
-    font-size: 7px;
-    padding: 0px 3px;
-    margin-left: 1px;
-    letter-spacing: 0;
-  }
-
-  .status-bar .rescan-btn {
-    padding: 3px 5px;
-  }
-
-  .status-bar .rescan-btn svg {
-    width: 10px;
-    height: 10px;
-  }
-
   .status-bar #btn-download svg {
     display: none;
   }
@@ -350,6 +274,7 @@
   align-items: center;
   gap: 10px;
   flex-wrap: nowrap;
+  padding-left: 10px;
 }
 
 /* Settings modal body as container query target for responsive layout */
@@ -444,18 +369,10 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  cursor: pointer;
-  padding: 6px 0;
-  border-radius: var(--radius-sm);
-  transition: opacity 0.15s;
-}
-
-.hotkey-row:hover {
-  opacity: 0.75;
+  padding: 6px 10px;
 }
 
 .hotkey-row label {
-  cursor: pointer;
   margin: 0;
   font-size: 13px;
 }
@@ -484,10 +401,24 @@
   line-height: 1;
 }
 
-.hotkey-keys .hotkey-not-set {
+.hotkey-set-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
   font-size: 11px;
-  color: var(--text-tertiary);
-  font-style: italic;
+  color: var(--primary-color);
+  background: transparent;
+  border: 1px solid var(--primary-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+}
+
+.hotkey-set-btn:hover {
+  background: var(--primary-color);
+  color: white;
 }
 
 .template-vars {
@@ -686,16 +617,18 @@
 }
 
 .dedup-group-images {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(72px, 1fr));
   gap: 8px;
-  overflow-x: auto;
   padding: 4px 2px;
+  max-height: 240px;
+  overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: var(--border-color) transparent;
 }
 
 .dedup-group-images::-webkit-scrollbar {
-  height: 4px;
+  width: 4px;
 }
 
 .dedup-group-images::-webkit-scrollbar-track {
@@ -708,7 +641,6 @@
 }
 
 .dedup-image {
-  flex-shrink: 0;
   position: relative;
   cursor: pointer;
   user-select: none;
@@ -726,8 +658,7 @@
 }
 
 .dedup-image-thumb {
-  width: 80px;
-  height: 80px;
+  aspect-ratio: 1;
   overflow: hidden;
   display: flex;
   align-items: center;
@@ -766,13 +697,6 @@
   background-position: center;
   background-size: 10px;
   z-index: 1;
-}
-
-.dedup-hint {
-  font-size: 11px;
-  color: var(--text-tertiary);
-  text-align: center;
-  padding: 4px 0 0;
 }
 
 /* Multitab Modal */
@@ -934,10 +858,11 @@
 
 /* Color Filter Swatches */
 .color-swatches {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(22px, 1fr));
   gap: 6px;
   padding: 8px 12px;
+  justify-items: center;
 }
 
 .color-swatch {

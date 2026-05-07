@@ -70,6 +70,7 @@ function installChromeStub(tabs: TabFixture[]): ChromeStub {
           title: t.title,
           url: t.restricted ? 'chrome://settings' : t.url,
           index: t.index ?? 0,
+          status: 'complete',
         };
       }),
       sendMessage,
@@ -173,11 +174,12 @@ describe('processMultiTabExtract — broadcast contract', () => {
     // imageCount as the previous successful tab — proves the loop
     // continued past the throw without resetting state.
     expect(captured[1]).toMatchObject({ completed: 2, total: 3, imageCount: 1 });
-    // The current tab title for the failure case falls back to 'Tab N'
-    // because tabTitle is only assigned AFTER extractFromSingleTab
-    // resolves — when it throws the catch block leaves tabTitle at
-    // its pre-loop default.
-    expect(captured[1].current).toBe('Tab 2');
+    // With status:'complete' present, extractFromSingleTab no longer
+    // throws at the waitForTabComplete gate — it proceeds, retrieves
+    // the tab title from chrome.tabs.get, and returns { images: [],
+    // tabTitle } on downstream failure. So the broadcast carries the
+    // actual tab title rather than the fallback 'Tab N'.
+    expect(captured[1].current).toBe('Bad');
   });
 
   it('skips restricted-URL tabs silently (zero images, broadcast still fires)', async () => {

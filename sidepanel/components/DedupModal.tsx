@@ -7,6 +7,7 @@
 // keep using `elements.dedupBody.innerHTML = ...` unchanged.
 import { useStoreSelector } from './storeHook';
 import { state } from '../state';
+import { t } from '../../shared/i18n';
 
 function close(): void {
   state.dedupModalState = { open: false };
@@ -35,7 +36,7 @@ export function DedupModal() {
               <rect x="14" y="14" width="8" height="8" rx="1" />
               <path d="M12 2v8M2 12h8M14 12h8M12 14v8" />
             </svg>
-            Similar Images <span class="pro-badge">PRO</span>
+            {t('dedup_modal_title')} <span class="pro-badge">PRO</span>
           </h2>
           <button id="btn-dedup-close" class="icon-btn" onClick={close}>
             <svg
@@ -56,12 +57,12 @@ export function DedupModal() {
         </div>
         <div class="modal-footer">
           <button id="btn-cancel-dedup" class="btn btn-secondary" onClick={close}>
-            Cancel
+            {t('common_cancel')}
           </button>
           {/* btn-remove-duplicates click handler is bound in init.ts > bindEvents.
               Keeping the same id ensures the existing binding still hits this node. */}
           <button id="btn-remove-duplicates" class="btn btn-primary">
-            Remove Duplicates <span class="pro-badge pro-badge-mini">PRO</span>
+            {t('dedup_remove_duplicates')} <span class="pro-badge pro-badge-mini">PRO</span>
           </button>
         </div>
       </div>

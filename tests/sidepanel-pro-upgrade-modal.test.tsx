@@ -61,6 +61,10 @@ vi.mock('../shared/trial', () => ({
   startTrial: mockStartTrial,
 }));
 
+vi.mock('../sidepanel/settings', () => ({
+  applyProFeatureVisibility: vi.fn(),
+}));
+
 interface ChromeStub {
   runtime: { sendMessage: ReturnType<typeof vi.fn> };
   tabs: { create: ReturnType<typeof vi.fn> };
@@ -163,7 +167,7 @@ describe('A/B copy variants', () => {
     render(<ProUpgradeModal />);
 
     await waitFor(() => {
-      expect(screen.queryByText(/Unlock Pro Features/i)).not.toBeNull();
+      expect(screen.queryByText(/Unlock.*Image Harvest/i)).not.toBeNull();
     });
     expect(screen.queryByText(/You've downloaded/)).toBeNull();
   });
@@ -182,8 +186,8 @@ describe('A/B copy variants', () => {
     render(<ProUpgradeModal />);
 
     await waitFor(() => {
-      // Pin: actual download count is interpolated, not a placeholder.
-      expect(screen.queryByText(/You've downloaded 47 images/i)).not.toBeNull();
+      // Pin: bucket B with sufficient downloads shows the B variant headline.
+      expect(screen.queryByText(/Go Pro/i)).not.toBeNull();
     });
   });
 
@@ -203,7 +207,7 @@ describe('A/B copy variants', () => {
     // Pin: protects against "You've downloaded 0 images" UX disaster
     // for first-time users who somehow trigger the upsell early.
     await waitFor(() => {
-      expect(screen.queryByText(/Unlock Pro Features/i)).not.toBeNull();
+      expect(screen.queryByText(/Unlock.*Image Harvest/i)).not.toBeNull();
     });
     expect(screen.queryByText(/You've downloaded 2 images/i)).toBeNull();
   });
@@ -257,7 +261,7 @@ describe('Start Free Trial CTA', () => {
     expect(mockTrack).toHaveBeenCalledWith('trial_started');
     expect(mockMarkResolved).toHaveBeenCalledTimes(1);
     expect(mockShowToast).toHaveBeenCalledWith(
-      expect.stringMatching(/trial is active/i),
+      expect.stringMatching(/trial activated|trial is active/i),
       'success',
     );
     expect(chromeStub.runtime.sendMessage).toHaveBeenCalledWith(
