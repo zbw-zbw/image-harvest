@@ -60,6 +60,12 @@
 
 ## 📖 项目文档
 
+- 🏗️ **[架构文档](./docs/ARCHITECTURE.zh-CN.md)** —— 运行时模型、IPC 协议、状态机、性能预算（[English](./docs/ARCHITECTURE.md)）
+- 🔒 **[安全策略](./SECURITY.zh-CN.md)** —— 漏洞披露流程、信任边界、权限说明（[English](./SECURITY.md)）
+- 🛡️ **[隐私政策](./docs/PRIVACY.zh-CN.md)** —— 数据处理、遥测细节、用户控制（[English](./docs/PRIVACY.md)）
+- 🤝 **[参与贡献](./CONTRIBUTING.zh-CN.md)** —— 开发环境搭建、编码规范、PR 流程（[English](./CONTRIBUTING.md)）
+- 📜 **[行为准则](./CODE_OF_CONDUCT.zh-CN.md)** —— 社区行为规范（[English](./CODE_OF_CONDUCT.md)）
+- 📋 **[更新日志](./CHANGELOG.md)** —— 发版记录
 - 🛒 **[Chrome 商店素材](./docs/chrome-store/)** —— 商店上架描述与简介文案（开源）
 - 🌐 **官方网站** —— [image-harvest.kyriewen.cn](https://image-harvest.kyriewen.cn)
 

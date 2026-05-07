@@ -60,6 +60,12 @@
 
 ## 📖 Documentation
 
+- 🏗️ **[Architecture](./docs/ARCHITECTURE.md)** — Runtime model, IPC protocol, state machines, performance budgets ([中文](./docs/ARCHITECTURE.zh-CN.md))
+- 🔒 **[Security Policy](./SECURITY.md)** — Vulnerability reporting, trust boundaries, permission justifications ([中文](./SECURITY.zh-CN.md))
+- 🛡️ **[Privacy Policy](./docs/PRIVACY.md)** — Data handling, telemetry details, user controls ([中文](./docs/PRIVACY.zh-CN.md))
+- 🤝 **[Contributing](./CONTRIBUTING.md)** — Dev setup, coding standards, PR process ([中文](./CONTRIBUTING.zh-CN.md))
+- 📜 **[Code of Conduct](./CODE_OF_CONDUCT.md)** — Community guidelines ([中文](./CODE_OF_CONDUCT.zh-CN.md))
+- 📋 **[Changelog](./CHANGELOG.md)** — Release history
 - 🛒 **[Chrome Store Assets](./docs/chrome-store/)** — Listing description & summary (public)
 - 🌐 **Website** — [image-harvest.kyriewen.cn](https://image-harvest.kyriewen.cn)
 
