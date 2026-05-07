@@ -161,12 +161,12 @@ describe('loadCollection', () => {
     expect(collectionMod.collectionGetAll).not.toHaveBeenCalled();
   });
 
-  it('empty collection → renders "No images in collection yet" empty state', async () => {
+  it('empty collection → renders empty state with collection_empty_title', async () => {
     const collectionMod = await import('../shared/collection');
     vi.mocked(collectionMod.collectionGetAll).mockResolvedValueOnce([]);
     await loadCollection();
     const body = document.getElementById('collection-body')!;
-    expect(body.innerHTML).toContain('No images in collection yet');
+    expect(body.innerHTML).toContain('Your collection is empty');
     expect(body.innerHTML).toContain('collection-empty');
   });
 
@@ -176,7 +176,7 @@ describe('loadCollection', () => {
     await loadCollection('no-match');
     const body = document.getElementById('collection-body')!;
     expect(body.innerHTML).toContain('No matching images found');
-    expect(body.innerHTML).toContain('Try a different search term');
+    expect(body.innerHTML).toContain('Try a different search keyword');
   });
 
   it('search filter: url/sourceTitle/sourceUrl/tags all participate', async () => {

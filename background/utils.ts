@@ -33,7 +33,8 @@ export async function getAccessibleTabId(explicitTabId?: number | null): Promise
 export function sendMessageToTabWithTimeout<T = unknown>(
   tabId: number,
   message: unknown,
-  timeoutMs: number = 30000
+  timeoutMs: number = 30000,
+  options?: chrome.tabs.MessageSendOptions
 ): Promise<T> {
   return new Promise((resolve, reject) => {
     const timer = setTimeout(() => {
@@ -41,7 +42,7 @@ export function sendMessageToTabWithTimeout<T = unknown>(
     }, timeoutMs);
 
     chrome.tabs
-      .sendMessage(tabId, message)
+      .sendMessage(tabId, message, options ?? {})
       .then((response) => {
         clearTimeout(timer);
         resolve(response as T);

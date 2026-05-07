@@ -391,15 +391,20 @@
 
 .pro-upgrade-cta-section {
   margin-top: 18px;
-  padding: 14px 14px 12px;
-  border-radius: var(--radius-md);
-  background: color-mix(in srgb, var(--primary-color) 8%, var(--bg-secondary));
-  border: 1px solid color-mix(in srgb, var(--primary-color) 25%, var(--border-color));
+  padding: 16px;
+  border-radius: var(--radius-lg, 10px);
+  background: color-mix(in srgb, var(--primary-color) 6%, var(--bg-secondary));
+  border: 1px solid color-mix(in srgb, var(--primary-color) 20%, var(--border-color));
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-  width: fit-content;
+  gap: 12px;
+  width: 100%;
+}
+
+.pro-upgrade-trial-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .pro-upgrade-trial-badge {
@@ -417,24 +422,56 @@
   letter-spacing: 0.01em;
 }
 
-.pro-upgrade-cta-row {
+.pro-upgrade-trial-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin: 0;
+  line-height: 1.5;
+}
+
+.pro-upgrade-trial-perks {
+  list-style: none;
+  padding: 0;
+  margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
-.pro-upgrade-cta-row .btn {
+.pro-upgrade-trial-perks li {
+  font-size: 12px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pro-upgrade-trial-perks li::before {
+  content: '✓';
+  color: var(--primary-color);
+  font-weight: 700;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.pro-upgrade-cta-row {
+  display: flex;
+  flex-direction: row;
+  gap: 12px;
+  width: auto;
   justify-content: center;
+}
+
+.pro-upgrade-cta-row .btn-cta {
+  flex: 0 1 auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   font-size: 13px;
   font-weight: 600;
-}
-
-.pro-upgrade-cta-row .btn-primary {
-  padding: 10px 14px;
-}
-
-.pro-upgrade-cta-row .btn-secondary {
-  padding: 8px 14px;
+  padding: 9px 20px;
+  border-radius: var(--radius-md);
+  white-space: nowrap;
 }
 
 /* Block-level button utility used by the CTA row and any future
@@ -481,11 +518,27 @@
 /* Removed the h4 "Pro Features" heading from the markup; kept the styles
    above intact for backwards-compat in case any other modal reuses them. */
 
+/* "Don't have a key? Get Pro" hint below the license input — positioned
+   directly under the input row to follow natural form flow. */
+.pro-upgrade-get-pro-hint {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--text-tertiary);
+}
+
+.pro-upgrade-get-pro-hint .license-link {
+  font-size: 12px;
+}
+
 /* Narrow viewport: keep the badge label readable when the panel is at
    minimum width, and avoid the trial badge wrapping awkwardly. */
 @media (max-width: 380px) {
   .pro-upgrade-trial-badge {
     font-size: 10.5px;
     padding: 3px 8px;
+  }
+
+  .pro-upgrade-cta-row {
+    flex-direction: column;
   }
 }

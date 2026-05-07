@@ -50,6 +50,7 @@ vi.mock('../sidepanel/components/mount', () => ({
 }));
 
 vi.mock('../sidepanel/message', () => ({
+  cancelDiscoveredToast: vi.fn(),
   handleKeyDown: vi.fn(),
   handleMessage: vi.fn(),
 }));
@@ -71,6 +72,7 @@ vi.mock('../sidepanel/render', () => ({
 vi.mock('../sidepanel/scan', () => ({
   fetchImages: vi.fn().mockResolvedValue(undefined),
   handleScanCancel: vi.fn(),
+  processImageExtras: vi.fn().mockResolvedValue(undefined),
 }));
 
 vi.mock('../sidepanel/settings', () => ({
@@ -97,6 +99,7 @@ vi.mock('../shared/storage', () => ({
 }));
 
 vi.mock('../sidepanel/ui', () => ({
+  applyTranslations: vi.fn(),
   handleProgressClose: vi.fn(),
   hideLoading: vi.fn(),
   hideRestricted: vi.fn(),

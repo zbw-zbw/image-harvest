@@ -36,10 +36,32 @@
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
 }
 
-/* Rescan button in status bar */
+/* Inline similar link inside "Found N images (X similar)" */
+.similar-inline {
+  color: var(--text-tertiary);
+}
+
+.similar-inline-link {
+  color: var(--primary-color);
+  cursor: pointer;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.similar-inline-link:hover {
+  text-decoration: underline;
+}
+
+.similar-inline-link.disabled {
+  color: var(--text-tertiary);
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Rescan button — base style shared by status-bar & toolbar inline variants */
 .rescan-btn {
   display: inline-flex;
   align-items: center;
@@ -65,6 +87,21 @@
   animation: spin 0.6s ease-in-out;
 }
 
+/* Inline rescan in toolbar row 2 — icon-only, no border, compact */
+.rescan-btn-inline {
+  border: none;
+  background: transparent;
+  padding: 4px;
+  border-radius: var(--radius-sm);
+  color: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+.rescan-btn-inline:hover {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+}
+
 .rescan-btn-lg {
   padding: 8px 20px;
   font-size: 13px;
@@ -74,13 +111,6 @@
 .rescan-btn-lg:hover {
   transform: translateY(-1px);
   box-shadow: var(--shadow-md);
-}
-
-/* Dedup info in status bar */
-.dedup-info {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
 }
 
 .download-group {
@@ -153,12 +183,15 @@
 
 .btn-secondary {
   background: var(--bg-secondary);
-  border-color: transparent;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  font-weight: 500;
 }
 
 .btn-secondary:hover {
   background: var(--bg-tertiary);
-  border-color: transparent;
+  border-color: var(--text-tertiary);
+  color: var(--text-primary);
 }
 
 .dropdown-menu {
@@ -194,11 +227,22 @@
 .dropdown-item {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 8px 12px;
   font-size: 12px;
   cursor: pointer;
   transition: background 0.2s;
+  gap: 8px;
+}
+
+/* Reserve fixed-width space for check mark on all items so PRO badge stays aligned */
+.dropdown-item::before {
+  content: '✓';
+  font-size: 11px;
+  width: 14px;
+  flex-shrink: 0;
+  text-align: center;
+  opacity: 0;
+  order: -1;
 }
 
 .dropdown-item:hover {
@@ -211,11 +255,8 @@
   font-weight: 600;
 }
 
-.dropdown-item.active::after {
-  content: '✓';
-  font-size: 11px;
-  margin-left: 12px;
-  flex-shrink: 0;
+.dropdown-item.active::before {
+  opacity: 1;
 }
 
 .dropdown-divider {
@@ -394,7 +435,6 @@
 .filter-option {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 7px 12px;
   font-size: 12px;
   color: var(--text-primary);
@@ -402,6 +442,18 @@
   border-radius: var(--radius-sm);
   transition: all 0.15s;
   user-select: none;
+  gap: 8px;
+}
+
+/* Reserve fixed-width space for check mark on all options so PRO badge stays aligned */
+.filter-option::before {
+  content: '✓';
+  font-size: 11px;
+  width: 14px;
+  flex-shrink: 0;
+  text-align: center;
+  opacity: 0;
+  order: -1;
 }
 
 .filter-option:hover {
@@ -415,11 +467,8 @@
   font-weight: 600;
 }
 
-.filter-option.active::after {
-  content: '✓';
-  font-size: 11px;
-  margin-left: 12px;
-  flex-shrink: 0;
+.filter-option.active::before {
+  opacity: 1;
 }
 
 /* Filter Divider */
@@ -626,25 +675,35 @@
 }
 
 /* ────────────────────────────────────────────────────────────────────
- * Batch URL Copy Button (Sprint 3.4)
- *
- * Inherits .select-all-btn for size + border + colors, then adds:
- *   - disabled state (greyed out + cursor not-allowed)
- *   - hover only when enabled
- *   - icon container shrinks gracefully on narrow viewports so the
- *     button still fits next to "Select all" at the 280px sidepanel
- *     min-width
- *
- * Day/night themes are inherited from CSS variables — no override
- * needed because we only reuse existing tokens (--bg-color,
- * --text-secondary, --primary-color).
+ * Status-bar action buttons (shared base for Copy URLs, Similar, etc.)
  * ────────────────────────────────────────────────────────────────── */
-.batch-url-copy-btn {
-  /* Tighter gap so the icon + label don't push out of the toolbar
-     row when the count badge ("Copy URLs (12)") is visible. */
-  gap: 4px;
+.status-action-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 5px 10px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-color);
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  box-sizing: border-box;
 }
 
+.status-action-btn:hover {
+  background: var(--bg-secondary);
+}
+
+/* ────────────────────────────────────────────────────────────────────
+ * Batch URL Copy Button (Sprint 3.4 → moved to status-bar)
+ *
+ * No outer checkbox frame — just icon + label, matching rescan-btn
+ * visual weight. Disabled state greys out + blocks interaction.
+ * ────────────────────────────────────────────────────────────────── */
 .batch-url-copy-btn:disabled,
 .batch-url-copy-btn[disabled] {
   opacity: 0.45;
@@ -652,22 +711,13 @@
   pointer-events: none;
 }
 
-.batch-url-copy-btn:not([disabled]):hover .select-all-checkbox {
-  /* Mirror .select-all-btn.partial visual feedback so users get the
-     same affordance for both selection-driven CTAs. */
-  background: var(--primary-color);
-  border-color: var(--primary-color);
-  color: white;
+.batch-url-copy-btn:not([disabled]):hover {
+  background: var(--bg-secondary);
 }
 
-.batch-url-copy-btn:not([disabled]):hover .select-all-checkbox svg {
-  color: white;
-}
-
-/* Below 320px (cramped sidepanel), drop the label and keep just the
-   icon. Container is still keyboard-focusable + tooltip-readable. */
+/* Below 320px (cramped sidepanel), drop the label and keep just the icon. */
 @media (max-width: 320px) {
-  .batch-url-copy-btn .select-all-text {
+  .batch-url-copy-btn .btn-label {
     display: none;
   }
 }

@@ -8,7 +8,7 @@
 // Preact's reconciliation.
 import { render, type ComponentType } from 'preact';
 import { LiveIndicator } from './LiveIndicator';
-import { DownloadLabel, FoundActionCount, SimilarCount } from './StatusCounts';
+import { DownloadLabel, FoundActionCount, SimilarInline } from './StatusCounts';
 import { StateScreens } from './StateScreens';
 import { ScanProgressOverlay } from './ScanProgressOverlay';
 import { DownloadProgressModal } from './DownloadProgressModal';
@@ -143,7 +143,7 @@ export function mountPreactComponents(): void {
   // Inline counters
   mountAt('live-indicator', LiveIndicator);
   mountAt('found-action-count', FoundActionCount);
-  mountAt('similar-count', SimilarCount);
+  mountAt('similar-inline-mount', SimilarInline);
   mountAt('download-label', DownloadLabel);
   // Block-level overlays / badges
   mountAt('scan-overlay', ScanProgressOverlay, 'div');

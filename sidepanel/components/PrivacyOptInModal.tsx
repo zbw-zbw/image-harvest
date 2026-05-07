@@ -17,6 +17,7 @@
 import { useStoreSelector } from './storeHook';
 import { state } from '../state';
 import { setOptIn } from '../../shared/telemetry';
+import { t } from '../../shared/i18n';
 
 const DECIDED_KEY = '_telemetry_opt_in_decided';
 
@@ -65,30 +66,26 @@ export function PrivacyOptInModal() {
             >
               <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
             </svg>
-            Help us improve — anonymously
+            {t('privacy_modal_title')}
           </h2>
         </div>
         <div class="modal-body">
           <p class="privacy-opt-in-desc">
-            Image Harvest can send <strong>anonymous usage data</strong> to help us
-            understand which features matter most and where users get stuck.
+            {t('privacy_desc_prefix')}<strong>{t('privacy_anonymous_data')}</strong>{t('privacy_desc_suffix')}
           </p>
           <ul class="privacy-opt-in-list">
             <li>
-              <strong>What we collect:</strong> button clicks, scan counts, feature
-              usage. No URLs, no image data, no personal info.
+              <strong>{t('privacy_collect_title')}</strong> {t('privacy_collect_desc')}
             </li>
             <li>
-              <strong>What we never collect:</strong> the pages you visit, image
-              contents, your IP, your email, or anything that could identify you.
+              <strong>{t('privacy_never_collect_title')}</strong> {t('privacy_never_collect_desc')}
             </li>
             <li>
-              <strong>Always reversible:</strong> you can switch this off anytime in
-              Settings.
+              <strong>{t('privacy_reversible_title')}</strong> {t('privacy_reversible_desc')}
             </li>
           </ul>
           <p class="privacy-opt-in-footnote">
-            Your privacy is non-negotiable. This is opt-in only.
+            {t('privacy_footnote')}
           </p>
         </div>
         <div class="modal-footer privacy-opt-in-footer">
@@ -97,14 +94,14 @@ export function PrivacyOptInModal() {
             class="btn btn-secondary"
             onClick={handleDecline}
           >
-            No thanks
+            {t('privacy_decline')}
           </button>
           <button
             id="btn-privacy-opt-in-accept"
             class="btn btn-primary"
             onClick={handleAccept}
           >
-            Sure, help improve
+            {t('privacy_accept')}
           </button>
         </div>
       </div>

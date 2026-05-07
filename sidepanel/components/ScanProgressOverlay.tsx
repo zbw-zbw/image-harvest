@@ -7,11 +7,12 @@
 // click handler is bound in init.ts — Preact rendering doesn't change which
 // DOM id receives the click.
 import { useStoreSelector } from './storeHook';
+import { t } from '../../shared/i18n';
 
 export function ScanProgressOverlay() {
   const sp = useStoreSelector((s) => s.scanProgress);
   const percent = sp.total > 0 ? Math.round((sp.current / sp.total) * 100) : 0;
-  const text = sp.total === 0 ? 'scanning for images...' : `${sp.current} / ${sp.total} images`;
+  const text = sp.total === 0 ? t('scan_discovering') : t('scan_progress_text', { current: sp.current, total: sp.total });
   // The progress bar is hidden during the indeterminate "discovery" phase;
   // the spinner is sufficient signal that work is happening.
   const barClass = `progress-bar${sp.indeterminate ? ' hidden' : ''}`;
@@ -19,7 +20,7 @@ export function ScanProgressOverlay() {
     <div id="scan-overlay" class={`scan-overlay${sp.visible ? '' : ' hidden'}`}>
       <div class="scan-overlay-float">
         <div class="scan-overlay-content">
-          <button id="btn-scan-cancel" class="icon-btn scan-cancel-btn" title="Cancel scan">
+          <button id="btn-scan-cancel" class="icon-btn scan-cancel-btn" title={t('scan_cancel')}>
             <svg
               width="18"
               height="18"

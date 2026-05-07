@@ -10,6 +10,7 @@
 
 import type JSZipType from 'jszip';
 import { collectionGetAll } from '../shared/collection';
+import { t } from '../shared/i18n';
 import type { CollectionItem, ImageItem } from '../shared/types';
 import {
   downloadSingle,
@@ -67,8 +68,8 @@ export async function loadCollection(searchQuery = ''): Promise<void> {
       elements.collectionBody.innerHTML = `
         <div class="collection-empty">
           <div class="collection-empty-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg></div>
-          <p>${searchQuery ? 'No matching images found' : 'No images in collection yet'}</p>
-          <p style="font-size:11px;margin-top:4px;color:var(--text-tertiary)">${searchQuery ? 'Try a different search term' : 'Click the ★ button on any image to save it here'}</p>
+          <p>${searchQuery ? t('collection_no_match') : t('collection_empty_title')}</p>
+          <p style="font-size:11px;margin-top:4px;color:var(--text-tertiary)">${searchQuery ? t('collection_no_match_hint') : t('collection_empty_hint')}</p>
         </div>`;
       return;
     }

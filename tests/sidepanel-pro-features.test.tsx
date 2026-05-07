@@ -24,6 +24,7 @@
 //     behind the `show*Modal` shells which we do not exercise).
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
+vi.mock('virtua', () => ({ Virtualizer: vi.fn() }));
 vi.mock('../sidepanel/filter', () => ({
   applyFilters: vi.fn(),
 }));
@@ -180,38 +181,31 @@ describe('detectSimilarImages — algorithm', () => {
 
 describe('detectSimilarImages — UI side effects', () => {
   it('shows the Dedup button when groups exist AND enableSimilarDetection !== false', () => {
-    const btn = document.createElement('button');
-    btn.style.display = 'none';
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (elements as any).btnDedup = btn;
-
     const phashA = 'a'.repeat(16);
     state.allImages = [makeImg({ id: 'a', phash: phashA }), makeImg({ id: 'b', phash: phashA })];
     detectSimilarImages();
 
-    expect(btn.style.display).toBe('');
+    // The Preact component now self-manages btnDedup visibility via
+    // state.similarGroups — verify the grouping result instead.
+    expect(state.similarGroups.length).toBeGreaterThan(0);
   });
 
-  it('hides the Dedup button when enableSimilarDetection === false (even if groups exist)', () => {
-    const btn = document.createElement('button');
-    btn.style.display = '';
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (elements as any).btnDedup = btn;
+  it('still computes groups when enableSimilarDetection === false (visibility is managed by the Preact component)', () => {
     state.appSettings = { ...state.appSettings, enableSimilarDetection: false };
 
     const phashA = 'a'.repeat(16);
     state.allImages = [makeImg({ id: 'a', phash: phashA }), makeImg({ id: 'b', phash: phashA })];
     detectSimilarImages();
 
-    expect(btn.style.display).toBe('none');
+    // detectSimilarImages is a pure grouping algorithm — it does NOT
+    // check enableSimilarDetection. The Preact Toolbar component reads
+    // both state.similarGroups AND appSettings.enableSimilarDetection
+    // to decide whether to render the Dedup button.
+    expect(state.similarGroups.length).toBeGreaterThan(0);
   });
 
-  it('toggles the dedup-info banner via the .hidden class', () => {
-    const banner = document.createElement('div');
-    banner.id = 'dedup-info';
-    document.body.appendChild(banner);
-
-    // No groups (algo runs but finds no duplicates) → hidden.
+  it('sets similarGroups correctly based on duplicate detection', () => {
+    // No groups (algo runs but finds no duplicates).
     // Use 2 images with DIFFERENT phash so withHash.length >= 2
     // (so the early-return guard is bypassed) but no group forms.
     state.allImages = [
@@ -220,13 +214,12 @@ describe('detectSimilarImages — UI side effects', () => {
     ];
     detectSimilarImages();
     expect(state.similarGroups).toEqual([]);
-    expect(banner.classList.contains('hidden')).toBe(true);
 
-    // Two duplicates → visible.
+    // Two duplicates → groups populated.
     const phashA = 'a'.repeat(16);
     state.allImages = [makeImg({ id: 'a', phash: phashA }), makeImg({ id: 'b', phash: phashA })];
     detectSimilarImages();
-    expect(banner.classList.contains('hidden')).toBe(false);
+    expect(state.similarGroups.length).toBeGreaterThan(0);
   });
 
   it('early-returns BEFORE touching DOM when fewer than 2 images carry a phash (perf guard)', () => {

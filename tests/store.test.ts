@@ -3,6 +3,15 @@
 // selector subscriptions with default + custom equality, batched setMany,
 // the wildcard "subscribeAll" channel, and reset().
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+
+vi.mock('virtua', () => ({
+  Virtualizer: vi.fn(),
+}));
+
+vi.mock('../sidepanel/init', () => ({
+  isWithinTabSwitchGrace: vi.fn(() => false),
+}));
+
 import { state, store } from '../sidepanel/state';
 
 beforeEach(() => {

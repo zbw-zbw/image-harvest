@@ -192,13 +192,16 @@ export function groupImages(images: ImageItem[], mode: string): ImageGroup[] {
 
 /**
  * Toggle a group's collapsed state. <ImageGrid> subscribes to
- * state.collapsedGroups, so mutating the set is enough to trigger a
- * re-render — no manual renderImages() call needed.
+ * state.collapsedGroups via useStoreSelector — we must replace the Set
+ * reference (not mutate in-place) so the Proxy set trap fires and
+ * notifySelectors() triggers a Preact re-render.
  */
 export function toggleGroupCollapse(groupName: string): void {
-  if (state.collapsedGroups.has(groupName)) {
-    state.collapsedGroups.delete(groupName);
+  const next = new Set(state.collapsedGroups);
+  if (next.has(groupName)) {
+    next.delete(groupName);
   } else {
-    state.collapsedGroups.add(groupName);
+    next.add(groupName);
   }
+  state.collapsedGroups = next;
 }

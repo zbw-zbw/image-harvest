@@ -19,6 +19,7 @@
 //     (overflow-y: auto, padding, gap via grid-template) keeps owning the
 //     scroll container. virtua only manages which children are mounted.
 import { Virtualizer } from 'virtua';
+import { t } from '../../shared/i18n';
 import type { ImageItem } from '../../shared/types';
 import { groupImages, toggleGroupCollapse } from '../render';
 import { state } from '../state';
@@ -26,8 +27,13 @@ import { ImageCard } from './ImageCard';
 import { SkeletonCard } from './SkeletonCard';
 import { useStoreSelector } from './storeHook';
 
-/** Threshold above which list-view switches to virtualized rendering. */
-const VIRTUAL_THRESHOLD = 50;
+/**
+ * Threshold above which list-view switches to virtualized rendering.
+ * Set high (500) because virtua's Virtualizer breaks CSS grid layout
+ * (gap, height) inside Chrome side-panel flex containers. Plain DOM
+ * rendering handles hundreds of cards without perceptible lag.
+ */
+const VIRTUAL_THRESHOLD = 500;
 
 const IconChevron = () => (
   <svg
@@ -109,6 +115,7 @@ interface FlatListProps {
  */
 function FlatList({ images, listView, trailingSkeletons }: FlatListProps) {
   const shouldVirtualize = listView && images.length > VIRTUAL_THRESHOLD;
+
   if (!shouldVirtualize) {
     return (
       <>
@@ -152,7 +159,7 @@ function GroupBlock({ name, images, collapsed, listView, showCurrentBadge }: Gro
         </span>
         <span class="group-name">
           {name}
-          {showCurrentBadge && <span class="tab-current-badge">Current</span>}
+          {showCurrentBadge && <span class="tab-current-badge">{t('grid_current_tab_badge')}</span>}
         </span>
         <span class="group-count">{images.length}</span>
       </div>

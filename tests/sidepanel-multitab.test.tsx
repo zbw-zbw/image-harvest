@@ -768,14 +768,14 @@ describe('startMultiTabExtract', () => {
     expect(ui.hideProgress).toHaveBeenCalledTimes(1);
   });
 
-  it('dedupe skips url already in state.allImages (no duplicate push)', async () => {
+  it('replaces allImages with multi-tab results (full replacement, not merge)', async () => {
     state.allImages = [
       { id: 'x', url: 'https://a.com/same.png' } as unknown as import('../shared/types').ImageItem,
     ];
     chromeStub.runtime.sendMessage.mockResolvedValueOnce({
       success: true,
       images: [
-        { url: 'https://a.com/same.png' }, // duplicate
+        { url: 'https://a.com/same.png' }, // overlap with existing
         { url: 'https://a.com/new.png' },
       ],
     });
@@ -783,12 +783,12 @@ describe('startMultiTabExtract', () => {
     const { startMultiTabExtract } = await import('../sidepanel/multitab');
     await startMultiTabExtract([1]);
 
-    // Pin: pre-existing item retained (not clobbered by the newly-
-    // arriving one with reset colors/phash), new item appended.
-    // Without the `.find(url === ...)` guard, a second multi-tab
-    // extract covering overlapping tabs would corrupt colors cache.
+    // Pin: multi-tab extract replaces allImages entirely with the
+    // response images (each gets a freshly generated id). The user
+    // explicitly chose which tabs to extract from, so only those
+    // results should appear.
     expect(state.allImages).toHaveLength(2);
-    expect(state.allImages[0].id).toBe('x');
+    expect(state.allImages[0].id).toBe('id-https://a.com/same.png');
     expect(state.allImages[1].url).toBe('https://a.com/new.png');
   });
 
@@ -872,14 +872,19 @@ describe('startMultiTabExtract', () => {
     expect(ui.hideProgress).toHaveBeenCalledTimes(1);
   });
 
-  it('response missing error field → falls back to "Unknown error"', async () => {
+  it('response missing error field → falls back to default error message', async () => {
     chromeStub.runtime.sendMessage.mockResolvedValueOnce({ success: false });
 
     const { startMultiTabExtract } = await import('../sidepanel/multitab');
     await startMultiTabExtract([1]);
 
     const ui = await import('../sidepanel/ui');
-    expect(ui.showToast).toHaveBeenCalledWith('Extraction failed: Unknown error', 'error');
+    // Source uses t('toast_extraction_failed') + ': ' + t('error_default_message').
+    // With i18n catalogue loaded, this resolves to English messages.
+    expect(ui.showToast).toHaveBeenCalledWith(
+      'Extraction failed: An error occurred',
+      'error'
+    );
   });
 
   it('sendMessage throws + NOT aborted → "Multi-tab extraction failed" toast', async () => {

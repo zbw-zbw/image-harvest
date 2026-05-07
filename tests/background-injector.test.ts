@@ -91,19 +91,9 @@ afterEach(() => {
  * injection (with `files`) rejects with the supplied error.
  */
 function installInjectionFlow(rejectMessage: string): void {
-  chromeStub.scripting.executeScript.mockImplementation(
-    async (opts: { func?: unknown; files?: unknown }) => {
-      if (opts.func) {
-        // Probe: report "no existing globals" so we fall through.
-        return [{ result: false }];
-      }
-      if (opts.files) {
-        // Standard injection: throw the classified message.
-        throw new Error(rejectMessage);
-      }
-      return [];
-    }
-  );
+  // New flow: no probe stage — executeScript is only called once with
+  // `files`. Rejecting it triggers the outer-catch error classifier.
+  chromeStub.scripting.executeScript.mockRejectedValue(new Error(rejectMessage));
 }
 
 describe('injectContentScript — happy path', () => {
@@ -120,25 +110,24 @@ describe('injectContentScript — happy path', () => {
   });
 
   it('returns { success: true } after a successful standard injection', async () => {
-    chromeStub.scripting.executeScript.mockImplementation(
-      async (opts: { func?: unknown; files?: unknown }) => {
-        if (opts.func) return [{ result: false }];
-        if (opts.files) return [{ result: undefined }];
-        return [];
-      }
-    );
+    chromeStub.scripting.executeScript.mockResolvedValue([{ result: undefined }]);
+    // Post-injection PING must succeed for the happy path.
+    let pingCount = 0;
+    chromeStub.tabs.sendMessage.mockReset();
+    chromeStub.tabs.sendMessage.mockImplementation(async () => {
+      pingCount++;
+      if (pingCount === 1) throw new Error('No content script'); // initial PING fails
+      return { pong: true }; // post-injection PING succeeds
+    });
 
     const result = await injectContentScript(1);
 
     expect(result).toEqual({ success: true });
-    // Both the probe and the standard injection should have been called.
-    expect(chromeStub.scripting.executeScript).toHaveBeenCalledTimes(2);
-    // Standard injection used the manifest-derived files list.
-    const filesCall = chromeStub.scripting.executeScript.mock.calls.find(
-      (call) => 'files' in (call[0] as object)
-    );
-    expect(filesCall?.[0]).toMatchObject({
-      target: { tabId: 1 },
+    // New flow: only one executeScript call (files injection, no probe).
+    expect(chromeStub.scripting.executeScript).toHaveBeenCalledTimes(1);
+    const filesCall = chromeStub.scripting.executeScript.mock.calls[0];
+    expect(filesCall[0]).toMatchObject({
+      target: { tabId: 1, frameIds: [0] },
       files: ['assets/main.ts-loader-XXXX.js'],
     });
   });
@@ -268,88 +257,63 @@ describe('injectContentScript — error classification (outer catch)', () => {
   });
 });
 
-describe('injectContentScript — probe-stage classification', () => {
-  it('classifies probe-stage "showing error" reject → INJECTION_FAILED with the failed-load message', async () => {
-    // The probe (the executeScript call WITH `func`) rejects with an
-    // "error page" message. injector's probe-stage catch matches this
-    // and returns the failed-load variant of the message — distinct
-    // from the outer catch's restricted-page variant.
-    chromeStub.scripting.executeScript.mockImplementation(async (opts: { func?: unknown }) => {
-      if (opts.func) throw new Error('Frame is showing error page');
-      return [];
-    });
+describe('injectContentScript — post-injection PING verification', () => {
+  it('classifies "showing error" executeScript reject → INJECTION_FAILED via outer catch', async () => {
+    // New flow: no probe stage. executeScript({ files }) rejects with
+    // an "error page" message, caught by the outer catch classifier.
+    chromeStub.scripting.executeScript.mockRejectedValue(new Error('Frame is showing error page'));
 
     const result = await injectContentScript(1);
 
     expect(result).toEqual({
       success: false,
       error: ERROR_CODES.INJECTION_FAILED,
-      message: expect.stringContaining('failed to load'),
+      message: expect.stringContaining('browser internal'),
     });
   });
 
-  it('swallows probe-stage rejection that is NOT an error-page signal → continues to standard injection', async () => {
-    // Pin: only "error page" / "showing error" strings short-circuit
-    // the probe stage. All other probe failures (CSP, timeout,
-    // permission revoked mid-scan) must fall through to the standard
-    // chrome.scripting.executeScript({files}) call so those failures
-    // get classified by the richer outer-catch matcher.
-    chromeStub.scripting.executeScript.mockImplementation(
-      async (opts: { func?: unknown; files?: unknown }) => {
-        if (opts.func) throw new Error('Some transient probe glitch');
-        if (opts.files) return [{ result: undefined }]; // standard injection succeeds
-        return [];
-      }
-    );
+  it('injection succeeds but all post-injection PINGs fail → INJECTION_FAILED with PING message', async () => {
+    // Pin: the post-injection PING loop (3 attempts). When all PINGs
+    // fail, the injector returns a specific "failed to respond to
+    // PING" error — distinct from an executeScript failure.
+    chromeStub.scripting.executeScript.mockResolvedValue([{ result: undefined }]);
+    // All sendMessage calls reject (initial PING + 3 post-injection PINGs).
 
     const result = await injectContentScript(1);
-    expect(result).toEqual({ success: true });
-    // Both executeScript calls fired (probe + files).
-    expect(chromeStub.scripting.executeScript).toHaveBeenCalledTimes(2);
+
+    expect(result).toEqual({
+      success: false,
+      error: ERROR_CODES.INJECTION_FAILED,
+      message: expect.stringContaining('failed to respond to PING'),
+    });
   });
 
-  it('probe returns {result:true} → waits for ping, skips standard injection entirely (already-injected variant)', async () => {
-    // Pin: the "probe sees existing globals" path (L87-95). This
-    // happens when a previous injection ran but the PING at the top
-    // of injectContentScript timed out (slow page, first message).
-    // Re-injecting would duplicate the content script and wire
-    // duplicate onMessage listeners.
-    chromeStub.scripting.executeScript.mockImplementation(async (opts: { func?: unknown }) => {
-      if (opts.func) return [{ result: true }]; // probe says "already injected"
-      // If anything hits the files branch, that's a regression.
-      throw new Error('standard injection should NOT run when probe=true');
-    });
-    // PING the first time (top of function) fails → forces probe.
-    // PING the second time (inside the probe=true branch) succeeds.
-    let sendCount = 0;
+  it('injection succeeds + post-injection PING succeeds on 2nd attempt → success', async () => {
+    chromeStub.scripting.executeScript.mockResolvedValue([{ result: undefined }]);
+    let pingCount = 0;
     chromeStub.tabs.sendMessage.mockReset();
     chromeStub.tabs.sendMessage.mockImplementation(async () => {
-      sendCount++;
-      if (sendCount === 1) throw new Error('No content script');
+      pingCount++;
+      // 1st call = initial PING (fails), 2nd = 1st post-injection (fails),
+      // 3rd = 2nd post-injection (succeeds)
+      if (pingCount <= 2) throw new Error('No content script');
       return { pong: true };
     });
 
     const result = await injectContentScript(1);
     expect(result).toEqual({ success: true });
-    // Exactly one executeScript call — the probe itself.
     expect(chromeStub.scripting.executeScript).toHaveBeenCalledTimes(1);
-    // Two PINGs fired: initial + post-probe confirmation.
-    expect(sendCount).toBe(2);
   });
 
-  it('probe returns {result:true} + post-probe PING rejects → swallows the reject, still returns success', async () => {
-    // Pin: the `catch { await sleep(500) }` inside the probe=true
-    // branch. A flaky PING after probe-sees-globals must NOT demote
-    // a successful already-injected case to re-injection — that would
-    // double-wire listeners.
-    chromeStub.scripting.executeScript.mockImplementation(async (opts: { func?: unknown }) => {
-      if (opts.func) return [{ result: true }];
-      throw new Error('standard injection should NOT run when probe=true');
-    });
-    // Both PINGs fail (initial + post-probe), but we should still
-    // return success because probe=true is authoritative.
+  it('injection succeeds + first post-injection PING succeeds → success (no extra retries)', async () => {
+    chromeStub.scripting.executeScript.mockResolvedValue([{ result: undefined }]);
+    let pingCount = 0;
     chromeStub.tabs.sendMessage.mockReset();
-    chromeStub.tabs.sendMessage.mockRejectedValue(new Error('timeout'));
+    chromeStub.tabs.sendMessage.mockImplementation(async () => {
+      pingCount++;
+      if (pingCount === 1) throw new Error('No content script'); // initial PING
+      return { pong: true }; // first post-injection PING succeeds
+    });
 
     const result = await injectContentScript(1);
     expect(result).toEqual({ success: true });
@@ -365,16 +329,18 @@ describe('injectContentScript — probe-stage classification', () => {
 
 describe('getContentScriptFiles — fallback when manifest is missing content_scripts', () => {
   it('uses the conventional crxjs loader path when manifest.content_scripts is undefined', async () => {
-    // Manifest returns NO content_scripts at all — forces L44-45
-    // fallback to ['assets/main.ts-loader.js'].
+    // Manifest returns NO content_scripts at all — forces fallback
+    // to ['assets/main.ts-loader.js'].
     chromeStub.runtime.getManifest.mockReturnValue({ name: 'x' });
-    chromeStub.scripting.executeScript.mockImplementation(
-      async (opts: { func?: unknown; files?: string[] }) => {
-        if (opts.func) return [{ result: false }];
-        if (opts.files) return [{ result: undefined }];
-        return [];
-      }
-    );
+    chromeStub.scripting.executeScript.mockResolvedValue([{ result: undefined }]);
+    // Post-injection PING must succeed.
+    let pingCount = 0;
+    chromeStub.tabs.sendMessage.mockReset();
+    chromeStub.tabs.sendMessage.mockImplementation(async () => {
+      pingCount++;
+      if (pingCount === 1) throw new Error('No content script');
+      return { pong: true };
+    });
 
     const result = await injectContentScript(1);
     expect(result).toEqual({ success: true });
@@ -394,13 +360,15 @@ describe('getContentScriptFiles — fallback when manifest is missing content_sc
   it('uses fallback when manifest.content_scripts is an empty array too', async () => {
     // Declared but no js entries — same fallback.
     chromeStub.runtime.getManifest.mockReturnValue({ content_scripts: [] });
-    chromeStub.scripting.executeScript.mockImplementation(
-      async (opts: { func?: unknown; files?: string[] }) => {
-        if (opts.func) return [{ result: false }];
-        if (opts.files) return [{ result: undefined }];
-        return [];
-      }
-    );
+    chromeStub.scripting.executeScript.mockResolvedValue([{ result: undefined }]);
+    // Post-injection PING must succeed.
+    let pingCount = 0;
+    chromeStub.tabs.sendMessage.mockReset();
+    chromeStub.tabs.sendMessage.mockImplementation(async () => {
+      pingCount++;
+      if (pingCount === 1) throw new Error('No content script');
+      return { pong: true };
+    });
 
     await injectContentScript(1);
     const filesCall = chromeStub.scripting.executeScript.mock.calls.find(
@@ -425,13 +393,15 @@ describe('injectContentScript — tabs.get rejection (L76 inner catch)', () => {
     // circuit the whole operation — we still try to inject and let
     // the real error surface from the scripting.executeScript call.
     chromeStub.tabs.get.mockRejectedValueOnce(new Error('No tab with id: 1'));
-    chromeStub.scripting.executeScript.mockImplementation(
-      async (opts: { func?: unknown; files?: unknown }) => {
-        if (opts.func) return [{ result: false }];
-        if (opts.files) return [{ result: undefined }];
-        return [];
-      }
-    );
+    chromeStub.scripting.executeScript.mockResolvedValue([{ result: undefined }]);
+    // Post-injection PING must succeed.
+    let pingCount = 0;
+    chromeStub.tabs.sendMessage.mockReset();
+    chromeStub.tabs.sendMessage.mockImplementation(async () => {
+      pingCount++;
+      if (pingCount === 1) throw new Error('No content script');
+      return { pong: true };
+    });
 
     const result = await injectContentScript(1);
     // Falls through to standard injection which succeeds.
@@ -462,14 +432,18 @@ describe('injectContentScript with allFrames — injectIntoAllFrames loop', () =
     const result = await injectContentScript(1, { allFrames: true });
     expect(result).toEqual({ success: true });
 
-    // PINGs: 1 for the top-level check + 1 for frame 1 (only
-    // non-restricted sub-frame).
+    // Verify sub-frame 1 was PINGed.
     expect(chromeStub.tabs.sendMessage).toHaveBeenCalledWith(1, { type: 'PING' }, { frameId: 1 });
-    // frameId 0 (main) and frameId 2 (chrome://) MUST be skipped.
-    const perFrameCalls = chromeStub.tabs.sendMessage.mock.calls.filter(
-      (c) => c[2] && typeof c[2] === 'object' && 'frameId' in (c[2] as object)
+    // Filter out the initial PING (frameId: 0) to count only per-sub-frame PINGs.
+    // frameId 0 (main frame initial PING) and frameId 2 (chrome://) MUST be skipped.
+    const subFrameCalls = chromeStub.tabs.sendMessage.mock.calls.filter(
+      (c) =>
+        c[2] &&
+        typeof c[2] === 'object' &&
+        'frameId' in (c[2] as object) &&
+        (c[2] as { frameId: number }).frameId !== 0
     );
-    expect(perFrameCalls).toHaveLength(1);
+    expect(subFrameCalls).toHaveLength(1);
   });
 
   it('sub-frame PING rejects → falls through to scripting.executeScript on that frame', async () => {
@@ -479,10 +453,13 @@ describe('injectContentScript with allFrames — injectIntoAllFrames loop', () =
     // it loaded late) would never get injected — common on SPAs that
     // lazy-mount iframes.
     chromeStub.tabs.sendMessage.mockReset();
-    // Top-level PING (no frameId) succeeds.
+    // Initial PING (frameId: 0) succeeds → already-injected short-circuit.
+    // Sub-frame PINGs fail → triggers per-frame injection.
     chromeStub.tabs.sendMessage.mockImplementation(
       async (_tabId: number, _msg: unknown, options?: { frameId?: number }) => {
-        if (options?.frameId != null) throw new Error('No content script in sub-frame');
+        if (options?.frameId != null && options.frameId !== 0) {
+          throw new Error('No content script in sub-frame');
+        }
         return { pong: true };
       }
     );
@@ -510,9 +487,12 @@ describe('injectContentScript with allFrames — injectIntoAllFrames loop', () =
     // injection. A single iframe with restrictive CSP would otherwise
     // kill the whole scan even though 99% of the tab works fine.
     chromeStub.tabs.sendMessage.mockReset();
+    // Initial PING (frameId: 0) succeeds; sub-frame PINGs fail.
     chromeStub.tabs.sendMessage.mockImplementation(
       async (_tabId: number, _msg: unknown, options?: { frameId?: number }) => {
-        if (options?.frameId != null) throw new Error('sub-frame PING fail');
+        if (options?.frameId != null && options.frameId !== 0) {
+          throw new Error('sub-frame PING fail');
+        }
         return { pong: true };
       }
     );
@@ -544,11 +524,15 @@ describe('injectContentScript with allFrames — injectIntoAllFrames loop', () =
 
     const result = await injectContentScript(1, { allFrames: true });
     expect(result).toEqual({ success: true });
-    // No per-frame PINGs should have fired.
-    const perFrameCalls = chromeStub.tabs.sendMessage.mock.calls.filter(
-      (c) => c[2] && typeof c[2] === 'object' && 'frameId' in (c[2] as object)
+    // Only the initial PING (frameId: 0) should have fired — no sub-frame PINGs.
+    const subFrameCalls = chromeStub.tabs.sendMessage.mock.calls.filter(
+      (c) =>
+        c[2] &&
+        typeof c[2] === 'object' &&
+        'frameId' in (c[2] as object) &&
+        (c[2] as { frameId: number }).frameId !== 0
     );
-    expect(perFrameCalls).toHaveLength(0);
+    expect(subFrameCalls).toHaveLength(0);
   });
 
   it('getAllFrames throws → console.warn + injectContentScript still returns success', async () => {

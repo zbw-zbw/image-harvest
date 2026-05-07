@@ -8,23 +8,28 @@ import { hideScanOverlay, showScanOverlay } from './scan';
 import { closeAllFilterDropdowns } from './settings';
 import { elements, state } from './state';
 import { throttle } from './utils';
+import { t } from '../shared/i18n';
 
 // ============================================
 // Filter Button Labels
 // ============================================
-const filterLabelDefaults = {
-  size: 'Size',
-  sizeMin: 'Min',
-  sizeMax: 'Max',
-  types: 'Type',
-  layout: 'Layout',
-  url: 'URL',
-  color: 'Color',
-  group: 'Group',
-  sort: 'Sort',
-} as const;
+function getFilterLabelDefaults() {
+  return {
+    size: t('filter_size'),
+    sizeMin: 'Min',
+    sizeMax: 'Max',
+    types: t('filter_type'),
+    layout: t('filter_layout'),
+    url: t('filter_url'),
+    color: t('filter_color'),
+    group: t('toolbar_group'),
+    sort: t('toolbar_sort'),
+  };
+}
 
 export function updateFilterButtonLabels(): void {
+  const defaults = getFilterLabelDefaults();
+
   // Size button
   const sizeBtn = document.querySelector<HTMLElement>('.filter-btn[data-filter="size"]');
   if (sizeBtn) {
@@ -32,7 +37,7 @@ export function updateFilterButtonLabels(): void {
       state.activeFilters.size !== 'all' ||
       state.activeFilters.sizeMin > 0 ||
       state.activeFilters.sizeMax !== Infinity;
-    let label: string = filterLabelDefaults.size;
+    let label: string = defaults.size;
     if (state.activeFilters.size !== 'all') {
       const sizeLabels: Record<string, string> = {
         small: 'Small',
@@ -51,7 +56,7 @@ export function updateFilterButtonLabels(): void {
   const typeBtn = document.querySelector<HTMLElement>('.filter-btn[data-filter="type"]');
   if (typeBtn) {
     const hasTypeFilter = state.activeFilters.types.length > 0;
-    let label: string = filterLabelDefaults.types;
+    let label: string = defaults.types;
     if (hasTypeFilter) {
       const typeLabels: Record<string, string> = {
         png: 'PNG',
@@ -63,7 +68,7 @@ export function updateFilterButtonLabels(): void {
         ico: 'ICO',
         bmp: 'BMP',
       };
-      label = state.activeFilters.types.map((t) => typeLabels[t] || t).join(', ');
+      label = state.activeFilters.types.map((type) => typeLabels[type] || type).join(', ');
     }
     typeBtn.textContent = label + '▾';
     typeBtn.classList.toggle('active', hasTypeFilter);
@@ -73,7 +78,7 @@ export function updateFilterButtonLabels(): void {
   const layoutBtn = document.querySelector<HTMLElement>('.filter-btn[data-filter="layout"]');
   if (layoutBtn) {
     const hasLayoutFilter = state.activeFilters.layout !== 'all';
-    let label: string = filterLabelDefaults.layout;
+    let label: string = defaults.layout;
     if (hasLayoutFilter) {
       const layoutLabels: Record<string, string> = {
         square: 'Square',
@@ -91,7 +96,7 @@ export function updateFilterButtonLabels(): void {
   const urlBtn = document.querySelector<HTMLElement>('.filter-btn[data-filter="url"]');
   if (urlBtn) {
     const hasUrlFilter = !!state.activeFilters.urlKeyword;
-    urlBtn.textContent = hasUrlFilter ? 'URL▾' : 'URL▾';
+    urlBtn.textContent = defaults.url + '▾';
     urlBtn.classList.toggle('active', hasUrlFilter);
   }
 
@@ -101,7 +106,7 @@ export function updateFilterButtonLabels(): void {
     const hasColorFilter = !!state.activeFilters.color;
     // Preserve the PRO badge when updating text
     const badge = colorBtn.querySelector('.pro-badge');
-    colorBtn.textContent = hasColorFilter ? 'Color▾ ' : 'Color▾ ';
+    colorBtn.textContent = defaults.color + '▾ ';
     if (badge) colorBtn.appendChild(badge);
     colorBtn.classList.toggle('active', hasColorFilter);
   }
@@ -141,7 +146,8 @@ export function applyViewMode(mode: 'grid' | 'list'): void {
     groupContent.classList.toggle('list-view', mode === 'list');
   });
   if (elements.btnViewToggle) {
-    elements.btnViewToggle.title = mode === 'grid' ? 'Switch to list view' : 'Switch to grid view';
+    elements.btnViewToggle.title =
+      mode === 'grid' ? t('title_switch_list') : t('title_switch_grid');
   }
   const iconGrid = document.getElementById('icon-grid');
   const iconList = document.getElementById('icon-list');
@@ -152,7 +158,7 @@ export function applyViewMode(mode: 'grid' | 'list'): void {
   }
   const viewToggleLabel = document.getElementById('view-toggle-label');
   if (viewToggleLabel) {
-    viewToggleLabel.textContent = mode === 'grid' ? 'List' : 'Grid';
+    viewToggleLabel.textContent = mode === 'grid' ? t('view_list') : t('view_grid');
   }
 }
 
@@ -173,13 +179,28 @@ export function getMinCardWidth(): number {
 export function checkNarrowMode(): void {
   if (!elements.imageGrid) return;
 
-  const computedStyle = getComputedStyle(elements.imageGrid);
-  const gridPaddingLeft = parseFloat(computedStyle.paddingLeft) || 10;
-  const gridPaddingRight = parseFloat(computedStyle.paddingRight) || 10;
-  const gridGap = parseFloat(computedStyle.gap) || 10;
-  const gridPadding = gridPaddingLeft + gridPaddingRight;
   const minCardWidth = getMinCardWidth();
-  const availableWidth = elements.imageGrid.clientWidth - gridPadding;
+  let availableWidth: number;
+  let gridGap: number;
+
+  // When imageGrid is hidden (e.g. modal open over it), clientWidth is 0.
+  // Fall back to #app width so compact-mode toggles correctly even when a
+  // modal (collection, dedup, etc.) is the visible content.
+  if (elements.imageGrid.clientWidth > 0) {
+    const computedStyle = getComputedStyle(elements.imageGrid);
+    const gridPaddingLeft = parseFloat(computedStyle.paddingLeft) || 10;
+    const gridPaddingRight = parseFloat(computedStyle.paddingRight) || 10;
+    gridGap = parseFloat(computedStyle.gap) || 10;
+    const gridPadding = gridPaddingLeft + gridPaddingRight;
+    availableWidth = elements.imageGrid.clientWidth - gridPadding;
+  } else {
+    const appElement = document.getElementById('app');
+    const appWidth = appElement?.clientWidth || document.documentElement.clientWidth;
+    gridGap = 10;
+    const gridPadding = 20; // fallback padding estimate
+    availableWidth = appWidth - gridPadding;
+  }
+
   const canFitTwoColumns = availableWidth >= minCardWidth * 2 + gridGap;
 
   // Compact mode: when panel is narrow (can't fit two columns, or each card < 310px)
@@ -323,7 +344,7 @@ export function showProgress(title: string, onAbort?: () => void): void {
   state.downloadProgress = {
     ...state.downloadProgress,
     visible: true,
-    title: title || 'Downloading...',
+    title: title || t('progress_downloading'),
   };
 }
 
@@ -365,8 +386,8 @@ export function showError(code: string, message: string, workaround?: string): v
   // <ErrorScreen> reads errorInfo for code/message/workaround; uiScreen
   // controls visibility (mutually exclusive with empty/restricted).
   state.errorInfo = {
-    code: code || 'Error',
-    message: message || 'An error occurred',
+    code: code || t('error_default_code'),
+    message: message || t('error_default_message'),
     workaround,
   };
   state.uiScreen = 'error';
@@ -527,7 +548,7 @@ export function showLoading(): void {
   state.scanProgress = {
     visible: true,
     indeterminate: true,
-    title: 'Scanning...',
+    title: t('scan_scanning'),
     current: 0,
     total: 0,
     currentUrl: '',
@@ -550,9 +571,7 @@ export function resetStatusBar(): void {
   // Reset similar groups state and UI
   state.similarGroups = [];
   // similarCount is Preact-managed (StatusCounts.SimilarCount).
-  if (elements.btnDedup) (elements.btnDedup as HTMLElement).style.display = 'none';
-  const dedupInfo = document.getElementById('dedup-info');
-  if (dedupInfo) dedupInfo.classList.add('hidden');
+  // Similar button is always visible; badge auto-hides when count is 0.
 }
 
 export function hideAll(): void {
@@ -560,4 +579,56 @@ export function hideAll(): void {
   if (elements.loadingState) elements.loadingState.classList.add('hidden');
   // empty/error/restricted are Preact-managed; resetting uiScreen hides them.
   state.uiScreen = 'images';
+}
+
+// ============================================
+// i18n: Apply translations to DOM elements
+// ============================================
+
+/**
+ * Walk the DOM and update textContent for all elements carrying a
+ * `data-i18n` attribute. The attribute value is the i18n key looked up
+ * via `t()`. Elements whose key resolves to the key itself (missing
+ * translation) are left untouched so the original hard-coded English
+ * remains visible as a safe fallback.
+ *
+ * Also updates placeholder attributes when `data-i18n-placeholder` is present.
+ *
+ * Call this:
+ *  1. Once at init (after detectLocale resolves) to stamp the UI with the
+ *     user's preferred language.
+ *  2. From the onLocaleChange listener so a runtime language switch in
+ *     Settings takes effect immediately without a panel reload.
+ */
+export function applyTranslations(): void {
+  // Translate textContent via data-i18n
+  document.querySelectorAll<HTMLElement>('[data-i18n]').forEach((element) => {
+    const key = element.getAttribute('data-i18n');
+    if (!key) return;
+    const translated = t(key);
+    // Only apply if t() resolved to an actual translation (not the raw key)
+    if (translated !== key) {
+      element.textContent = translated;
+    }
+  });
+
+  // Translate placeholder attributes via data-i18n-placeholder
+  document.querySelectorAll<HTMLElement>('[data-i18n-placeholder]').forEach((element) => {
+    const key = element.getAttribute('data-i18n-placeholder');
+    if (!key) return;
+    const translated = t(key);
+    if (translated !== key) {
+      (element as HTMLInputElement).placeholder = translated;
+    }
+  });
+
+  // Translate title attributes via data-i18n-title
+  document.querySelectorAll<HTMLElement>('[data-i18n-title]').forEach((element) => {
+    const key = element.getAttribute('data-i18n-title');
+    if (!key) return;
+    const translated = t(key);
+    if (translated !== key) {
+      element.title = translated;
+    }
+  });
 }

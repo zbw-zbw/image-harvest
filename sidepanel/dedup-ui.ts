@@ -8,6 +8,7 @@
 //   - removeImageById (called from ImageCard render loop)
 //   - detectSimilarImages (called from scan.ts + settings.ts)
 
+import { t } from '../shared/i18n';
 import { applyFilters } from './filter';
 import { closeDedupModal, detectSimilarImages } from './pro-features';
 import { showProUpgradeModal } from './settings';
@@ -28,16 +29,14 @@ export function showDedupModal(): void {
   const dedupBody = document.getElementById('dedup-body');
   if (dedupBody) {
     if (state.similarGroups.length === 0) {
-      dedupBody.innerHTML = '<p class="empty-message">No similar images found</p>';
+      dedupBody.innerHTML = `<p class="empty-message">${t('dedup_no_similar')}</p>`;
       return;
     }
-    dedupBody.innerHTML = `
-      <p class="dedup-hint">Click images to mark them for removal</p>
-      ${state.similarGroups
-        .map(
-          (group, gi) => `
+    dedupBody.innerHTML = `${state.similarGroups
+      .map(
+        (group, gi) => `
       <div class="dedup-group" data-group="${gi}">
-        <div class="dedup-group-title">Group ${gi + 1} (${group.length} similar)</div>
+        <div class="dedup-group-title">${t('dedup_group_title', { index: gi + 1, count: group.length })}</div>
         <div class="dedup-group-images">
           ${group
             .map(
@@ -53,8 +52,8 @@ export function showDedupModal(): void {
         </div>
       </div>
     `
-        )
-        .join('')}`;
+      )
+      .join('')}`;
 
     // Click image to toggle selection (mark for removal)
     dedupBody.querySelectorAll('.dedup-image').forEach((el) => {

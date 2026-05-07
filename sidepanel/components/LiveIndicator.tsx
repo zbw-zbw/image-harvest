@@ -3,6 +3,7 @@
 // in sidepanel/settings.ts > updateLiveIndicator(). The component is mounted
 // once during init and re-renders whenever its inputs change in the store.
 import { useStoreSelector } from './storeHook';
+import { t } from '../../shared/i18n';
 
 export function LiveIndicator() {
   // Visibility = pro user AND live monitoring not explicitly disabled.
@@ -13,10 +14,10 @@ export function LiveIndicator() {
   return (
     <span
       class={`live-indicator${isActive ? '' : ' hidden'}`}
-      title="Live monitoring is active — new images are detected automatically"
+      title={t('live_indicator_tooltip')}
     >
       <span class="live-dot" />
-      Live
+      {t('live_indicator_label')}
     </span>
   );
 }

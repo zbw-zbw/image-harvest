@@ -22,6 +22,7 @@ import {
 import { state } from '../state';
 import { track } from '../../shared/telemetry';
 import { EVENTS } from '../../shared/telemetry-events';
+import { t } from '../../shared/i18n';
 
 /**
  * Open the Pro upgrade modal. We DO NOT call markResolved() here — the
@@ -90,8 +91,8 @@ export function SoftPaywallBanner() {
         </svg>
       </div>
       <div class="soft-paywall-banner-text">
-        <strong>Loving Image Harvest?</strong>
-        <span>Try Pro free for 7 days — unlock batch download, multi-tab extract & more.</span>
+        <strong>{t('paywall_banner_title')}</strong>
+        <span>{t('paywall_banner_desc')}</span>
       </div>
       <div class="soft-paywall-banner-actions">
         <button
@@ -100,7 +101,7 @@ export function SoftPaywallBanner() {
           class="btn btn-primary btn-sm"
           onClick={handleTry}
         >
-          Try Pro Free
+          {t('paywall_banner_try_cta')}
         </button>
         <button
           id="btn-soft-paywall-later"
@@ -108,15 +109,15 @@ export function SoftPaywallBanner() {
           class="btn btn-secondary btn-sm"
           onClick={handleDismiss}
         >
-          Maybe later
+          {t('paywall_banner_later')}
         </button>
       </div>
       <button
         id="btn-soft-paywall-close"
         type="button"
         class="soft-paywall-banner-close icon-btn"
-        title="Dismiss"
-        aria-label="Dismiss"
+        title={t('common_dismiss')}
+        aria-label={t('common_dismiss')}
         onClick={handleClose}
       >
         <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">

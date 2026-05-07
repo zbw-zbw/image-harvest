@@ -1,9 +1,11 @@
 // Message handling from background script and keyboard shortcuts
 
 import { MESSAGE_TYPES } from '../shared/constants';
+import { t } from '../shared/i18n';
 import type { ImageItem } from '../shared/types';
 import { clearSelection, downloadSelectedAsZip, hideDownloadDropdown, selectAll } from './actions';
 import { applyFilters } from './filter';
+import { isWithinTabSwitchGrace } from './init';
 import { processImageExtras, updateScanProgress } from './scan';
 import { renderImages } from './render';
 import { applyProFeatureVisibility, closeAllFilterDropdowns, closeSettings } from './settings';
@@ -29,6 +31,19 @@ export function showDiscoveredToastDebounced(addedCount: number): void {
     }
     discoveredToastTimer = null;
   }, DISCOVERED_TOAST_DEBOUNCE_MS);
+}
+
+/**
+ * Cancel any pending "new images discovered" debounce timer and reset the
+ * accumulated count. Called during tab switches to prevent a stale toast
+ * from the previous tab appearing on the new tab.
+ */
+export function cancelDiscoveredToast(): void {
+  if (discoveredToastTimer) {
+    clearTimeout(discoveredToastTimer);
+    discoveredToastTimer = null;
+  }
+  discoveredToastCount = 0;
 }
 
 interface IncomingMessage {
@@ -63,6 +78,14 @@ export function handleMessage(message: IncomingMessage): void {
       // Ignore during tab switching — the new tab's loadCurrentTab will
       // handle image loading from cache or a fresh scan.
       if (state.isTabSwitching) {
+        break;
+      }
+
+      // Grace period after a tab switch: isTabSwitching resets in the
+      // finally block, but content script live monitoring or background
+      // may still broadcast IMAGES_DISCOVERED shortly after. Suppress
+      // these to prevent "new images discovered" toasts on cached tabs.
+      if (isWithinTabSwitchGrace()) {
         break;
       }
 
@@ -116,7 +139,7 @@ export function handleMessage(message: IncomingMessage): void {
           // title so it stays distinct from "scanning for images...".
           state.scanProgress = {
             ...state.scanProgress,
-            title: `Found ${state.allImages.length} images`,
+            title: t('status_found_images', { count: state.allImages.length }),
           };
 
           // Always keep the bottom status bar count in sync

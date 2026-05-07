@@ -54,7 +54,7 @@ export async function injectContentScript(
   try {
     // 1) Already injected? PING the main frame.
     try {
-      await sendMessageToTabWithTimeout(tabId, { type: MESSAGE_TYPES.PING }, 3000);
+      await sendMessageToTabWithTimeout(tabId, { type: MESSAGE_TYPES.PING }, 2000, { frameId: 0 });
       if (allFrames) await injectIntoAllFrames(tabId);
       return { success: true };
     } catch {
@@ -72,43 +72,38 @@ export async function injectContentScript(
         };
       }
     } catch {
-      // If tab info is unavailable, fall through to injection — it will surface its own error.
+      // If tab info is unavailable, fall through to injection.
     }
 
-    // 3) Probe for existing globals (handles double-injection edge case).
-    try {
-      const probeResult = await chrome.scripting.executeScript({
-        target: { tabId, frameIds: [0] },
-        // `isExtracting` is a global declared by the legacy content script;
-        // the function runs in the page world so a string-based typeof is safe.
-        func: () => typeof (globalThis as Record<string, unknown>).isExtracting !== 'undefined',
-      });
-      if (probeResult?.[0]?.result === true) {
-        await new Promise((resolve) => setTimeout(resolve, 200));
-        try {
-          await sendMessageToTabWithTimeout(tabId, { type: MESSAGE_TYPES.PING }, 3000);
-        } catch {
-          await new Promise((resolve) => setTimeout(resolve, 500));
-        }
-        if (allFrames) await injectIntoAllFrames(tabId);
-        return { success: true };
-      }
-    } catch (probeError) {
-      const message = (probeError as Error).message ?? '';
-      if (message.includes('error page') || message.includes('showing error')) {
-        return {
-          success: false,
-          error: ERROR_CODES.INJECTION_FAILED,
-          message: 'Cannot access this page: the page failed to load or is showing an error',
-        };
-      }
-    }
-
-    // 4) Standard injection into the main frame.
+    // 3) Inject the content script into the main frame only.
     await chrome.scripting.executeScript({
-      target: { tabId },
+      target: { tabId, frameIds: [0] },
       files: getContentScriptFiles(),
     });
+
+    // 4) Wait for the content script's onMessage listener to be ready.
+    const maxPingAttempts = 3;
+    const pingDelayMs = 150;
+    let scriptReady = false;
+    for (let attempt = 0; attempt < maxPingAttempts; attempt++) {
+      try {
+        await sendMessageToTabWithTimeout(tabId, { type: MESSAGE_TYPES.PING }, 1500, {
+          frameId: 0,
+        });
+        scriptReady = true;
+        break;
+      } catch {
+        await new Promise((resolve) => setTimeout(resolve, pingDelayMs));
+      }
+    }
+
+    if (!scriptReady) {
+      return {
+        success: false,
+        error: ERROR_CODES.INJECTION_FAILED,
+        message: 'Content script injected but failed to respond to PING',
+      };
+    }
 
     if (allFrames) await injectIntoAllFrames(tabId);
 

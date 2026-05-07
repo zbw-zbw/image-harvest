@@ -144,7 +144,7 @@ interface SingleTabExtractResult {
 /** Extract images from many tabs sequentially, broadcasting progress. */
 export async function processMultiTabExtract(tabIds: number[]): Promise<MultiTabResult> {
   const allTabImages: ImageItem[] = [];
-  const perTabTimeoutMs = 15000;
+  const perTabTimeoutMs = 30000;
 
   let currentTabId: number | null = null;
   try {
@@ -166,8 +166,8 @@ export async function processMultiTabExtract(tabIds: number[]): Promise<MultiTab
       ]);
       tabTitle = tabImages.tabTitle || tabTitle;
       allTabImages.push(...tabImages.images);
-    } catch {
-      // Tab skipped.
+    } catch (tabError) {
+      console.warn(`[multi-tab] Tab ${tid} skipped:`, (tabError as Error).message);
     }
 
     broadcastToPopup({
@@ -182,6 +182,34 @@ export async function processMultiTabExtract(tabIds: number[]): Promise<MultiTab
   return { success: true, images: allTabImages, tabCount: tabIds.length };
 }
 
+/**
+ * Wait for a tab to finish loading (status === 'complete').
+ * Resolves immediately if the tab is already complete.
+ * Rejects after `timeoutMs` to avoid blocking indefinitely.
+ */
+async function waitForTabComplete(tabId: number, timeoutMs: number = 3000): Promise<void> {
+  const tabInfo = await chrome.tabs.get(tabId);
+  if (tabInfo.status === 'complete') return;
+
+  return new Promise<void>((resolve) => {
+    const timer = setTimeout(() => {
+      chrome.tabs.onUpdated.removeListener(listener);
+      // Resolve anyway — the page may be usable even if not fully "complete"
+      resolve();
+    }, timeoutMs);
+
+    const listener = (updatedTabId: number, changeInfo: chrome.tabs.TabChangeInfo): void => {
+      if (updatedTabId === tabId && changeInfo.status === 'complete') {
+        clearTimeout(timer);
+        chrome.tabs.onUpdated.removeListener(listener);
+        resolve();
+      }
+    };
+
+    chrome.tabs.onUpdated.addListener(listener);
+  });
+}
+
 async function extractFromSingleTab(
   tid: number,
   isCurrentTab: boolean = false
@@ -193,36 +221,53 @@ async function extractFromSingleTab(
     return { images: [], tabTitle };
   }
 
-  const injResult = await Promise.race<{ success: boolean }>([
-    injectContentScript(tid),
-    new Promise<{ success: false }>((resolve) =>
-      setTimeout(
-        () =>
-          resolve({
-            success: false,
-          }),
-        10000
-      )
-    ),
-  ]);
-  if (!injResult.success) {
+  // Wait for the page to finish loading before injecting / extracting.
+  if (tabInfo.status !== 'complete') {
+    await waitForTabComplete(tid);
+  }
+
+  // Give injectContentScript at most 8 seconds to avoid hanging on pages
+  // where chrome.scripting.executeScript stalls (CSP, heavy JS, etc.).
+  try {
+    const injResult = await Promise.race([
+      injectContentScript(tid),
+      new Promise<{ success: false; error: string; message: string }>((resolve) =>
+        setTimeout(
+          () => resolve({ success: false, error: 'TIMEOUT', message: 'Injection timed out' }),
+          8000
+        )
+      ),
+    ]);
+    if (!injResult.success) {
+      return { images: [], tabTitle };
+    }
+  } catch {
     return { images: [], tabTitle };
   }
 
-  const tabResponse: ExtractResponse = await sendMessageToTabWithTimeout(
-    tid,
-    { type: MESSAGE_TYPES.EXTRACT_IMAGES },
-    10000
-  );
+  try {
+    const tabResponse: ExtractResponse = await sendMessageToTabWithTimeout(
+      tid,
+      { type: MESSAGE_TYPES.EXTRACT_IMAGES },
+      10000,
+      { frameId: 0 }
+    );
 
-  const images: ImageItem[] = (tabResponse?.images || []).map((img) => ({
-    ...img,
-    tabId: tid,
-    tabTitle: tabInfo.title || '',
-    tabUrl: tabInfo.url || '',
-    tabIndex: tabInfo.index ?? 0,
-    isCurrentTab,
-  }));
+    const images: ImageItem[] = (tabResponse?.images || []).map((img) => ({
+      ...img,
+      tabId: tid,
+      tabTitle: tabInfo.title || '',
+      tabUrl: tabInfo.url || '',
+      tabIndex: tabInfo.index ?? 0,
+      isCurrentTab,
+    }));
 
-  return { images, tabTitle };
+    return { images, tabTitle };
+  } catch (extractError) {
+    console.warn(
+      `[multi-tab] ✗ EXTRACT_IMAGES failed for tab ${tid}:`,
+      (extractError as Error).message
+    );
+    return { images: [], tabTitle };
+  }
 }

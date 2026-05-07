@@ -197,7 +197,7 @@ describe('paywall-state: counters track shown', () => {
 describe('<SoftPaywallBanner>', () => {
   test('renders nothing initially (async eligibility check)', () => {
     render(<SoftPaywallBanner />);
-    expect(screen.queryByText(/Loving Image Harvest/i)).toBeNull();
+    expect(screen.queryByText(/Upgrade to Pro/i)).toBeNull();
   });
 
   test('renders nothing for Pro users even when eligible', async () => {
@@ -207,7 +207,7 @@ describe('<SoftPaywallBanner>', () => {
     // Give the useEffect microtasks a chance to settle.
     await Promise.resolve();
     await Promise.resolve();
-    expect(screen.queryByText(/Loving Image Harvest/i)).toBeNull();
+    expect(screen.queryByText(/Upgrade to Pro/i)).toBeNull();
   });
 
   test('renders nothing when below threshold', async () => {
@@ -215,29 +215,29 @@ describe('<SoftPaywallBanner>', () => {
     render(<SoftPaywallBanner />);
     await Promise.resolve();
     await Promise.resolve();
-    expect(screen.queryByText(/Loving Image Harvest/i)).toBeNull();
+    expect(screen.queryByText(/Upgrade to Pro/i)).toBeNull();
   });
 
   test('renders banner once threshold met', async () => {
     await recordDownloads(SOFT_PAYWALL_THRESHOLD);
     render(<SoftPaywallBanner />);
     await waitFor(() => {
-      expect(screen.queryByText(/Loving Image Harvest/i)).not.toBeNull();
+      expect(screen.queryByText(/Upgrade to Pro/i)).not.toBeNull();
     });
     expect(screen.queryByRole('button', { name: 'Try Pro Free' })).not.toBeNull();
-    expect(screen.queryByRole('button', { name: 'Maybe later' })).not.toBeNull();
+    expect(screen.queryByRole('button', { name: 'Later' })).not.toBeNull();
   });
 
   test('clicking "Maybe later" dismisses and persists dismissedAt', async () => {
     await recordDownloads(SOFT_PAYWALL_THRESHOLD);
     render(<SoftPaywallBanner />);
-    const laterBtn = await screen.findByRole('button', { name: 'Maybe later' });
+    const laterBtn = await screen.findByRole('button', { name: 'Later' });
 
     fireEvent.click(laterBtn);
 
     // Banner disappears.
     await waitFor(() => {
-      expect(screen.queryByText(/Loving Image Harvest/i)).toBeNull();
+      expect(screen.queryByText(/Upgrade to Pro/i)).toBeNull();
     });
     // State reflects the dismissal.
     const s = await getState();
@@ -267,7 +267,7 @@ describe('<SoftPaywallBanner>', () => {
     fireEvent.click(closeBtn);
 
     await waitFor(() => {
-      expect(screen.queryByText(/Loving Image Harvest/i)).toBeNull();
+      expect(screen.queryByText(/Upgrade to Pro/i)).toBeNull();
     });
     const s = await getState();
     expect(s.dismissedAt).toBe(now);

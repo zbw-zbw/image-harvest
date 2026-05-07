@@ -21,6 +21,7 @@
 //
 // Called from settings.ts > showSettings() via dynamic import.
 import { MESSAGE_TYPES, PRICING_PAGE_URL } from '../shared/constants';
+import { t } from '../shared/i18n';
 import { applyProFeatureVisibility, closeProUpgradeModal } from './settings';
 import { showConfirmDialog, showToast } from './ui';
 
@@ -60,9 +61,9 @@ export async function updateLicenseUI(): Promise<void> {
       const planBadge = document.getElementById('license-plan-badge');
       if (planBadge && info.plan) {
         const planLabels: Record<string, string> = {
-          monthly: 'Monthly',
-          yearly: 'Yearly',
-          lifetime: 'Lifetime',
+          monthly: t('plan_monthly'),
+          yearly: t('plan_yearly'),
+          lifetime: t('plan_lifetime'),
         };
         planBadge.textContent = planLabels[info.plan] || info.plan;
       }
@@ -70,9 +71,9 @@ export async function updateLicenseUI(): Promise<void> {
       const expiresEl = document.getElementById('license-expires');
       if (expiresEl) {
         if (info.plan === 'lifetime') {
-          expiresEl.textContent = 'Never expires';
+          expiresEl.textContent = t('plan_never_expires');
         } else if (info.expiresAt) {
-          expiresEl.textContent = 'Expires: ' + formatDateYMD(info.expiresAt);
+          expiresEl.textContent = t('plan_expires_date', { date: formatDateYMD(info.expiresAt) });
         } else {
           expiresEl.textContent = '';
         }
@@ -100,7 +101,7 @@ export async function activateLicenseFromInput(
   const key = inputEl.value.trim();
   if (!key) {
     if (errorEl) {
-      errorEl.textContent = 'Please enter a license key';
+      errorEl.textContent = t('license_enter_key');
       errorEl.classList.remove('hidden');
     }
     return;
@@ -108,7 +109,7 @@ export async function activateLicenseFromInput(
 
   const originalText = buttonEl.textContent;
   buttonEl.disabled = true;
-  buttonEl.textContent = 'Activating...';
+  buttonEl.textContent = t('license_activating');
   if (errorEl) errorEl.classList.add('hidden');
 
   try {
@@ -121,16 +122,16 @@ export async function activateLicenseFromInput(
       inputEl.value = '';
       if (closeModalOnSuccess) closeProUpgradeModal();
       await applyProFeatureVisibility();
-      showToast('Pro activated successfully!', 'success');
+      showToast(t('toast_pro_activated'), 'success');
     } else {
       if (errorEl) {
-        errorEl.textContent = result?.error || 'Activation failed';
+        errorEl.textContent = result?.error || t('license_activation_failed');
         errorEl.classList.remove('hidden');
       }
     }
   } catch {
     if (errorEl) {
-      errorEl.textContent = 'Network error. Please try again.';
+      errorEl.textContent = t('license_network_error');
       errorEl.classList.remove('hidden');
     }
   } finally {

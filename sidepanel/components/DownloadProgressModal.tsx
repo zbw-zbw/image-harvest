@@ -6,6 +6,7 @@
 // Close button keeps id `btn-progress-close` for the existing click handler
 // in init.ts (it triggers the abort callback registered in showProgress).
 import { useStoreSelector } from './storeHook';
+import { t } from '../../shared/i18n';
 
 export function DownloadProgressModal() {
   const dp = useStoreSelector((s) => s.downloadProgress);
@@ -15,8 +16,8 @@ export function DownloadProgressModal() {
   // get the simpler "current / total" line.
   const text =
     dp.imageCount != null
-      ? `${dp.current} / ${dp.total} tabs · ${dp.imageCount} images found`
-      : `${dp.current} / ${dp.total}`;
+      ? t('progress_multitab_text', { current: dp.current, total: dp.total, count: dp.imageCount })
+      : t('progress_text', { current: dp.current, total: dp.total });
   return (
     <div id="progress-modal" class={`modal${dp.visible ? '' : ' hidden'}`}>
       <div class="modal-overlay" />
@@ -24,7 +25,7 @@ export function DownloadProgressModal() {
         {!isPopup && (
           <div class="modal-header">
             <h2 id="progress-title">{dp.title}</h2>
-            <button id="btn-progress-close" class="icon-btn" title="Cancel">
+            <button id="btn-progress-close" class="icon-btn" title={t('common_cancel')}>
               <svg
                 width="20"
                 height="20"

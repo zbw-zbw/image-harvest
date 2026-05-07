@@ -1,64 +1,854 @@
 {
-  "app_name": { "message": "Image Harvest" },
-  "app_tagline": { "message": "从任意网页批量下载图片" },
-
-  "common_cancel": { "message": "取消" },
-  "common_confirm": { "message": "确认" },
-  "common_close": { "message": "关闭" },
-  "common_save": { "message": "保存" },
-  "common_delete": { "message": "删除" },
-  "common_copy": { "message": "复制" },
-  "common_download": { "message": "下载" },
-  "common_upgrade": { "message": "升级到 Pro" },
-  "common_maybe_later": { "message": "稍后再说" },
-
-  "settings_title": { "message": "设置" },
-  "settings_section_appearance": { "message": "外观" },
-  "settings_section_experience": { "message": "体验" },
-  "settings_section_scan": { "message": "扫描" },
-  "settings_section_download": { "message": "下载" },
-  "settings_section_language": { "message": "语言" },
-  "settings_language_label": { "message": "界面语言" },
-  "settings_language_desc": { "message": "选择界面语言。重启面板后所有位置生效。" },
-
-  "toolbar_select_all": { "message": "全选" },
-  "toolbar_deselect_all": { "message": "取消全选" },
-  "toolbar_copy_urls": { "message": "复制 URL" },
-  "toolbar_copy_urls_tooltip": { "message": "复制选中图片的 URL 到剪贴板" },
-  "toolbar_copy_urls_empty": { "message": "请先选择图片" },
-
-  "toast_url_copied_single": { "message": "URL 已复制!" },
-  "toast_url_copied_batch": { "message": "已复制 {count} 个 URL 到剪贴板" },
-  "toast_url_copy_failed": { "message": "复制 URL 失败" },
-  "toast_download_started": { "message": "已开始下载" },
-  "toast_download_failed": { "message": "下载失败" },
-  "toast_download_cancelled": { "message": "已取消下载" },
-  "toast_download_completed": { "message": "已下载 {count} 张图片" },
-  "toast_no_images_selected": { "message": "未选中任何图片" },
-  "toast_image_removed": { "message": "已移除图片" },
-  "toast_collection_added": { "message": "已添加到收藏" },
-  "toast_collection_add_failed": { "message": "添加到收藏失败" },
-  "toast_collection_removed": { "message": "已从收藏移除" },
-  "toast_collection_remove_failed": { "message": "移除失败" },
-  "toast_color_copied": { "message": "颜色 {hex} 已复制" },
-  "toast_color_copy_failed": { "message": "复制颜色失败" },
-
-  "pro_feature_blocked_format_conversion": { "message": "格式转换是 Pro 功能,升级即可解锁!" },
-  "pro_feature_blocked_advanced_grouping": { "message": "高级分组是 Pro 功能,升级即可解锁!" },
-  "pro_feature_blocked_collection": { "message": "收藏是 Pro 功能" },
-  "pro_feature_blocked_image_delete": { "message": "移除图片是 Pro 功能,升级即可解锁!" },
-  "pro_feature_blocked_color_copy": { "message": "复制颜色是 Pro 功能" },
-  "pro_feature_blocked_reverse_search": { "message": "{engine} 搜索需要 Pro,升级即可解锁!" },
-  "pro_zip_limit": { "message": "免费版每个 ZIP 最多 {max} 张图片,升级 Pro 解锁无限!" },
-  "pro_copy_urls_limit": { "message": "免费版单次最多复制 {max} 个 URL,升级 Pro 解锁无限!" },
-  "pro_collection_limit": { "message": "免费版最多收藏 {max} 张,升级 Pro 解锁无限!" },
-
-  "rating_title": { "message": "喜欢 Image Harvest 吗?" },
+  "app_name": {
+    "message": "Image Harvest"
+  },
+  "app_tagline": {
+    "message": "从任意网页批量下载图片"
+  },
+  "common_cancel": {
+    "message": "取消"
+  },
+  "common_confirm": {
+    "message": "确认"
+  },
+  "common_close": {
+    "message": "关闭"
+  },
+  "common_save": {
+    "message": "保存"
+  },
+  "common_delete": {
+    "message": "删除"
+  },
+  "common_copy": {
+    "message": "复制"
+  },
+  "common_download": {
+    "message": "下载"
+  },
+  "common_upgrade": {
+    "message": "升级到 Pro"
+  },
+  "common_maybe_later": {
+    "message": "稍后再说"
+  },
+  "settings_title": {
+    "message": "设置"
+  },
+  "settings_section_appearance": {
+    "message": "外观"
+  },
+  "settings_section_experience": {
+    "message": "体验"
+  },
+  "settings_section_scan": {
+    "message": "扫描"
+  },
+  "settings_section_download": {
+    "message": "下载"
+  },
+  "settings_section_language": {
+    "message": "语言"
+  },
+  "settings_language_label": {
+    "message": "界面语言"
+  },
+  "toolbar_select_all": {
+    "message": "全选"
+  },
+  "toolbar_deselect_all": {
+    "message": "取消全选"
+  },
+  "toolbar_copy_urls": {
+    "message": "复制链接"
+  },
+  "toolbar_copy_urls_tooltip": {
+    "message": "复制选中图片的链接到剪贴板"
+  },
+  "toolbar_copy_urls_empty": {
+    "message": "请先选择图片"
+  },
+  "toast_url_copied_single": {
+    "message": "链接已复制!"
+  },
+  "toast_url_copied_batch": {
+    "message": "已复制 {count} 个链接到剪贴板"
+  },
+  "toast_url_copy_failed": {
+    "message": "复制链接失败"
+  },
+  "toast_download_started": {
+    "message": "已开始下载"
+  },
+  "toast_download_failed": {
+    "message": "下载失败"
+  },
+  "toast_download_cancelled": {
+    "message": "已取消下载"
+  },
+  "toast_download_completed": {
+    "message": "已下载 {count} 张图片"
+  },
+  "toast_no_images_selected": {
+    "message": "未选中任何图片"
+  },
+  "toast_image_removed": {
+    "message": "已移除图片"
+  },
+  "toast_collection_added": {
+    "message": "已添加到收藏"
+  },
+  "toast_collection_add_failed": {
+    "message": "添加到收藏失败"
+  },
+  "toast_collection_removed": {
+    "message": "已从收藏移除"
+  },
+  "toast_collection_remove_failed": {
+    "message": "移除失败"
+  },
+  "toast_color_copied": {
+    "message": "颜色 {hex} 已复制"
+  },
+  "toast_color_copy_failed": {
+    "message": "复制颜色失败"
+  },
+  "pro_feature_blocked_format_conversion": {
+    "message": "格式转换是 Pro 功能,升级即可解锁!"
+  },
+  "pro_feature_blocked_advanced_grouping": {
+    "message": "高级分组是 Pro 功能,升级即可解锁!"
+  },
+  "pro_feature_blocked_collection": {
+    "message": "收藏是 Pro 功能"
+  },
+  "pro_feature_blocked_image_delete": {
+    "message": "移除图片是 Pro 功能,升级即可解锁!"
+  },
+  "pro_feature_blocked_color_copy": {
+    "message": "复制颜色是 Pro 功能"
+  },
+  "pro_feature_blocked_reverse_search": {
+    "message": "{engine} 搜索需要 Pro,升级即可解锁!"
+  },
+  "pro_zip_limit": {
+    "message": "免费版每个 ZIP 最多 {max} 张图片,升级 Pro 解锁无限!"
+  },
+  "pro_copy_urls_limit": {
+    "message": "免费版单次最多复制 {max} 个链接，升级 Pro 解锁无限！"
+  },
+  "pro_collection_limit": {
+    "message": "免费版最多收藏 {max} 张,升级 Pro 解锁无限!"
+  },
+  "toolbar_sort": {
+    "message": "排序"
+  },
+  "toolbar_group": {
+    "message": "分组"
+  },
+  "toolbar_rescan": {
+    "message": "重新扫描"
+  },
+  "toolbar_download_all": {
+    "message": "全部下载"
+  },
+  "toolbar_download_selected": {
+    "message": "下载 ({count})"
+  },
+  "filter_size": {
+    "message": "尺寸"
+  },
+  "filter_type": {
+    "message": "类型"
+  },
+  "filter_layout": {
+    "message": "比例"
+  },
+  "filter_url": {
+    "message": "链接"
+  },
+  "filter_color": {
+    "message": "颜色"
+  },
+  "filter_all": {
+    "message": "全部"
+  },
+  "filter_min_width": {
+    "message": "最小宽度"
+  },
+  "filter_max_width": {
+    "message": "最大宽度"
+  },
+  "filter_height": {
+    "message": "高度"
+  },
+  "filter_none": {
+    "message": "无"
+  },
+  "filter_format": {
+    "message": "格式"
+  },
+  "filter_domain": {
+    "message": "域名"
+  },
+  "filter_tab": {
+    "message": "标签页"
+  },
+  "sort_size_desc": {
+    "message": "尺寸 ↓（大到小）"
+  },
+  "sort_size_asc": {
+    "message": "尺寸 ↑（小到大）"
+  },
+  "sort_filesize_desc": {
+    "message": "文件大小 ↓（大到小）"
+  },
+  "sort_filesize_asc": {
+    "message": "文件大小 ↑（小到大）"
+  },
+  "layout_all": {
+    "message": "全部"
+  },
+  "layout_square": {
+    "message": "方形 (1:1)"
+  },
+  "layout_landscape": {
+    "message": "横向 (>1:1)"
+  },
+  "layout_portrait": {
+    "message": "纵向 (<1:1)"
+  },
+  "layout_panorama": {
+    "message": "全景 (>2:1)"
+  },
+  "size_all": {
+    "message": "全部"
+  },
+  "size_small": {
+    "message": "小 < 100px"
+  },
+  "size_medium": {
+    "message": "中 100-500px"
+  },
+  "size_large": {
+    "message": "大 500-1000px"
+  },
+  "size_xl": {
+    "message": "超大 > 1000px"
+  },
+  "color_all": {
+    "message": "全部颜色"
+  },
+  "filter_url_placeholder": {
+    "message": "按链接关键词过滤..."
+  },
+  "settings_display": {
+    "message": "显示"
+  },
+  "settings_side_panel": {
+    "message": "在侧边栏显示"
+  },
+  "settings_side_panel_desc": {
+    "message": "以侧边栏形式打开插件（而非弹出窗口）"
+  },
+  "settings_density": {
+    "message": "布局密度:"
+  },
+  "settings_density_compact": {
+    "message": "紧凑"
+  },
+  "settings_density_standard": {
+    "message": "标准"
+  },
+  "settings_density_comfortable": {
+    "message": "宽松"
+  },
+  "settings_theme": {
+    "message": "主题:"
+  },
+  "settings_theme_system": {
+    "message": "跟随系统"
+  },
+  "settings_theme_light": {
+    "message": "浅色"
+  },
+  "settings_theme_dark": {
+    "message": "深色"
+  },
+  "settings_default_group": {
+    "message": "默认分组方式:"
+  },
+  "settings_similar": {
+    "message": "相似图片检测"
+  },
+  "settings_color_extract": {
+    "message": "颜色提取"
+  },
+  "settings_all_frames": {
+    "message": "搜索所有 iframe"
+  },
+  "settings_live_monitor": {
+    "message": "实时监控"
+  },
+  "settings_download_options": {
+    "message": "指定下载选项"
+  },
+  "settings_subfolder": {
+    "message": "子文件夹:"
+  },
+  "settings_filename": {
+    "message": "文件名:"
+  },
+  "settings_convert_format": {
+    "message": "转换格式:"
+  },
+  "settings_no_warning": {
+    "message": "下载大量文件时不再提示"
+  },
+  "settings_telemetry": {
+    "message": "分享匿名使用数据"
+  },
+  "settings_save": {
+    "message": "保存设置"
+  },
+  "settings_reset": {
+    "message": "重置"
+  },
+  "settings_saved": {
+    "message": "设置已保存"
+  },
+  "settings_save_failed": {
+    "message": "保存设置失败"
+  },
+  "status_found_images": {
+    "message": "找到 {count} 张图片"
+  },
+  "status_similar": {
+    "message": "相似"
+  },
+  "rating_title": {
+    "message": "喜欢 Image Harvest 吗?"
+  },
   "rating_desc": {
     "message": "如果我们帮你节省了时间,在 Chrome 应用商店留下 5 星评价对我们意义重大。"
   },
-  "rating_rate_now": { "message": "⭐ 去 Chrome 商店评价" },
-  "rating_later": { "message": "稍后再说" },
-  "rating_never": { "message": "不再提示" },
-  "rating_close": { "message": "关闭" }
+  "rating_rate_now": {
+    "message": "⭐ 去 Chrome 商店评价"
+  },
+  "rating_later": {
+    "message": "稍后再说"
+  },
+  "rating_never": {
+    "message": "不再提示"
+  },
+  "rating_close": {
+    "message": "关闭"
+  },
+  "btn_deactivate": {
+    "message": "解绑"
+  },
+  "card_add_to_collection": {
+    "message": "添加到收藏"
+  },
+  "card_copy_url": {
+    "message": "复制链接"
+  },
+  "card_open_in_new_tab": {
+    "message": "在新标签页打开"
+  },
+  "card_remove_from_collection": {
+    "message": "从收藏中移除"
+  },
+  "card_remove_image": {
+    "message": "移除图片"
+  },
+  "card_reverse_search": {
+    "message": "以图搜图（{engine}）"
+  },
+  "collection_export_tooltip": {
+    "message": "导出收藏为 ZIP"
+  },
+  "collection_modal_title": {
+    "message": "收藏"
+  },
+  "collection_search_placeholder": {
+    "message": "搜索收藏..."
+  },
+  "common_dismiss": {
+    "message": "关闭"
+  },
+  "common_remove": {
+    "message": "移除"
+  },
+  "confirm_remove_image_message": {
+    "message": "确定从列表中移除此图片？"
+  },
+  "confirm_remove_image_title": {
+    "message": "移除图片"
+  },
+  "dedup_modal_title": {
+    "message": "相似图片"
+  },
+  "dedup_remove_duplicates": {
+    "message": "移除重复项"
+  },
+  "dialog_deactivate_message": {
+    "message": "确定要在此设备上解绑许可证吗？解绑后可在其他设备上激活。"
+  },
+  "dialog_deactivate_title": {
+    "message": "解绑许可证"
+  },
+  "dialog_download_many_message": {
+    "message": "即将下载 {count} 张图片，是否继续？"
+  },
+  "dialog_download_many_title": {
+    "message": "批量下载图片"
+  },
+  "empty_no_images_desc": {
+    "message": "尝试滚动页面或点击重新扫描以找到更多图片。"
+  },
+  "empty_no_results_desc": {
+    "message": "尝试调整筛选条件以查看更多结果。"
+  },
+  "empty_rescan_images": {
+    "message": "重新扫描"
+  },
+  "empty_reset_filters": {
+    "message": "重置筛选"
+  },
+  "empty_title": {
+    "message": "未找到图片"
+  },
+  "error_default_code": {
+    "message": "错误"
+  },
+  "error_default_message": {
+    "message": "发生错误"
+  },
+  "grid_current_tab_badge": {
+    "message": "当前标签页"
+  },
+  "hotkey_not_set": {
+    "message": "未设置"
+  },
+  "hotkey_click_to_set": {
+    "message": "点击设置"
+  },
+  "live_indicator_label": {
+    "message": "实时"
+  },
+  "live_indicator_tooltip": {
+    "message": "实时监控已启用 - 自动检测新图片"
+  },
+  "multitab_modal_title": {
+    "message": "多标签页提取"
+  },
+  "multitab_progress_default": {
+    "message": "正在从选中的标签页提取图片..."
+  },
+  "multitab_start_extraction": {
+    "message": "开始提取"
+  },
+  "multitab_current": {
+    "message": "当前"
+  },
+  "multitab_untitled": {
+    "message": "未命名"
+  },
+  "paywall_banner_desc": {
+    "message": "解锁多标签页提取、颜色筛选等高级功能。"
+  },
+  "paywall_banner_later": {
+    "message": "稍后"
+  },
+  "paywall_banner_title": {
+    "message": "升级到 Pro"
+  },
+  "paywall_banner_try_cta": {
+    "message": "免费试用 Pro"
+  },
+  "plan_expires_date": {
+    "message": "到期时间：{date}"
+  },
+  "plan_lifetime": {
+    "message": "永久"
+  },
+  "plan_monthly": {
+    "message": "月付"
+  },
+  "plan_never_expires": {
+    "message": "永不过期"
+  },
+  "plan_yearly": {
+    "message": "年付"
+  },
+  "privacy_accept": {
+    "message": "接受"
+  },
+  "privacy_anonymous_data": {
+    "message": "匿名使用数据"
+  },
+  "privacy_collect_desc": {
+    "message": "功能使用情况、崩溃报告和性能指标"
+  },
+  "privacy_collect_title": {
+    "message": "我们收集的内容"
+  },
+  "privacy_decline": {
+    "message": "拒绝"
+  },
+  "privacy_desc_prefix": {
+    "message": "我们收集"
+  },
+  "privacy_desc_suffix": {
+    "message": "以改进 Image Harvest。"
+  },
+  "privacy_footnote": {
+    "message": "您可以随时在设置中更改此选项。"
+  },
+  "privacy_modal_title": {
+    "message": "帮助改进 Image Harvest"
+  },
+  "privacy_never_collect_desc": {
+    "message": "个人数据、浏览历史或图片内容"
+  },
+  "privacy_never_collect_title": {
+    "message": "我们绝不收集的内容"
+  },
+  "privacy_reversible_desc": {
+    "message": "可随时在设置中更改偏好"
+  },
+  "privacy_reversible_title": {
+    "message": "完全可逆"
+  },
+  "pro_activate": {
+    "message": "激活"
+  },
+  "pro_active_badge": {
+    "message": "Pro 已激活"
+  },
+  "pro_already_have_key": {
+    "message": "已有许可证密钥？"
+  },
+  "pro_deactivate_tooltip": {
+    "message": "解绑许可证"
+  },
+  "pro_feature_batch_desc": {
+    "message": "一键下载所有图片"
+  },
+  "pro_feature_batch_title": {
+    "message": "批量下载"
+  },
+  "pro_feature_color_desc": {
+    "message": "按主色调筛选图片"
+  },
+  "pro_feature_color_title": {
+    "message": "颜色筛选"
+  },
+  "pro_feature_dedup_desc": {
+    "message": "自动检测并移除重复图片"
+  },
+  "pro_feature_dedup_title": {
+    "message": "重复检测"
+  },
+  "pro_feature_multitab_desc": {
+    "message": "同时从多个标签页提取图片"
+  },
+  "pro_feature_multitab_title": {
+    "message": "多标签页提取"
+  },
+  "pro_feature_reverse_search_desc": {
+    "message": "通过以图搜图查找图片来源"
+  },
+  "pro_feature_reverse_search_title": {
+    "message": "以图搜图"
+  },
+  "pro_get_pro_link": {
+    "message": "获取 Pro"
+  },
+  "pro_headline_variant_a": {
+    "message": "解锁 Image Harvest 的全部功能"
+  },
+  "pro_headline_variant_b": {
+    "message": "升级 Pro — 每周节省数小时"
+  },
+  "pro_no_key_hint": {
+    "message": "还没有密钥？"
+  },
+  "pro_pricing_cta": {
+    "message": "查看价格"
+  },
+  "pro_subline_variant_a": {
+    "message": "一次购买，永久更新。"
+  },
+  "pro_subline_variant_b": {
+    "message": "加入数千名高级用户的行列。"
+  },
+  "pro_trial_badge": {
+    "message": "7 天免费试用"
+  },
+  "pro_trial_desc": {
+    "message": "免费体验全部 Pro 功能 7 天，无需任何承诺。"
+  },
+  "pro_trial_perk_full_access": {
+    "message": "完整使用所有 Pro 功能"
+  },
+  "pro_trial_perk_no_card": {
+    "message": "无需绑定信用卡"
+  },
+  "pro_trial_perk_cancel": {
+    "message": "到期自动结束，无需手动取消"
+  },
+  "pro_trial_start_cta": {
+    "message": "开始免费试用"
+  },
+  "pro_trial_start_failed": {
+    "message": "启动试用失败"
+  },
+  "pro_trial_started_toast": {
+    "message": "Pro 试用已激活！畅享 7 天全部功能。"
+  },
+  "pro_trial_starting": {
+    "message": "正在启动试用..."
+  },
+  "pro_trial_unavailable": {
+    "message": "试用不可用"
+  },
+  "progress_downloading": {
+    "message": "下载中..."
+  },
+  "progress_text": {
+    "message": "{current} / {total}"
+  },
+  "progress_multitab_text": {
+    "message": "{current}/{total} 个标签页 · 已找到 {count} 张图片"
+  },
+  "restricted_subtitle": {
+    "message": "此页面限制了内容脚本。请尝试其他页面。"
+  },
+  "scan_cancel": {
+    "message": "取消扫描"
+  },
+  "scan_discovering": {
+    "message": "正在扫描图片..."
+  },
+  "scan_progress_text": {
+    "message": "扫描中：{current} / {total}"
+  },
+  "scan_scanning": {
+    "message": "扫描中..."
+  },
+  "scan_updated": {
+    "message": "已更新"
+  },
+  "scan_updating": {
+    "message": "更新中..."
+  },
+  "status_n_selected": {
+    "message": "已选 {count} 张"
+  },
+  "status_total_images": {
+    "message": "共 {count} 张"
+  },
+  "title_click_copy_color": {
+    "message": "点击复制 {color}"
+  },
+  "title_collection": {
+    "message": "收藏"
+  },
+  "title_download": {
+    "message": "下载图片"
+  },
+  "title_multitab": {
+    "message": "多标签页提取"
+  },
+  "title_rescan": {
+    "message": "重新扫描图片"
+  },
+  "title_select_all": {
+    "message": "点击全选"
+  },
+  "title_settings": {
+    "message": "设置"
+  },
+  "title_switch_grid": {
+    "message": "切换到网格视图"
+  },
+  "title_switch_list": {
+    "message": "切换到列表视图"
+  },
+  "title_transparent_image": {
+    "message": "透明图片"
+  },
+  "title_upgrade_copy_color": {
+    "message": "升级 Pro 以复制颜色"
+  },
+  "title_view_similar": {
+    "message": "查看相似图片"
+  },
+  "toast_deactivate_failed": {
+    "message": "解绑失败"
+  },
+  "toast_license_deactivated": {
+    "message": "许可证已解绑"
+  },
+  "toast_n_new": {
+    "message": "{count} 张新增"
+  },
+  "toast_n_removed": {
+    "message": "{count} 张移除"
+  },
+  "toast_pro_color_filter": {
+    "message": "颜色筛选是 Pro 功能，升级以解锁！"
+  },
+  "toast_pro_naming_locked": {
+    "message": "自定义命名是 Pro 功能，升级以解锁！"
+  },
+  "toast_pro_setting_locked": {
+    "message": "此设置需要 Pro，升级以解锁！"
+  },
+  "toast_settings_reset": {
+    "message": "设置已重置为默认值"
+  },
+  "view_grid": {
+    "message": "网格"
+  },
+  "view_list": {
+    "message": "列表"
+  },
+  "format_original": {
+    "message": "原始格式"
+  },
+  "menu_reverse_search": {
+    "message": "以图搜图"
+  },
+  "settings_all_frames_desc": {
+    "message": "同时扫描 iframe 和嵌入框架中的图片"
+  },
+  "settings_color_extract_desc": {
+    "message": "提取每张图片的主色调用于筛选"
+  },
+  "settings_download_options_desc": {
+    "message": "自定义子文件夹、文件名模板和格式转换"
+  },
+  "settings_hotkey": {
+    "message": "快捷键："
+  },
+  "settings_live_monitor_desc": {
+    "message": "页面内容变化时自动检测新图片"
+  },
+  "settings_max_size": {
+    "message": "启用最大尺寸过滤"
+  },
+  "settings_max_size_desc": {
+    "message": "过滤大于指定尺寸的图片"
+  },
+  "settings_min_size": {
+    "message": "启用最小尺寸过滤"
+  },
+  "settings_min_size_desc": {
+    "message": "过滤小于指定尺寸的图片"
+  },
+  "settings_no_warning_desc": {
+    "message": "下载多文件时跳过确认对话框"
+  },
+  "settings_section_display": {
+    "message": "显示"
+  },
+  "settings_section_pro": {
+    "message": "Pro"
+  },
+  "settings_section_account": {
+    "message": "账号"
+  },
+  "settings_similar_desc": {
+    "message": "查找并分组视觉相似或重复的图片"
+  },
+  "settings_telemetry_desc": {
+    "message": "发送匿名功能使用事件。不包含网址、图片或个人信息。"
+  },
+  "status_found_prefix": {
+    "message": "找到"
+  },
+  "status_found_suffix": {
+    "message": "张图片"
+  },
+  "filter_type_other": {
+    "message": "其他"
+  },
+  "license_activating": {
+    "message": "激活中..."
+  },
+  "license_activation_failed": {
+    "message": "激活失败"
+  },
+  "license_enter_key": {
+    "message": "请输入许可证密钥"
+  },
+  "license_network_error": {
+    "message": "网络错误，请重试。"
+  },
+  "license_placeholder": {
+    "message": "输入许可证密钥"
+  },
+  "settings_height_gte": {
+    "message": "高度 ≥"
+  },
+  "settings_height_lte": {
+    "message": "高度 ≤"
+  },
+  "settings_width_gte": {
+    "message": "宽度 ≥"
+  },
+  "settings_width_lte": {
+    "message": "宽度 ≤"
+  },
+  "toast_pro_activated": {
+    "message": "Pro 激活成功！"
+  },
+  "multitab_extracting": {
+    "message": "提取中..."
+  },
+  "multitab_starting": {
+    "message": "开始提取..."
+  },
+  "settings_variables_hint": {
+    "message": "变量：{domain}、{index}、{original}、{format}、{width}、{height}"
+  },
+  "toast_extraction_cancelled": {
+    "message": "提取已取消"
+  },
+  "toast_extraction_failed": {
+    "message": "提取失败"
+  },
+  "toast_extraction_success": {
+    "message": "已从 {tabs} 个标签页提取 {images} 张图片"
+  },
+  "toast_multitab_failed": {
+    "message": "多标签页提取失败"
+  },
+  "toolbar_similar": {
+    "message": "相似"
+  },
+  "status_similar_count": {
+    "message": "{count} 张相似"
+  },
+  "dedup_no_similar": {
+    "message": "未找到相似图片"
+  },
+  "dedup_group_title": {
+    "message": "第 {index} 组（{count} 张相似）"
+  },
+  "collection_no_match": {
+    "message": "未找到匹配的图片"
+  },
+  "collection_empty_title": {
+    "message": "收藏夹为空"
+  },
+  "collection_no_match_hint": {
+    "message": "请尝试其他搜索关键词"
+  },
+  "collection_empty_hint": {
+    "message": "点击任意图片上的星标图标即可添加到收藏夹"
+  }
 }

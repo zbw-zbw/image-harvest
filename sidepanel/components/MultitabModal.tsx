@@ -4,6 +4,7 @@
 // only owns the wrapper visibility and the static chrome.
 import { useStoreSelector } from './storeHook';
 import { state } from '../state';
+import { t } from '../../shared/i18n';
 
 function close(): void {
   state.multitabModalState = { open: false };
@@ -30,7 +31,7 @@ export function MultitabModal() {
               <line x1="3" y1="9" x2="21" y2="9" />
               <line x1="9" y1="21" x2="9" y2="9" />
             </svg>
-            Multi-Tab Extract <span class="pro-badge">PRO</span>
+            {t('multitab_modal_title')} <span class="pro-badge">PRO</span>
           </h2>
           <button id="btn-multitab-close" class="icon-btn" onClick={close}>
             <svg
@@ -47,7 +48,7 @@ export function MultitabModal() {
         </div>
         <div class="multitab-select-all-bar">
           {/* Click handler bound in init.ts; keep the id so it still hits. */}
-          <button id="multitab-select-all" class="select-all-btn" title="Select all">
+          <button id="multitab-select-all" class="select-all-btn" title={t('toolbar_select_all')}>
             <span class="select-all-checkbox">
               <svg
                 width="12"
@@ -61,7 +62,7 @@ export function MultitabModal() {
                 <polyline points="20 6 9 17 4 12" />
               </svg>
             </span>
-            <span class="select-all-text">Select all</span>
+            <span class="select-all-text">{t('toolbar_select_all')}</span>
           </button>
         </div>
         <div class="modal-body">
@@ -70,10 +71,10 @@ export function MultitabModal() {
         </div>
         <div class="modal-footer">
           <button id="btn-cancel-multitab" class="btn btn-secondary" onClick={close}>
-            Cancel
+            {t('common_cancel')}
           </button>
           <button id="btn-start-extraction" class="btn btn-primary">
-            Start Extraction
+            {t('multitab_start_extraction')}
           </button>
           {/* Extraction progress strip — toggled by pro-features.ts via legacy
               classList. We render it static (always present) so the existing
@@ -82,7 +83,7 @@ export function MultitabModal() {
             <div class="progress-bar">
               <div id="extraction-fill" class="progress-fill" />
             </div>
-            <span id="extraction-text">0 / 0 tabs</span>
+            <span id="extraction-text">{t('multitab_progress_default')}</span>
           </div>
         </div>
       </div>

@@ -23,6 +23,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 // The state-machine functions themselves only touch state.scanProgress
 // and document.querySelectorAll('.toolbar, .status-bar') — the rest of
 // the imports are dead weight for our test.
+vi.mock('virtua', () => ({ Virtualizer: vi.fn() }));
 vi.mock('../sidepanel/ui', () => ({
   hideLoading: vi.fn(),
   showEmpty: vi.fn(),
@@ -248,7 +249,7 @@ describe('handleScanCancel', () => {
     expect(ui.showEmpty).not.toHaveBeenCalled();
     // Prefix comes from i18n key 'toast.download.cancelled' → "Download cancelled";
     // the " · N images found" suffix is appended in scan.ts L33-40 without translation.
-    expect(ui.showToast).toHaveBeenCalledWith('Download cancelled · 3 images found', 'info');
+    expect(ui.showToast).toHaveBeenCalledWith('Download cancelled · Found 3 images', 'info');
   });
 
   it('without discovered images → calls showEmpty + emits bare "Scan cancelled" toast (no applyFilters)', async () => {

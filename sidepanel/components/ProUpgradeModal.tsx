@@ -30,6 +30,7 @@
 import { useEffect, useState } from 'preact/hooks';
 import { useStoreSelector } from './storeHook';
 import { state } from '../state';
+import { t } from '../../shared/i18n';
 import { track, flushNow } from '../../shared/telemetry';
 import { EVENTS } from '../../shared/telemetry-events';
 import { getProUpsellBucket, type AbBucket } from '../../shared/ab-experiment';
@@ -56,16 +57,16 @@ function close(): void {
 // personalized value-prop line. A is the static control.
 function variantHeadline(bucket: AbBucket, download: number): string {
   if (bucket === 'b' && download >= 5) {
-    return `You've downloaded ${download} images — go unlimited`;
+    return t('pro_headline_variant_b', { download });
   }
-  return 'Unlock Pro Features';
+  return t('pro_headline_variant_a');
 }
 
 function variantSubline(bucket: AbBucket): string {
   if (bucket === 'b') {
-    return 'Power users save 10× more time with batch + multi-tab + reverse search.';
+    return t('pro_subline_variant_b');
   }
-  return 'Batch downloads, multi-tab extract, reverse search & more.';
+  return t('pro_subline_variant_a');
 }
 
 // ── Trial CTA: kicks off the 7-day free trial flow.
@@ -85,7 +86,7 @@ async function handleStartTrial(
   try {
     ({ startTrial } = await import('../../shared/trial'));
   } catch {
-    setError('Trial unavailable. Please try again later.');
+    setError(t('pro_trial_unavailable'));
     return;
   }
 
@@ -95,13 +96,13 @@ async function handleStartTrial(
   try {
     const result = await startTrial();
     if (!result.success) {
-      setError(result.error || 'Could not start your trial. Please try again.');
+      setError(result.error || t('pro_trial_start_failed'));
       return;
     }
     void track(EVENTS.TRIAL_STARTED);
     void flushNow();
     await markResolved();
-    showToast('Your 7-day Pro trial is active!', 'success');
+    showToast(t('pro_trial_started_toast'), 'success');
     try {
       await chrome.runtime.sendMessage({ type: MESSAGE_TYPES.VALIDATE_LICENSE });
     } catch {
@@ -206,53 +207,61 @@ export function ProUpgradeModal() {
           <div class="pro-upgrade-features">
             <ul class="pro-feature-list">
               <ProFeatureItem
-                title="Unlimited batch download"
-                desc="ZIP any number of images in one go — no Free-tier cap."
+                title={t('pro_feature_batch_title')}
+                desc={t('pro_feature_batch_desc')}
               />
               <ProFeatureItem
-                title="Multi-tab extraction"
-                desc="Pull images from every open tab simultaneously."
+                title={t('pro_feature_multitab_title')}
+                desc={t('pro_feature_multitab_desc')}
               />
               <ProFeatureItem
-                title="Reverse image search"
-                desc="Search via Google, TinEye, Baidu, and Yandex with one click."
+                title={t('pro_feature_reverse_search_title')}
+                desc={t('pro_feature_reverse_search_desc')}
               />
               <ProFeatureItem
-                title="Similar & duplicate detection"
-                desc="Auto-group lookalikes using perceptual hashing."
+                title={t('pro_feature_dedup_title')}
+                desc={t('pro_feature_dedup_desc')}
               />
               <ProFeatureItem
-                title="Color extraction & filtering"
-                desc="Filter your gallery by dominant color palette."
+                title={t('pro_feature_color_title')}
+                desc={t('pro_feature_color_desc')}
               />
             </ul>
           </div>
 
           {/* ── Section 2: trial / pricing CTAs ─────────────────────────── */}
           <div class="pro-upgrade-cta-section">
-            <div class="pro-upgrade-trial-badge">
-              <span aria-hidden="true">🎁</span>
-              7-Day Free Trial · No credit card required
+            <div class="pro-upgrade-trial-header">
+              <div class="pro-upgrade-trial-badge">
+                <span aria-hidden="true">🎁</span>
+                {t('pro_trial_badge')}
+              </div>
+              <p class="pro-upgrade-trial-desc">{t('pro_trial_desc')}</p>
             </div>
+            <ul class="pro-upgrade-trial-perks">
+              <li>{t('pro_trial_perk_full_access')}</li>
+              <li>{t('pro_trial_perk_no_card')}</li>
+              <li>{t('pro_trial_perk_cancel')}</li>
+            </ul>
             <div class="pro-upgrade-cta-row">
               <button
                 id="btn-pro-modal-trial"
                 type="button"
-                class="btn btn-primary btn-block"
+                class="btn btn-primary btn-cta"
                 disabled={trialLoading}
                 onClick={() => {
                   void handleStartTrial(setTrialError, setTrialLoading);
                 }}
               >
-                {trialLoading ? 'Starting…' : 'Start Free Trial'}
+                {trialLoading ? t('pro_trial_starting') : t('pro_trial_start_cta')}
               </button>
               <button
                 id="btn-pro-modal-pricing"
                 type="button"
-                class="btn btn-secondary btn-block"
+                class="btn btn-secondary btn-cta"
                 onClick={handlePricingClick}
               >
-                View Pricing →
+                {t('pro_pricing_cta')}
               </button>
             </div>
             <p
@@ -263,9 +272,9 @@ export function ProUpgradeModal() {
             </p>
           </div>
 
-          {/* ── Section 3: legacy already-have-a-key activation form ───── */}
+          {/* ── Section 3: license key activation form ──────────────────── */}
           <div class="pro-upgrade-divider">
-            <span>Already have a key?</span>
+            <span>{t('pro_already_have_key')}</span>
           </div>
           <div class="pro-upgrade-input-section">
             <div class="license-input-row">
@@ -282,21 +291,21 @@ export function ProUpgradeModal() {
                 autocomplete="off"
               />
               <button id="btn-pro-modal-activate" class="btn btn-primary btn-sm">
-                Activate
+                {t('pro_activate')}
               </button>
             </div>
             <p id="pro-modal-error" class={`license-error${ms.errorText ? '' : ' hidden'}`}>
               {ms.errorText}
             </p>
-            <p class="setting-desc license-hint">
-              {`Don't have a key? `}
+            <p class="pro-upgrade-get-pro-hint">
+              {t('pro_no_key_hint')}{' '}
               <a
                 id="link-pro-modal-get"
                 href="#"
                 class="license-link"
                 onClick={handleLegacyGetProClick}
               >
-                Get Pro →
+                {t('pro_get_pro_link')}
               </a>
             </p>
           </div>

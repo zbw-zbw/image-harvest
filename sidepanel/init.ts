@@ -8,7 +8,7 @@ import { setEnvelopeMeta, track, flushNow } from '../shared/telemetry';
 import { EVENTS } from '../shared/telemetry-events';
 import { isProUser } from '../shared/license';
 import { getProUpsellBucket } from '../shared/ab-experiment';
-import { detectLocale, t } from '../shared/i18n';
+import { detectLocale, onLocaleChange, t } from '../shared/i18n';
 import {
   clearSelection,
   downloadSelectedAsZip,
@@ -27,18 +27,17 @@ import {
   syncCustomSizeInputsFromSettings,
 } from './filter';
 import { mountPreactComponents } from './components/mount';
-import { handleKeyDown, handleMessage } from './message';
+import { cancelDiscoveredToast, handleKeyDown, handleMessage } from './message';
 import {
   exportCollection,
   removeDuplicates,
   showCollectionModal,
-  showDedupModal,
   showMultiTabModal,
   startMultiTabExtract,
   toggleMultitabSelectAll,
 } from './pro-features';
 import { renderImages } from './render';
-import { fetchImages, handleScanCancel } from './scan';
+import { fetchImages, handleScanCancel, processImageExtras } from './scan';
 import {
   applyDensity,
   applyProFeatureVisibility,
@@ -58,6 +57,7 @@ import {
 import { clearTabImageCache, getTabImageCache, saveTabImageCache } from '../shared/storage';
 import { elements, state } from './state';
 import {
+  applyTranslations,
   handleProgressClose,
   hideLoading,
   hideRestricted,
@@ -72,6 +72,18 @@ import { debounce, generateId, loadSettings } from './utils';
 
 // Module-level rescan debounce timer
 let tabUpdatedTimer: ReturnType<typeof setTimeout> | null = null;
+
+// Timestamp of the last tab switch — used by handleTabUpdated and
+// handleMessage to suppress Chrome's spurious events that arrive shortly
+// after a tab switch (race condition where isTabSwitching has already been
+// reset in the finally block).
+let lastTabSwitchTime = 0;
+const TAB_SWITCH_GRACE_MS = 2000;
+
+/** Check if we are still within the grace period after a tab switch. */
+export function isWithinTabSwitchGrace(): boolean {
+  return Date.now() - lastTabSwitchTime < TAB_SWITCH_GRACE_MS;
+}
 
 // ============================================
 // Initialization
@@ -162,16 +174,35 @@ async function init(): Promise<void> {
   syncCustomSizeInputsFromSettings();
   await applyProFeatureVisibility();
   updateFilterButtonLabels();
+  applyTranslations();
   initResizeObserver();
+
+  // Register locale-change listener so a runtime language switch in Settings
+  // immediately updates all DOM text without requiring a panel reload.
+  onLocaleChange(() => {
+    applyTranslations();
+    updateFilterButtonLabels();
+    updateSelectionUI();
+    // Bump the localeTick counter so Preact components that call t() re-render
+    // with the new translations without requiring a panel reload.
+    state.localeTick = (state.localeTick ?? 0) + 1;
+  });
 
   // Show loading overlay immediately — before establishing any message
   // connections that could trigger early image rendering via IMAGES_DISCOVERED
   showLoading();
 
-  // Establish a long-lived connection to background for broadcast messages
-  // (avoids "Could not establish connection" errors from runtime.sendMessage)
-  const uiPort = chrome.runtime.connect({ name: 'image-snatcher-ui' });
-  uiPort.onMessage.addListener(handleMessage);
+  // Establish a long-lived connection to background for broadcast messages.
+  // Wrap in try-catch: after extension reload the background service worker
+  // may not be ready yet, which causes chrome.runtime.connect() to throw
+  // synchronously. Without this guard the entire init() would abort and
+  // loadCurrentTab() would never execute — the panel would stay blank.
+  try {
+    const uiPort = chrome.runtime.connect({ name: 'image-snatcher-ui' });
+    uiPort.onMessage.addListener(handleMessage);
+  } catch (error) {
+    console.warn('Failed to connect to background — will retry via sendMessage:', error);
+  }
 
   // Listen for tab switches / navigations so we can auto-refresh
   if (!state.isPopupMode) {
@@ -208,7 +239,7 @@ async function init(): Promise<void> {
       if (document.visibilityState === 'hidden') {
         lastHiddenTime = Date.now();
       } else if (document.visibilityState === 'visible' && state.isInitialized) {
-        if (state.isTabSwitching) {
+        if (state.isTabSwitching || isWithinTabSwitchGrace()) {
           lastHiddenTime = 0;
           return;
         }
@@ -218,29 +249,42 @@ async function init(): Promise<void> {
 
         lastHiddenTime = 0;
 
-        if (state.currentTabId != null && state.tabCache.has(state.currentTabId)) {
-          return;
+        // If we already have images for the current tab (either in memory
+        // cache or currently displayed), skip the rescan.
+        if (state.currentTabId != null) {
+          if (state.tabCache.has(state.currentTabId) || state.allImages.length > 0) {
+            return;
+          }
         }
 
-        loadCurrentTab(false, true);
+        loadCurrentTab(false, state.currentTabId ?? undefined);
       }
     });
   }
 
   // Initial load for the current tab (trigger rescan with progress overlay)
-  await loadCurrentTab(false, true);
+  await loadCurrentTab(false);
   state.isInitialized = true;
 }
 
 /**
- * Determine the current active tab and either show the restricted
+ * Determine the target tab and either show the restricted
  * placeholder or scan for images.
+ *
+ * @param forceRescan  - skip cache and do a full scan
+ * @param targetTabId  - explicit tab to load; falls back to querying the active tab
  */
-async function loadCurrentTab(forceRescan = false, showCacheToast = false): Promise<void> {
+async function loadCurrentTab(forceRescan = false, targetTabId?: number): Promise<void> {
   let activeTab: chrome.tabs.Tab | undefined;
   try {
-    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-    activeTab = tab;
+    if (targetTabId != null) {
+      // Use the explicitly provided tab — avoids querying the wrong active tab
+      // during rapid tab switches in the shared sidepanel instance.
+      activeTab = await chrome.tabs.get(targetTabId);
+    } else {
+      const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+      activeTab = tab;
+    }
     if (!activeTab || isRestrictedUrl(activeTab.url)) {
       state.currentTabId = null;
       hideLoading();
@@ -278,15 +322,20 @@ async function loadCurrentTab(forceRescan = false, showCacheToast = false): Prom
   if (!forceRescan && state.tabCache.has(tabId)) {
     const cached = state.tabCache.get(tabId)!;
     if (cached.url === tabUrl) {
+      // Assign filteredImages BEFORE allImages so that any store-proxy
+      // subscriber triggered by the allImages write already sees the
+      // correct filtered data (prevents a single-frame flash).
+      if (cached.filteredImages && cached.filteredImages.length > 0) {
+        state.filteredImages = cached.filteredImages;
+        state.lastRenderedFilteredIds = cached.lastRenderedFilteredIds ?? null;
+      }
       state.allImages = cached.images;
       state.selectedImages = cached.selectedImages;
       hideLoading();
-      applyFilters();
-      updateSelectionUI();
-
-      if (showCacheToast && !state.isTabSwitching) {
-        loadCurrentTab(true, false);
+      if (!cached.filteredImages || cached.filteredImages.length === 0) {
+        applyFilters();
       }
+      updateSelectionUI();
       return;
     }
   }
@@ -302,27 +351,37 @@ async function loadCurrentTab(forceRescan = false, showCacheToast = false): Prom
         phash: null,
       }));
       state.selectedImages = new Set();
+
+      // Apply filters to compute filteredImages for this restored data
       hideLoading();
       applyFilters();
       updateSelectionUI();
 
-      if (!state.isTabSwitching) {
-        loadCurrentTab(true, false);
-      }
+      // Write into the in-memory tabCache (including filteredImages) so
+      // subsequent tab switches hit the fast path and skip applyFilters().
+      state.tabCache.set(tabId, {
+        url: tabUrl,
+        images: [...state.allImages],
+        selectedImages: new Set(),
+        filteredImages: [...state.filteredImages],
+        lastRenderedFilteredIds: state.lastRenderedFilteredIds,
+      });
+
+      // Re-derive extras (file size, dimensions, colors, pHash) that are
+      // not persisted in the session-storage cache.  Fire-and-forget so
+      // the UI is responsive immediately while extras load in the background.
+      processImageExtras(state.allImages);
       return;
     }
   }
 
-  // No cache available — full scan with loading UI
-  await fetchImages();
+  // No cache available — full scan with loading UI.
+  // Pass the resolved tabId explicitly so fetchImages never falls back to
+  // querying the active tab (which may differ during rapid tab switches).
+  await fetchImages(tabId);
 
-  // Cache the results for this tab (both in-memory and session storage)
-  state.tabCache.set(tabId, {
-    url: tabUrl,
-    images: state.allImages,
-    selectedImages: new Set(state.selectedImages),
-  });
-  saveTabImageCache(tabId, tabUrl, state.allImages);
+  // fetchImages already persists to tabCache + sessionStorage using the
+  // locked scanTabId, so no duplicate cache write is needed here.
 
   // Establish a named port connection to the content script
   try {
@@ -347,6 +406,8 @@ async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Promise<v
       url: cachedUrl,
       images: [...state.allImages],
       selectedImages: new Set(state.selectedImages),
+      filteredImages: [...state.filteredImages],
+      lastRenderedFilteredIds: state.lastRenderedFilteredIds,
     });
     if (cachedUrl) {
       saveTabImageCache(state.currentTabId, cachedUrl, state.allImages);
@@ -358,8 +419,25 @@ async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Promise<v
   state.isSilentScanning = false;
   state.isScanning = false;
 
+  // Cancel any pending handleTabUpdated rescan timer — the tab switch
+  // supersedes any queued URL-change rescan from the previous tab.
+  if (tabUpdatedTimer) {
+    clearTimeout(tabUpdatedTimer);
+    tabUpdatedTimer = null;
+  }
+
+  // Clear stale toasts from the previous tab (e.g. "Found N images" toast
+  // from a scan that completed on the old tab just before the switch).
+  state.toasts = [];
+
+  // Cancel any pending "new images discovered" debounce timer from the
+  // previous tab's live monitoring — prevents a stale toast from firing
+  // after the switch.
+  cancelDiscoveredToast();
+
   // Mark that this visibility change is caused by a tab switch
   state.isTabSwitching = true;
+  lastTabSwitchTime = Date.now();
 
   state.currentTabId = newTabId;
 
@@ -369,13 +447,41 @@ async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Promise<v
   // Fast path (synchronous)
   if (cached) {
     try {
+      // ── IMPORTANT: assign filteredImages BEFORE allImages ──
+      // The store proxy notifies Preact subscribers on every state.xxx
+      // assignment.  If allImages is assigned first, subscribers (e.g.
+      // FoundActionCount) re-render and read filteredImages — which still
+      // holds the *previous* tab's data, causing a single-frame flash of
+      // the wrong count / image list.  By assigning filteredImages first
+      // we guarantee that any subscriber triggered by the subsequent
+      // allImages assignment already sees the correct filtered data.
+      if (cached.filteredImages && cached.filteredImages.length > 0) {
+        state.filteredImages = cached.filteredImages;
+        state.lastRenderedFilteredIds = cached.lastRenderedFilteredIds ?? null;
+      }
+
       state.allImages = cached.images;
       state.selectedImages = cached.selectedImages;
-      state.lastRenderedFilteredIds = null;
       hideLoading();
       hideRestricted();
-      applyFilters();
+
+      // If no cached filteredImages were available, derive them now.
+      if (!cached.filteredImages || cached.filteredImages.length === 0) {
+        applyFilters();
+      }
+
+      // Update the found count immediately so the status bar doesn't flash
+      // the previous tab's count.
+      if (elements.foundCount) {
+        elements.foundCount.textContent = String(state.filteredImages.length);
+      }
+
       updateSelectionUI();
+
+      // Ensure the Preact <ImageGrid> picks up the new filteredImages. The
+      // store proxy notifies subscribers on assignment, so the grid will
+      // re-render with the correct (already-sorted) data.
+      renderImages();
 
       // Verify the URL still matches asynchronously
       try {
@@ -391,9 +497,13 @@ async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Promise<v
           showRestricted();
           return;
         }
-        if (cached.url !== newTab.url) {
-          await loadCurrentTab(true);
+        if (cached.url && cached.url !== newTab.url) {
+          await loadCurrentTab(true, newTabId);
           return;
+        }
+        // If cached.url was empty (saved before URL was known), update it now
+        if (!cached.url && newTab.url) {
+          cached.url = newTab.url;
         }
       } catch {
         // Tab may have been closed — ignore
@@ -448,7 +558,7 @@ async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Promise<v
         });
     }
 
-    await loadCurrentTab(true);
+    await loadCurrentTab(false, newTabId);
   } finally {
     state.isTabSwitching = false;
   }
@@ -461,6 +571,18 @@ function handleTabUpdated(
 ): void {
   // Only react to URL changes / completed loads
   if (!changeInfo.url && changeInfo.status !== 'complete') return;
+
+  // Ignore during tab switching — handleTabChange handles the new tab's
+  // lifecycle. Without this guard, Chrome's "complete" event for the newly
+  // activated tab can race with handleTabChange and trigger a redundant
+  // rescan that shows a stale toast ("Found N images" from wrong tab).
+  if (state.isTabSwitching) return;
+
+  // Grace period after a tab switch: Chrome may fire a status=complete event
+  // for the newly activated tab shortly after handleTabChange finishes (and
+  // isTabSwitching has already been reset to false). Ignore events within
+  // the grace window to prevent spurious rescans.
+  if (Date.now() - lastTabSwitchTime < TAB_SWITCH_GRACE_MS) return;
 
   // Only handle the current tab — or, when there is no current tab, the
   // updated tab is the active tab in this window
@@ -514,7 +636,7 @@ function handleTabUpdated(
     state.selectedImages.clear();
     state.filteredImages = [];
     if (elements.imageGrid) elements.imageGrid.innerHTML = '';
-    loadCurrentTab(true);
+    loadCurrentTab(true, tabId);
   }, 800);
 }
 
@@ -618,7 +740,7 @@ function bindEvents(): void {
       state.isFetching = false;
       // Show loading overlay immediately to prevent stale content flash
       showLoading();
-      loadCurrentTab(true);
+      loadCurrentTab(true, state.currentTabId ?? undefined);
     });
   }
 
@@ -981,7 +1103,8 @@ function bindEvents(): void {
 
   // Pro features
   if (elements.btnCollection) elements.btnCollection.addEventListener('click', showCollectionModal);
-  if (elements.btnDedup) elements.btnDedup.addEventListener('click', showDedupModal);
+  // btn-dedup removed from HTML — Similar entry is now the SimilarInline
+  // Preact component in toolbar row 2, which handles clicks internally.
   if (elements.btnMultitab) elements.btnMultitab.addEventListener('click', showMultiTabModal);
   // The DedupModal / CollectionModal / MultitabModal Preact shells own their
   // close/cancel/back buttons (each calls the corresponding store-mutation
@@ -1078,7 +1201,7 @@ function bindEvents(): void {
       if (resetBtnLabel && resetBtnLabel.textContent?.trim() === 'Rescan Images') {
         // Force reset isFetching so a new scan can start
         state.isFetching = false;
-        loadCurrentTab(true);
+        loadCurrentTab(true, state.currentTabId ?? undefined);
         return;
       }
       state.activeFilters = {

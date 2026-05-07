@@ -122,8 +122,8 @@
 .setting-select {
   position: relative;
   display: inline-block;
-  margin-top: 4px;
-  margin-left: 12px;
+  margin-top: 0;
+  margin-left: 0;
 }
 
 .setting-select-btn {
@@ -132,6 +132,7 @@
   gap: 6px;
   padding: 6px 10px;
   font-size: 12px;
+  line-height: 18px;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   background: var(--bg-color);
@@ -139,7 +140,9 @@
   cursor: pointer;
   transition: all 0.2s;
   min-width: 120px;
+  min-height: 32px;
   justify-content: space-between;
+  box-sizing: border-box;
 }
 
 .setting-select-btn:hover {
@@ -184,7 +187,6 @@
 .setting-select-option {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   padding: 7px 12px;
   font-size: 12px;
   color: var(--text-primary);
@@ -193,6 +195,23 @@
   transition: all 0.15s;
   user-select: none;
   white-space: nowrap;
+  gap: 8px;
+}
+
+/* Push PRO badge to the right edge inside dropdown options */
+.setting-select-option .pro-badge-mini {
+  margin-left: auto;
+}
+
+/* Reserve fixed-width space for check mark on all options so PRO badge stays aligned */
+.setting-select-option::before {
+  content: '✓';
+  font-size: 11px;
+  width: 14px;
+  flex-shrink: 0;
+  text-align: center;
+  opacity: 0;
+  order: -1;
 }
 
 .setting-select-option:hover {
@@ -206,11 +225,8 @@
   font-weight: 600;
 }
 
-.setting-select-option.active::after {
-  content: '✓';
-  font-size: 11px;
-  margin-left: 12px;
-  flex-shrink: 0;
+.setting-select-option.active::before {
+  opacity: 1;
 }
 
 /* Settings Text/Number Inputs - matches filter-custom style */
@@ -268,6 +284,8 @@
 /* Setting Group Label */
 .settings-content .setting-group > label {
   font-size: 13px;
+  line-height: 20px;
+  min-height: 20px;
   color: var(--text-primary);
   white-space: nowrap;
   margin: 0;
@@ -306,6 +324,13 @@
 .settings-content .setting-inputs > .setting-select {
   display: inline-flex;
   width: auto;
+}
+
+.settings-content .setting-format-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding-left: 10px;
 }
 
 .settings-content .setting-inputs .setting-format-row {

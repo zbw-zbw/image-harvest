@@ -8,6 +8,7 @@
 // purely to project a single store value into the DOM. The legacy call
 // sites have been left as no-op comments so any new contributor can grep
 // for the old element id and immediately find this file.
+import { t } from '../../shared/i18n';
 import { useStoreSelector } from './storeHook';
 
 /** Toolbar label: "Found N images". */
@@ -16,10 +17,34 @@ export function FoundActionCount() {
   return <span id="found-action-count">{count}</span>;
 }
 
-/** Toolbar dedup button label: "N Similar". */
-export function SimilarCount() {
+/**
+ * Inline similar-image indicator next to "Found N images".
+ * Renders "(N similar)" as a clickable link that opens the dedup modal.
+ * Always visible — shows count 0 when no similar groups exist.
+ */
+export function SimilarInline() {
   const count = useStoreSelector((s) => s.similarGroups.length);
-  return <span id="similar-count">{count}</span>;
+  useStoreSelector((s) => s.localeTick);
+
+  const handleClick = async () => {
+    if (count === 0) return;
+    const { showDedupModal } = await import('../pro-features');
+    showDedupModal();
+  };
+
+  return (
+    <span class="similar-inline">
+      (<a
+        class={`similar-inline-link${count === 0 ? ' disabled' : ''}`}
+        role="button"
+        tabIndex={count > 0 ? 0 : -1}
+        title={count > 0 ? t('title_view_similar') : undefined}
+        onClick={handleClick}
+      >
+        {t('status_similar_count', { count })}
+      </a>)
+    </span>
+  );
 }
 
 /**
@@ -34,6 +59,11 @@ export function SimilarCount() {
  */
 export function DownloadLabel() {
   const selectedSize = useStoreSelector((s) => s.selectedImages.size);
-  const text = selectedSize > 0 ? `Download (${selectedSize})` : 'Download All';
+  const filteredCount = useStoreSelector((s) => s.filteredImages.length);
+  // Subscribe to localeTick so a runtime language switch triggers re-render
+  useStoreSelector((s) => s.localeTick);
+  const text = selectedSize > 0
+    ? t('toolbar_download_selected', { count: selectedSize })
+    : t('toolbar_download_all') + (filteredCount > 0 ? ` (${filteredCount})` : '');
   return <span id="download-label">{text}</span>;
 }

@@ -366,20 +366,11 @@ describe('clearCurrentImages / resetStatusBar / hideAll', () => {
     expect(grid.innerHTML).toBe('');
   });
 
-  it('resetStatusBar zeros foundCount text + clears similarGroups + hides dedup widgets', () => {
+  it('resetStatusBar zeros foundCount text + clears similarGroups', () => {
     const foundCount = document.createElement('span');
     foundCount.textContent = '42';
     document.body.appendChild(foundCount);
     elements.foundCount = foundCount;
-
-    const btnDedup = document.createElement('button');
-    btnDedup.style.display = 'inline-flex';
-    document.body.appendChild(btnDedup);
-    elements.btnDedup = btnDedup;
-
-    const dedupInfo = document.createElement('div');
-    dedupInfo.id = 'dedup-info';
-    document.body.appendChild(dedupInfo);
 
     state.similarGroups = [{ id: 'g1' } as never];
 
@@ -387,8 +378,6 @@ describe('clearCurrentImages / resetStatusBar / hideAll', () => {
 
     expect(foundCount.textContent).toBe('0');
     expect(state.similarGroups).toEqual([]);
-    expect(btnDedup.style.display).toBe('none');
-    expect(dedupInfo.classList.contains('hidden')).toBe(true);
   });
 
   it('hideAll hides imageGrid + loadingState and resets uiScreen to "images"', () => {
@@ -982,20 +971,14 @@ describe('showLoading / hideLoading', () => {
     expect(state.scanSkeletonsToShow).toBe(state.scanSkeletonLimit);
   });
 
-  it('resets status bar counts (foundCount textContent "0" + btnDedup display "none" + dedup-info .hidden)', () => {
+  it('resets status bar counts (foundCount textContent "0")', () => {
     document.getElementById('found-count')!.textContent = '42';
-    const btnDedup = document.getElementById('btn-dedup')!;
-    btnDedup.style.display = '';
-    const dedupInfo = document.getElementById('dedup-info')!;
-    dedupInfo.classList.remove('hidden');
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     state.similarGroups = [[{ id: 'a' }, { id: 'b' }]] as any;
 
     showLoading();
 
     expect(document.getElementById('found-count')!.textContent).toBe('0');
-    expect(btnDedup.style.display).toBe('none');
-    expect(dedupInfo.classList.contains('hidden')).toBe(true);
     expect(state.similarGroups).toEqual([]);
   });
 

@@ -31,6 +31,10 @@ export interface TabCacheEntry {
   url: string;
   images: ImageItem[];
   selectedImages: Set<string>;
+  /** Cached filtered result so tab-switch fast path can skip applyFilters(). */
+  filteredImages?: ImageItem[];
+  /** Matches state.lastRenderedFilteredIds at the time of caching. */
+  lastRenderedFilteredIds?: string | null;
 }
 
 // ── Similar-image group ─────────────────────────────────────────────────────
@@ -362,6 +366,14 @@ export interface SidepanelState {
    * only controls in-memory visibility for the current session.
    */
   privacyOptInModalState: ModalState;
+
+  /**
+   * Monotonically-increasing counter bumped every time the runtime locale
+   * changes (via Settings → language switch). Preact components that call
+   * `t()` subscribe to this field so they re-render with the new translations
+   * without needing a panel reload.
+   */
+  localeTick: number;
 }
 
 // ── Initial state value ─────────────────────────────────────────────────────
@@ -442,6 +454,7 @@ function createInitialState(): SidepanelState {
     proUpgradeModalState: { open: false, errorText: '' },
     settingsModalState: { open: false },
     privacyOptInModalState: { open: false },
+    localeTick: 0,
   };
 }
 
