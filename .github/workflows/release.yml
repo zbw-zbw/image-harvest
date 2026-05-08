@@ -13,9 +13,28 @@
 name: Release
 
 on:
+  # Tag-triggered release: pushing a `v*.*.*` tag fires the build + publish.
+  # Guarded below to refuse "back-tagging" historical commits (see
+  # "Verify tag points to a recent commit on the default branch" step).
   push:
     tags:
       - 'v*.*.*'
+
+  # Manual escape hatch for maintainers — bypasses the recency guard,
+  # useful for re-running a release on a known-good historical tag, or for
+  # cutting a release without pushing a new tag (e.g. test runs).
+  # Trigger from: Actions tab → "Release" workflow → "Run workflow".
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to release (e.g. v1.0.2). Must already exist in the repo.'
+        required: true
+        type: string
+      skip_recency_guard:
+        description: 'Bypass the "tag must point to a recent commit" guard. Use only when intentionally re-releasing a historical tag.'
+        required: false
+        type: boolean
+        default: false
 
 # Allow only one release run per tag — concurrent triggers for the same tag
 # would race when uploading release assets.
@@ -30,18 +49,74 @@ permissions:
 
 env:
   NODE_VERSION: '22'
+  # How many recent commits on the default branch the tag is allowed to
+  # point at. Anything older than this triggers the back-tag guard. Bump
+  # this if you legitimately need a longer hot-fix backport window.
+  TAG_RECENCY_WINDOW: '20'
 
 jobs:
   release:
     name: Build & publish
     runs-on: ubuntu-latest
     steps:
+      - name: Resolve target ref
+        id: ref
+        run: |
+          # For tag-push triggers, use the tag from GITHUB_REF.
+          # For workflow_dispatch triggers, use the user-supplied tag input.
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            TAG="${{ inputs.tag }}"
+          else
+            TAG="${GITHUB_REF#refs/tags/}"
+          fi
+          if [ -z "$TAG" ]; then
+            echo "::error::Could not determine tag name"
+            exit 1
+          fi
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "Resolved tag: $TAG"
+
       - name: Checkout
         uses: actions/checkout@v4
         with:
           # Full history lets `softprops/action-gh-release` auto-generate
-          # release notes from the commits since the previous tag.
+          # release notes from the commits since the previous tag, and
+          # lets the recency guard below walk the default branch.
           fetch-depth: 0
+          ref: ${{ steps.ref.outputs.tag }}
+
+      # Recency guard: refuse to publish if the tag points at a commit that
+      # is more than $TAG_RECENCY_WINDOW commits behind the default branch
+      # tip. This prevents "back-tagging" a months-old commit and silently
+      # rebuilding it under the current toolchain — which historically
+      # produced a v1.0.1 zip that was actually post-1.0.1 code.
+      #
+      # Bypass: workflow_dispatch with skip_recency_guard=true.
+      - name: Verify tag points to a recent commit on the default branch
+        if: github.event_name != 'workflow_dispatch' || inputs.skip_recency_guard != true
+        run: |
+          TAG="${{ steps.ref.outputs.tag }}"
+          DEFAULT_BRANCH="${{ github.event.repository.default_branch }}"
+          # Make sure the default branch is fetched (Checkout above only
+          # guarantees the tag ref).
+          git fetch --no-tags --depth=${{ env.TAG_RECENCY_WINDOW }} \
+            origin "$DEFAULT_BRANCH:refs/remotes/origin/$DEFAULT_BRANCH"
+
+          TAG_SHA="$(git rev-parse "$TAG^{commit}")"
+          # Is the tag commit reachable from the default branch tip within
+          # the recency window?
+          if git merge-base --is-ancestor "$TAG_SHA" "origin/$DEFAULT_BRANCH"; then
+            DISTANCE="$(git rev-list --count "$TAG_SHA..origin/$DEFAULT_BRANCH")"
+            echo "Tag $TAG points to commit $TAG_SHA"
+            echo "That commit is $DISTANCE commits behind origin/$DEFAULT_BRANCH"
+            if [ "$DISTANCE" -gt "${{ env.TAG_RECENCY_WINDOW }}" ]; then
+              echo "::error::Tag $TAG is $DISTANCE commits behind origin/$DEFAULT_BRANCH (max allowed: ${{ env.TAG_RECENCY_WINDOW }}). This looks like a back-tagged historical release. If this is intentional (e.g. hot-fix backport), re-run via Actions → Run workflow with skip_recency_guard=true."
+              exit 1
+            fi
+          else
+            echo "::error::Tag $TAG ($TAG_SHA) is not an ancestor of origin/$DEFAULT_BRANCH. Refusing to release a tag that is not reachable from the default branch."
+            exit 1
+          fi
 
       - name: Setup Node
         uses: actions/setup-node@v4
@@ -57,11 +132,12 @@ jobs:
       # extension zip would silently disagree with the GitHub Release name.
       - name: Verify tag matches package.json version
         run: |
-          TAG="${GITHUB_REF#refs/tags/v}"
+          TAG="${{ steps.ref.outputs.tag }}"
+          TAG_VERSION="${TAG#v}"
           PKG="$(node -p "require('./package.json').version")"
-          echo "tag=$TAG  package.json=$PKG"
-          if [ "$TAG" != "$PKG" ]; then
-            echo "::error::Tag v$TAG does not match package.json version $PKG"
+          echo "tag=$TAG_VERSION  package.json=$PKG"
+          if [ "$TAG_VERSION" != "$PKG" ]; then
+            echo "::error::Tag v$TAG_VERSION does not match package.json version $PKG"
             exit 1
           fi
 
