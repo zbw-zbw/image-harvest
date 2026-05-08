@@ -73,8 +73,21 @@
 }
 
 @container statusbar (max-width: 440px) {
-  .status-bar #btn-download svg {
+  .status-bar .rescan-text {
     display: none;
+  }
+
+  .status-bar #download-label {
+    display: none;
+  }
+}
+
+@container statusbar (max-width: 360px) {
+  .status-bar .found-info {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    max-width: 100px;
   }
 }
 
@@ -863,6 +876,17 @@
   gap: 6px;
   padding: 8px 12px;
   justify-items: center;
+}
+
+.color-empty-hint {
+  font-size: 11px;
+  color: var(--text-tertiary);
+  padding: 8px 12px;
+  margin: 0;
+  text-align: center;
+  line-height: 1.4;
+  grid-column: 1 / -1;
+  white-space: nowrap;
 }
 
 .color-swatch {

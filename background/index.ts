@@ -67,7 +67,7 @@ chrome.runtime.onInstalled.addListener((details) => {
 });
 
 chrome.runtime.onConnect.addListener((port) => {
-  if (port.name !== 'image-snatcher-ui') return;
+  if (port.name !== 'image-harvest-ui') return;
   uiPorts.add(port);
   port.onDisconnect.addListener(() => {
     uiPorts.delete(port);

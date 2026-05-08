@@ -236,8 +236,38 @@
   "size_xl": {
     "message": "XL > 1000px"
   },
+  "size_btn_small": {
+    "message": "Pequeño"
+  },
+  "size_btn_medium": {
+    "message": "Mediano"
+  },
+  "size_btn_large": {
+    "message": "Grande"
+  },
+  "size_btn_xl": {
+    "message": "XL"
+  },
+  "size_btn_custom": {
+    "message": "Personalizado"
+  },
+  "layout_btn_square": {
+    "message": "Cuadrado"
+  },
+  "layout_btn_landscape": {
+    "message": "Horizontal"
+  },
+  "layout_btn_portrait": {
+    "message": "Vertical"
+  },
+  "layout_btn_panorama": {
+    "message": "Panorama"
+  },
   "color_all": {
     "message": "Todos los colores"
+  },
+  "color_no_extracted": {
+    "message": "Aún no se han extraído colores"
   },
   "filter_url_placeholder": {
     "message": "Filtrar por palabra clave en URL..."

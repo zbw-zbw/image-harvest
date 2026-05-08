@@ -198,7 +198,7 @@ async function init(): Promise<void> {
   // synchronously. Without this guard the entire init() would abort and
   // loadCurrentTab() would never execute — the panel would stay blank.
   try {
-    const uiPort = chrome.runtime.connect({ name: 'image-snatcher-ui' });
+    const uiPort = chrome.runtime.connect({ name: 'image-harvest-ui' });
     uiPort.onMessage.addListener(handleMessage);
   } catch (error) {
     console.warn('Failed to connect to background — will retry via sendMessage:', error);
@@ -385,7 +385,7 @@ async function loadCurrentTab(forceRescan = false, targetTabId?: number): Promis
 
   // Establish a named port connection to the content script
   try {
-    const port = chrome.tabs.connect(tabId, { name: 'image-snatcher-ui' });
+    const port = chrome.tabs.connect(tabId, { name: 'image-harvest-ui' });
     port.onDisconnect.addListener(() => {
       if (chrome.runtime.lastError) {
         // Content script not ready or tab was closed — silently ignore

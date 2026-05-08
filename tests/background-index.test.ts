@@ -203,7 +203,7 @@ describe('module bootstrap', () => {
   it('onConnect: adds matching ports to uiPorts set, removes them on disconnect', () => {
     let onDisconnect: (() => void) | null = null;
     const port = {
-      name: 'image-snatcher-ui',
+      name: 'image-harvest-ui',
       onDisconnect: { addListener: vi.fn((fn) => (onDisconnect = fn)) },
     } as unknown as chrome.runtime.Port;
 

@@ -140,8 +140,7 @@ export function renderColorSwatches(): void {
     .map(([hex]) => hex);
 
   if (sortedColors.length === 0) {
-    container.innerHTML =
-      '<p style="font-size:11px;color:var(--text-tertiary);padding:4px 0;">No colors extracted yet</p>';
+    container.innerHTML = `<p class="color-empty-hint">${t('color_no_extracted')}</p>`;
     return;
   }
 

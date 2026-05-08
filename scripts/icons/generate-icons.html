@@ -805,14 +805,14 @@
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement('a');
       anchor.href = url;
-      anchor.download = 'image-snatcher-icons.zip';
+      anchor.download = 'image-harvest-icons.zip';
       document.body.appendChild(anchor);
       anchor.click();
       document.body.removeChild(anchor);
       URL.revokeObjectURL(url);
 
       showStatus(
-        `⬇️ Downloaded image-snatcher-icons.zip (${generatedIcons.length} files, no compression applied).\n` +
+        `⬇️ Downloaded image-harvest-icons.zip (${generatedIcons.length} files, no compression applied).\n` +
         'Unzip and place files into the corresponding directories.'
       );
     }

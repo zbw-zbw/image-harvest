@@ -177,10 +177,10 @@ describe('module bootstrap', () => {
     expect(onConnectListener).toBeTypeOf('function');
   });
 
-  it('onConnect: image-snatcher-ui port disconnect triggers removeAllHighlights', () => {
+  it('onConnect: image-harvest-ui port disconnect triggers removeAllHighlights', () => {
     let onDisconnect: (() => void) | null = null;
     const port = {
-      name: 'image-snatcher-ui',
+      name: 'image-harvest-ui',
       onDisconnect: { addListener: vi.fn((fn) => (onDisconnect = fn)) },
     } as unknown as chrome.runtime.Port;
 

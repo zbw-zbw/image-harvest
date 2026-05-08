@@ -236,8 +236,38 @@
   "size_xl": {
     "message": "特大 > 1000px"
   },
+  "size_btn_small": {
+    "message": "小"
+  },
+  "size_btn_medium": {
+    "message": "中"
+  },
+  "size_btn_large": {
+    "message": "大"
+  },
+  "size_btn_xl": {
+    "message": "特大"
+  },
+  "size_btn_custom": {
+    "message": "カスタム"
+  },
+  "layout_btn_square": {
+    "message": "正方形"
+  },
+  "layout_btn_landscape": {
+    "message": "横長"
+  },
+  "layout_btn_portrait": {
+    "message": "縦長"
+  },
+  "layout_btn_panorama": {
+    "message": "パノラマ"
+  },
   "color_all": {
     "message": "すべての色"
+  },
+  "color_no_extracted": {
+    "message": "まだ色が抽出されていません"
   },
   "filter_url_placeholder": {
     "message": "URLキーワードで絞り込み..."

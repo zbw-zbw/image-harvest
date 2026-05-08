@@ -224,15 +224,15 @@ describe('sidepanel/init.ts module bootstrap', () => {
     expect(ui.showLoading).toHaveBeenCalled();
   });
 
-  it('chrome.runtime.connect is called with name "image-snatcher-ui" (long-lived port)', async () => {
+  it('chrome.runtime.connect is called with name "image-harvest-ui" (long-lived port)', async () => {
     await loadInitModule();
     const chromeMock = (
       globalThis as unknown as { chrome: { runtime: { connect: ReturnType<typeof vi.fn> } } }
     ).chrome;
-    // Pin: the long-lived port is named "image-snatcher-ui" — content
+    // Pin: the long-lived port is named "image-harvest-ui" — content
     // script's onConnect listener uses this exact name to drive the
     // highlight-cleanup safety net.
-    expect(chromeMock.runtime.connect).toHaveBeenCalledWith({ name: 'image-snatcher-ui' });
+    expect(chromeMock.runtime.connect).toHaveBeenCalledWith({ name: 'image-harvest-ui' });
   });
 
   it('uiPort.onMessage.addListener wires handleMessage as the broadcast handler', async () => {

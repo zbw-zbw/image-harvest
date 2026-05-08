@@ -741,6 +741,7 @@ describe('renderColorSwatches', () => {
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ] as any;
     renderColorSwatches();
+    expect(container.querySelector('.color-empty-hint')).not.toBeNull();
     expect(container.innerHTML).toContain('No colors extracted yet');
     expect(container.querySelectorAll('.color-swatch')).toHaveLength(0);
   });

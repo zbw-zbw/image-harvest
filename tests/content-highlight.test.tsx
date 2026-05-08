@@ -104,17 +104,17 @@ describe('toggleFAB / removeFAB', () => {
     expect(document.body.innerHTML).toBe(before);
   });
 
-  it('removeFAB cleans up stale #image-snatcher-fab-host elements', async () => {
+  it('removeFAB cleans up stale #image-harvest-fab-host elements', async () => {
     const stale = document.createElement('div');
-    stale.id = 'image-snatcher-fab-host';
+    stale.id = 'image-harvest-fab-host';
     document.body.appendChild(stale);
     const stale2 = document.createElement('div');
-    stale2.id = 'image-snatcher-fab-host';
+    stale2.id = 'image-harvest-fab-host';
     document.body.appendChild(stale2);
 
     const { removeFAB } = await import('../content/highlight');
     removeFAB();
-    expect(document.querySelectorAll('#image-snatcher-fab-host')).toHaveLength(0);
+    expect(document.querySelectorAll('#image-harvest-fab-host')).toHaveLength(0);
   });
 
   it('removeFAB is a no-op when no stale FAB exists', async () => {
@@ -218,7 +218,7 @@ describe('addHighlight', () => {
     const { addHighlight } = await import('../content/highlight');
     expect(addHighlight('https://example.com/og.jpg')).toEqual({ found: true });
     // No border element should have been appended for metadata.
-    expect(document.querySelectorAll('.image-snatcher-highlight-border')).toHaveLength(0);
+    expect(document.querySelectorAll('.image-harvest-highlight-border')).toHaveLength(0);
   });
 
   it('calls scrollIntoView on the target by default (shouldScroll=true)', async () => {
@@ -255,7 +255,7 @@ describe('addHighlight', () => {
     expect(addHighlight('https://example.com/idempotent.jpg').found).toBe(true);
     expect(addHighlight('https://example.com/idempotent.jpg').found).toBe(true);
     // Only ONE border element should exist.
-    expect(document.querySelectorAll('.image-snatcher-highlight-border')).toHaveLength(1);
+    expect(document.querySelectorAll('.image-harvest-highlight-border')).toHaveLength(1);
   });
 
   it('appends a fixed-position border with data-highlight-url=URL', async () => {
@@ -267,7 +267,7 @@ describe('addHighlight', () => {
     const { addHighlight } = await import('../content/highlight');
     addHighlight('https://example.com/border.jpg', false);
 
-    const border = document.querySelector('.image-snatcher-highlight-border') as HTMLDivElement;
+    const border = document.querySelector('.image-harvest-highlight-border') as HTMLDivElement;
     expect(border).not.toBeNull();
     expect(border.dataset.highlightUrl).toBe('https://example.com/border.jpg');
     expect(border.style.position).toBe('fixed');
@@ -282,7 +282,7 @@ describe('addHighlight', () => {
     const { addHighlight } = await import('../content/highlight');
     addHighlight('https://example.com/overlay.jpg', false);
 
-    expect(document.querySelector('.image-snatcher-overlay')).not.toBeNull();
+    expect(document.querySelector('.image-harvest-overlay')).not.toBeNull();
   });
 });
 
@@ -299,10 +299,10 @@ describe('removeSingleHighlight', () => {
 
     const { addHighlight, removeSingleHighlight } = await import('../content/highlight');
     addHighlight('https://example.com/single.jpg', false);
-    expect(document.querySelectorAll('.image-snatcher-highlight-border')).toHaveLength(1);
+    expect(document.querySelectorAll('.image-harvest-highlight-border')).toHaveLength(1);
 
     removeSingleHighlight('https://example.com/single.jpg');
-    expect(document.querySelectorAll('.image-snatcher-highlight-border')).toHaveLength(0);
+    expect(document.querySelectorAll('.image-harvest-highlight-border')).toHaveLength(0);
   });
 
   it('removes overlay when the LAST highlight is removed', async () => {
@@ -313,10 +313,10 @@ describe('removeSingleHighlight', () => {
 
     const { addHighlight, removeSingleHighlight } = await import('../content/highlight');
     addHighlight('https://example.com/last.jpg', false);
-    expect(document.querySelector('.image-snatcher-overlay')).not.toBeNull();
+    expect(document.querySelector('.image-harvest-overlay')).not.toBeNull();
 
     removeSingleHighlight('https://example.com/last.jpg');
-    expect(document.querySelector('.image-snatcher-overlay')).toBeNull();
+    expect(document.querySelector('.image-harvest-overlay')).toBeNull();
   });
 
   it('preserves overlay when there are still highlights remaining', async () => {
@@ -334,8 +334,8 @@ describe('removeSingleHighlight', () => {
     addHighlight('https://example.com/keep2.jpg', false);
 
     removeSingleHighlight('https://example.com/keep1.jpg');
-    expect(document.querySelector('.image-snatcher-overlay')).not.toBeNull();
-    expect(document.querySelectorAll('.image-snatcher-highlight-border')).toHaveLength(1);
+    expect(document.querySelector('.image-harvest-overlay')).not.toBeNull();
+    expect(document.querySelectorAll('.image-harvest-highlight-border')).toHaveLength(1);
   });
 
   it('is a no-op for an unknown URL (silent failure)', async () => {
@@ -361,11 +361,11 @@ describe('removeAllHighlights', () => {
     addHighlight('https://example.com/a.jpg', false);
     addHighlight('https://example.com/b.jpg', false);
     addHighlight('https://example.com/c.jpg', false);
-    expect(document.querySelectorAll('.image-snatcher-highlight-border')).toHaveLength(3);
+    expect(document.querySelectorAll('.image-harvest-highlight-border')).toHaveLength(3);
 
     removeAllHighlights();
-    expect(document.querySelectorAll('.image-snatcher-highlight-border')).toHaveLength(0);
-    expect(document.querySelector('.image-snatcher-overlay')).toBeNull();
+    expect(document.querySelectorAll('.image-harvest-highlight-border')).toHaveLength(0);
+    expect(document.querySelector('.image-harvest-overlay')).toBeNull();
   });
 
   it('is a no-op when no highlights exist', async () => {
@@ -391,7 +391,7 @@ describe('syncHighlights', () => {
 
     const { syncHighlights } = await import('../content/highlight');
     syncHighlights(['https://example.com/sync1.jpg', 'https://example.com/sync2.jpg']);
-    expect(document.querySelectorAll('.image-snatcher-highlight-border')).toHaveLength(2);
+    expect(document.querySelectorAll('.image-harvest-highlight-border')).toHaveLength(2);
   });
 
   it('removes highlights that are no longer in the input list', async () => {
@@ -406,11 +406,11 @@ describe('syncHighlights', () => {
 
     const { syncHighlights } = await import('../content/highlight');
     syncHighlights(['https://example.com/keep.jpg', 'https://example.com/drop.jpg']);
-    expect(document.querySelectorAll('.image-snatcher-highlight-border')).toHaveLength(2);
+    expect(document.querySelectorAll('.image-harvest-highlight-border')).toHaveLength(2);
 
     // Re-sync with only "keep".
     syncHighlights(['https://example.com/keep.jpg']);
-    const remaining = document.querySelectorAll('.image-snatcher-highlight-border');
+    const remaining = document.querySelectorAll('.image-harvest-highlight-border');
     expect(remaining).toHaveLength(1);
     expect((remaining[0] as HTMLElement).dataset.highlightUrl).toBe('https://example.com/keep.jpg');
   });
@@ -423,14 +423,14 @@ describe('syncHighlights', () => {
 
     const { syncHighlights } = await import('../content/highlight');
     syncHighlights(['https://example.com/stable.jpg']);
-    const firstBorder = document.querySelector('.image-snatcher-highlight-border');
+    const firstBorder = document.querySelector('.image-harvest-highlight-border');
 
     // Re-sync with same URL — should be the SAME border element.
     syncHighlights(['https://example.com/stable.jpg']);
-    const secondBorder = document.querySelector('.image-snatcher-highlight-border');
+    const secondBorder = document.querySelector('.image-harvest-highlight-border');
 
     expect(secondBorder).toBe(firstBorder);
-    expect(document.querySelectorAll('.image-snatcher-highlight-border')).toHaveLength(1);
+    expect(document.querySelectorAll('.image-harvest-highlight-border')).toHaveLength(1);
   });
 
   it('empty input list clears all highlights and removes overlay', async () => {
@@ -441,11 +441,11 @@ describe('syncHighlights', () => {
 
     const { syncHighlights } = await import('../content/highlight');
     syncHighlights(['https://example.com/clear.jpg']);
-    expect(document.querySelectorAll('.image-snatcher-highlight-border')).toHaveLength(1);
+    expect(document.querySelectorAll('.image-harvest-highlight-border')).toHaveLength(1);
 
     syncHighlights([]);
-    expect(document.querySelectorAll('.image-snatcher-highlight-border')).toHaveLength(0);
-    expect(document.querySelector('.image-snatcher-overlay')).toBeNull();
+    expect(document.querySelectorAll('.image-harvest-highlight-border')).toHaveLength(0);
+    expect(document.querySelector('.image-harvest-overlay')).toBeNull();
   });
 
   it('silently skips URLs with no matching element (passes through, no border created)', async () => {
@@ -457,7 +457,7 @@ describe('syncHighlights', () => {
     const { syncHighlights } = await import('../content/highlight');
     syncHighlights(['https://example.com/exists.jpg', 'https://example.com/ghost.jpg']);
     // Only ONE border (for the existing img); ghost URL contributes nothing.
-    expect(document.querySelectorAll('.image-snatcher-highlight-border')).toHaveLength(1);
+    expect(document.querySelectorAll('.image-harvest-highlight-border')).toHaveLength(1);
   });
 });
 
@@ -579,7 +579,7 @@ describe('addHighlight — background-image / lazy-data / link / meta fallbacks'
     const result = addHighlight('https://example.com/favicon.ico');
     expect(result.found).toBe(true);
     // Metadata early-ack: NO border created even though found=true.
-    expect(document.querySelectorAll('.image-snatcher-highlight-border')).toHaveLength(0);
+    expect(document.querySelectorAll('.image-harvest-highlight-border')).toHaveLength(0);
   });
 
   it('matches <link rel="apple-touch-icon">', async () => {
@@ -785,7 +785,7 @@ describe('overlay lifecycle — ESC / click-to-dismiss', () => {
 
     const { addHighlight } = await import('../content/highlight');
     addHighlight('https://example.com/esc-target.jpg');
-    expect(document.querySelector('.image-snatcher-overlay')).not.toBeNull();
+    expect(document.querySelector('.image-harvest-overlay')).not.toBeNull();
 
     // Act: fire ESC in capture phase (the handler uses addEventListener
     // with useCapture=true so we dispatch on document).
@@ -797,7 +797,7 @@ describe('overlay lifecycle — ESC / click-to-dismiss', () => {
     document.dispatchEvent(escEvent);
 
     // Assert: highlights + overlay gone, CLEAR_SELECTION fired exactly once.
-    expect(document.querySelector('.image-snatcher-overlay')).toBeNull();
+    expect(document.querySelector('.image-harvest-overlay')).toBeNull();
     expect(sendMessageSpy).toHaveBeenCalledTimes(1);
     const msg = sendMessageSpy.mock.calls[0][0];
     expect(msg.type).toBe('CLEAR_SELECTION');
@@ -816,7 +816,7 @@ describe('overlay lifecycle — ESC / click-to-dismiss', () => {
     // keystroke would kill the highlight — regression-prone since the
     // ESC check is one line inside a shared keydown listener.
     document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Tab', bubbles: true }));
-    expect(document.querySelector('.image-snatcher-overlay')).not.toBeNull();
+    expect(document.querySelector('.image-harvest-overlay')).not.toBeNull();
     expect(sendMessageSpy).not.toHaveBeenCalled();
   });
 
@@ -828,12 +828,12 @@ describe('overlay lifecycle — ESC / click-to-dismiss', () => {
 
     const { addHighlight } = await import('../content/highlight');
     addHighlight('https://example.com/click-target.jpg');
-    const overlay = document.querySelector('.image-snatcher-overlay') as HTMLDivElement;
+    const overlay = document.querySelector('.image-harvest-overlay') as HTMLDivElement;
     expect(overlay).not.toBeNull();
 
     overlay.click();
 
-    expect(document.querySelector('.image-snatcher-overlay')).toBeNull();
+    expect(document.querySelector('.image-harvest-overlay')).toBeNull();
     expect(sendMessageSpy).toHaveBeenCalledWith(
       expect.objectContaining({ type: 'CLEAR_SELECTION' })
     );
@@ -860,7 +860,7 @@ describe('overlay lifecycle — ESC / click-to-dismiss', () => {
     expect(() => {
       document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
     }).not.toThrow();
-    expect(document.querySelector('.image-snatcher-overlay')).toBeNull();
+    expect(document.querySelector('.image-harvest-overlay')).toBeNull();
   });
 });
 

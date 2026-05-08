@@ -339,7 +339,7 @@ export interface SidepanelState {
    */
   proLicenseInfo: {
     plan: string;
-    expiresAt?: number;
+    expiresAt?: number | string;
   } | null;
 
   /** Active toast notifications rendered by <ToastContainer>. */

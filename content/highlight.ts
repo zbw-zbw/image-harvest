@@ -16,7 +16,7 @@ export function toggleFAB(): void {
 }
 export function removeFAB(): void {
   // Clean up any stale FAB elements from previous versions
-  const staleFabs = document.querySelectorAll('#image-snatcher-fab-host');
+  const staleFabs = document.querySelectorAll('#image-harvest-fab-host');
   staleFabs.forEach((el) => el.remove());
 }
 
@@ -37,7 +37,7 @@ function ensureHighlightStyles(): void {
   if (highlightStyleElement) return;
   highlightStyleElement = document.createElement('style');
   highlightStyleElement.textContent = `
-    @keyframes image-snatcher-pulse {
+    @keyframes image-harvest-pulse {
       0% {
         box-shadow: 0 0 8px 2px rgba(96, 181, 87, 0.7),
                     0 0 20px 6px rgba(96, 181, 87, 0.35);
@@ -54,8 +54,8 @@ function ensureHighlightStyles(): void {
         border-color: #60B557;
       }
     }
-    .image-snatcher-highlight-border {
-      animation: image-snatcher-pulse 1.2s ease-in-out 3;
+    .image-harvest-highlight-border {
+      animation: image-harvest-pulse 1.2s ease-in-out 3;
     }
   `;
   document.head.appendChild(highlightStyleElement);
@@ -72,7 +72,7 @@ function ensureOverlay(): void {
   if (overlayElement) return;
   ensureHighlightStyles();
   overlayElement = document.createElement('div');
-  overlayElement.className = 'image-snatcher-overlay';
+  overlayElement.className = 'image-harvest-overlay';
   overlayElement.style.cssText = `
     position: fixed;
     top: 0;
@@ -447,7 +447,7 @@ function createSingleHighlight(imageUrl: string, target: Element): void {
 
   // Create a fixed-position overlay div that tracks the target element
   const border = document.createElement('div');
-  border.className = 'image-snatcher-highlight-border';
+  border.className = 'image-harvest-highlight-border';
   border.dataset.highlightUrl = imageUrl;
 
   const rect = target.getBoundingClientRect();

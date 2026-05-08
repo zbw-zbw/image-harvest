@@ -246,8 +246,38 @@
   "size_xl": {
     "message": "XL > 1000px"
   },
+  "size_btn_small": {
+    "message": "Small"
+  },
+  "size_btn_medium": {
+    "message": "Medium"
+  },
+  "size_btn_large": {
+    "message": "Large"
+  },
+  "size_btn_xl": {
+    "message": "XL"
+  },
+  "size_btn_custom": {
+    "message": "Custom"
+  },
+  "layout_btn_square": {
+    "message": "Square"
+  },
+  "layout_btn_landscape": {
+    "message": "Landscape"
+  },
+  "layout_btn_portrait": {
+    "message": "Portrait"
+  },
+  "layout_btn_panorama": {
+    "message": "Panorama"
+  },
   "color_all": {
     "message": "All Colors"
+  },
+  "color_no_extracted": {
+    "message": "No colors extracted yet"
   },
   "filter_url_placeholder": {
     "message": "Filter by URL keyword..."

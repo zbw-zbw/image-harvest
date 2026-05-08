@@ -236,8 +236,38 @@
   "size_xl": {
     "message": "超大 > 1000px"
   },
+  "size_btn_small": {
+    "message": "小"
+  },
+  "size_btn_medium": {
+    "message": "中"
+  },
+  "size_btn_large": {
+    "message": "大"
+  },
+  "size_btn_xl": {
+    "message": "超大"
+  },
+  "size_btn_custom": {
+    "message": "自定义"
+  },
+  "layout_btn_square": {
+    "message": "方形"
+  },
+  "layout_btn_landscape": {
+    "message": "横向"
+  },
+  "layout_btn_portrait": {
+    "message": "纵向"
+  },
+  "layout_btn_panorama": {
+    "message": "全景"
+  },
   "color_all": {
     "message": "全部颜色"
+  },
+  "color_no_extracted": {
+    "message": "暂未提取到颜色"
   },
   "filter_url_placeholder": {
     "message": "按链接关键词过滤..."

@@ -282,6 +282,7 @@
   justify-content: flex-start;
   flex-wrap: nowrap;
   min-width: 0;
+  overflow: visible;
 }
 
 .filter-buttons.filter-actions-right {

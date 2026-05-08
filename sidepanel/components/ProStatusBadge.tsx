@@ -24,8 +24,8 @@ import { t } from '../../shared/i18n';
  */
 export interface ProLicenseInfo {
   plan: 'monthly' | 'yearly' | 'lifetime' | string;
-  /** Unix-epoch seconds; ignored for lifetime plans. */
-  expiresAt?: number;
+  /** Unix-epoch seconds/ms OR ISO-8601 string; ignored for lifetime plans. */
+  expiresAt?: number | string;
 }
 
 const PLAN_LABELS: Record<string, () => string> = {
@@ -34,10 +34,17 @@ const PLAN_LABELS: Record<string, () => string> = {
   lifetime: () => t('plan_lifetime'),
 };
 
-function formatDateYMD(timestamp: number): string {
-  // Backend can send seconds OR milliseconds; normalize defensively.
-  const ms = timestamp > 1e12 ? timestamp : timestamp * 1000;
-  const d = new Date(ms);
+function formatDateYMD(timestamp: number | string): string {
+  let d: Date;
+  if (typeof timestamp === 'string') {
+    // ISO date string from backend (e.g. "2026-06-08T00:00:00.000Z")
+    d = new Date(timestamp);
+  } else {
+    // Backend can send seconds OR milliseconds; normalize defensively.
+    const ms = timestamp > 1e12 ? timestamp : timestamp * 1000;
+    d = new Date(ms);
+  }
+  if (Number.isNaN(d.getTime())) return '';
   return `${d.getFullYear()}/${String(d.getMonth() + 1).padStart(2, '0')}/${String(
     d.getDate()
   ).padStart(2, '0')}`;

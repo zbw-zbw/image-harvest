@@ -471,7 +471,7 @@ function initContentScript(): void {
   // fails to arrive.
   try {
     chrome.runtime.onConnect.addListener((port) => {
-      if (port.name === 'image-snatcher-ui') {
+      if (port.name === 'image-harvest-ui') {
         port.onDisconnect.addListener(() => {
           removeAllHighlights();
         });

@@ -65,7 +65,7 @@ The extension follows the **classic MV3 three-process model**:
 │   (sidepanel/ + pages/)    │    │   (pages/reverse-search.*) │
 │   ─ Preact + Vanilla DOM   │    │                            │
 └──────────────┬─────────────┘    └──────────────┬─────────────┘
-               │  chrome.runtime.connect("image-snatcher-ui")
+               │  chrome.runtime.connect("image-harvest-ui")
                │  chrome.runtime.sendMessage / onMessage
                ▼
 ┌──────────────────────────────────────────────────────────────┐
@@ -106,13 +106,13 @@ Each has different APIs, different lifetimes, different storage scopes, and
 different debuggers. Knowing which one you're in is the most common cause
 of "but it works locally" bugs.
 
-| Surface | File entry | Lifetime | Has DOM? | Sees `chrome.tabs`? | Storage scope |
-|---|---|---|---|---|---|
-| **Service Worker** | `background/index.ts` | Spun up on demand by Chrome; goes dormant after ~30 s idle | ❌ | ✅ Full | `chrome.storage.{local,sync,session}` |
-| **Side Panel** | `pages/sidepanel.html` → `sidepanel/init.ts` | Persistent while the panel is open; survives tab switches | ✅ | ✅ Full | Same storage namespace as SW |
-| **Popup** | `pages/popup.html` → same `init.ts` (mode flag) | Killed the moment the popup loses focus | ✅ | ✅ Full | Same storage namespace as SW |
-| **Content Script** | `content/main.ts` | Lives as long as the page lives; killed on navigation / reload | ✅ (page DOM) | ❌ (cannot call `chrome.tabs.*`) | `chrome.storage.local` only |
-| **Reverse Search Page** | `pages/reverse-search.html` → `pages/reverse-search.ts` | Opened in a new tab via `chrome.tabs.create` | ✅ | ✅ | Same as SW |
+| Surface                 | File entry                                              | Lifetime                                                       | Has DOM?      | Sees `chrome.tabs`?              | Storage scope                         |
+| ----------------------- | ------------------------------------------------------- | -------------------------------------------------------------- | ------------- | -------------------------------- | ------------------------------------- |
+| **Service Worker**      | `background/index.ts`                                   | Spun up on demand by Chrome; goes dormant after ~30 s idle     | ❌            | ✅ Full                          | `chrome.storage.{local,sync,session}` |
+| **Side Panel**          | `pages/sidepanel.html` → `sidepanel/init.ts`            | Persistent while the panel is open; survives tab switches      | ✅            | ✅ Full                          | Same storage namespace as SW          |
+| **Popup**               | `pages/popup.html` → same `init.ts` (mode flag)         | Killed the moment the popup loses focus                        | ✅            | ✅ Full                          | Same storage namespace as SW          |
+| **Content Script**      | `content/main.ts`                                       | Lives as long as the page lives; killed on navigation / reload | ✅ (page DOM) | ❌ (cannot call `chrome.tabs.*`) | `chrome.storage.local` only           |
+| **Reverse Search Page** | `pages/reverse-search.html` → `pages/reverse-search.ts` | Opened in a new tab via `chrome.tabs.create`                   | ✅            | ✅                               | Same as SW                            |
 
 ### Why both Side Panel and Popup share `init.ts`
 
@@ -152,7 +152,7 @@ Chrome opens pages/sidepanel.html (or popup.html in popup mode)
         │
         ▼
 sidepanel/init.ts  ─ mounts Preact components, caches DOM refs,
-                     loads settings, opens chrome.runtime.connect("image-snatcher-ui"),
+                     loads settings, opens chrome.runtime.connect("image-harvest-ui"),
                      calls loadCurrentTab()
         │
         ▼ (async)
@@ -392,7 +392,7 @@ A few defensive patterns to know:
   navigation during a scan produces a noisy red console error.
 - **`broadcastToPopup`** iterates over `uiPorts: Set<chrome.runtime.Port>`,
   the long-lived ports the side panel and popup open at boot via
-  `chrome.runtime.connect({name: 'image-snatcher-ui'})`. This is how
+  `chrome.runtime.connect({name: 'image-harvest-ui'})`. This is how
   `IMAGES_DISCOVERED` reaches the panel without per-message ack
   ceremony.
 - **`getAccessibleTabId`** is the single chokepoint for "do not let the
@@ -415,10 +415,10 @@ The injection flow is a 4-step ladder:
    already have one — return success.
 2. **Bail on restricted URLs.** Return a friendly `INJECTION_FAILED`
    with `message: 'Cannot access this page: browser internal or error
-   pages are not supported'`.
+pages are not supported'`.
 3. **Probe for legacy globals.** `executeScript` runs a tiny `func` in
    the page world that checks `typeof globalThis.isExtracting !==
-   'undefined'`. This catches the double-injection edge case where the
+'undefined'`. This catches the double-injection edge case where the
    script is loading but hasn't yet attached its message listener.
 4. **Inject the bundled script(s)** read from
    `chrome.runtime.getManifest().content_scripts[0].js`. The hashed
@@ -500,22 +500,22 @@ might be inadequate.
 
 `extractImages()` runs 14 stages in this exact order:
 
-| # | Stage | What it catches |
-|---|---|---|
-| 1 | `<img>` tags | `src`, `srcset`, `currentSrc`, `data-src`/`data-original`/`data-lazy*` |
-| 2 | Background images | Inline `style="background-image:..."` and computed `getComputedStyle(el).backgroundImage` |
-| 3 | `<picture>` / `<source>` | Per-source `srcset` resolutions |
-| 4 | Stylesheet rules | Cross-origin stylesheets are skipped (CORS); same-origin walked via `CSSStyleSheet.cssRules` |
-| 5 | Inline `<svg>` | Serialized via `XMLSerializer` → data URL |
-| 6 | `<canvas>` | `toDataURL` (skips if too small or `SecurityError`) |
-| 7 | `<video poster>` | The poster attribute, treated as an image |
-| 8 | `<input type="image">` | The `src` attribute |
-| 9 | `<object>` / `<embed>` | When `type` starts with `image/` |
-| 10 | `<link rel="icon"/"apple-touch-icon">` and `<meta property="og:image"/twitter:image*>` | Page metadata images (skip-highlight tagged) |
-| 11 | CSS `content: url(...)` | `::before` / `::after` pseudo-element images |
-| 12 | Lazy-load extras | `data-bg`, `data-srcset`, picture-source `data-src*` |
-| 13 | Shadow DOM | `extractFromShadowDom` walks every open shadow root |
-| 14 | Iframes | Same-origin only; cross-origin iframes are silently skipped |
+| #   | Stage                                                                                  | What it catches                                                                              |
+| --- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------- |
+| 1   | `<img>` tags                                                                           | `src`, `srcset`, `currentSrc`, `data-src`/`data-original`/`data-lazy*`                       |
+| 2   | Background images                                                                      | Inline `style="background-image:..."` and computed `getComputedStyle(el).backgroundImage`    |
+| 3   | `<picture>` / `<source>`                                                               | Per-source `srcset` resolutions                                                              |
+| 4   | Stylesheet rules                                                                       | Cross-origin stylesheets are skipped (CORS); same-origin walked via `CSSStyleSheet.cssRules` |
+| 5   | Inline `<svg>`                                                                         | Serialized via `XMLSerializer` → data URL                                                    |
+| 6   | `<canvas>`                                                                             | `toDataURL` (skips if too small or `SecurityError`)                                          |
+| 7   | `<video poster>`                                                                       | The poster attribute, treated as an image                                                    |
+| 8   | `<input type="image">`                                                                 | The `src` attribute                                                                          |
+| 9   | `<object>` / `<embed>`                                                                 | When `type` starts with `image/`                                                             |
+| 10  | `<link rel="icon"/"apple-touch-icon">` and `<meta property="og:image"/twitter:image*>` | Page metadata images (skip-highlight tagged)                                                 |
+| 11  | CSS `content: url(...)`                                                                | `::before` / `::after` pseudo-element images                                                 |
+| 12  | Lazy-load extras                                                                       | `data-bg`, `data-srcset`, picture-source `data-src*`                                         |
+| 13  | Shadow DOM                                                                             | `extractFromShadowDom` walks every open shadow root                                          |
+| 14  | Iframes                                                                                | Same-origin only; cross-origin iframes are silently skipped                                  |
 
 After stage 14 the deduplicated `images.values()` array is capped at
 `LIMITS.MAX_IMAGES_PER_SCAN` (1000) and returned.
@@ -533,11 +533,11 @@ A small module-level mutable bag:
 ```ts
 state = {
   isExtracting: false,
-  seenUrls: new Set<string>(),       // dedup across all 14 stages
-  liveObserver: null,                // MutationObserver | null
-  highlightedElements: new Map(),    // url → wrapper element
-  fabContainer: null,                // legacy FAB (deprecated, kept for back-compat no-op)
-}
+  seenUrls: new Set<string>(), // dedup across all 14 stages
+  liveObserver: null, // MutationObserver | null
+  highlightedElements: new Map(), // url → wrapper element
+  fabContainer: null, // legacy FAB (deprecated, kept for back-compat no-op)
+};
 ```
 
 **`isExtensionContextValid()`** is the most-called helper in the file.
@@ -585,7 +585,7 @@ Pure helpers split out of `main.ts` to keep that file readable. Each
 exported function follows the same shape:
 
 ```ts
-export async function extractXxxImages(images: Map<string, ImageItem>): Promise<void>
+export async function extractXxxImages(images: Map<string, ImageItem>): Promise<void>;
 ```
 
 They mutate the shared `images` Map directly (instead of returning a
@@ -620,7 +620,7 @@ sequence is:
 8. `loadSettings()` → apply theme + density + live-monitor indicator.
 9. `bindEvents()` — wires every legacy click handler.
 10. Connect long-lived port: `chrome.runtime.connect({name:
-    'image-snatcher-ui'})`.
+'image-harvest-ui'})`.
 11. Listen on `tabs.onActivated` + `tabs.onUpdated` (side panel only —
     popups die on focus loss).
 12. `loadCurrentTab(false, true)` — kick off the first scan.
@@ -638,19 +638,19 @@ a tiny pub/sub layer.
 
 The most consequential fields:
 
-| Field | Type | Why it matters |
-|---|---|---|
-| `currentTabId` | `number \| null` | Active tab the panel mirrors. Null on restricted pages. |
-| `discoveredImages` | `ImageItem[]` | Authoritative scan result, post-dedup. |
-| `discoveredColors` | `string[]` | Aggregated dominant colors across all images for the color filter swatches. |
-| `selectedIds` | `Set<string>` | Selected image ids; drives highlight + download. |
-| `tabCache` | `Map<number, ImageItem[]>` | In-memory mirror of `chrome.storage.session` per-tab cache (avoids round-trip on tab switch). |
-| `appSettings` | `AppSettings` | Latest persisted settings (filters live separately in `filterConfig`). |
-| `currentSortMode` | `SortMode` | One of `size-desc \| size-asc \| filesize-desc \| filesize-asc \| type \| natural`. |
-| `lastRenderedFilteredIds` | `string[] \| null` | Cache key for `applyFilters` short-circuit; null forces re-render. |
-| `proInfo` | `ProUserInfo` | Latest license check; gates Pro UI affordances. |
-| `scanProgress` | `{indeterminate, done, total}` | Drives the scan overlay's progress bar. |
-| `*ModalState` | Modal-specific shapes | Preact components read this; setting it open=true triggers render. |
+| Field                     | Type                           | Why it matters                                                                                |
+| ------------------------- | ------------------------------ | --------------------------------------------------------------------------------------------- |
+| `currentTabId`            | `number \| null`               | Active tab the panel mirrors. Null on restricted pages.                                       |
+| `discoveredImages`        | `ImageItem[]`                  | Authoritative scan result, post-dedup.                                                        |
+| `discoveredColors`        | `string[]`                     | Aggregated dominant colors across all images for the color filter swatches.                   |
+| `selectedIds`             | `Set<string>`                  | Selected image ids; drives highlight + download.                                              |
+| `tabCache`                | `Map<number, ImageItem[]>`     | In-memory mirror of `chrome.storage.session` per-tab cache (avoids round-trip on tab switch). |
+| `appSettings`             | `AppSettings`                  | Latest persisted settings (filters live separately in `filterConfig`).                        |
+| `currentSortMode`         | `SortMode`                     | One of `size-desc \| size-asc \| filesize-desc \| filesize-asc \| type \| natural`.           |
+| `lastRenderedFilteredIds` | `string[] \| null`             | Cache key for `applyFilters` short-circuit; null forces re-render.                            |
+| `proInfo`                 | `ProUserInfo`                  | Latest license check; gates Pro UI affordances.                                               |
+| `scanProgress`            | `{indeterminate, done, total}` | Drives the scan overlay's progress bar.                                                       |
+| `*ModalState`             | Modal-specific shapes          | Preact components read this; setting it open=true triggers render.                            |
 
 `elements` is the parallel sibling: a typed cache of `HTMLElement`
 refs populated by `cacheElements()`. Reading from `elements` is ~20×
@@ -659,13 +659,13 @@ faster than re-querying the DOM and avoids stale-ref bugs after
 
 ### Imperative modules vs Preact components
 
-| Concern | Belongs in | Example |
-|---|---|---|
-| Toolbar buttons, filter chips | Imperative `*.ts` + `bindEvents()` | `sidepanel/settings.ts > toggleFilterDropdown` |
-| Image grid render loop | Preact `ImageGrid.tsx` (virtua) | virtualized list of 1000+ cards |
-| Modals (settings, multi-tab, dedup, collection) | Preact `*Modal.tsx` | `SettingsModal.tsx`, `MultitabModal.tsx`, etc. |
-| Toasts, badges, indicators | Preact `*.tsx` | `ToastContainer.tsx`, `LiveIndicator.tsx` |
-| Privacy / Pro upsell | Preact `*Modal.tsx` | `PrivacyOptInModal.tsx`, `ProUpgradeModal.tsx` |
+| Concern                                         | Belongs in                         | Example                                        |
+| ----------------------------------------------- | ---------------------------------- | ---------------------------------------------- |
+| Toolbar buttons, filter chips                   | Imperative `*.ts` + `bindEvents()` | `sidepanel/settings.ts > toggleFilterDropdown` |
+| Image grid render loop                          | Preact `ImageGrid.tsx` (virtua)    | virtualized list of 1000+ cards                |
+| Modals (settings, multi-tab, dedup, collection) | Preact `*Modal.tsx`                | `SettingsModal.tsx`, `MultitabModal.tsx`, etc. |
+| Toasts, badges, indicators                      | Preact `*.tsx`                     | `ToastContainer.tsx`, `LiveIndicator.tsx`      |
+| Privacy / Pro upsell                            | Preact `*Modal.tsx`                | `PrivacyOptInModal.tsx`, `ProUpgradeModal.tsx` |
 
 The boundary is "components that own complex internal state should be
 Preact; everything else stays vanilla". Don't migrate vanilla code to
@@ -808,25 +808,25 @@ runtimes without bundle duplication.
 
 ### Module-by-module
 
-| File | Public API | Notes |
-|---|---|---|
-| `types.ts` | All TS interfaces (`ImageItem`, `AppSettings`, `LicenseData`, `Telemetry*`) | No runtime code. |
-| `constants.ts` | `MESSAGE_TYPES`, `STORAGE_KEYS`, `LIMITS`, `FREE_LIMITS`, `PRICING`, `LICENSE_*`, `TELEMETRY_*`, `SEARCH_ENGINES`, `NAMING_VARIABLES` | Every literal a wire-format consumer reads. |
-| `storage.ts` | `getFilterConfig` / `saveFilterConfig` / `getDownloadHistory` / `addDownloadRecord` / `getAppSettings` / `saveAppSettings` / `getTabImageCache` / `saveTabImageCache` / `setDisplayMode` / … | Wraps `chrome.storage.{sync,local,session}`; defensively merges with defaults. |
-| `utils.ts` | `resolveUrl`, `getDomain`, `getFileFormat`, `isDataUri`, `isImageDataUri`, `generateDataUriKey`, `extractBackgroundUrls`, `isGradient`, `isRestrictedUrl`, `deepMerge`, `generateId`, … | Pure, framework-free. 100% test coverage. |
-| `converter.ts` | `convertImage(blob, target)` returns `{dataUrl, blob, format}` | Canvas API; falls back to PNG when `toBlob` returns null. |
-| `naming.ts` | `applyNamingTemplate(template, vars)` | Replaces `{index}`, `{original}`, `{title}`, `{domain}`, `{width}`, `{height}`, `{format}`, `{date}`, `{timestamp}`, `{number}`. |
-| `phash.ts` | `computePhash(imageData)` returns 64-char binary string; `hammingDistance(a, b)` | Pure DCT-based perceptual hash, ~1 ms/image at 256×256. |
-| `color-extract.ts` | `extractDominantColors(imageData, k=5)` returns `string[]` of `#RRGGBB` | Median-cut quantization. |
-| `collection.ts` | `collectionInit / Add / Remove / Update / GetAll / GetById / Search / Export / Clear` | IndexedDB store `collections` in `ImageSnatcherDB` v1. |
-| `license.ts` | `activateLicense / deactivateLicense / isProUser / getLicenseInfo / validateLicenseRemote / getOrCreateInstanceId` | Rounds-trip to `https://image-harvest.kyriewen.cn/api/license/*`. |
-| `trial.ts` | `startTrial / isTrialEligible / isTrialActive / getTrialState / reportTrialExpiryIfNeeded` | One-shot 7-day Pro trial; sentinel in `chrome.storage.local`. |
-| `telemetry.ts` | `setOptIn / isOptedIn / track / flushNow / setEnvelopeMeta / __resetForTests` | Anonymous-only event SDK. **Read this file before adding any new event.** |
-| `telemetry-events.ts` | `EVENTS` (the whitelist), `EVENT_PROP_SCHEMAS` (per-event allowed prop keys), `sanitizeEventProps`, `isKnownEvent` | The only file that defines what may be sent. |
-| `ab-experiment.ts` | `getProUpsellBucket()` returns `'A' \| 'B'` | Stable per-install bucket; persisted. |
-| `paywall-state.ts` | `getPaywallState`, `recordPaywallEvent`, gating helpers | Determines whether the paywall is "soft" (banner) or "hard" (modal) based on user history. |
-| `rating-prompt-state.ts` | `shouldShowRatingPrompt`, `recordRatingPromptShown`, `recordRatingPromptDismissed` | "Leave a review" trigger logic — gated on N successful downloads + cooldown. |
-| `i18n.ts` | `detectLocale`, `t(key, vars?)`, `getActiveLocale` | Loads catalogue from `_locales/*/messages.json` (mirrored into `dist/_locales/` by `vite.config.ts > copyStaticAssetsPlugin`). |
+| File                     | Public API                                                                                                                                                                                   | Notes                                                                                                                            |
+| ------------------------ | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `types.ts`               | All TS interfaces (`ImageItem`, `AppSettings`, `LicenseData`, `Telemetry*`)                                                                                                                  | No runtime code.                                                                                                                 |
+| `constants.ts`           | `MESSAGE_TYPES`, `STORAGE_KEYS`, `LIMITS`, `FREE_LIMITS`, `PRICING`, `LICENSE_*`, `TELEMETRY_*`, `SEARCH_ENGINES`, `NAMING_VARIABLES`                                                        | Every literal a wire-format consumer reads.                                                                                      |
+| `storage.ts`             | `getFilterConfig` / `saveFilterConfig` / `getDownloadHistory` / `addDownloadRecord` / `getAppSettings` / `saveAppSettings` / `getTabImageCache` / `saveTabImageCache` / `setDisplayMode` / … | Wraps `chrome.storage.{sync,local,session}`; defensively merges with defaults.                                                   |
+| `utils.ts`               | `resolveUrl`, `getDomain`, `getFileFormat`, `isDataUri`, `isImageDataUri`, `generateDataUriKey`, `extractBackgroundUrls`, `isGradient`, `isRestrictedUrl`, `deepMerge`, `generateId`, …      | Pure, framework-free. 100% test coverage.                                                                                        |
+| `converter.ts`           | `convertImage(blob, target)` returns `{dataUrl, blob, format}`                                                                                                                               | Canvas API; falls back to PNG when `toBlob` returns null.                                                                        |
+| `naming.ts`              | `applyNamingTemplate(template, vars)`                                                                                                                                                        | Replaces `{index}`, `{original}`, `{title}`, `{domain}`, `{width}`, `{height}`, `{format}`, `{date}`, `{timestamp}`, `{number}`. |
+| `phash.ts`               | `computePhash(imageData)` returns 64-char binary string; `hammingDistance(a, b)`                                                                                                             | Pure DCT-based perceptual hash, ~1 ms/image at 256×256.                                                                          |
+| `color-extract.ts`       | `extractDominantColors(imageData, k=5)` returns `string[]` of `#RRGGBB`                                                                                                                      | Median-cut quantization.                                                                                                         |
+| `collection.ts`          | `collectionInit / Add / Remove / Update / GetAll / GetById / Search / Export / Clear`                                                                                                        | IndexedDB store `collections` in `ImageSnatcherDB` v1.                                                                           |
+| `license.ts`             | `activateLicense / deactivateLicense / isProUser / getLicenseInfo / validateLicenseRemote / getOrCreateInstanceId`                                                                           | Rounds-trip to `https://image-harvest.kyriewen.cn/api/license/*`.                                                                |
+| `trial.ts`               | `startTrial / isTrialEligible / isTrialActive / getTrialState / reportTrialExpiryIfNeeded`                                                                                                   | One-shot 7-day Pro trial; sentinel in `chrome.storage.local`.                                                                    |
+| `telemetry.ts`           | `setOptIn / isOptedIn / track / flushNow / setEnvelopeMeta / __resetForTests`                                                                                                                | Anonymous-only event SDK. **Read this file before adding any new event.**                                                        |
+| `telemetry-events.ts`    | `EVENTS` (the whitelist), `EVENT_PROP_SCHEMAS` (per-event allowed prop keys), `sanitizeEventProps`, `isKnownEvent`                                                                           | The only file that defines what may be sent.                                                                                     |
+| `ab-experiment.ts`       | `getProUpsellBucket()` returns `'A' \| 'B'`                                                                                                                                                  | Stable per-install bucket; persisted.                                                                                            |
+| `paywall-state.ts`       | `getPaywallState`, `recordPaywallEvent`, gating helpers                                                                                                                                      | Determines whether the paywall is "soft" (banner) or "hard" (modal) based on user history.                                       |
+| `rating-prompt-state.ts` | `shouldShowRatingPrompt`, `recordRatingPromptShown`, `recordRatingPromptDismissed`                                                                                                           | "Leave a review" trigger logic — gated on N successful downloads + cooldown.                                                     |
+| `i18n.ts`                | `detectLocale`, `t(key, vars?)`, `getActiveLocale`                                                                                                                                           | Loads catalogue from `_locales/*/messages.json` (mirrored into `dist/_locales/` by `vite.config.ts > copyStaticAssetsPlugin`).   |
 
 ### Why telemetry has its own install id
 
@@ -848,66 +848,66 @@ per-installation identifier. This is deliberate:
 The single source of truth for message names is
 `shared/constants.ts > MESSAGE_TYPES`. Every cross-runtime call goes
 through `chrome.runtime.sendMessage` (request/response) or
-`port.postMessage` over the long-lived `'image-snatcher-ui'` port
+`port.postMessage` over the long-lived `'image-harvest-ui'` port
 (broadcast). The table below documents every wire contract.
 
 ### Side Panel / Popup → Background (request/response)
 
-| Message | Request shape | Response shape | Owner handler |
-|---|---|---|---|
-| `GET_IMAGES` | `{tabId?, searchAllFrames?, liveMonitoring?}` | `{success, images: ImageItem[]}` | `extractor.getImagesFromTab` |
-| `GET_HISTORY` | `{}` | `{success, history: DownloadRecord[]}` | `storage.getDownloadHistory` |
-| `CLEAR_HISTORY` | `{}` | `{success}` | `storage.clearDownloadHistory` |
-| `GET_FILTER_CONFIG` | `{}` | `{success, config: FilterConfig}` | `storage.getFilterConfig` |
-| `SAVE_FILTER_CONFIG` | `{config: FilterConfig}` | `{success}` | `storage.saveFilterConfig` |
-| `SET_DISPLAY_MODE` | `{useSidePanel: boolean}` | `{success}` | `display-mode.applyDisplayMode` |
-| `MULTI_TAB_EXTRACT` | `{tabIds: number[]}` | `{success, images, tabCount}` | `extractor.processMultiTabExtract` |
-| `FETCH_IMAGE_DATA` | `{url: string}` | `{success, dataUrl, contentType}` | `reverse-search.fetchImageData` |
-| `REVERSE_SEARCH_UPLOAD` | `{engine, imageUrl}` | `{success, redirectUrl}` | `reverse-search.reverseSearchUpload` |
-| `HIGHLIGHT_IMAGE` | `{tabId?, imageUrl}` | `{success, found}` | proxied to content script |
-| `UNHIGHLIGHT_IMAGE` | `{tabId?, imageUrl}` | `{success}` | proxied to content script |
-| `HIGHLIGHT_IMAGES` | `{tabId?, imageUrls: string[]}` | `{success}` | proxied to content script |
-| `REMOVE_HIGHLIGHT` | `{tabId?}` | `{success}` | proxied to content script |
-| `SIDE_PANEL_OPENED` | `{tabId}` | `{success}` | tracks in `sidePanelOpenedTabs` Set |
-| `SIDE_PANEL_CLOSED` | `{tabId}` | `{success}` | drops from `sidePanelOpenedTabs` |
-| `ACTIVATE_LICENSE` | `{licenseKey}` | `{success, plan, expiresAt, error?}` | `license.activateLicense` |
-| `DEACTIVATE_LICENSE` | `{}` | `{success}` | `license.deactivateLicense` |
-| `VALIDATE_LICENSE` | `{}` | `{success, status, plan, expiresAt}` | `license.validateLicense` |
-| `GET_LICENSE_STATUS` | `{}` | `{success, info: ProUserInfo}` | `license.getLicenseInfo` |
+| Message                 | Request shape                                 | Response shape                         | Owner handler                        |
+| ----------------------- | --------------------------------------------- | -------------------------------------- | ------------------------------------ |
+| `GET_IMAGES`            | `{tabId?, searchAllFrames?, liveMonitoring?}` | `{success, images: ImageItem[]}`       | `extractor.getImagesFromTab`         |
+| `GET_HISTORY`           | `{}`                                          | `{success, history: DownloadRecord[]}` | `storage.getDownloadHistory`         |
+| `CLEAR_HISTORY`         | `{}`                                          | `{success}`                            | `storage.clearDownloadHistory`       |
+| `GET_FILTER_CONFIG`     | `{}`                                          | `{success, config: FilterConfig}`      | `storage.getFilterConfig`            |
+| `SAVE_FILTER_CONFIG`    | `{config: FilterConfig}`                      | `{success}`                            | `storage.saveFilterConfig`           |
+| `SET_DISPLAY_MODE`      | `{useSidePanel: boolean}`                     | `{success}`                            | `display-mode.applyDisplayMode`      |
+| `MULTI_TAB_EXTRACT`     | `{tabIds: number[]}`                          | `{success, images, tabCount}`          | `extractor.processMultiTabExtract`   |
+| `FETCH_IMAGE_DATA`      | `{url: string}`                               | `{success, dataUrl, contentType}`      | `reverse-search.fetchImageData`      |
+| `REVERSE_SEARCH_UPLOAD` | `{engine, imageUrl}`                          | `{success, redirectUrl}`               | `reverse-search.reverseSearchUpload` |
+| `HIGHLIGHT_IMAGE`       | `{tabId?, imageUrl}`                          | `{success, found}`                     | proxied to content script            |
+| `UNHIGHLIGHT_IMAGE`     | `{tabId?, imageUrl}`                          | `{success}`                            | proxied to content script            |
+| `HIGHLIGHT_IMAGES`      | `{tabId?, imageUrls: string[]}`               | `{success}`                            | proxied to content script            |
+| `REMOVE_HIGHLIGHT`      | `{tabId?}`                                    | `{success}`                            | proxied to content script            |
+| `SIDE_PANEL_OPENED`     | `{tabId}`                                     | `{success}`                            | tracks in `sidePanelOpenedTabs` Set  |
+| `SIDE_PANEL_CLOSED`     | `{tabId}`                                     | `{success}`                            | drops from `sidePanelOpenedTabs`     |
+| `ACTIVATE_LICENSE`      | `{licenseKey}`                                | `{success, plan, expiresAt, error?}`   | `license.activateLicense`            |
+| `DEACTIVATE_LICENSE`    | `{}`                                          | `{success}`                            | `license.deactivateLicense`          |
+| `VALIDATE_LICENSE`      | `{}`                                          | `{success, status, plan, expiresAt}`   | `license.validateLicense`            |
+| `GET_LICENSE_STATUS`    | `{}`                                          | `{success, info: ProUserInfo}`         | `license.getLicenseInfo`             |
 
 ### Background → Content Script
 
-| Message | Request shape | Response shape | Owner handler |
-|---|---|---|---|
-| `EXTRACT_IMAGES` | `{skipIframes?}` | `{success, images: ImageItem[]}` | `content/main.extractImages` |
-| `START_LIVE_MONITOR` | `{config?: {debounceMs?}}` | `{success}` | `content/monitor.startLiveMonitoring` |
-| `STOP_LIVE_MONITOR` | `{}` | `{success}` | `content/monitor.stopLiveMonitoring` |
-| `HIGHLIGHT_IMAGE` | `{imageUrl}` | `{success, found}` | `content/highlight.addHighlight` |
-| `UNHIGHLIGHT_IMAGE` | `{imageUrl}` | `{success}` | `content/highlight.removeSingleHighlight` |
-| `HIGHLIGHT_IMAGES` | `{imageUrls: string[]}` | `{success}` | `content/highlight.syncHighlights` |
-| `REMOVE_HIGHLIGHT` | `{}` | `{success}` | `content/highlight.removeAllHighlights` |
-| `PING` | `{}` | `{type: PONG}` | injection liveness probe |
-| `TOGGLE_FAB` | `{}` | `{success}` | deprecated no-op (kept for back-compat) |
+| Message              | Request shape              | Response shape                   | Owner handler                             |
+| -------------------- | -------------------------- | -------------------------------- | ----------------------------------------- |
+| `EXTRACT_IMAGES`     | `{skipIframes?}`           | `{success, images: ImageItem[]}` | `content/main.extractImages`              |
+| `START_LIVE_MONITOR` | `{config?: {debounceMs?}}` | `{success}`                      | `content/monitor.startLiveMonitoring`     |
+| `STOP_LIVE_MONITOR`  | `{}`                       | `{success}`                      | `content/monitor.stopLiveMonitoring`      |
+| `HIGHLIGHT_IMAGE`    | `{imageUrl}`               | `{success, found}`               | `content/highlight.addHighlight`          |
+| `UNHIGHLIGHT_IMAGE`  | `{imageUrl}`               | `{success}`                      | `content/highlight.removeSingleHighlight` |
+| `HIGHLIGHT_IMAGES`   | `{imageUrls: string[]}`    | `{success}`                      | `content/highlight.syncHighlights`        |
+| `REMOVE_HIGHLIGHT`   | `{}`                       | `{success}`                      | `content/highlight.removeAllHighlights`   |
+| `PING`               | `{}`                       | `{type: PONG}`                   | injection liveness probe                  |
+| `TOGGLE_FAB`         | `{}`                       | `{success}`                      | deprecated no-op (kept for back-compat)   |
 
 ### Content Script → Background (broadcast / fire-and-forget)
 
-| Message | Shape | Behavior |
-|---|---|---|
-| `IMAGES_DISCOVERED` | `{type, images: ImageItem[]}` | Background re-broadcasts to every connected `image-snatcher-ui` port (i.e. every open panel/popup). |
-| `EXTRACTION_ERROR` | `{type, error, code?}` | Same broadcast; panel surfaces as a toast. |
+| Message             | Shape                         | Behavior                                                                                           |
+| ------------------- | ----------------------------- | -------------------------------------------------------------------------------------------------- |
+| `IMAGES_DISCOVERED` | `{type, images: ImageItem[]}` | Background re-broadcasts to every connected `image-harvest-ui` port (i.e. every open panel/popup). |
+| `EXTRACTION_ERROR`  | `{type, error, code?}`        | Same broadcast; panel surfaces as a toast.                                                         |
 
 ### Background → Side Panel / Popup (broadcast over port)
 
-| Message | Shape | Triggered by |
-|---|---|---|
-| `IMAGES_DISCOVERED` | `{images, fromTabId}` | Re-broadcast of content script discovery events |
-| `DOWNLOAD_PROGRESS` | `{completed, total, current, imageCount}` | `extractor.processMultiTabExtract` per-tab |
-| `DOWNLOAD_COMPLETE` | `{count}` | After ZIP download finalizes |
-| `DOWNLOAD_ERROR` | `{error}` | When `chrome.downloads.download` rejects |
-| `LICENSE_STATUS_CHANGED` | `{info: ProUserInfo}` | After `license.ts > onAlarm` flips status |
-| `MULTI_TAB_EXTRACT_COMPLETE` | `{images, tabCount}` | `extractor.processMultiTabExtract` final |
-| `MULTI_TAB_EXTRACT_ERROR` | `{error}` | Multi-tab orchestration failure |
-| `CLEAR_SELECTION` | `{type}` | Triggered when content script tells the panel to drop selection (rare) |
+| Message                      | Shape                                     | Triggered by                                                           |
+| ---------------------------- | ----------------------------------------- | ---------------------------------------------------------------------- |
+| `IMAGES_DISCOVERED`          | `{images, fromTabId}`                     | Re-broadcast of content script discovery events                        |
+| `DOWNLOAD_PROGRESS`          | `{completed, total, current, imageCount}` | `extractor.processMultiTabExtract` per-tab                             |
+| `DOWNLOAD_COMPLETE`          | `{count}`                                 | After ZIP download finalizes                                           |
+| `DOWNLOAD_ERROR`             | `{error}`                                 | When `chrome.downloads.download` rejects                               |
+| `LICENSE_STATUS_CHANGED`     | `{info: ProUserInfo}`                     | After `license.ts > onAlarm` flips status                              |
+| `MULTI_TAB_EXTRACT_COMPLETE` | `{images, tabCount}`                      | `extractor.processMultiTabExtract` final                               |
+| `MULTI_TAB_EXTRACT_ERROR`    | `{error}`                                 | Multi-tab orchestration failure                                        |
+| `CLEAR_SELECTION`            | `{type}`                                  | Triggered when content script tells the panel to drop selection (rare) |
 
 ### Error envelope conventions
 
@@ -936,46 +936,46 @@ across reloads, sync, and incognito.
 Used only for filter preferences that the user expects to follow them
 across machines.
 
-| Key | Shape | Owner |
-|---|---|---|
+| Key            | Shape          | Owner                            |
+| -------------- | -------------- | -------------------------------- |
 | `filterConfig` | `FilterConfig` | `storage.{get,save}FilterConfig` |
 
 ### `chrome.storage.local` (per-machine, ~10 MB cap)
 
 The bulk of persistent state.
 
-| Key | Shape | Owner | Notes |
-|---|---|---|---|
-| `appSettings` | `AppSettings` | `storage.{get,save}AppSettings` | Theme / density / display mode / live-monitoring / size limits |
-| `downloadHistory` | `DownloadRecord[]` | `storage.{get,add,remove,clear}DownloadHistory` | Capped at `LIMITS.MAX_DOWNLOAD_HISTORY = 20` |
-| `licenseData` | `LicenseData` | `license.{save,get,clear}LicenseData` | Pro plan, expiry, instance id, last verified |
-| `instanceId` | `string` | `license.getOrCreateInstanceId` | Stable per-install id for license activation |
-| `telemetryOptIn` | `boolean` | `telemetry.{is,set}OptIn` | Defaults to `true` until user makes an explicit choice |
-| `telemetryQueue` | `TelemetryEvent[]` | internal to telemetry SDK | Persisted retry queue; capped at `TELEMETRY_MAX_QUEUE = 100` |
-| `telemetryInstanceHash` | `string` | internal to telemetry SDK | SHA-256 truncated; never sent raw |
-| `telemetryInstanceId` | `string` | internal to telemetry SDK | Source of the hash; **never sent** |
-| `_telemetry_first_open_at` | `number` | `sidepanel/init.ts` | Timestamp of first successful boot — gates `EXTENSION_FIRST_OPEN` event |
-| `_telemetry_opt_in_decided` | `boolean` | `PrivacyOptInModal` | Set to `true` on first user choice; gates the modal |
-| `trialState` | `{startedAt, expiresAt}` | `shared/trial.ts` | One-shot 7-day Pro trial sentinel |
-| `proUpsellBucket` | `'A' \| 'B'` | `shared/ab-experiment.ts` | Stable A/B bucket per install |
-| `paywallState` | `{lastShownAt, dismissals, ...}` | `shared/paywall-state.ts` | Soft vs hard paywall escalation tracking |
-| `ratingPromptState` | `{lastShownAt, dismissals, downloads}` | `shared/rating-prompt-state.ts` | "Leave a review" cooldown |
+| Key                         | Shape                                  | Owner                                           | Notes                                                                   |
+| --------------------------- | -------------------------------------- | ----------------------------------------------- | ----------------------------------------------------------------------- |
+| `appSettings`               | `AppSettings`                          | `storage.{get,save}AppSettings`                 | Theme / density / display mode / live-monitoring / size limits          |
+| `downloadHistory`           | `DownloadRecord[]`                     | `storage.{get,add,remove,clear}DownloadHistory` | Capped at `LIMITS.MAX_DOWNLOAD_HISTORY = 20`                            |
+| `licenseData`               | `LicenseData`                          | `license.{save,get,clear}LicenseData`           | Pro plan, expiry, instance id, last verified                            |
+| `instanceId`                | `string`                               | `license.getOrCreateInstanceId`                 | Stable per-install id for license activation                            |
+| `telemetryOptIn`            | `boolean`                              | `telemetry.{is,set}OptIn`                       | Defaults to `true` until user makes an explicit choice                  |
+| `telemetryQueue`            | `TelemetryEvent[]`                     | internal to telemetry SDK                       | Persisted retry queue; capped at `TELEMETRY_MAX_QUEUE = 100`            |
+| `telemetryInstanceHash`     | `string`                               | internal to telemetry SDK                       | SHA-256 truncated; never sent raw                                       |
+| `telemetryInstanceId`       | `string`                               | internal to telemetry SDK                       | Source of the hash; **never sent**                                      |
+| `_telemetry_first_open_at`  | `number`                               | `sidepanel/init.ts`                             | Timestamp of first successful boot — gates `EXTENSION_FIRST_OPEN` event |
+| `_telemetry_opt_in_decided` | `boolean`                              | `PrivacyOptInModal`                             | Set to `true` on first user choice; gates the modal                     |
+| `trialState`                | `{startedAt, expiresAt}`               | `shared/trial.ts`                               | One-shot 7-day Pro trial sentinel                                       |
+| `proUpsellBucket`           | `'A' \| 'B'`                           | `shared/ab-experiment.ts`                       | Stable A/B bucket per install                                           |
+| `paywallState`              | `{lastShownAt, dismissals, ...}`       | `shared/paywall-state.ts`                       | Soft vs hard paywall escalation tracking                                |
+| `ratingPromptState`         | `{lastShownAt, dismissals, downloads}` | `shared/rating-prompt-state.ts`                 | "Leave a review" cooldown                                               |
 
 ### `chrome.storage.session` (in-memory, cleared on browser restart)
 
 Used as a fast cache for state that should survive panel close/reopen
 but not browser restart.
 
-| Key | Shape | Owner | Notes |
-|---|---|---|---|
-| `sessionState` | `unknown` | `storage.{save,get,clear}SessionState` | Reserved; not currently written by core code |
+| Key                   | Shape                | Owner                                   | Notes                                           |
+| --------------------- | -------------------- | --------------------------------------- | ----------------------------------------------- |
+| `sessionState`        | `unknown`            | `storage.{save,get,clear}SessionState`  | Reserved; not currently written by core code    |
 | `tabImgCache_<tabId>` | `TabImageCacheEntry` | `storage.{save,get,clear}TabImageCache` | Per-tab `{url, timestamp, images: ImageItem[]}` |
 
 ### IndexedDB — `ImageSnatcherDB`
 
-| DB | Store | Schema v | Owner |
-|---|---|---|---|
-| `ImageSnatcherDB` | `collections` | 1 | `shared/collection.ts` |
+| DB                | Store         | Schema v | Owner                  |
+| ----------------- | ------------- | -------- | ---------------------- |
+| `ImageSnatcherDB` | `collections` | 1        | `shared/collection.ts` |
 
 Indexes: `tags` (multiEntry), `sourceUrl`, `createdAt`. Records are the
 `CollectionItem` shape including `Blob` thumbnail + full image
@@ -1113,6 +1113,7 @@ Constants live in `shared/constants.ts`:
 ```
 
 Opt-out (`setOptIn(false)`) immediately:
+
 1. Sets `optInCache = false`.
 2. Persists to storage.
 3. Drops the in-memory queue.
@@ -1160,7 +1161,7 @@ if (!info.isPro) {
 
 `FREE_LIMITS` in `shared/constants.ts` defines the **soft caps** —
 e.g. `MAX_ZIP_IMAGES: 30` for Free vs unlimited for Pro. Soft caps
-deliberately let the user *experience* the feature first ("first wow"
+deliberately let the user _experience_ the feature first ("first wow"
 strategy) before the upsell trips.
 
 ### Activation: turning a key into Pro
@@ -1182,23 +1183,23 @@ User-driven flow (`sidepanel/license-ui.ts`):
 
 ### Enforcement: what's gated
 
-| Free | Pro |
-|---|---|
-| ZIP cap = 30 images / batch | Unlimited |
-| Batch URL copy = 20 max | Unlimited |
-| Collection cap = 5 favorites | Unlimited |
-| Group modes = `none` + `format` | All 5 (`none`, `domain`, `format`, `size`, `tab`) |
-| Reverse search = Google + TinEye | + Baidu + Yandex |
-| ❌ Color filter (free can view, can't filter by color) | ✅ |
-| ❌ Color copy | ✅ |
-| ❌ Highlight batch | ✅ Batch + auto-scroll |
-| ❌ Live monitoring | ✅ MutationObserver |
-| ❌ Image delete (per-card) | ✅ |
-| ❌ Format conversion | ✅ PNG / JPG / WebP |
-| ❌ Custom naming template | ✅ Full template variables |
-| ❌ pHash dedup modal | ✅ |
-| ❌ Multi-tab extract | ✅ Cross-tab |
-| ❌ Advanced preview | ✅ Lightbox + metadata panel |
+| Free                                                   | Pro                                               |
+| ------------------------------------------------------ | ------------------------------------------------- |
+| ZIP cap = 30 images / batch                            | Unlimited                                         |
+| Batch URL copy = 20 max                                | Unlimited                                         |
+| Collection cap = 5 favorites                           | Unlimited                                         |
+| Group modes = `none` + `format`                        | All 5 (`none`, `domain`, `format`, `size`, `tab`) |
+| Reverse search = Google + TinEye                       | + Baidu + Yandex                                  |
+| ❌ Color filter (free can view, can't filter by color) | ✅                                                |
+| ❌ Color copy                                          | ✅                                                |
+| ❌ Highlight batch                                     | ✅ Batch + auto-scroll                            |
+| ❌ Live monitoring                                     | ✅ MutationObserver                               |
+| ❌ Image delete (per-card)                             | ✅                                                |
+| ❌ Format conversion                                   | ✅ PNG / JPG / WebP                               |
+| ❌ Custom naming template                              | ✅ Full template variables                        |
+| ❌ pHash dedup modal                                   | ✅                                                |
+| ❌ Multi-tab extract                                   | ✅ Cross-tab                                      |
+| ❌ Advanced preview                                    | ✅ Lightbox + metadata panel                      |
 
 ### Trial
 
@@ -1233,8 +1234,8 @@ monitor).
    - `plan` — `"free" | "monthly" | "yearly" | "lifetime" | "trial"`.
    - `schemaVersion` — currently `1`.
    - `events: TelemetryEvent[]`.
-   No URLs, no page titles, no image URLs/data, no IP (server-side
-   discards after country lookup), no user-typed text.
+     No URLs, no page titles, no image URLs/data, no IP (server-side
+     discards after country lookup), no user-typed text.
 3. **Whitelist-only event names.** `track(name, props)` calls
    `isKnownEvent(name)` against `EVENTS` in
    `shared/telemetry-events.ts` — unknown names are dropped with a
@@ -1300,10 +1301,10 @@ Japanese (`ja`), Spanish (`es`).
 
 This is the most common confusion for new contributors:
 
-| System | Used by | API | Catalogue |
-|---|---|---|---|
-| **Chrome MV3 native i18n** | `manifest.config.ts` (extension name & description), Chrome Web Store listing | `__MSG_xxx__` placeholders + `chrome.i18n.getMessage` | `_locales/<lang>/messages.json` |
-| **Custom in-bundle i18n** | All UI strings inside the panel/popup | `t('key', vars?)` from `shared/i18n.ts` | Same `_locales/<lang>/messages.json` (re-loaded at runtime via fetch) |
+| System                     | Used by                                                                       | API                                                   | Catalogue                                                             |
+| -------------------------- | ----------------------------------------------------------------------------- | ----------------------------------------------------- | --------------------------------------------------------------------- |
+| **Chrome MV3 native i18n** | `manifest.config.ts` (extension name & description), Chrome Web Store listing | `__MSG_xxx__` placeholders + `chrome.i18n.getMessage` | `_locales/<lang>/messages.json`                                       |
+| **Custom in-bundle i18n**  | All UI strings inside the panel/popup                                         | `t('key', vars?)` from `shared/i18n.ts`               | Same `_locales/<lang>/messages.json` (re-loaded at runtime via fetch) |
 
 We re-use the same JSON file for both systems to keep translation
 work in one place. `vite.config.ts > copyStaticAssetsPlugin` mirrors
@@ -1430,11 +1431,11 @@ dist/
 
 `scripts/check-bundle-size.mjs` enforces three hard caps:
 
-| Chunk | Budget | Why |
-|---|---|---|
-| `init.js` | 50 kB gzip | Sidepanel first-paint critical path |
-| `index.ts.js` (background) | 12 kB gzip | SW cold-start time |
-| `main.ts.js` (content) | 14 kB gzip | Per-page injection cost |
+| Chunk                      | Budget     | Why                                 |
+| -------------------------- | ---------- | ----------------------------------- |
+| `init.js`                  | 50 kB gzip | Sidepanel first-paint critical path |
+| `index.ts.js` (background) | 12 kB gzip | SW cold-start time                  |
+| `main.ts.js` (content)     | 14 kB gzip | Per-page injection cost             |
 
 Bumping a budget requires editing the file and citing the reason in
 the commit. The CI pipeline fails any PR that goes over without the
@@ -1442,13 +1443,13 @@ intentional bump.
 
 ### Dev vs prod
 
-| Command | What it does |
-|---|---|
-| `npm run dev` | `vite` dev server with HMR — writes `dist/` on every save. Reload the unpacked extension in `chrome://extensions/` to pick up changes; refresh the target page for content-script edits. |
-| `npm run build` | `vite build` → optimized `dist/` |
-| `npm run build:analyze` | `ANALYZE=1 vite build` → also emits `dist/stats.{html,txt}` |
-| `npm run preview` | Serves the prod build for sanity-check |
-| `npm run zip` | Build + zip into `image-harvest-vX.Y.Z.zip` (Web Store ready) |
+| Command                 | What it does                                                                                                                                                                             |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `npm run dev`           | `vite` dev server with HMR — writes `dist/` on every save. Reload the unpacked extension in `chrome://extensions/` to pick up changes; refresh the target page for content-script edits. |
+| `npm run build`         | `vite build` → optimized `dist/`                                                                                                                                                         |
+| `npm run build:analyze` | `ANALYZE=1 vite build` → also emits `dist/stats.{html,txt}`                                                                                                                              |
+| `npm run preview`       | Serves the prod build for sanity-check                                                                                                                                                   |
+| `npm run zip`           | Build + zip into `image-harvest-vX.Y.Z.zip` (Web Store ready)                                                                                                                            |
 
 ## 17. Performance Budgets
 
@@ -1458,21 +1459,21 @@ warm browser, 50 Mbps connection, default Chrome settings**.
 
 ### Boot latency
 
-| Phase | Budget | Notes |
-|---|---|---|
-| Side panel HTML parse + CSS apply | < 50 ms | Pure HTML, no JS yet |
-| `init.js` parse + execute | < 80 ms | 44 kB gzip / ~165 kB raw |
-| `await detectLocale()` (i18n catalogue load) | < 30 ms | One `fetch('_locales/<lang>/messages.json')` |
-| `cacheElements()` + `bindEvents()` + first render | < 50 ms | DOM-bound |
-| **Total visible-blank → first-paint** | **< 200 ms** | User-perceived "open speed" |
+| Phase                                             | Budget       | Notes                                        |
+| ------------------------------------------------- | ------------ | -------------------------------------------- |
+| Side panel HTML parse + CSS apply                 | < 50 ms      | Pure HTML, no JS yet                         |
+| `init.js` parse + execute                         | < 80 ms      | 44 kB gzip / ~165 kB raw                     |
+| `await detectLocale()` (i18n catalogue load)      | < 30 ms      | One `fetch('_locales/<lang>/messages.json')` |
+| `cacheElements()` + `bindEvents()` + first render | < 50 ms      | DOM-bound                                    |
+| **Total visible-blank → first-paint**             | **< 200 ms** | User-perceived "open speed"                  |
 
 ### Scan latency
 
-| Page complexity | Budget | Notes |
-|---|---|---|
-| Static page, ~20 images | < 300 ms | Stage 1-12 in `extractImages` |
-| Heavy SPA, ~200 images, Shadow DOM | < 1500 ms | Adds stage 13 traversal cost |
-| Pinterest-class infinite scroll | first batch < 500 ms | Live monitoring streams the rest |
+| Page complexity                    | Budget               | Notes                            |
+| ---------------------------------- | -------------------- | -------------------------------- |
+| Static page, ~20 images            | < 300 ms             | Stage 1-12 in `extractImages`    |
+| Heavy SPA, ~200 images, Shadow DOM | < 1500 ms            | Adds stage 13 traversal cost     |
+| Pinterest-class infinite scroll    | first batch < 500 ms | Live monitoring streams the rest |
 
 The `IMAGES_DISCOVERED` streaming pattern is what keeps perceived
 latency low — even when the full 1500 ms scan runs, the panel renders
@@ -1480,13 +1481,13 @@ the first cards within 200-300 ms.
 
 ### Memory budget
 
-| Resource | Budget | Where enforced |
-|---|---|---|
-| Thumbnails per scan | < 50 MB | `LIMITS.MAX_THUMBNAIL_MEMORY_MB` |
-| Single ZIP archive | < 500 MB | `LIMITS.MAX_ZIP_SIZE_MB` |
-| Telemetry retry queue | 100 events | `TELEMETRY_MAX_QUEUE` |
-| Download history | 20 records | `LIMITS.MAX_DOWNLOAD_HISTORY` |
-| Free-tier collection | 5 items | `FREE_LIMITS.MAX_COLLECTION_ITEMS` |
+| Resource              | Budget     | Where enforced                     |
+| --------------------- | ---------- | ---------------------------------- |
+| Thumbnails per scan   | < 50 MB    | `LIMITS.MAX_THUMBNAIL_MEMORY_MB`   |
+| Single ZIP archive    | < 500 MB   | `LIMITS.MAX_ZIP_SIZE_MB`           |
+| Telemetry retry queue | 100 events | `TELEMETRY_MAX_QUEUE`              |
+| Download history      | 20 records | `LIMITS.MAX_DOWNLOAD_HISTORY`      |
+| Free-tier collection  | 5 items    | `FREE_LIMITS.MAX_COLLECTION_ITEMS` |
 
 ### Bundle size budget
 
@@ -1496,13 +1497,13 @@ See §16. Three hard caps with CI enforcement.
 
 The extension is **offline-first by design**. Network calls happen only:
 
-| Trigger | Endpoint | Frequency |
-|---|---|---|
-| License activation | `POST /api/license/verify` + `POST /api/license/activate` | Once per activation |
-| Daily license check | `POST /api/license/verify` | Once / 24h via `chrome.alarms` |
-| Telemetry batch | `POST /api/telemetry` | Every 5s OR every 20 events (only if user opted in) |
-| Cross-origin image fetch (during ZIP / extras) | The image's own URL | On user action |
-| Reverse search redirect | The search engine's URL | On user click |
+| Trigger                                        | Endpoint                                                  | Frequency                                           |
+| ---------------------------------------------- | --------------------------------------------------------- | --------------------------------------------------- |
+| License activation                             | `POST /api/license/verify` + `POST /api/license/activate` | Once per activation                                 |
+| Daily license check                            | `POST /api/license/verify`                                | Once / 24h via `chrome.alarms`                      |
+| Telemetry batch                                | `POST /api/telemetry`                                     | Every 5s OR every 20 events (only if user opted in) |
+| Cross-origin image fetch (during ZIP / extras) | The image's own URL                                       | On user action                                      |
+| Reverse search redirect                        | The search engine's URL                                   | On user click                                       |
 
 There is no background polling, no analytics SDK, no third-party SDK.
 A user who never activates Pro and opts out of telemetry generates
@@ -1515,13 +1516,13 @@ image-heavy real sites before each release.
 
 ### Layer 1: Vitest unit suite (53 files / ~1,345 cases)
 
-| Aspect | Setting |
-|---|---|
-| Runner | Vitest 2 |
-| Env | node + jsdom (per file glob: `*.test.tsx` → jsdom; `*.test.ts` → node) |
-| Scope | `shared/`, `background/`, `content/`, `sidepanel/`, `pages/`, Preact components |
-| Coverage gate | All files Lines ≥ 80% (currently 80.00%) |
-| Run command | `npm test` (CI), `npm run test:watch` (dev), `npm run test:coverage` (HTML report) |
+| Aspect        | Setting                                                                            |
+| ------------- | ---------------------------------------------------------------------------------- |
+| Runner        | Vitest 2                                                                           |
+| Env           | node + jsdom (per file glob: `*.test.tsx` → jsdom; `*.test.ts` → node)             |
+| Scope         | `shared/`, `background/`, `content/`, `sidepanel/`, `pages/`, Preact components    |
+| Coverage gate | All files Lines ≥ 80% (currently 80.00%)                                           |
+| Run command   | `npm test` (CI), `npm run test:watch` (dev), `npm run test:coverage` (HTML report) |
 
 #### Mocking conventions
 
@@ -1542,21 +1543,23 @@ image-heavy real sites before each release.
 
 ### Layer 2: Playwright e2e (41 specs)
 
-| Aspect | Setting |
-|---|---|
-| Runner | Playwright 1.59 |
-| Browser | Headed Chromium via `launchPersistentContext` |
-| Workers | 1 (MV3 SWs don't init reliably headless / concurrent) |
-| Extension load | Unpacked from `dist/` (you must `npm run build` first) |
-| Run command | `npm run test:e2e` (full), `npm run test:e2e:ui` (UI runner) |
-| CI | `xvfb-run --auto-servernum npm run test:e2e` |
+| Aspect         | Setting                                                      |
+| -------------- | ------------------------------------------------------------ |
+| Runner         | Playwright 1.59                                              |
+| Browser        | Headed Chromium via `launchPersistentContext`                |
+| Workers        | 1 (MV3 SWs don't init reliably headless / concurrent)        |
+| Extension load | Unpacked from `dist/` (you must `npm run build` first)       |
+| Run command    | `npm run test:e2e` (full), `npm run test:e2e:ui` (UI runner) |
+| CI             | `xvfb-run --auto-servernum npm run test:e2e`                 |
 
 #### Deterministic state pattern
 
 E2e tests opt into a "test mode" by injecting:
 
 ```ts
-await page.addInitScript(() => { window.__IH_E2E__ = true; });
+await page.addInitScript(() => {
+  window.__IH_E2E__ = true;
+});
 ```
 
 When `init.ts` sees this flag, it exposes `window.__IH__ = { store,
@@ -1619,26 +1622,26 @@ npm run release:major     # 1.x.y → 2.0.0
 
 ### What gets versioned where
 
-| Artifact | Source | When updated |
-|---|---|---|
-| `package.json` version | `npm version` | Every release |
-| `manifest.config.ts` version | reads `package.json` | Automatic |
-| `dist/manifest.json` version | emitted by crxjs from manifest.config.ts | At build time |
-| GitHub Release tag | `git tag vX.Y.Z` | `npm version` creates |
-| `CHANGELOG.md` | manually appended | Pre-release PR |
-| Chrome Web Store listing | manual upload | Post-release |
+| Artifact                     | Source                                   | When updated          |
+| ---------------------------- | ---------------------------------------- | --------------------- |
+| `package.json` version       | `npm version`                            | Every release         |
+| `manifest.config.ts` version | reads `package.json`                     | Automatic             |
+| `dist/manifest.json` version | emitted by crxjs from manifest.config.ts | At build time         |
+| GitHub Release tag           | `git tag vX.Y.Z`                         | `npm version` creates |
+| `CHANGELOG.md`               | manually appended                        | Pre-release PR        |
+| Chrome Web Store listing     | manual upload                            | Post-release          |
 
 ### CI matrix (ci.yml)
 
 Five jobs run in parallel on every push/PR:
 
-| Job | What | Time |
-|---|---|---|
-| `lint` | ESLint + Prettier check | ~20s |
-| `typecheck` | `tsc --noEmit` | ~30s |
-| `test` | Vitest + coverage upload | ~60s |
-| `build` | Vite build + bundle-size budget check + dist artifact upload | ~45s |
-| `e2e` | Playwright (depends on `build`) | ~3-4 min |
+| Job         | What                                                         | Time     |
+| ----------- | ------------------------------------------------------------ | -------- |
+| `lint`      | ESLint + Prettier check                                      | ~20s     |
+| `typecheck` | `tsc --noEmit`                                               | ~30s     |
+| `test`      | Vitest + coverage upload                                     | ~60s     |
+| `build`     | Vite build + bundle-size budget check + dist artifact upload | ~45s     |
+| `e2e`       | Playwright (depends on `build`)                              | ~3-4 min |
 
 `concurrency: cancel-in-progress: true` cancels obsolete runs when new
 commits land on the same ref.
@@ -1692,7 +1695,7 @@ Recipes for the most common types of contribution.
 2. Track the upsell view: `track(EVENTS.PRO_UPSELL_SHOWN, { feature: 'your-key' })`.
 3. Define a Free fallback if the feature has a meaningful "tasting"
    version (see "Sprint 3.5" in `CHANGELOG.md` — `MAX_COLLECTION_ITEMS:
-   5` is an example).
+5` is an example).
 4. Lazy-load the implementation via dynamic `import()` from
    `pro-features.ts` so the initial bundle stays under budget.
 5. Add the feature to the Free vs Pro table in `README.md` and §13.
@@ -1721,7 +1724,7 @@ See §15 — 4-step PR.
 3. Replace the imperative DOM-mutating code with a render that reads
    from `useStore(s => s.yourFeatureState)`.
 4. Add the mount point to `sidepanel/components/mount.tsx >
-   mountPreactComponents()`.
+mountPreactComponents()`.
 5. Update `sidepanel/state.ts` with the new state shape.
 6. Update `init.ts` if the new component changes mount-order
    assumptions.
@@ -1729,32 +1732,32 @@ See §15 — 4-step PR.
 
 ## 21. Glossary
 
-| Term | Definition |
-|---|---|
-| **MV3** | Manifest V3 — the latest Chrome extension manifest standard. Banned dynamic `eval`, swapped persistent background pages for ephemeral service workers. |
-| **Service Worker (SW)** | The background context. Spun up on demand, killed after ~30s idle, has full `chrome.*` API access but no DOM. |
-| **Content Script** | The page-injected script. Runs in an isolated world (sees DOM but not page JS), cannot call `chrome.tabs.*`. |
-| **Side Panel** | Chrome's persistent side-panel UI (Chrome 114+). Sticks around across tab switches. |
-| **Popup** | The classic toolbar popup that dies on focus loss. |
-| **`@crxjs/vite-plugin`** | Vite plugin that handles MV3 quirks (manifest emission, content-script bundling, HMR). Currently on `2.0.0-beta.25`. |
-| **`vite-html-include`** | Custom local plugin that expands `<!-- @include foo.html -->` macros before crxjs sees the HTML. |
-| **`uiPorts`** | The `Set<chrome.runtime.Port>` in the background SW that holds every connected side-panel/popup port for broadcast. |
-| **Long-lived port** | The persistent connection opened via `chrome.runtime.connect({name})` — used for broadcast (e.g. `IMAGES_DISCOVERED`). |
-| **Restricted URL** | A URL the extension cannot inject into: `chrome://`, `chrome-extension://` (other extensions), Web Store, view-source, etc. Detected by `shared/utils.ts > isRestrictedUrl`. |
-| **`ImageItem`** | The central data structure (see `shared/types.ts`). Carries id, URL, dimensions, format, source, optional pHash and dominant colors. |
-| **`isProUser()`** | The single gate every Pro feature consults. Returns `{isPro, plan, expiresAt, status}`. |
-| **Trial** | The one-shot 7-day full-Pro trial; not user-resettable. |
-| **Soft paywall** | A non-blocking banner that asks the user to upgrade. |
-| **Hard paywall** | A blocking modal that gates the next user action. |
-| **First wow** | The product principle of letting the user experience a Pro feature once before the upsell trips. See `FREE_LIMITS` design notes in `shared/constants.ts`. |
-| **Live monitoring** | Pro feature: `MutationObserver` watches `document.body` and streams newly-added images to the panel. |
-| **pHash** | Perceptual hash. 64-bit DCT-based fingerprint used for similar-image detection. |
-| **Median Cut** | The color-quantization algorithm used for dominant-color extraction. |
-| **`virtua`** | Third-party Preact-incompatible (React-only) virtualized-list library, aliased to `preact/compat`. |
-| **`fake-indexeddb`** | npm dev dep used in unit tests so `shared/collection.ts` works under jsdom. |
-| **`installChromeMock()`** | Test helper (`tests/_helpers/`) that resets `chrome.*` to a clean spy-able mock per test. |
-| **`__IH_E2E__`** | The sentinel `window` flag e2e tests set so `init.ts` exposes `window.__IH__` for direct state access. |
-| **Bucket** | A/B experiment assignment (`'A'` or `'B'`) stamped on every applicable telemetry event. |
+| Term                      | Definition                                                                                                                                                                   |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| **MV3**                   | Manifest V3 — the latest Chrome extension manifest standard. Banned dynamic `eval`, swapped persistent background pages for ephemeral service workers.                       |
+| **Service Worker (SW)**   | The background context. Spun up on demand, killed after ~30s idle, has full `chrome.*` API access but no DOM.                                                                |
+| **Content Script**        | The page-injected script. Runs in an isolated world (sees DOM but not page JS), cannot call `chrome.tabs.*`.                                                                 |
+| **Side Panel**            | Chrome's persistent side-panel UI (Chrome 114+). Sticks around across tab switches.                                                                                          |
+| **Popup**                 | The classic toolbar popup that dies on focus loss.                                                                                                                           |
+| **`@crxjs/vite-plugin`**  | Vite plugin that handles MV3 quirks (manifest emission, content-script bundling, HMR). Currently on `2.0.0-beta.25`.                                                         |
+| **`vite-html-include`**   | Custom local plugin that expands `<!-- @include foo.html -->` macros before crxjs sees the HTML.                                                                             |
+| **`uiPorts`**             | The `Set<chrome.runtime.Port>` in the background SW that holds every connected side-panel/popup port for broadcast.                                                          |
+| **Long-lived port**       | The persistent connection opened via `chrome.runtime.connect({name})` — used for broadcast (e.g. `IMAGES_DISCOVERED`).                                                       |
+| **Restricted URL**        | A URL the extension cannot inject into: `chrome://`, `chrome-extension://` (other extensions), Web Store, view-source, etc. Detected by `shared/utils.ts > isRestrictedUrl`. |
+| **`ImageItem`**           | The central data structure (see `shared/types.ts`). Carries id, URL, dimensions, format, source, optional pHash and dominant colors.                                         |
+| **`isProUser()`**         | The single gate every Pro feature consults. Returns `{isPro, plan, expiresAt, status}`.                                                                                      |
+| **Trial**                 | The one-shot 7-day full-Pro trial; not user-resettable.                                                                                                                      |
+| **Soft paywall**          | A non-blocking banner that asks the user to upgrade.                                                                                                                         |
+| **Hard paywall**          | A blocking modal that gates the next user action.                                                                                                                            |
+| **First wow**             | The product principle of letting the user experience a Pro feature once before the upsell trips. See `FREE_LIMITS` design notes in `shared/constants.ts`.                    |
+| **Live monitoring**       | Pro feature: `MutationObserver` watches `document.body` and streams newly-added images to the panel.                                                                         |
+| **pHash**                 | Perceptual hash. 64-bit DCT-based fingerprint used for similar-image detection.                                                                                              |
+| **Median Cut**            | The color-quantization algorithm used for dominant-color extraction.                                                                                                         |
+| **`virtua`**              | Third-party Preact-incompatible (React-only) virtualized-list library, aliased to `preact/compat`.                                                                           |
+| **`fake-indexeddb`**      | npm dev dep used in unit tests so `shared/collection.ts` works under jsdom.                                                                                                  |
+| **`installChromeMock()`** | Test helper (`tests/_helpers/`) that resets `chrome.*` to a clean spy-able mock per test.                                                                                    |
+| **`__IH_E2E__`**          | The sentinel `window` flag e2e tests set so `init.ts` exposes `window.__IH__` for direct state access.                                                                       |
+| **Bucket**                | A/B experiment assignment (`'A'` or `'B'`) stamped on every applicable telemetry event.                                                                                      |
 
 ---
 

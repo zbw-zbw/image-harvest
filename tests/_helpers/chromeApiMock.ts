@@ -96,7 +96,7 @@ export function installChromeMock(options: InstallOptions = {}): ChromeMock {
     runtime: {
       sendMessage: vi.fn().mockResolvedValue({}),
       connect: vi.fn(() => ({
-        name: 'image-snatcher-ui',
+        name: 'image-harvest-ui',
         onMessage: {
           addListener: vi.fn((fn: TabListener) => {
             if (capturePortListeners) capturePortListeners.message.push(fn);
@@ -117,7 +117,7 @@ export function installChromeMock(options: InstallOptions = {}): ChromeMock {
       get: vi.fn().mockResolvedValue({ id: 1, url: 'https://example.com' }),
       create: vi.fn().mockResolvedValue(undefined),
       connect: vi.fn(() => ({
-        name: 'image-snatcher-ui',
+        name: 'image-harvest-ui',
         onDisconnect: { addListener: vi.fn() },
         disconnect: vi.fn(),
       })),

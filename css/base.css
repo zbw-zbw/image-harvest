@@ -134,10 +134,16 @@
   opacity: 1;
 }
 
-/* Pro status responsive: progressively hide info on narrow panels */
-/* Step 1: hide plan label */
-@media (max-width: 420px) {
-  .pro-responsive-plan {
+/* Pro status responsive: progressively hide info on narrow panels.
+   Use container query on .toolbar (ancestor) so it works in a
+   side-panel whose width != viewport width. */
+.toolbar:has(.pro-status-area) {
+  container-type: inline-size;
+  container-name: protoolbar;
+}
+
+@container protoolbar (max-width: 380px) {
+  .pro-expiry-label {
     display: none;
   }
 
@@ -146,15 +152,11 @@
   }
 }
 
-/* Step 2: hide expiry */
-@media (max-width: 340px) {
-  .pro-responsive-expiry {
+@container protoolbar (max-width: 300px) {
+  .pro-plan-label {
     display: none;
   }
-}
 
-/* Step 3: hide expiry on very narrow widths via container-based approach */
-@media (max-width: 300px) {
   .pro-active-badge {
     padding: 2px 6px;
     font-size: 10px;

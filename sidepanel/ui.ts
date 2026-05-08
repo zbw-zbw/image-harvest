@@ -40,11 +40,11 @@ export function updateFilterButtonLabels(): void {
     let label: string = defaults.size;
     if (state.activeFilters.size !== 'all') {
       const sizeLabels: Record<string, string> = {
-        small: 'Small',
-        medium: 'Medium',
-        large: 'Large',
-        xl: 'XL',
-        custom: 'Custom',
+        small: t('size_btn_small'),
+        medium: t('size_btn_medium'),
+        large: t('size_btn_large'),
+        xl: t('size_btn_xl'),
+        custom: t('size_btn_custom'),
       };
       label = sizeLabels[state.activeFilters.size] || label;
     }
@@ -67,6 +67,7 @@ export function updateFilterButtonLabels(): void {
         svg: 'SVG',
         ico: 'ICO',
         bmp: 'BMP',
+        other: t('filter_type_other'),
       };
       label = state.activeFilters.types.map((type) => typeLabels[type] || type).join(', ');
     }
@@ -81,10 +82,10 @@ export function updateFilterButtonLabels(): void {
     let label: string = defaults.layout;
     if (hasLayoutFilter) {
       const layoutLabels: Record<string, string> = {
-        square: 'Square',
-        landscape: 'Landscape',
-        portrait: 'Portrait',
-        panorama: 'Panorama',
+        square: t('layout_btn_square'),
+        landscape: t('layout_btn_landscape'),
+        portrait: t('layout_btn_portrait'),
+        panorama: t('layout_btn_panorama'),
       };
       label = layoutLabels[state.activeFilters.layout] || label;
     }
