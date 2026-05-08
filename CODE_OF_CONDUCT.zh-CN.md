@@ -52,7 +52,7 @@
 可通过以下渠道向负责执行的社区领导者报告滥用、骚扰或其他不可接受的
 行为：
 
-- **电子邮件**：`coderkyriewen@gmail.com`，主题前缀 `[CONDUCT]`
+- **电子邮件**：`support@kyriewen.cn`，主题前缀 `[CONDUCT]`
 - **GitHub**：提交私密 issue（如果仓库支持），或直接发邮件
 
 所有投诉将被迅速、公正地审查和调查。

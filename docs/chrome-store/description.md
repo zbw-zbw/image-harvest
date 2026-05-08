@@ -95,4 +95,4 @@ Works on Chrome 88+. Built with Manifest V3.
 
 ## 📧 Support
 
-`coderkyriewen@gmail.com`
+`support@kyriewen.cn`

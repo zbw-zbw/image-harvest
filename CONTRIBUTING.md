@@ -287,6 +287,6 @@ By contributing, you agree that your contributions will be licensed under the [M
 
 ---
 
-Questions? Open an issue or email `coderkyriewen@gmail.com`.
+Questions? Open an issue or email `support@kyriewen.cn`.
 
 Thanks for helping make Image Harvest better! 🌾

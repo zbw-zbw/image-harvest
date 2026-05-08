@@ -395,7 +395,7 @@ The Chrome Web Store has dozens of "image downloader" extensions, most released 
 - **Official Website**: [image-harvest.kyriewen.cn](https://image-harvest.kyriewen.cn)
 - **Pricing Page**: [image-harvest.kyriewen.cn/pricing](https://image-harvest.kyriewen.cn/pricing)
 - **FAQ**: [image-harvest.kyriewen.cn/faq](https://image-harvest.kyriewen.cn/faq)
-- **Support Email**: [coderkyriewen@gmail.com](mailto:coderkyriewen@gmail.com)
+- **Support Email**: [support@kyriewen.cn](mailto:support@kyriewen.cn)
 - **Bug Reports & Feature Requests**: [GitHub Issues](https://github.com/zbw-zbw/image-harvest/issues)
 - **Leave a Review**: [Chrome Web Store Reviews](https://chromewebstore.google.com/detail/iecgnjidmogebokcfnejncgnelcepffo/reviews)
 

@@ -63,7 +63,7 @@ or acting as an appointed representative at an online or offline event.
 Instances of abusive, harassing, or otherwise unacceptable behavior may
 be reported to the community leaders responsible for enforcement at:
 
-- **Email**: `coderkyriewen@gmail.com` with subject prefix
+- **Email**: `support@kyriewen.cn` with subject prefix
   `[CONDUCT]`
 - **GitHub**: open a private issue (if the repository supports private
   issues) or email directly

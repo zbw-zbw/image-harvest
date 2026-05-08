@@ -206,10 +206,10 @@ image-harvest/
 
 Image Harvest 有 **两层自动化测试**：
 
-| 层 | Runner | 环境 | 范围 | 命令 |
-|---|---|---|---|---|
-| 单元 | Vitest 2 | node + jsdom | `shared/*`、`background/*`、`content/*`、`sidepanel/*`、`pages/*`、Preact 组件 | `npm test` |
-| E2E | Playwright 1.59 | 有头 Chromium + 已解压 `dist/` | 用户交互流程（扫描 → 过滤 → 下载、Pro 门控等） | `npm run e2e` |
+| 层   | Runner          | 环境                           | 范围                                                                           | 命令          |
+| ---- | --------------- | ------------------------------ | ------------------------------------------------------------------------------ | ------------- |
+| 单元 | Vitest 2        | node + jsdom                   | `shared/*`、`background/*`、`content/*`、`sidepanel/*`、`pages/*`、Preact 组件 | `npm test`    |
+| E2E  | Playwright 1.59 | 有头 Chromium + 已解压 `dist/` | 用户交互流程（扫描 → 过滤 → 下载、Pro 门控等）                                 | `npm run e2e` |
 
 **当前覆盖**：~46 个单测文件 / 1258 个用例 + 38 个 e2e spec，全部通过。
 
@@ -311,6 +311,6 @@ feat(extractor): 添加对 <object type="image/svg+xml"> 的支持
 
 ---
 
-有疑问？欢迎提 issue 或发邮件到 `coderkyriewen@gmail.com`。
+有疑问？欢迎提 issue 或发邮件到 `support@kyriewen.cn`。
 
 感谢你帮助 Image Harvest 变得更好！🌾
