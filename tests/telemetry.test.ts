@@ -210,23 +210,26 @@ describe('batch + throttle', () => {
   test('flushes once the 5s window elapses', async () => {
     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
     await track(EVENTS.SCAN_TRIGGERED);
-    // Wait for scheduleFlush() to actually arm the setTimeout. Under CI
-    // load the awaited chain inside track() (isOptedIn → storage.get →
-    // sha256Hex → storage.set) can take dozens of microtask rounds, so a
-    // fixed drainMicrotasks(10) is not enough — we poll on the actual
-    // observable: vi.getTimerCount(). Bail after ~200 rounds (still
-    // sub-ms wall clock) so a genuine bug surfaces as a real failure
-    // instead of an infinite loop.
+    // Phase 1: wait for scheduleFlush() to actually arm the setTimeout.
+    // Under CI load the awaited chain inside track() (isOptedIn →
+    // storage.get → sha256Hex → storage.set) can take dozens of microtask
+    // rounds, so a fixed drainMicrotasks(10) is not enough — we poll on
+    // the actual observable: vi.getTimerCount(). Bail after ~200 rounds
+    // so a genuine bug surfaces as a real failure instead of an infinite loop.
     for (let i = 0; i < 200 && vi.getTimerCount() === 0; i++) {
       await Promise.resolve();
     }
     expect(vi.getTimerCount()).toBeGreaterThan(0);
+    // Phase 2: advance fake time to fire the timer callback `void flushNow()`.
     await vi.advanceTimersByTimeAsync(TELEMETRY_FLUSH_INTERVAL_MS + 10);
-    // The setTimeout callback fires `void flushNow()` — poll until the
-    // resulting sendBatch promise resolves and the mock fetch is captured.
-    for (let i = 0; i < 200 && mockFetch.calls.length === 0; i++) {
-      await Promise.resolve();
-    }
+    // Phase 3: wait for the in-flight flushNow() to fully settle. We CANNOT
+    // rely on microtask draining alone because sendBatch() awaits
+    // sha256Hex() (native crypto.subtle.digest) which resolves on a
+    // macrotask boundary — fake-timer microtask polls miss it entirely.
+    // __test.waitForIdle() observes the `inFlight` flag inside the SDK
+    // and is the only deterministic signal that the whole chain
+    // (buildEnvelope → fetchImpl → resp.json) has actually finished.
+    await __test.waitForIdle();
     expect(mockFetch.calls).toHaveLength(1);
   });
 
