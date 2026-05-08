@@ -3,7 +3,6 @@ name: 🐛 Bug Report
 about: Something isn't working as expected
 title: '[Bug] '
 labels: bug
-assignees: zbw-zbw
 ---
 
 ## Describe the Bug
