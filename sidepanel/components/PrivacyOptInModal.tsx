@@ -71,7 +71,9 @@ export function PrivacyOptInModal() {
         </div>
         <div class="modal-body">
           <p class="privacy-opt-in-desc">
-            {t('privacy_desc_prefix')}<strong>{t('privacy_anonymous_data')}</strong>{t('privacy_desc_suffix')}
+            {t('privacy_desc_prefix')}
+            <strong>{t('privacy_anonymous_data')}</strong>
+            {t('privacy_desc_suffix')}
           </p>
           <ul class="privacy-opt-in-list">
             <li>
@@ -84,23 +86,13 @@ export function PrivacyOptInModal() {
               <strong>{t('privacy_reversible_title')}</strong> {t('privacy_reversible_desc')}
             </li>
           </ul>
-          <p class="privacy-opt-in-footnote">
-            {t('privacy_footnote')}
-          </p>
+          <p class="privacy-opt-in-footnote">{t('privacy_footnote')}</p>
         </div>
         <div class="modal-footer privacy-opt-in-footer">
-          <button
-            id="btn-privacy-opt-in-decline"
-            class="btn btn-secondary"
-            onClick={handleDecline}
-          >
+          <button id="btn-privacy-opt-in-decline" class="btn btn-secondary" onClick={handleDecline}>
             {t('privacy_decline')}
           </button>
-          <button
-            id="btn-privacy-opt-in-accept"
-            class="btn btn-primary"
-            onClick={handleAccept}
-          >
+          <button id="btn-privacy-opt-in-accept" class="btn btn-primary" onClick={handleAccept}>
             {t('privacy_accept')}
           </button>
         </div>

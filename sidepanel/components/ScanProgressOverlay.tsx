@@ -12,7 +12,10 @@ import { t } from '../../shared/i18n';
 export function ScanProgressOverlay() {
   const sp = useStoreSelector((s) => s.scanProgress);
   const percent = sp.total > 0 ? Math.round((sp.current / sp.total) * 100) : 0;
-  const text = sp.total === 0 ? t('scan_discovering') : t('scan_progress_text', { current: sp.current, total: sp.total });
+  const text =
+    sp.total === 0
+      ? t('scan_discovering')
+      : t('scan_progress_text', { current: sp.current, total: sp.total });
   // The progress bar is hidden during the indeterminate "discovery" phase;
   // the spinner is sufficient signal that work is happening.
   const barClass = `progress-bar${sp.indeterminate ? ' hidden' : ''}`;

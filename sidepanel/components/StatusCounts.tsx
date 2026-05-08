@@ -34,7 +34,8 @@ export function SimilarInline() {
 
   return (
     <span class="similar-inline">
-      (<a
+      (
+      <a
         class={`similar-inline-link${count === 0 ? ' disabled' : ''}`}
         role="button"
         tabIndex={count > 0 ? 0 : -1}
@@ -42,7 +43,8 @@ export function SimilarInline() {
         onClick={handleClick}
       >
         {t('status_similar_count', { count })}
-      </a>)
+      </a>
+      )
     </span>
   );
 }
@@ -62,8 +64,9 @@ export function DownloadLabel() {
   const filteredCount = useStoreSelector((s) => s.filteredImages.length);
   // Subscribe to localeTick so a runtime language switch triggers re-render
   useStoreSelector((s) => s.localeTick);
-  const text = selectedSize > 0
-    ? t('toolbar_download_selected', { count: selectedSize })
-    : t('toolbar_download_all') + (filteredCount > 0 ? ` (${filteredCount})` : '');
+  const text =
+    selectedSize > 0
+      ? t('toolbar_download_selected', { count: selectedSize })
+      : t('toolbar_download_all') + (filteredCount > 0 ? ` (${filteredCount})` : '');
   return <span id="download-label">{text}</span>;
 }

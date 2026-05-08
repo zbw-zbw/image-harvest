@@ -255,9 +255,7 @@ export function ImageCard({ img, index }: Props) {
 
   // When not scanning (e.g. restoring from cache on tab switch), skip the
   // skeleton → image load animation by pre-setting the "loaded" class.
-  const isNotScanning = useStoreSelector(
-    (s) => !s.isScanning && s.scanSkeletonsToShow === 0
-  );
+  const isNotScanning = useStoreSelector((s) => !s.isScanning && s.scanSkeletonsToShow === 0);
 
   // Image load handlers — keep the legacy `.loaded` class flow so existing
   // CSS transitions (fade-in, broken-image fallback) still work.

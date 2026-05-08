@@ -228,11 +228,11 @@ describe('View Pricing CTA', () => {
 
     expect(chromeStub.tabs.create).toHaveBeenCalledTimes(1);
     expect(chromeStub.tabs.create).toHaveBeenCalledWith(
-      expect.objectContaining({ url: expect.stringMatching(/^https?:\/\//) }),
+      expect.objectContaining({ url: expect.stringMatching(/^https?:\/\//) })
     );
     expect(mockTrack).toHaveBeenCalledWith(
       'pro_upsell_cta_clicked',
-      expect.objectContaining({ cta: 'pricing' }),
+      expect.objectContaining({ cta: 'pricing' })
     );
   });
 });
@@ -256,16 +256,16 @@ describe('Start Free Trial CTA', () => {
 
     expect(mockTrack).toHaveBeenCalledWith(
       'pro_upsell_cta_clicked',
-      expect.objectContaining({ cta: 'trial' }),
+      expect.objectContaining({ cta: 'trial' })
     );
     expect(mockTrack).toHaveBeenCalledWith('trial_started');
     expect(mockMarkResolved).toHaveBeenCalledTimes(1);
     expect(mockShowToast).toHaveBeenCalledWith(
       expect.stringMatching(/trial activated|trial is active/i),
-      'success',
+      'success'
     );
     expect(chromeStub.runtime.sendMessage).toHaveBeenCalledWith(
-      expect.objectContaining({ type: expect.stringMatching(/VALIDATE_LICENSE/i) }),
+      expect.objectContaining({ type: expect.stringMatching(/VALIDATE_LICENSE/i) })
     );
   });
 
@@ -300,7 +300,7 @@ describe('Start Free Trial CTA', () => {
     mockStartTrial.mockReturnValueOnce(
       new Promise((res) => {
         resolveTrial = res;
-      }),
+      })
     );
 
     await openModal();
@@ -313,7 +313,7 @@ describe('Start Free Trial CTA', () => {
     // intent-of-click, not result-of-trial.
     expect(mockTrack).toHaveBeenCalledWith(
       'pro_upsell_cta_clicked',
-      expect.objectContaining({ cta: 'trial' }),
+      expect.objectContaining({ cta: 'trial' })
     );
 
     // Cleanup the dangling promise.
@@ -332,7 +332,7 @@ describe('Close interactions', () => {
 
     expect(mockTrack).toHaveBeenCalledWith(
       'pro_upsell_dismissed',
-      expect.objectContaining({ trigger: 'modal_close' }),
+      expect.objectContaining({ trigger: 'modal_close' })
     );
     const { state } = await import('../sidepanel/state');
     expect(state.proUpgradeModalState.open).toBe(false);
@@ -364,7 +364,7 @@ describe('Close interactions', () => {
     // component's onClick is telemetry-only.
     expect(mockTrack).toHaveBeenCalledWith(
       'pro_upsell_cta_clicked',
-      expect.objectContaining({ cta: 'get_pro' }),
+      expect.objectContaining({ cta: 'get_pro' })
     );
   });
 });

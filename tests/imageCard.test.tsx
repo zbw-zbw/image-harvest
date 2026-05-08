@@ -95,7 +95,9 @@ describe('ImageCard – rendering', () => {
     const img = makeImage({ colors: [] });
     const { container } = render(<ImageCard img={img} index={0} />);
     expect(container.querySelector('.card-color-bar-transparent')).toBeInTheDocument();
-    expect(container.querySelectorAll('.card-color-bar:not(.card-color-bar-transparent)').length).toBe(0);
+    expect(
+      container.querySelectorAll('.card-color-bar:not(.card-color-bar-transparent)').length
+    ).toBe(0);
   });
 
   it('omits the color bar entirely when extraction is disabled', () => {
@@ -174,10 +176,7 @@ describe('ImageCard – click handlers', () => {
       expect(mocks.pro.addToCollection).toHaveBeenCalledWith(img);
     });
     // The legacy "Collection is a Pro feature" pre-block toast must NOT fire.
-    expect(mocks.ui.showToast).not.toHaveBeenCalledWith(
-      'Collection is a Pro feature',
-      'warning'
-    );
+    expect(mocks.ui.showToast).not.toHaveBeenCalledWith('Collection is a Pro feature', 'warning');
     expect(mocks.settings.showProUpgradeModal).not.toHaveBeenCalled();
   });
 

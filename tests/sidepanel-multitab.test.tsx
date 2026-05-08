@@ -881,10 +881,7 @@ describe('startMultiTabExtract', () => {
     const ui = await import('../sidepanel/ui');
     // Source uses t('toast_extraction_failed') + ': ' + t('error_default_message').
     // With i18n catalogue loaded, this resolves to English messages.
-    expect(ui.showToast).toHaveBeenCalledWith(
-      'Extraction failed: An error occurred',
-      'error'
-    );
+    expect(ui.showToast).toHaveBeenCalledWith('Extraction failed: An error occurred', 'error');
   });
 
   it('sendMessage throws + NOT aborted → "Multi-tab extraction failed" toast', async () => {

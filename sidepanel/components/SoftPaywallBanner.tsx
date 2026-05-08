@@ -14,11 +14,7 @@
 // hook because it's purely transient UI and never read by anyone else.
 // Persistent decisions go through shared/paywall-state.ts.
 import { useEffect, useState } from 'preact/hooks';
-import {
-  markDismissed,
-  markShown,
-  shouldShowBanner,
-} from '../../shared/paywall-state';
+import { markDismissed, markShown, shouldShowBanner } from '../../shared/paywall-state';
 import { state } from '../state';
 import { track } from '../../shared/telemetry';
 import { EVENTS } from '../../shared/telemetry-events';
@@ -81,9 +77,21 @@ export function SoftPaywallBanner() {
   if (!visible) return null;
 
   return (
-    <div id="soft-paywall-banner" class="soft-paywall-banner" role="region" aria-label="Pro upgrade suggestion">
+    <div
+      id="soft-paywall-banner"
+      class="soft-paywall-banner"
+      role="region"
+      aria-label="Pro upgrade suggestion"
+    >
       <div class="soft-paywall-banner-icon" aria-hidden="true">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <path d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z" />
           <path d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z" />
           <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
@@ -120,7 +128,14 @@ export function SoftPaywallBanner() {
         aria-label={t('common_dismiss')}
         onClick={handleClose}
       >
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <svg
+          width="14"
+          height="14"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+        >
           <path d="M18 6L6 18M6 6l12 12" />
         </svg>
       </button>

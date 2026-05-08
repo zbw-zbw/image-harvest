@@ -61,9 +61,7 @@ function EmptyScreen({ visible }: ScreenProps) {
   // Two textual variants distinguish "filtered to nothing" from "page has
   // zero images". The button label shifts accordingly so users can tell
   // whether clicking will reset filters or rescan from scratch.
-  const desc = info.isNoResults
-    ? t('empty_no_results_desc')
-    : t('empty_no_images_desc');
+  const desc = info.isNoResults ? t('empty_no_results_desc') : t('empty_no_images_desc');
   const buttonLabel = info.isNoResults ? t('empty_reset_filters') : t('empty_rescan_images');
   return (
     <div id="empty-state" class={`empty-state${visible ? '' : ' hidden'}`}>
@@ -169,9 +167,7 @@ function RestrictedScreen({ visible }: ScreenProps) {
           <h2 class="restricted-title">
             Image Harvest <span class="restricted-version">v1.0.0</span>
           </h2>
-          <p class="restricted-subtitle">
-            {t('restricted_subtitle')}
-          </p>
+          <p class="restricted-subtitle">{t('restricted_subtitle')}</p>
         </div>
       </div>
     </div>

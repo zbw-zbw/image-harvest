@@ -12,10 +12,7 @@ export function LiveIndicator() {
   const isActive = useStoreSelector((s) => s.isProUser && s.appSettings.liveMonitoring !== false);
 
   return (
-    <span
-      class={`live-indicator${isActive ? '' : ' hidden'}`}
-      title={t('live_indicator_tooltip')}
-    >
+    <span class={`live-indicator${isActive ? '' : ' hidden'}`} title={t('live_indicator_tooltip')}>
       <span class="live-dot" />
       {t('live_indicator_label')}
     </span>

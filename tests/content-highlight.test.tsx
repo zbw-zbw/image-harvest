@@ -878,7 +878,10 @@ describe('addHighlight — exotic source dispatch', () => {
   it('matches <picture> > <source srcset> candidate URLs', async () => {
     const picture = document.createElement('picture');
     const source = document.createElement('source');
-    source.setAttribute('srcset', 'https://example.com/pic-480.webp 480w, https://example.com/pic-960.webp 960w');
+    source.setAttribute(
+      'srcset',
+      'https://example.com/pic-480.webp 480w, https://example.com/pic-960.webp 960w'
+    );
     picture.appendChild(source);
     const fallbackImg = document.createElement('img');
     fallbackImg.src = 'https://example.com/pic-fallback.jpg';

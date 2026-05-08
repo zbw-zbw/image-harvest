@@ -67,7 +67,13 @@ export function SettingsModal() {
             inner .modal-body's overflow-y:auto works correctly. */}
         <div
           data-slot="settings-body"
-          style={{ flex: '1 1 auto', overflow: 'hidden', display: 'flex', flexDirection: 'column', minHeight: 0 }}
+          style={{
+            flex: '1 1 auto',
+            overflow: 'hidden',
+            display: 'flex',
+            flexDirection: 'column',
+            minHeight: 0,
+          }}
         />
         {/* Slot for the legacy footer (Reset / Save buttons). Planted
             synchronously by mountSettingsModal() alongside the body. */}

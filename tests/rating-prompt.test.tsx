@@ -168,7 +168,10 @@ describe('rating-prompt-state', () => {
 // (which calls i18n.t and shouldShowRatingPrompt) doesn't blow up at
 // module load.
 
-import { RatingPromptModal, CHROME_STORE_REVIEW_URL } from '../sidepanel/components/RatingPromptModal';
+import {
+  RatingPromptModal,
+  CHROME_STORE_REVIEW_URL,
+} from '../sidepanel/components/RatingPromptModal';
 import * as ratingState from '../shared/rating-prompt-state';
 
 describe('<RatingPromptModal/>', () => {
@@ -226,11 +229,7 @@ describe('<RatingPromptModal/>', () => {
     const { findByText } = render(<RatingPromptModal />);
     const btn = await findByText('⭐ Rate on Chrome Store');
     fireEvent.click(btn);
-    expect(openSpy).toHaveBeenCalledWith(
-      CHROME_STORE_REVIEW_URL,
-      '_blank',
-      'noopener,noreferrer'
-    );
+    expect(openSpy).toHaveBeenCalledWith(CHROME_STORE_REVIEW_URL, '_blank', 'noopener,noreferrer');
     expect(markResolved).toHaveBeenCalledTimes(1);
   });
 

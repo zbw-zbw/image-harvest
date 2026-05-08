@@ -32,7 +32,12 @@ export function CollectionModal() {
             {t('collection_modal_title')} <span class="pro-badge">PRO</span>
           </h2>
           <div class="modal-header-actions">
-            <button id="btn-collection-back" class="icon-btn" title={t('common_close')} onClick={close}>
+            <button
+              id="btn-collection-back"
+              class="icon-btn"
+              title={t('common_close')}
+              onClick={close}
+            >
               <svg
                 width="20"
                 height="20"
@@ -53,7 +58,11 @@ export function CollectionModal() {
             placeholder={t('collection_search_placeholder')}
             class="collection-search-input"
           />
-          <button id="btn-collection-export" class="icon-btn" title={t('collection_export_tooltip')}>
+          <button
+            id="btn-collection-export"
+            class="icon-btn"
+            title={t('collection_export_tooltip')}
+          >
             <svg
               width="18"
               height="18"

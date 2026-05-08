@@ -64,7 +64,7 @@ export function ProStatusBadge() {
   const info = useStoreSelector((s) => s.proLicenseInfo);
   // Subscribe to localeTick so a runtime language switch triggers re-render
   useStoreSelector((s) => s.localeTick);
-  const planLabel = info?.plan ? (PLAN_LABELS[info.plan]?.() || info.plan) : '';
+  const planLabel = info?.plan ? PLAN_LABELS[info.plan]?.() || info.plan : '';
   let expiryLabel = '';
   if (info?.plan !== 'lifetime' && info?.expiresAt) {
     expiryLabel = t('plan_expires_date', { date: formatDateYMD(info.expiresAt) });
@@ -115,8 +115,20 @@ export function ProStatusBadge() {
             {expiryLabel}
           </span>
         )}
-        <button id="btn-top-deactivate" class="btn-deactivate-inline" title={t('pro_deactivate_tooltip')} aria-label={t('pro_deactivate_tooltip')}>
-          <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <button
+          id="btn-top-deactivate"
+          class="btn-deactivate-inline"
+          title={t('pro_deactivate_tooltip')}
+          aria-label={t('pro_deactivate_tooltip')}
+        >
+          <svg
+            width="10"
+            height="10"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+          >
             <path d="M18 6L6 18M6 6l12 12" />
           </svg>
         </button>

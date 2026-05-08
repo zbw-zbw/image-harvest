@@ -78,7 +78,7 @@ function variantSubline(bucket: AbBucket): string {
 // `handleStartTrial` swaps to the real call without touching call sites.
 async function handleStartTrial(
   setError: (msg: string) => void,
-  setLoading: (loading: boolean) => void,
+  setLoading: (loading: boolean) => void
 ): Promise<void> {
   void track(EVENTS.PRO_UPSELL_CTA_CLICKED, { trigger: 'modal', cta: 'trial' });
 
@@ -145,10 +145,7 @@ export function ProUpgradeModal() {
   useEffect(() => {
     let cancelled = false;
     void (async () => {
-      const [b, ps] = await Promise.all([
-        getProUpsellBucket(),
-        getPaywallState(),
-      ]);
+      const [b, ps] = await Promise.all([getProUpsellBucket(), getPaywallState()]);
       if (cancelled) return;
       setBucket(b);
       setDownloadCount(ps.downloadCount);
@@ -264,10 +261,7 @@ export function ProUpgradeModal() {
                 {t('pro_pricing_cta')}
               </button>
             </div>
-            <p
-              id="pro-modal-trial-error"
-              class={`license-error${trialError ? '' : ' hidden'}`}
-            >
+            <p id="pro-modal-trial-error" class={`license-error${trialError ? '' : ' hidden'}`}>
               {trialError}
             </p>
           </div>
