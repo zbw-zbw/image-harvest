@@ -56,9 +56,66 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ## [Unreleased]
 
-### 🧪 Test Coverage Expansion
+## [1.0.2][1.0.2] - 2026-05-08
 
-No production code changed in this entry — purely additive test hardening.
+### 🌍 Internationalization, Trial & Productivity Update
+
+继 1.0.1 的 Chrome Web Store 上架优化之后，本次发版聚焦三件事：**让全球用户都能用母语使用插件**、**降低 Pro 功能的尝鲜门槛**、**把高频复制场景做成一等公民**。同时附带一次大规模的测试加固（不影响生产代码），整体 All-files Lines 覆盖率推到 80%。
+
+#### ✨ Added — 多语言支持（i18n，5 种语言）
+
+- **新增 5 种语言 UI**：英语 (`en`)、简体中文 (`zh_CN`)、繁体中文 (`zh_TW`)、日语 (`ja`)、西班牙语 (`es`)
+- 全部文案走 `chrome.i18n` + `_locales/<lang>/messages.json` 标准方案，覆盖侧边栏、弹窗、设置页、收藏夹、反向搜图页、所有 toast / 模态框 / 按钮 / 表单
+- 文案 key 统一改为下划线命名规范（`scan_button` 而非 `scanButton`），便于翻译协作和后续机器翻译流水线
+- 语言跟随浏览器 UI 语言自动切换，无需用户手动选择
+- 新增 e2e 用例 `e2e/i18n-locale-switch.e2e.ts` 锁定多语言切换契约
+
+#### ✨ Added — 7 天 Pro 试用 + 软付费墙 + A/B + 评分提示（变现优化套件）
+
+- **7 天 Pro 全功能试用**：新装用户自动激活试用，期间所有 Pro 功能（多 Tab 提取、相似图检测、批量高亮、收藏夹、格式转换、命名模板、TinEye/Baidu/Yandex 反搜等）全部解锁
+  - 试用状态在 `chrome.storage.local` 持久化，跨设备隔离
+  - 试用进度条在侧边栏顶部展示剩余天数
+  - 试用到期前 1 天弹出温和提醒，过期后自动降级为免费版
+  - 新模块：`shared/trial.ts`（试用状态机）、`tests/trial.test.ts`（单元测试）
+- **软付费墙（Soft Paywall）**：Pro 功能点击触发可关闭的升级提示，非强制拦截，保留"先体验再付费"的流畅感
+  - 新模块：`shared/paywall-state.ts`（出现频次去抖 + 用户偏好记忆）
+- **A/B 实验框架**：内建轻量级 A/B 分桶能力，用于持续优化付费转化文案
+- **应用内评分提示**：满足正向使用条件后（多次成功下载且无报错）触发一次性的 Chrome Web Store 评分引导
+  - 新模块：`shared/rating-prompt-state.ts`（基于行为信号的触发逻辑 + 7 日冷却）
+
+#### ✨ Added — 批量复制图片链接（高频场景一等公民）
+
+- **批量复制 URL**：选中任意张图片后一键将所有 URL 复制到剪贴板（换行分隔），适配文档/聊天/SEO 调研等高频粘贴场景
+- 单图卡片右键菜单也新增"复制链接"项，与批量入口语义一致
+- 复制成功 toast 显示具体复制条数（"已复制 12 个链接"），失败时给出明确的剪贴板权限提示
+- 新增 e2e 用例 `e2e/copy-url.e2e.ts` + `e2e/batch-copy-url.e2e.ts` 双重锁定
+
+#### 🔁 Changed — 支付系统迁移：PayPal → Creem
+
+- **支付通道从 PayPal 切换到 Creem**：更稳定的全球收款 + 更友好的中国大陆/东南亚地区支持 + 更短的到账周期
+- 三档定价不变（Monthly $2.99 / Yearly $19.99 / Lifetime $39.99），既有用户的许可证持续有效，无需重新激活
+- 客服邮箱从个人 Gmail 改为品牌邮箱（用于 Creem 商户认证）
+- 内部新增促销许可证批量生成脚本（仅维护方使用）
+
+#### ✨ Added — 匿名遥测（Telemetry，默认关闭，需用户主动 opt-in）
+
+- 在设置页新增"匿名使用统计"开关，**默认关闭**，开启后才会上报
+- 上报内容仅限聚合事件计数（如 scan/download/dedup 调用次数、错误类型枚举），**不包含**任何图片 URL、页面 URL、个人身份信息
+- 配套后台 admin dashboard（独立私有仓库）用于产品决策，公开仓库不含任何后台代码
+- 新模块：`shared/telemetry.ts` + `shared/telemetry-events.ts`
+
+#### 🐛 Fixed — UI / UX 细节修复
+
+- **窄边栏响应式布局**：极窄宽度下工具栏不再溢出，按钮按优先级渐进折叠
+- **设置页滚动**：设置面板内容超长时正确滚动，不再被底部按钮遮挡
+- **Pro 徽章定位**：Pro 标记在所有过滤按钮 active 态下都正确保留，不会因状态切换消失
+- **试用倒计时加载态**：试用剩余天数加载期间不再短暂闪烁 "0 天"
+- **空状态布局**：扫描无结果页面在窄边栏下不再溢出
+- **标签页切换闪烁**：跨标签页切换时图片网格不再短暂白屏
+- **"显示模式"开关恒可用**：Side Panel ↔ Popup 切换在任何状态下都可用，不再被首次扫描前的初始化阻塞
+- **Telemetry 兜底**：`chrome.storage.local.get` 在某些 Chrome 版本上返回 `undefined` 时的崩溃保护
+
+#### 🧪 Added — Test Coverage Expansion（不改动生产代码）
 
 #### Added — E2E Tests (Playwright)
 
@@ -400,5 +457,6 @@ Follow-up sweep lifting `All files` Lines from **75.48% → 80.00%** (+4.52pp, u
 
 ---
 
+[1.0.2]: https://chromewebstore.google.com/detail/iecgnjidmogebokcfnejncgnelcepffo
 [1.0.1]: https://chromewebstore.google.com/detail/iecgnjidmogebokcfnejncgnelcepffo
 [1.0.0]: https://chromewebstore.google.com/detail/iecgnjidmogebokcfnejncgnelcepffo
