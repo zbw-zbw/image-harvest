@@ -142,7 +142,7 @@
   container-name: protoolbar;
 }
 
-@container protoolbar (max-width: 380px) {
+@container protoolbar (max-width: 480px) {
   .pro-expiry-label {
     display: none;
   }
