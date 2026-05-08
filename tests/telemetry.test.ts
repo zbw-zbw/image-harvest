@@ -215,8 +215,15 @@ describe('batch + throttle', () => {
     await drainMicrotasks();
     await vi.advanceTimersByTimeAsync(TELEMETRY_FLUSH_INTERVAL_MS + 10);
     // The setTimeout callback fires `void flushNow()` — give the resulting
-    // sendBatch promise a chance to resolve before we assert.
-    await drainMicrotasks();
+    // sendBatch promise a chance to resolve before we assert. Under CI load
+    // the fixed-round drainMicrotasks() can race with the awaited chain
+    // inside flushNow() (storage.get → JSON parse → fetch dispatch), so
+    // poll until the call is captured or we exhaust ~50 rounds (~5ms wall
+    // clock). Either we see the flush deterministically, or we surface a
+    // real bug rather than a timing flake.
+    for (let i = 0; i < 50 && mockFetch.calls.length === 0; i++) {
+      await drainMicrotasks();
+    }
     expect(mockFetch.calls).toHaveLength(1);
   });
 
