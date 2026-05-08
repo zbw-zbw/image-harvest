@@ -5,6 +5,53 @@ All notable changes to **Image Harvest** will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+<!--
+═══════════════════════════════════════════════════════════════════════════════
+HOW TO ADD A NEW RELEASE ENTRY
+═══════════════════════════════════════════════════════════════════════════════
+
+1. While developing, accumulate notes under the `## [Unreleased]` heading
+   below, grouped by the standard Keep a Changelog sections:
+     ### ✨ Added       — new features users can see
+     ### 🔄 Changed     — changes in existing functionality
+     ### ⚠️ Deprecated  — soon-to-be removed features
+     ### 🗑️ Removed     — removed features
+     ### 🐛 Fixed       — bug fixes
+     ### 🔒 Security    — security-related fixes
+     ### 🧪 Test Coverage Expansion — test-only changes (project convention)
+
+2. When cutting a release (e.g. v1.0.2):
+
+   a) Bump version in: package.json + manifest.config.ts + CHANGELOG below
+   b) Replace `## [Unreleased]` with `## [1.0.2] — YYYY-MM-DD`
+   c) Add a fresh `## [Unreleased]` heading at the top with empty subsections,
+      so the next cycle has somewhere to write
+   d) Update the comparison links at the bottom of this file (if/when added)
+   e) Tag the commit:  git tag v1.0.2 && git push --tags
+   f) Draft a GitHub Release (Releases → Draft new release → choose tag),
+      paste the same changelog section as the release notes
+   g) Trigger the Chrome Web Store upload workflow (or upload manually)
+
+3. Audience reminder: end users read this file. Lead with WHAT changed and
+   WHY they care, not implementation detail. Save deep technical notes for
+   commit messages or PR descriptions.
+
+4. Quick template to copy when starting a new release block:
+
+       ## [X.Y.Z] — YYYY-MM-DD
+
+       ### ✨ Added
+       - Short user-facing description.
+
+       ### 🔄 Changed
+       - Short user-facing description.
+
+       ### 🐛 Fixed
+       - Short user-facing description (link issue # if applicable).
+
+═══════════════════════════════════════════════════════════════════════════════
+-->
+
 ---
 
 ## [Unreleased]

@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <img src="icons/icon128.png" alt="Image Harvest" width="128" height="128">
+  <img src="icons/logo.png" alt="Image Harvest" width="200" height="200">
 </p>
 
 <p align="center">
@@ -54,6 +54,18 @@
   <a href="https://image-harvest.kyriewen.cn/pricing">
     <strong>💎 定价方案</strong>
   </a>
+</p>
+
+---
+
+## 🎬 功能演示
+
+<p align="center">
+  <img src="assets/demo/hero.gif" alt="Image Harvest 功能演示" width="720">
+</p>
+
+<p align="center">
+  <em>在任意网页打开侧边栏 → 智能扫描 → 按尺寸/格式/布局筛选 → 一键打包下载 ZIP，全程一气呵成。</em>
 </p>
 
 ---

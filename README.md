@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <img src="icons/icon128.png" alt="Image Harvest" width="128" height="128">
+  <img src="icons/logo.png" alt="Image Harvest" width="200" height="200">
 </p>
 
 <p align="center">
@@ -54,6 +54,18 @@
   <a href="./docs/README.md">
     <strong>📖 Documentation</strong>
   </a>
+</p>
+
+---
+
+## 🎬 Demo
+
+<p align="center">
+  <img src="assets/demo/hero.gif" alt="Image Harvest in action" width="720">
+</p>
+
+<p align="center">
+  <em>Open the side panel on any webpage → smart scan → filter by size/format/layout → batch download as ZIP. All in one click.</em>
 </p>
 
 ---
