@@ -210,19 +210,22 @@ describe('batch + throttle', () => {
   test('flushes once the 5s window elapses', async () => {
     vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
     await track(EVENTS.SCAN_TRIGGERED);
-    // Drain microtasks so scheduleFlush() definitely armed the setTimeout
-    // before we advance fake time. See the long comment above this block.
-    await drainMicrotasks();
+    // Wait for scheduleFlush() to actually arm the setTimeout. Under CI
+    // load the awaited chain inside track() (isOptedIn → storage.get →
+    // sha256Hex → storage.set) can take dozens of microtask rounds, so a
+    // fixed drainMicrotasks(10) is not enough — we poll on the actual
+    // observable: vi.getTimerCount(). Bail after ~200 rounds (still
+    // sub-ms wall clock) so a genuine bug surfaces as a real failure
+    // instead of an infinite loop.
+    for (let i = 0; i < 200 && vi.getTimerCount() === 0; i++) {
+      await Promise.resolve();
+    }
+    expect(vi.getTimerCount()).toBeGreaterThan(0);
     await vi.advanceTimersByTimeAsync(TELEMETRY_FLUSH_INTERVAL_MS + 10);
-    // The setTimeout callback fires `void flushNow()` — give the resulting
-    // sendBatch promise a chance to resolve before we assert. Under CI load
-    // the fixed-round drainMicrotasks() can race with the awaited chain
-    // inside flushNow() (storage.get → JSON parse → fetch dispatch), so
-    // poll until the call is captured or we exhaust ~50 rounds (~5ms wall
-    // clock). Either we see the flush deterministically, or we surface a
-    // real bug rather than a timing flake.
-    for (let i = 0; i < 50 && mockFetch.calls.length === 0; i++) {
-      await drainMicrotasks();
+    // The setTimeout callback fires `void flushNow()` — poll until the
+    // resulting sendBatch promise resolves and the mock fetch is captured.
+    for (let i = 0; i < 200 && mockFetch.calls.length === 0; i++) {
+      await Promise.resolve();
     }
     expect(mockFetch.calls).toHaveLength(1);
   });
