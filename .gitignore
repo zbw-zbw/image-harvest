@@ -13,7 +13,10 @@ dist/
 .vite/
 
 # Release artifacts (produced by `npm run zip` or the release workflow)
-image-harvest-v*.zip
+# Ignore zips in the repo root (transient local builds), but keep archived
+# zips under /releases/ checked in for historical reference.
+/image-harvest-v*.zip
+!/releases/image-harvest-v*.zip
 
 # Playwright e2e artifacts
 /test-results/
