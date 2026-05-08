@@ -45,8 +45,8 @@ export const EVENTS = {
   PRO_UPSELL_SHOWN: 'pro_upsell_shown', // props: { trigger: string }
   PRO_UPSELL_DISMISSED: 'pro_upsell_dismissed',
   PRO_UPSELL_CTA_CLICKED: 'pro_upsell_cta_clicked', // "Get Pro →" / "Start Free Trial"
-  PRICING_PAGE_VIEWED: 'pricing_viewed', // fired by website/, not extension
-  CHECKOUT_STARTED: 'checkout_started', // fired by website/
+  PRICING_PAGE_VIEWED: 'pricing_viewed', // fired by the marketing site, not the extension
+  CHECKOUT_STARTED: 'checkout_started', // fired by the marketing site
   LICENSE_ACTIVATED: 'license_activated', // props: { plan: string }
   TRIAL_STARTED: 'trial_started',
   TRIAL_EXPIRED: 'trial_expired',

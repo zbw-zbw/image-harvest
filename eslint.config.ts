@@ -30,7 +30,6 @@ const config: Linter.Config[] = [
     ignores: [
       'node_modules/**',
       'dist/**',
-      'website/**', // separate Next.js project with its own ESLint
       'docs/**',
       'assets/**',
       'icons/**',

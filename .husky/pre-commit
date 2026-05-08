@@ -1,2 +1,5 @@
-# Run formatter + linter on staged files only (fast)
+# Step 1 — block plausible secret leaks before anything else (~50ms)
+node ./scripts/check-secrets.mjs || exit 1
+
+# Step 2 — run formatter + linter on staged files only (fast)
 npx lint-staged

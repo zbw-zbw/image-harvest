@@ -337,7 +337,8 @@ image-harvest/
 ├── docs/                       ─ 公开文档（chrome-store/）+ 私有文档（被 .gitignore）
 │   └── chrome-store/           ─   商店上架描述 + 简介
 │
-├── website/                    ─ Next.js 营销站子项目
+│                              （营销站源码位于独立私有仓库，
+│                                部署在 image-harvest.kyriewen.cn）
 │
 └── .github/                    ─ CI/CD + 社区文件
     ├── workflows/ci.yml        ─   lint + typecheck + test + build + e2e

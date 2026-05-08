@@ -356,7 +356,8 @@ image-harvest/
 ├── docs/                       ─ Public docs (chrome-store/) + private docs (.gitignored)
 │   └── chrome-store/           ─   Listing description + summary
 │
-├── website/                    ─ Next.js marketing site (separate subproject)
+│                              (Marketing site source lives in a separate private repo;
+│                               deployed at image-harvest.kyriewen.cn)
 │
 └── .github/                    ─ CI/CD + community files
     ├── workflows/ci.yml        ─   lint + typecheck + test + build + e2e

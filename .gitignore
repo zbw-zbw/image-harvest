@@ -31,19 +31,26 @@ image-harvest-v*.zip
 .vscode/
 .idea/
 
-# Environment variables
+# Environment variables (defense-in-depth: catch every variant)
 .env
-.env.local
+.env.*
+*.env
+!*.env.example
+!.env.example
+# Common secret file shapes (allow .ts/.tsx/.js source files that just have "secret" in the name)
+*.pem
+*.key
+*.crt
+*credentials*
+*secret*
+!*secret*.ts
+!*secret*.tsx
+!*secret*.js
+!*secret*.mjs
 
 # AI configuration files
 .aone_copilot/
 .qoder/
-
-# Private docs (business strategy, launch content, ads, release notes, PRD) - local only, never pushed
-docs/launch/
-docs/ads/
-docs/release/
-docs/product/
 
 # Local git backups (never commit)
 .git-backup-*/

@@ -106,15 +106,6 @@ npm run build
 
 > **Tip:** Running `npm run dev` keeps `dist/` updated as you edit. After a save, just hit the **reload** button on the Image Harvest card in `chrome://extensions/`. For content-script changes you'll also need to refresh the target webpage.
 
-### Run the Marketing Website Locally (optional)
-
-```bash
-cd website
-npm install
-npm run dev
-# Visit http://localhost:3000
-```
-
 ## Project Structure
 
 ```text
@@ -156,7 +147,6 @@ image-harvest/
 ├── tests/                     # Vitest *.test.ts → shared/*.ts
 ├── assets/ + icons/           # Visual assets
 ├── docs/chrome-store/         # Chrome Web Store listing copy
-├── website/                   # Next.js marketing site (separate subproject)
 └── scripts/icons/             # Icon generation scripts
 ```
 

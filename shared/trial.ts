@@ -16,7 +16,7 @@
 //      instantly. This protects against the user uninstalling and
 //      reinstalling to re-trial within the same Chrome profile (the
 //      `instanceId` survives uninstall via chrome.storage.local).
-//   3. We POST to website/api/trial/start with the install's instanceId.
+//   3. We POST to /api/trial/start (on the backend) with the install's instanceId.
 //      Server checks its own DB for any prior redemption (defense in
 //      depth — different machine, same person? we can't fully prevent
 //      it without an account, but at least we deny same-instanceId

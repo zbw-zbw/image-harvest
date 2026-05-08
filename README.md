@@ -216,8 +216,7 @@ image-harvest/
 ├── tests/                     # Vitest *.test.ts (pure helpers under shared/*.ts)
 ├── icons/                     # Extension icons (PNG, generated from SVG source)
 ├── assets/                    # Marketing assets
-├── scripts/icons/             # Icon-generation scripts
-└── website/                   # Marketing website (Next.js, deployed at image-harvest.kyriewen.cn)
+└── scripts/icons/             # Icon-generation scripts
 ```
 
 ### Build & Dev
@@ -399,9 +398,9 @@ The Chrome Web Store has dozens of "image downloader" extensions, most released 
 - **Bug Reports & Feature Requests**: [GitHub Issues](https://github.com/zbw-zbw/image-harvest/issues)
 - **Leave a Review**: [Chrome Web Store Reviews](https://chromewebstore.google.com/detail/iecgnjidmogebokcfnejncgnelcepffo/reviews)
 
-### About the `website/` Subproject
+### About the Marketing Website
 
-The `website/` directory contains the marketing site for Image Harvest, built with [Next.js](https://nextjs.org). It hosts the landing page, pricing, FAQ, and license activation portal. See [website/README.md](./website/README.md) for development instructions.
+The marketing site for Image Harvest (landing page, pricing, FAQ, license activation portal) is hosted at [image-harvest.kyriewen.cn](https://image-harvest.kyriewen.cn). Its source code lives in a separate repository and is not part of this open-source extension.
 
 ---
 

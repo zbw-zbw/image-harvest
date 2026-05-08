@@ -224,9 +224,8 @@ export async function deactivateLicense(): Promise<{ success: true }> {
   const licenseData = await getLicenseData();
   if (!licenseData) return { success: true };
 
-  // Trial licenses live in a separate `trials` table on the server
-  // (see website/migrations/trials.sql). The /api/license/activate
-  // endpoint only knows about paid licenses; routing a trial key
+  // Trial licenses live in a separate `trials` table on the server.
+  // The /api/license/activate endpoint only knows about paid licenses; routing a trial key
   // through it would 404 and surface a confusing error to the user
   // who's just trying to revoke their own trial. Skip the remote
   // call — the local sentinel in shared/trial.ts already prevents

@@ -119,15 +119,6 @@ npm run build
 > 在 `chrome://extensions/` 上点击 Image Harvest 卡片的 **重新加载** 按钮。
 > 内容脚本的修改还需要刷新目标网页。
 
-### 本地运行营销网站（可选）
-
-```bash
-cd website
-npm install
-npm run dev
-# 访问 http://localhost:3000
-```
-
 ## 项目结构
 
 ```text
@@ -172,7 +163,6 @@ image-harvest/
 ├── e2e/                       # Playwright *.e2e.ts → 端到端测试
 ├── assets/ + icons/           # 视觉资源
 ├── docs/chrome-store/         # Chrome Web Store 上架文案
-├── website/                   # Next.js 营销站子项目
 └── scripts/                   # 工具脚本（体积检查、zip 构建、图标生成）
 ```
 
