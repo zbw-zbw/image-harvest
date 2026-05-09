@@ -38,6 +38,7 @@ import { getState as getPaywallState, markResolved } from '../../shared/paywall-
 import { PRICING_PAGE_URL, MESSAGE_TYPES } from '../../shared/constants';
 import { showToast } from '../ui';
 import { applyProFeatureVisibility } from '../settings';
+import { startTrial as startTrialFn, isTrialEligible } from '../../shared/trial';
 
 function close(): void {
   // Clear errorText on close so the next open starts clean.
@@ -82,19 +83,11 @@ async function handleStartTrial(
 ): Promise<void> {
   void track(EVENTS.PRO_UPSELL_CTA_CLICKED, { trigger: 'modal', cta: 'trial' });
 
-  let startTrial: typeof import('../../shared/trial').startTrial;
-  try {
-    ({ startTrial } = await import('../../shared/trial'));
-  } catch {
-    setError(t('pro_trial_unavailable'));
-    return;
-  }
-
   setError('');
   setLoading(true);
 
   try {
-    const result = await startTrial();
+    const result = await startTrialFn();
     if (!result.success) {
       setError(result.error || t('pro_trial_start_failed'));
       return;
@@ -166,7 +159,6 @@ export function ProUpgradeModal() {
     let cancelled = false;
     void (async () => {
       try {
-        const { isTrialEligible } = await import('../../shared/trial');
         const eligible = await isTrialEligible();
         if (!cancelled) setTrialEligible(eligible);
       } catch {

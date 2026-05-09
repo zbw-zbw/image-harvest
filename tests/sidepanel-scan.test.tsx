@@ -240,6 +240,10 @@ describe('handleScanCancel', () => {
   it('with discovered images → calls applyFilters + emits "N images found" toast (no showEmpty)', async () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     state.allImages = [{ id: 'a' }, { id: 'b' }, { id: 'c' }] as any;
+    // applyFilters is mocked (no-op), so pre-set filteredImages to match
+    // the count the toast should display. The real applyFilters would
+    // populate this from allImages; here we simulate that outcome.
+    state.filteredImages = [...state.allImages];
 
     handleScanCancel();
 

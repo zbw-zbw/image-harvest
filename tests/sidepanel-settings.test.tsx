@@ -767,10 +767,10 @@ describe('resetSettings', () => {
     expect(state.appSettings.filenameTemplate).toBe('img_{index}_{original}.{format}');
     expect(state.appSettings.convertFormat).toBe('none');
     expect(state.appSettings.searchAllFrames).toBe(false);
-    expect(state.appSettings.liveMonitoring).toBe(false);
-    expect(state.appSettings.minWidth).toBe(50);
-    expect(state.appSettings.maxWidth).toBe(8000);
-    expect(state.appSettings.enableSimilarDetection).toBe(false);
+    expect(state.appSettings.liveMonitoring).toBe(true);
+    expect(state.appSettings.minWidth).toBe(0);
+    expect(state.appSettings.maxWidth).toBe(99999);
+    expect(state.appSettings.enableSimilarDetection).toBe(true);
   });
 
   it('shows success toast + opens settings modal (via showSettings)', async () => {
@@ -1289,10 +1289,10 @@ describe('saveSettings', () => {
     document.querySelector<HTMLInputElement>('#setting-max-width')!.value = '';
 
     await saveSettings();
-    // Pin: parseInt('') is NaN; the `|| 50` / `|| 8000` fallback
-    // protects against silent NaN propagation that would break filter math.
-    expect(state.appSettings.minWidth).toBe(50);
-    expect(state.appSettings.maxWidth).toBe(8000);
+    // Pin: parseInt('') is NaN; the fallback uses DEFAULT_APP_SETTINGS
+    // values to protect against silent NaN propagation.
+    expect(state.appSettings.minWidth).toBe(0);
+    expect(state.appSettings.maxWidth).toBe(99999);
   });
 
   it('display mode change: previous=true, new=false → calls switchDisplayMode + NO success toast', async () => {

@@ -194,13 +194,9 @@ export function ImageCard({ img, index }: Props) {
 
   const handleFavorite = async (e: MouseEvent) => {
     e.stopPropagation();
-    // Pro guard: block free users from using the collection feature,
-    // matching the same pattern as handleDelete and handleColorClick.
-    if (!isProUser) {
-      showToast(t('pro_feature_blocked_collection'), 'warning');
-      showProUpgradeModal();
-      return;
-    }
+    // Sprint 3.5: Pro guard removed from component level. Free-tier cap
+    // is now enforced inside addToCollection (pro-features.ts) so every
+    // entry point (button, drag, shortcut) inherits the same gate.
     if (isFavorited) {
       await removeFromCollection(img.id);
       setIsFavorited(false);

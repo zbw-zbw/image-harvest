@@ -29,6 +29,7 @@ vi.mock('../sidepanel/actions', () => ({
   clearSelection: vi.fn(),
   downloadSelectedAsZip: vi.fn(),
   hideDownloadDropdown: vi.fn(),
+  removeAllHighlightsOnPage: vi.fn(),
   selectAll: vi.fn(),
 }));
 vi.mock('../sidepanel/filter', () => ({
@@ -621,11 +622,13 @@ describe('handleKeyDown — ESC modal priority chain', () => {
     expect(actMod.clearSelection).not.toHaveBeenCalled();
   });
 
-  it('ESC with no modals + selection → also calls clearSelection', async () => {
+  it('ESC with no modals + selection → preserves selection, only removes page highlights', async () => {
     state.selectedImages = new Set(['a', 'b']);
     press('Escape');
     const actMod = await import('../sidepanel/actions');
-    expect(actMod.clearSelection).toHaveBeenCalledTimes(1);
+    // ESC no longer clears selection — it only exits the page highlight view.
+    expect(actMod.clearSelection).not.toHaveBeenCalled();
+    expect(actMod.removeAllHighlightsOnPage).toHaveBeenCalledTimes(1);
   });
 });
 

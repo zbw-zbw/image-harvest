@@ -776,7 +776,7 @@ describe('findImageElement — Shadow DOM fallbacks (section 10)', () => {
 // is still selected after the user bailed via ESC.
 
 describe('overlay lifecycle — ESC / click-to-dismiss', () => {
-  it('ESC key removes all highlights AND fires CLEAR_SELECTION', async () => {
+  it('ESC key removes all highlights but preserves selection state (no CLEAR_SELECTION)', async () => {
     // Arrange: add a highlight so the overlay + ESC handler get installed.
     const img = document.createElement('img');
     img.src = 'https://example.com/esc-target.jpg';
@@ -796,11 +796,11 @@ describe('overlay lifecycle — ESC / click-to-dismiss', () => {
     });
     document.dispatchEvent(escEvent);
 
-    // Assert: highlights + overlay gone, CLEAR_SELECTION fired exactly once.
+    // Assert: highlights + overlay gone, but CLEAR_SELECTION is NOT sent —
+    // ESC only exits the page highlight view, it does not deselect images
+    // in the sidepanel list.
     expect(document.querySelector('.image-harvest-overlay')).toBeNull();
-    expect(sendMessageSpy).toHaveBeenCalledTimes(1);
-    const msg = sendMessageSpy.mock.calls[0][0];
-    expect(msg.type).toBe('CLEAR_SELECTION');
+    expect(sendMessageSpy).not.toHaveBeenCalled();
   });
 
   it('non-ESC key on document does NOT tear down the overlay', async () => {
@@ -820,7 +820,7 @@ describe('overlay lifecycle — ESC / click-to-dismiss', () => {
     expect(sendMessageSpy).not.toHaveBeenCalled();
   });
 
-  it('clicking the overlay dismisses all highlights AND fires CLEAR_SELECTION', async () => {
+  it('clicking the overlay dismisses all highlights but preserves selection state (no CLEAR_SELECTION)', async () => {
     const img = document.createElement('img');
     img.src = 'https://example.com/click-target.jpg';
     stubRect(img);
@@ -833,10 +833,9 @@ describe('overlay lifecycle — ESC / click-to-dismiss', () => {
 
     overlay.click();
 
+    // Overlay removed, but selection in sidepanel is preserved.
     expect(document.querySelector('.image-harvest-overlay')).toBeNull();
-    expect(sendMessageSpy).toHaveBeenCalledWith(
-      expect.objectContaining({ type: 'CLEAR_SELECTION' })
-    );
+    expect(sendMessageSpy).not.toHaveBeenCalled();
   });
 
   it('dismiss swallows chrome.runtime.sendMessage exceptions (extension context invalidated)', async () => {

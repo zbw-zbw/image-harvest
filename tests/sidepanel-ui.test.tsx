@@ -764,6 +764,8 @@ describe('updateFilterButtonLabels', () => {
       size: 'all',
       sizeMin: 0,
       sizeMax: Infinity,
+      customMinEnabled: false,
+      customMaxEnabled: false,
     };
     updateFilterButtonLabels();
     const btn = document.querySelector<HTMLElement>('.filter-btn[data-filter="size"]')!;
@@ -776,8 +778,9 @@ describe('updateFilterButtonLabels', () => {
     state.activeFilters = { ...state.activeFilters, size: 'medium' };
     updateFilterButtonLabels();
     const btn = document.querySelector<HTMLElement>('.filter-btn[data-filter="size"]')!;
-    expect(btn.textContent).toBe('Medium▾');
+    expect(btn.textContent).toBe('Medium▾×');
     expect(btn.classList.contains('active')).toBe(true);
+    expect(btn.querySelector('.filter-clear')).not.toBeNull();
   });
 
   it('labels type with the comma-joined mapped list + active when any type selected', async () => {
@@ -787,8 +790,9 @@ describe('updateFilterButtonLabels', () => {
     const btn = document.querySelector<HTMLElement>('.filter-btn[data-filter="type"]')!;
     // Labels map to uppercase canonical names — pin the case since
     // legacy 'png'/'jpg' stored in filterConfig flows through here.
-    expect(btn.textContent).toBe('PNG, JPG▾');
+    expect(btn.textContent).toBe('PNG, JPG▾×');
     expect(btn.classList.contains('active')).toBe(true);
+    expect(btn.querySelector('.filter-clear')).not.toBeNull();
   });
 
   it("maps unknown type entries through as-is (fallback) so new formats don't blank the button", async () => {
@@ -798,7 +802,7 @@ describe('updateFilterButtonLabels', () => {
     const btn = document.querySelector<HTMLElement>('.filter-btn[data-filter="type"]')!;
     // Unknown types render their raw key — better than a blank button
     // if we add a new format to shared/constants.ts but forget the label map.
-    expect(btn.textContent).toBe('avif▾');
+    expect(btn.textContent).toBe('avif▾×');
   });
 
   it('labels layout by bucket + marks active when non-"all" (e.g. Landscape)', async () => {
@@ -806,8 +810,9 @@ describe('updateFilterButtonLabels', () => {
     state.activeFilters = { ...state.activeFilters, layout: 'landscape' };
     updateFilterButtonLabels();
     const btn = document.querySelector<HTMLElement>('.filter-btn[data-filter="layout"]')!;
-    expect(btn.textContent).toBe('Landscape▾');
+    expect(btn.textContent).toBe('Landscape▾×');
     expect(btn.classList.contains('active')).toBe(true);
+    expect(btn.querySelector('.filter-clear')).not.toBeNull();
   });
 
   it('toggles URL button .active when urlKeyword is non-empty (label stays "URL▾")', async () => {
@@ -818,8 +823,9 @@ describe('updateFilterButtonLabels', () => {
     // URL button intentionally keeps its label constant (icon-like)
     // and only signals state via `.active` — pin this so a refactor
     // doesn't start embedding the keyword into the label.
-    expect(btn.textContent).toBe('URL▾');
+    expect(btn.textContent).toBe('URL▾×');
     expect(btn.classList.contains('active')).toBe(true);
+    expect(btn.querySelector('.filter-clear')).not.toBeNull();
   });
 
   it('PRESERVES the .pro-badge child when updating the color button label', async () => {

@@ -222,22 +222,22 @@ describe('colorDistance', () => {
 });
 
 describe('filterBySettingsMinSize', () => {
-  it('passes everything when enableMinSize is false', () => {
-    state.appSettings = {
-      ...state.appSettings,
-      enableMinSize: false,
-      minWidth: 1000,
-      minHeight: 1000,
+  it('passes everything when customMinEnabled is false', () => {
+    state.activeFilters = {
+      ...state.activeFilters,
+      customMinEnabled: false,
+      customMinWidth: 1000,
+      customMinHeight: 1000,
     };
     expect(filterBySettingsMinSize(makeImg({ naturalWidth: 50, naturalHeight: 50 }))).toBe(true);
   });
 
   it('requires both width AND height to meet their respective bounds', () => {
-    state.appSettings = {
-      ...state.appSettings,
-      enableMinSize: true,
-      minWidth: 100,
-      minHeight: 100,
+    state.activeFilters = {
+      ...state.activeFilters,
+      customMinEnabled: true,
+      customMinWidth: 100,
+      customMinHeight: 100,
     };
     expect(filterBySettingsMinSize(makeImg({ naturalWidth: 200, naturalHeight: 200 }))).toBe(true);
     expect(filterBySettingsMinSize(makeImg({ naturalWidth: 100, naturalHeight: 100 }))).toBe(true); // inclusive
@@ -245,24 +245,24 @@ describe('filterBySettingsMinSize', () => {
     expect(filterBySettingsMinSize(makeImg({ naturalWidth: 200, naturalHeight: 50 }))).toBe(false);
   });
 
-  it('treats undefined minWidth/minHeight as 0 (effectively pass-through when enabled)', () => {
-    state.appSettings = {
-      ...state.appSettings,
-      enableMinSize: true,
-      minWidth: undefined as unknown as number,
-      minHeight: undefined as unknown as number,
+  it('treats undefined customMinWidth/customMinHeight as 0 (effectively pass-through when enabled)', () => {
+    state.activeFilters = {
+      ...state.activeFilters,
+      customMinEnabled: true,
+      customMinWidth: undefined as unknown as number,
+      customMinHeight: undefined as unknown as number,
     };
     expect(filterBySettingsMinSize(makeImg({ naturalWidth: 1, naturalHeight: 1 }))).toBe(true);
   });
 });
 
 describe('filterBySettingsMaxSize', () => {
-  it('passes everything when enableMaxSize is false', () => {
-    state.appSettings = {
-      ...state.appSettings,
-      enableMaxSize: false,
-      maxWidth: 100,
-      maxHeight: 100,
+  it('passes everything when customMaxEnabled is false', () => {
+    state.activeFilters = {
+      ...state.activeFilters,
+      customMaxEnabled: false,
+      customMaxWidth: 100,
+      customMaxHeight: 100,
     };
     expect(filterBySettingsMaxSize(makeImg({ naturalWidth: 5000, naturalHeight: 5000 }))).toBe(
       true
@@ -270,11 +270,11 @@ describe('filterBySettingsMaxSize', () => {
   });
 
   it('requires both width AND height to be within their respective bounds', () => {
-    state.appSettings = {
-      ...state.appSettings,
-      enableMaxSize: true,
-      maxWidth: 1000,
-      maxHeight: 1000,
+    state.activeFilters = {
+      ...state.activeFilters,
+      customMaxEnabled: true,
+      customMaxWidth: 1000,
+      customMaxHeight: 1000,
     };
     expect(filterBySettingsMaxSize(makeImg({ naturalWidth: 800, naturalHeight: 800 }))).toBe(true);
     expect(filterBySettingsMaxSize(makeImg({ naturalWidth: 1000, naturalHeight: 1000 }))).toBe(
@@ -288,12 +288,12 @@ describe('filterBySettingsMaxSize', () => {
     );
   });
 
-  it('treats undefined maxWidth/maxHeight as Infinity (effectively no upper bound when enabled)', () => {
-    state.appSettings = {
-      ...state.appSettings,
-      enableMaxSize: true,
-      maxWidth: undefined as unknown as number,
-      maxHeight: undefined as unknown as number,
+  it('treats undefined customMaxWidth/customMaxHeight as Infinity (effectively no upper bound when enabled)', () => {
+    state.activeFilters = {
+      ...state.activeFilters,
+      customMaxEnabled: true,
+      customMaxWidth: undefined as unknown as number,
+      customMaxHeight: undefined as unknown as number,
     };
     expect(filterBySettingsMaxSize(makeImg({ naturalWidth: 99999, naturalHeight: 99999 }))).toBe(
       true
@@ -373,30 +373,29 @@ describe('applyCustomSizeInputs', () => {
     vi.clearAllMocks();
   });
 
-  it('reads all 4 inputs into appSettings + flips enableMinSize/enableMaxSize', () => {
+  it('reads all 4 inputs into activeFilters + flips customMinEnabled/customMaxEnabled', () => {
     const { minW, minH, maxW, maxH } = mountSizeInputs();
     minW.value = '200';
     minH.value = '150';
     maxW.value = '2000';
     maxH.value = '1500';
     applyCustomSizeInputs();
-    expect(state.appSettings.enableMinSize).toBe(true);
-    expect(state.appSettings.minWidth).toBe(200);
-    expect(state.appSettings.minHeight).toBe(150);
-    expect(state.appSettings.enableMaxSize).toBe(true);
-    expect(state.appSettings.maxWidth).toBe(2000);
-    expect(state.appSettings.maxHeight).toBe(1500);
+    expect(state.activeFilters.customMinEnabled).toBe(true);
+    expect(state.activeFilters.customMinWidth).toBe(200);
+    expect(state.activeFilters.customMinHeight).toBe(150);
+    expect(state.activeFilters.customMaxEnabled).toBe(true);
+    expect(state.activeFilters.customMaxWidth).toBe(2000);
+    expect(state.activeFilters.customMaxHeight).toBe(1500);
   });
 
-  it('leaves enableMinSize=false when all min inputs are empty/zero', () => {
+  it('leaves customMinEnabled=false when all min inputs are empty/zero', () => {
     // Pin: "no min fields filled in" must not enable the min-size
     // filter. A regression here would silently filter out every image
-    // with w<0 or h<0 (i.e. nothing), but also persist the enabled
-    // flag into storage and surprise the next session.
+    // with w<0 or h<0 (i.e. nothing).
     mountSizeInputs();
     applyCustomSizeInputs();
-    expect(state.appSettings.enableMinSize).toBe(false);
-    expect(state.appSettings.enableMaxSize).toBe(false);
+    expect(state.activeFilters.customMinEnabled).toBe(false);
+    expect(state.activeFilters.customMaxEnabled).toBe(false);
   });
 
   it('falls back to 0 / Infinity for empty inputs (NaN guard via parseInt || 0)', () => {
@@ -404,10 +403,10 @@ describe('applyCustomSizeInputs', () => {
     minW.value = '100';
     // The 3 other inputs stay empty.
     applyCustomSizeInputs();
-    expect(state.appSettings.minWidth).toBe(100);
-    expect(state.appSettings.minHeight).toBe(0);
-    expect(state.appSettings.maxWidth).toBe(Infinity);
-    expect(state.appSettings.maxHeight).toBe(Infinity);
+    expect(state.activeFilters.customMinWidth).toBe(100);
+    expect(state.activeFilters.customMinHeight).toBe(0);
+    expect(state.activeFilters.customMaxWidth).toBe(Infinity);
+    expect(state.activeFilters.customMaxHeight).toBe(Infinity);
   });
 
   it('resets size preset to "all" + deactivates [data-size-filter] buttons when any custom value is entered', () => {
@@ -441,25 +440,13 @@ describe('applyCustomSizeInputs', () => {
     expect(state.activeFilters.sizeMax).toBe(2000);
   });
 
-  it('persists updated appSettings to chrome.storage.local + calls updateFilterButtonLabels', () => {
+  it('calls updateFilterButtonLabels after applying custom size inputs', () => {
     const { minW } = mountSizeInputs();
     minW.value = '500';
     applyCustomSizeInputs();
     expect(updateFilterButtonLabels).toHaveBeenCalledTimes(1);
-    expect(storageSet).toHaveBeenCalledTimes(1);
-    expect(storageSet).toHaveBeenCalledWith({ appSettings: state.appSettings });
-  });
-
-  it('swallows chrome.storage.local.set rejection (best-effort persistence contract)', async () => {
-    // Pin the `.catch(() => {})` — a storage quota error or a rare
-    // runtime-gone race must not throw out of a pure user action.
-    storageSet.mockRejectedValueOnce(new Error('QuotaExceeded'));
-    const { minW } = mountSizeInputs();
-    minW.value = '500';
-    expect(() => applyCustomSizeInputs()).not.toThrow();
-    // Drain the attached .catch microtask.
-    await Promise.resolve();
-    await Promise.resolve();
+    // Source no longer persists to chrome.storage — only session-local
+    // activeFilters are updated.
   });
 });
 

@@ -59,6 +59,13 @@ vi.mock('../sidepanel/ui', () => ({
 
 vi.mock('../shared/trial', () => ({
   startTrial: mockStartTrial,
+  isTrialEligible: vi.fn().mockResolvedValue(true),
+}));
+
+vi.mock('../shared/license', () => ({
+  getLicenseData: vi.fn().mockResolvedValue(null),
+  saveLicenseData: vi.fn().mockResolvedValue(undefined),
+  getOrCreateInstanceId: vi.fn().mockResolvedValue('test-instance-id'),
 }));
 
 vi.mock('../sidepanel/settings', () => ({
@@ -68,6 +75,7 @@ vi.mock('../sidepanel/settings', () => ({
 interface ChromeStub {
   runtime: { sendMessage: ReturnType<typeof vi.fn> };
   tabs: { create: ReturnType<typeof vi.fn> };
+  storage: { local: { get: ReturnType<typeof vi.fn>; set: ReturnType<typeof vi.fn> } };
 }
 
 let chromeStub: ChromeStub;
@@ -76,6 +84,12 @@ function installChrome(): void {
   chromeStub = {
     runtime: { sendMessage: vi.fn().mockResolvedValue(undefined) },
     tabs: { create: vi.fn().mockResolvedValue(undefined) },
+    storage: {
+      local: {
+        get: vi.fn().mockResolvedValue({}),
+        set: vi.fn().mockResolvedValue(undefined),
+      },
+    },
   };
   (globalThis as unknown as { chrome: unknown }).chrome = chromeStub;
 }
