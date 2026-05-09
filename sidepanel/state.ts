@@ -24,6 +24,18 @@ export interface ActiveFilters {
   urlKeyword: string;
   /** null = all colors, hex string = selected */
   color: string | null;
+
+  // ── Runtime (session-local) custom size filter ──────────────────────────
+  // These are initialised from appSettings on every panel open via
+  // syncCustomSizeInputsFromSettings(). Toolbar size-input edits only
+  // mutate these fields — they never touch appSettings or chrome.storage,
+  // so the global defaults stay intact for the next session.
+  customMinEnabled: boolean;
+  customMinWidth: number;
+  customMinHeight: number;
+  customMaxEnabled: boolean;
+  customMaxWidth: number;
+  customMaxHeight: number;
 }
 
 // ── Per-tab cache entry ─────────────────────────────────────────────────────
@@ -398,11 +410,18 @@ function createInitialState(): SidepanelState {
       layout: 'all',
       urlKeyword: '',
       color: null,
+      // Runtime custom size — initialised from appSettings each session
+      customMinEnabled: true,
+      customMinWidth: 0,
+      customMinHeight: 0,
+      customMaxEnabled: true,
+      customMaxWidth: 99999,
+      customMaxHeight: 99999,
     },
 
     collapsedGroups: new Set<string>(),
     similarGroups: [],
-    currentSortMode: 'size-desc',
+    currentSortMode: 'natural',
     currentViewMode: 'list',
     currentGroupMode: 'none',
 

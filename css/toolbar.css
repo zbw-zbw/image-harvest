@@ -39,6 +39,35 @@
   gap: 4px;
 }
 
+/* Hide the entire "Found N images (X similar)" line while scanning
+   to avoid showing confusing partial counts. The .scanning-disabled
+   class is already applied to .status-bar by scan.ts. */
+.scanning-disabled .found-info {
+  visibility: hidden;
+}
+
+/* Fade-in / hide helpers for Preact-managed status components */
+.status-hidden {
+  opacity: 0;
+  width: 0;
+  overflow: hidden;
+}
+
+.status-fade-in {
+  animation: statusFadeIn 0.35s ease-out both;
+}
+
+@keyframes statusFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 /* Inline similar link inside "Found N images (X similar)" */
 .similar-inline {
   color: var(--text-tertiary);
@@ -157,6 +186,7 @@
   transition: all 0.2s;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 4px;
 }
 
@@ -394,6 +424,31 @@
   border-color: var(--primary-color);
   color: var(--primary-color);
   background: var(--selected-bg);
+}
+
+/* "×" clear button inside active filter buttons */
+.filter-clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 14px;
+  height: 14px;
+  margin-left: 2px;
+  border-radius: 50%;
+  font-size: 11px;
+  line-height: 1;
+  color: var(--primary-color);
+  cursor: pointer;
+  flex-shrink: 0;
+  opacity: 0.7;
+  transition:
+    opacity 0.15s,
+    background 0.15s;
+}
+
+.filter-clear:hover {
+  opacity: 1;
+  background: rgba(0, 0, 0, 0.08);
 }
 
 .filter-btn.icon-only {

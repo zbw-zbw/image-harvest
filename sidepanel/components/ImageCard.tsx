@@ -170,6 +170,7 @@ export function ImageCard({ img, index }: Props) {
   const format = (img.format || 'unknown').toUpperCase();
   const colors = img.colors || [];
 
+
   // ── Handlers ──────────────────────────────────────────────────────────
   const handleCardClick = (e: MouseEvent) => {
     // Card click toggles selection unless the click originated inside an
@@ -193,14 +194,13 @@ export function ImageCard({ img, index }: Props) {
 
   const handleFavorite = async (e: MouseEvent) => {
     e.stopPropagation();
-    // Sprint 3.5: Free users get MAX_COLLECTION_ITEMS "tasting" slots.
-    // The cap check moved into addToCollection so we don't need to
-    // duplicate the threshold here; we just optimistically flip the
-    // local "favorited" state AFTER addToCollection resolves successfully.
-    // We can't tell from the void return whether the cap blocked the add,
-    // so we re-check by querying the collection afterwards via
-    // isImageInCollection — cheap (IndexedDB get-all) and keeps the
-    // optimistic UX honest when the Pro guard fires.
+    // Pro guard: block free users from using the collection feature,
+    // matching the same pattern as handleDelete and handleColorClick.
+    if (!isProUser) {
+      showToast(t('pro_feature_blocked_collection'), 'warning');
+      showProUpgradeModal();
+      return;
+    }
     if (isFavorited) {
       await removeFromCollection(img.id);
       setIsFavorited(false);
@@ -384,6 +384,10 @@ export function ImageCard({ img, index }: Props) {
 // Mirrors pro-features.ts > renderColorBar / renderTransparentBar. Keeping
 // the markup consistent (same data-color attribute, same swatch class) means
 // existing CSS continues to apply without changes.
+//
+// When colors arrive asynchronously the bar transitions from a transparent
+// checkerboard to the real swatches with a CSS fade-in animation. The
+// container keeps a fixed height so no layout shift occurs.
 interface ColorBarProps {
   colors: string[];
   onSwatchClick: (color: string) => (e: MouseEvent) => void;

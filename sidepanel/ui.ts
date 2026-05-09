@@ -4,6 +4,7 @@
 // UI组件模块：提供过滤器标签、视图切换、响应式、对话框、通知、加载状态等UI功能
 
 import { hideDownloadDropdown } from './actions';
+import { applyFilters, clearCustomSizeInputs, syncCustomSizeInputsFromSettings } from './filter';
 import { hideScanOverlay, showScanOverlay } from './scan';
 import { closeAllFilterDropdowns } from './settings';
 import { elements, state } from './state';
@@ -13,6 +14,29 @@ import { t } from '../shared/i18n';
 // ============================================
 // Filter Button Labels
 // ============================================
+
+/**
+ * Append or remove a tiny "×" clear-span inside a filter button.
+ * When the user clicks the "×" the provided `onClear` callback fires,
+ * the click does NOT bubble to the button itself (no dropdown toggle).
+ */
+function toggleClearBtn(btn: HTMLElement, isActive: boolean, onClear: () => void): void {
+  let clearSpan = btn.querySelector<HTMLElement>('.filter-clear');
+  if (isActive) {
+    if (!clearSpan) {
+      clearSpan = document.createElement('span');
+      clearSpan.className = 'filter-clear';
+      clearSpan.textContent = '×';
+      clearSpan.addEventListener('click', (e) => {
+        e.stopPropagation();
+        onClear();
+      });
+      btn.appendChild(clearSpan);
+    }
+  } else {
+    clearSpan?.remove();
+  }
+}
 function getFilterLabelDefaults() {
   return {
     size: t('filter_size'),
@@ -33,10 +57,19 @@ export function updateFilterButtonLabels(): void {
   // Size button
   const sizeBtn = document.querySelector<HTMLElement>('.filter-btn[data-filter="size"]');
   if (sizeBtn) {
+    const hasCustomMin =
+      state.activeFilters.customMinEnabled &&
+      (state.activeFilters.customMinWidth > 0 || state.activeFilters.customMinHeight > 0);
+    const hasCustomMax =
+      state.activeFilters.customMaxEnabled &&
+      (state.activeFilters.customMaxWidth < Infinity ||
+        state.activeFilters.customMaxHeight < Infinity);
     const hasSizeFilter =
       state.activeFilters.size !== 'all' ||
       state.activeFilters.sizeMin > 0 ||
-      state.activeFilters.sizeMax !== Infinity;
+      state.activeFilters.sizeMax !== Infinity ||
+      hasCustomMin ||
+      hasCustomMax;
     let label: string = defaults.size;
     if (state.activeFilters.size !== 'all') {
       const sizeLabels: Record<string, string> = {
@@ -50,6 +83,18 @@ export function updateFilterButtonLabels(): void {
     }
     sizeBtn.textContent = label + '▾';
     sizeBtn.classList.toggle('active', hasSizeFilter);
+    toggleClearBtn(sizeBtn, hasSizeFilter, () => {
+      state.activeFilters.size = 'all';
+      state.activeFilters.sizeMin = 0;
+      state.activeFilters.sizeMax = Infinity;
+      // Restore custom size from global settings
+      syncCustomSizeInputsFromSettings();
+      document.querySelectorAll('[data-size-filter]').forEach((o) => o.classList.remove('active'));
+      const allOpt = document.querySelector('[data-size-filter="all"]');
+      if (allOpt) allOpt.classList.add('active');
+      updateFilterButtonLabels();
+      applyFilters();
+    });
   }
 
   // Type button
@@ -73,6 +118,14 @@ export function updateFilterButtonLabels(): void {
     }
     typeBtn.textContent = label + '▾';
     typeBtn.classList.toggle('active', hasTypeFilter);
+    toggleClearBtn(typeBtn, hasTypeFilter, () => {
+      state.activeFilters.types = [];
+      document.querySelectorAll<HTMLInputElement>('.type-checkbox').forEach((cb) => {
+        cb.checked = true;
+      });
+      updateFilterButtonLabels();
+      applyFilters();
+    });
   }
 
   // Layout button
@@ -90,7 +143,17 @@ export function updateFilterButtonLabels(): void {
       label = layoutLabels[state.activeFilters.layout] || label;
     }
     layoutBtn.textContent = label + '▾';
-    layoutBtn.classList.toggle('active', state.activeFilters.layout !== 'all');
+    layoutBtn.classList.toggle('active', hasLayoutFilter);
+    toggleClearBtn(layoutBtn, hasLayoutFilter, () => {
+      state.activeFilters.layout = 'all';
+      document
+        .querySelectorAll('[data-layout-filter]')
+        .forEach((o) => o.classList.remove('active'));
+      const allOpt = document.querySelector('[data-layout-filter="all"]');
+      if (allOpt) allOpt.classList.add('active');
+      updateFilterButtonLabels();
+      applyFilters();
+    });
   }
 
   // URL button
@@ -99,6 +162,12 @@ export function updateFilterButtonLabels(): void {
     const hasUrlFilter = !!state.activeFilters.urlKeyword;
     urlBtn.textContent = defaults.url + '▾';
     urlBtn.classList.toggle('active', hasUrlFilter);
+    toggleClearBtn(urlBtn, hasUrlFilter, () => {
+      state.activeFilters.urlKeyword = '';
+      if (elements.filterUrlInput) (elements.filterUrlInput as HTMLInputElement).value = '';
+      updateFilterButtonLabels();
+      applyFilters();
+    });
   }
 
   // Color button
@@ -110,6 +179,16 @@ export function updateFilterButtonLabels(): void {
     colorBtn.textContent = defaults.color + '▾ ';
     if (badge) colorBtn.appendChild(badge);
     colorBtn.classList.toggle('active', hasColorFilter);
+    toggleClearBtn(colorBtn, hasColorFilter, () => {
+      state.activeFilters.color = null;
+      document
+        .querySelectorAll('#color-swatches .color-swatch')
+        .forEach((s) => s.classList.remove('active'));
+      const allOpt = document.querySelector('[data-color-filter="all"]');
+      if (allOpt) allOpt.classList.add('active');
+      updateFilterButtonLabels();
+      applyFilters();
+    });
   }
 
   // Group button (icon-only: toggle active state only)
@@ -121,7 +200,7 @@ export function updateFilterButtonLabels(): void {
   // Sort button (icon-only: toggle active state only)
   const sortBtn = document.querySelector<HTMLElement>('.filter-btn[data-filter="sort"]');
   if (sortBtn) {
-    sortBtn.classList.toggle('active', state.currentSortMode !== 'size-desc');
+    sortBtn.classList.toggle('active', state.currentSortMode !== 'natural');
   }
 }
 
@@ -406,7 +485,24 @@ export function showEmpty(isNoResults?: boolean): void {
 }
 
 export function showRestricted(): void {
-  hideAll();
+  // Hide all normal-page UI elements FIRST (synchronous DOM ops) to prevent
+  // a flash of the previous tab's content before the restricted screen
+  // appears. We use both the CSS class AND an inline style override for
+  // image-grid-wrapper: the class handles the normal case, while the inline
+  // style ensures immediate hiding even when this function is called from
+  // an async path (e.g. handleTabChange's URL-verification await) where
+  // the wrapper may have just been shown by hideRestricted().
+  const wrapper = document.querySelector<HTMLElement>('.image-grid-wrapper');
+  if (wrapper) {
+    wrapper.classList.add('hidden');
+    wrapper.style.display = 'none';
+  }
+  document.querySelectorAll('.toolbar, .status-bar').forEach((el) => {
+    el.classList.add('hidden');
+  });
+  if (elements.imageGrid) elements.imageGrid.classList.add('hidden');
+  if (elements.loadingState) elements.loadingState.classList.add('hidden');
+
   // Invalidate the rendered-filter cache because the grid DOM is about to be
   // hidden/cleared. Without this, a subsequent applyFilters() after
   // hideRestricted() would see matching IDs and skip renderImages().
@@ -415,14 +511,30 @@ export function showRestricted(): void {
   closeAllFilterDropdowns();
   hideDownloadDropdown();
   hideScanOverlay();
-  // Hide toolbar, status-bar and image-grid-wrapper that are irrelevant on restricted pages
-  document.querySelectorAll('.toolbar, .status-bar, .image-grid-wrapper').forEach((el) => {
-    el.classList.add('hidden');
-  });
+
+  // Synchronously show the StateScreens mount container so the restricted
+  // screen is visible in the same paint frame as the image grid disappears.
+  const stateScreensMount = document.querySelector<HTMLElement>(
+    '[data-preact-mount="state-screens"]'
+  );
+  if (stateScreensMount) stateScreensMount.style.display = 'flex';
+
+  // Now flip the screen — Preact will show the restricted screen via
+  // StateScreens. The mount container is already visible (set above).
   state.uiScreen = 'restricted';
 }
 
 export function hideRestricted(): void {
+  // Synchronously hide the StateScreens mount container BEFORE restoring
+  // normal UI, so the restricted screen disappears in the same paint frame
+  // as the image grid appears. This prevents a one-frame flash where both
+  // layers are visible (the Preact useEffect that normally toggles the
+  // mount container's display is async and would lag by one frame).
+  const stateScreensMount = document.querySelector<HTMLElement>(
+    '[data-preact-mount="state-screens"]'
+  );
+  if (stateScreensMount) stateScreensMount.style.display = 'none';
+
   // Setting uiScreen to 'images' tears down the restricted screen (and any
   // empty/error sibling) via the <StateScreens> component.
   if (state.uiScreen === 'restricted') state.uiScreen = 'images';
@@ -430,10 +542,29 @@ export function hideRestricted(): void {
   // previous showLoading() → showRestricted() transition (e.g. switching to a
   // restricted tab and back).
   hideScanOverlay();
+  // Clear residual skeleton count so ImageCard's isNotScanning check
+  // (!isScanning && scanSkeletonsToShow === 0) evaluates to true. Without
+  // this, cards restored from cache would remain in "loading" state with
+  // shimmer placeholders because scanSkeletonsToShow was never cleared when
+  // the user left the normal tab mid-scan.
+  state.scanSkeletonsToShow = 0;
   // Restore toolbar, status-bar and image-grid-wrapper
-  document.querySelectorAll('.toolbar, .status-bar, .image-grid-wrapper').forEach((el) => {
+  document.querySelectorAll('.toolbar, .status-bar').forEach((el) => {
     el.classList.remove('hidden');
   });
+  // showRestricted() sets both the CSS class AND an inline style on
+  // image-grid-wrapper to guarantee immediate hiding. We must clear
+  // both when restoring visibility.
+  const wrapper = document.querySelector<HTMLElement>('.image-grid-wrapper');
+  if (wrapper) {
+    wrapper.classList.remove('hidden');
+    wrapper.style.removeProperty('display');
+  }
+  // hideAll() (called by showRestricted) adds 'hidden' to #image-grid.
+  // When switching back from a restricted tab to a cached normal tab,
+  // renderImages() may be skipped (needsRender=false optimisation), so
+  // we must explicitly restore imageGrid visibility here.
+  if (elements.imageGrid) elements.imageGrid.classList.remove('hidden');
 }
 
 export function clearCurrentImages(): void {
@@ -529,6 +660,14 @@ export function showLoading(): void {
     // Restore visibility in case it was hidden during a tab switch
     (elements.imageGrid as HTMLElement).style.visibility = '';
     elements.imageGrid.classList.remove('hidden');
+
+    // Force a synchronous layout reflow so the browser computes the actual
+    // dimensions of the now-visible containers before we read clientHeight.
+    // Without this, clientHeight may still return 0 because the browser
+    // batches style recalculations and the 'hidden' removal (display:none →
+    // display:flex) hasn't been flushed yet.
+    void (gridWrapper as HTMLElement).offsetHeight;
+
     const isListView = elements.imageGrid.classList.contains('list-view');
     const containerHeight = (gridWrapper as HTMLElement | null)?.clientHeight || 600;
     const skeletonCount = calcSkeletonCount(containerHeight, isListView);

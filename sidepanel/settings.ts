@@ -1,7 +1,7 @@
 // Settings: Hotkey display, Settings modal, Filter dropdowns, Pro feature visibility.
 // (License UI is lazy-loaded from ./license-ui on first Settings open.)
 
-import { MESSAGE_TYPES } from '../shared/constants';
+import { DEFAULT_APP_SETTINGS, MESSAGE_TYPES } from '../shared/constants';
 import { applyFilters, renderColorSwatches, syncCustomSizeInputsFromSettings } from './filter';
 import { detectSimilarImages } from './pro-features';
 import { fetchImages, processImageExtras } from './scan';
@@ -104,13 +104,22 @@ export function showSettings(): void {
     state.isProUser ? state.appSettings.liveMonitoring !== false : false
   );
   setToggle('setting-min-size', !!state.appSettings.enableMinSize);
-  setInput('setting-min-width', String((state.appSettings.minWidth as number | undefined) || 50));
-  setInput('setting-min-height', String((state.appSettings.minHeight as number | undefined) || 50));
+  setInput(
+    'setting-min-width',
+    String((state.appSettings.minWidth as number | undefined) ?? DEFAULT_APP_SETTINGS.minWidth)
+  );
+  setInput(
+    'setting-min-height',
+    String((state.appSettings.minHeight as number | undefined) ?? DEFAULT_APP_SETTINGS.minHeight)
+  );
   setToggle('setting-max-size', !!state.appSettings.enableMaxSize);
-  setInput('setting-max-width', String((state.appSettings.maxWidth as number | undefined) || 8000));
+  setInput(
+    'setting-max-width',
+    String((state.appSettings.maxWidth as number | undefined) ?? DEFAULT_APP_SETTINGS.maxWidth)
+  );
   setInput(
     'setting-max-height',
-    String((state.appSettings.maxHeight as number | undefined) || 8000)
+    String((state.appSettings.maxHeight as number | undefined) ?? DEFAULT_APP_SETTINGS.maxHeight)
   );
   setToggle(
     'setting-similar-detection',
@@ -184,11 +193,23 @@ export async function saveSettings(): Promise<void> {
   // Free tier: Live Monitoring requires Pro
   state.appSettings.liveMonitoring = state.isProUser ? getToggle('setting-live-monitor') : false;
   state.appSettings.enableMinSize = getToggle('setting-min-size');
-  state.appSettings.minWidth = parseInt(getInput('setting-min-width')) || 50;
-  state.appSettings.minHeight = parseInt(getInput('setting-min-height')) || 50;
+  const parsedMinWidth = parseInt(getInput('setting-min-width'));
+  state.appSettings.minWidth = isNaN(parsedMinWidth)
+    ? DEFAULT_APP_SETTINGS.minWidth
+    : parsedMinWidth;
+  const parsedMinHeight = parseInt(getInput('setting-min-height'));
+  state.appSettings.minHeight = isNaN(parsedMinHeight)
+    ? DEFAULT_APP_SETTINGS.minHeight
+    : parsedMinHeight;
   state.appSettings.enableMaxSize = getToggle('setting-max-size');
-  state.appSettings.maxWidth = parseInt(getInput('setting-max-width')) || 8000;
-  state.appSettings.maxHeight = parseInt(getInput('setting-max-height')) || 8000;
+  const parsedMaxWidth = parseInt(getInput('setting-max-width'));
+  state.appSettings.maxWidth = isNaN(parsedMaxWidth)
+    ? DEFAULT_APP_SETTINGS.maxWidth
+    : parsedMaxWidth;
+  const parsedMaxHeight = parseInt(getInput('setting-max-height'));
+  state.appSettings.maxHeight = isNaN(parsedMaxHeight)
+    ? DEFAULT_APP_SETTINGS.maxHeight
+    : parsedMaxHeight;
   state.appSettings.enableSimilarDetection = getToggle('setting-similar-detection');
   state.appSettings.enableColorExtraction = getToggle('setting-color-extract');
   state.appSettings.noManyFilesWarning = getToggle('setting-no-warning');
@@ -266,27 +287,7 @@ export async function saveSettings(): Promise<void> {
 }
 
 export function resetSettings(): void {
-  state.appSettings = {
-    useSidePanel: true,
-    density: 'standard',
-    theme: 'system',
-    defaultGroup: 'none',
-    specifyDownload: true,
-    subfolder: '{domain}',
-    filenameTemplate: 'img_{index}_{original}.{format}',
-    convertFormat: 'none',
-    searchAllFrames: false,
-    liveMonitoring: false,
-    enableMinSize: false,
-    minWidth: 50,
-    minHeight: 50,
-    enableMaxSize: false,
-    maxWidth: 8000,
-    maxHeight: 8000,
-    enableSimilarDetection: false,
-    enableColorExtraction: false,
-    noManyFilesWarning: false,
-  };
+  state.appSettings = { ...DEFAULT_APP_SETTINGS };
   showSettings();
   updateLiveIndicator();
   showToast(t('toast_settings_reset'), 'success');
@@ -617,12 +618,18 @@ export async function updateTopProStatus(): Promise<void> {
           type: 'danger',
         });
         if (!confirmed) return;
+        const originalText = deactivateBtn.textContent;
+        deactivateBtn.setAttribute('disabled', 'true');
+        deactivateBtn.textContent = t('license_deactivating');
         try {
           await chrome.runtime.sendMessage({ type: MESSAGE_TYPES.DEACTIVATE_LICENSE });
-          showToast(t('toast_license_deactivated'), 'info');
           await applyProFeatureVisibility();
+          showToast(t('toast_license_deactivated'), 'info');
         } catch {
           showToast(t('toast_deactivate_failed'), 'error');
+        } finally {
+          deactivateBtn.removeAttribute('disabled');
+          deactivateBtn.textContent = originalText ?? t('btn_deactivate');
         }
       });
     }

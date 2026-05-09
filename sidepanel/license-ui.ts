@@ -190,25 +190,24 @@ export function bindLicenseModalEvents(): void {
   if (deactivateBtn) {
     deactivateBtn.addEventListener('click', async () => {
       const confirmed = await showConfirmDialog({
-        title: 'Deactivate License',
-        message:
-          'Are you sure you want to deactivate your license on this device? You can reactivate it later.',
-        confirmText: 'Deactivate',
-        cancelText: 'Cancel',
+        title: t('dialog_deactivate_title'),
+        message: t('dialog_deactivate_message'),
+        confirmText: t('btn_deactivate'),
+        cancelText: t('common_cancel'),
         type: 'danger',
       });
       if (!confirmed) return;
       deactivateBtn.disabled = true;
-      deactivateBtn.textContent = 'Deactivating...';
+      deactivateBtn.textContent = t('license_deactivating');
       try {
         await chrome.runtime.sendMessage({ type: MESSAGE_TYPES.DEACTIVATE_LICENSE });
         await applyProFeatureVisibility();
-        showToast('License deactivated', 'info');
+        showToast(t('toast_license_deactivated'), 'info');
       } catch {
-        showToast('Failed to deactivate', 'error');
+        showToast(t('toast_deactivate_failed'), 'error');
       } finally {
         deactivateBtn.disabled = false;
-        deactivateBtn.textContent = 'Deactivate';
+        deactivateBtn.textContent = t('btn_deactivate');
       }
     });
   }

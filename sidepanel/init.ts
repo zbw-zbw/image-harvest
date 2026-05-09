@@ -478,10 +478,18 @@ async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Promise<v
 
       updateSelectionUI();
 
-      // Ensure the Preact <ImageGrid> picks up the new filteredImages. The
-      // store proxy notifies subscribers on assignment, so the grid will
-      // re-render with the correct (already-sorted) data.
-      renderImages();
+      // Only re-render when the filtered image list actually changed.
+      // If the user simply switched away and came back to the same tab
+      // with identical data, skip renderImages() to avoid a visual flash
+      // (renderImages resets scrollTop and triggers Preact reconciliation).
+      const cachedFilteredIds = cached.lastRenderedFilteredIds ?? null;
+      const needsRender = !cachedFilteredIds || cachedFilteredIds !== state.lastRenderedFilteredIds;
+      if (needsRender) {
+        console.debug('[tab-switch] filteredIds changed or missing – re-rendering');
+        renderImages();
+      } else {
+        console.debug('[tab-switch] filteredIds unchanged – skipping renderImages');
+      }
 
       // Verify the URL still matches asynchronously
       try {
@@ -973,8 +981,7 @@ function bindEvents(): void {
   // Sort filter options
   document.querySelectorAll<HTMLElement>('[data-sort-filter]').forEach((opt) => {
     opt.addEventListener('click', () => {
-      state.currentSortMode = (opt.dataset.sortFilter ||
-        'size-desc') as typeof state.currentSortMode;
+      state.currentSortMode = (opt.dataset.sortFilter || 'natural') as typeof state.currentSortMode;
       document.querySelectorAll('[data-sort-filter]').forEach((o) => o.classList.remove('active'));
       opt.classList.add('active');
       updateFilterButtonLabels();
@@ -1204,6 +1211,8 @@ function bindEvents(): void {
         loadCurrentTab(true, state.currentTabId ?? undefined);
         return;
       }
+      // Reset all filters to defaults, restoring custom size from global
+      // settings (not zero) so the global > local contract is preserved.
       state.activeFilters = {
         size: 'all',
         sizeMin: 0,
@@ -1212,8 +1221,16 @@ function bindEvents(): void {
         layout: 'all',
         urlKeyword: '',
         color: null,
+        customMinEnabled: state.appSettings.enableMinSize,
+        customMinWidth: state.appSettings.minWidth ?? 0,
+        customMinHeight: state.appSettings.minHeight ?? 0,
+        customMaxEnabled: state.appSettings.enableMaxSize,
+        customMaxWidth: state.appSettings.maxWidth ?? 8000,
+        customMaxHeight: state.appSettings.maxHeight ?? 8000,
       };
       if (elements.filterUrlInput) (elements.filterUrlInput as HTMLInputElement).value = '';
+      // Restore custom size input fields from global settings
+      syncCustomSizeInputsFromSettings();
       document.querySelectorAll<HTMLInputElement>('.type-checkbox').forEach((cb) => {
         cb.checked = true;
       });

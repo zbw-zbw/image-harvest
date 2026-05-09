@@ -35,10 +35,9 @@ export function handleScanCancel(): void {
 
   if (state.allImages.length > 0) {
     applyFilters();
-    // Toast keeps the legacy English wording for the count suffix until
-    // a dedicated i18n key is added; the prefix is translated.
+    // Use filteredImages count so the toast matches the bottom status bar.
     showToast(
-      `${t('toast_download_cancelled')} · ${t('status_found_images', { count: state.allImages.length })}`,
+      `${t('toast_download_cancelled')} · ${t('status_found_images', { count: state.filteredImages.length })}`,
       'info'
     );
   } else {
@@ -305,7 +304,8 @@ export async function rescanWithProgress(tabId: number, tabUrl: string): Promise
       hideScanOverlay();
       applyFilters();
       updateSelectionUI();
-      showToast(t('status_found_images', { count: state.allImages.length }), 'success');
+      // Use filteredImages count so the toast matches the bottom status bar.
+      showToast(t('status_found_images', { count: state.filteredImages.length }), 'success');
 
       // Update both caches with fresh data
       state.tabCache.set(tabId, {
@@ -483,8 +483,9 @@ export async function fetchImages(targetTabId?: number): Promise<void> {
       // Render the final complete image list
       applyFilters();
 
-      // Notify the user how many images were found
-      showToast(t('status_found_images', { count: state.allImages.length }), 'success');
+      // Notify the user how many images were found (use filteredImages count
+      // so the toast matches the bottom status bar).
+      showToast(t('status_found_images', { count: state.filteredImages.length }), 'success');
 
       // Telemetry: pair with scan_triggered above. images_shown is the
       // immediate render signal; scan_completed carries duration so we

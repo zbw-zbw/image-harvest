@@ -1,7 +1,6 @@
 // Content Script Highlight Module
 // Handles image highlighting and locating functionality
 
-import { MESSAGE_TYPES } from '../shared/constants';
 import { resolveUrl, isDataUri, generateDataUriKey, extractBackgroundUrls } from '../shared/utils';
 import { parseSrcset } from './utils';
 import { collectShadowRoots } from './shadow-iframe';
@@ -107,12 +106,10 @@ function ensureOverlay(): void {
 
 function dismissAllHighlights(): void {
   removeAllHighlights();
-  // Notify sidepanel/popup to clear selection
-  try {
-    chrome.runtime.sendMessage({ type: MESSAGE_TYPES.CLEAR_SELECTION });
-  } catch {
-    /* extension context may be invalid */
-  }
+  // Only remove the page-side highlight visuals (overlay + borders).
+  // Do NOT send CLEAR_SELECTION — the user's selection in the sidepanel
+  // image list should be preserved. ESC / clicking the overlay is just
+  // exiting the page highlight view, not deselecting images.
 }
 
 function removeOverlay(): void {
@@ -426,6 +423,18 @@ export function addHighlight(imageUrl: string, shouldScroll = true): { found: bo
   // Metadata elements (<link>, <meta>) exist in <head> and cannot be
   // visually highlighted or scrolled to — just acknowledge they exist.
   if (isMetadataElement(target)) return { found: true };
+
+  // Validate that the element has a reasonable on-screen position.
+  // Some images (e.g. hidden, lazy-loaded placeholders, or elements
+  // removed from layout) report a zero-size rect or sit at (0,0) with
+  // negligible dimensions. Showing the overlay + highlight border for
+  // these confuses users, so we silently skip the visual highlight.
+  const rect = target.getBoundingClientRect();
+  const hasZeroSize = rect.width < 2 || rect.height < 2;
+  const isAtOriginSmall = rect.top === 0 && rect.left === 0 && rect.width < 10 && rect.height < 10;
+  if (hasZeroSize || isAtOriginSmall) {
+    return { found: false };
+  }
 
   // Create highlight immediately — rAF loop will track position during scroll
   createSingleHighlight(imageUrl, target);

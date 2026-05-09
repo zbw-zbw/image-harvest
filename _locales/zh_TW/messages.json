@@ -194,6 +194,9 @@
   "filter_tab": {
     "message": "分頁"
   },
+  "sort_none": {
+    "message": "無（頁面順序）"
+  },
   "sort_size_desc": {
     "message": "尺寸 ↓（大到小）"
   },
@@ -376,6 +379,9 @@
   },
   "btn_deactivate": {
     "message": "解綁"
+  },
+  "license_deactivating": {
+    "message": "解綁中..."
   },
   "card_add_to_collection": {
     "message": "加入收藏"
@@ -880,5 +886,62 @@
   },
   "collection_empty_hint": {
     "message": "點擊任意圖片上的星標圖示即可加入收藏夾"
+  },
+  "restricted_notice": {
+    "message": "此頁面不允許擴充功能注入腳本。請導航至一般網頁（如文章、圖庫或搜尋結果）以開始擷取圖片。"
+  },
+  "restricted_features_heading": {
+    "message": "Image Harvest 功能一覽"
+  },
+  "restricted_feature_batch_title": {
+    "message": "批次下載"
+  },
+  "restricted_feature_batch_desc": {
+    "message": "一鍵選取並下載任意網頁上的所有圖片。可依尺寸、格式或版面進行篩選。"
+  },
+  "restricted_feature_dedup_title": {
+    "message": "相似圖片偵測"
+  },
+  "restricted_feature_dedup_desc": {
+    "message": "透過感知雜湊自動尋找並移除近似重複的圖片。"
+  },
+  "restricted_feature_reverse_title": {
+    "message": "以圖搜圖"
+  },
+  "restricted_feature_reverse_desc": {
+    "message": "一鍵在 Google、TinEye、Yandex 和 Baidu 中搜尋任意圖片。"
+  },
+  "restricted_feature_multitab_title": {
+    "message": "多分頁擷取"
+  },
+  "restricted_feature_multitab_desc": {
+    "message": "同時從多個已開啟的分頁中擷取圖片，並打包為 ZIP 下載。"
+  },
+  "restricted_feature_color_title": {
+    "message": "色彩擷取"
+  },
+  "restricted_feature_color_desc": {
+    "message": "自動擷取每張圖片的主色調。點擊色塊即可複製十六進位色碼。"
+  },
+  "restricted_feature_filter_title": {
+    "message": "智慧篩選"
+  },
+  "restricted_feature_filter_desc": {
+    "message": "依尺寸、類型、版面、URL 模式或主色調篩選圖片，精準找到所需內容。"
+  },
+  "restricted_feature_collection_title": {
+    "message": "收藏管理"
+  },
+  "restricted_feature_collection_desc": {
+    "message": "將圖片收藏至持久化集合中，跨工作階段保存。隨時整理與回顧。"
+  },
+  "restricted_feature_preview_title": {
+    "message": "即時預覽"
+  },
+  "restricted_feature_preview_desc": {
+    "message": "一覽查看高解析度原圖及中繼資料——尺寸、檔案大小和格式。"
+  },
+  "restricted_link_website": {
+    "message": "官方網站"
   }
 }

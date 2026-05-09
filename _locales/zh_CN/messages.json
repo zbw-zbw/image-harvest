@@ -194,6 +194,9 @@
   "filter_tab": {
     "message": "标签页"
   },
+  "sort_none": {
+    "message": "无（页面顺序）"
+  },
   "sort_size_desc": {
     "message": "尺寸 ↓（大到小）"
   },
@@ -376,6 +379,9 @@
   },
   "btn_deactivate": {
     "message": "解绑"
+  },
+  "license_deactivating": {
+    "message": "解绑中..."
   },
   "card_add_to_collection": {
     "message": "添加到收藏"
@@ -880,5 +886,62 @@
   },
   "collection_empty_hint": {
     "message": "点击任意图片上的星标图标即可添加到收藏夹"
+  },
+  "restricted_notice": {
+    "message": "此页面不允许扩展注入脚本。请导航到常规网页（如文章、图库或搜索结果）以开始提取图片。"
+  },
+  "restricted_features_heading": {
+    "message": "Image Harvest 功能一览"
+  },
+  "restricted_feature_batch_title": {
+    "message": "批量下载"
+  },
+  "restricted_feature_batch_desc": {
+    "message": "一键选择并下载任意网页上的所有图片。可按尺寸、格式或布局进行筛选。"
+  },
+  "restricted_feature_dedup_title": {
+    "message": "相似图片检测"
+  },
+  "restricted_feature_dedup_desc": {
+    "message": "通过感知哈希自动查找并移除近似重复的图片。"
+  },
+  "restricted_feature_reverse_title": {
+    "message": "以图搜图"
+  },
+  "restricted_feature_reverse_desc": {
+    "message": "一键在 Google、TinEye、Yandex 和 Baidu 中搜索任意图片。"
+  },
+  "restricted_feature_multitab_title": {
+    "message": "多标签页提取"
+  },
+  "restricted_feature_multitab_desc": {
+    "message": "同时从多个已打开的标签页中提取图片，并打包为 ZIP 下载。"
+  },
+  "restricted_feature_color_title": {
+    "message": "颜色提取"
+  },
+  "restricted_feature_color_desc": {
+    "message": "自动提取每张图片的主色调。点击色块即可复制十六进制颜色代码。"
+  },
+  "restricted_feature_filter_title": {
+    "message": "智能过滤"
+  },
+  "restricted_feature_filter_desc": {
+    "message": "按尺寸、类型、布局、URL 模式或主色调过滤图片，精准找到所需内容。"
+  },
+  "restricted_feature_collection_title": {
+    "message": "收藏管理"
+  },
+  "restricted_feature_collection_desc": {
+    "message": "将图片收藏到持久化集合中，跨会话保存。随时整理和回顾。"
+  },
+  "restricted_feature_preview_title": {
+    "message": "即时预览"
+  },
+  "restricted_feature_preview_desc": {
+    "message": "一览查看高清原图及元数据——尺寸、文件大小和格式。"
+  },
+  "restricted_link_website": {
+    "message": "官方网站"
   }
 }

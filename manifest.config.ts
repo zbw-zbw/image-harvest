@@ -53,6 +53,16 @@ export default defineManifest({
   // (Already covered by the broader 'assets/*' rule below, but listing the
   // page explicitly here makes the dependency obvious.)
 
+  commands: {
+    _execute_action: {
+      suggested_key: {
+        default: 'Ctrl+Shift+S',
+        mac: 'Command+Shift+S',
+      },
+      description: 'Open Image Harvest',
+    },
+  },
+
   side_panel: {
     default_path: 'pages/sidepanel.html',
   },

@@ -137,11 +137,12 @@ export function ProUpgradeModal() {
   const [downloadCount, setDownloadCount] = useState(0);
   const [trialError, setTrialError] = useState('');
   const [trialLoading, setTrialLoading] = useState(false);
+  const [trialEligible, setTrialEligible] = useState(true);
 
-  // Resolve A/B bucket + paywall download count once on mount. Both are
-  // cheap (cache-hit after first call) and feed the variant copy. We
-  // resolve them eagerly so the headline doesn't flicker A→B when the
-  // modal opens.
+  // Resolve A/B bucket + paywall download count + trial eligibility once
+  // on mount. All are cheap (cache-hit after first call) and feed the
+  // variant copy / trial CTA visibility. We resolve them eagerly so the
+  // headline doesn't flicker A→B when the modal opens.
   useEffect(() => {
     let cancelled = false;
     void (async () => {
@@ -155,10 +156,27 @@ export function ProUpgradeModal() {
     };
   }, []);
 
-  // Reset trial error every time the modal closes so it doesn't
-  // resurface on the next open.
+  // Re-check trial eligibility every time the modal opens so users who
+  // have already started or exhausted their trial don't see the CTA.
   useEffect(() => {
-    if (!ms.open) setTrialError('');
+    if (!ms.open) {
+      setTrialError('');
+      return;
+    }
+    let cancelled = false;
+    void (async () => {
+      try {
+        const { isTrialEligible } = await import('../../shared/trial');
+        const eligible = await isTrialEligible();
+        if (!cancelled) setTrialEligible(eligible);
+      } catch {
+        // If the trial module fails to load, hide the CTA to be safe.
+        if (!cancelled) setTrialEligible(false);
+      }
+    })();
+    return () => {
+      cancelled = true;
+    };
   }, [ms.open]);
 
   return (
@@ -228,42 +246,50 @@ export function ProUpgradeModal() {
 
           {/* ── Section 2: trial / pricing CTAs ─────────────────────────── */}
           <div class="pro-upgrade-cta-section">
-            <div class="pro-upgrade-trial-header">
-              <div class="pro-upgrade-trial-badge">
-                <span aria-hidden="true">🎁</span>
-                {t('pro_trial_badge')}
-              </div>
-              <p class="pro-upgrade-trial-desc">{t('pro_trial_desc')}</p>
-            </div>
-            <ul class="pro-upgrade-trial-perks">
-              <li>{t('pro_trial_perk_full_access')}</li>
-              <li>{t('pro_trial_perk_no_card')}</li>
-              <li>{t('pro_trial_perk_cancel')}</li>
-            </ul>
+            {trialEligible && (
+              <>
+                <div class="pro-upgrade-trial-header">
+                  <div class="pro-upgrade-trial-badge">
+                    <span aria-hidden="true">🎁</span>
+                    {t('pro_trial_badge')}
+                  </div>
+                  <p class="pro-upgrade-trial-desc">{t('pro_trial_desc')}</p>
+                </div>
+                <ul class="pro-upgrade-trial-perks">
+                  <li>{t('pro_trial_perk_full_access')}</li>
+                  <li>{t('pro_trial_perk_no_card')}</li>
+                  <li>{t('pro_trial_perk_cancel')}</li>
+                </ul>
+              </>
+            )}
             <div class="pro-upgrade-cta-row">
-              <button
-                id="btn-pro-modal-trial"
-                type="button"
-                class="btn btn-primary btn-cta"
-                disabled={trialLoading}
-                onClick={() => {
-                  void handleStartTrial(setTrialError, setTrialLoading);
-                }}
-              >
-                {trialLoading ? t('pro_trial_starting') : t('pro_trial_start_cta')}
-              </button>
+              {trialEligible && (
+                <button
+                  id="btn-pro-modal-trial"
+                  type="button"
+                  class="btn btn-primary btn-cta"
+                  disabled={trialLoading}
+                  onClick={() => {
+                    void handleStartTrial(setTrialError, setTrialLoading);
+                  }}
+                >
+                  {trialLoading ? t('pro_trial_starting') : t('pro_trial_start_cta')}
+                </button>
+              )}
               <button
                 id="btn-pro-modal-pricing"
                 type="button"
-                class="btn btn-secondary btn-cta"
+                class={`btn btn-cta ${trialEligible ? 'btn-secondary' : 'btn-primary'}`}
                 onClick={handlePricingClick}
               >
                 {t('pro_pricing_cta')}
               </button>
             </div>
-            <p id="pro-modal-trial-error" class={`license-error${trialError ? '' : ' hidden'}`}>
-              {trialError}
-            </p>
+            {trialEligible && (
+              <p id="pro-modal-trial-error" class={`license-error${trialError ? '' : ' hidden'}`}>
+                {trialError}
+              </p>
+            )}
           </div>
 
           {/* ── Section 3: license key activation form ──────────────────── */}

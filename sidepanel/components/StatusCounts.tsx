@@ -11,19 +11,32 @@
 import { t } from '../../shared/i18n';
 import { useStoreSelector } from './storeHook';
 
-/** Toolbar label: "Found N images". */
+/**
+ * Toolbar label: "Found N images".
+ * Hidden while a scan is in progress to avoid confusing partial counts;
+ * fades in smoothly once scanning completes.
+ */
 export function FoundActionCount() {
   const count = useStoreSelector((s) => s.filteredImages.length);
-  return <span id="found-action-count">{count}</span>;
+  const isScanning = useStoreSelector((s) => s.isScanning);
+
+  if (isScanning) return <span id="found-action-count" class="status-hidden" />;
+
+  return (
+    <span id="found-action-count" class="status-fade-in">
+      {count}
+    </span>
+  );
 }
 
 /**
  * Inline similar-image indicator next to "Found N images".
  * Renders "(N similar)" as a clickable link that opens the dedup modal.
- * Always visible — shows count 0 when no similar groups exist.
+ * Hidden during scanning to stay consistent with the found-count above.
  */
 export function SimilarInline() {
   const count = useStoreSelector((s) => s.similarGroups.length);
+  const isScanning = useStoreSelector((s) => s.isScanning);
   useStoreSelector((s) => s.localeTick);
 
   const handleClick = async () => {
@@ -32,8 +45,10 @@ export function SimilarInline() {
     showDedupModal();
   };
 
+  if (isScanning) return <span class="similar-inline status-hidden" />;
+
   return (
-    <span class="similar-inline">
+    <span class="similar-inline status-fade-in">
       (
       <a
         class={`similar-inline-link${count === 0 ? ' disabled' : ''}`}

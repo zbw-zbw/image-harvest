@@ -6,13 +6,14 @@
 import type { AppSettings, FilterConfig } from './types';
 
 export const DEFAULT_FILTER_CONFIG: FilterConfig = {
-  // Size filters
-  enableMinSize: false,
-  minWidth: 50,
-  minHeight: 50,
-  enableMaxSize: false,
-  maxWidth: 8000,
-  maxHeight: 8000,
+  // Size filters — switches default ON; values 0 / 99999 mean "no limit"
+  // so no images are filtered out unless the user tightens the range.
+  enableMinSize: true,
+  minWidth: 0,
+  minHeight: 0,
+  enableMaxSize: true,
+  maxWidth: 99999,
+  maxHeight: 99999,
 
   // Aspect ratio
   enableAspectRatio: false,
@@ -270,12 +271,12 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   convertFormat: 'none',
   searchAllFrames: false,
   liveMonitoring: true,
-  enableMinSize: false,
-  minWidth: 50,
-  minHeight: 50,
-  enableMaxSize: false,
-  maxWidth: 8000,
-  maxHeight: 8000,
+  enableMinSize: true,
+  minWidth: 0,
+  minHeight: 0,
+  enableMaxSize: true,
+  maxWidth: 99999,
+  maxHeight: 99999,
   enableSimilarDetection: true,
   enableColorExtraction: true,
   noManyFilesWarning: false,

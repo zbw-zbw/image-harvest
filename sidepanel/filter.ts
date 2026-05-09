@@ -47,7 +47,10 @@ export function sortImages(): void {
   sortImagesArray(state.filteredImages);
 }
 
-/** Sort an array of images in-place using the current sort mode. */
+/** Sort an array of images in-place using the current sort mode.
+ *  A deterministic tiebreaker (image id) is always applied so images
+ *  with identical sort keys (e.g. all zero-size images) maintain a
+ *  consistent order across re-renders, view switches, and cache restores. */
 export function sortImagesArray(images: ImageItem[]): void {
   images.sort((a, b) => {
     const aW = a.naturalWidth || a.displayWidth || 0;
@@ -57,21 +60,30 @@ export function sortImagesArray(images: ImageItem[]): void {
     const aPixels = aW * aH;
     const bPixels = bW * bH;
 
+    let primary: number;
     switch (state.currentSortMode) {
       case 'size-asc':
-        return aPixels - bPixels;
+        primary = aPixels - bPixels;
+        break;
       case 'filesize-desc':
-        return (b.estimatedSize || 0) - (a.estimatedSize || 0);
+        primary = (b.estimatedSize || 0) - (a.estimatedSize || 0);
+        break;
       case 'filesize-asc':
-        return (a.estimatedSize || 0) - (b.estimatedSize || 0);
+        primary = (a.estimatedSize || 0) - (b.estimatedSize || 0);
+        break;
       case 'type':
-        return (a.format || '').localeCompare(b.format || '');
+        primary = (a.format || '').localeCompare(b.format || '');
+        break;
       case 'natural':
         return 0;
       case 'size-desc':
       default:
-        return bPixels - aPixels;
+        primary = bPixels - aPixels;
+        break;
     }
+    // Deterministic tiebreaker: fall back to id comparison so images with
+    // identical sort keys always appear in the same order.
+    return primary !== 0 ? primary : a.id.localeCompare(b.id);
   });
 }
 
@@ -181,22 +193,22 @@ export function renderColorSwatches(): void {
 }
 
 export function filterBySettingsMinSize(img: ImageItem): boolean {
-  if (!state.appSettings.enableMinSize) return true;
+  if (!state.activeFilters.customMinEnabled) return true;
   const w = img.naturalWidth || img.displayWidth || 0;
   const h = img.naturalHeight || img.displayHeight || 0;
   return (
-    w >= ((state.appSettings.minWidth as number | undefined) || 0) &&
-    h >= ((state.appSettings.minHeight as number | undefined) || 0)
+    w >= (state.activeFilters.customMinWidth || 0) &&
+    h >= (state.activeFilters.customMinHeight || 0)
   );
 }
 
 export function filterBySettingsMaxSize(img: ImageItem): boolean {
-  if (!state.appSettings.enableMaxSize) return true;
+  if (!state.activeFilters.customMaxEnabled) return true;
   const w = img.naturalWidth || img.displayWidth || 0;
   const h = img.naturalHeight || img.displayHeight || 0;
   return (
-    w <= ((state.appSettings.maxWidth as number | undefined) || Infinity) &&
-    h <= ((state.appSettings.maxHeight as number | undefined) || Infinity)
+    w <= (state.activeFilters.customMaxWidth || Infinity) &&
+    h <= (state.activeFilters.customMaxHeight || Infinity)
   );
 }
 
@@ -211,32 +223,34 @@ export function clearCustomSizeInputs(): void {
 }
 
 export function applyCustomSizeInputs(): void {
-  const minW =
-    parseInt(
-      (document.getElementById('filter-min-width') as HTMLInputElement | null)?.value || ''
-    ) || 0;
-  const minH =
-    parseInt(
-      (document.getElementById('filter-min-height') as HTMLInputElement | null)?.value || ''
-    ) || 0;
-  const maxW =
-    parseInt(
-      (document.getElementById('filter-max-width') as HTMLInputElement | null)?.value || ''
-    ) || 0;
-  const maxH =
-    parseInt(
-      (document.getElementById('filter-max-height') as HTMLInputElement | null)?.value || ''
-    ) || 0;
+  const minWRaw =
+    (document.getElementById('filter-min-width') as HTMLInputElement | null)?.value || '';
+  const minHRaw =
+    (document.getElementById('filter-min-height') as HTMLInputElement | null)?.value || '';
+  const maxWRaw =
+    (document.getElementById('filter-max-width') as HTMLInputElement | null)?.value || '';
+  const maxHRaw =
+    (document.getElementById('filter-max-height') as HTMLInputElement | null)?.value || '';
 
+  const minW = minWRaw ? parseInt(minWRaw) : 0;
+  const minH = minHRaw ? parseInt(minHRaw) : 0;
+  const maxW = maxWRaw ? parseInt(maxWRaw) : 0;
+  const maxH = maxHRaw ? parseInt(maxHRaw) : 0;
+
+  // Custom size filter stays enabled as long as any input has a meaningful
+  // value (> 0 for min, > 0 for max). Empty inputs are treated as "no limit".
   const hasMin = minW > 0 || minH > 0;
   const hasMax = maxW > 0 || maxH > 0;
 
-  state.appSettings.enableMinSize = hasMin;
-  state.appSettings.minWidth = minW || 0;
-  state.appSettings.minHeight = minH || 0;
-  state.appSettings.enableMaxSize = hasMax;
-  state.appSettings.maxWidth = maxW || Infinity;
-  state.appSettings.maxHeight = maxH || Infinity;
+  // Only update the session-local (runtime) custom size filter — never
+  // touch appSettings or chrome.storage so the global defaults stay
+  // intact for the next panel session.
+  state.activeFilters.customMinEnabled = hasMin;
+  state.activeFilters.customMinWidth = minW;
+  state.activeFilters.customMinHeight = minH;
+  state.activeFilters.customMaxEnabled = hasMax;
+  state.activeFilters.customMaxWidth = hasMax ? maxW || Infinity : Infinity;
+  state.activeFilters.customMaxHeight = hasMax ? maxH || Infinity : Infinity;
 
   // Deselect preset options when custom values are entered
   if (hasMin || hasMax) {
@@ -248,27 +262,60 @@ export function applyCustomSizeInputs(): void {
 
   updateFilterButtonLabels();
   applyFilters();
-
-  // Persist to storage
-  chrome.storage.local.set({ appSettings: state.appSettings }).catch(() => {});
 }
 
+/**
+ * Initialise the runtime (session-local) custom size filter from the
+ * persisted global settings, and populate the toolbar input fields.
+ *
+ * Called once during init() and again after the user saves settings so
+ * that any global changes are immediately reflected in the toolbar.
+ * Toolbar edits only modify activeFilters.custom* (see
+ * applyCustomSizeInputs) and are discarded when the panel closes.
+ */
 export function syncCustomSizeInputsFromSettings(): void {
   const minWInput = document.getElementById('filter-min-width') as HTMLInputElement | null;
   const minHInput = document.getElementById('filter-min-height') as HTMLInputElement | null;
   const maxWInput = document.getElementById('filter-max-width') as HTMLInputElement | null;
   const maxHInput = document.getElementById('filter-max-height') as HTMLInputElement | null;
 
+  // ── 1. Copy global settings → runtime locals ──────────────────────────
+  state.activeFilters.customMinEnabled = state.appSettings.enableMinSize;
+  state.activeFilters.customMinWidth = state.appSettings.minWidth ?? 0;
+  state.activeFilters.customMinHeight = state.appSettings.minHeight ?? 0;
+  state.activeFilters.customMaxEnabled = state.appSettings.enableMaxSize;
+  state.activeFilters.customMaxWidth = state.appSettings.maxWidth ?? 8000;
+  state.activeFilters.customMaxHeight = state.appSettings.maxHeight ?? 8000;
+
+  // ── 2. Toggle visibility of the custom-size section ───────────────────
+  const customSizeContainer = document.querySelector('.filter-custom-size') as HTMLElement | null;
+  const customSizeDivider = customSizeContainer?.previousElementSibling as HTMLElement | null;
+  const anyEnabled = state.appSettings.enableMinSize || state.appSettings.enableMaxSize;
+
+  if (customSizeContainer) {
+    customSizeContainer.style.display = anyEnabled ? '' : 'none';
+  }
+  if (customSizeDivider?.classList.contains('filter-divider')) {
+    customSizeDivider.style.display = anyEnabled ? '' : 'none';
+  }
+
+  // ── 3. Populate input fields from global values ───────────────────────
   if (state.appSettings.enableMinSize) {
-    if (minWInput && state.appSettings.minWidth)
-      minWInput.value = String(state.appSettings.minWidth);
-    if (minHInput && state.appSettings.minHeight)
-      minHInput.value = String(state.appSettings.minHeight);
+    const minW = state.appSettings.minWidth ?? 0;
+    const minH = state.appSettings.minHeight ?? 0;
+    if (minWInput) minWInput.value = minW > 0 ? String(minW) : '';
+    if (minHInput) minHInput.value = minH > 0 ? String(minH) : '';
+  } else {
+    if (minWInput) minWInput.value = '';
+    if (minHInput) minHInput.value = '';
   }
   if (state.appSettings.enableMaxSize) {
-    const maxW = state.appSettings.maxWidth as number | undefined;
-    const maxH = state.appSettings.maxHeight as number | undefined;
-    if (maxWInput && maxW && maxW < Infinity) maxWInput.value = String(maxW);
-    if (maxHInput && maxH && maxH < Infinity) maxHInput.value = String(maxH);
+    const maxW = state.appSettings.maxWidth ?? Infinity;
+    const maxH = state.appSettings.maxHeight ?? Infinity;
+    if (maxWInput) maxWInput.value = maxW < Infinity ? String(maxW) : '';
+    if (maxHInput) maxHInput.value = maxH < Infinity ? String(maxH) : '';
+  } else {
+    if (maxWInput) maxWInput.value = '';
+    if (maxHInput) maxHInput.value = '';
   }
 }

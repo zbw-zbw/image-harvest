@@ -194,6 +194,9 @@
   "filter_tab": {
     "message": "タブ"
   },
+  "sort_none": {
+    "message": "なし（ページ順）"
+  },
   "sort_size_desc": {
     "message": "サイズ ↓（大きい順）"
   },
@@ -376,6 +379,9 @@
   },
   "btn_deactivate": {
     "message": "無効化"
+  },
+  "license_deactivating": {
+    "message": "無効化中..."
   },
   "card_add_to_collection": {
     "message": "コレクションに追加"
@@ -880,5 +886,62 @@
   },
   "collection_empty_hint": {
     "message": "画像の星アイコンをクリックしてコレクションに追加"
+  },
+  "restricted_notice": {
+    "message": "このページでは拡張機能のスクリプト注入が制限されています。通常のウェブページ（記事、ギャラリー、検索結果など）に移動して画像の抽出を開始してください。"
+  },
+  "restricted_features_heading": {
+    "message": "Image Harvest でできること"
+  },
+  "restricted_feature_batch_title": {
+    "message": "一括ダウンロード"
+  },
+  "restricted_feature_batch_desc": {
+    "message": "ワンクリックで任意のウェブページからすべての画像を選択してダウンロード。サイズ、形式、レイアウトでフィルタリング可能。"
+  },
+  "restricted_feature_dedup_title": {
+    "message": "類似画像検出"
+  },
+  "restricted_feature_dedup_desc": {
+    "message": "パーセプチュアルハッシュを使用して、ほぼ重複した画像を自動的に検出・除去します。"
+  },
+  "restricted_feature_reverse_title": {
+    "message": "画像で検索"
+  },
+  "restricted_feature_reverse_desc": {
+    "message": "Google、TinEye、Yandex、Baiduでワンクリックで任意の画像を検索。"
+  },
+  "restricted_feature_multitab_title": {
+    "message": "マルチタブ抽出"
+  },
+  "restricted_feature_multitab_desc": {
+    "message": "複数の開いているタブから一度に画像を抽出し、ZIPアーカイブとしてダウンロード。"
+  },
+  "restricted_feature_color_title": {
+    "message": "カラー抽出"
+  },
+  "restricted_feature_color_desc": {
+    "message": "各画像から主要な色を自動抽出。カラースウォッチをクリックしてHEXコードをコピー。"
+  },
+  "restricted_feature_filter_title": {
+    "message": "スマートフィルター"
+  },
+  "restricted_feature_filter_desc": {
+    "message": "サイズ、タイプ、レイアウト、URLパターン、主要色で画像をフィルタリングし、必要な画像を正確に見つけます。"
+  },
+  "restricted_feature_collection_title": {
+    "message": "お気に入りコレクション"
+  },
+  "restricted_feature_collection_desc": {
+    "message": "画像を永続的なコレクションにブックマーク。セッションをまたいで保存され、いつでも整理・閲覧可能。"
+  },
+  "restricted_feature_preview_title": {
+    "message": "インスタントプレビュー"
+  },
+  "restricted_feature_preview_desc": {
+    "message": "フル解像度の画像とメタデータ（サイズ、ファイルサイズ、形式）を一目で確認。"
+  },
+  "restricted_link_website": {
+    "message": "公式サイト"
   }
 }

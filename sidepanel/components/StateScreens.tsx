@@ -44,7 +44,7 @@ export function StateScreens() {
   }, [screen]);
 
   return (
-    <div ref={rootRef}>
+    <div ref={rootRef} style="display:flex;flex-direction:column;flex:1 1 auto;min-height:0;overflow:hidden">
       <EmptyScreen visible={screen === 'empty'} />
       <ErrorScreen visible={screen === 'error'} />
       <RestrictedScreen visible={screen === 'restricted'} />
@@ -148,12 +148,108 @@ function ErrorScreen({ visible }: ScreenProps) {
   );
 }
 
+// Feature items for the restricted screen — each describes a core capability
+// of Image Harvest so users see value even on restricted pages.
+const RESTRICTED_FEATURES = [
+  {
+    gradient: 'gradient-blue',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="7 10 12 15 17 10" />
+        <line x1="12" y1="15" x2="12" y2="3" />
+      </svg>
+    ),
+    titleKey: 'restricted_feature_batch_title',
+    descKey: 'restricted_feature_batch_desc',
+  },
+  {
+    gradient: 'gradient-purple',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="2" y="2" width="8" height="8" rx="1" />
+        <rect x="14" y="2" width="8" height="8" rx="1" />
+        <rect x="2" y="14" width="8" height="8" rx="1" />
+        <rect x="14" y="14" width="8" height="8" rx="1" />
+      </svg>
+    ),
+    titleKey: 'restricted_feature_dedup_title',
+    descKey: 'restricted_feature_dedup_desc',
+  },
+  {
+    gradient: 'gradient-green',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8" />
+        <line x1="21" y1="21" x2="16.65" y2="16.65" />
+      </svg>
+    ),
+    titleKey: 'restricted_feature_reverse_title',
+    descKey: 'restricted_feature_reverse_desc',
+  },
+  {
+    gradient: 'gradient-amber',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="18" height="18" rx="2" />
+        <line x1="3" y1="9" x2="21" y2="9" />
+        <line x1="9" y1="21" x2="9" y2="9" />
+      </svg>
+    ),
+    titleKey: 'restricted_feature_multitab_title',
+    descKey: 'restricted_feature_multitab_desc',
+  },
+  {
+    gradient: 'gradient-pink',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="13.5" cy="6.5" r="2.5" />
+        <circle cx="17" cy="15" r="3" />
+        <circle cx="8.5" cy="12.5" r="4.5" />
+      </svg>
+    ),
+    titleKey: 'restricted_feature_color_title',
+    descKey: 'restricted_feature_color_desc',
+  },
+  {
+    gradient: 'gradient-teal',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+      </svg>
+    ),
+    titleKey: 'restricted_feature_filter_title',
+    descKey: 'restricted_feature_filter_desc',
+  },
+  {
+    gradient: 'gradient-indigo',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+      </svg>
+    ),
+    titleKey: 'restricted_feature_collection_title',
+    descKey: 'restricted_feature_collection_desc',
+  },
+  {
+    gradient: 'gradient-rose',
+    icon: (
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+        <circle cx="8.5" cy="8.5" r="1.5" />
+        <polyline points="21 15 16 10 5 21" />
+      </svg>
+    ),
+    titleKey: 'restricted_feature_preview_title',
+    descKey: 'restricted_feature_preview_desc',
+  },
+] as const;
+
 function RestrictedScreen({ visible }: ScreenProps) {
-  // The restricted screen is a pure marketing card — no per-instance data —
-  // so it just toggles visibility. The original markup lived in
-  // _shared-body.html; we mirror it here. Auxiliary copy & buttons (Open
-  // Settings, etc.) are kept in the static markup outside this component so
-  // the scope of the migration stays small.
+  // Read version from the extension manifest so it stays in sync with
+  // package.json automatically (crxjs injects the version at build time).
+  const version = chrome?.runtime?.getManifest?.()?.version ?? '1.0.2';
+
   return (
     <div id="restricted-state" class={`restricted-state${visible ? '' : ' hidden'}`}>
       <div class="restricted-hero">
@@ -165,10 +261,48 @@ function RestrictedScreen({ visible }: ScreenProps) {
             </span>
           </div>
           <h2 class="restricted-title">
-            Image Harvest <span class="restricted-version">v1.0.0</span>
+            Image Harvest <span class="restricted-version">v{version}</span>
           </h2>
-          <p class="restricted-subtitle">{t('restricted_subtitle')}</p>
+          <p class="restricted-subtitle">
+            {t('restricted_subtitle')}
+            {' ('}
+            <a href="https://image-harvest.kyriewen.cn" target="_blank" rel="noopener noreferrer" class="restricted-inline-link">
+              {t('restricted_link_website')}
+            </a>
+            {' / '}
+            <a href="https://github.com/zbw-zbw/image-harvest" target="_blank" rel="noopener noreferrer" class="restricted-inline-link">
+              GitHub
+            </a>
+            {')'}
+          </p>
         </div>
+      </div>
+
+      {/* Notice banner */}
+      <div class="restricted-notice">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink:0;margin-top:1px">
+          <circle cx="12" cy="12" r="10" />
+          <line x1="12" y1="8" x2="12" y2="12" />
+          <line x1="12" y1="16" x2="12.01" y2="16" />
+        </svg>
+        <span>{t('restricted_notice')}</span>
+      </div>
+
+      {/* Feature showcase */}
+      <div class="restricted-body">
+        <div class="restricted-section-title">{t('restricted_features_heading')}</div>
+        <div class="restricted-features">
+          {RESTRICTED_FEATURES.map((feat) => (
+            <div class="restricted-feature" key={feat.titleKey}>
+              <div class={`restricted-feature-icon-wrap ${feat.gradient}`}>{feat.icon}</div>
+              <div class="restricted-feature-text">
+                <strong>{t(feat.titleKey)}</strong>
+                <p>{t(feat.descKey)}</p>
+              </div>
+            </div>
+          ))}
+        </div>
+
       </div>
     </div>
   );

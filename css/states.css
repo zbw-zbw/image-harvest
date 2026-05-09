@@ -757,6 +757,22 @@
   background: linear-gradient(135deg, #f59e0b, #fbbf24);
 }
 
+.restricted-feature-icon-wrap.gradient-pink {
+  background: linear-gradient(135deg, #ec4899, #f472b6);
+}
+
+.restricted-feature-icon-wrap.gradient-teal {
+  background: linear-gradient(135deg, #14b8a6, #2dd4bf);
+}
+
+.restricted-feature-icon-wrap.gradient-indigo {
+  background: linear-gradient(135deg, #6366f1, #818cf8);
+}
+
+.restricted-feature-icon-wrap.gradient-rose {
+  background: linear-gradient(135deg, #e11d48, #fb7185);
+}
+
 .restricted-feature-text strong {
   display: block;
   font-size: 13px;
@@ -770,4 +786,16 @@
   line-height: 1.5;
   color: var(--text-secondary);
   margin: 0;
+}
+
+/* Inline links in the subtitle (website / GitHub) */
+.restricted-inline-link {
+  color: var(--text-tertiary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  transition: color 0.15s;
+}
+
+.restricted-inline-link:hover {
+  color: var(--primary-color);
 }

@@ -3,7 +3,12 @@
 import { MESSAGE_TYPES } from '../shared/constants';
 import { t } from '../shared/i18n';
 import type { ImageItem } from '../shared/types';
-import { clearSelection, downloadSelectedAsZip, hideDownloadDropdown, selectAll } from './actions';
+import {
+  downloadSelectedAsZip,
+  hideDownloadDropdown,
+  removeAllHighlightsOnPage,
+  selectAll,
+} from './actions';
 import { applyFilters } from './filter';
 import { isWithinTabSwitchGrace } from './init';
 import { processImageExtras, updateScanProgress } from './scan';
@@ -290,10 +295,10 @@ export function handleKeyDown(e: KeyboardEvent): void {
     }
     hideDownloadDropdown();
     closeAllFilterDropdowns();
-    // Clear selection and remove page highlights
-    if (state.selectedImages.size > 0) {
-      clearSelection();
-    }
+    // Only remove page highlights — preserve selection state and scroll
+    // position. ESC is just exiting the page highlight view, not
+    // deselecting images in the list.
+    removeAllHighlightsOnPage();
     return;
   }
 

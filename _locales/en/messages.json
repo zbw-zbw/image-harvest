@@ -204,6 +204,9 @@
   "filter_tab": {
     "message": "Tab"
   },
+  "sort_none": {
+    "message": "None (Page order)"
+  },
   "sort_size_desc": {
     "message": "Size ↓ (Large first)"
   },
@@ -386,6 +389,9 @@
   },
   "btn_deactivate": {
     "message": "Deactivate"
+  },
+  "license_deactivating": {
+    "message": "Deactivating..."
   },
   "card_add_to_collection": {
     "message": "Add to collection"
@@ -884,5 +890,62 @@
   },
   "toast_multitab_failed": {
     "message": "Multi-tab extraction failed"
+  },
+  "restricted_notice": {
+    "message": "This page does not allow extensions to inject scripts. Navigate to a regular webpage (e.g. an article, gallery, or search results) to start extracting images."
+  },
+  "restricted_features_heading": {
+    "message": "What you can do with Image Harvest"
+  },
+  "restricted_feature_batch_title": {
+    "message": "Batch Download"
+  },
+  "restricted_feature_batch_desc": {
+    "message": "Select and download all images from any webpage with one click. Filter by size, format, or layout."
+  },
+  "restricted_feature_dedup_title": {
+    "message": "Similar Image Detection"
+  },
+  "restricted_feature_dedup_desc": {
+    "message": "Automatically find and remove near-duplicate images using perceptual hashing."
+  },
+  "restricted_feature_reverse_title": {
+    "message": "Reverse Image Search"
+  },
+  "restricted_feature_reverse_desc": {
+    "message": "Look up any image across Google, TinEye, Yandex, and Baidu with a single click."
+  },
+  "restricted_feature_multitab_title": {
+    "message": "Multi-Tab Extract"
+  },
+  "restricted_feature_multitab_desc": {
+    "message": "Extract images from multiple open tabs at once and download them all in a ZIP archive."
+  },
+  "restricted_feature_color_title": {
+    "message": "Color Extraction"
+  },
+  "restricted_feature_color_desc": {
+    "message": "Automatically extract dominant colors from each image. Click any swatch to copy the hex code."
+  },
+  "restricted_feature_filter_title": {
+    "message": "Smart Filters"
+  },
+  "restricted_feature_filter_desc": {
+    "message": "Filter images by size, type, layout, URL pattern, or dominant color to find exactly what you need."
+  },
+  "restricted_feature_collection_title": {
+    "message": "Favorites Collection"
+  },
+  "restricted_feature_collection_desc": {
+    "message": "Bookmark images to a persistent collection that stays across sessions. Organize and revisit anytime."
+  },
+  "restricted_feature_preview_title": {
+    "message": "Instant Preview"
+  },
+  "restricted_feature_preview_desc": {
+    "message": "View full-resolution images with metadata — dimensions, file size, and format — at a glance."
+  },
+  "restricted_link_website": {
+    "message": "Official Website"
   }
 }

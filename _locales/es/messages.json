@@ -194,6 +194,9 @@
   "filter_tab": {
     "message": "Pestaña"
   },
+  "sort_none": {
+    "message": "Ninguno (Orden de página)"
+  },
   "sort_size_desc": {
     "message": "Tamaño ↓ (Mayor primero)"
   },
@@ -376,6 +379,9 @@
   },
   "btn_deactivate": {
     "message": "Desactivar"
+  },
+  "license_deactivating": {
+    "message": "Desactivando..."
   },
   "card_add_to_collection": {
     "message": "Agregar a colección"
@@ -880,5 +886,62 @@
   },
   "collection_empty_hint": {
     "message": "Haz clic en el icono de estrella de cualquier imagen para añadirla a tu colección"
+  },
+  "restricted_notice": {
+    "message": "Esta página no permite que las extensiones inyecten scripts. Navega a una página web normal (por ejemplo, un artículo, galería o resultados de búsqueda) para comenzar a extraer imágenes."
+  },
+  "restricted_features_heading": {
+    "message": "Lo que puedes hacer con Image Harvest"
+  },
+  "restricted_feature_batch_title": {
+    "message": "Descarga por lotes"
+  },
+  "restricted_feature_batch_desc": {
+    "message": "Selecciona y descarga todas las imágenes de cualquier página web con un clic. Filtra por tamaño, formato o disposición."
+  },
+  "restricted_feature_dedup_title": {
+    "message": "Detección de imágenes similares"
+  },
+  "restricted_feature_dedup_desc": {
+    "message": "Encuentra y elimina automáticamente imágenes casi duplicadas usando hash perceptual."
+  },
+  "restricted_feature_reverse_title": {
+    "message": "Búsqueda inversa de imágenes"
+  },
+  "restricted_feature_reverse_desc": {
+    "message": "Busca cualquier imagen en Google, TinEye, Yandex y Baidu con un solo clic."
+  },
+  "restricted_feature_multitab_title": {
+    "message": "Extracción multi-pestaña"
+  },
+  "restricted_feature_multitab_desc": {
+    "message": "Extrae imágenes de múltiples pestañas abiertas a la vez y descárgalas en un archivo ZIP."
+  },
+  "restricted_feature_color_title": {
+    "message": "Extracción de colores"
+  },
+  "restricted_feature_color_desc": {
+    "message": "Extrae automáticamente los colores dominantes de cada imagen. Haz clic en cualquier muestra para copiar el código hex."
+  },
+  "restricted_feature_filter_title": {
+    "message": "Filtros inteligentes"
+  },
+  "restricted_feature_filter_desc": {
+    "message": "Filtra imágenes por tamaño, tipo, disposición, patrón de URL o color dominante para encontrar exactamente lo que necesitas."
+  },
+  "restricted_feature_collection_title": {
+    "message": "Colección de favoritos"
+  },
+  "restricted_feature_collection_desc": {
+    "message": "Guarda imágenes en una colección persistente que se mantiene entre sesiones. Organiza y revisa en cualquier momento."
+  },
+  "restricted_feature_preview_title": {
+    "message": "Vista previa instantánea"
+  },
+  "restricted_feature_preview_desc": {
+    "message": "Visualiza imágenes en resolución completa con metadatos — dimensiones, tamaño de archivo y formato — de un vistazo."
+  },
+  "restricted_link_website": {
+    "message": "Sitio web oficial"
   }
 }
