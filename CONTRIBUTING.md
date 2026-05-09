@@ -271,6 +271,30 @@ To keep the project focused and its values consistent, the following will be rej
 - ❌ **Reformatting existing code style-only**, unless pre-agreed in an issue
 - ❌ **AI-generated PRs with no human review** — please actually read what the AI wrote
 
+## Coordinated Releases
+
+Most contributions are pure-frontend and can ship independently — go ahead.
+
+A small set of features depends on a hosted service (license activation,
+Pro trial, anonymous telemetry, reverse-image-search proxy). The endpoints
+those features call are documented at the production URLs they hit (see
+`shared/license.ts`, `shared/constants.ts`). If your PR changes any of the
+following, please **open an issue first** so we can coordinate the rollout:
+
+- Request / response **field shape** of any `/api/license/*`,
+  `/api/trial/*`, or `/api/telemetry` call
+- New or removed Pro-only feature flags
+- Anything that would make an older installed extension stop working
+  against the live backend (we cannot force-update users instantly)
+
+The reason: the server side is a separate deploy that needs to ship
+**before** the extension can rely on the new contract. Maintainer will
+sequence the two releases (backend first → verify → then publish the new
+extension version).
+
+Bug fixes, UI tweaks, refactors, tests, docs, translations, and any
+purely-local feature do **not** need this coordination — just open the PR.
+
 ## License
 
 By contributing, you agree that your contributions will be licensed under the [MIT License](./LICENSE) that covers the project.

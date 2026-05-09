@@ -420,7 +420,7 @@ The marketing site for Image Harvest (landing page, pricing, FAQ, license activa
 
 See [CHANGELOG.md](./CHANGELOG.md) for the full release history.
 
-**Latest**: `v1.0.0` — 🎉 Initial public release on Chrome Web Store.
+**Latest**: `v1.0.2` — 🌍 5-language UI (EN/中/繁/日/Es), 🆓 7-day Pro trial, 📋 batch URL copy, 💳 Creem checkout migration, and the first wave of anonymous opt-in telemetry. See [CHANGELOG.md](./CHANGELOG.md) for the full list.
 
 ---
 
