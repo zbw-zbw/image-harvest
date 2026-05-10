@@ -35,6 +35,7 @@ export interface PortListenerBuckets {
 
 export interface ChromeMock {
   runtime: {
+    id: string;
     sendMessage: AnyFn;
     connect: AnyFn;
     lastError: chrome.runtime.LastError | null;
@@ -94,6 +95,7 @@ export function installChromeMock(options: InstallOptions = {}): ChromeMock {
 
   const mock: ChromeMock = {
     runtime: {
+      id: 'test-extension-id',
       sendMessage: vi.fn().mockResolvedValue({}),
       connect: vi.fn(() => ({
         name: 'image-harvest-ui',

@@ -55,7 +55,7 @@ import {
   updateLiveIndicator,
 } from './settings';
 import { clearTabImageCache, getTabImageCache, saveTabImageCache } from '../shared/storage';
-import { elements, state } from './state';
+import { elements, state, store } from './state';
 import {
   applyTranslations,
   handleProgressClose,
@@ -83,6 +83,27 @@ const TAB_SWITCH_GRACE_MS = 2000;
 /** Check if we are still within the grace period after a tab switch. */
 export function isWithinTabSwitchGrace(): boolean {
   return Date.now() - lastTabSwitchTime < TAB_SWITCH_GRACE_MS;
+}
+
+// Flag set by uiPort.onDisconnect — signals that the extension has been
+// reloaded and chrome.* APIs are no longer valid. All event listeners
+// (onActivated, onUpdated, visibilitychange) check this before calling
+// any chrome.* API to prevent crashing Chrome.
+let extensionContextInvalidated = false;
+
+/**
+ * Returns true if the extension context is still valid. When the extension
+ * is reloaded from chrome://extensions, the background SW disconnects and
+ * chrome.runtime.id becomes undefined. Continuing to call chrome.tabs.*
+ * or chrome.runtime.* in this state can crash the entire browser.
+ */
+function isExtensionContextValid(): boolean {
+  if (extensionContextInvalidated) return false;
+  if (!chrome.runtime?.id) {
+    extensionContextInvalidated = true;
+    return false;
+  }
+  return true;
 }
 
 // ============================================
@@ -200,6 +221,15 @@ async function init(): Promise<void> {
   try {
     const uiPort = chrome.runtime.connect({ name: 'image-harvest-ui' });
     uiPort.onMessage.addListener(handleMessage);
+    // When the extension is reloaded (e.g. developer clicks the refresh
+    // button on chrome://extensions), the background SW is torn down and
+    // the port disconnects. Without this handler, sidepanel listeners
+    // (onActivated, onUpdated, visibilitychange) keep firing and call
+    // chrome.tabs/runtime APIs on the now-invalid extension context,
+    // which can crash the entire Chrome process.
+    uiPort.onDisconnect.addListener(() => {
+      extensionContextInvalidated = true;
+    });
   } catch (error) {
     console.warn('Failed to connect to background — will retry via sendMessage:', error);
   }
@@ -210,6 +240,7 @@ async function init(): Promise<void> {
     chrome.tabs.onUpdated.addListener(handleTabUpdated);
     // Clean up cache when a tab is closed
     chrome.tabs.onRemoved.addListener((tabId) => {
+      if (!isExtensionContextValid()) return;
       state.tabCache.delete(tabId);
       clearTabImageCache(tabId);
     });
@@ -217,6 +248,7 @@ async function init(): Promise<void> {
 
   // Clean up page highlights when side panel / popup is closed
   window.addEventListener('beforeunload', () => {
+    if (!isExtensionContextValid()) return;
     removeAllHighlightsOnPage();
     // Notify background to stop tracking this tab's side panel
     if (!state.isPopupMode && state.currentTabId != null) {
@@ -236,6 +268,7 @@ async function init(): Promise<void> {
     let lastHiddenTime = 0;
 
     document.addEventListener('visibilitychange', () => {
+      if (!isExtensionContextValid()) return;
       if (document.visibilityState === 'hidden') {
         lastHiddenTime = Date.now();
       } else if (document.visibilityState === 'visible' && state.isInitialized) {
@@ -245,19 +278,26 @@ async function init(): Promise<void> {
         }
         // Only trigger rescan if the panel was hidden for more than 1 second
         const wasHiddenLong = Date.now() - lastHiddenTime > 1000;
-        if (!wasHiddenLong) return;
+        if (!wasHiddenLong) {
+          return;
+        }
 
         lastHiddenTime = 0;
 
-        // If we already have images for the current tab (either in memory
-        // cache or currently displayed), skip the rescan.
-        if (state.currentTabId != null) {
-          if (state.tabCache.has(state.currentTabId) || state.allImages.length > 0) {
-            return;
-          }
+        // When currentTabId is null the user is on a restricted page (e.g.
+        // chrome://) — don't trigger loadCurrentTab here; handleTabChange
+        // will handle it when the user switches to a real tab.
+        if (state.currentTabId == null) {
+          return;
         }
 
-        loadCurrentTab(false, state.currentTabId ?? undefined);
+        // If we already have images for the current tab (either in memory
+        // cache or currently displayed), skip the rescan.
+        if (state.tabCache.has(state.currentTabId) || state.allImages.length > 0) {
+          return;
+        }
+
+        loadCurrentTab(false, state.currentTabId);
       }
     });
   }
@@ -397,6 +437,7 @@ async function loadCurrentTab(forceRescan = false, targetTabId?: number): Promis
 }
 
 async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Promise<void> {
+  if (!isExtensionContextValid()) return;
   const newTabId = activeInfo.tabId;
 
   // Save current tab state to cache before switching
@@ -447,26 +488,37 @@ async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Promise<v
   // Fast path (synchronous)
   if (cached) {
     try {
-      // ── IMPORTANT: assign filteredImages BEFORE allImages ──
-      // The store proxy notifies Preact subscribers on every state.xxx
-      // assignment.  If allImages is assigned first, subscribers (e.g.
-      // FoundActionCount) re-render and read filteredImages — which still
-      // holds the *previous* tab's data, causing a single-frame flash of
-      // the wrong count / image list.  By assigning filteredImages first
-      // we guarantee that any subscriber triggered by the subsequent
-      // allImages assignment already sees the correct filtered data.
-      if (cached.filteredImages && cached.filteredImages.length > 0) {
-        state.filteredImages = cached.filteredImages;
-        state.lastRenderedFilteredIds = cached.lastRenderedFilteredIds ?? null;
-      }
+      // ── Hide the grid while we swap data so the user never sees the
+      // intermediate state (old images → new images). We use
+      // visibility:hidden (not display:none) to keep layout stable.
+      const gridWrapper = document.querySelector('.image-grid-wrapper') as HTMLElement | null;
+      if (gridWrapper) gridWrapper.style.visibility = 'hidden';
 
-      state.allImages = cached.images;
-      state.selectedImages = cached.selectedImages;
+      // ── Determine up-front whether the filtered image set changed ──
+      const cachedFilteredIds = cached.lastRenderedFilteredIds ?? null;
+      const isSameFilteredSet =
+        cachedFilteredIds != null && cachedFilteredIds === state.lastRenderedFilteredIds;
+
+      // Batch all state assignments to avoid intermediate Preact renders.
+      const patch: Record<string, unknown> = {
+        allImages: cached.images,
+        selectedImages: cached.selectedImages,
+      };
+      // Only assign filteredImages when the content actually changed.
+      // Cached arrays are spread-copies ([...arr]) so their reference
+      // always differs — assigning them unconditionally would trigger
+      // ImageGrid's useStoreSelector to re-render all cards.
+      if (!isSameFilteredSet && cached.filteredImages && cached.filteredImages.length > 0) {
+        patch.filteredImages = cached.filteredImages;
+        patch.lastRenderedFilteredIds = cachedFilteredIds;
+      }
+      store.setMany(patch as Partial<typeof state>);
+
       hideLoading();
       hideRestricted();
 
       // If no cached filteredImages were available, derive them now.
-      if (!cached.filteredImages || cached.filteredImages.length === 0) {
+      if (!isSameFilteredSet && (!cached.filteredImages || cached.filteredImages.length === 0)) {
         applyFilters();
       }
 
@@ -478,18 +530,25 @@ async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Promise<v
 
       updateSelectionUI();
 
-      // Only re-render when the filtered image list actually changed.
-      // If the user simply switched away and came back to the same tab
-      // with identical data, skip renderImages() to avoid a visual flash
-      // (renderImages resets scrollTop and triggers Preact reconciliation).
-      const cachedFilteredIds = cached.lastRenderedFilteredIds ?? null;
-      const needsRender = !cachedFilteredIds || cachedFilteredIds !== state.lastRenderedFilteredIds;
-      if (needsRender) {
-        console.debug('[tab-switch] filteredIds changed or missing – re-rendering');
-        renderImages();
+      if (!isSameFilteredSet) {
+        renderImages({ skipScrollReset: true });
       } else {
-        console.debug('[tab-switch] filteredIds unchanged – skipping renderImages');
+        // Ensure the grid element is visible after showRestricted hid it.
+        if (elements.imageGrid) elements.imageGrid.classList.remove('hidden');
+        state.uiScreen = 'images';
       }
+
+      // Reveal the grid after Preact has finished rendering the new cards.
+      // Double-rAF ensures we're past the paint that contains the new DOM.
+      requestAnimationFrame(() => {
+        requestAnimationFrame(() => {
+          if (gridWrapper) {
+            gridWrapper.style.visibility = '';
+            gridWrapper.classList.remove('hidden');
+            gridWrapper.style.display = '';
+          }
+        });
+      });
 
       // Verify the URL still matches asynchronously
       try {
@@ -577,6 +636,7 @@ function handleTabUpdated(
   changeInfo: chrome.tabs.TabChangeInfo,
   tab: chrome.tabs.Tab
 ): void {
+  if (!isExtensionContextValid()) return;
   // Only react to URL changes / completed loads
   if (!changeInfo.url && changeInfo.status !== 'complete') return;
 

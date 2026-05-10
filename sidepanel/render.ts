@@ -71,7 +71,7 @@ export function renderProgressiveImages(): void {
   updateSelectionUI();
 }
 
-export function renderImages(): void {
+export function renderImages(options?: { skipScrollReset?: boolean }): void {
   if (!elements.imageGrid) return;
 
   // Final render pass: clear any leftover skeletons so the grid shows only
@@ -101,8 +101,11 @@ export function renderImages(): void {
 
   elements.imageGrid.classList.remove('hidden');
 
-  // Always scroll to top on re-render so the user sees images from the beginning
-  elements.imageGrid.scrollTop = 0;
+  // Scroll to top on re-render so the user sees images from the beginning,
+  // unless the caller explicitly opts out (e.g. tab-switch cache restore).
+  if (!options?.skipScrollReset) {
+    elements.imageGrid.scrollTop = 0;
+  }
 
   // Re-check narrow mode after grid becomes visible (important for popup mode
   // where initial check may see clientWidth=0 when grid was hidden)

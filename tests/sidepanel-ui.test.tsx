@@ -759,13 +759,20 @@ describe('updateFilterButtonLabels', () => {
 
   it('labels "Size" + inactive when size filter is "all" + no min/max', async () => {
     const { updateFilterButtonLabels } = await import('../sidepanel/ui');
+    // customMinEnabled / customMaxEnabled must match the appSettings defaults
+    // (enableMinSize=true, enableMaxSize=true) so the X button logic correctly
+    // treats this as "unchanged from defaults → no clear button".
     state.activeFilters = {
       ...state.activeFilters,
       size: 'all',
       sizeMin: 0,
       sizeMax: Infinity,
-      customMinEnabled: false,
-      customMaxEnabled: false,
+      customMinEnabled: true,
+      customMinWidth: 0,
+      customMinHeight: 0,
+      customMaxEnabled: true,
+      customMaxWidth: 99999,
+      customMaxHeight: 99999,
     };
     updateFilterButtonLabels();
     const btn = document.querySelector<HTMLElement>('.filter-btn[data-filter="size"]')!;

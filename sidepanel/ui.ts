@@ -57,13 +57,20 @@ export function updateFilterButtonLabels(): void {
   // Size button
   const sizeBtn = document.querySelector<HTMLElement>('.filter-btn[data-filter="size"]');
   if (sizeBtn) {
+    // Only show X button when the user has manually changed the custom size
+    // inputs away from the global settings defaults (not absolute 0/Infinity).
+    const settingsMinW = state.appSettings.minWidth ?? 0;
+    const settingsMinH = state.appSettings.minHeight ?? 0;
+    const settingsMaxW = state.appSettings.maxWidth ?? 99999;
+    const settingsMaxH = state.appSettings.maxHeight ?? 99999;
     const hasCustomMin =
-      state.activeFilters.customMinEnabled &&
-      (state.activeFilters.customMinWidth > 0 || state.activeFilters.customMinHeight > 0);
+      state.activeFilters.customMinEnabled !== state.appSettings.enableMinSize ||
+      state.activeFilters.customMinWidth !== settingsMinW ||
+      state.activeFilters.customMinHeight !== settingsMinH;
     const hasCustomMax =
-      state.activeFilters.customMaxEnabled &&
-      (state.activeFilters.customMaxWidth < Infinity ||
-        state.activeFilters.customMaxHeight < Infinity);
+      state.activeFilters.customMaxEnabled !== state.appSettings.enableMaxSize ||
+      state.activeFilters.customMaxWidth !== settingsMaxW ||
+      state.activeFilters.customMaxHeight !== settingsMaxH;
     const hasSizeFilter =
       state.activeFilters.size !== 'all' ||
       state.activeFilters.sizeMin > 0 ||
