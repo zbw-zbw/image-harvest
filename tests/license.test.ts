@@ -62,6 +62,54 @@ describe('getOrCreateInstanceId', () => {
     expect(a).toBe(b);
     expect(a).toMatch(/^inst_/);
   });
+
+  it('retries and succeeds after a transient storage failure', async () => {
+    // Simulate: first get() throws, second get() works (empty → creates new id).
+    const originalGet = (globalThis as any).chrome.storage.local.get;
+    let callCount = 0;
+    (globalThis as any).chrome.storage.local.get = async (...args: any[]) => {
+      callCount++;
+      if (callCount === 1) throw new Error('transient storage failure');
+      return originalGet(...args);
+    };
+
+    const id = await getOrCreateInstanceId();
+    // Should have retried and produced a normal id, NOT a fallback.
+    expect(id).toMatch(/^inst_/);
+    expect(id).not.toMatch(/^inst_fallback_/);
+    // Verify it was persisted (second call returns the same id).
+    (globalThis as any).chrome.storage.local.get = originalGet;
+    const id2 = await getOrCreateInstanceId();
+    expect(id2).toBe(id);
+  });
+
+  it('returns inst_fallback_ id when all retry attempts fail', async () => {
+    // Force every storage call to throw.
+    (globalThis as any).chrome.storage.local.get = async () => {
+      throw new Error('storage permanently broken');
+    };
+    (globalThis as any).chrome.storage.local.set = async () => {
+      throw new Error('storage permanently broken');
+    };
+
+    const id = await getOrCreateInstanceId();
+    expect(id).toMatch(/^inst_fallback_/);
+  });
+
+  it('fallback id contains a numeric timestamp suffix', async () => {
+    (globalThis as any).chrome.storage.local.get = async () => {
+      throw new Error('broken');
+    };
+    (globalThis as any).chrome.storage.local.set = async () => {
+      throw new Error('broken');
+    };
+
+    const id = await getOrCreateInstanceId();
+    const suffix = id.replace('inst_fallback_', '');
+    // Date.now() produces a number; the suffix should parse as one.
+    expect(Number(suffix)).toBeGreaterThan(0);
+    expect(Number.isFinite(Number(suffix))).toBe(true);
+  });
 });
 
 describe('activateLicense', () => {

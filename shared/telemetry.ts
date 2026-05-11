@@ -140,6 +140,10 @@ export async function track(
   name: TelemetryEventName | string,
   props?: TelemetryProps
 ): Promise<void> {
+  // Completely silence telemetry in dev builds so local development
+  // does not pollute the production analytics database.
+  if (typeof __DEV__ !== 'undefined' && __DEV__) return;
+
   const opted = await isOptedIn();
   if (!opted) return;
   if (!isKnownEvent(name)) {

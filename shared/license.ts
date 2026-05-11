@@ -21,18 +21,31 @@ interface DeactivationResult {
 
 /** Stable per-installation identifier; created on first call, persisted. */
 export async function getOrCreateInstanceId(): Promise<string> {
-  try {
-    const result = await chrome.storage.local.get('instanceId');
-    if (result.instanceId) return result.instanceId as string;
+  // Retry up to 3 times with a short delay to ride out transient storage
+  // failures (e.g. extension context briefly invalid after an update).
+  const maxRetries = 3;
+  const retryDelayMs = 200;
 
-    const id =
-      'inst_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 10);
-    await chrome.storage.local.set({ instanceId: id });
-    return id;
-  } catch (error) {
-    console.error('Failed to get/create instance ID:', error);
-    return 'inst_fallback_' + Date.now();
+  for (let attempt = 0; attempt < maxRetries; attempt++) {
+    try {
+      const result = await chrome.storage.local.get('instanceId');
+      if (result.instanceId) return result.instanceId as string;
+
+      const id =
+        'inst_' + Date.now().toString(36) + '_' + Math.random().toString(36).substring(2, 10);
+      await chrome.storage.local.set({ instanceId: id });
+      return id;
+    } catch (error) {
+      if (attempt < maxRetries - 1) {
+        await new Promise((resolve) => setTimeout(resolve, retryDelayMs));
+        continue;
+      }
+      console.error('Failed to get/create instance ID after retries:', error);
+      return 'inst_fallback_' + Date.now();
+    }
   }
+  // Unreachable, but satisfies TypeScript's control-flow analysis.
+  return 'inst_fallback_' + Date.now();
 }
 
 export async function saveLicenseData(data: LicenseData): Promise<boolean> {

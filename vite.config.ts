@@ -42,7 +42,13 @@ function copyStaticAssetsPlugin(): Plugin {
 // the largest chunks. Off by default so production builds stay clean.
 const analyze = process.env.ANALYZE === '1';
 
-export default defineConfig({
+export default defineConfig(({ mode }) => ({
+  // Compile-time constants injected into the bundle. `__DEV__` is used by
+  // shared/telemetry.ts to completely disable telemetry in dev builds so
+  // local development does not pollute the production analytics database.
+  define: {
+    __DEV__: JSON.stringify(mode !== 'production'),
+  },
   // Preact JSX automatic runtime — matches the tsconfig "jsxImportSource":
   // "preact" setting so `.tsx` files compile without an explicit `h` import.
   esbuild: {
@@ -124,4 +130,4 @@ export default defineConfig({
       port: 5173,
     },
   },
-});
+}));

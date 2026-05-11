@@ -265,6 +265,77 @@ describe('startTrial', () => {
     expect(result.success).toBe(false);
     expect(mockSaveLicenseData).not.toHaveBeenCalled();
   });
+
+  it('fallback instanceId → trial still succeeds and sends source="fallback"', async () => {
+    mockGetOrCreateInstanceId.mockResolvedValueOnce('inst_fallback_1234567890');
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        success: true,
+        licenseKey: 'TRIAL-FALL-BACK-TEST',
+        plan: 'trial',
+        expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
+      }),
+    });
+
+    const { startTrial } = await import('../shared/trial');
+    const result = await startTrial();
+
+    // Must NOT block the user — trial should succeed even with a fallback ID.
+    expect(result.success).toBe(true);
+    expect(result.plan).toBe('trial');
+
+    // The request body must include source='fallback' for traceability.
+    const fetchBody = JSON.parse(fetchMock.mock.calls[0][1].body as string);
+    expect(fetchBody.source).toBe('fallback');
+    expect(fetchBody.instanceId).toBe('inst_fallback_1234567890');
+  });
+
+  it('normal instanceId → sends source="normal" in request body', async () => {
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        success: true,
+        licenseKey: 'TRIAL-NORM-ALID-TEST',
+        plan: 'trial',
+        expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
+      }),
+    });
+
+    const { startTrial } = await import('../shared/trial');
+    const result = await startTrial();
+
+    expect(result.success).toBe(true);
+    const fetchBody = JSON.parse(fetchMock.mock.calls[0][1].body as string);
+    expect(fetchBody.source).toBe('normal');
+    expect(fetchBody.instanceId).toBe('inst_abc123');
+  });
+
+  it('saveLicenseData returns false → trial still returns success (server state is authoritative)', async () => {
+    mockSaveLicenseData.mockResolvedValueOnce(false);
+    fetchMock.mockResolvedValueOnce({
+      ok: true,
+      status: 200,
+      json: async () => ({
+        success: true,
+        licenseKey: 'TRIAL-SAVE-FAIL-TEST',
+        plan: 'trial',
+        expiresAt: Date.now() + 7 * 24 * 60 * 60 * 1000,
+      }),
+    });
+
+    const { startTrial } = await import('../shared/trial');
+    const result = await startTrial();
+
+    // Pin: the server has already minted the trial. Even if local
+    // persistence fails, the next isProUser() call will re-validate
+    // against the server and recover. Blocking the user here would
+    // be worse than a degraded local cache.
+    expect(result.success).toBe(true);
+    expect(mockSaveLicenseData).toHaveBeenCalledTimes(1);
+  });
 });
 
 // ────────────────────────────────────────────────────────────────────────────

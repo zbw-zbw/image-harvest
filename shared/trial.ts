@@ -94,12 +94,16 @@ export async function startTrial(): Promise<TrialStartResult> {
   }
 
   const instanceId = await getOrCreateInstanceId();
+  // Tag fallback IDs so the server can persist the source for traceability
+  // without blocking the user from starting a trial.
+  const source = instanceId.startsWith('inst_fallback_') ? 'fallback' : 'normal';
+
   let response: TrialApiResponse;
   try {
     const resp = await fetch(LICENSE_API_URL.replace(/\/license$/, '/trial/start'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ instanceId }),
+      body: JSON.stringify({ instanceId, source }),
     });
     if (!resp.ok) {
       // 409 = server says you've already redeemed. Persist the sentinel
@@ -145,7 +149,10 @@ export async function startTrial(): Promise<TrialStartResult> {
     lastVerified: Date.now(),
     instanceId,
   };
-  await saveLicenseData(licenseData);
+  const saved = await saveLicenseData(licenseData);
+  if (!saved) {
+    console.warn('Trial started server-side but local persistence failed.');
+  }
 
   // Local sentinel — also a redemption record. Stored separately from
   // the license itself so a future deactivate doesn't make the user
