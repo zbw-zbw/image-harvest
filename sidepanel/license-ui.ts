@@ -125,7 +125,7 @@ export async function activateLicenseFromInput(
       showToast(t('toast_pro_activated'), 'success');
     } else {
       if (errorEl) {
-        errorEl.textContent = result?.error || t('license_activation_failed');
+        errorEl.textContent = t(result?.error || 'license_activation_failed');
         errorEl.classList.remove('hidden');
       }
     }

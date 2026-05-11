@@ -89,7 +89,7 @@ async function handleStartTrial(
   try {
     const result = await startTrialFn();
     if (!result.success) {
-      setError(result.error || t('pro_trial_start_failed'));
+      setError(t(result.error || 'pro_trial_start_failed'));
       return;
     }
     void track(EVENTS.TRIAL_STARTED);

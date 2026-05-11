@@ -1,0 +1,971 @@
+{
+  "app_name": {
+    "message": "Image Harvest"
+  },
+  "app_tagline": {
+    "message": "حمّل أي صورة من أي صفحة ويب"
+  },
+  "common_cancel": {
+    "message": "إلغاء"
+  },
+  "common_confirm": {
+    "message": "تأكيد"
+  },
+  "common_close": {
+    "message": "إغلاق"
+  },
+  "common_save": {
+    "message": "حفظ"
+  },
+  "common_delete": {
+    "message": "حذف"
+  },
+  "common_copy": {
+    "message": "نسخ"
+  },
+  "common_download": {
+    "message": "تحميل"
+  },
+  "common_upgrade": {
+    "message": "الترقية إلى Pro"
+  },
+  "common_maybe_later": {
+    "message": "ربما لاحقًا"
+  },
+  "settings_title": {
+    "message": "الإعدادات"
+  },
+  "settings_section_appearance": {
+    "message": "المظهر"
+  },
+  "settings_section_experience": {
+    "message": "التجربة"
+  },
+  "settings_section_scan": {
+    "message": "المسح"
+  },
+  "settings_section_download": {
+    "message": "التحميل"
+  },
+  "settings_section_language": {
+    "message": "اللغة"
+  },
+  "settings_language_label": {
+    "message": "لغة العرض"
+  },
+  "toolbar_select_all": {
+    "message": "تحديد الكل"
+  },
+  "toolbar_deselect_all": {
+    "message": "إلغاء تحديد الكل"
+  },
+  "toolbar_copy_urls": {
+    "message": "نسخ الروابط"
+  },
+  "toolbar_copy_urls_tooltip": {
+    "message": "نسخ روابط الصور المحددة إلى الحافظة"
+  },
+  "toolbar_copy_urls_empty": {
+    "message": "حدد الصور أولاً"
+  },
+  "toast_url_copied_single": {
+    "message": "تم نسخ الرابط!"
+  },
+  "toast_url_copied_batch": {
+    "message": "تم نسخ {count} رابط إلى الحافظة"
+  },
+  "toast_url_copy_failed": {
+    "message": "فشل نسخ الرابط"
+  },
+  "toast_download_started": {
+    "message": "بدأ التحميل"
+  },
+  "toast_download_failed": {
+    "message": "فشل التحميل"
+  },
+  "toast_download_cancelled": {
+    "message": "تم إلغاء التحميل"
+  },
+  "toast_download_completed": {
+    "message": "تم تحميل {count} صورة"
+  },
+  "toast_no_images_selected": {
+    "message": "لم يتم تحديد أي صور"
+  },
+  "toast_image_removed": {
+    "message": "تمت إزالة الصورة"
+  },
+  "toast_collection_added": {
+    "message": "تمت الإضافة إلى المجموعة"
+  },
+  "toast_collection_add_failed": {
+    "message": "فشلت الإضافة إلى المجموعة"
+  },
+  "toast_collection_removed": {
+    "message": "تمت الإزالة من المجموعة"
+  },
+  "toast_collection_remove_failed": {
+    "message": "فشلت الإزالة"
+  },
+  "toast_color_copied": {
+    "message": "تم نسخ اللون {hex}"
+  },
+  "toast_color_copy_failed": {
+    "message": "فشل نسخ اللون"
+  },
+  "pro_feature_blocked_format_conversion": {
+    "message": "تحويل الصيغ ميزة Pro. قم بالترقية لفتحها!"
+  },
+  "pro_feature_blocked_advanced_grouping": {
+    "message": "التجميع المتقدم ميزة Pro. قم بالترقية لفتحها!"
+  },
+  "pro_feature_blocked_collection": {
+    "message": "المجموعة ميزة Pro"
+  },
+  "pro_feature_blocked_image_delete": {
+    "message": "إزالة الصور ميزة Pro. قم بالترقية لفتحها!"
+  },
+  "pro_feature_blocked_color_copy": {
+    "message": "نسخ الألوان ميزة Pro"
+  },
+  "pro_feature_blocked_reverse_search": {
+    "message": "البحث عبر {engine} يتطلب Pro. قم بالترقية لفتحه!"
+  },
+  "pro_zip_limit": {
+    "message": "الخطة المجانية تسمح بـ {max} صورة كحد أقصى لكل ZIP. قم بالترقية إلى Pro للحصول على عدد غير محدود!"
+  },
+  "pro_copy_urls_limit": {
+    "message": "الخطة المجانية تسمح بـ {max} رابط في المرة الواحدة. قم بالترقية إلى Pro للحصول على عدد غير محدود!"
+  },
+  "pro_collection_limit": {
+    "message": "الخطة المجانية تسمح بـ {max} مفضلة كحد أقصى. قم بالترقية إلى Pro للحصول على عدد غير محدود!"
+  },
+  "toolbar_sort": {
+    "message": "ترتيب"
+  },
+  "toolbar_group": {
+    "message": "تجميع"
+  },
+  "toolbar_similar": {
+    "message": "مشابهة"
+  },
+  "status_similar_count": {
+    "message": "{count} مشابهة"
+  },
+  "toolbar_rescan": {
+    "message": "إعادة المسح"
+  },
+  "toolbar_download_all": {
+    "message": "تحميل الكل"
+  },
+  "toolbar_download_selected": {
+    "message": "تحميل ({count})"
+  },
+  "filter_size": {
+    "message": "الحجم"
+  },
+  "filter_type": {
+    "message": "النوع"
+  },
+  "filter_layout": {
+    "message": "التخطيط"
+  },
+  "filter_url": {
+    "message": "URL"
+  },
+  "filter_color": {
+    "message": "اللون"
+  },
+  "filter_all": {
+    "message": "الكل"
+  },
+  "filter_min_width": {
+    "message": "أدنى عرض"
+  },
+  "filter_max_width": {
+    "message": "أقصى عرض"
+  },
+  "filter_height": {
+    "message": "ا"
+  },
+  "filter_none": {
+    "message": "لا شيء"
+  },
+  "filter_format": {
+    "message": "الصيغة"
+  },
+  "filter_domain": {
+    "message": "النطاق"
+  },
+  "filter_tab": {
+    "message": "علامة تبويب"
+  },
+  "sort_none": {
+    "message": "بلا (ترتيب الصفحة)"
+  },
+  "sort_size_desc": {
+    "message": "الحجم ↓ (الأكبر أولاً)"
+  },
+  "sort_size_asc": {
+    "message": "الحجم ↑ (الأصغر أولاً)"
+  },
+  "sort_filesize_desc": {
+    "message": "حجم الملف ↓ (الأكبر أولاً)"
+  },
+  "sort_filesize_asc": {
+    "message": "حجم الملف ↑ (الأصغر أولاً)"
+  },
+  "layout_all": {
+    "message": "الكل"
+  },
+  "layout_square": {
+    "message": "مربع (1:1)"
+  },
+  "layout_landscape": {
+    "message": "أفقي (>1:1)"
+  },
+  "layout_portrait": {
+    "message": "عمودي (<1:1)"
+  },
+  "layout_panorama": {
+    "message": "بانوراما (>2:1)"
+  },
+  "size_all": {
+    "message": "الكل"
+  },
+  "size_small": {
+    "message": "صغير < 100px"
+  },
+  "size_medium": {
+    "message": "متوسط 100-500px"
+  },
+  "size_large": {
+    "message": "كبير 500-1000px"
+  },
+  "size_xl": {
+    "message": "XL > 1000px"
+  },
+  "size_btn_small": {
+    "message": "صغير"
+  },
+  "size_btn_medium": {
+    "message": "متوسط"
+  },
+  "size_btn_large": {
+    "message": "كبير"
+  },
+  "size_btn_xl": {
+    "message": "XL"
+  },
+  "size_btn_custom": {
+    "message": "مخصص"
+  },
+  "layout_btn_square": {
+    "message": "مربع"
+  },
+  "layout_btn_landscape": {
+    "message": "أفقي"
+  },
+  "layout_btn_portrait": {
+    "message": "عمودي"
+  },
+  "layout_btn_panorama": {
+    "message": "بانوراما"
+  },
+  "color_all": {
+    "message": "كل الألوان"
+  },
+  "color_no_extracted": {
+    "message": "لم يتم استخراج الألوان بعد"
+  },
+  "filter_url_placeholder": {
+    "message": "تصفية حسب كلمة مفتاحية في الرابط..."
+  },
+  "settings_display": {
+    "message": "العرض"
+  },
+  "settings_side_panel": {
+    "message": "العرض في اللوحة الجانبية"
+  },
+  "settings_side_panel_desc": {
+    "message": "فتح النتائج في اللوحة الجانبية للمتصفح بدلاً من النافذة المنبثقة"
+  },
+  "settings_density": {
+    "message": "كثافة التخطيط:"
+  },
+  "settings_density_compact": {
+    "message": "مضغوط"
+  },
+  "settings_density_standard": {
+    "message": "قياسي"
+  },
+  "settings_density_comfortable": {
+    "message": "مريح"
+  },
+  "settings_theme": {
+    "message": "السمة:"
+  },
+  "settings_theme_system": {
+    "message": "النظام"
+  },
+  "settings_theme_light": {
+    "message": "فاتح"
+  },
+  "settings_theme_dark": {
+    "message": "داكن"
+  },
+  "settings_default_group": {
+    "message": "التجميع الافتراضي:"
+  },
+  "settings_similar": {
+    "message": "كشف الصور المتشابهة"
+  },
+  "settings_color_extract": {
+    "message": "استخراج الألوان"
+  },
+  "settings_all_frames": {
+    "message": "البحث في جميع الإطارات"
+  },
+  "settings_live_monitor": {
+    "message": "المراقبة المباشرة"
+  },
+  "settings_download_options": {
+    "message": "تحديد خيارات التحميل"
+  },
+  "settings_subfolder": {
+    "message": "مجلد فرعي:"
+  },
+  "settings_filename": {
+    "message": "اسم الملف:"
+  },
+  "settings_convert_format": {
+    "message": "تحويل الصيغة:"
+  },
+  "settings_no_warning": {
+    "message": "عدم التحذير عند تحميل ملفات كثيرة"
+  },
+  "settings_telemetry": {
+    "message": "مشاركة بيانات الاستخدام المجهولة"
+  },
+  "settings_save": {
+    "message": "حفظ الإعدادات"
+  },
+  "settings_reset": {
+    "message": "إعادة تعيين"
+  },
+  "settings_saved": {
+    "message": "تم حفظ الإعدادات"
+  },
+  "settings_save_failed": {
+    "message": "فشل حفظ الإعدادات"
+  },
+  "status_found_images": {
+    "message": "تم العثور على {count} صورة"
+  },
+  "status_similar": {
+    "message": "مشابهة"
+  },
+  "rating_title": {
+    "message": "هل تستمتع بـ Image Harvest؟"
+  },
+  "rating_desc": {
+    "message": "إذا وفّرنا لك بعض الوقت، فإن تقييمًا سريعًا بـ 5 نجوم على Chrome Web Store سيعني لنا الكثير."
+  },
+  "rating_rate_now": {
+    "message": "⭐ قيّم على Chrome Store"
+  },
+  "rating_later": {
+    "message": "ربما لاحقًا"
+  },
+  "rating_never": {
+    "message": "لا تسأل مجددًا"
+  },
+  "rating_close": {
+    "message": "إغلاق"
+  },
+  "btn_deactivate": {
+    "message": "إلغاء التفعيل"
+  },
+  "license_deactivating": {
+    "message": "جارٍ إلغاء التفعيل..."
+  },
+  "card_add_to_collection": {
+    "message": "إضافة إلى المجموعة"
+  },
+  "card_copy_url": {
+    "message": "نسخ الرابط"
+  },
+  "card_open_in_new_tab": {
+    "message": "فتح في علامة تبويب جديدة"
+  },
+  "card_remove_from_collection": {
+    "message": "إزالة من المجموعة"
+  },
+  "card_remove_image": {
+    "message": "إزالة الصورة"
+  },
+  "card_reverse_search": {
+    "message": "بحث عكسي ({engine})"
+  },
+  "collection_export_tooltip": {
+    "message": "تصدير المجموعة كـ ZIP"
+  },
+  "collection_modal_title": {
+    "message": "المجموعة"
+  },
+  "collection_search_placeholder": {
+    "message": "البحث في المجموعة..."
+  },
+  "collection_no_match": {
+    "message": "لم يتم العثور على صور مطابقة"
+  },
+  "collection_empty_title": {
+    "message": "مجموعتك فارغة"
+  },
+  "collection_no_match_hint": {
+    "message": "جرّب كلمة بحث مختلفة"
+  },
+  "collection_empty_hint": {
+    "message": "انقر على أيقونة النجمة على أي صورة لإضافتها إلى مجموعتك"
+  },
+  "common_dismiss": {
+    "message": "تجاهل"
+  },
+  "common_remove": {
+    "message": "إزالة"
+  },
+  "confirm_remove_image_message": {
+    "message": "هل تريد إزالة هذه الصورة من القائمة؟"
+  },
+  "confirm_remove_image_title": {
+    "message": "إزالة الصورة"
+  },
+  "dedup_modal_title": {
+    "message": "الصور المتشابهة"
+  },
+  "dedup_no_similar": {
+    "message": "لم يتم العثور على صور متشابهة"
+  },
+  "dedup_group_title": {
+    "message": "المجموعة {index} ({count} متشابهة)"
+  },
+  "dedup_remove_duplicates": {
+    "message": "إزالة المكررات"
+  },
+  "dialog_deactivate_message": {
+    "message": "هل أنت متأكد من رغبتك في إلغاء تفعيل الترخيص على هذا الجهاز؟ يمكنك تفعيله على جهاز آخر بعد إلغاء التفعيل."
+  },
+  "dialog_deactivate_title": {
+    "message": "إلغاء تفعيل الترخيص"
+  },
+  "dialog_download_many_message": {
+    "message": "أنت على وشك تحميل {count} صورة. هل تريد المتابعة؟"
+  },
+  "dialog_download_many_title": {
+    "message": "تحميل صور كثيرة"
+  },
+  "empty_no_images_desc": {
+    "message": "حاول تمرير الصفحة أو انقر على إعادة المسح لاكتشاف المزيد من الصور."
+  },
+  "empty_no_results_desc": {
+    "message": "حاول تعديل الفلاتر لرؤية المزيد من النتائج."
+  },
+  "empty_rescan_images": {
+    "message": "إعادة مسح الصور"
+  },
+  "empty_reset_filters": {
+    "message": "إعادة تعيين الفلاتر"
+  },
+  "empty_title": {
+    "message": "لم يتم العثور على صور"
+  },
+  "error_default_code": {
+    "message": "خطأ"
+  },
+  "error_default_message": {
+    "message": "حدث خطأ"
+  },
+  "grid_current_tab_badge": {
+    "message": "علامة التبويب الحالية"
+  },
+  "hotkey_not_set": {
+    "message": "غير محدد"
+  },
+  "hotkey_click_to_set": {
+    "message": "انقر للتحديد"
+  },
+  "live_indicator_label": {
+    "message": "مباشر"
+  },
+  "live_indicator_tooltip": {
+    "message": "المراقبة المباشرة نشطة — يتم اكتشاف الصور الجديدة تلقائيًا"
+  },
+  "multitab_modal_title": {
+    "message": "استخراج من عدة علامات تبويب"
+  },
+  "multitab_progress_default": {
+    "message": "جارٍ استخراج الصور من علامات التبويب المحددة..."
+  },
+  "multitab_start_extraction": {
+    "message": "بدء الاستخراج"
+  },
+  "multitab_current": {
+    "message": "الحالية"
+  },
+  "multitab_untitled": {
+    "message": "بدون عنوان"
+  },
+  "paywall_banner_desc": {
+    "message": "افتح الميزات المتقدمة مثل الاستخراج من عدة علامات تبويب، والتصفية حسب اللون، والمزيد."
+  },
+  "paywall_banner_later": {
+    "message": "لاحقًا"
+  },
+  "paywall_banner_title": {
+    "message": "الترقية إلى Pro"
+  },
+  "paywall_banner_try_cta": {
+    "message": "جرّب Pro مجانًا"
+  },
+  "plan_expires_date": {
+    "message": "ينتهي: {date}"
+  },
+  "plan_lifetime": {
+    "message": "مدى الحياة"
+  },
+  "plan_monthly": {
+    "message": "شهري"
+  },
+  "plan_never_expires": {
+    "message": "لا تنتهي صلاحيته"
+  },
+  "plan_yearly": {
+    "message": "سنوي"
+  },
+  "privacy_accept": {
+    "message": "قبول"
+  },
+  "privacy_anonymous_data": {
+    "message": "بيانات استخدام مجهولة الهوية"
+  },
+  "privacy_collect_desc": {
+    "message": "استخدام الميزات، وتقارير الأعطال، ومقاييس الأداء"
+  },
+  "privacy_collect_title": {
+    "message": "ما نجمعه"
+  },
+  "privacy_decline": {
+    "message": "رفض"
+  },
+  "privacy_desc_prefix": {
+    "message": "نجمع "
+  },
+  "privacy_desc_suffix": {
+    "message": " لتحسين Image Harvest."
+  },
+  "privacy_footnote": {
+    "message": "يمكنك تغيير هذا في أي وقت من الإعدادات."
+  },
+  "privacy_modal_title": {
+    "message": "ساعد في تحسين Image Harvest"
+  },
+  "privacy_never_collect_desc": {
+    "message": "البيانات الشخصية، أو سجل التصفح، أو محتوى الصور"
+  },
+  "privacy_never_collect_title": {
+    "message": "ما لا نجمعه أبدًا"
+  },
+  "privacy_reversible_desc": {
+    "message": "غيّر تفضيلاتك في أي وقت من الإعدادات"
+  },
+  "privacy_reversible_title": {
+    "message": "قابل للعكس بالكامل"
+  },
+  "pro_activate": {
+    "message": "تفعيل"
+  },
+  "pro_active_badge": {
+    "message": "Pro مفعّل"
+  },
+  "pro_already_have_key": {
+    "message": "هل لديك مفتاح ترخيص بالفعل؟"
+  },
+  "pro_deactivate_tooltip": {
+    "message": "إلغاء تفعيل الترخيص"
+  },
+  "pro_feature_batch_desc": {
+    "message": "حمّل جميع الصور دفعة واحدة بنقرة واحدة"
+  },
+  "pro_feature_batch_title": {
+    "message": "التحميل الجماعي"
+  },
+  "pro_feature_color_desc": {
+    "message": "تصفية الصور حسب اللون السائد"
+  },
+  "pro_feature_color_title": {
+    "message": "التصفية حسب اللون"
+  },
+  "pro_feature_dedup_desc": {
+    "message": "اكتشاف وإزالة الصور المكررة تلقائيًا"
+  },
+  "pro_feature_dedup_title": {
+    "message": "كشف التكرار"
+  },
+  "pro_feature_multitab_desc": {
+    "message": "استخراج الصور من عدة علامات تبويب في وقت واحد"
+  },
+  "pro_feature_multitab_title": {
+    "message": "الاستخراج من عدة علامات تبويب"
+  },
+  "pro_feature_reverse_search_desc": {
+    "message": "اعثر على مصدر أي صورة باستخدام البحث العكسي"
+  },
+  "pro_feature_reverse_search_title": {
+    "message": "البحث العكسي عن الصور"
+  },
+  "pro_get_pro_link": {
+    "message": "احصل على Pro"
+  },
+  "pro_headline_variant_a": {
+    "message": "أطلق العنان لكامل قوة Image Harvest"
+  },
+  "pro_headline_variant_b": {
+    "message": "انتقل إلى Pro — وفّر ساعات كل أسبوع"
+  },
+  "pro_no_key_hint": {
+    "message": "ليس لديك مفتاح بعد؟"
+  },
+  "pro_pricing_cta": {
+    "message": "عرض الأسعار"
+  },
+  "pro_subline_variant_a": {
+    "message": "شراء لمرة واحدة. تحديثات مدى الحياة."
+  },
+  "pro_subline_variant_b": {
+    "message": "انضم إلى آلاف المستخدمين المحترفين."
+  },
+  "pro_trial_badge": {
+    "message": "تجربة مجانية لمدة 7 أيام"
+  },
+  "pro_trial_desc": {
+    "message": "جرّب جميع ميزات Pro مجانًا لمدة 7 أيام. بدون التزام."
+  },
+  "pro_trial_perk_full_access": {
+    "message": "وصول كامل لجميع ميزات Pro"
+  },
+  "pro_trial_perk_no_card": {
+    "message": "لا حاجة لبطاقة ائتمان"
+  },
+  "pro_trial_perk_cancel": {
+    "message": "تنتهي تلقائيًا — لا حاجة للإلغاء"
+  },
+  "pro_trial_start_cta": {
+    "message": "بدء التجربة المجانية"
+  },
+  "pro_trial_start_failed": {
+    "message": "فشل بدء الفترة التجريبية"
+  },
+  "pro_trial_started_toast": {
+    "message": "تم تفعيل تجربة Pro! استمتع بجميع الميزات لمدة 7 أيام."
+  },
+  "pro_trial_starting": {
+    "message": "جارٍ بدء الفترة التجريبية..."
+  },
+  "pro_trial_unavailable": {
+    "message": "الفترة التجريبية غير متاحة"
+  },
+  "progress_downloading": {
+    "message": "جارٍ التحميل..."
+  },
+  "progress_text": {
+    "message": "{current} من {total}"
+  },
+  "progress_multitab_text": {
+    "message": "{current}/{total} علامة تبويب · تم العثور على {count} صورة"
+  },
+  "restricted_subtitle": {
+    "message": "هذه الصفحة تقيّد سكربتات المحتوى. جرّب صفحة أخرى."
+  },
+  "scan_cancel": {
+    "message": "إلغاء المسح"
+  },
+  "scan_discovering": {
+    "message": "جارٍ اكتشاف الصور..."
+  },
+  "scan_progress_text": {
+    "message": "المسح: {current} من {total}"
+  },
+  "scan_scanning": {
+    "message": "جارٍ المسح..."
+  },
+  "scan_updated": {
+    "message": "تم التحديث"
+  },
+  "scan_updating": {
+    "message": "جارٍ التحديث..."
+  },
+  "status_n_selected": {
+    "message": "{count} محدد"
+  },
+  "status_total_images": {
+    "message": "{count} إجمالي"
+  },
+  "title_click_copy_color": {
+    "message": "انقر لنسخ {color}"
+  },
+  "title_collection": {
+    "message": "المجموعة"
+  },
+  "title_download": {
+    "message": "تحميل الصور"
+  },
+  "title_multitab": {
+    "message": "الاستخراج من عدة علامات تبويب"
+  },
+  "title_rescan": {
+    "message": "إعادة مسح الصور"
+  },
+  "title_select_all": {
+    "message": "انقر لتحديد الكل"
+  },
+  "title_settings": {
+    "message": "الإعدادات"
+  },
+  "title_switch_grid": {
+    "message": "التبديل إلى عرض الشبكة"
+  },
+  "title_switch_list": {
+    "message": "التبديل إلى عرض القائمة"
+  },
+  "title_transparent_image": {
+    "message": "صورة شفافة"
+  },
+  "title_upgrade_copy_color": {
+    "message": "قم بالترقية إلى Pro لنسخ الألوان"
+  },
+  "title_view_similar": {
+    "message": "عرض الصور المتشابهة"
+  },
+  "toast_deactivate_failed": {
+    "message": "فشل إلغاء التفعيل"
+  },
+  "toast_license_deactivated": {
+    "message": "تم إلغاء تفعيل الترخيص"
+  },
+  "toast_n_new": {
+    "message": "{count} جديدة"
+  },
+  "toast_n_removed": {
+    "message": "{count} تمت إزالتها"
+  },
+  "toast_pro_color_filter": {
+    "message": "التصفية حسب اللون ميزة Pro. قم بالترقية للتصفية حسب اللون!"
+  },
+  "toast_pro_naming_locked": {
+    "message": "التسمية المخصصة ميزة Pro. قم بالترقية لفتحها!"
+  },
+  "toast_pro_setting_locked": {
+    "message": "هذا الإعداد يتطلب Pro. قم بالترقية لفتحه!"
+  },
+  "toast_settings_reset": {
+    "message": "تمت إعادة الإعدادات إلى الافتراضية"
+  },
+  "view_grid": {
+    "message": "شبكة"
+  },
+  "view_list": {
+    "message": "قائمة"
+  },
+  "format_original": {
+    "message": "الأصلي"
+  },
+  "menu_reverse_search": {
+    "message": "بحث عكسي"
+  },
+  "settings_all_frames_desc": {
+    "message": "مسح الصور داخل الإطارات المضمنة أيضًا"
+  },
+  "settings_color_extract_desc": {
+    "message": "استخراج الألوان السائدة من كل صورة للتصفية"
+  },
+  "settings_download_options_desc": {
+    "message": "تخصيص المجلد الفرعي وقالب اسم الملف وتحويل الصيغة"
+  },
+  "settings_hotkey": {
+    "message": "اختصار لوحة المفاتيح:"
+  },
+  "settings_live_monitor_desc": {
+    "message": "اكتشاف الصور الجديدة تلقائيًا عند تغيّر محتوى الصفحة"
+  },
+  "settings_max_size": {
+    "message": "تفعيل فلتر الحجم الأقصى"
+  },
+  "settings_max_size_desc": {
+    "message": "إخفاء الصور الأكبر من الأبعاد المحددة"
+  },
+  "settings_min_size": {
+    "message": "تفعيل فلتر الحجم الأدنى"
+  },
+  "settings_min_size_desc": {
+    "message": "إخفاء الصور الأصغر من الأبعاد المحددة"
+  },
+  "settings_no_warning_desc": {
+    "message": "تخطي مربع حوار التأكيد عند تحميل ملفات كثيرة"
+  },
+  "settings_section_display": {
+    "message": "العرض"
+  },
+  "settings_section_pro": {
+    "message": "Pro"
+  },
+  "settings_section_account": {
+    "message": "الحساب"
+  },
+  "settings_similar_desc": {
+    "message": "العثور على الصور المتشابهة أو المكررة بصريًا وتجميعها"
+  },
+  "settings_telemetry_desc": {
+    "message": "إرسال أحداث استخدام الميزات بشكل مجهول. بدون روابط أو صور أو بيانات شخصية."
+  },
+  "status_found_prefix": {
+    "message": "تم العثور على"
+  },
+  "status_found_suffix": {
+    "message": "صورة"
+  },
+  "filter_type_other": {
+    "message": "أخرى"
+  },
+  "license_activating": {
+    "message": "جارٍ التفعيل..."
+  },
+  "license_activation_failed": {
+    "message": "فشل التفعيل"
+  },
+  "license_enter_key": {
+    "message": "يرجى إدخال مفتاح الترخيص"
+  },
+  "license_network_error": {
+    "message": "خطأ في الشبكة. يرجى المحاولة مرة أخرى."
+  },
+  "license_placeholder": {
+    "message": "أدخل مفتاح الترخيص"
+  },
+  "settings_height_gte": {
+    "message": "الارتفاع ≥"
+  },
+  "settings_height_lte": {
+    "message": "الارتفاع ≤"
+  },
+  "settings_width_gte": {
+    "message": "العرض ≥"
+  },
+  "settings_width_lte": {
+    "message": "العرض ≤"
+  },
+  "toast_pro_activated": {
+    "message": "تم تفعيل Pro بنجاح!"
+  },
+  "multitab_extracting": {
+    "message": "جارٍ الاستخراج..."
+  },
+  "multitab_starting": {
+    "message": "جارٍ بدء الاستخراج..."
+  },
+  "settings_variables_hint": {
+    "message": "المتغيرات: {domain}, {index}, {original}, {format}, {width}, {height}"
+  },
+  "toast_extraction_cancelled": {
+    "message": "تم إلغاء الاستخراج"
+  },
+  "toast_extraction_failed": {
+    "message": "فشل الاستخراج"
+  },
+  "toast_extraction_success": {
+    "message": "تم استخراج {images} صورة من {tabs} علامة تبويب"
+  },
+  "toast_multitab_failed": {
+    "message": "فشل الاستخراج من عدة علامات تبويب"
+  },
+  "restricted_notice": {
+    "message": "هذه الصفحة لا تسمح للإضافات بحقن السكربتات. انتقل إلى صفحة ويب عادية (مثل مقال أو معرض أو نتائج بحث) لبدء استخراج الصور."
+  },
+  "restricted_features_heading": {
+    "message": "ما يمكنك فعله مع Image Harvest"
+  },
+  "restricted_feature_batch_title": {
+    "message": "التحميل الجماعي"
+  },
+  "restricted_feature_batch_desc": {
+    "message": "حدد وحمّل جميع الصور من أي صفحة ويب بنقرة واحدة. صفّي حسب الحجم أو الصيغة أو التخطيط."
+  },
+  "restricted_feature_dedup_title": {
+    "message": "كشف الصور المتشابهة"
+  },
+  "restricted_feature_dedup_desc": {
+    "message": "اعثر تلقائيًا على الصور شبه المكررة وأزلها باستخدام التجزئة الإدراكية."
+  },
+  "restricted_feature_reverse_title": {
+    "message": "البحث العكسي عن الصور"
+  },
+  "restricted_feature_reverse_desc": {
+    "message": "ابحث عن أي صورة عبر Google و TinEye و Yandex و Baidu بنقرة واحدة."
+  },
+  "restricted_feature_multitab_title": {
+    "message": "الاستخراج من عدة علامات تبويب"
+  },
+  "restricted_feature_multitab_desc": {
+    "message": "استخرج الصور من عدة علامات تبويب مفتوحة في وقت واحد وحمّلها جميعًا في أرشيف ZIP."
+  },
+  "restricted_feature_color_title": {
+    "message": "استخراج الألوان"
+  },
+  "restricted_feature_color_desc": {
+    "message": "استخرج الألوان السائدة تلقائيًا من كل صورة. انقر على أي عينة لنسخ رمز HEX."
+  },
+  "restricted_feature_filter_title": {
+    "message": "فلاتر ذكية"
+  },
+  "restricted_feature_filter_desc": {
+    "message": "صفّي الصور حسب الحجم أو النوع أو التخطيط أو نمط الرابط أو اللون السائد للعثور على ما تحتاجه بالضبط."
+  },
+  "restricted_feature_collection_title": {
+    "message": "مجموعة المفضلة"
+  },
+  "restricted_feature_collection_desc": {
+    "message": "أضف الصور إلى مجموعة دائمة تبقى عبر الجلسات. نظّمها وراجعها في أي وقت."
+  },
+  "restricted_feature_preview_title": {
+    "message": "معاينة فورية"
+  },
+  "restricted_feature_preview_desc": {
+    "message": "اعرض الصور بدقة كاملة مع البيانات الوصفية — الأبعاد وحجم الملف والصيغة — بنظرة واحدة."
+  },
+  "restricted_link_website": {
+    "message": "الموقع الرسمي"
+  },
+  "trial_error_already_redeemed": {
+    "message": "لقد استخدمت بالفعل التجربة المجانية على هذا التثبيت."
+  },
+  "trial_error_already_used": {
+    "message": "لقد استخدمت بالفعل التجربة المجانية."
+  },
+  "trial_error_http": {
+    "message": "تعذر بدء الفترة التجريبية. يرجى المحاولة لاحقًا."
+  },
+  "trial_error_network": {
+    "message": "خطأ في الشبكة. يرجى التحقق من اتصالك والمحاولة مرة أخرى."
+  },
+  "trial_error_server_declined": {
+    "message": "رفض الخادم الفترة التجريبية."
+  },
+  "license_error_network": {
+    "message": "خطأ في الشبكة. يرجى التحقق من اتصالك."
+  },
+  "license_error_invalid_key": {
+    "message": "مفتاح ترخيص غير صالح."
+  },
+  "license_error_activation_failed": {
+    "message": "فشل التفعيل. يرجى المحاولة مرة أخرى."
+  }
+}

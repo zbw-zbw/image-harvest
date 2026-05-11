@@ -943,5 +943,29 @@
   },
   "restricted_link_website": {
     "message": "Sitio web oficial"
+  },
+  "trial_error_already_redeemed": {
+    "message": "Ya has usado tu prueba gratuita en esta instalación."
+  },
+  "trial_error_already_used": {
+    "message": "Ya has usado tu prueba gratuita."
+  },
+  "trial_error_http": {
+    "message": "No se pudo iniciar la prueba. Inténtalo de nuevo más tarde."
+  },
+  "trial_error_network": {
+    "message": "Error de red. Comprueba tu conexión e inténtalo de nuevo."
+  },
+  "trial_error_server_declined": {
+    "message": "El servidor rechazó la prueba."
+  },
+  "license_error_network": {
+    "message": "Error de red. Comprueba tu conexión."
+  },
+  "license_error_invalid_key": {
+    "message": "Clave de licencia no válida."
+  },
+  "license_error_activation_failed": {
+    "message": "Error de activación. Inténtalo de nuevo."
   }
 }

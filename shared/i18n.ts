@@ -24,8 +24,21 @@ import zhCN from '../_locales/zh_CN/messages.json';
 import zhTW from '../_locales/zh_TW/messages.json';
 import ja from '../_locales/ja/messages.json';
 import es from '../_locales/es/messages.json';
+import ko from '../_locales/ko/messages.json';
+import de from '../_locales/de/messages.json';
+import fr from '../_locales/fr/messages.json';
+import pt from '../_locales/pt/messages.json';
+import ru from '../_locales/ru/messages.json';
+import ar from '../_locales/ar/messages.json';
+import hi from '../_locales/hi/messages.json';
+import th from '../_locales/th/messages.json';
+import it from '../_locales/it/messages.json';
+import nl from '../_locales/nl/messages.json';
 
-export type Locale = 'en' | 'zh-CN' | 'zh-TW' | 'ja' | 'es';
+export type Locale =
+  | 'en' | 'zh-CN' | 'zh-TW' | 'ja' | 'es'
+  | 'ko' | 'de' | 'fr' | 'pt' | 'ru'
+  | 'ar' | 'hi' | 'th' | 'it' | 'nl';
 
 export interface MessageEntry {
   message: string;
@@ -41,6 +54,16 @@ const CATALOGUES: Record<Locale, Catalogue> = {
   'zh-TW': zhTW as Catalogue,
   ja: ja as Catalogue,
   es: es as Catalogue,
+  ko: ko as Catalogue,
+  de: de as Catalogue,
+  fr: fr as Catalogue,
+  pt: pt as Catalogue,
+  ru: ru as Catalogue,
+  ar: ar as Catalogue,
+  hi: hi as Catalogue,
+  th: th as Catalogue,
+  it: it as Catalogue,
+  nl: nl as Catalogue,
 };
 
 // English is always the fallback when a key is missing in the active locale,
@@ -50,7 +73,11 @@ const CATALOGUES: Record<Locale, Catalogue> = {
 // "every translatable string in the product".
 const FALLBACK_LOCALE: Locale = 'en';
 
-export const SUPPORTED_LOCALES: readonly Locale[] = ['en', 'zh-CN', 'zh-TW', 'ja', 'es'] as const;
+export const SUPPORTED_LOCALES: readonly Locale[] = [
+  'en', 'zh-CN', 'zh-TW', 'ja', 'es',
+  'ko', 'de', 'fr', 'pt', 'ru',
+  'ar', 'hi', 'th', 'it', 'nl',
+] as const;
 
 const LOCALE_LABELS: Record<Locale, string> = {
   en: 'English',
@@ -58,6 +85,16 @@ const LOCALE_LABELS: Record<Locale, string> = {
   'zh-TW': '繁體中文',
   ja: '日本語',
   es: 'Español',
+  ko: '한국어',
+  de: 'Deutsch',
+  fr: 'Français',
+  pt: 'Português',
+  ru: 'Русский',
+  ar: 'العربية',
+  hi: 'हिन्दी',
+  th: 'ไทย',
+  it: 'Italiano',
+  nl: 'Nederlands',
 };
 
 export function getLocaleLabel(locale: Locale): string {
@@ -94,7 +131,8 @@ export function onLocaleChange(listener: LocaleListener): () => void {
  *   "zh"        → "zh-CN"
  *   "zh-Hant"   → "zh-TW"
  *   "ja-JP"     → "ja"
- *   "fr"        → "en"   (unsupported → fallback)
+ *   "fr-FR"     → "fr"
+ *   "xyz"       → "en"   (unsupported → fallback)
  *
  * The mapping is deliberately conservative: we'd rather show English than
  * silently render a half-translated UI in a partially-mapped locale.
@@ -111,10 +149,13 @@ export function normalizeLocale(raw: string | undefined | null): Locale {
     if (lower.includes('tw') || lower.includes('hant') || lower.includes('hk')) return 'zh-TW';
     return 'zh-CN';
   }
-  if (lower.startsWith('ja')) return 'ja';
-  if (lower.startsWith('es')) return 'es';
-  if (lower.startsWith('en')) return 'en';
-  return FALLBACK_LOCALE;
+  const PRIMARY_MAP: Record<string, Locale> = {
+    ja: 'ja', es: 'es', en: 'en',
+    ko: 'ko', de: 'de', fr: 'fr', pt: 'pt', ru: 'ru',
+    ar: 'ar', hi: 'hi', th: 'th', it: 'it', nl: 'nl',
+  };
+  const primary = lower.split('-')[0];
+  return PRIMARY_MAP[primary] ?? FALLBACK_LOCALE;
 }
 
 /**

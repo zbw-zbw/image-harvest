@@ -1,0 +1,971 @@
+{
+  "app_name": {
+    "message": "Image Harvest"
+  },
+  "app_tagline": {
+    "message": "Download elke afbeelding van elke webpagina"
+  },
+  "common_cancel": {
+    "message": "Annuleren"
+  },
+  "common_confirm": {
+    "message": "Bevestigen"
+  },
+  "common_close": {
+    "message": "Sluiten"
+  },
+  "common_save": {
+    "message": "Opslaan"
+  },
+  "common_delete": {
+    "message": "Verwijderen"
+  },
+  "common_copy": {
+    "message": "Kopiëren"
+  },
+  "common_download": {
+    "message": "Downloaden"
+  },
+  "common_upgrade": {
+    "message": "Upgraden naar Pro"
+  },
+  "common_maybe_later": {
+    "message": "Misschien later"
+  },
+  "settings_title": {
+    "message": "Instellingen"
+  },
+  "settings_section_appearance": {
+    "message": "Uiterlijk"
+  },
+  "settings_section_experience": {
+    "message": "Ervaring"
+  },
+  "settings_section_scan": {
+    "message": "Scan"
+  },
+  "settings_section_download": {
+    "message": "Download"
+  },
+  "settings_section_language": {
+    "message": "Taal"
+  },
+  "settings_language_label": {
+    "message": "Weergavetaal"
+  },
+  "toolbar_select_all": {
+    "message": "Alles selecteren"
+  },
+  "toolbar_deselect_all": {
+    "message": "Alles deselecteren"
+  },
+  "toolbar_copy_urls": {
+    "message": "URL's kopiëren"
+  },
+  "toolbar_copy_urls_tooltip": {
+    "message": "Kopieer geselecteerde afbeelding-URL's naar klembord"
+  },
+  "toolbar_copy_urls_empty": {
+    "message": "Selecteer eerst afbeeldingen"
+  },
+  "toast_url_copied_single": {
+    "message": "URL gekopieerd!"
+  },
+  "toast_url_copied_batch": {
+    "message": "{count} URL's gekopieerd naar klembord"
+  },
+  "toast_url_copy_failed": {
+    "message": "Kan URL niet kopiëren"
+  },
+  "toast_download_started": {
+    "message": "Download gestart"
+  },
+  "toast_download_failed": {
+    "message": "Download mislukt"
+  },
+  "toast_download_cancelled": {
+    "message": "Download geannuleerd"
+  },
+  "toast_download_completed": {
+    "message": "{count} afbeeldingen gedownload"
+  },
+  "toast_no_images_selected": {
+    "message": "Geen afbeeldingen geselecteerd"
+  },
+  "toast_image_removed": {
+    "message": "Afbeelding verwijderd"
+  },
+  "toast_collection_added": {
+    "message": "Toegevoegd aan collectie"
+  },
+  "toast_collection_add_failed": {
+    "message": "Kan niet toevoegen aan collectie"
+  },
+  "toast_collection_removed": {
+    "message": "Verwijderd uit collectie"
+  },
+  "toast_collection_remove_failed": {
+    "message": "Kan niet verwijderen"
+  },
+  "toast_color_copied": {
+    "message": "Kleur {hex} gekopieerd"
+  },
+  "toast_color_copy_failed": {
+    "message": "Kan kleur niet kopiëren"
+  },
+  "pro_feature_blocked_format_conversion": {
+    "message": "Formaatconversie is een Pro-functie. Upgrade om te ontgrendelen!"
+  },
+  "pro_feature_blocked_advanced_grouping": {
+    "message": "Geavanceerde groepering is een Pro-functie. Upgrade om te ontgrendelen!"
+  },
+  "pro_feature_blocked_collection": {
+    "message": "Collectie is een Pro-functie"
+  },
+  "pro_feature_blocked_image_delete": {
+    "message": "Afbeelding verwijderen is een Pro-functie. Upgrade om te ontgrendelen!"
+  },
+  "pro_feature_blocked_color_copy": {
+    "message": "Kleur kopiëren is een Pro-functie"
+  },
+  "pro_feature_blocked_reverse_search": {
+    "message": "{engine}-zoekopdracht vereist Pro. Upgrade om te ontgrendelen!"
+  },
+  "pro_zip_limit": {
+    "message": "Het gratis plan staat maximaal {max} afbeeldingen per ZIP toe. Upgrade naar Pro voor onbeperkt!"
+  },
+  "pro_copy_urls_limit": {
+    "message": "Het gratis plan staat maximaal {max} URL's tegelijk toe. Upgrade naar Pro voor onbeperkt!"
+  },
+  "pro_collection_limit": {
+    "message": "Het gratis plan staat maximaal {max} favorieten toe. Upgrade naar Pro voor onbeperkt!"
+  },
+  "toolbar_sort": {
+    "message": "Sorteren"
+  },
+  "toolbar_group": {
+    "message": "Groeperen"
+  },
+  "toolbar_similar": {
+    "message": "Vergelijkbaar"
+  },
+  "status_similar_count": {
+    "message": "{count} vergelijkbaar"
+  },
+  "toolbar_rescan": {
+    "message": "Opnieuw scannen"
+  },
+  "toolbar_download_all": {
+    "message": "Alles downloaden"
+  },
+  "toolbar_download_selected": {
+    "message": "Downloaden ({count})"
+  },
+  "filter_size": {
+    "message": "Grootte"
+  },
+  "filter_type": {
+    "message": "Type"
+  },
+  "filter_layout": {
+    "message": "Layout"
+  },
+  "filter_url": {
+    "message": "URL"
+  },
+  "filter_color": {
+    "message": "Kleur"
+  },
+  "filter_all": {
+    "message": "Alles"
+  },
+  "filter_min_width": {
+    "message": "Min B"
+  },
+  "filter_max_width": {
+    "message": "Max B"
+  },
+  "filter_height": {
+    "message": "H"
+  },
+  "filter_none": {
+    "message": "Geen"
+  },
+  "filter_format": {
+    "message": "Formaat"
+  },
+  "filter_domain": {
+    "message": "Domein"
+  },
+  "filter_tab": {
+    "message": "Tabblad"
+  },
+  "sort_none": {
+    "message": "Geen (Paginavolgorde)"
+  },
+  "sort_size_desc": {
+    "message": "Grootte ↓ (Groot eerst)"
+  },
+  "sort_size_asc": {
+    "message": "Grootte ↑ (Klein eerst)"
+  },
+  "sort_filesize_desc": {
+    "message": "Bestandsgrootte ↓ (Groot eerst)"
+  },
+  "sort_filesize_asc": {
+    "message": "Bestandsgrootte ↑ (Klein eerst)"
+  },
+  "layout_all": {
+    "message": "Alles"
+  },
+  "layout_square": {
+    "message": "Vierkant (1:1)"
+  },
+  "layout_landscape": {
+    "message": "Liggend (>1:1)"
+  },
+  "layout_portrait": {
+    "message": "Staand (<1:1)"
+  },
+  "layout_panorama": {
+    "message": "Panorama (>2:1)"
+  },
+  "size_all": {
+    "message": "Alles"
+  },
+  "size_small": {
+    "message": "Klein < 100px"
+  },
+  "size_medium": {
+    "message": "Gemiddeld 100-500px"
+  },
+  "size_large": {
+    "message": "Groot 500-1000px"
+  },
+  "size_xl": {
+    "message": "XL > 1000px"
+  },
+  "size_btn_small": {
+    "message": "Klein"
+  },
+  "size_btn_medium": {
+    "message": "Gemiddeld"
+  },
+  "size_btn_large": {
+    "message": "Groot"
+  },
+  "size_btn_xl": {
+    "message": "XL"
+  },
+  "size_btn_custom": {
+    "message": "Aangepast"
+  },
+  "layout_btn_square": {
+    "message": "Vierkant"
+  },
+  "layout_btn_landscape": {
+    "message": "Liggend"
+  },
+  "layout_btn_portrait": {
+    "message": "Staand"
+  },
+  "layout_btn_panorama": {
+    "message": "Panorama"
+  },
+  "color_all": {
+    "message": "Alle kleuren"
+  },
+  "color_no_extracted": {
+    "message": "Nog geen kleuren geëxtraheerd"
+  },
+  "filter_url_placeholder": {
+    "message": "Filteren op URL-trefwoord..."
+  },
+  "settings_display": {
+    "message": "Weergave"
+  },
+  "settings_side_panel": {
+    "message": "Weergeven in zijpaneel"
+  },
+  "settings_side_panel_desc": {
+    "message": "Open resultaten in het zijpaneel van de browser in plaats van een pop-upvenster"
+  },
+  "settings_density": {
+    "message": "Layoutdichtheid:"
+  },
+  "settings_density_compact": {
+    "message": "Compact"
+  },
+  "settings_density_standard": {
+    "message": "Standaard"
+  },
+  "settings_density_comfortable": {
+    "message": "Comfortabel"
+  },
+  "settings_theme": {
+    "message": "Thema:"
+  },
+  "settings_theme_system": {
+    "message": "Systeem"
+  },
+  "settings_theme_light": {
+    "message": "Licht"
+  },
+  "settings_theme_dark": {
+    "message": "Donker"
+  },
+  "settings_default_group": {
+    "message": "Standaard groepering:"
+  },
+  "settings_similar": {
+    "message": "Detectie vergelijkbare afbeeldingen"
+  },
+  "settings_color_extract": {
+    "message": "Kleurextractie"
+  },
+  "settings_all_frames": {
+    "message": "Zoeken in alle frames"
+  },
+  "settings_live_monitor": {
+    "message": "Live monitoring"
+  },
+  "settings_download_options": {
+    "message": "Downloadopties specificeren"
+  },
+  "settings_subfolder": {
+    "message": "Submap:"
+  },
+  "settings_filename": {
+    "message": "Bestandsnaam:"
+  },
+  "settings_convert_format": {
+    "message": "Formaat converteren:"
+  },
+  "settings_no_warning": {
+    "message": "Niet waarschuwen bij het downloaden van veel bestanden"
+  },
+  "settings_telemetry": {
+    "message": "Anonieme gebruiksgegevens delen"
+  },
+  "settings_save": {
+    "message": "Instellingen opslaan"
+  },
+  "settings_reset": {
+    "message": "Herstellen"
+  },
+  "settings_saved": {
+    "message": "Instellingen opgeslagen"
+  },
+  "settings_save_failed": {
+    "message": "Kan instellingen niet opslaan"
+  },
+  "status_found_images": {
+    "message": "{count} afbeeldingen gevonden"
+  },
+  "status_similar": {
+    "message": "Vergelijkbaar"
+  },
+  "rating_title": {
+    "message": "Bevalt Image Harvest?"
+  },
+  "rating_desc": {
+    "message": "Als we je tijd hebben bespaard, zou een korte 5-sterren review op de Chrome Web Store heel veel voor ons betekenen."
+  },
+  "rating_rate_now": {
+    "message": "⭐ Beoordeel op Chrome Store"
+  },
+  "rating_later": {
+    "message": "Misschien later"
+  },
+  "rating_never": {
+    "message": "Niet meer vragen"
+  },
+  "rating_close": {
+    "message": "Sluiten"
+  },
+  "btn_deactivate": {
+    "message": "Deactiveren"
+  },
+  "license_deactivating": {
+    "message": "Deactiveren..."
+  },
+  "card_add_to_collection": {
+    "message": "Toevoegen aan collectie"
+  },
+  "card_copy_url": {
+    "message": "URL kopiëren"
+  },
+  "card_open_in_new_tab": {
+    "message": "Openen in nieuw tabblad"
+  },
+  "card_remove_from_collection": {
+    "message": "Verwijderen uit collectie"
+  },
+  "card_remove_image": {
+    "message": "Afbeelding verwijderen"
+  },
+  "card_reverse_search": {
+    "message": "Omgekeerd zoeken ({engine})"
+  },
+  "collection_export_tooltip": {
+    "message": "Collectie exporteren als ZIP"
+  },
+  "collection_modal_title": {
+    "message": "Collectie"
+  },
+  "collection_search_placeholder": {
+    "message": "Zoeken in collectie..."
+  },
+  "collection_no_match": {
+    "message": "Geen overeenkomende afbeeldingen gevonden"
+  },
+  "collection_empty_title": {
+    "message": "Je collectie is leeg"
+  },
+  "collection_no_match_hint": {
+    "message": "Probeer een ander zoekwoord"
+  },
+  "collection_empty_hint": {
+    "message": "Klik op het sterpictogram bij een afbeelding om deze aan je collectie toe te voegen"
+  },
+  "common_dismiss": {
+    "message": "Negeren"
+  },
+  "common_remove": {
+    "message": "Verwijderen"
+  },
+  "confirm_remove_image_message": {
+    "message": "Deze afbeelding uit de lijst verwijderen?"
+  },
+  "confirm_remove_image_title": {
+    "message": "Afbeelding verwijderen"
+  },
+  "dedup_modal_title": {
+    "message": "Vergelijkbare afbeeldingen"
+  },
+  "dedup_no_similar": {
+    "message": "Geen vergelijkbare afbeeldingen gevonden"
+  },
+  "dedup_group_title": {
+    "message": "Groep {index} ({count} vergelijkbaar)"
+  },
+  "dedup_remove_duplicates": {
+    "message": "Duplicaten verwijderen"
+  },
+  "dialog_deactivate_message": {
+    "message": "Weet je zeker dat je je licentie op dit apparaat wilt deactiveren? Je kunt deze na deactivering op een ander apparaat activeren."
+  },
+  "dialog_deactivate_title": {
+    "message": "Licentie deactiveren"
+  },
+  "dialog_download_many_message": {
+    "message": "Je staat op het punt {count} afbeeldingen te downloaden. Doorgaan?"
+  },
+  "dialog_download_many_title": {
+    "message": "Veel afbeeldingen downloaden"
+  },
+  "empty_no_images_desc": {
+    "message": "Probeer de pagina te scrollen of klik op Opnieuw scannen om meer afbeeldingen te ontdekken."
+  },
+  "empty_no_results_desc": {
+    "message": "Probeer je filters aan te passen om meer resultaten te zien."
+  },
+  "empty_rescan_images": {
+    "message": "Afbeeldingen opnieuw scannen"
+  },
+  "empty_reset_filters": {
+    "message": "Filters herstellen"
+  },
+  "empty_title": {
+    "message": "Geen afbeeldingen gevonden"
+  },
+  "error_default_code": {
+    "message": "Fout"
+  },
+  "error_default_message": {
+    "message": "Er is een fout opgetreden"
+  },
+  "grid_current_tab_badge": {
+    "message": "Huidig tabblad"
+  },
+  "hotkey_not_set": {
+    "message": "Niet ingesteld"
+  },
+  "hotkey_click_to_set": {
+    "message": "Klik om in te stellen"
+  },
+  "live_indicator_label": {
+    "message": "Live"
+  },
+  "live_indicator_tooltip": {
+    "message": "Live monitoring is actief — nieuwe afbeeldingen worden automatisch gedetecteerd"
+  },
+  "multitab_modal_title": {
+    "message": "Multi-tabblad extractie"
+  },
+  "multitab_progress_default": {
+    "message": "Afbeeldingen extraheren uit geselecteerde tabbladen..."
+  },
+  "multitab_start_extraction": {
+    "message": "Extractie starten"
+  },
+  "multitab_current": {
+    "message": "Huidig"
+  },
+  "multitab_untitled": {
+    "message": "Naamloos"
+  },
+  "paywall_banner_desc": {
+    "message": "Ontgrendel geavanceerde functies zoals multi-tabblad extractie, kleurfiltering en meer."
+  },
+  "paywall_banner_later": {
+    "message": "Later"
+  },
+  "paywall_banner_title": {
+    "message": "Upgraden naar Pro"
+  },
+  "paywall_banner_try_cta": {
+    "message": "Probeer Pro gratis"
+  },
+  "plan_expires_date": {
+    "message": "Verloopt: {date}"
+  },
+  "plan_lifetime": {
+    "message": "Levenslang"
+  },
+  "plan_monthly": {
+    "message": "Maandelijks"
+  },
+  "plan_never_expires": {
+    "message": "Verloopt nooit"
+  },
+  "plan_yearly": {
+    "message": "Jaarlijks"
+  },
+  "privacy_accept": {
+    "message": "Accepteren"
+  },
+  "privacy_anonymous_data": {
+    "message": "anonieme gebruiksgegevens"
+  },
+  "privacy_collect_desc": {
+    "message": "Functiegebruik, crashrapporten en prestatiemetingen"
+  },
+  "privacy_collect_title": {
+    "message": "Wat we verzamelen"
+  },
+  "privacy_decline": {
+    "message": "Weigeren"
+  },
+  "privacy_desc_prefix": {
+    "message": "We verzamelen "
+  },
+  "privacy_desc_suffix": {
+    "message": " om Image Harvest te verbeteren."
+  },
+  "privacy_footnote": {
+    "message": "Je kunt dit op elk moment wijzigen in Instellingen."
+  },
+  "privacy_modal_title": {
+    "message": "Help Image Harvest te verbeteren"
+  },
+  "privacy_never_collect_desc": {
+    "message": "Persoonlijke gegevens, browsegeschiedenis of afbeeldingsinhoud"
+  },
+  "privacy_never_collect_title": {
+    "message": "Wat we nooit verzamelen"
+  },
+  "privacy_reversible_desc": {
+    "message": "Wijzig je voorkeur op elk moment in Instellingen"
+  },
+  "privacy_reversible_title": {
+    "message": "Volledig omkeerbaar"
+  },
+  "pro_activate": {
+    "message": "Activeren"
+  },
+  "pro_active_badge": {
+    "message": "Pro actief"
+  },
+  "pro_already_have_key": {
+    "message": "Heb je al een licentiesleutel?"
+  },
+  "pro_deactivate_tooltip": {
+    "message": "Licentie deactiveren"
+  },
+  "pro_feature_batch_desc": {
+    "message": "Download alle afbeeldingen in één keer met een enkele klik"
+  },
+  "pro_feature_batch_title": {
+    "message": "Batchdownload"
+  },
+  "pro_feature_color_desc": {
+    "message": "Filter afbeeldingen op dominante kleur"
+  },
+  "pro_feature_color_title": {
+    "message": "Kleurfiltering"
+  },
+  "pro_feature_dedup_desc": {
+    "message": "Detecteer en verwijder automatisch dubbele afbeeldingen"
+  },
+  "pro_feature_dedup_title": {
+    "message": "Duplicaatdetectie"
+  },
+  "pro_feature_multitab_desc": {
+    "message": "Extraheer afbeeldingen uit meerdere tabbladen tegelijk"
+  },
+  "pro_feature_multitab_title": {
+    "message": "Multi-tabblad extractie"
+  },
+  "pro_feature_reverse_search_desc": {
+    "message": "Vind de bron van elke afbeelding met omgekeerd zoeken"
+  },
+  "pro_feature_reverse_search_title": {
+    "message": "Omgekeerd afbeeldingen zoeken"
+  },
+  "pro_get_pro_link": {
+    "message": "Pro kopen"
+  },
+  "pro_headline_variant_a": {
+    "message": "Ontgrendel de volledige kracht van Image Harvest"
+  },
+  "pro_headline_variant_b": {
+    "message": "Ga Pro — Bespaar uren per week"
+  },
+  "pro_no_key_hint": {
+    "message": "Heb je nog geen sleutel?"
+  },
+  "pro_pricing_cta": {
+    "message": "Prijzen bekijken"
+  },
+  "pro_subline_variant_a": {
+    "message": "Eenmalige aankoop. Levenslange updates."
+  },
+  "pro_subline_variant_b": {
+    "message": "Sluit je aan bij duizenden ervaren gebruikers."
+  },
+  "pro_trial_badge": {
+    "message": "7 dagen gratis proberen"
+  },
+  "pro_trial_desc": {
+    "message": "Probeer alle Pro-functies 7 dagen gratis. Geen verplichtingen."
+  },
+  "pro_trial_perk_full_access": {
+    "message": "Volledige toegang tot alle Pro-functies"
+  },
+  "pro_trial_perk_no_card": {
+    "message": "Geen creditcard vereist"
+  },
+  "pro_trial_perk_cancel": {
+    "message": "Verloopt automatisch — geen opzegging nodig"
+  },
+  "pro_trial_start_cta": {
+    "message": "Gratis proefperiode starten"
+  },
+  "pro_trial_start_failed": {
+    "message": "Kan proefperiode niet starten"
+  },
+  "pro_trial_started_toast": {
+    "message": "Pro-proefperiode geactiveerd! Geniet 7 dagen van alle functies."
+  },
+  "pro_trial_starting": {
+    "message": "Proefperiode starten..."
+  },
+  "pro_trial_unavailable": {
+    "message": "Proefperiode niet beschikbaar"
+  },
+  "progress_downloading": {
+    "message": "Downloaden..."
+  },
+  "progress_text": {
+    "message": "{current} van {total}"
+  },
+  "progress_multitab_text": {
+    "message": "{current}/{total} tabbladen · {count} afbeeldingen gevonden"
+  },
+  "restricted_subtitle": {
+    "message": "Deze pagina beperkt contentscripts. Probeer een andere pagina."
+  },
+  "scan_cancel": {
+    "message": "Scan annuleren"
+  },
+  "scan_discovering": {
+    "message": "Afbeeldingen ontdekken..."
+  },
+  "scan_progress_text": {
+    "message": "Scannen: {current} van {total}"
+  },
+  "scan_scanning": {
+    "message": "Scannen..."
+  },
+  "scan_updated": {
+    "message": "Bijgewerkt"
+  },
+  "scan_updating": {
+    "message": "Bijwerken..."
+  },
+  "status_n_selected": {
+    "message": "{count} geselecteerd"
+  },
+  "status_total_images": {
+    "message": "{count} totaal"
+  },
+  "title_click_copy_color": {
+    "message": "Klik om {color} te kopiëren"
+  },
+  "title_collection": {
+    "message": "Collectie"
+  },
+  "title_download": {
+    "message": "Afbeeldingen downloaden"
+  },
+  "title_multitab": {
+    "message": "Multi-tabblad extractie"
+  },
+  "title_rescan": {
+    "message": "Afbeeldingen opnieuw scannen"
+  },
+  "title_select_all": {
+    "message": "Klik om alles te selecteren"
+  },
+  "title_settings": {
+    "message": "Instellingen"
+  },
+  "title_switch_grid": {
+    "message": "Schakelen naar rasterweergave"
+  },
+  "title_switch_list": {
+    "message": "Schakelen naar lijstweergave"
+  },
+  "title_transparent_image": {
+    "message": "Transparante afbeelding"
+  },
+  "title_upgrade_copy_color": {
+    "message": "Upgrade naar Pro om kleuren te kopiëren"
+  },
+  "title_view_similar": {
+    "message": "Vergelijkbare afbeeldingen bekijken"
+  },
+  "toast_deactivate_failed": {
+    "message": "Kan niet deactiveren"
+  },
+  "toast_license_deactivated": {
+    "message": "Licentie gedeactiveerd"
+  },
+  "toast_n_new": {
+    "message": "{count} nieuw"
+  },
+  "toast_n_removed": {
+    "message": "{count} verwijderd"
+  },
+  "toast_pro_color_filter": {
+    "message": "Kleurfiltering is een Pro-functie. Upgrade om op kleur te filteren!"
+  },
+  "toast_pro_naming_locked": {
+    "message": "Aangepaste naamgeving is een Pro-functie. Upgrade om te ontgrendelen!"
+  },
+  "toast_pro_setting_locked": {
+    "message": "Deze instelling vereist Pro. Upgrade om te ontgrendelen!"
+  },
+  "toast_settings_reset": {
+    "message": "Instellingen hersteld naar standaardwaarden"
+  },
+  "view_grid": {
+    "message": "Raster"
+  },
+  "view_list": {
+    "message": "Lijst"
+  },
+  "format_original": {
+    "message": "Origineel"
+  },
+  "menu_reverse_search": {
+    "message": "Omgekeerd zoeken"
+  },
+  "settings_all_frames_desc": {
+    "message": "Scan ook afbeeldingen in iframes en ingebedde frames"
+  },
+  "settings_color_extract_desc": {
+    "message": "Extraheer dominante kleuren uit elke afbeelding voor filtering"
+  },
+  "settings_download_options_desc": {
+    "message": "Pas submap, bestandsnaamsjabloon en formaatconversie aan"
+  },
+  "settings_hotkey": {
+    "message": "Sneltoets:"
+  },
+  "settings_live_monitor_desc": {
+    "message": "Detecteer automatisch nieuwe afbeeldingen wanneer de pagina-inhoud verandert"
+  },
+  "settings_max_size": {
+    "message": "Maximale groottefilter inschakelen"
+  },
+  "settings_max_size_desc": {
+    "message": "Verberg afbeeldingen groter dan de opgegeven afmetingen"
+  },
+  "settings_min_size": {
+    "message": "Minimale groottefilter inschakelen"
+  },
+  "settings_min_size_desc": {
+    "message": "Verberg afbeeldingen kleiner dan de opgegeven afmetingen"
+  },
+  "settings_no_warning_desc": {
+    "message": "Sla het bevestigingsvenster over bij het downloaden van veel bestanden"
+  },
+  "settings_section_display": {
+    "message": "Weergave"
+  },
+  "settings_section_pro": {
+    "message": "Pro"
+  },
+  "settings_section_account": {
+    "message": "Account"
+  },
+  "settings_similar_desc": {
+    "message": "Vind en groepeer visueel vergelijkbare of dubbele afbeeldingen"
+  },
+  "settings_telemetry_desc": {
+    "message": "Stuur anonieme functiegebruiksgebeurtenissen. Geen URL's, geen afbeeldingen, geen persoonlijke gegevens."
+  },
+  "status_found_prefix": {
+    "message": "Gevonden"
+  },
+  "status_found_suffix": {
+    "message": "afbeeldingen"
+  },
+  "filter_type_other": {
+    "message": "Overig"
+  },
+  "license_activating": {
+    "message": "Activeren..."
+  },
+  "license_activation_failed": {
+    "message": "Activering mislukt"
+  },
+  "license_enter_key": {
+    "message": "Voer een licentiesleutel in"
+  },
+  "license_network_error": {
+    "message": "Netwerkfout. Probeer het opnieuw."
+  },
+  "license_placeholder": {
+    "message": "Voer licentiesleutel in"
+  },
+  "settings_height_gte": {
+    "message": "Hoogte ≥"
+  },
+  "settings_height_lte": {
+    "message": "Hoogte ≤"
+  },
+  "settings_width_gte": {
+    "message": "Breedte ≥"
+  },
+  "settings_width_lte": {
+    "message": "Breedte ≤"
+  },
+  "toast_pro_activated": {
+    "message": "Pro succesvol geactiveerd!"
+  },
+  "multitab_extracting": {
+    "message": "Extraheren..."
+  },
+  "multitab_starting": {
+    "message": "Extractie starten..."
+  },
+  "settings_variables_hint": {
+    "message": "Variabelen: {domain}, {index}, {original}, {format}, {width}, {height}"
+  },
+  "toast_extraction_cancelled": {
+    "message": "Extractie geannuleerd"
+  },
+  "toast_extraction_failed": {
+    "message": "Extractie mislukt"
+  },
+  "toast_extraction_success": {
+    "message": "{images} afbeeldingen geëxtraheerd uit {tabs} tabbladen"
+  },
+  "toast_multitab_failed": {
+    "message": "Multi-tabblad extractie mislukt"
+  },
+  "restricted_notice": {
+    "message": "Deze pagina staat extensies niet toe om scripts te injecteren. Navigeer naar een gewone webpagina (bijv. een artikel, galerij of zoekresultaten) om afbeeldingen te extraheren."
+  },
+  "restricted_features_heading": {
+    "message": "Wat je kunt doen met Image Harvest"
+  },
+  "restricted_feature_batch_title": {
+    "message": "Batchdownload"
+  },
+  "restricted_feature_batch_desc": {
+    "message": "Selecteer en download alle afbeeldingen van elke webpagina met één klik. Filter op grootte, formaat of layout."
+  },
+  "restricted_feature_dedup_title": {
+    "message": "Detectie vergelijkbare afbeeldingen"
+  },
+  "restricted_feature_dedup_desc": {
+    "message": "Vind en verwijder automatisch bijna-duplicaten met perceptuele hashing."
+  },
+  "restricted_feature_reverse_title": {
+    "message": "Omgekeerd afbeeldingen zoeken"
+  },
+  "restricted_feature_reverse_desc": {
+    "message": "Zoek elke afbeelding op via Google, TinEye, Yandex en Baidu met een enkele klik."
+  },
+  "restricted_feature_multitab_title": {
+    "message": "Multi-tabblad extractie"
+  },
+  "restricted_feature_multitab_desc": {
+    "message": "Extraheer afbeeldingen uit meerdere open tabbladen tegelijk en download ze allemaal in een ZIP-archief."
+  },
+  "restricted_feature_color_title": {
+    "message": "Kleurextractie"
+  },
+  "restricted_feature_color_desc": {
+    "message": "Extraheer automatisch dominante kleuren uit elke afbeelding. Klik op een kleurstaal om de hexcode te kopiëren."
+  },
+  "restricted_feature_filter_title": {
+    "message": "Slimme filters"
+  },
+  "restricted_feature_filter_desc": {
+    "message": "Filter afbeeldingen op grootte, type, layout, URL-patroon of dominante kleur om precies te vinden wat je zoekt."
+  },
+  "restricted_feature_collection_title": {
+    "message": "Favorieten collectie"
+  },
+  "restricted_feature_collection_desc": {
+    "message": "Sla afbeeldingen op in een permanente collectie die bewaard blijft tussen sessies. Organiseer en bekijk op elk moment."
+  },
+  "restricted_feature_preview_title": {
+    "message": "Direct voorbeeld"
+  },
+  "restricted_feature_preview_desc": {
+    "message": "Bekijk afbeeldingen op volledige resolutie met metadata — afmetingen, bestandsgrootte en formaat — in één oogopslag."
+  },
+  "restricted_link_website": {
+    "message": "Officiële website"
+  },
+  "trial_error_already_redeemed": {
+    "message": "Je hebt je gratis proefperiode al gebruikt op deze installatie."
+  },
+  "trial_error_already_used": {
+    "message": "Je hebt je gratis proefperiode al gebruikt."
+  },
+  "trial_error_http": {
+    "message": "Kan proefperiode niet starten. Probeer het later opnieuw."
+  },
+  "trial_error_network": {
+    "message": "Netwerkfout. Controleer je verbinding en probeer het opnieuw."
+  },
+  "trial_error_server_declined": {
+    "message": "Server heeft de proefperiode geweigerd."
+  },
+  "license_error_network": {
+    "message": "Netwerkfout. Controleer je verbinding."
+  },
+  "license_error_invalid_key": {
+    "message": "Ongeldige licentiesleutel."
+  },
+  "license_error_activation_failed": {
+    "message": "Activering mislukt. Probeer het opnieuw."
+  }
+}

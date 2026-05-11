@@ -107,11 +107,24 @@ describe('normalizeLocale', () => {
   });
 
   it('falls back to en for unsupported / empty input', () => {
-    expect(normalizeLocale('fr')).toBe('en');
-    expect(normalizeLocale('de-DE')).toBe('en');
+    expect(normalizeLocale('xyz')).toBe('en');
+    expect(normalizeLocale('sv-SE')).toBe('en');
     expect(normalizeLocale('')).toBe('en');
     expect(normalizeLocale(null)).toBe('en');
     expect(normalizeLocale(undefined)).toBe('en');
+  });
+
+  it('maps new supported locales correctly', () => {
+    expect(normalizeLocale('fr')).toBe('fr');
+    expect(normalizeLocale('de-DE')).toBe('de');
+    expect(normalizeLocale('ko')).toBe('ko');
+    expect(normalizeLocale('pt-BR')).toBe('pt');
+    expect(normalizeLocale('ru')).toBe('ru');
+    expect(normalizeLocale('ar')).toBe('ar');
+    expect(normalizeLocale('hi')).toBe('hi');
+    expect(normalizeLocale('th')).toBe('th');
+    expect(normalizeLocale('it')).toBe('it');
+    expect(normalizeLocale('nl')).toBe('nl');
   });
 });
 
@@ -248,8 +261,12 @@ describe('catalogue parity', () => {
 });
 
 describe('SUPPORTED_LOCALES + getLocaleLabel', () => {
-  it('exposes the expected 5-locale roster', () => {
-    expect([...SUPPORTED_LOCALES]).toEqual(['en', 'zh-CN', 'zh-TW', 'ja', 'es']);
+  it('exposes the expected 15-locale roster', () => {
+    expect([...SUPPORTED_LOCALES]).toEqual([
+      'en', 'zh-CN', 'zh-TW', 'ja', 'es',
+      'ko', 'de', 'fr', 'pt', 'ru',
+      'ar', 'hi', 'th', 'it', 'nl',
+    ]);
   });
 
   it('returns a human-readable label for every supported locale', () => {

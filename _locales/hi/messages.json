@@ -1,0 +1,971 @@
+{
+  "app_name": {
+    "message": "Image Harvest"
+  },
+  "app_tagline": {
+    "message": "किसी भी वेबपेज से कोई भी छवि डाउनलोड करें"
+  },
+  "common_cancel": {
+    "message": "रद्द करें"
+  },
+  "common_confirm": {
+    "message": "पुष्टि करें"
+  },
+  "common_close": {
+    "message": "बंद करें"
+  },
+  "common_save": {
+    "message": "सहेजें"
+  },
+  "common_delete": {
+    "message": "हटाएं"
+  },
+  "common_copy": {
+    "message": "कॉपी करें"
+  },
+  "common_download": {
+    "message": "डाउनलोड"
+  },
+  "common_upgrade": {
+    "message": "Pro में अपग्रेड करें"
+  },
+  "common_maybe_later": {
+    "message": "बाद में"
+  },
+  "settings_title": {
+    "message": "सेटिंग्स"
+  },
+  "settings_section_appearance": {
+    "message": "दिखावट"
+  },
+  "settings_section_experience": {
+    "message": "अनुभव"
+  },
+  "settings_section_scan": {
+    "message": "स्कैन"
+  },
+  "settings_section_download": {
+    "message": "डाउनलोड"
+  },
+  "settings_section_language": {
+    "message": "भाषा"
+  },
+  "settings_language_label": {
+    "message": "प्रदर्शन भाषा"
+  },
+  "toolbar_select_all": {
+    "message": "सभी चुनें"
+  },
+  "toolbar_deselect_all": {
+    "message": "सभी अचयनित करें"
+  },
+  "toolbar_copy_urls": {
+    "message": "URL कॉपी करें"
+  },
+  "toolbar_copy_urls_tooltip": {
+    "message": "चयनित छवि URL क्लिपबोर्ड पर कॉपी करें"
+  },
+  "toolbar_copy_urls_empty": {
+    "message": "पहले छवियां चुनें"
+  },
+  "toast_url_copied_single": {
+    "message": "URL कॉपी हो गया!"
+  },
+  "toast_url_copied_batch": {
+    "message": "{count} URL क्लिपबोर्ड पर कॉपी किए गए"
+  },
+  "toast_url_copy_failed": {
+    "message": "URL कॉपी करने में विफल"
+  },
+  "toast_download_started": {
+    "message": "डाउनलोड शुरू हुआ"
+  },
+  "toast_download_failed": {
+    "message": "डाउनलोड विफल"
+  },
+  "toast_download_cancelled": {
+    "message": "डाउनलोड रद्द किया गया"
+  },
+  "toast_download_completed": {
+    "message": "{count} छवियां डाउनलोड हुईं"
+  },
+  "toast_no_images_selected": {
+    "message": "कोई छवि चयनित नहीं"
+  },
+  "toast_image_removed": {
+    "message": "छवि हटाई गई"
+  },
+  "toast_collection_added": {
+    "message": "संग्रह में जोड़ा गया"
+  },
+  "toast_collection_add_failed": {
+    "message": "संग्रह में जोड़ने में विफल"
+  },
+  "toast_collection_removed": {
+    "message": "संग्रह से हटाया गया"
+  },
+  "toast_collection_remove_failed": {
+    "message": "हटाने में विफल"
+  },
+  "toast_color_copied": {
+    "message": "रंग {hex} कॉपी हो गया"
+  },
+  "toast_color_copy_failed": {
+    "message": "रंग कॉपी करने में विफल"
+  },
+  "pro_feature_blocked_format_conversion": {
+    "message": "फॉर्मेट कन्वर्शन एक Pro सुविधा है। अनलॉक करने के लिए अपग्रेड करें!"
+  },
+  "pro_feature_blocked_advanced_grouping": {
+    "message": "उन्नत ग्रुपिंग एक Pro सुविधा है। अनलॉक करने के लिए अपग्रेड करें!"
+  },
+  "pro_feature_blocked_collection": {
+    "message": "संग्रह एक Pro सुविधा है"
+  },
+  "pro_feature_blocked_image_delete": {
+    "message": "छवि हटाना एक Pro सुविधा है। अनलॉक करने के लिए अपग्रेड करें!"
+  },
+  "pro_feature_blocked_color_copy": {
+    "message": "रंग कॉपी एक Pro सुविधा है"
+  },
+  "pro_feature_blocked_reverse_search": {
+    "message": "{engine} सर्च के लिए Pro आवश्यक है। अनलॉक करने के लिए अपग्रेड करें!"
+  },
+  "pro_zip_limit": {
+    "message": "मुफ्त योजना प्रति ZIP अधिकतम {max} छवियों की अनुमति देती है। असीमित के लिए Pro में अपग्रेड करें!"
+  },
+  "pro_copy_urls_limit": {
+    "message": "मुफ्त योजना एक बार में अधिकतम {max} URL की अनुमति देती है। असीमित के लिए Pro में अपग्रेड करें!"
+  },
+  "pro_collection_limit": {
+    "message": "मुफ्त योजना अधिकतम {max} पसंदीदा की अनुमति देती है। असीमित के लिए Pro में अपग्रेड करें!"
+  },
+  "toolbar_sort": {
+    "message": "क्रमबद्ध करें"
+  },
+  "toolbar_group": {
+    "message": "समूह"
+  },
+  "toolbar_similar": {
+    "message": "समान"
+  },
+  "status_similar_count": {
+    "message": "{count} समान"
+  },
+  "toolbar_rescan": {
+    "message": "पुनः स्कैन"
+  },
+  "toolbar_download_all": {
+    "message": "सभी डाउनलोड करें"
+  },
+  "toolbar_download_selected": {
+    "message": "डाउनलोड ({count})"
+  },
+  "filter_size": {
+    "message": "आकार"
+  },
+  "filter_type": {
+    "message": "प्रकार"
+  },
+  "filter_layout": {
+    "message": "लेआउट"
+  },
+  "filter_url": {
+    "message": "URL"
+  },
+  "filter_color": {
+    "message": "रंग"
+  },
+  "filter_all": {
+    "message": "सभी"
+  },
+  "filter_min_width": {
+    "message": "न्यूनतम W"
+  },
+  "filter_max_width": {
+    "message": "अधिकतम W"
+  },
+  "filter_height": {
+    "message": "H"
+  },
+  "filter_none": {
+    "message": "कोई नहीं"
+  },
+  "filter_format": {
+    "message": "फॉर्मेट"
+  },
+  "filter_domain": {
+    "message": "डोमेन"
+  },
+  "filter_tab": {
+    "message": "टैब"
+  },
+  "sort_none": {
+    "message": "कोई नहीं (पेज क्रम)"
+  },
+  "sort_size_desc": {
+    "message": "आकार ↓ (बड़ा पहले)"
+  },
+  "sort_size_asc": {
+    "message": "आकार ↑ (छोटा पहले)"
+  },
+  "sort_filesize_desc": {
+    "message": "फ़ाइल आकार ↓ (बड़ा पहले)"
+  },
+  "sort_filesize_asc": {
+    "message": "फ़ाइल आकार ↑ (छोटा पहले)"
+  },
+  "layout_all": {
+    "message": "सभी"
+  },
+  "layout_square": {
+    "message": "वर्गाकार (1:1)"
+  },
+  "layout_landscape": {
+    "message": "लैंडस्केप (>1:1)"
+  },
+  "layout_portrait": {
+    "message": "पोर्ट्रेट (<1:1)"
+  },
+  "layout_panorama": {
+    "message": "पैनोरमा (>2:1)"
+  },
+  "size_all": {
+    "message": "सभी"
+  },
+  "size_small": {
+    "message": "छोटा < 100px"
+  },
+  "size_medium": {
+    "message": "मध्यम 100-500px"
+  },
+  "size_large": {
+    "message": "बड़ा 500-1000px"
+  },
+  "size_xl": {
+    "message": "XL > 1000px"
+  },
+  "size_btn_small": {
+    "message": "छोटा"
+  },
+  "size_btn_medium": {
+    "message": "मध्यम"
+  },
+  "size_btn_large": {
+    "message": "बड़ा"
+  },
+  "size_btn_xl": {
+    "message": "XL"
+  },
+  "size_btn_custom": {
+    "message": "कस्टम"
+  },
+  "layout_btn_square": {
+    "message": "वर्गाकार"
+  },
+  "layout_btn_landscape": {
+    "message": "लैंडस्केप"
+  },
+  "layout_btn_portrait": {
+    "message": "पोर्ट्रेट"
+  },
+  "layout_btn_panorama": {
+    "message": "पैनोरमा"
+  },
+  "color_all": {
+    "message": "सभी रंग"
+  },
+  "color_no_extracted": {
+    "message": "अभी तक कोई रंग निकाला नहीं गया"
+  },
+  "filter_url_placeholder": {
+    "message": "URL कीवर्ड से फ़िल्टर करें..."
+  },
+  "settings_display": {
+    "message": "प्रदर्शन"
+  },
+  "settings_side_panel": {
+    "message": "साइड पैनल में दिखाएं"
+  },
+  "settings_side_panel_desc": {
+    "message": "पॉपअप विंडो के बजाय ब्राउज़र साइड पैनल में परिणाम खोलें"
+  },
+  "settings_density": {
+    "message": "लेआउट घनत्व:"
+  },
+  "settings_density_compact": {
+    "message": "सघन"
+  },
+  "settings_density_standard": {
+    "message": "मानक"
+  },
+  "settings_density_comfortable": {
+    "message": "आरामदायक"
+  },
+  "settings_theme": {
+    "message": "थीम:"
+  },
+  "settings_theme_system": {
+    "message": "सिस्टम"
+  },
+  "settings_theme_light": {
+    "message": "लाइट"
+  },
+  "settings_theme_dark": {
+    "message": "डार्क"
+  },
+  "settings_default_group": {
+    "message": "डिफ़ॉल्ट ग्रुप:"
+  },
+  "settings_similar": {
+    "message": "समान छवि पहचान"
+  },
+  "settings_color_extract": {
+    "message": "रंग निष्कर्षण"
+  },
+  "settings_all_frames": {
+    "message": "सभी फ़्रेम में खोजें"
+  },
+  "settings_live_monitor": {
+    "message": "लाइव मॉनिटरिंग"
+  },
+  "settings_download_options": {
+    "message": "डाउनलोड विकल्प निर्दिष्ट करें"
+  },
+  "settings_subfolder": {
+    "message": "सबफ़ोल्डर:"
+  },
+  "settings_filename": {
+    "message": "फ़ाइल नाम:"
+  },
+  "settings_convert_format": {
+    "message": "फॉर्मेट कन्वर्ट करें:"
+  },
+  "settings_no_warning": {
+    "message": "कई फ़ाइलें डाउनलोड करते समय चेतावनी न दें"
+  },
+  "settings_telemetry": {
+    "message": "गुमनाम उपयोग डेटा साझा करें"
+  },
+  "settings_save": {
+    "message": "सेटिंग्स सहेजें"
+  },
+  "settings_reset": {
+    "message": "रीसेट"
+  },
+  "settings_saved": {
+    "message": "सेटिंग्स सहेजी गईं"
+  },
+  "settings_save_failed": {
+    "message": "सेटिंग्स सहेजने में विफल"
+  },
+  "status_found_images": {
+    "message": "{count} छवियां मिलीं"
+  },
+  "status_similar": {
+    "message": "समान"
+  },
+  "rating_title": {
+    "message": "Image Harvest पसंद आ रहा है?"
+  },
+  "rating_desc": {
+    "message": "अगर हमने आपका समय बचाया है, तो Chrome Web Store पर एक 5-स्टार समीक्षा हमारे लिए बहुत मायने रखेगी।"
+  },
+  "rating_rate_now": {
+    "message": "⭐ Chrome Store पर रेट करें"
+  },
+  "rating_later": {
+    "message": "बाद में"
+  },
+  "rating_never": {
+    "message": "दोबारा न पूछें"
+  },
+  "rating_close": {
+    "message": "बंद करें"
+  },
+  "btn_deactivate": {
+    "message": "निष्क्रिय करें"
+  },
+  "license_deactivating": {
+    "message": "निष्क्रिय किया जा रहा है..."
+  },
+  "card_add_to_collection": {
+    "message": "संग्रह में जोड़ें"
+  },
+  "card_copy_url": {
+    "message": "URL कॉपी करें"
+  },
+  "card_open_in_new_tab": {
+    "message": "नए टैब में खोलें"
+  },
+  "card_remove_from_collection": {
+    "message": "संग्रह से हटाएं"
+  },
+  "card_remove_image": {
+    "message": "छवि हटाएं"
+  },
+  "card_reverse_search": {
+    "message": "रिवर्स सर्च ({engine})"
+  },
+  "collection_export_tooltip": {
+    "message": "संग्रह को ZIP के रूप में निर्यात करें"
+  },
+  "collection_modal_title": {
+    "message": "संग्रह"
+  },
+  "collection_search_placeholder": {
+    "message": "संग्रह में खोजें..."
+  },
+  "collection_no_match": {
+    "message": "कोई मेल खाती छवि नहीं मिली"
+  },
+  "collection_empty_title": {
+    "message": "आपका संग्रह खाली है"
+  },
+  "collection_no_match_hint": {
+    "message": "कोई अन्य खोज कीवर्ड आज़माएं"
+  },
+  "collection_empty_hint": {
+    "message": "किसी भी छवि पर स्टार आइकन क्लिक करके उसे अपने संग्रह में जोड़ें"
+  },
+  "common_dismiss": {
+    "message": "खारिज करें"
+  },
+  "common_remove": {
+    "message": "हटाएं"
+  },
+  "confirm_remove_image_message": {
+    "message": "इस छवि को सूची से हटाएं?"
+  },
+  "confirm_remove_image_title": {
+    "message": "छवि हटाएं"
+  },
+  "dedup_modal_title": {
+    "message": "समान छवियां"
+  },
+  "dedup_no_similar": {
+    "message": "कोई समान छवि नहीं मिली"
+  },
+  "dedup_group_title": {
+    "message": "समूह {index} ({count} समान)"
+  },
+  "dedup_remove_duplicates": {
+    "message": "डुप्लिकेट हटाएं"
+  },
+  "dialog_deactivate_message": {
+    "message": "क्या आप वाकई इस डिवाइस पर अपना लाइसेंस निष्क्रिय करना चाहते हैं? निष्क्रियण के बाद आप इसे किसी अन्य डिवाइस पर सक्रिय कर सकते हैं।"
+  },
+  "dialog_deactivate_title": {
+    "message": "लाइसेंस निष्क्रिय करें"
+  },
+  "dialog_download_many_message": {
+    "message": "आप {count} छवियां डाउनलोड करने वाले हैं। जारी रखें?"
+  },
+  "dialog_download_many_title": {
+    "message": "कई छवियां डाउनलोड करें"
+  },
+  "empty_no_images_desc": {
+    "message": "पेज स्क्रॉल करें या अधिक छवियां खोजने के लिए पुनः स्कैन क्लिक करें।"
+  },
+  "empty_no_results_desc": {
+    "message": "अधिक परिणाम देखने के लिए अपने फ़िल्टर समायोजित करें।"
+  },
+  "empty_rescan_images": {
+    "message": "छवियां पुनः स्कैन करें"
+  },
+  "empty_reset_filters": {
+    "message": "फ़िल्टर रीसेट करें"
+  },
+  "empty_title": {
+    "message": "कोई छवि नहीं मिली"
+  },
+  "error_default_code": {
+    "message": "त्रुटि"
+  },
+  "error_default_message": {
+    "message": "एक त्रुटि हुई"
+  },
+  "grid_current_tab_badge": {
+    "message": "वर्तमान टैब"
+  },
+  "hotkey_not_set": {
+    "message": "सेट नहीं"
+  },
+  "hotkey_click_to_set": {
+    "message": "सेट करने के लिए क्लिक करें"
+  },
+  "live_indicator_label": {
+    "message": "लाइव"
+  },
+  "live_indicator_tooltip": {
+    "message": "लाइव मॉनिटरिंग सक्रिय है — नई छवियां स्वचालित रूप से पहचानी जाती हैं"
+  },
+  "multitab_modal_title": {
+    "message": "मल्टी-टैब एक्सट्रैक्ट"
+  },
+  "multitab_progress_default": {
+    "message": "चयनित टैब से छवियां निकाली जा रही हैं..."
+  },
+  "multitab_start_extraction": {
+    "message": "निष्कर्षण शुरू करें"
+  },
+  "multitab_current": {
+    "message": "वर्तमान"
+  },
+  "multitab_untitled": {
+    "message": "बिना शीर्षक"
+  },
+  "paywall_banner_desc": {
+    "message": "मल्टी-टैब निष्कर्षण, रंग फ़िल्टरिंग और अन्य उन्नत सुविधाएं अनलॉक करें।"
+  },
+  "paywall_banner_later": {
+    "message": "बाद में"
+  },
+  "paywall_banner_title": {
+    "message": "Pro में अपग्रेड करें"
+  },
+  "paywall_banner_try_cta": {
+    "message": "Pro मुफ्त आज़माएं"
+  },
+  "plan_expires_date": {
+    "message": "समाप्ति: {date}"
+  },
+  "plan_lifetime": {
+    "message": "आजीवन"
+  },
+  "plan_monthly": {
+    "message": "मासिक"
+  },
+  "plan_never_expires": {
+    "message": "कभी समाप्त नहीं होता"
+  },
+  "plan_yearly": {
+    "message": "वार्षिक"
+  },
+  "privacy_accept": {
+    "message": "स्वीकार करें"
+  },
+  "privacy_anonymous_data": {
+    "message": "गुमनाम उपयोग डेटा"
+  },
+  "privacy_collect_desc": {
+    "message": "सुविधा उपयोग, क्रैश रिपोर्ट, और प्रदर्शन मेट्रिक्स"
+  },
+  "privacy_collect_title": {
+    "message": "हम क्या एकत्र करते हैं"
+  },
+  "privacy_decline": {
+    "message": "अस्वीकार करें"
+  },
+  "privacy_desc_prefix": {
+    "message": "हम "
+  },
+  "privacy_desc_suffix": {
+    "message": " Image Harvest को बेहतर बनाने के लिए एकत्र करते हैं।"
+  },
+  "privacy_footnote": {
+    "message": "आप इसे कभी भी सेटिंग्स में बदल सकते हैं।"
+  },
+  "privacy_modal_title": {
+    "message": "Image Harvest को बेहतर बनाने में मदद करें"
+  },
+  "privacy_never_collect_desc": {
+    "message": "व्यक्तिगत डेटा, ब्राउज़िंग इतिहास, या छवि सामग्री"
+  },
+  "privacy_never_collect_title": {
+    "message": "हम कभी एकत्र नहीं करते"
+  },
+  "privacy_reversible_desc": {
+    "message": "सेटिंग्स में कभी भी अपनी पसंद बदलें"
+  },
+  "privacy_reversible_title": {
+    "message": "पूरी तरह प्रतिवर्ती"
+  },
+  "pro_activate": {
+    "message": "सक्रिय करें"
+  },
+  "pro_active_badge": {
+    "message": "Pro सक्रिय"
+  },
+  "pro_already_have_key": {
+    "message": "पहले से लाइसेंस कुंजी है?"
+  },
+  "pro_deactivate_tooltip": {
+    "message": "लाइसेंस निष्क्रिय करें"
+  },
+  "pro_feature_batch_desc": {
+    "message": "एक क्लिक में सभी छवियां एक साथ डाउनलोड करें"
+  },
+  "pro_feature_batch_title": {
+    "message": "बैच डाउनलोड"
+  },
+  "pro_feature_color_desc": {
+    "message": "प्रमुख रंग के अनुसार छवियां फ़िल्टर करें"
+  },
+  "pro_feature_color_title": {
+    "message": "रंग फ़िल्टरिंग"
+  },
+  "pro_feature_dedup_desc": {
+    "message": "डुप्लिकेट छवियों को स्वचालित रूप से पहचानें और हटाएं"
+  },
+  "pro_feature_dedup_title": {
+    "message": "डुप्लिकेट पहचान"
+  },
+  "pro_feature_multitab_desc": {
+    "message": "एक साथ कई टैब से छवियां निकालें"
+  },
+  "pro_feature_multitab_title": {
+    "message": "मल्टी-टैब निष्कर्षण"
+  },
+  "pro_feature_reverse_search_desc": {
+    "message": "रिवर्स सर्च से किसी भी छवि का स्रोत खोजें"
+  },
+  "pro_feature_reverse_search_title": {
+    "message": "रिवर्स इमेज सर्च"
+  },
+  "pro_get_pro_link": {
+    "message": "Pro पाएं"
+  },
+  "pro_headline_variant_a": {
+    "message": "Image Harvest की पूरी शक्ति अनलॉक करें"
+  },
+  "pro_headline_variant_b": {
+    "message": "Pro बनें — हर हफ्ते घंटे बचाएं"
+  },
+  "pro_no_key_hint": {
+    "message": "अभी तक कुंजी नहीं है?"
+  },
+  "pro_pricing_cta": {
+    "message": "मूल्य देखें"
+  },
+  "pro_subline_variant_a": {
+    "message": "एक बार भुगतान। आजीवन अपडेट।"
+  },
+  "pro_subline_variant_b": {
+    "message": "हज़ारों पावर यूज़र्स से जुड़ें।"
+  },
+  "pro_trial_badge": {
+    "message": "7-दिन मुफ्त ट्रायल"
+  },
+  "pro_trial_desc": {
+    "message": "7 दिनों के लिए सभी Pro सुविधाएं मुफ्त आज़माएं। कोई बाध्यता नहीं।"
+  },
+  "pro_trial_perk_full_access": {
+    "message": "सभी Pro सुविधाओं तक पूर्ण पहुंच"
+  },
+  "pro_trial_perk_no_card": {
+    "message": "क्रेडिट कार्ड आवश्यक नहीं"
+  },
+  "pro_trial_perk_cancel": {
+    "message": "स्वचालित रूप से समाप्त होता है — रद्द करने की आवश्यकता नहीं"
+  },
+  "pro_trial_start_cta": {
+    "message": "मुफ्त ट्रायल शुरू करें"
+  },
+  "pro_trial_start_failed": {
+    "message": "ट्रायल शुरू करने में विफल"
+  },
+  "pro_trial_started_toast": {
+    "message": "Pro ट्रायल सक्रिय! 7 दिनों तक सभी सुविधाओं का आनंद लें।"
+  },
+  "pro_trial_starting": {
+    "message": "ट्रायल शुरू हो रहा है..."
+  },
+  "pro_trial_unavailable": {
+    "message": "ट्रायल उपलब्ध नहीं"
+  },
+  "progress_downloading": {
+    "message": "डाउनलोड हो रहा है..."
+  },
+  "progress_text": {
+    "message": "{current} / {total}"
+  },
+  "progress_multitab_text": {
+    "message": "{current}/{total} टैब · {count} छवियां मिलीं"
+  },
+  "restricted_subtitle": {
+    "message": "यह पेज कंटेंट स्क्रिप्ट को प्रतिबंधित करता है। कोई अन्य पेज आज़माएं।"
+  },
+  "scan_cancel": {
+    "message": "स्कैन रद्द करें"
+  },
+  "scan_discovering": {
+    "message": "छवियां खोजी जा रही हैं..."
+  },
+  "scan_progress_text": {
+    "message": "स्कैनिंग: {current} / {total}"
+  },
+  "scan_scanning": {
+    "message": "स्कैन हो रहा है..."
+  },
+  "scan_updated": {
+    "message": "अपडेट हुआ"
+  },
+  "scan_updating": {
+    "message": "अपडेट हो रहा है..."
+  },
+  "status_n_selected": {
+    "message": "{count} चयनित"
+  },
+  "status_total_images": {
+    "message": "{count} कुल"
+  },
+  "title_click_copy_color": {
+    "message": "{color} कॉपी करने के लिए क्लिक करें"
+  },
+  "title_collection": {
+    "message": "संग्रह"
+  },
+  "title_download": {
+    "message": "छवियां डाउनलोड करें"
+  },
+  "title_multitab": {
+    "message": "मल्टी-टैब एक्सट्रैक्ट"
+  },
+  "title_rescan": {
+    "message": "छवियां पुनः स्कैन करें"
+  },
+  "title_select_all": {
+    "message": "सभी चुनने के लिए क्लिक करें"
+  },
+  "title_settings": {
+    "message": "सेटिंग्स"
+  },
+  "title_switch_grid": {
+    "message": "ग्रिड व्यू पर स्विच करें"
+  },
+  "title_switch_list": {
+    "message": "सूची व्यू पर स्विच करें"
+  },
+  "title_transparent_image": {
+    "message": "पारदर्शी छवि"
+  },
+  "title_upgrade_copy_color": {
+    "message": "रंग कॉपी करने के लिए Pro में अपग्रेड करें"
+  },
+  "title_view_similar": {
+    "message": "समान छवियां देखें"
+  },
+  "toast_deactivate_failed": {
+    "message": "निष्क्रिय करने में विफल"
+  },
+  "toast_license_deactivated": {
+    "message": "लाइसेंस निष्क्रिय किया गया"
+  },
+  "toast_n_new": {
+    "message": "{count} नई"
+  },
+  "toast_n_removed": {
+    "message": "{count} हटाई गईं"
+  },
+  "toast_pro_color_filter": {
+    "message": "रंग फ़िल्टरिंग एक Pro सुविधा है। रंग से फ़िल्टर करने के लिए अपग्रेड करें!"
+  },
+  "toast_pro_naming_locked": {
+    "message": "कस्टम नामकरण एक Pro सुविधा है। अनलॉक करने के लिए अपग्रेड करें!"
+  },
+  "toast_pro_setting_locked": {
+    "message": "इस सेटिंग के लिए Pro आवश्यक है। अनलॉक करने के लिए अपग्रेड करें!"
+  },
+  "toast_settings_reset": {
+    "message": "सेटिंग्स डिफ़ॉल्ट पर रीसेट हुईं"
+  },
+  "view_grid": {
+    "message": "ग्रिड"
+  },
+  "view_list": {
+    "message": "सूची"
+  },
+  "format_original": {
+    "message": "मूल"
+  },
+  "menu_reverse_search": {
+    "message": "रिवर्स सर्च"
+  },
+  "settings_all_frames_desc": {
+    "message": "iframe और एम्बेडेड फ़्रेम के अंदर की छवियां भी स्कैन करें"
+  },
+  "settings_color_extract_desc": {
+    "message": "फ़िल्टरिंग के लिए प्रत्येक छवि से प्रमुख रंग निकालें"
+  },
+  "settings_download_options_desc": {
+    "message": "सबफ़ोल्डर, फ़ाइल नाम टेम्पलेट, और फॉर्मेट कन्वर्शन कस्टमाइज़ करें"
+  },
+  "settings_hotkey": {
+    "message": "हॉटकी:"
+  },
+  "settings_live_monitor_desc": {
+    "message": "पेज सामग्री बदलने पर नई छवियों को स्वचालित रूप से पहचानें"
+  },
+  "settings_max_size": {
+    "message": "अधिकतम आकार फ़िल्टर सक्षम करें"
+  },
+  "settings_max_size_desc": {
+    "message": "निर्दिष्ट आयामों से बड़ी छवियां छिपाएं"
+  },
+  "settings_min_size": {
+    "message": "न्यूनतम आकार फ़िल्टर सक्षम करें"
+  },
+  "settings_min_size_desc": {
+    "message": "निर्दिष्ट आयामों से छोटी छवियां छिपाएं"
+  },
+  "settings_no_warning_desc": {
+    "message": "कई फ़ाइलें डाउनलोड करते समय पुष्टि संवाद छोड़ें"
+  },
+  "settings_section_display": {
+    "message": "प्रदर्शन"
+  },
+  "settings_section_pro": {
+    "message": "Pro"
+  },
+  "settings_section_account": {
+    "message": "खाता"
+  },
+  "settings_similar_desc": {
+    "message": "दृश्य रूप से समान या डुप्लिकेट छवियां खोजें और समूहित करें"
+  },
+  "settings_telemetry_desc": {
+    "message": "गुमनाम सुविधा-उपयोग इवेंट भेजें। कोई URL नहीं, कोई छवि नहीं, कोई व्यक्तिगत जानकारी नहीं।"
+  },
+  "status_found_prefix": {
+    "message": "मिलीं"
+  },
+  "status_found_suffix": {
+    "message": "छवियां"
+  },
+  "filter_type_other": {
+    "message": "अन्य"
+  },
+  "license_activating": {
+    "message": "सक्रिय किया जा रहा है..."
+  },
+  "license_activation_failed": {
+    "message": "सक्रियण विफल"
+  },
+  "license_enter_key": {
+    "message": "कृपया लाइसेंस कुंजी दर्ज करें"
+  },
+  "license_network_error": {
+    "message": "नेटवर्क त्रुटि। कृपया पुनः प्रयास करें।"
+  },
+  "license_placeholder": {
+    "message": "लाइसेंस कुंजी दर्ज करें"
+  },
+  "settings_height_gte": {
+    "message": "ऊंचाई ≥"
+  },
+  "settings_height_lte": {
+    "message": "ऊंचाई ≤"
+  },
+  "settings_width_gte": {
+    "message": "चौड़ाई ≥"
+  },
+  "settings_width_lte": {
+    "message": "चौड़ाई ≤"
+  },
+  "toast_pro_activated": {
+    "message": "Pro सफलतापूर्वक सक्रिय!"
+  },
+  "multitab_extracting": {
+    "message": "निकाला जा रहा है..."
+  },
+  "multitab_starting": {
+    "message": "निष्कर्षण शुरू हो रहा है..."
+  },
+  "settings_variables_hint": {
+    "message": "वेरिएबल: {domain}, {index}, {original}, {format}, {width}, {height}"
+  },
+  "toast_extraction_cancelled": {
+    "message": "निष्कर्षण रद्द किया गया"
+  },
+  "toast_extraction_failed": {
+    "message": "निष्कर्षण विफल"
+  },
+  "toast_extraction_success": {
+    "message": "{tabs} टैब से {images} छवियां निकाली गईं"
+  },
+  "toast_multitab_failed": {
+    "message": "मल्टी-टैब निष्कर्षण विफल"
+  },
+  "restricted_notice": {
+    "message": "यह पेज एक्सटेंशन को स्क्रिप्ट इंजेक्ट करने की अनुमति नहीं देता। छवियां निकालना शुरू करने के लिए किसी सामान्य वेबपेज (जैसे लेख, गैलरी, या खोज परिणाम) पर जाएं।"
+  },
+  "restricted_features_heading": {
+    "message": "Image Harvest से आप क्या कर सकते हैं"
+  },
+  "restricted_feature_batch_title": {
+    "message": "बैच डाउनलोड"
+  },
+  "restricted_feature_batch_desc": {
+    "message": "एक क्लिक में किसी भी वेबपेज से सभी छवियां चुनें और डाउनलोड करें। आकार, फॉर्मेट, या लेआउट से फ़िल्टर करें।"
+  },
+  "restricted_feature_dedup_title": {
+    "message": "समान छवि पहचान"
+  },
+  "restricted_feature_dedup_desc": {
+    "message": "परसेप्चुअल हैशिंग का उपयोग करके लगभग डुप्लिकेट छवियां स्वचालित रूप से खोजें और हटाएं।"
+  },
+  "restricted_feature_reverse_title": {
+    "message": "रिवर्स इमेज सर्च"
+  },
+  "restricted_feature_reverse_desc": {
+    "message": "Google, TinEye, Yandex, और Baidu पर एक क्लिक में किसी भी छवि को खोजें।"
+  },
+  "restricted_feature_multitab_title": {
+    "message": "मल्टी-टैब एक्सट्रैक्ट"
+  },
+  "restricted_feature_multitab_desc": {
+    "message": "एक साथ कई खुले टैब से छवियां निकालें और उन सभी को ZIP आर्काइव में डाउनलोड करें।"
+  },
+  "restricted_feature_color_title": {
+    "message": "रंग निष्कर्षण"
+  },
+  "restricted_feature_color_desc": {
+    "message": "प्रत्येक छवि से प्रमुख रंग स्वचालित रूप से निकालें। हेक्स कोड कॉपी करने के लिए किसी भी स्वैच पर क्लिक करें।"
+  },
+  "restricted_feature_filter_title": {
+    "message": "स्मार्ट फ़िल्टर"
+  },
+  "restricted_feature_filter_desc": {
+    "message": "आकार, प्रकार, लेआउट, URL पैटर्न, या प्रमुख रंग से छवियां फ़िल्टर करें और ठीक वही खोजें जो आपको चाहिए।"
+  },
+  "restricted_feature_collection_title": {
+    "message": "पसंदीदा संग्रह"
+  },
+  "restricted_feature_collection_desc": {
+    "message": "छवियों को एक स्थायी संग्रह में बुकमार्क करें जो सत्रों के बीच बना रहता है। कभी भी व्यवस्थित करें और पुनः देखें।"
+  },
+  "restricted_feature_preview_title": {
+    "message": "तत्काल पूर्वावलोकन"
+  },
+  "restricted_feature_preview_desc": {
+    "message": "मेटाडेटा — आयाम, फ़ाइल आकार, और फॉर्मेट — के साथ पूर्ण-रिज़ॉल्यूशन छवियां एक नज़र में देखें।"
+  },
+  "restricted_link_website": {
+    "message": "आधिकारिक वेबसाइट"
+  },
+  "trial_error_already_redeemed": {
+    "message": "आपने इस इंस्टॉल पर पहले ही अपना मुफ्त ट्रायल उपयोग कर लिया है।"
+  },
+  "trial_error_already_used": {
+    "message": "आपने पहले ही अपना मुफ्त ट्रायल उपयोग कर लिया है।"
+  },
+  "trial_error_http": {
+    "message": "ट्रायल शुरू नहीं हो सका। कृपया बाद में पुनः प्रयास करें।"
+  },
+  "trial_error_network": {
+    "message": "नेटवर्क त्रुटि। कृपया अपना कनेक्शन जांचें और पुनः प्रयास करें।"
+  },
+  "trial_error_server_declined": {
+    "message": "सर्वर ने ट्रायल अस्वीकार कर दिया।"
+  },
+  "license_error_network": {
+    "message": "नेटवर्क त्रुटि। कृपया अपना कनेक्शन जांचें।"
+  },
+  "license_error_invalid_key": {
+    "message": "अमान्य लाइसेंस कुंजी।"
+  },
+  "license_error_activation_failed": {
+    "message": "सक्रियण विफल। कृपया पुनः प्रयास करें।"
+  }
+}

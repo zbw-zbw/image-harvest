@@ -184,7 +184,7 @@ describe('startTrial', () => {
     const result = await startTrial();
 
     expect(result.success).toBe(false);
-    expect(result.error).toMatch(/already used your free trial/i);
+    expect(result.error).toBe('trial_error_already_redeemed');
     expect(fetchMock).not.toHaveBeenCalled();
     expect(mockSaveLicenseData).not.toHaveBeenCalled();
   });
@@ -199,7 +199,7 @@ describe('startTrial', () => {
     const result = await startTrial();
 
     expect(result.success).toBe(false);
-    expect(result.error).toMatch(/already used your free trial/i);
+    expect(result.error).toBe('trial_error_already_used');
     // Pin: the sentinel persistence on 409 is what prevents future
     // network round-trips. Without it, every modal open would hit
     // /api/trial/start and waste both the user's bandwidth and our
@@ -218,7 +218,7 @@ describe('startTrial', () => {
     const result = await startTrial();
 
     expect(result.success).toBe(false);
-    expect(result.error).toMatch(/HTTP 500/);
+    expect(result.error).toBe('trial_error_http');
     // Pin: a transient 5xx must NOT lock the user out. They should
     // be able to retry once the server recovers.
     expect(storage.has('_trial_redeemed_at')).toBe(false);
@@ -230,7 +230,7 @@ describe('startTrial', () => {
     const result = await startTrial();
 
     expect(result.success).toBe(false);
-    expect(result.error).toMatch(/network error/i);
+    expect(result.error).toBe('trial_error_network');
     expect(storage.has('_trial_redeemed_at')).toBe(false);
     expect(mockSaveLicenseData).not.toHaveBeenCalled();
   });

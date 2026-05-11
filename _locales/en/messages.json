@@ -947,5 +947,29 @@
   },
   "restricted_link_website": {
     "message": "Official Website"
+  },
+  "trial_error_already_redeemed": {
+    "message": "You have already used your free trial on this install."
+  },
+  "trial_error_already_used": {
+    "message": "You have already used your free trial."
+  },
+  "trial_error_http": {
+    "message": "Could not start trial. Please try again later."
+  },
+  "trial_error_network": {
+    "message": "Network error. Please check your connection and try again."
+  },
+  "trial_error_server_declined": {
+    "message": "Server declined the trial."
+  },
+  "license_error_network": {
+    "message": "Network error. Please check your connection."
+  },
+  "license_error_invalid_key": {
+    "message": "Invalid license key."
+  },
+  "license_error_activation_failed": {
+    "message": "Activation failed. Please try again."
   }
 }

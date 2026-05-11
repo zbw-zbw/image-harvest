@@ -114,7 +114,7 @@ async function validateLicenseRemoteSafe(licenseKey: string): Promise<LicenseVal
     return await validateLicenseRemote(licenseKey);
   } catch (error) {
     console.error('Failed to validate license remotely:', error);
-    return { valid: false, error: 'Network error. Please check your connection.' };
+    return { valid: false, error: 'license_error_network' };
   }
 }
 
@@ -147,7 +147,7 @@ export async function activateLicenseRemote(
     return (await response.json()) as RemoteActivationResponse;
   } catch (error) {
     console.error('Failed to activate license remotely:', error);
-    return { success: false, error: 'Network error. Please check your connection.' };
+    return { success: false, error: 'license_error_network' };
   }
 }
 
@@ -173,7 +173,7 @@ export async function deactivateLicenseRemote(
     return (await response.json()) as DeactivationResult;
   } catch (error) {
     console.error('Failed to deactivate license remotely:', error);
-    return { success: false, error: 'Network error. Please check your connection.' };
+    return { success: false, error: 'license_error_network' };
   }
 }
 
@@ -190,7 +190,7 @@ export async function activateLicense(licenseKey: string): Promise<LicenseActiva
   if (!validation.valid) {
     return {
       success: false,
-      error: validation.error || validation.status || 'Invalid license key',
+      error: validation.error || validation.status || 'license_error_invalid_key',
     };
   }
 
@@ -198,7 +198,7 @@ export async function activateLicense(licenseKey: string): Promise<LicenseActiva
   if (!activation.success) {
     return {
       success: false,
-      error: activation.error || 'Activation failed',
+      error: activation.error || 'license_error_activation_failed',
     };
   }
 

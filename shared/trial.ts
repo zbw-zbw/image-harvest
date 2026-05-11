@@ -89,7 +89,7 @@ export async function startTrial(): Promise<TrialStartResult> {
   if (!(await isTrialEligible())) {
     return {
       success: false,
-      error: 'You have already used your free trial on this install.',
+      error: 'trial_error_already_redeemed',
     };
   }
 
@@ -114,12 +114,12 @@ export async function startTrial(): Promise<TrialStartResult> {
         });
         return {
           success: false,
-          error: 'You have already used your free trial.',
+          error: 'trial_error_already_used',
         };
       }
       return {
         success: false,
-        error: `Could not start trial (HTTP ${resp.status}).`,
+        error: 'trial_error_http',
       };
     }
     response = (await resp.json()) as TrialApiResponse;
@@ -127,14 +127,14 @@ export async function startTrial(): Promise<TrialStartResult> {
     console.error('Trial start network error:', err);
     return {
       success: false,
-      error: 'Network error. Please check your connection and try again.',
+      error: 'trial_error_network',
     };
   }
 
   if (!response.success || !response.licenseKey) {
     return {
       success: false,
-      error: response.error || 'Server declined the trial.',
+      error: response.error || 'trial_error_server_declined',
     };
   }
 

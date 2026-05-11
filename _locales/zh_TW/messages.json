@@ -943,5 +943,29 @@
   },
   "restricted_link_website": {
     "message": "官方網站"
+  },
+  "trial_error_already_redeemed": {
+    "message": "您已在此安裝中使用過免費試用。"
+  },
+  "trial_error_already_used": {
+    "message": "您已使用過免費試用。"
+  },
+  "trial_error_http": {
+    "message": "無法開始試用，請稍後重試。"
+  },
+  "trial_error_network": {
+    "message": "網路錯誤，請檢查您的網路連線後重試。"
+  },
+  "trial_error_server_declined": {
+    "message": "伺服器拒絕了試用請求。"
+  },
+  "license_error_network": {
+    "message": "網路錯誤，請檢查您的網路連線。"
+  },
+  "license_error_invalid_key": {
+    "message": "無效的授權金鑰。"
+  },
+  "license_error_activation_failed": {
+    "message": "啟用失敗，請重試。"
   }
 }

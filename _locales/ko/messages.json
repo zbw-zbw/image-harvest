@@ -1,0 +1,971 @@
+{
+  "app_name": {
+    "message": "Image Harvest"
+  },
+  "app_tagline": {
+    "message": "모든 웹페이지에서 모든 이미지를 다운로드하세요"
+  },
+  "common_cancel": {
+    "message": "취소"
+  },
+  "common_confirm": {
+    "message": "확인"
+  },
+  "common_close": {
+    "message": "닫기"
+  },
+  "common_save": {
+    "message": "저장"
+  },
+  "common_delete": {
+    "message": "삭제"
+  },
+  "common_copy": {
+    "message": "복사"
+  },
+  "common_download": {
+    "message": "다운로드"
+  },
+  "common_upgrade": {
+    "message": "Pro로 업그레이드"
+  },
+  "common_maybe_later": {
+    "message": "나중에"
+  },
+  "settings_title": {
+    "message": "설정"
+  },
+  "settings_section_appearance": {
+    "message": "외관"
+  },
+  "settings_section_experience": {
+    "message": "사용 환경"
+  },
+  "settings_section_scan": {
+    "message": "스캔"
+  },
+  "settings_section_download": {
+    "message": "다운로드"
+  },
+  "settings_section_language": {
+    "message": "언어"
+  },
+  "settings_language_label": {
+    "message": "표시 언어"
+  },
+  "toolbar_select_all": {
+    "message": "모두 선택"
+  },
+  "toolbar_deselect_all": {
+    "message": "선택 해제"
+  },
+  "toolbar_copy_urls": {
+    "message": "URL 복사"
+  },
+  "toolbar_copy_urls_tooltip": {
+    "message": "선택한 이미지 URL을 클립보드에 복사"
+  },
+  "toolbar_copy_urls_empty": {
+    "message": "먼저 이미지를 선택하세요"
+  },
+  "toast_url_copied_single": {
+    "message": "URL이 복사되었습니다!"
+  },
+  "toast_url_copied_batch": {
+    "message": "{count}개의 URL이 클립보드에 복사되었습니다"
+  },
+  "toast_url_copy_failed": {
+    "message": "URL 복사 실패"
+  },
+  "toast_download_started": {
+    "message": "다운로드 시작됨"
+  },
+  "toast_download_failed": {
+    "message": "다운로드 실패"
+  },
+  "toast_download_cancelled": {
+    "message": "다운로드 취소됨"
+  },
+  "toast_download_completed": {
+    "message": "{count}개의 이미지를 다운로드했습니다"
+  },
+  "toast_no_images_selected": {
+    "message": "선택된 이미지가 없습니다"
+  },
+  "toast_image_removed": {
+    "message": "이미지가 제거되었습니다"
+  },
+  "toast_collection_added": {
+    "message": "컬렉션에 추가됨"
+  },
+  "toast_collection_add_failed": {
+    "message": "컬렉션 추가 실패"
+  },
+  "toast_collection_removed": {
+    "message": "컬렉션에서 제거됨"
+  },
+  "toast_collection_remove_failed": {
+    "message": "제거 실패"
+  },
+  "toast_color_copied": {
+    "message": "색상 {hex} 복사됨"
+  },
+  "toast_color_copy_failed": {
+    "message": "색상 복사 실패"
+  },
+  "pro_feature_blocked_format_conversion": {
+    "message": "포맷 변환은 Pro 기능입니다. 업그레이드하여 잠금 해제하세요!"
+  },
+  "pro_feature_blocked_advanced_grouping": {
+    "message": "고급 그룹화는 Pro 기능입니다. 업그레이드하여 잠금 해제하세요!"
+  },
+  "pro_feature_blocked_collection": {
+    "message": "컬렉션은 Pro 기능입니다"
+  },
+  "pro_feature_blocked_image_delete": {
+    "message": "이미지 제거는 Pro 기능입니다. 업그레이드하여 잠금 해제하세요!"
+  },
+  "pro_feature_blocked_color_copy": {
+    "message": "색상 복사는 Pro 기능입니다"
+  },
+  "pro_feature_blocked_reverse_search": {
+    "message": "{engine} 검색은 Pro가 필요합니다. 업그레이드하여 잠금 해제하세요!"
+  },
+  "pro_zip_limit": {
+    "message": "무료 플랜은 ZIP당 최대 {max}개의 이미지만 허용합니다. Pro로 업그레이드하면 무제한!"
+  },
+  "pro_copy_urls_limit": {
+    "message": "무료 플랜은 한 번에 최대 {max}개의 URL만 허용합니다. Pro로 업그레이드하면 무제한!"
+  },
+  "pro_collection_limit": {
+    "message": "무료 플랜은 최대 {max}개의 즐겨찾기만 허용합니다. Pro로 업그레이드하면 무제한!"
+  },
+  "toolbar_sort": {
+    "message": "정렬"
+  },
+  "toolbar_group": {
+    "message": "그룹"
+  },
+  "toolbar_similar": {
+    "message": "유사"
+  },
+  "status_similar_count": {
+    "message": "{count}개 유사"
+  },
+  "toolbar_rescan": {
+    "message": "재스캔"
+  },
+  "toolbar_download_all": {
+    "message": "모두 다운로드"
+  },
+  "toolbar_download_selected": {
+    "message": "다운로드 ({count})"
+  },
+  "filter_size": {
+    "message": "크기"
+  },
+  "filter_type": {
+    "message": "유형"
+  },
+  "filter_layout": {
+    "message": "레이아웃"
+  },
+  "filter_url": {
+    "message": "URL"
+  },
+  "filter_color": {
+    "message": "색상"
+  },
+  "filter_all": {
+    "message": "전체"
+  },
+  "filter_min_width": {
+    "message": "최소 W"
+  },
+  "filter_max_width": {
+    "message": "최대 W"
+  },
+  "filter_height": {
+    "message": "H"
+  },
+  "filter_none": {
+    "message": "없음"
+  },
+  "filter_format": {
+    "message": "포맷"
+  },
+  "filter_domain": {
+    "message": "도메인"
+  },
+  "filter_tab": {
+    "message": "탭"
+  },
+  "sort_none": {
+    "message": "없음 (페이지 순서)"
+  },
+  "sort_size_desc": {
+    "message": "크기 ↓ (큰 순)"
+  },
+  "sort_size_asc": {
+    "message": "크기 ↑ (작은 순)"
+  },
+  "sort_filesize_desc": {
+    "message": "파일 크기 ↓ (큰 순)"
+  },
+  "sort_filesize_asc": {
+    "message": "파일 크기 ↑ (작은 순)"
+  },
+  "layout_all": {
+    "message": "전체"
+  },
+  "layout_square": {
+    "message": "정사각형 (1:1)"
+  },
+  "layout_landscape": {
+    "message": "가로형 (>1:1)"
+  },
+  "layout_portrait": {
+    "message": "세로형 (<1:1)"
+  },
+  "layout_panorama": {
+    "message": "파노라마 (>2:1)"
+  },
+  "size_all": {
+    "message": "전체"
+  },
+  "size_small": {
+    "message": "소형 < 100px"
+  },
+  "size_medium": {
+    "message": "중형 100-500px"
+  },
+  "size_large": {
+    "message": "대형 500-1000px"
+  },
+  "size_xl": {
+    "message": "XL > 1000px"
+  },
+  "size_btn_small": {
+    "message": "소형"
+  },
+  "size_btn_medium": {
+    "message": "중형"
+  },
+  "size_btn_large": {
+    "message": "대형"
+  },
+  "size_btn_xl": {
+    "message": "XL"
+  },
+  "size_btn_custom": {
+    "message": "사용자 지정"
+  },
+  "layout_btn_square": {
+    "message": "정사각형"
+  },
+  "layout_btn_landscape": {
+    "message": "가로형"
+  },
+  "layout_btn_portrait": {
+    "message": "세로형"
+  },
+  "layout_btn_panorama": {
+    "message": "파노라마"
+  },
+  "color_all": {
+    "message": "모든 색상"
+  },
+  "color_no_extracted": {
+    "message": "아직 추출된 색상이 없습니다"
+  },
+  "filter_url_placeholder": {
+    "message": "URL 키워드로 필터..."
+  },
+  "settings_display": {
+    "message": "표시"
+  },
+  "settings_side_panel": {
+    "message": "사이드 패널에 표시"
+  },
+  "settings_side_panel_desc": {
+    "message": "팝업 창 대신 브라우저 사이드 패널에서 결과 열기"
+  },
+  "settings_density": {
+    "message": "레이아웃 밀도:"
+  },
+  "settings_density_compact": {
+    "message": "조밀"
+  },
+  "settings_density_standard": {
+    "message": "표준"
+  },
+  "settings_density_comfortable": {
+    "message": "여유"
+  },
+  "settings_theme": {
+    "message": "테마:"
+  },
+  "settings_theme_system": {
+    "message": "시스템"
+  },
+  "settings_theme_light": {
+    "message": "라이트"
+  },
+  "settings_theme_dark": {
+    "message": "다크"
+  },
+  "settings_default_group": {
+    "message": "기본 그룹 기준:"
+  },
+  "settings_similar": {
+    "message": "유사 이미지 감지"
+  },
+  "settings_color_extract": {
+    "message": "색상 추출"
+  },
+  "settings_all_frames": {
+    "message": "모든 프레임에서 검색"
+  },
+  "settings_live_monitor": {
+    "message": "실시간 모니터링"
+  },
+  "settings_download_options": {
+    "message": "다운로드 옵션 지정"
+  },
+  "settings_subfolder": {
+    "message": "하위 폴더:"
+  },
+  "settings_filename": {
+    "message": "파일명:"
+  },
+  "settings_convert_format": {
+    "message": "포맷 변환:"
+  },
+  "settings_no_warning": {
+    "message": "다수 파일 다운로드 시 경고하지 않기"
+  },
+  "settings_telemetry": {
+    "message": "익명 사용 데이터 공유"
+  },
+  "settings_save": {
+    "message": "설정 저장"
+  },
+  "settings_reset": {
+    "message": "초기화"
+  },
+  "settings_saved": {
+    "message": "설정이 저장되었습니다"
+  },
+  "settings_save_failed": {
+    "message": "설정 저장 실패"
+  },
+  "status_found_images": {
+    "message": "{count}개의 이미지를 찾았습니다"
+  },
+  "status_similar": {
+    "message": "유사"
+  },
+  "rating_title": {
+    "message": "Image Harvest가 마음에 드시나요?"
+  },
+  "rating_desc": {
+    "message": "시간을 절약해 드렸다면, Chrome 웹 스토어에 별 5개 리뷰를 남겨주시면 큰 힘이 됩니다."
+  },
+  "rating_rate_now": {
+    "message": "⭐ Chrome 스토어에서 평가하기"
+  },
+  "rating_later": {
+    "message": "나중에"
+  },
+  "rating_never": {
+    "message": "다시 묻지 않기"
+  },
+  "rating_close": {
+    "message": "닫기"
+  },
+  "btn_deactivate": {
+    "message": "비활성화"
+  },
+  "license_deactivating": {
+    "message": "비활성화 중..."
+  },
+  "card_add_to_collection": {
+    "message": "컬렉션에 추가"
+  },
+  "card_copy_url": {
+    "message": "URL 복사"
+  },
+  "card_open_in_new_tab": {
+    "message": "새 탭에서 열기"
+  },
+  "card_remove_from_collection": {
+    "message": "컬렉션에서 제거"
+  },
+  "card_remove_image": {
+    "message": "이미지 제거"
+  },
+  "card_reverse_search": {
+    "message": "역방향 검색 ({engine})"
+  },
+  "collection_export_tooltip": {
+    "message": "컬렉션을 ZIP으로 내보내기"
+  },
+  "collection_modal_title": {
+    "message": "컬렉션"
+  },
+  "collection_search_placeholder": {
+    "message": "컬렉션 검색..."
+  },
+  "collection_no_match": {
+    "message": "일치하는 이미지가 없습니다"
+  },
+  "collection_empty_title": {
+    "message": "컬렉션이 비어 있습니다"
+  },
+  "collection_no_match_hint": {
+    "message": "다른 검색 키워드를 시도해 보세요"
+  },
+  "collection_empty_hint": {
+    "message": "이미지의 별 아이콘을 클릭하여 컬렉션에 추가하세요"
+  },
+  "common_dismiss": {
+    "message": "닫기"
+  },
+  "common_remove": {
+    "message": "제거"
+  },
+  "confirm_remove_image_message": {
+    "message": "이 이미지를 목록에서 제거하시겠습니까?"
+  },
+  "confirm_remove_image_title": {
+    "message": "이미지 제거"
+  },
+  "dedup_modal_title": {
+    "message": "유사 이미지"
+  },
+  "dedup_no_similar": {
+    "message": "유사한 이미지가 없습니다"
+  },
+  "dedup_group_title": {
+    "message": "그룹 {index} ({count}개 유사)"
+  },
+  "dedup_remove_duplicates": {
+    "message": "중복 제거"
+  },
+  "dialog_deactivate_message": {
+    "message": "이 기기에서 라이선스를 비활성화하시겠습니까? 비활성화 후 다른 기기에서 활성화할 수 있습니다."
+  },
+  "dialog_deactivate_title": {
+    "message": "라이선스 비활성화"
+  },
+  "dialog_download_many_message": {
+    "message": "{count}개의 이미지를 다운로드하려고 합니다. 계속하시겠습니까?"
+  },
+  "dialog_download_many_title": {
+    "message": "대량 이미지 다운로드"
+  },
+  "empty_no_images_desc": {
+    "message": "페이지를 스크롤하거나 재스캔을 클릭하여 더 많은 이미지를 찾아보세요."
+  },
+  "empty_no_results_desc": {
+    "message": "필터를 조정하여 더 많은 결과를 확인하세요."
+  },
+  "empty_rescan_images": {
+    "message": "이미지 재스캔"
+  },
+  "empty_reset_filters": {
+    "message": "필터 초기화"
+  },
+  "empty_title": {
+    "message": "이미지를 찾을 수 없습니다"
+  },
+  "error_default_code": {
+    "message": "오류"
+  },
+  "error_default_message": {
+    "message": "오류가 발생했습니다"
+  },
+  "grid_current_tab_badge": {
+    "message": "현재 탭"
+  },
+  "hotkey_not_set": {
+    "message": "미설정"
+  },
+  "hotkey_click_to_set": {
+    "message": "클릭하여 설정"
+  },
+  "live_indicator_label": {
+    "message": "실시간"
+  },
+  "live_indicator_tooltip": {
+    "message": "실시간 모니터링 활성 — 새 이미지가 자동으로 감지됩니다"
+  },
+  "multitab_modal_title": {
+    "message": "멀티탭 추출"
+  },
+  "multitab_progress_default": {
+    "message": "선택한 탭에서 이미지를 추출하는 중..."
+  },
+  "multitab_start_extraction": {
+    "message": "추출 시작"
+  },
+  "multitab_current": {
+    "message": "현재"
+  },
+  "multitab_untitled": {
+    "message": "제목 없음"
+  },
+  "paywall_banner_desc": {
+    "message": "멀티탭 추출, 색상 필터링 등 고급 기능을 잠금 해제하세요."
+  },
+  "paywall_banner_later": {
+    "message": "나중에"
+  },
+  "paywall_banner_title": {
+    "message": "Pro로 업그레이드"
+  },
+  "paywall_banner_try_cta": {
+    "message": "Pro 무료 체험"
+  },
+  "plan_expires_date": {
+    "message": "만료일: {date}"
+  },
+  "plan_lifetime": {
+    "message": "평생"
+  },
+  "plan_monthly": {
+    "message": "월간"
+  },
+  "plan_never_expires": {
+    "message": "만료 없음"
+  },
+  "plan_yearly": {
+    "message": "연간"
+  },
+  "privacy_accept": {
+    "message": "수락"
+  },
+  "privacy_anonymous_data": {
+    "message": "익명 사용 데이터"
+  },
+  "privacy_collect_desc": {
+    "message": "기능 사용 현황, 충돌 보고서 및 성능 지표"
+  },
+  "privacy_collect_title": {
+    "message": "수집하는 항목"
+  },
+  "privacy_decline": {
+    "message": "거부"
+  },
+  "privacy_desc_prefix": {
+    "message": "Image Harvest 개선을 위해 "
+  },
+  "privacy_desc_suffix": {
+    "message": "을(를) 수집합니다."
+  },
+  "privacy_footnote": {
+    "message": "설정에서 언제든지 변경할 수 있습니다."
+  },
+  "privacy_modal_title": {
+    "message": "Image Harvest 개선에 도움 주기"
+  },
+  "privacy_never_collect_desc": {
+    "message": "개인 정보, 브라우징 기록 또는 이미지 내용"
+  },
+  "privacy_never_collect_title": {
+    "message": "절대 수집하지 않는 항목"
+  },
+  "privacy_reversible_desc": {
+    "message": "설정에서 언제든지 변경 가능"
+  },
+  "privacy_reversible_title": {
+    "message": "완전히 되돌릴 수 있음"
+  },
+  "pro_activate": {
+    "message": "활성화"
+  },
+  "pro_active_badge": {
+    "message": "Pro 활성"
+  },
+  "pro_already_have_key": {
+    "message": "이미 라이선스 키가 있으신가요?"
+  },
+  "pro_deactivate_tooltip": {
+    "message": "라이선스 비활성화"
+  },
+  "pro_feature_batch_desc": {
+    "message": "한 번의 클릭으로 모든 이미지를 일괄 다운로드"
+  },
+  "pro_feature_batch_title": {
+    "message": "일괄 다운로드"
+  },
+  "pro_feature_color_desc": {
+    "message": "주요 색상별로 이미지 필터링"
+  },
+  "pro_feature_color_title": {
+    "message": "색상 필터링"
+  },
+  "pro_feature_dedup_desc": {
+    "message": "중복 이미지를 자동으로 감지하고 제거"
+  },
+  "pro_feature_dedup_title": {
+    "message": "중복 감지"
+  },
+  "pro_feature_multitab_desc": {
+    "message": "여러 탭에서 한 번에 이미지 추출"
+  },
+  "pro_feature_multitab_title": {
+    "message": "멀티탭 추출"
+  },
+  "pro_feature_reverse_search_desc": {
+    "message": "역방향 검색으로 이미지 출처 찾기"
+  },
+  "pro_feature_reverse_search_title": {
+    "message": "역방향 이미지 검색"
+  },
+  "pro_get_pro_link": {
+    "message": "Pro 구매"
+  },
+  "pro_headline_variant_a": {
+    "message": "Image Harvest의 모든 기능을 잠금 해제하세요"
+  },
+  "pro_headline_variant_b": {
+    "message": "Pro로 업그레이드 — 매주 시간을 절약하세요"
+  },
+  "pro_no_key_hint": {
+    "message": "아직 키가 없으신가요?"
+  },
+  "pro_pricing_cta": {
+    "message": "가격 보기"
+  },
+  "pro_subline_variant_a": {
+    "message": "일회성 구매. 평생 업데이트."
+  },
+  "pro_subline_variant_b": {
+    "message": "수천 명의 파워 유저와 함께하세요."
+  },
+  "pro_trial_badge": {
+    "message": "7일 무료 체험"
+  },
+  "pro_trial_desc": {
+    "message": "7일간 모든 Pro 기능을 무료로 체험하세요. 약정이 없습니다."
+  },
+  "pro_trial_perk_full_access": {
+    "message": "모든 Pro 기능 완전 이용"
+  },
+  "pro_trial_perk_no_card": {
+    "message": "신용카드 불필요"
+  },
+  "pro_trial_perk_cancel": {
+    "message": "자동 만료 — 해지 불필요"
+  },
+  "pro_trial_start_cta": {
+    "message": "무료 체험 시작"
+  },
+  "pro_trial_start_failed": {
+    "message": "체험 시작 실패"
+  },
+  "pro_trial_started_toast": {
+    "message": "Pro 체험이 활성화되었습니다! 7일간 모든 기능을 이용하세요."
+  },
+  "pro_trial_starting": {
+    "message": "체험 시작 중..."
+  },
+  "pro_trial_unavailable": {
+    "message": "체험을 이용할 수 없습니다"
+  },
+  "progress_downloading": {
+    "message": "다운로드 중..."
+  },
+  "progress_text": {
+    "message": "{current} / {total}"
+  },
+  "progress_multitab_text": {
+    "message": "{current}/{total} 탭 · {count}개 이미지 발견"
+  },
+  "restricted_subtitle": {
+    "message": "이 페이지는 콘텐츠 스크립트를 제한합니다. 다른 페이지를 시도해 주세요."
+  },
+  "scan_cancel": {
+    "message": "스캔 취소"
+  },
+  "scan_discovering": {
+    "message": "이미지 탐색 중..."
+  },
+  "scan_progress_text": {
+    "message": "스캔 중: {current} / {total}"
+  },
+  "scan_scanning": {
+    "message": "스캔 중..."
+  },
+  "scan_updated": {
+    "message": "업데이트됨"
+  },
+  "scan_updating": {
+    "message": "업데이트 중..."
+  },
+  "status_n_selected": {
+    "message": "{count}개 선택됨"
+  },
+  "status_total_images": {
+    "message": "총 {count}개"
+  },
+  "title_click_copy_color": {
+    "message": "클릭하여 {color} 복사"
+  },
+  "title_collection": {
+    "message": "컬렉션"
+  },
+  "title_download": {
+    "message": "이미지 다운로드"
+  },
+  "title_multitab": {
+    "message": "멀티탭 추출"
+  },
+  "title_rescan": {
+    "message": "이미지 재스캔"
+  },
+  "title_select_all": {
+    "message": "클릭하여 모두 선택"
+  },
+  "title_settings": {
+    "message": "설정"
+  },
+  "title_switch_grid": {
+    "message": "그리드 보기로 전환"
+  },
+  "title_switch_list": {
+    "message": "목록 보기로 전환"
+  },
+  "title_transparent_image": {
+    "message": "투명 이미지"
+  },
+  "title_upgrade_copy_color": {
+    "message": "Pro로 업그레이드하여 색상 복사"
+  },
+  "title_view_similar": {
+    "message": "유사 이미지 보기"
+  },
+  "toast_deactivate_failed": {
+    "message": "비활성화 실패"
+  },
+  "toast_license_deactivated": {
+    "message": "라이선스가 비활성화되었습니다"
+  },
+  "toast_n_new": {
+    "message": "{count}개 새로 추가"
+  },
+  "toast_n_removed": {
+    "message": "{count}개 제거됨"
+  },
+  "toast_pro_color_filter": {
+    "message": "색상 필터링은 Pro 기능입니다. 업그레이드하여 색상별 필터링을 이용하세요!"
+  },
+  "toast_pro_naming_locked": {
+    "message": "사용자 지정 파일명은 Pro 기능입니다. 업그레이드하여 잠금 해제하세요!"
+  },
+  "toast_pro_setting_locked": {
+    "message": "이 설정은 Pro가 필요합니다. 업그레이드하여 잠금 해제하세요!"
+  },
+  "toast_settings_reset": {
+    "message": "설정이 기본값으로 초기화되었습니다"
+  },
+  "view_grid": {
+    "message": "그리드"
+  },
+  "view_list": {
+    "message": "목록"
+  },
+  "format_original": {
+    "message": "원본"
+  },
+  "menu_reverse_search": {
+    "message": "역방향 검색"
+  },
+  "settings_all_frames_desc": {
+    "message": "iframe 및 임베디드 프레임 내부의 이미지도 스캔"
+  },
+  "settings_color_extract_desc": {
+    "message": "필터링을 위해 각 이미지에서 주요 색상 추출"
+  },
+  "settings_download_options_desc": {
+    "message": "하위 폴더, 파일명 템플릿, 포맷 변환 사용자 지정"
+  },
+  "settings_hotkey": {
+    "message": "단축키:"
+  },
+  "settings_live_monitor_desc": {
+    "message": "페이지 내용이 변경되면 새 이미지를 자동으로 감지"
+  },
+  "settings_max_size": {
+    "message": "최대 크기 필터 활성화"
+  },
+  "settings_max_size_desc": {
+    "message": "지정된 크기보다 큰 이미지 숨기기"
+  },
+  "settings_min_size": {
+    "message": "최소 크기 필터 활성화"
+  },
+  "settings_min_size_desc": {
+    "message": "지정된 크기보다 작은 이미지 숨기기"
+  },
+  "settings_no_warning_desc": {
+    "message": "다수 파일 다운로드 시 확인 대화상자 건너뛰기"
+  },
+  "settings_section_display": {
+    "message": "표시"
+  },
+  "settings_section_pro": {
+    "message": "Pro"
+  },
+  "settings_section_account": {
+    "message": "계정"
+  },
+  "settings_similar_desc": {
+    "message": "시각적으로 유사하거나 중복된 이미지 찾기 및 그룹화"
+  },
+  "settings_telemetry_desc": {
+    "message": "익명 기능 사용 이벤트 전송. URL, 이미지, 개인 정보 없음."
+  },
+  "status_found_prefix": {
+    "message": "발견"
+  },
+  "status_found_suffix": {
+    "message": "이미지"
+  },
+  "filter_type_other": {
+    "message": "기타"
+  },
+  "license_activating": {
+    "message": "활성화 중..."
+  },
+  "license_activation_failed": {
+    "message": "활성화 실패"
+  },
+  "license_enter_key": {
+    "message": "라이선스 키를 입력하세요"
+  },
+  "license_network_error": {
+    "message": "네트워크 오류. 다시 시도해 주세요."
+  },
+  "license_placeholder": {
+    "message": "라이선스 키 입력"
+  },
+  "settings_height_gte": {
+    "message": "높이 ≥"
+  },
+  "settings_height_lte": {
+    "message": "높이 ≤"
+  },
+  "settings_width_gte": {
+    "message": "너비 ≥"
+  },
+  "settings_width_lte": {
+    "message": "너비 ≤"
+  },
+  "toast_pro_activated": {
+    "message": "Pro가 성공적으로 활성화되었습니다!"
+  },
+  "multitab_extracting": {
+    "message": "추출 중..."
+  },
+  "multitab_starting": {
+    "message": "추출 시작 중..."
+  },
+  "settings_variables_hint": {
+    "message": "변수: {domain}, {index}, {original}, {format}, {width}, {height}"
+  },
+  "toast_extraction_cancelled": {
+    "message": "추출이 취소되었습니다"
+  },
+  "toast_extraction_failed": {
+    "message": "추출 실패"
+  },
+  "toast_extraction_success": {
+    "message": "{tabs}개 탭에서 {images}개 이미지를 추출했습니다"
+  },
+  "toast_multitab_failed": {
+    "message": "멀티탭 추출 실패"
+  },
+  "restricted_notice": {
+    "message": "이 페이지는 확장 프로그램의 스크립트 삽입을 허용하지 않습니다. 일반 웹페이지(예: 기사, 갤러리, 검색 결과)로 이동하여 이미지 추출을 시작하세요."
+  },
+  "restricted_features_heading": {
+    "message": "Image Harvest로 할 수 있는 것들"
+  },
+  "restricted_feature_batch_title": {
+    "message": "일괄 다운로드"
+  },
+  "restricted_feature_batch_desc": {
+    "message": "한 번의 클릭으로 웹페이지의 모든 이미지를 선택하고 다운로드하세요. 크기, 포맷 또는 레이아웃별로 필터링할 수 있습니다."
+  },
+  "restricted_feature_dedup_title": {
+    "message": "유사 이미지 감지"
+  },
+  "restricted_feature_dedup_desc": {
+    "message": "지각적 해싱을 사용하여 유사 중복 이미지를 자동으로 찾고 제거합니다."
+  },
+  "restricted_feature_reverse_title": {
+    "message": "역방향 이미지 검색"
+  },
+  "restricted_feature_reverse_desc": {
+    "message": "한 번의 클릭으로 Google, TinEye, Yandex, Baidu에서 이미지를 검색하세요."
+  },
+  "restricted_feature_multitab_title": {
+    "message": "멀티탭 추출"
+  },
+  "restricted_feature_multitab_desc": {
+    "message": "열려 있는 여러 탭에서 한 번에 이미지를 추출하고 ZIP 파일로 다운로드하세요."
+  },
+  "restricted_feature_color_title": {
+    "message": "색상 추출"
+  },
+  "restricted_feature_color_desc": {
+    "message": "각 이미지에서 자동으로 주요 색상을 추출합니다. 색상 견본을 클릭하여 HEX 코드를 복사하세요."
+  },
+  "restricted_feature_filter_title": {
+    "message": "스마트 필터"
+  },
+  "restricted_feature_filter_desc": {
+    "message": "크기, 유형, 레이아웃, URL 패턴 또는 주요 색상별로 이미지를 필터링하여 원하는 이미지를 정확히 찾으세요."
+  },
+  "restricted_feature_collection_title": {
+    "message": "즐겨찾기 컬렉션"
+  },
+  "restricted_feature_collection_desc": {
+    "message": "세션 간에 유지되는 영구 컬렉션에 이미지를 북마크하세요. 언제든지 정리하고 다시 볼 수 있습니다."
+  },
+  "restricted_feature_preview_title": {
+    "message": "즉시 미리보기"
+  },
+  "restricted_feature_preview_desc": {
+    "message": "크기, 파일 크기, 포맷 등 메타데이터와 함께 고해상도 이미지를 한눈에 확인하세요."
+  },
+  "restricted_link_website": {
+    "message": "공식 웹사이트"
+  },
+  "trial_error_already_redeemed": {
+    "message": "이 설치에서 이미 무료 체험을 사용하셨습니다."
+  },
+  "trial_error_already_used": {
+    "message": "이미 무료 체험을 사용하셨습니다."
+  },
+  "trial_error_http": {
+    "message": "체험을 시작할 수 없습니다. 나중에 다시 시도해 주세요."
+  },
+  "trial_error_network": {
+    "message": "네트워크 오류. 연결을 확인하고 다시 시도해 주세요."
+  },
+  "trial_error_server_declined": {
+    "message": "서버에서 체험을 거부했습니다."
+  },
+  "license_error_network": {
+    "message": "네트워크 오류. 연결을 확인해 주세요."
+  },
+  "license_error_invalid_key": {
+    "message": "유효하지 않은 라이선스 키입니다."
+  },
+  "license_error_activation_failed": {
+    "message": "활성화에 실패했습니다. 다시 시도해 주세요."
+  }
+}

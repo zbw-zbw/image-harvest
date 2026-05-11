@@ -943,5 +943,29 @@
   },
   "restricted_link_website": {
     "message": "公式サイト"
+  },
+  "trial_error_already_redeemed": {
+    "message": "このインストールでは既に無料トライアルを使用済みです。"
+  },
+  "trial_error_already_used": {
+    "message": "既に無料トライアルを使用済みです。"
+  },
+  "trial_error_http": {
+    "message": "トライアルを開始できませんでした。後でもう一度お試しください。"
+  },
+  "trial_error_network": {
+    "message": "ネットワークエラーです。接続を確認してもう一度お試しください。"
+  },
+  "trial_error_server_declined": {
+    "message": "サーバーがトライアルを拒否しました。"
+  },
+  "license_error_network": {
+    "message": "ネットワークエラーです。接続を確認してください。"
+  },
+  "license_error_invalid_key": {
+    "message": "無効なライセンスキーです。"
+  },
+  "license_error_activation_failed": {
+    "message": "アクティベーションに失敗しました。もう一度お試しください。"
   }
 }
