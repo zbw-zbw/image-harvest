@@ -125,16 +125,84 @@ function removeOverlay(): void {
 }
 
 /**
+ * Detect whether an element is truly visible to the user without requiring
+ * interaction (click, hover, dropdown expand, etc.).
+ *
+ * Returns false for elements inside:
+ *  - display:none ancestors
+ *  - visibility:hidden / opacity:0 ancestors
+ *  - collapsed containers (overflow:hidden with near-zero effective size)
+ *  - popover / dropdown / tooltip containers that are not currently shown
+ *
+ * Returns true for elements that are simply off-screen (next-page / below
+ * the fold) — these can be scrolled into view without user interaction.
+ */
+function isElementAccessibleWithoutInteraction(element: Element): boolean {
+  let current: Element | null = element;
+
+  while (current && current !== document.documentElement) {
+    const style = window.getComputedStyle(current);
+
+    // display:none — element is completely removed from layout
+    if (style.display === 'none') return false;
+
+    // visibility:hidden or collapse — element occupies space but is invisible
+    if (style.visibility === 'hidden' || style.visibility === 'collapse') return false;
+
+    // opacity:0 — fully transparent (often used for hidden interactive elements)
+    if (parseFloat(style.opacity) === 0) return false;
+
+    // Check for clipped-away content: an ancestor with overflow:hidden and
+    // a very small size that effectively hides children. This catches
+    // collapsed accordion panels, unexpanded dropdowns, etc.
+    // Exception: the element itself (we already checked its rect in the caller)
+    if (current !== element) {
+      const overflow = style.overflow + style.overflowX + style.overflowY;
+      if (overflow.includes('hidden')) {
+        const rect = current.getBoundingClientRect();
+        // If the clipping container is tiny (< 4px in either dimension),
+        // children are effectively invisible to the user.
+        if (rect.width < 4 || rect.height < 4) return false;
+      }
+    }
+
+    // Common patterns for hidden interactive containers:
+    // aria-hidden="true" on an ancestor means it's not presented to the user
+    if (current !== element && current.getAttribute('aria-hidden') === 'true') return false;
+
+    // Popover / dropdown / collapse patterns: check for closed state
+    if (current !== element) {
+      const ariaExpanded = current.getAttribute('aria-expanded');
+      // If this container explicitly says it's collapsed, skip
+      if (ariaExpanded === 'false') {
+        // Only treat as hidden if the container is also small / clipped
+        const rect = current.getBoundingClientRect();
+        if (rect.height < 4 || rect.width < 4) return false;
+      }
+    }
+
+    current = current.parentElement;
+  }
+
+  return true;
+}
+
+/**
  * Pick the best element from a list of candidates matching the same image URL.
  * Strategy:
- *  1. Filter out zero-size / invisible elements
- *  2. Prefer elements currently inside the viewport
- *  3. Among in-viewport elements, pick the one closest to viewport center
- *  4. If none are in-viewport, pick the one closest to viewport edges
+ *  1. Filter out elements hidden behind interactions (dropdowns, tooltips, etc.)
+ *  2. Filter out zero-size elements
+ *  3. Prefer elements currently inside the viewport
+ *  4. Among in-viewport elements, pick the one closest to viewport center
+ *  5. If none are in-viewport, pick the one closest to viewport edges
+ *     (these are off-screen but scrollable — still valid for highlight)
  */
 function pickBestCandidate(candidates: Element[]): Element | null {
   if (candidates.length === 0) return null;
-  if (candidates.length === 1) return candidates[0];
+  if (candidates.length === 1) {
+    // Single candidate: still verify it's accessible
+    return isElementAccessibleWithoutInteraction(candidates[0]) ? candidates[0] : null;
+  }
 
   const viewportWidth = window.innerWidth;
   const viewportHeight = window.innerHeight;
@@ -152,6 +220,9 @@ function pickBestCandidate(candidates: Element[]): Element | null {
   const scored: Scored[] = [];
 
   for (const el of candidates) {
+    // Skip elements that require interaction to become visible
+    if (!isElementAccessibleWithoutInteraction(el)) continue;
+
     const rect = el.getBoundingClientRect();
     // Skip zero-size elements
     if (rect.width < 2 || rect.height < 2) continue;
@@ -175,7 +246,7 @@ function pickBestCandidate(candidates: Element[]): Element | null {
     scored.push({ element: el, rect, inViewport, distanceToCenter, distanceToViewport });
   }
 
-  if (scored.length === 0) return candidates[0];
+  if (scored.length === 0) return null;
 
   // Sort: in-viewport first, then by distance to center / distance to viewport
   scored.sort((a, b) => {
