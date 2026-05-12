@@ -19,6 +19,7 @@
 import { isRestrictedUrl } from '../shared/utils';
 import { t } from '../shared/i18n';
 import type { ImageItem } from '../shared/types';
+import { clearSelection } from './actions';
 import { applyFilters } from './filter';
 import { closeMultiTabModal } from './pro-features';
 import { processImageExtras } from './scan';
@@ -314,6 +315,13 @@ export async function startMultiTabExtract(tabIds: number[]): Promise<void> {
         colors: undefined,
         phash: null,
       }));
+
+      // Clear any previous selection & highlights before replacing the image
+      // list.  After multi-tab extraction the old image IDs no longer exist
+      // in the new result set, so keeping them would cause stale "N selected"
+      // badges, orphaned highlight overlays on the page, and broken downloads
+      // (the selected IDs can't be resolved to actual blobs).
+      clearSelection();
 
       // Replace allImages with only the multi-tab results.
       // The user explicitly chose which tabs to extract from; showing images
