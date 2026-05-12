@@ -417,7 +417,6 @@ export async function downloadSelectedAsZip(targetFormat: string | null): Promis
     // Rating prompt — same batch contribution rule (success count, not
     // selected count). See DOWNLOAD_SINGLE call above for rationale.
     if (successCount > 0) void recordDownloadForRating(successCount);
-    clearSelection();
   } catch (error) {
     if (!aborted) {
       console.error('ZIP download error:', error);
