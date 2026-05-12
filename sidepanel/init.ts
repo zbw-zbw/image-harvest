@@ -8,7 +8,7 @@ import { setEnvelopeMeta, track, flushNow } from '../shared/telemetry';
 import { EVENTS } from '../shared/telemetry-events';
 import { isProUser } from '../shared/license';
 import { getProUpsellBucket } from '../shared/ab-experiment';
-import { detectLocale, onLocaleChange, t } from '../shared/i18n';
+import { detectLocale, onLocaleChange, setLocale, t, type Locale } from '../shared/i18n';
 import {
   clearSelection,
   downloadSelectedAsZip,
@@ -189,6 +189,18 @@ async function init(): Promise<void> {
 
   applyTheme((state.appSettings.theme as string) || 'system');
   applyDensity((state.appSettings.density as string) || 'standard');
+  // Apply default group mode from saved settings so the panel opens with
+  // the user's preferred grouping without requiring a manual selection.
+  if (state.appSettings.defaultGroup && state.appSettings.defaultGroup !== 'none') {
+    state.currentGroupMode = state.appSettings.defaultGroup;
+    // Sync the group-filter dropdown UI so the active item matches.
+    document.querySelectorAll('[data-group-filter]').forEach((opt) => {
+      opt.classList.toggle(
+        'active',
+        (opt as HTMLElement).dataset.groupFilter === state.appSettings.defaultGroup
+      );
+    });
+  }
   updateLiveIndicator();
 
   bindEvents();
@@ -1096,6 +1108,19 @@ function bindEvents(): void {
   if (elements.btnSaveSettings) elements.btnSaveSettings.addEventListener('click', saveSettings);
   if (elements.btnResetDefaults) elements.btnResetDefaults.addEventListener('click', resetSettings);
 
+  // Theme radio: apply immediately on selection and persist (no explicit save required).
+  document
+    .querySelectorAll<HTMLInputElement>('input[type="radio"][name="theme"]')
+    .forEach((radio) => {
+      radio.addEventListener('change', () => {
+        if (radio.checked) {
+          applyTheme(radio.value);
+          state.appSettings.theme = radio.value as 'system' | 'light' | 'dark';
+          void chrome.storage.local.set({ appSettings: state.appSettings });
+        }
+      });
+    });
+
   // Toggle setting-inputs sub-panels based on checkbox state
   const settingTogglePairs: Array<[string, string]> = [
     ['setting-download-options', 'download-options-inputs'],
@@ -1154,6 +1179,10 @@ function bindEvents(): void {
           }
           setSelect(selectEl.id, value);
           dropdown.classList.add('hidden');
+          // Language switch takes effect immediately (no save required).
+          if (selectEl.id === 'setting-language' && value) {
+            void setLocale(value as Locale);
+          }
         });
       });
     }

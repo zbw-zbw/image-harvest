@@ -220,18 +220,9 @@ export async function saveSettings(): Promise<void> {
   void setOptIn(getToggle('setting-telemetry')).catch(() => {
     /* best-effort */
   });
-  // Language: same one-way persistence pattern as telemetry above. The
-  // dropdown's data-value is a normalized Locale (en | zh-CN | zh-TW |
-  // ja | es) populated from the `data-value` attribute on the active
-  // .setting-select-option. setLocale() persists to chrome.storage and
-  // fires onLocaleChange listeners so any subscribed Preact components
-  // re-render in the new language without a panel reload.
-  const nextLocale = getSelect('setting-language') as Locale;
-  if (nextLocale) {
-    void setLocale(nextLocale).catch(() => {
-      /* best-effort */
-    });
-  }
+  // Language: now applied immediately on dropdown selection (in init.ts).
+  // No need to re-apply here — setLocale() was already called when the
+  // user picked a language from the dropdown.
 
   try {
     const stored = await chrome.storage.local.get('appSettings');
@@ -254,7 +245,6 @@ export async function saveSettings(): Promise<void> {
     // and rendering would flash "No images found". The ongoing fetchImages()
     // will call applyFilters() automatically when it completes.
     syncCustomSizeInputsFromSettings();
-    await applyProFeatureVisibility();
     if (!state.isFetching) {
       applyFilters();
     }
@@ -281,6 +271,11 @@ export async function saveSettings(): Promise<void> {
     if ((similarNewlyEnabled || colorNewlyEnabled) && state.allImages.length > 0) {
       processImageExtras(state.allImages);
     }
+
+    // Pro visibility check involves message-passing to the background SW
+    // (which may need to wake up) and potentially a remote license verify
+    // round-trip. Run it non-blocking so the save toast appears instantly.
+    void applyProFeatureVisibility();
   } catch {
     showToast(t('settings_save_failed'), 'error');
   }

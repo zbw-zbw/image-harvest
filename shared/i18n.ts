@@ -19,26 +19,29 @@
 // Keys use underscores only (Chrome forbids dots in message keys).
 // `description` is for translators only; we ignore it at runtime.
 
+// Core locales — bundled statically for instant availability.
 import en from '../_locales/en/messages.json';
 import zhCN from '../_locales/zh_CN/messages.json';
 import zhTW from '../_locales/zh_TW/messages.json';
 import ja from '../_locales/ja/messages.json';
 import es from '../_locales/es/messages.json';
-import ko from '../_locales/ko/messages.json';
-import de from '../_locales/de/messages.json';
-import fr from '../_locales/fr/messages.json';
-import pt from '../_locales/pt/messages.json';
-import ru from '../_locales/ru/messages.json';
-import ar from '../_locales/ar/messages.json';
-import hi from '../_locales/hi/messages.json';
-import th from '../_locales/th/messages.json';
-import it from '../_locales/it/messages.json';
-import nl from '../_locales/nl/messages.json';
 
 export type Locale =
-  | 'en' | 'zh-CN' | 'zh-TW' | 'ja' | 'es'
-  | 'ko' | 'de' | 'fr' | 'pt' | 'ru'
-  | 'ar' | 'hi' | 'th' | 'it' | 'nl';
+  | 'en'
+  | 'zh-CN'
+  | 'zh-TW'
+  | 'ja'
+  | 'es'
+  | 'ko'
+  | 'de'
+  | 'fr'
+  | 'pt'
+  | 'ru'
+  | 'ar'
+  | 'hi'
+  | 'th'
+  | 'it'
+  | 'nl';
 
 export interface MessageEntry {
   message: string;
@@ -46,25 +49,39 @@ export interface MessageEntry {
 }
 export type Catalogue = Record<string, MessageEntry>;
 
-// Static catalogues — bundled at build time so the first call to t() is
-// synchronous and never blocks rendering on a network/storage roundtrip.
-const CATALOGUES: Record<Locale, Catalogue> = {
+// Core catalogues — bundled at build time for instant synchronous t() calls.
+// Extended locales are lazy-loaded on first use to keep the main bundle small.
+const CATALOGUES: Partial<Record<Locale, Catalogue>> = {
   en: en as Catalogue,
   'zh-CN': zhCN as Catalogue,
   'zh-TW': zhTW as Catalogue,
   ja: ja as Catalogue,
   es: es as Catalogue,
-  ko: ko as Catalogue,
-  de: de as Catalogue,
-  fr: fr as Catalogue,
-  pt: pt as Catalogue,
-  ru: ru as Catalogue,
-  ar: ar as Catalogue,
-  hi: hi as Catalogue,
-  th: th as Catalogue,
-  it: it as Catalogue,
-  nl: nl as Catalogue,
 };
+
+// Lazy-loader map for extended locales. Each entry is an async function that
+// imports the JSON only when the locale is first activated.
+const LAZY_LOADERS: Partial<Record<Locale, () => Promise<Catalogue>>> = {
+  ko: () => import('../_locales/ko/messages.json').then((m) => m.default as Catalogue),
+  de: () => import('../_locales/de/messages.json').then((m) => m.default as Catalogue),
+  fr: () => import('../_locales/fr/messages.json').then((m) => m.default as Catalogue),
+  pt: () => import('../_locales/pt/messages.json').then((m) => m.default as Catalogue),
+  ru: () => import('../_locales/ru/messages.json').then((m) => m.default as Catalogue),
+  ar: () => import('../_locales/ar/messages.json').then((m) => m.default as Catalogue),
+  hi: () => import('../_locales/hi/messages.json').then((m) => m.default as Catalogue),
+  th: () => import('../_locales/th/messages.json').then((m) => m.default as Catalogue),
+  it: () => import('../_locales/it/messages.json').then((m) => m.default as Catalogue),
+  nl: () => import('../_locales/nl/messages.json').then((m) => m.default as Catalogue),
+};
+
+/** Load a lazy locale into CATALOGUES if not already present. */
+async function ensureLocaleLoaded(locale: Locale): Promise<void> {
+  if (CATALOGUES[locale]) return;
+  const loader = LAZY_LOADERS[locale];
+  if (loader) {
+    CATALOGUES[locale] = await loader();
+  }
+}
 
 // English is always the fallback when a key is missing in the active locale,
 // guaranteeing that t() never returns the raw key string in production builds
@@ -74,9 +91,21 @@ const CATALOGUES: Record<Locale, Catalogue> = {
 const FALLBACK_LOCALE: Locale = 'en';
 
 export const SUPPORTED_LOCALES: readonly Locale[] = [
-  'en', 'zh-CN', 'zh-TW', 'ja', 'es',
-  'ko', 'de', 'fr', 'pt', 'ru',
-  'ar', 'hi', 'th', 'it', 'nl',
+  'en',
+  'zh-CN',
+  'zh-TW',
+  'ja',
+  'es',
+  'ko',
+  'de',
+  'fr',
+  'pt',
+  'ru',
+  'ar',
+  'hi',
+  'th',
+  'it',
+  'nl',
 ] as const;
 
 const LOCALE_LABELS: Record<Locale, string> = {
@@ -150,9 +179,19 @@ export function normalizeLocale(raw: string | undefined | null): Locale {
     return 'zh-CN';
   }
   const PRIMARY_MAP: Record<string, Locale> = {
-    ja: 'ja', es: 'es', en: 'en',
-    ko: 'ko', de: 'de', fr: 'fr', pt: 'pt', ru: 'ru',
-    ar: 'ar', hi: 'hi', th: 'th', it: 'it', nl: 'nl',
+    ja: 'ja',
+    es: 'es',
+    en: 'en',
+    ko: 'ko',
+    de: 'de',
+    fr: 'fr',
+    pt: 'pt',
+    ru: 'ru',
+    ar: 'ar',
+    hi: 'hi',
+    th: 'th',
+    it: 'it',
+    nl: 'nl',
   };
   const primary = lower.split('-')[0];
   return PRIMARY_MAP[primary] ?? FALLBACK_LOCALE;
@@ -173,6 +212,7 @@ export async function detectLocale(): Promise<Locale> {
     const saved = stored?.[STORAGE_KEY_LOCALE];
     if (typeof saved === 'string') {
       const normalized = normalizeLocale(saved);
+      await ensureLocaleLoaded(normalized);
       activeLocale = normalized;
       return normalized;
     }
@@ -189,6 +229,7 @@ export async function detectLocale(): Promise<Locale> {
     browser = navigator.language;
   }
   const normalized = normalizeLocale(browser);
+  await ensureLocaleLoaded(normalized);
   activeLocale = normalized;
   return normalized;
 }
@@ -210,6 +251,7 @@ export async function setLocale(locale: Locale): Promise<void> {
     }
     return;
   }
+  await ensureLocaleLoaded(normalized);
   activeLocale = normalized;
   try {
     await chrome?.storage?.local?.set?.({ [STORAGE_KEY_LOCALE]: normalized });

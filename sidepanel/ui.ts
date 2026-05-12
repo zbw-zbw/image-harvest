@@ -778,4 +778,15 @@ export function applyTranslations(): void {
       element.title = translated;
     }
   });
+
+  // Sync setting-select display text with the translated active option.
+  // After data-i18n elements update, the .setting-select-text (button label)
+  // still shows the old language text. Re-derive it from the active option.
+  document.querySelectorAll<HTMLElement>('.setting-select').forEach((selectEl) => {
+    const textEl = selectEl.querySelector('.setting-select-text');
+    const activeOpt = selectEl.querySelector<HTMLElement>('.setting-select-option.active');
+    if (textEl && activeOpt) {
+      textEl.textContent = activeOpt.textContent;
+    }
+  });
 }

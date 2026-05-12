@@ -91,17 +91,24 @@ export async function clearLicenseData(): Promise<boolean> {
  *     marking a paying customer as expired.
  */
 export async function validateLicenseRemote(licenseKey: string): Promise<LicenseValidationResult> {
-  const response = await fetch(LICENSE_API_URL + '/verify', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ licenseKey }),
-  });
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 5000);
+  try {
+    const response = await fetch(LICENSE_API_URL + '/verify', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ licenseKey }),
+      signal: controller.signal,
+    });
 
-  if (!response.ok) {
-    throw new Error('License verify failed: HTTP ' + response.status);
+    if (!response.ok) {
+      throw new Error('License verify failed: HTTP ' + response.status);
+    }
+
+    return (await response.json()) as LicenseValidationResult;
+  } finally {
+    clearTimeout(timeout);
   }
-
-  return (await response.json()) as LicenseValidationResult;
 }
 
 /**
@@ -129,6 +136,8 @@ export async function activateLicenseRemote(
   licenseKey: string,
   instanceId: string
 ): Promise<RemoteActivationResponse> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
   try {
     const response = await fetch(LICENSE_API_URL + '/activate', {
       method: 'POST',
@@ -138,6 +147,7 @@ export async function activateLicenseRemote(
         instanceId,
         action: 'activate',
       }),
+      signal: controller.signal,
     });
 
     if (!response.ok) {
@@ -148,6 +158,8 @@ export async function activateLicenseRemote(
   } catch (error) {
     console.error('Failed to activate license remotely:', error);
     return { success: false, error: 'license_error_network' };
+  } finally {
+    clearTimeout(timeout);
   }
 }
 
@@ -155,6 +167,8 @@ export async function deactivateLicenseRemote(
   licenseKey: string,
   instanceId: string
 ): Promise<DeactivationResult> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
   try {
     const response = await fetch(LICENSE_API_URL + '/activate', {
       method: 'POST',
@@ -164,6 +178,7 @@ export async function deactivateLicenseRemote(
         instanceId,
         action: 'deactivate',
       }),
+      signal: controller.signal,
     });
 
     if (!response.ok) {
@@ -174,6 +189,8 @@ export async function deactivateLicenseRemote(
   } catch (error) {
     console.error('Failed to deactivate license remotely:', error);
     return { success: false, error: 'license_error_network' };
+  } finally {
+    clearTimeout(timeout);
   }
 }
 

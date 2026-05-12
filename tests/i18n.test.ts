@@ -244,7 +244,7 @@ describe('catalogue parity', () => {
   // gap that should be flagged in CI.
   const enKeys = new Set(Object.keys(en));
 
-  const localeMap: Record<Exclude<Locale, 'en'>, Record<string, unknown>> = {
+  const localeMap: Partial<Record<Exclude<Locale, 'en'>, Record<string, unknown>>> = {
     'zh-CN': zhCN,
     'zh-TW': zhTW,
     ja,
@@ -263,9 +263,21 @@ describe('catalogue parity', () => {
 describe('SUPPORTED_LOCALES + getLocaleLabel', () => {
   it('exposes the expected 15-locale roster', () => {
     expect([...SUPPORTED_LOCALES]).toEqual([
-      'en', 'zh-CN', 'zh-TW', 'ja', 'es',
-      'ko', 'de', 'fr', 'pt', 'ru',
-      'ar', 'hi', 'th', 'it', 'nl',
+      'en',
+      'zh-CN',
+      'zh-TW',
+      'ja',
+      'es',
+      'ko',
+      'de',
+      'fr',
+      'pt',
+      'ru',
+      'ar',
+      'hi',
+      'th',
+      'it',
+      'nl',
     ]);
   });
 
