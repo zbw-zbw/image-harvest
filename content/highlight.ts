@@ -124,6 +124,70 @@ function removeOverlay(): void {
   removeHighlightStyles();
 }
 
+/**
+ * Pick the best element from a list of candidates matching the same image URL.
+ * Strategy:
+ *  1. Filter out zero-size / invisible elements
+ *  2. Prefer elements currently inside the viewport
+ *  3. Among in-viewport elements, pick the one closest to viewport center
+ *  4. If none are in-viewport, pick the one closest to viewport edges
+ */
+function pickBestCandidate(candidates: Element[]): Element | null {
+  if (candidates.length === 0) return null;
+  if (candidates.length === 1) return candidates[0];
+
+  const viewportWidth = window.innerWidth;
+  const viewportHeight = window.innerHeight;
+  const viewportCenterX = viewportWidth / 2;
+  const viewportCenterY = viewportHeight / 2;
+
+  interface Scored {
+    element: Element;
+    rect: DOMRect;
+    inViewport: boolean;
+    distanceToCenter: number;
+    distanceToViewport: number;
+  }
+
+  const scored: Scored[] = [];
+
+  for (const el of candidates) {
+    const rect = el.getBoundingClientRect();
+    // Skip zero-size elements
+    if (rect.width < 2 || rect.height < 2) continue;
+
+    const elCenterX = rect.left + rect.width / 2;
+    const elCenterY = rect.top + rect.height / 2;
+
+    const inViewport =
+      rect.bottom > 0 && rect.top < viewportHeight && rect.right > 0 && rect.left < viewportWidth;
+
+    const distanceToCenter = Math.hypot(elCenterX - viewportCenterX, elCenterY - viewportCenterY);
+
+    // Distance from element edge to viewport edge (0 if inside viewport)
+    let distanceToViewport = 0;
+    if (!inViewport) {
+      const dx = Math.max(0, rect.left - viewportWidth, -rect.right);
+      const dy = Math.max(0, rect.top - viewportHeight, -rect.bottom);
+      distanceToViewport = Math.hypot(dx, dy);
+    }
+
+    scored.push({ element: el, rect, inViewport, distanceToCenter, distanceToViewport });
+  }
+
+  if (scored.length === 0) return candidates[0];
+
+  // Sort: in-viewport first, then by distance to center / distance to viewport
+  scored.sort((a, b) => {
+    if (a.inViewport && !b.inViewport) return -1;
+    if (!a.inViewport && b.inViewport) return 1;
+    if (a.inViewport && b.inViewport) return a.distanceToCenter - b.distanceToCenter;
+    return a.distanceToViewport - b.distanceToViewport;
+  });
+
+  return scored[0].element;
+}
+
 function findImageElement(url: string): Element | null {
   const isTargetDataUri = isDataUri(url);
   // For data URIs, generate a key for comparison since the full string is huge
@@ -139,45 +203,61 @@ function findImageElement(url: string): Element | null {
     return candidateUrl === url || resolveUrl(candidateUrl) === url;
   }
 
+  // Collect ALL matching elements instead of returning the first one
+  const candidates: Element[] = [];
+
   // 1. Check <img> elements (including srcset and lazy-load attributes)
   const imgs = document.querySelectorAll('img');
   for (const img of imgs) {
+    let matched = false;
     const src = img.currentSrc || img.src;
-    if (urlMatches(src)) return img;
+    if (urlMatches(src)) matched = true;
 
     // Check srcset
-    if (img.srcset) {
+    if (!matched && img.srcset) {
       const srcsetUrls = parseSrcset(img.srcset);
       for (const { url: candidateUrl } of srcsetUrls) {
-        if (urlMatches(candidateUrl)) return img;
+        if (urlMatches(candidateUrl)) {
+          matched = true;
+          break;
+        }
       }
     }
 
     // Check lazy-load attributes
-    for (const attr of [
-      'data-src',
-      'data-original',
-      'data-lazy',
-      'data-lazy-src',
-      'data-srcset',
-      'data-lazy-srcset',
-    ]) {
-      const val = img.getAttribute(attr);
-      if (!val) continue;
-      if (attr.includes('srcset')) {
-        const parsed = parseSrcset(val);
-        for (const { url: candidateUrl } of parsed) {
-          if (urlMatches(candidateUrl)) return img;
+    if (!matched) {
+      for (const attr of [
+        'data-src',
+        'data-original',
+        'data-lazy',
+        'data-lazy-src',
+        'data-srcset',
+        'data-lazy-srcset',
+      ]) {
+        const val = img.getAttribute(attr);
+        if (!val) continue;
+        if (attr.includes('srcset')) {
+          const parsed = parseSrcset(val);
+          for (const { url: candidateUrl } of parsed) {
+            if (urlMatches(candidateUrl)) {
+              matched = true;
+              break;
+            }
+          }
+        } else if (urlMatches(val)) {
+          matched = true;
         }
-      } else if (urlMatches(val)) {
-        return img;
+        if (matched) break;
       }
     }
+
+    if (matched) candidates.push(img);
   }
 
   // 2. Check <picture> > <source>
   const pictures = document.querySelectorAll('picture');
   for (const picture of pictures) {
+    let matched = false;
     const sources = picture.querySelectorAll('source');
     for (const source of sources) {
       for (const attr of ['srcset', 'data-srcset', 'data-lazy-srcset']) {
@@ -185,36 +265,47 @@ function findImageElement(url: string): Element | null {
         if (!val) continue;
         const srcsetUrls = parseSrcset(val);
         for (const { url: candidateUrl } of srcsetUrls) {
-          if (urlMatches(candidateUrl)) return picture.querySelector('img') || picture;
+          if (urlMatches(candidateUrl)) {
+            matched = true;
+            break;
+          }
+        }
+        if (matched) break;
+      }
+      if (!matched) {
+        for (const attr of ['src', 'data-src']) {
+          const val = source.getAttribute(attr);
+          if (urlMatches(val)) {
+            matched = true;
+            break;
+          }
         }
       }
-      for (const attr of ['src', 'data-src']) {
-        const val = source.getAttribute(attr);
-        if (urlMatches(val)) return picture.querySelector('img') || picture;
-      }
+      if (matched) break;
     }
+    if (matched) candidates.push(picture.querySelector('img') || picture);
   }
 
   // 3. Check <video> poster attribute
   const videos = document.querySelectorAll<HTMLVideoElement>('video[poster]');
   for (const video of videos) {
-    if (urlMatches(video.poster)) return video;
+    if (urlMatches(video.poster)) candidates.push(video);
   }
 
   // 4. Check <input type="image">
   const inputImages = document.querySelectorAll<HTMLInputElement>('input[type="image"]');
   for (const input of inputImages) {
-    if (urlMatches(input.src)) return input;
+    if (urlMatches(input.src)) candidates.push(input);
   }
 
   // 5. Check <object> and <embed>
   const objects = document.querySelectorAll<HTMLObjectElement>('object[data]');
   for (const obj of objects) {
-    if (urlMatches(obj.data)) return obj;
+    if (urlMatches(obj.data)) candidates.push(obj);
   }
   const embeds = document.querySelectorAll<HTMLEmbedElement>('embed[src]');
   for (const embed of embeds) {
-    if (urlMatches(embed.src)) return embed;
+    if (urlMatches(embed.src)) candidates.push(embed);
   }
 
   // 6. Check inline <svg> elements (compare by data URI key)
@@ -226,7 +317,7 @@ function findImageElement(url: string): Element | null {
         const svgString = serializer.serializeToString(svg);
         const dataUri =
           'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
-        if (generateDataUriKey(dataUri) === targetDataKey) return svg;
+        if (generateDataUriKey(dataUri) === targetDataKey) candidates.push(svg);
       } catch {
         /* skip */
       }
@@ -239,7 +330,7 @@ function findImageElement(url: string): Element | null {
     for (const canvas of canvases) {
       try {
         const canvasDataUri = canvas.toDataURL('image/png');
-        if (generateDataUriKey(canvasDataUri) === targetDataKey) return canvas;
+        if (generateDataUriKey(canvasDataUri) === targetDataKey) candidates.push(canvas);
       } catch {
         /* tainted canvas */
       }
@@ -255,7 +346,10 @@ function findImageElement(url: string): Element | null {
       if (bg && bg !== 'none') {
         const bgUrls = extractBackgroundUrls(bg);
         for (const u of bgUrls) {
-          if (urlMatches(u)) return el;
+          if (urlMatches(u)) {
+            candidates.push(el);
+            break;
+          }
         }
       }
 
@@ -266,7 +360,10 @@ function findImageElement(url: string): Element | null {
         if (content && content !== 'none' && content !== 'normal' && content !== '""') {
           const contentUrls = extractBackgroundUrls(content);
           for (const u of contentUrls) {
-            if (urlMatches(u)) return el;
+            if (urlMatches(u)) {
+              candidates.push(el);
+              break;
+            }
           }
         }
       }
@@ -290,7 +387,10 @@ function findImageElement(url: string): Element | null {
       if (!val) continue;
       const urlMatch = val.match(/url\(['"]?([^'")]+)['"]?\)/);
       const rawUrl = urlMatch ? urlMatch[1] : val;
-      if (urlMatches(rawUrl)) return el;
+      if (urlMatches(rawUrl)) {
+        candidates.push(el);
+        break;
+      }
     }
   }
 
@@ -300,47 +400,68 @@ function findImageElement(url: string): Element | null {
     // Check <img> in shadow DOM
     const shadowImgs = shadowRoot.querySelectorAll('img');
     for (const img of shadowImgs) {
-      if (urlMatches(img.currentSrc) || urlMatches(img.src)) return img;
+      if (urlMatches(img.currentSrc) || urlMatches(img.src)) {
+        candidates.push(img);
+        continue;
+      }
       if (img.srcset) {
+        let matched = false;
         for (const { url: candidateUrl } of parseSrcset(img.srcset)) {
-          if (urlMatches(candidateUrl)) return img;
+          if (urlMatches(candidateUrl)) {
+            matched = true;
+            break;
+          }
+        }
+        if (matched) {
+          candidates.push(img);
+          continue;
         }
       }
       for (const attr of ['data-src', 'data-original', 'data-lazy', 'data-lazy-src']) {
-        if (urlMatches(img.getAttribute(attr))) return img;
+        if (urlMatches(img.getAttribute(attr))) {
+          candidates.push(img);
+          break;
+        }
       }
     }
 
     // Check <picture> > <source> in shadow DOM
     const shadowPictures = shadowRoot.querySelectorAll('picture');
     for (const picture of shadowPictures) {
+      let matched = false;
       for (const source of picture.querySelectorAll('source')) {
         for (const attr of ['srcset', 'data-srcset', 'src', 'data-src']) {
           const val = source.getAttribute(attr);
           if (!val) continue;
           if (attr.includes('srcset')) {
             for (const { url: candidateUrl } of parseSrcset(val)) {
-              if (urlMatches(candidateUrl)) return picture.querySelector('img') || picture;
+              if (urlMatches(candidateUrl)) {
+                matched = true;
+                break;
+              }
             }
           } else if (urlMatches(val)) {
-            return picture.querySelector('img') || picture;
+            matched = true;
           }
+          if (matched) break;
         }
+        if (matched) break;
       }
+      if (matched) candidates.push(picture.querySelector('img') || picture);
     }
 
     // Check <video poster>, <input type=image>, <object>, <embed> in shadow DOM
     for (const video of shadowRoot.querySelectorAll<HTMLVideoElement>('video[poster]')) {
-      if (urlMatches(video.poster)) return video;
+      if (urlMatches(video.poster)) candidates.push(video);
     }
     for (const input of shadowRoot.querySelectorAll<HTMLInputElement>('input[type="image"]')) {
-      if (urlMatches(input.src)) return input;
+      if (urlMatches(input.src)) candidates.push(input);
     }
     for (const obj of shadowRoot.querySelectorAll<HTMLObjectElement>('object[data]')) {
-      if (urlMatches(obj.data)) return obj;
+      if (urlMatches(obj.data)) candidates.push(obj);
     }
     for (const embed of shadowRoot.querySelectorAll<HTMLEmbedElement>('embed[src]')) {
-      if (urlMatches(embed.src)) return embed;
+      if (urlMatches(embed.src)) candidates.push(embed);
     }
 
     // Check background images in shadow DOM
@@ -350,7 +471,10 @@ function findImageElement(url: string): Element | null {
         const bg = window.getComputedStyle(el).backgroundImage;
         if (bg && bg !== 'none') {
           for (const u of extractBackgroundUrls(bg)) {
-            if (urlMatches(u)) return el;
+            if (urlMatches(u)) {
+              candidates.push(el);
+              break;
+            }
           }
         }
       } catch {
@@ -366,7 +490,7 @@ function findImageElement(url: string): Element | null {
           const svgString = serializer.serializeToString(svg);
           const dataUri =
             'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
-          if (generateDataUriKey(dataUri) === targetDataKey) return svg;
+          if (generateDataUriKey(dataUri) === targetDataKey) candidates.push(svg);
         } catch {
           /* skip */
         }
@@ -374,7 +498,13 @@ function findImageElement(url: string): Element | null {
     }
   }
 
+  // If we found candidates from the DOM, pick the best one
+  if (candidates.length > 0) {
+    return pickBestCandidate(candidates);
+  }
+
   // 11. Check <link> elements (favicon, apple-touch-icon, etc.)
+  // These are metadata elements — no position-based ranking needed
   if (!isTargetDataUri) {
     const linkSelectors = [
       'link[rel="icon"]',
