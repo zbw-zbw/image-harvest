@@ -24,11 +24,8 @@
     );
   }
 
-  // Dynamically load popup.css
-  const popupStyleLink = document.createElement('link');
-  popupStyleLink.rel = 'stylesheet';
-  popupStyleLink.href = 'popup.css';
-  document.head.appendChild(popupStyleLink);
+  // popup.css is already included via <link> in popup.html at build time
+  // (Vite hashes it to /assets/popup-XXXX.css). No dynamic injection needed.
 })();
 
 /**

@@ -402,6 +402,13 @@ async function loadCurrentTab(forceRescan = false, targetTabId?: number): Promis
       hideLoading();
       if (!cached.filteredImages || cached.filteredImages.length === 0) {
         applyFilters();
+      } else if (state.isPopupMode) {
+        // Popup opens a fresh DOM each time — always force a render even
+        // when filteredImages was restored from cache. Without this the
+        // lastRenderedFilteredIds optimization in applyFilters() would
+        // skip renderImages(), leaving the grid empty.
+        state.lastRenderedFilteredIds = null;
+        renderImages({ skipScrollReset: true });
       }
       updateSelectionUI();
       return;

@@ -69,18 +69,17 @@ describe('setupPopupMode IIFE', () => {
     expect(document.body.classList.contains('popup-mode')).toBe(true);
   });
 
-  it('pathname=popup.html → injects popup.css <link rel="stylesheet"> into head', async () => {
+  it('pathname=popup.html → does NOT inject popup.css dynamically (handled by HTML <link>)', async () => {
     setLocationPathname('/popup.html');
     await loadPopupModule();
 
-    // Pin: dynamic CSS injection (vs. <link> in the HTML) lets sidepanel
-    // mode skip popup.css entirely — saves a network round-trip on the
-    // hot path of opening the side panel.
+    // Pin: popup.css is included via <link> in popup.html at build time
+    // (Vite hashes it). No dynamic injection is needed — the IIFE only
+    // adds the popup-mode class hooks.
     const link = document.head.querySelector<HTMLLinkElement>(
       'link[rel="stylesheet"][href="popup.css"]'
     );
-    expect(link).not.toBeNull();
-    expect(link?.href).toContain('popup.css');
+    expect(link).toBeNull();
   });
 
   it('pathname=sidepanel.html → does NOTHING (early return at IIFE entry)', async () => {
@@ -89,10 +88,9 @@ describe('setupPopupMode IIFE', () => {
 
     // Pin: the pathname guard is the linchpin of mode separation. If
     // popup.ts accidentally runs in sidepanel mode, sidepanel would
-    // get popup-mode class + popup.css → broken layout.
+    // get popup-mode class → broken layout.
     expect(document.documentElement.classList.contains('popup-mode')).toBe(false);
     expect(document.body.classList.contains('popup-mode')).toBe(false);
-    expect(document.head.querySelector('link[href="popup.css"]')).toBeNull();
   });
 
   it('body NOT yet present → defers popup-mode class to DOMContentLoaded (once)', async () => {
