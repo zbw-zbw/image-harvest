@@ -37,12 +37,12 @@ export function handleScanCancel(): void {
     applyFilters();
     // Use filteredImages count so the toast matches the bottom status bar.
     showToast(
-      `${t('toast_download_cancelled')} · ${t('status_found_images', { count: state.filteredImages.length })}`,
+      `${t('toast_scan_cancelled')} · ${t('status_found_images', { count: state.filteredImages.length })}`,
       'info'
     );
   } else {
     showEmpty();
-    showToast(t('toast_download_cancelled'), 'info');
+    showToast(t('toast_scan_cancelled'), 'info');
   }
 }
 
@@ -408,11 +408,13 @@ export async function fetchImages(targetTabId?: number): Promise<void> {
     // "response failed" (content script not ready) and "0 images" (SPA
     // hasn't rendered yet) scenarios.
     const retryDelays = [500, 1000, 1500];
+    let retryCount = 0;
     for (const delay of retryDelays) {
       // Stop retrying once we have a successful response WITH images
       const hasImages = response?.success && response.images && response.images.length > 0;
       if (hasImages || state.scanAborted) break;
 
+      retryCount++;
       await new Promise<void>((resolve) => setTimeout(resolve, delay));
       if (state.scanAborted) break;
 
@@ -544,6 +546,10 @@ export async function fetchImageDataUrl(imageUrl: string): Promise<string | null
 }
 
 export async function processImageExtras(images: ImageItem[]): Promise<void> {
+  // Snapshot tabId at the start so we can bail if the user switches tabs
+  // during the long-running async batch processing below.
+  const extrasTabId = state.currentTabId;
+
   const metaPromises: Array<Promise<unknown>> = [];
   images.forEach((img) => {
     // For data: URLs, calculate size directly from the base64 string
@@ -607,31 +613,23 @@ export async function processImageExtras(images: ImageItem[]): Promise<void> {
     }
   });
 
-  const needsPHash = state.appSettings.enableSimilarDetection !== false;
-  const needsColors = state.appSettings.enableColorExtraction !== false;
-
-  if (!needsPHash && !needsColors) {
-    if (metaPromises.length > 0) {
-      await Promise.allSettled(metaPromises);
-      patchCardExtras(images);
-    }
-    return;
-  }
-
   // Process images in batches with scan overlay progress
   const batchSize = 5;
-  const imagesToProcess = images.filter(
-    (img) => (needsPHash && !img.phash) || (needsColors && !img.colors)
-  );
+  const imagesToProcess = images.filter((img) => !img.phash || !img.colors);
 
   for (let i = 0; i < imagesToProcess.length; i += batchSize) {
+    // Abort if user switched tabs during processing — continuing would
+    // mutate stale image objects and trigger detectSimilarImages /
+    // patchCardExtras for the wrong tab, causing count leaks and flicker.
+    if (state.currentTabId !== extrasTabId) return;
+
     const batch = imagesToProcess.slice(i, i + batchSize);
     const batchPromises = batch.map(async (img) => {
       const dataUrl = await fetchImageDataUrl(img.url);
       if (!dataUrl) return;
 
       const extraPromises: Array<Promise<unknown>> = [];
-      if (needsPHash && !img.phash) {
+      if (!img.phash) {
         extraPromises.push(
           calculatePHash(dataUrl)
             .then((hash) => {
@@ -642,7 +640,7 @@ export async function processImageExtras(images: ImageItem[]): Promise<void> {
             })
         );
       }
-      if (needsColors && !img.colors) {
+      if (!img.colors) {
         extraPromises.push(
           extractColorsFromUrl(dataUrl, 10)
             .then((colors) => {
@@ -657,6 +655,9 @@ export async function processImageExtras(images: ImageItem[]): Promise<void> {
     });
 
     await Promise.allSettled([...batchPromises, ...metaPromises.splice(0, batchSize)]);
+
+    // Re-check after await — tab may have changed during batch processing
+    if (state.currentTabId !== extrasTabId) return;
 
     // Incrementally patch card DOM for updated properties (filesize, format,
     // color bar) instead of rebuilding the entire grid, avoiding flicker.
@@ -684,8 +685,6 @@ export async function processImageExtras(images: ImageItem[]): Promise<void> {
  */
 export function patchCardExtras(images: ImageItem[]): void {
   if (!elements.imageGrid) return;
-  const colorExtractionEnabled = state.appSettings.enableColorExtraction !== false;
-
   let needsRerender = false;
 
   images.forEach((img) => {
@@ -718,7 +717,7 @@ export function patchCardExtras(images: ImageItem[]): void {
     // Color bar is now Preact-managed (ColorBar component in ImageCard).
     // If colors arrived but the card still shows the empty/transparent bar,
     // flag for a Preact re-render instead of imperatively replacing the DOM.
-    if (colorExtractionEnabled && img.colors && img.colors.length > 0) {
+    if (img.colors && img.colors.length > 0) {
       const colorsContainer = card.querySelector('.card-colors');
       if (colorsContainer && colorsContainer.querySelector('.card-color-bar-transparent')) {
         needsRerender = true;

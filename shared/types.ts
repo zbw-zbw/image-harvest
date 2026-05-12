@@ -51,8 +51,6 @@ export interface AppSettings {
   enableMaxSize: boolean;
   maxWidth: number;
   maxHeight: number;
-  enableSimilarDetection: boolean;
-  enableColorExtraction: boolean;
   noManyFilesWarning: boolean;
 }
 

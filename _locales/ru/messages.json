@@ -86,6 +86,9 @@
   "toast_download_cancelled": {
     "message": "Загрузка отменена"
   },
+  "toast_scan_cancelled": {
+    "message": "Сканирование отменено"
+  },
   "toast_download_completed": {
     "message": "Скачано {count} изображений"
   },

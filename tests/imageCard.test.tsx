@@ -100,10 +100,9 @@ describe('ImageCard – rendering', () => {
     ).toBe(0);
   });
 
-  it('omits the color bar entirely when extraction is disabled', () => {
-    state.appSettings = { ...state.appSettings, enableColorExtraction: false };
+  it('always renders the color bar (extraction is always enabled)', () => {
     const { container } = render(<ImageCard img={makeImage()} index={0} />);
-    expect(container.querySelector('.card-color-bar-row')).toBeNull();
+    expect(container.querySelector('.card-colors')).toBeInTheDocument();
   });
 });
 
@@ -161,23 +160,20 @@ describe('ImageCard – click handlers', () => {
     );
   });
 
-  it('lets a free user click favorite — the cap is now enforced inside addToCollection (Sprint 3.5)', async () => {
-    // Sprint 3.5 removed the component-level Pro guard from
-    // handleFavorite. Free users now get MAX_COLLECTION_ITEMS slots
-    // before the paywall trips, and the gating moved into
-    // pro-features.addToCollection so every entry point inherits the
-    // same cap. The component therefore just calls addToCollection and
-    // re-checks isImageInCollection to keep the heart icon honest.
+  it('blocks a free user from clicking favorite and shows upgrade prompt', async () => {
+    // Collection is now a Pro-only feature. Non-Pro users are fully
+    // blocked at the component level — handleFavorite shows a warning
+    // toast and the Pro upgrade modal without calling addToCollection.
     state.isProUser = false;
     const img = makeImage({ id: 'fav-free' });
     const { container } = render(<ImageCard img={img} index={0} />);
     fireEvent.click(container.querySelector('.btn-favorite')!);
     await waitFor(() => {
-      expect(mocks.pro.addToCollection).toHaveBeenCalledWith(img);
+      expect(mocks.ui.showToast).toHaveBeenCalledWith('Collection is a Pro feature', 'warning');
+      expect(mocks.settings.showProUpgradeModal).toHaveBeenCalled();
     });
-    // The legacy "Collection is a Pro feature" pre-block toast must NOT fire.
-    expect(mocks.ui.showToast).not.toHaveBeenCalledWith('Collection is a Pro feature', 'warning');
-    expect(mocks.settings.showProUpgradeModal).not.toHaveBeenCalled();
+    // addToCollection must NOT be invoked for free users.
+    expect(mocks.pro.addToCollection).not.toHaveBeenCalled();
   });
 
   it('adds to collection when a Pro user clicks favorite', async () => {

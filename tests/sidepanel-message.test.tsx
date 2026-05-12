@@ -457,11 +457,6 @@ describe('handleMessage — CLEAR_SELECTION + LICENSE_STATUS_CHANGED', () => {
 describe('handleMessage — MULTI_TAB_EXTRACT', () => {
   beforeEach(() => {
     state.allImages = [];
-    state.appSettings = {
-      ...state.appSettings,
-      enableSimilarDetection: false,
-      enableColorExtraction: false,
-    };
   });
 
   it('success: merges deduped images, switches groupMode→tab, closes modal, success toast', async () => {
@@ -501,12 +496,7 @@ describe('handleMessage — MULTI_TAB_EXTRACT', () => {
     expect(state.allImages).toHaveLength(2);
   });
 
-  it('success + Pro features enabled → triggers processImageExtras on the new images', async () => {
-    state.appSettings = {
-      ...state.appSettings,
-      enableSimilarDetection: true,
-      enableColorExtraction: true,
-    };
+  it('success → always triggers processImageExtras on the new images', async () => {
     handleMessage({
       type: MESSAGE_TYPES.MULTI_TAB_EXTRACT_COMPLETE,
       success: true,

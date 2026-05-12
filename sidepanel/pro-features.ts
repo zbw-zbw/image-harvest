@@ -14,7 +14,7 @@ export function detectSimilarImages(): void {
   const withHash = state.allImages.filter((img) => img.phash);
   if (withHash.length < 2) return;
 
-  const HASH_THRESHOLD = 0;
+  const HASH_THRESHOLD = 5;
   const ASPECT_RATIO_TOLERANCE = 0.15;
 
   function getAspectRatio(img: ImageItem): number {
@@ -30,7 +30,7 @@ export function detectSimilarImages(): void {
     return diff <= ASPECT_RATIO_TOLERANCE;
   }
 
-  state.similarGroups = [];
+  const groups: ImageItem[][] = [];
   const used = new Set<number>();
 
   for (let i = 0; i < withHash.length; i++) {
@@ -52,10 +52,16 @@ export function detectSimilarImages(): void {
     }
 
     if (group.length > 1) {
-      state.similarGroups.push(group);
+      groups.push(group);
       used.add(i);
     }
   }
+
+  // Assign the final result in one shot so the Proxy set trap fires and
+  // notifies selector subscribers (e.g. SimilarInline Preact component).
+  // Using state.similarGroups.push() would mutate the array in place
+  // without triggering the Proxy, leaving Preact components stale.
+  state.similarGroups = groups;
 
   // similarCount is now a Preact component (StatusCounts.SimilarCount)
   // subscribed to state.similarGroups.length.
@@ -121,28 +127,16 @@ export function removeImageById(imageId: string): void {
 }
 
 // ============================================
-// Collection / Favorites — Sprint 3.5: Free users get 5 "tasting" slots,
-// Pro is unlimited. The Pro guard moved from ImageCard.handleFavorite to
-// here so the limit lives next to the data write — keeping the cap as a
-// pure-data concern means future entry points (drag-to-collection,
-// keyboard shortcut) automatically inherit the same gate.
+// Collection / Favorites — Pro-only feature.
+// Non-Pro users are completely blocked from adding to collection.
 // ============================================
 export async function addToCollection(img: ImageItem): Promise<void> {
   try {
-    // Free-tier cap: count current items first; if at/over the cap, block
-    // and surface the upgrade modal. Pro users skip this entirely. We
-    // count before write to avoid race-y "added then immediately removed"
-    // UX when the user is exactly at the threshold.
+    // Pro guard: collection is a Pro-only feature.
     if (!state.isProUser) {
-      const existing = await collectionGetAll();
-      // If this image is already collected (toggle case), let the write
-      // proceed; collectionAdd is idempotent on { id }.
-      const alreadyIn = existing.some((c: CollectionItem) => c.id === img.id);
-      if (!alreadyIn && existing.length >= FREE_LIMITS.MAX_COLLECTION_ITEMS) {
-        showToast(t('pro_collection_limit', { max: FREE_LIMITS.MAX_COLLECTION_ITEMS }), 'warning');
-        showProUpgradeModal();
-        return;
-      }
+      showToast(t('pro_feature_blocked_collection'), 'warning');
+      showProUpgradeModal();
+      return;
     }
 
     // Get the actual page URL from the active tab (not the extension panel URL)

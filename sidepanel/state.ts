@@ -47,6 +47,8 @@ export interface TabCacheEntry {
   filteredImages?: ImageItem[];
   /** Matches state.lastRenderedFilteredIds at the time of caching. */
   lastRenderedFilteredIds?: string | null;
+  /** Cached similar-image groups so tab-switch restores the correct count. */
+  similarGroups?: SimilarGroup[];
 }
 
 // ── Similar-image group ─────────────────────────────────────────────────────

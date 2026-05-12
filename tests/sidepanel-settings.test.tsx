@@ -404,8 +404,6 @@ describe('bindProGuards — Pro paywall interceptor', () => {
       <input id="pro-modal-key-input" />
       <button id="btn-collection">Collection</button>
       <button id="btn-multitab">Multi-Tab</button>
-      <input type="checkbox" id="setting-similar-detection" />
-      <input type="checkbox" id="setting-color-extract" />
       <input type="checkbox" id="setting-live-monitor" />
       <input id="setting-subfolder" />
       <input id="setting-filename" />
@@ -473,9 +471,10 @@ describe('bindProGuards — Pro paywall interceptor', () => {
     }
   );
 
-  it.each(['setting-similar-detection', 'setting-color-extract', 'setting-live-monitor'])(
-    'free user clicking Pro toggle #%s → close settings + warning toast + open upgrade modal',
-    async (id) => {
+  it(
+    'free user clicking Pro toggle #setting-live-monitor → close settings + warning toast + open upgrade modal',
+    async () => {
+      const id = 'setting-live-monitor';
       state.isProUser = false;
       state.settingsModalState = { ...state.settingsModalState, open: true };
       state.proUpgradeModalState = { open: false, errorText: '' };
@@ -496,7 +495,7 @@ describe('bindProGuards — Pro paywall interceptor', () => {
     state.isProUser = true;
     state.settingsModalState = { ...state.settingsModalState, open: true };
 
-    document.getElementById('setting-similar-detection')!.click();
+    document.getElementById('setting-live-monitor')!.click();
 
     expect(state.settingsModalState.open).toBe(true);
     const ui = await import('../sidepanel/ui');
@@ -732,7 +731,7 @@ describe('resetSettings', () => {
     installChromeMock();
   });
 
-  it('resets state.appSettings to documented defaults (all 19 fields)', () => {
+  it('resets state.appSettings to documented defaults (all 17 fields)', () => {
     // Pre-pollute with non-default values
     state.appSettings = {
       useSidePanel: false,
@@ -751,8 +750,6 @@ describe('resetSettings', () => {
       enableMaxSize: true,
       maxWidth: 100,
       maxHeight: 100,
-      enableSimilarDetection: true,
-      enableColorExtraction: true,
       noManyFilesWarning: true,
     } as typeof state.appSettings;
 
@@ -770,7 +767,6 @@ describe('resetSettings', () => {
     expect(state.appSettings.liveMonitoring).toBe(true);
     expect(state.appSettings.minWidth).toBe(0);
     expect(state.appSettings.maxWidth).toBe(99999);
-    expect(state.appSettings.enableSimilarDetection).toBe(true);
   });
 
   it('shows success toast + opens settings modal (via showSettings)', async () => {
@@ -819,16 +815,12 @@ describe('showSettings', () => {
     expect((document.getElementById('setting-side-panel') as HTMLInputElement).checked).toBe(true);
   });
 
-  it('forces Pro-only toggles to false for free users (live-monitor + similar + color)', () => {
+  it('forces Pro-only toggles to false for free users (live-monitor)', () => {
     document.body.innerHTML = `
       <input type="checkbox" id="setting-live-monitor" />
-      <input type="checkbox" id="setting-similar-detection" />
-      <input type="checkbox" id="setting-color-extract" />
     `;
     state.isProUser = false;
     state.appSettings.liveMonitoring = true;
-    state.appSettings.enableSimilarDetection = true;
-    state.appSettings.enableColorExtraction = true;
 
     showSettings();
 
@@ -836,12 +828,6 @@ describe('showSettings', () => {
     // the underlying state value. Otherwise free users could see "ON"
     // in the UI but the feature wouldn't actually work — confusing UX.
     expect((document.getElementById('setting-live-monitor') as HTMLInputElement).checked).toBe(
-      false
-    );
-    expect((document.getElementById('setting-similar-detection') as HTMLInputElement).checked).toBe(
-      false
-    );
-    expect((document.getElementById('setting-color-extract') as HTMLInputElement).checked).toBe(
       false
     );
   });
@@ -905,19 +891,15 @@ describe('applyProFeatureVisibility', () => {
     expect(state.isProUser).toBe(false);
   });
 
-  it('newly-Pro transition (free → Pro) auto-enables 3 Pro features + persists', async () => {
+  it('newly-Pro transition (free → Pro) auto-enables liveMonitoring + persists', async () => {
     chromeMock.runtime.sendMessage.mockResolvedValue({ isPro: true });
     state.isProUser = false;
-    state.appSettings.enableSimilarDetection = false;
-    state.appSettings.enableColorExtraction = false;
     state.appSettings.liveMonitoring = false;
 
     await applyProFeatureVisibility();
 
-    // Pin: first-time activation should turn ON the 3 default Pro features
+    // Pin: first-time activation should turn ON liveMonitoring
     // so the user sees value immediately, and persist so they survive reload.
-    expect(state.appSettings.enableSimilarDetection).toBe(true);
-    expect(state.appSettings.enableColorExtraction).toBe(true);
     expect(state.appSettings.liveMonitoring).toBe(true);
     expect(chromeMock.storage.local.set).toHaveBeenCalledWith(
       expect.objectContaining({ appSettings: state.appSettings })
@@ -939,22 +921,15 @@ describe('applyProFeatureVisibility', () => {
   it('already-Pro (no transition) does NOT re-enable defaults or persist', async () => {
     chromeMock.runtime.sendMessage.mockResolvedValue({ isPro: true });
     state.isProUser = true; // wasPro=true, isProUser stays true → no transition
-    state.appSettings.enableSimilarDetection = false; // user opted out
-    state.appSettings.enableColorExtraction = false;
 
     await applyProFeatureVisibility();
 
-    // Pin: respect user's opt-out. Auto-enabling on EVERY call would
-    // override their preference every time settings opens.
-    expect(state.appSettings.enableSimilarDetection).toBe(false);
-    expect(state.appSettings.enableColorExtraction).toBe(false);
     expect(chromeMock.storage.local.set).not.toHaveBeenCalled();
   });
 
   it('does not crash when #dedup-info element is absent (removed from DOM)', async () => {
     chromeMock.runtime.sendMessage.mockResolvedValue({ isPro: false });
     document.body.innerHTML = '';
-    state.appSettings.enableSimilarDetection = false;
 
     // applyProFeatureVisibility no longer manipulates #dedup-info directly;
     // similar-detection visibility is driven by Preact components. Verify
@@ -962,51 +937,17 @@ describe('applyProFeatureVisibility', () => {
     await expect(applyProFeatureVisibility()).resolves.toBeUndefined();
   });
 
-  it('hides color filter button + dropdown when colorExtraction disabled', async () => {
+  it('forces Pro toggle (live-monitor) to unchecked for free users', async () => {
     chromeMock.runtime.sendMessage.mockResolvedValue({ isPro: false });
     document.body.innerHTML = `
-      <button class="filter-btn" data-filter="color"></button>
-      <div id="filter-color"></div>
-    `;
-    state.appSettings.enableColorExtraction = false;
-
-    await applyProFeatureVisibility();
-    expect(
-      (document.querySelector('.filter-btn[data-filter="color"]') as HTMLElement).style.display
-    ).toBe('none');
-    expect((document.getElementById('filter-color') as HTMLElement).style.display).toBe('none');
-  });
-
-  it('clears active color filter + calls applyFilters when colorExtraction newly disabled', async () => {
-    chromeMock.runtime.sendMessage.mockResolvedValue({ isPro: false });
-    state.appSettings.enableColorExtraction = false;
-    state.activeFilters.color = '#ff0000';
-
-    await applyProFeatureVisibility();
-    const filter = await import('../sidepanel/filter');
-    expect(state.activeFilters.color).toBeNull();
-    expect(filter.applyFilters).toHaveBeenCalled();
-  });
-
-  it('forces Pro toggles to unchecked for free users (3 Pro toggles)', async () => {
-    chromeMock.runtime.sendMessage.mockResolvedValue({ isPro: false });
-    document.body.innerHTML = `
-      <input type="checkbox" id="setting-similar-detection" checked />
-      <input type="checkbox" id="setting-color-extract" checked />
       <input type="checkbox" id="setting-live-monitor" checked />
     `;
 
     await applyProFeatureVisibility();
-    // Pin: the three toggles in the Settings form MUST visually reflect
+    // Pin: the Pro toggle in the Settings form MUST visually reflect
     // the actual capability. Showing "ON" while the underlying state is
     // disabled would mislead users (the click handler intercepts and
     // shows the upgrade modal, but the visual mismatch is still bad UX).
-    expect((document.getElementById('setting-similar-detection') as HTMLInputElement).checked).toBe(
-      false
-    );
-    expect((document.getElementById('setting-color-extract') as HTMLInputElement).checked).toBe(
-      false
-    );
     expect((document.getElementById('setting-live-monitor') as HTMLInputElement).checked).toBe(
       false
     );
@@ -1196,8 +1137,6 @@ describe('saveSettings', () => {
     theme?: string;
     defaultGroup?: string;
     searchAllFrames?: boolean;
-    similar?: boolean;
-    color?: boolean;
   }): void {
     const checked = (b: boolean | undefined): string => (b ? 'checked' : '');
     document.body.innerHTML = `
@@ -1229,8 +1168,6 @@ describe('saveSettings', () => {
       <input type="checkbox" id="setting-max-size" />
       <input id="setting-max-width" value="8000" />
       <input id="setting-max-height" value="8000" />
-      <input type="checkbox" id="setting-similar-detection" ${checked(opts.similar)} />
-      <input type="checkbox" id="setting-color-extract" ${checked(opts.color)} />
       <input type="checkbox" id="setting-no-warning" />
     `;
   }
@@ -1358,33 +1295,6 @@ describe('saveSettings', () => {
     expect(scan.fetchImages).not.toHaveBeenCalled();
   });
 
-  it('Pro user newly-enables similar OR color + has scanned images → processImageExtras retroactively', async () => {
-    buildSettingsFormDOM({ similar: true, color: false });
-    state.isProUser = true;
-    chromeMock.runtime.sendMessage.mockResolvedValue({ isPro: true });
-    state.appSettings.enableSimilarDetection = false; // prev=false, new=true
-    state.appSettings.enableColorExtraction = false;
-    state.allImages = [{ id: 'a', url: 'a.jpg' } as never];
-
-    await saveSettings();
-    const scan = await import('../sidepanel/scan');
-    // Pin: newly-enabled Pro feature retroactively processes already-
-    // scanned images. Without it, the user would have to manually
-    // trigger a re-scan to benefit from the feature on existing results.
-    expect(scan.processImageExtras).toHaveBeenCalledWith(state.allImages);
-  });
-
-  it('Pro feature unchanged: does NOT call processImageExtras', async () => {
-    buildSettingsFormDOM({ similar: true });
-    state.isProUser = true;
-    chromeMock.runtime.sendMessage.mockResolvedValue({ isPro: true });
-    state.appSettings.enableSimilarDetection = true; // prev=true, new=true → no transition
-    state.allImages = [{ id: 'a', url: 'a.jpg' } as never];
-
-    await saveSettings();
-    const scan = await import('../sidepanel/scan');
-    expect(scan.processImageExtras).not.toHaveBeenCalled();
-  });
 
   it('isFetching=true: SKIPS applyFilters (avoid flashing "No images found")', async () => {
     buildSettingsFormDOM({});

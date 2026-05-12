@@ -86,6 +86,9 @@
   "toast_download_cancelled": {
     "message": "다운로드 취소됨"
   },
+  "toast_scan_cancelled": {
+    "message": "스캔이 취소되었습니다"
+  },
   "toast_download_completed": {
     "message": "{count}개의 이미지를 다운로드했습니다"
   },

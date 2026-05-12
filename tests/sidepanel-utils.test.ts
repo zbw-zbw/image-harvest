@@ -367,7 +367,7 @@ describe('loadSettings', () => {
   it('merges stored appSettings onto defaults AND hydrates filterConfig onto DEFAULT_FILTER_CONFIG', async () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ((globalThis as any).chrome.storage.local.get as any).mockResolvedValueOnce({
-      appSettings: { filenameTemplate: '{number}.{format}', enableColorExtraction: false },
+      appSettings: { filenameTemplate: '{number}.{format}', noManyFilesWarning: true },
       filterConfig: { minWidth: 200, minHeight: 150 },
     });
 
@@ -375,7 +375,7 @@ describe('loadSettings', () => {
 
     // Stored key wins over in-memory default.
     expect(state.appSettings.filenameTemplate).toBe('{number}.{format}');
-    expect(state.appSettings.enableColorExtraction).toBe(false);
+    expect(state.appSettings.noManyFilesWarning).toBe(true);
     // DEFAULT_FILTER_CONFIG keys that were not stored must remain present.
     expect(state.filterConfig).toMatchObject({
       ...DEFAULT_FILTER_CONFIG,
@@ -387,7 +387,7 @@ describe('loadSettings', () => {
   it('installs DEFAULT_FILTER_CONFIG verbatim when the stored filterConfig key is missing', async () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ((globalThis as any).chrome.storage.local.get as any).mockResolvedValueOnce({
-      appSettings: { enableColorExtraction: true },
+      appSettings: { noManyFilesWarning: false },
       // no filterConfig key
     });
 

@@ -112,16 +112,30 @@ function isExtensionContextValid(): boolean {
 async function init(): Promise<void> {
   state.isPopupMode = window.location.pathname.endsWith('popup.html');
 
-  // ── i18n: resolve user / browser locale before any UI text is rendered ──
+  // ── Instant visual feedback ─────────────────────────────────────────────
+  // Mount Preact components, cache DOM refs, and show loading skeletons
+  // BEFORE any async work (locale detection, telemetry, settings load).
+  // This ensures the user sees skeleton placeholders the moment the panel
+  // opens, eliminating the blank-screen flash. Locale detection and
+  // translations are applied later via applyTranslations().
+  mountPreactComponents();
+  cacheElements();
+  showLoading();
+
+  // ── i18n: resolve user / browser locale ─────────────────────────────────
   // Catalogue lookup is sync once detectLocale() resolves, so subsequent
-  // t() calls inside mountPreactComponents / cacheElements / loadSettings
-  // see the right language. Failure here must not block init — t() falls
-  // back to English when activeLocale stays at its module default.
+  // t() calls inside loadSettings / applyTranslations see the right
+  // language. Failure here must not block init — t() falls back to English
+  // when activeLocale stays at its module default.
   try {
     await detectLocale();
   } catch {
     /* keep fallback locale */
   }
+  // Preact components were mounted above (before detectLocale) so their
+  // initial render used the default English locale. Bump localeTick now
+  // so every component that calls t() re-renders with the resolved language.
+  state.localeTick = (state.localeTick ?? 0) + 1;
 
   // ── Telemetry envelope sync ─────────────────────────────────────────────
   // Background SW seeds {version, plan} but lives in a different runtime,
@@ -178,13 +192,7 @@ async function init(): Promise<void> {
   } catch {
     /* telemetry must never break init */
   }
-  // Mount Preact components first: this swaps legacy DOM nodes for fresh
-  // mount points so that cacheElements() (which still runs for the rest of
-  // the imperative UI) does not cache stale references to nodes Preact has
-  // since taken ownership of.
-  mountPreactComponents();
 
-  cacheElements();
   await loadSettings();
 
   applyTheme((state.appSettings.theme as string) || 'system');
@@ -205,7 +213,11 @@ async function init(): Promise<void> {
 
   bindEvents();
   syncCustomSizeInputsFromSettings();
-  await applyProFeatureVisibility();
+  // Fire-and-forget: Pro visibility check involves a VALIDATE_LICENSE
+  // round-trip to the background SW (~1-1.5s). It only sets state.isProUser
+  // and toggles UI badges — none of which blocks image scanning. Running it
+  // non-blocking lets loadCurrentTab start immediately, saving ~1.2s.
+  const proVisibilityPromise = applyProFeatureVisibility();
   updateFilterButtonLabels();
   applyTranslations();
   initResizeObserver();
@@ -220,10 +232,6 @@ async function init(): Promise<void> {
     // with the new translations without requiring a panel reload.
     state.localeTick = (state.localeTick ?? 0) + 1;
   });
-
-  // Show loading overlay immediately — before establishing any message
-  // connections that could trigger early image rendering via IMAGES_DISCOVERED
-  showLoading();
 
   // Establish a long-lived connection to background for broadcast messages.
   // Wrap in try-catch: after extension reload the background service worker
@@ -314,8 +322,16 @@ async function init(): Promise<void> {
     });
   }
 
-  // Initial load for the current tab (trigger rescan with progress overlay)
+  // Initial load for the current tab (trigger rescan with progress overlay).
+  // Runs in parallel with proVisibilityPromise — image scanning does not
+  // depend on the Pro status, so there is no reason to wait for the
+  // ~1.2s VALIDATE_LICENSE round-trip before starting the scan.
   await loadCurrentTab(false);
+
+  // Ensure the Pro visibility promise settles before marking init done,
+  // so state.isProUser is resolved and UI badges are correct.
+  await proVisibilityPromise;
+
   state.isInitialized = true;
 }
 
@@ -461,6 +477,7 @@ async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Promise<v
       selectedImages: new Set(state.selectedImages),
       filteredImages: [...state.filteredImages],
       lastRenderedFilteredIds: state.lastRenderedFilteredIds,
+      similarGroups: [...state.similarGroups],
     });
     if (cachedUrl) {
       saveTabImageCache(state.currentTabId, cachedUrl, state.allImages);
@@ -515,6 +532,7 @@ async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Promise<v
       const patch: Record<string, unknown> = {
         allImages: cached.images,
         selectedImages: cached.selectedImages,
+        similarGroups: cached.similarGroups || [],
       };
       // Only assign filteredImages when the content actually changed.
       // Cached arrays are spread-copies ([...arr]) so their reference
@@ -623,6 +641,9 @@ async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Promise<v
     }
 
     // Normal page — show loading skeleton and do a full scan.
+    // Reset similar groups from previous tab so the status bar doesn't
+    // flash a stale count while the new tab is being scanned.
+    state.similarGroups = [];
     showLoading();
 
     // Notify background that the side panel is open on this tab
@@ -789,8 +810,6 @@ function cacheElements(): void {
     'setting-max-size',
     'setting-max-width',
     'setting-max-height',
-    'setting-similar-detection',
-    'setting-color-extract',
     'setting-no-warning',
     'download-count',
     'download-label',

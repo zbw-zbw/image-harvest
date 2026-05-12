@@ -86,6 +86,9 @@
   "toast_download_cancelled": {
     "message": "Download geannuleerd"
   },
+  "toast_scan_cancelled": {
+    "message": "Scan geannuleerd"
+  },
   "toast_download_completed": {
     "message": "{count} afbeeldingen gedownload"
   },

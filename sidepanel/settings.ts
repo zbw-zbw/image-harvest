@@ -121,14 +121,6 @@ export function showSettings(): void {
     'setting-max-height',
     String((state.appSettings.maxHeight as number | undefined) ?? DEFAULT_APP_SETTINGS.maxHeight)
   );
-  setToggle(
-    'setting-similar-detection',
-    state.isProUser ? state.appSettings.enableSimilarDetection !== false : false
-  );
-  setToggle(
-    'setting-color-extract',
-    state.isProUser ? state.appSettings.enableColorExtraction !== false : false
-  );
   setToggle('setting-no-warning', !!state.appSettings.noManyFilesWarning);
   // Language: source of truth is `getLocale()` (resolved by detectLocale()
   // at init time), not appSettings — i18n state lives in its own
@@ -163,8 +155,6 @@ export function closeSettings(): void {
 }
 
 export async function saveSettings(): Promise<void> {
-  const prevSimilar = state.appSettings.enableSimilarDetection;
-  const prevColor = state.appSettings.enableColorExtraction;
   const prevSearchAllFrames = state.appSettings.searchAllFrames;
 
   state.appSettings.useSidePanel = getToggle('setting-side-panel');
@@ -210,8 +200,6 @@ export async function saveSettings(): Promise<void> {
   state.appSettings.maxHeight = isNaN(parsedMaxHeight)
     ? DEFAULT_APP_SETTINGS.maxHeight
     : parsedMaxHeight;
-  state.appSettings.enableSimilarDetection = getToggle('setting-similar-detection');
-  state.appSettings.enableColorExtraction = getToggle('setting-color-extract');
   state.appSettings.noManyFilesWarning = getToggle('setting-no-warning');
   // Telemetry opt-in is intentionally NOT a member of appSettings (see
   // loadSettings comment). Forward the toggle's current value to the SDK,
@@ -262,14 +250,6 @@ export async function saveSettings(): Promise<void> {
     const searchAllFramesChanged = !!state.appSettings.searchAllFrames !== !!prevSearchAllFrames;
     if (searchAllFramesChanged) {
       fetchImages();
-    }
-
-    // If pro features were newly enabled, auto-process existing images.
-    // Use !! to normalize undefined/false so first-save doesn't trigger reprocessing.
-    const similarNewlyEnabled = !!state.appSettings.enableSimilarDetection && !prevSimilar;
-    const colorNewlyEnabled = !!state.appSettings.enableColorExtraction && !prevColor;
-    if ((similarNewlyEnabled || colorNewlyEnabled) && state.allImages.length > 0) {
-      processImageExtras(state.allImages);
     }
 
     // Pro visibility check involves message-passing to the background SW
@@ -473,8 +453,6 @@ export async function applyProFeatureVisibility(): Promise<void> {
 
   // When user just became Pro, auto-enable Pro default features and persist
   if (state.isProUser && !wasPro) {
-    state.appSettings.enableSimilarDetection = true;
-    state.appSettings.enableColorExtraction = true;
     state.appSettings.liveMonitoring = true;
     await chrome.storage.local.set({ appSettings: state.appSettings });
 
@@ -484,37 +462,14 @@ export async function applyProFeatureVisibility(): Promise<void> {
     }
   }
 
-  const similarEnabled = state.isProUser && state.appSettings.enableSimilarDetection !== false;
-
-  // Similar button is always visible in status bar; badge auto-hides via Preact.
-
-  // Color Extraction: color bars always visible for all users (visual appeal)
-  // But copy HEX and color filter require Pro (handled in click events)
-  const colorExtractionEnabled = state.appSettings.enableColorExtraction !== false;
-  const colorFilterBtn = document.querySelector<HTMLElement>('.filter-btn[data-filter="color"]');
-  const colorFilterDropdown = document.getElementById('filter-color');
-  if (colorFilterBtn) colorFilterBtn.style.display = colorExtractionEnabled ? '' : 'none';
-  if (colorFilterDropdown) colorFilterDropdown.style.display = colorExtractionEnabled ? '' : 'none';
-
-  // When color extraction is disabled in settings, clear any active color filter
-  if (!colorExtractionEnabled && state.activeFilters.color) {
-    state.activeFilters.color = null;
-    applyFilters();
-  }
-
-  // Pro toggles: Similar Detection, Color Extract, Live Monitoring
+  // Pro toggle: Live Monitoring
   // Not greyed out, not disabled visually. Click interception handles Pro check.
-  const proToggles: Array<HTMLInputElement | null> = [
-    document.getElementById('setting-similar-detection') as HTMLInputElement | null,
-    document.getElementById('setting-color-extract') as HTMLInputElement | null,
-    document.getElementById('setting-live-monitor') as HTMLInputElement | null,
-  ];
-  proToggles.forEach((toggle) => {
-    if (!toggle) return;
-    if (!state.isProUser) {
-      toggle.checked = false;
-    }
-  });
+  const liveMonitorToggle = document.getElementById(
+    'setting-live-monitor'
+  ) as HTMLInputElement | null;
+  if (liveMonitorToggle && !state.isProUser) {
+    liveMonitorToggle.checked = false;
+  }
 
   // Format Conversion: free users can open dropdown to see options, but selecting triggers Pro upgrade
   // Pro check is handled in the setting-select click event
@@ -731,15 +686,10 @@ export function bindProGuards(): void {
   // Color filter: free users can open dropdown to see colors, but clicking a swatch triggers Pro upgrade
   // (Pro check is handled in the color swatch click event, not here)
 
-  // Settings: Pro toggle interception (Similar Detection, Color Extract, Live Monitor)
-  const proSettingToggles: Array<HTMLElement | null> = [
-    document.getElementById('setting-similar-detection'),
-    document.getElementById('setting-color-extract'),
-    document.getElementById('setting-live-monitor'),
-  ];
-  proSettingToggles.forEach((toggle) => {
-    if (!toggle) return;
-    toggle.addEventListener(
+  // Settings: Pro toggle interception (Live Monitor)
+  const liveMonitorSetting = document.getElementById('setting-live-monitor');
+  if (liveMonitorSetting) {
+    liveMonitorSetting.addEventListener(
       'click',
       (e) => {
         if (!state.isProUser) {
@@ -747,22 +697,13 @@ export function bindProGuards(): void {
           e.stopImmediatePropagation();
           closeSettings();
           showToast(t('toast_pro_setting_locked'), 'warning');
-          // Telemetry: distinguish the three Pro toggles. Use stable
-          // feature keys so the dashboard can group correctly.
-          const featureMap: Record<string, string> = {
-            'setting-similar-detection': 'similar_detection',
-            'setting-color-extract': 'color_extract',
-            'setting-live-monitor': 'live_monitor',
-          };
-          void track(EVENTS.PRO_FEATURE_BLOCKED, {
-            feature: featureMap[toggle.id] || 'unknown_setting',
-          });
+          void track(EVENTS.PRO_FEATURE_BLOCKED, { feature: 'live_monitor' });
           showProUpgradeModal();
         }
       },
       true
     );
-  });
+  }
 
   // Settings: Pro input fields interception (Subfolder, Filename Template)
   ['setting-subfolder', 'setting-filename'].forEach((id) => {

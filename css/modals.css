@@ -11,6 +11,7 @@
   border-top: 1px solid var(--border-color);
   background: var(--bg-color);
   flex-shrink: 0;
+  margin-top: auto;
   font-size: 12px;
   overflow: visible;
   min-width: 0;

@@ -36,14 +36,16 @@ export function parseSrcset(srcset: string): SrcsetCandidate[] {
   return candidates.sort((a, b) => b.width - a.width);
 }
 
-/** Wait for an `<img>` to finish loading (or timeout after 2s). */
+/** Wait for an `<img>` to finish loading (or timeout after 500ms).
+ *  We only need the image to be loaded enough to read naturalWidth/Height;
+ *  a short timeout avoids blocking the entire extraction pipeline. */
 export function ensureImageLoaded(img: HTMLImageElement): Promise<void> {
   if (img.complete && img.naturalWidth > 0) {
     return Promise.resolve();
   }
 
   return new Promise((resolve) => {
-    const timeout = setTimeout(() => resolve(), 2000);
+    const timeout = setTimeout(() => resolve(), 500);
 
     img.addEventListener(
       'load',

@@ -86,6 +86,9 @@
   "toast_download_cancelled": {
     "message": "تم إلغاء التحميل"
   },
+  "toast_scan_cancelled": {
+    "message": "تم إلغاء الفحص"
+  },
   "toast_download_completed": {
     "message": "تم تحميل {count} صورة"
   },

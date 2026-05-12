@@ -544,17 +544,18 @@ export function hideRestricted(): void {
 
   // Setting uiScreen to 'images' tears down the restricted screen (and any
   // empty/error sibling) via the <StateScreens> component.
-  if (state.uiScreen === 'restricted') state.uiScreen = 'images';
-  // Clean up any scanning-disabled state that may have been left over from a
-  // previous showLoading() → showRestricted() transition (e.g. switching to a
-  // restricted tab and back).
-  hideScanOverlay();
-  // Clear residual skeleton count so ImageCard's isNotScanning check
-  // (!isScanning && scanSkeletonsToShow === 0) evaluates to true. Without
-  // this, cards restored from cache would remain in "loading" state with
-  // shimmer placeholders because scanSkeletonsToShow was never cleared when
-  // the user left the normal tab mid-scan.
-  state.scanSkeletonsToShow = 0;
+  const wasRestricted = state.uiScreen === 'restricted';
+  if (wasRestricted) state.uiScreen = 'images';
+  // Clean up scanning-disabled state and residual skeletons ONLY when we're
+  // actually transitioning away from a restricted/error/empty screen.
+  // During initial load, showLoading() sets scanProgress.visible and
+  // scanSkeletonsToShow before loadCurrentTab() calls hideRestricted() as a
+  // defensive "ensure normal UI" step — calling hideScanOverlay() or clearing
+  // skeletons there would erase the loading state the user is supposed to see.
+  if (wasRestricted || state.uiScreen === 'error' || state.uiScreen === 'empty') {
+    hideScanOverlay();
+    state.scanSkeletonsToShow = 0;
+  }
   // Restore toolbar, status-bar and image-grid-wrapper
   document.querySelectorAll('.toolbar, .status-bar').forEach((el) => {
     el.classList.remove('hidden');

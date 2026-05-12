@@ -250,12 +250,7 @@ export function handleMessage(message: IncomingMessage): void {
         closeMultiTabModal();
         showToast(`Extracted ${newImages.length} images from ${message.tabCount} tabs`, 'success');
 
-        if (
-          state.appSettings.enableSimilarDetection !== false ||
-          state.appSettings.enableColorExtraction !== false
-        ) {
-          processImageExtras(newImages);
-        }
+        processImageExtras(newImages);
       } else {
         showToast('Extraction failed', 'error');
       }

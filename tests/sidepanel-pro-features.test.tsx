@@ -180,7 +180,7 @@ describe('detectSimilarImages — algorithm', () => {
 });
 
 describe('detectSimilarImages — UI side effects', () => {
-  it('shows the Dedup button when groups exist AND enableSimilarDetection !== false', () => {
+  it('shows the Dedup button when groups exist (detection always enabled)', () => {
     const phashA = 'a'.repeat(16);
     state.allImages = [makeImg({ id: 'a', phash: phashA }), makeImg({ id: 'b', phash: phashA })];
     detectSimilarImages();
@@ -190,17 +190,13 @@ describe('detectSimilarImages — UI side effects', () => {
     expect(state.similarGroups.length).toBeGreaterThan(0);
   });
 
-  it('still computes groups when enableSimilarDetection === false (visibility is managed by the Preact component)', () => {
-    state.appSettings = { ...state.appSettings, enableSimilarDetection: false };
-
+  it('always computes groups (detection is always enabled)', () => {
     const phashA = 'a'.repeat(16);
     state.allImages = [makeImg({ id: 'a', phash: phashA }), makeImg({ id: 'b', phash: phashA })];
     detectSimilarImages();
 
-    // detectSimilarImages is a pure grouping algorithm — it does NOT
-    // check enableSimilarDetection. The Preact Toolbar component reads
-    // both state.similarGroups AND appSettings.enableSimilarDetection
-    // to decide whether to render the Dedup button.
+    // detectSimilarImages is a pure grouping algorithm. Detection is
+    // always enabled — no toggle to gate it.
     expect(state.similarGroups.length).toBeGreaterThan(0);
   });
 
@@ -419,6 +415,7 @@ describe('addToCollection', () => {
   });
 
   it('persists the image PLUS the active page url/title + createdAt timestamp', async () => {
+    state.isProUser = true;
     const now = 1_700_000_000_000;
     vi.spyOn(Date, 'now').mockReturnValue(now);
     const collectionMod = await import('../shared/collection');
@@ -456,6 +453,7 @@ describe('addToCollection', () => {
   });
 
   it('falls back to img.tabUrl/tabTitle when chrome.tabs.query throws (multi-tab mode)', async () => {
+    state.isProUser = true;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ((globalThis as any).chrome.tabs.query as any).mockRejectedValueOnce(
       new Error('No access to tab')
@@ -479,6 +477,7 @@ describe('addToCollection', () => {
   });
 
   it('falls back to empty strings when chrome.tabs.query returns [] (no active tab)', async () => {
+    state.isProUser = true;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ((globalThis as any).chrome.tabs.query as any).mockResolvedValueOnce([]);
     const collectionMod = await import('../shared/collection');
@@ -491,6 +490,7 @@ describe('addToCollection', () => {
   });
 
   it('toasts an error AND swallows when collectionAdd rejects (no uncaught promise)', async () => {
+    state.isProUser = true;
     const collectionMod = await import('../shared/collection');
     vi.mocked(collectionMod.collectionAdd).mockRejectedValueOnce(new Error('QuotaExceeded'));
     const uiMod = await import('../sidepanel/ui');

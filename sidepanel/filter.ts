@@ -156,10 +156,12 @@ export function renderColorSwatches(): void {
     return;
   }
 
+  const swatchTitle = state.isProUser ? (hex: string) => hex : () => t('title_upgrade_copy_color');
+
   container.innerHTML = sortedColors
     .map(
       (hex) =>
-        `<div class="color-swatch${state.activeFilters.color === hex ? ' active' : ''}" style="background:${hex}" data-color-value="${hex}" title="${hex}"></div>`
+        `<div class="color-swatch${state.activeFilters.color === hex ? ' active' : ''}" style="background:${hex}" data-color-value="${hex}" title="${swatchTitle(hex)}"></div>`
     )
     .join('');
 

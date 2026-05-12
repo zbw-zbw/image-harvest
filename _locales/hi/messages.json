@@ -86,6 +86,9 @@
   "toast_download_cancelled": {
     "message": "डाउनलोड रद्द किया गया"
   },
+  "toast_scan_cancelled": {
+    "message": "स्कैन रद्द किया गया"
+  },
   "toast_download_completed": {
     "message": "{count} छवियां डाउनलोड हुईं"
   },

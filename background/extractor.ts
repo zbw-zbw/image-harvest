@@ -18,13 +18,17 @@ interface InjectionError extends Error {
   workaround?: string;
 }
 
+// Per-tab dedup: if multiple callers request images from the same tab
+// concurrently (e.g. sidepanel retry loop), reuse the in-flight promise
+// instead of bombarding the content script with parallel EXTRACT_IMAGES.
+const pendingExtractions = new Map<number, Promise<ImageItem[]>>();
+
 /** Get all images from a tab; injects the content script as needed. */
 export async function getImagesFromTab(
   tabId: number | undefined,
   options: ExtractOptions = {}
 ): Promise<ImageItem[]> {
-  const { searchAllFrames = false, liveMonitoring = true } = options;
-
+  // Resolve tabId early so we can dedup on it
   if (!tabId) {
     const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
     if (tab && isRestrictedUrl(tab.url)) {
@@ -32,10 +36,29 @@ export async function getImagesFromTab(
     }
     tabId = tab?.id;
   }
-
   if (!tabId) {
     throw new Error('No active tab found');
   }
+
+  // If there's already an in-flight extraction for this tab, reuse it
+  const existing = pendingExtractions.get(tabId);
+  if (existing) {
+    return existing;
+  }
+
+  const promise = doGetImagesFromTab(tabId, options);
+  pendingExtractions.set(tabId, promise);
+  try {
+    return await promise;
+  } finally {
+    pendingExtractions.delete(tabId);
+  }
+}
+
+async function doGetImagesFromTab(tabId: number, options: ExtractOptions): Promise<ImageItem[]> {
+  const { searchAllFrames = false, liveMonitoring = true } = options;
+
+  // tabId is guaranteed non-null by the calling wrapper (getImagesFromTab).
 
   try {
     const tabInfo = await chrome.tabs.get(tabId);

@@ -74,9 +74,19 @@ export function renderProgressiveImages(): void {
 export function renderImages(options?: { skipScrollReset?: boolean }): void {
   if (!elements.imageGrid) return;
 
-  // Final render pass: clear any leftover skeletons so the grid shows only
-  // real cards. <ImageGrid> reads scanSkeletonsToShow from the store.
-  state.scanSkeletonsToShow = 0;
+  // Clear skeletons only when scan is fully complete. During progressive
+  // rendering, keep remaining skeletons to fill the viewport and prevent
+  // visible whitespace below real cards.
+  if (!state.scanProgress.visible) {
+    state.scanSkeletonsToShow = 0;
+  } else {
+    // Still scanning — keep enough skeletons to fill remaining space
+    const gridWrapper = document.querySelector('.image-grid-wrapper') as HTMLElement | null;
+    const containerHeight = gridWrapper?.clientHeight || 600;
+    const isListView = elements.imageGrid.classList.contains('list-view');
+    const totalSlots = calcSkeletonCount(containerHeight, isListView);
+    state.scanSkeletonsToShow = Math.max(0, totalSlots - state.filteredImages.length);
+  }
 
   if (state.filteredImages.length === 0) {
     // <ImageGrid> renders nothing when filteredImages is empty — no manual

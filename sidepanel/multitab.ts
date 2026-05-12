@@ -341,11 +341,7 @@ export async function startMultiTabExtract(tabIds: number[]): Promise<void> {
         addedCount > 0 ? 'success' : 'info'
       );
 
-      if (
-        addedCount > 0 &&
-        (state.appSettings.enableSimilarDetection !== false ||
-          state.appSettings.enableColorExtraction !== false)
-      ) {
+      if (addedCount > 0) {
         processImageExtras(newImages);
       }
     } else {

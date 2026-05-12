@@ -185,11 +185,13 @@ export async function extractImages(options: ExtractOptions = {}): Promise<Image
 async function extractImgTags(images: Map<string, ImageItem>): Promise<void> {
   const imgElements = Array.from(document.images);
 
+  // Wait for all images to load in parallel instead of serially.
+  // This reduces total wait from N×timeout to 1×timeout in the worst case.
+  // Use .catch() per-image so one failure doesn't abort the batch.
+  await Promise.all(imgElements.map((img) => ensureImageLoaded(img).catch(() => {})));
+
   for (const img of imgElements) {
     try {
-      // Wait for image to load if needed
-      await ensureImageLoaded(img);
-
       // Collect all candidate URLs from this <img>
       const candidateUrls = new Set<string>();
 

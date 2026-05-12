@@ -6,7 +6,7 @@
 // Reactive subscriptions (via useStoreSelector):
 //   - selectedImages.has(id) → toggles `.selected` and the checkbox icon
 //   - isProUser              → guards Pro-only actions (favorite, color copy)
-//   - appSettings.enableColorExtraction → shows color bar vs transparent bar
+//   - color bar is always shown (extraction is always enabled)
 //
 // The favorite button has its own async piece (isImageInCollection) that
 // can't live in the store cheaply (one IndexedDB lookup per image), so we
@@ -137,9 +137,9 @@ const IconOpen = () => (
 export function ImageCard({ img, index }: Props) {
   const isSelected = useStoreSelector((s) => s.selectedImages.has(img.id));
   const isProUser = useStoreSelector((s) => s.isProUser);
-  const colorExtractionEnabled = useStoreSelector(
-    (s) => s.appSettings.enableColorExtraction !== false
-  );
+  // Subscribe to localeTick so a runtime language switch triggers re-render
+  // and all t() calls (e.g. color-bar title, action tooltips) use the new locale.
+  useStoreSelector((s) => s.localeTick);
 
   // Favorite state lives outside the store: we'd need an IndexedDB lookup
   // per image to seed it eagerly, which would balloon initial render time.
@@ -194,9 +194,13 @@ export function ImageCard({ img, index }: Props) {
 
   const handleFavorite = async (e: MouseEvent) => {
     e.stopPropagation();
-    // Sprint 3.5: Pro guard removed from component level. Free-tier cap
-    // is now enforced inside addToCollection (pro-features.ts) so every
-    // entry point (button, drag, shortcut) inherits the same gate.
+    // Collection is a Pro-only feature. Non-Pro users see the upgrade
+    // modal immediately — no async work needed.
+    if (!isProUser) {
+      showToast(t('pro_feature_blocked_collection'), 'warning');
+      showProUpgradeModal();
+      return;
+    }
     if (isFavorited) {
       await removeFromCollection(img.id);
       setIsFavorited(false);
@@ -301,7 +305,7 @@ export function ImageCard({ img, index }: Props) {
           onError={handleImgError}
         />
       </div>
-      {colorExtractionEnabled && <ColorBar colors={colors} onSwatchClick={handleColorClick} />}
+      <ColorBar colors={colors} isProUser={isProUser} onSwatchClick={handleColorClick} />
       <div class="card-info-bar">
         <div class="card-tags">
           <span class="card-tag format">{format}</span>
@@ -386,10 +390,11 @@ export function ImageCard({ img, index }: Props) {
 // container keeps a fixed height so no layout shift occurs.
 interface ColorBarProps {
   colors: string[];
+  isProUser: boolean;
   onSwatchClick: (color: string) => (e: MouseEvent) => void;
 }
 
-function ColorBar({ colors, onSwatchClick }: ColorBarProps) {
+function ColorBar({ colors, isProUser, onSwatchClick }: ColorBarProps) {
   if (colors.length === 0) {
     // Transparent checkerboard strip — matches .card-color-bar-transparent in cards.css
     return (
@@ -407,7 +412,7 @@ function ColorBar({ colors, onSwatchClick }: ColorBarProps) {
           data-color={color}
           style={`background-color:${color}`}
           onClick={onSwatchClick(color)}
-          title={t('title_click_copy_color', { color })}
+          title={isProUser ? t('title_click_copy_color', { color }) : t('title_upgrade_copy_color')}
         />
       ))}
     </div>

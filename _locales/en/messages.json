@@ -89,6 +89,9 @@
   "toast_download_cancelled": {
     "message": "Download cancelled"
   },
+  "toast_scan_cancelled": {
+    "message": "Scan cancelled"
+  },
   "toast_download_completed": {
     "message": "Downloaded {count} images",
     "description": "{count} = number of images successfully downloaded"

@@ -809,44 +809,6 @@ describe('startMultiTabExtract', () => {
     expect(ui.showToast).toHaveBeenCalledWith('Extracted 1 images from 3 tabs', 'success');
   });
 
-  it('enableSimilarDetection=false AND enableColorExtraction=false → processImageExtras SKIPPED', async () => {
-    state.appSettings = {
-      enableSimilarDetection: false,
-      enableColorExtraction: false,
-    } as typeof state.appSettings;
-    chromeStub.runtime.sendMessage.mockResolvedValueOnce({
-      success: true,
-      images: [{ url: 'https://a.com/1.png' }],
-    });
-
-    const { startMultiTabExtract } = await import('../sidepanel/multitab');
-    await startMultiTabExtract([1]);
-
-    // Pin: BOTH flags must be explicitly false to skip. The `!==
-    // false` quirky check means undefined + true + missing all
-    // still fire extras. This case documents the exact "both off"
-    // path that power users depend on for performance.
-    const scan = await import('../sidepanel/scan');
-    expect(scan.processImageExtras).not.toHaveBeenCalled();
-  });
-
-  it('enableSimilarDetection=true, enableColorExtraction=false → still fires (OR semantics)', async () => {
-    state.appSettings = {
-      enableSimilarDetection: true,
-      enableColorExtraction: false,
-    } as typeof state.appSettings;
-    chromeStub.runtime.sendMessage.mockResolvedValueOnce({
-      success: true,
-      images: [{ url: 'https://a.com/1.png' }],
-    });
-
-    const { startMultiTabExtract } = await import('../sidepanel/multitab');
-    await startMultiTabExtract([1]);
-
-    const scan = await import('../sidepanel/scan');
-    // Pin: OR short-circuit — if EITHER toggle is on, extras run.
-    expect(scan.processImageExtras).toHaveBeenCalledTimes(1);
-  });
 
   it('response.success=false (or missing images) → error toast + NO state mutation', async () => {
     state.allImages = [];

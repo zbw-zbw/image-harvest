@@ -277,7 +277,5 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   enableMaxSize: true,
   maxWidth: 99999,
   maxHeight: 99999,
-  enableSimilarDetection: true,
-  enableColorExtraction: true,
   noManyFilesWarning: false,
 };
