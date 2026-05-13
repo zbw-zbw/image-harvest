@@ -402,16 +402,14 @@ async function loadCurrentTab(forceRescan = false, targetTabId?: number): Promis
       hideLoading();
       if (!cached.filteredImages || cached.filteredImages.length === 0) {
         applyFilters();
-      } else if (state.isPopupMode) {
-        // Popup opens a fresh DOM each time — always force a render even
-        // when filteredImages was restored from cache. Without this the
-        // lastRenderedFilteredIds optimization in applyFilters() would
-        // skip renderImages(), leaving the grid empty.
+      } else if (!state.isInitialized) {
         state.lastRenderedFilteredIds = null;
         renderImages({ skipScrollReset: true });
+      } else {
       }
       updateSelectionUI();
       return;
+    } else {
     }
   }
 
@@ -447,6 +445,7 @@ async function loadCurrentTab(forceRescan = false, targetTabId?: number): Promis
       // the UI is responsive immediately while extras load in the background.
       processImageExtras(state.allImages);
       return;
+    } else {
     }
   }
 
@@ -474,7 +473,6 @@ async function loadCurrentTab(forceRescan = false, targetTabId?: number): Promis
 async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Promise<void> {
   if (!isExtensionContextValid()) return;
   const newTabId = activeInfo.tabId;
-
   // Save current tab state to cache before switching
   if (state.currentTabId != null && state.currentTabId !== newTabId) {
     const cachedUrl = state.tabCache.get(state.currentTabId)?.url || '';
@@ -520,20 +518,19 @@ async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Promise<v
 
   // Check in-memory cache synchronously BEFORE any await
   const cached = state.tabCache.get(newTabId);
-
   // Fast path (synchronous)
   if (cached) {
     try {
-      // ── Hide the grid while we swap data so the user never sees the
-      // intermediate state (old images → new images). We use
-      // visibility:hidden (not display:none) to keep layout stable.
-      const gridWrapper = document.querySelector('.image-grid-wrapper') as HTMLElement | null;
-      if (gridWrapper) gridWrapper.style.visibility = 'hidden';
-
       // ── Determine up-front whether the filtered image set changed ──
       const cachedFilteredIds = cached.lastRenderedFilteredIds ?? null;
       const isSameFilteredSet =
         cachedFilteredIds != null && cachedFilteredIds === state.lastRenderedFilteredIds;
+      // ── Only hide the grid when content actually changes, so that
+      // switching back to an already-rendered tab is flicker-free. ──
+      const gridWrapper = document.querySelector('.image-grid-wrapper') as HTMLElement | null;
+      if (!isSameFilteredSet && gridWrapper) {
+        gridWrapper.style.visibility = 'hidden';
+      }
 
       // Batch all state assignments to avoid intermediate Preact renders.
       const patch: Record<string, unknown> = {
@@ -569,23 +566,27 @@ async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Promise<v
 
       if (!isSameFilteredSet) {
         renderImages({ skipScrollReset: true });
+
+        // Reveal the grid after Preact has finished rendering the new cards.
+        // Double-rAF ensures we're past the paint that contains the new DOM.
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => {
+            if (gridWrapper) {
+              gridWrapper.style.visibility = '';
+              gridWrapper.classList.remove('hidden');
+              gridWrapper.style.display = '';
+            }
+          });
+        });
       } else {
-        // Ensure the grid element is visible after showRestricted hid it.
+        // Same content — no re-render needed, just ensure grid is visible.
         if (elements.imageGrid) elements.imageGrid.classList.remove('hidden');
+        if (gridWrapper) {
+          gridWrapper.classList.remove('hidden');
+          gridWrapper.style.display = '';
+        }
         state.uiScreen = 'images';
       }
-
-      // Reveal the grid after Preact has finished rendering the new cards.
-      // Double-rAF ensures we're past the paint that contains the new DOM.
-      requestAnimationFrame(() => {
-        requestAnimationFrame(() => {
-          if (gridWrapper) {
-            gridWrapper.style.visibility = '';
-            gridWrapper.classList.remove('hidden');
-            gridWrapper.style.display = '';
-          }
-        });
-      });
 
       // Verify the URL still matches asynchronously
       try {

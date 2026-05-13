@@ -9,8 +9,10 @@
 // `subscribeSelector` (which already does change detection with the supplied
 // equality fn), and bumps a local counter to trigger a re-render. No SSR
 // concerns because extensions never SSR.
-import { useEffect, useReducer, useRef } from 'preact/hooks';
+import { useLayoutEffect, useReducer, useRef } from 'preact/hooks';
 import { store, type EqualityFn, type Selector, type SidepanelState } from '../state';
+
+const defaultEquality = <T>(a: T, b: T): boolean => Object.is(a, b);
 
 /**
  * Subscribe to a derived value from the store. Re-renders when the selector
@@ -34,12 +36,34 @@ export function useStoreSelector<T>(selector: Selector<T>, equalityFn?: Equality
   selectorRef.current = selector;
   equalityRef.current = equalityFn;
 
-  useEffect(() => {
-    return store.subscribeSelector(
+  // Track the snapshot value read during render so we can detect if the
+  // store changed between render and subscription registration.
+  const snapshotRef = useRef<T>(selector(store.state));
+  snapshotRef.current = selector(store.state);
+
+  // useLayoutEffect (not useEffect) so the subscription is registered
+  // synchronously after Preact commits the DOM — before the browser paints.
+  // Combined with the stale-check below, this closes the window where store
+  // mutations fired between render and subscription would be silently lost.
+  useLayoutEffect(() => {
+    const unsub = store.subscribeSelector(
       (s) => selectorRef.current(s),
       () => forceRender(),
       equalityRef.current
     );
+
+    // The store may have changed between the render snapshot and now (the
+    // subscription registration moment). This happens when init code
+    // mutates the store synchronously after mountPreactComponents() but
+    // before Preact runs effects. If the value drifted, force an immediate
+    // re-render so the component doesn't stay stuck on stale data.
+    const eq = equalityRef.current || defaultEquality;
+    const fresh = selectorRef.current(store.state);
+    if (!eq(fresh, snapshotRef.current)) {
+      forceRender();
+    }
+
+    return unsub;
   }, []);
 
   // Snapshot read on every render — cheap, and guarantees the value matches

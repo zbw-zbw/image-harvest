@@ -72,7 +72,9 @@ export function renderProgressiveImages(): void {
 }
 
 export function renderImages(options?: { skipScrollReset?: boolean }): void {
-  if (!elements.imageGrid) return;
+  if (!elements.imageGrid) {
+    return;
+  }
 
   // Clear skeletons only when scan is fully complete. During progressive
   // rendering, keep remaining skeletons to fill the viewport and prevent

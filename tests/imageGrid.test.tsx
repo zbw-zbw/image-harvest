@@ -5,7 +5,7 @@
 // mock — we're testing the GRID behavior here (flat vs grouped vs virtualized,
 // skeleton append, collapsed groups), not the cards themselves.
 import { describe, expect, it, vi, beforeEach } from 'vitest';
-import { render, fireEvent } from '@testing-library/preact';
+import { render, fireEvent, act } from '@testing-library/preact';
 
 // Replace ImageCard with a lightweight marker so we can count rendered cards
 // without dragging in the heavy dependency tree.
@@ -141,5 +141,84 @@ describe('ImageGrid – grouped mode', () => {
     const { container } = render(<ImageGrid />);
     expect(container.querySelectorAll('.image-group').length).toBe(1);
     expect(container.querySelectorAll('.skeleton-card').length).toBe(2);
+  });
+});
+
+describe('ImageGrid – reactive store updates (main rendering pipeline)', () => {
+  it('re-renders cards when filteredImages changes after mount', () => {
+    state.filteredImages = [];
+    state.currentGroupMode = 'none';
+    const { container } = render(<ImageGrid />);
+    expect(container.querySelectorAll('.mock-image-card').length).toBe(0);
+
+    act(() => {
+      state.filteredImages = makeImages(5);
+    });
+    expect(container.querySelectorAll('.mock-image-card').length).toBe(5);
+  });
+
+  it('handles the full init flow: mount empty → populate via store mutation', () => {
+    // Simulates: mountPreactComponents() → ImageGrid renders with [] →
+    // loadCurrentTab() → applyFilters() sets filteredImages = [...N images]
+    state.filteredImages = [];
+    state.currentGroupMode = 'none';
+    state.currentViewMode = 'grid';
+    const { container } = render(<ImageGrid />);
+    expect(container.querySelectorAll('.mock-image-card').length).toBe(0);
+
+    // Simulate applyFilters setting images
+    act(() => {
+      state.filteredImages = makeImages(35);
+    });
+    expect(container.querySelectorAll('.mock-image-card').length).toBe(35);
+  });
+
+  it('updates correctly when filteredImages is replaced multiple times', () => {
+    state.filteredImages = [];
+    state.currentGroupMode = 'none';
+    const { container } = render(<ImageGrid />);
+
+    act(() => {
+      state.filteredImages = makeImages(10);
+    });
+    expect(container.querySelectorAll('.mock-image-card').length).toBe(10);
+
+    act(() => {
+      state.filteredImages = makeImages(3);
+    });
+    expect(container.querySelectorAll('.mock-image-card').length).toBe(3);
+
+    act(() => {
+      state.filteredImages = [];
+    });
+    expect(container.querySelectorAll('.mock-image-card').length).toBe(0);
+  });
+
+  it('responds to groupMode changes', () => {
+    state.filteredImages = [
+      makeImage({ id: 'a1', url: 'https://a.test/1.png' }),
+      makeImage({ id: 'b1', url: 'https://b.test/1.png' }),
+    ];
+    state.currentGroupMode = 'none';
+    const { container } = render(<ImageGrid />);
+    expect(container.querySelectorAll('.image-group').length).toBe(0);
+
+    act(() => {
+      state.currentGroupMode = 'domain';
+    });
+    expect(container.querySelectorAll('.image-group').length).toBe(2);
+  });
+
+  it('correctly shows skeletons during scan then clears them', () => {
+    state.filteredImages = makeImages(2);
+    state.currentGroupMode = 'none';
+    state.scanSkeletonsToShow = 6;
+    const { container } = render(<ImageGrid />);
+    expect(container.querySelectorAll('.skeleton-card').length).toBe(6);
+
+    act(() => {
+      state.scanSkeletonsToShow = 0;
+    });
+    expect(container.querySelectorAll('.skeleton-card').length).toBe(0);
   });
 });
