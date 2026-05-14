@@ -170,7 +170,6 @@ export function ImageCard({ img, index }: Props) {
   const format = (img.format || 'unknown').toUpperCase();
   const colors = img.colors || [];
 
-
   // ── Handlers ──────────────────────────────────────────────────────────
   const handleCardClick = (e: MouseEvent) => {
     // Card click toggles selection unless the click originated inside an

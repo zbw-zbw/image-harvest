@@ -28,7 +28,10 @@ afterEach(() => {
   store.reset();
 });
 
-function TestComponent({ selector, equalityFn }: {
+function TestComponent({
+  selector,
+  equalityFn,
+}: {
   selector: (s: typeof state) => unknown;
   equalityFn?: (a: unknown, b: unknown) => boolean;
 }) {
@@ -39,16 +42,12 @@ function TestComponent({ selector, equalityFn }: {
 describe('useStoreSelector – basic reactivity', () => {
   it('renders the current store value on mount', () => {
     state.isScanning = true;
-    const { getByTestId } = render(
-      <TestComponent selector={(s) => s.isScanning} />
-    );
+    const { getByTestId } = render(<TestComponent selector={(s) => s.isScanning} />);
     expect(getByTestId('value').textContent).toBe('true');
   });
 
   it('re-renders when the subscribed value changes', () => {
-    const { getByTestId } = render(
-      <TestComponent selector={(s) => s.filteredImages.length} />
-    );
+    const { getByTestId } = render(<TestComponent selector={(s) => s.filteredImages.length} />);
     expect(getByTestId('value').textContent).toBe('0');
 
     act(() => {
@@ -99,9 +98,7 @@ describe('useStoreSelector – stale-check on mount', () => {
     // then the store is mutated SYNCHRONOUSLY after render() returns
     // but before the browser paints. The stale-check in useLayoutEffect
     // should catch this and trigger a re-render.
-    const { getByTestId } = render(
-      <TestComponent selector={(s) => s.filteredImages.length} />
-    );
+    const { getByTestId } = render(<TestComponent selector={(s) => s.filteredImages.length} />);
     // Initial render sees empty
     expect(getByTestId('value').textContent).toBe('0');
 
@@ -118,20 +115,20 @@ describe('useStoreSelector – stale-check on mount', () => {
   });
 
   it('handles multiple rapid mutations correctly', () => {
-    const { getByTestId } = render(
-      <TestComponent selector={(s) => s.filteredImages.length} />
-    );
+    const { getByTestId } = render(<TestComponent selector={(s) => s.filteredImages.length} />);
 
     act(() => {
       state.filteredImages = Array.from({ length: 3 }, (_, i) => ({
-        id: `a-${i}`, url: `u${i}`,
+        id: `a-${i}`,
+        url: `u${i}`,
       })) as never;
     });
     expect(getByTestId('value').textContent).toBe('3');
 
     act(() => {
       state.filteredImages = Array.from({ length: 10 }, (_, i) => ({
-        id: `b-${i}`, url: `u${i}`,
+        id: `b-${i}`,
+        url: `u${i}`,
       })) as never;
     });
     expect(getByTestId('value').textContent).toBe('10');
@@ -215,10 +212,12 @@ describe('useStoreSelector – simulated init flow (main rendering pipeline)', (
 
     act(() => {
       state.allImages = Array.from({ length: 20 }, (_, i) => ({
-        id: `img-${i}`, url: `u${i}`,
+        id: `img-${i}`,
+        url: `u${i}`,
       })) as never;
       state.filteredImages = Array.from({ length: 18 }, (_, i) => ({
-        id: `img-${i}`, url: `u${i}`,
+        id: `img-${i}`,
+        url: `u${i}`,
       })) as never;
     });
     expect(getByTestId('count').textContent).toBe('18');

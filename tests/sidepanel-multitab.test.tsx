@@ -809,7 +809,6 @@ describe('startMultiTabExtract', () => {
     expect(ui.showToast).toHaveBeenCalledWith('Extracted 1 images from 3 tabs', 'success');
   });
 
-
   it('response.success=false (or missing images) → error toast + NO state mutation', async () => {
     state.allImages = [];
     chromeStub.runtime.sendMessage.mockResolvedValueOnce({

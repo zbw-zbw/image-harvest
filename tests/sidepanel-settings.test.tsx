@@ -471,25 +471,22 @@ describe('bindProGuards — Pro paywall interceptor', () => {
     }
   );
 
-  it(
-    'free user clicking Pro toggle #setting-live-monitor → close settings + warning toast + open upgrade modal',
-    async () => {
-      const id = 'setting-live-monitor';
-      state.isProUser = false;
-      state.settingsModalState = { ...state.settingsModalState, open: true };
-      state.proUpgradeModalState = { open: false, errorText: '' };
+  it('free user clicking Pro toggle #setting-live-monitor → close settings + warning toast + open upgrade modal', async () => {
+    const id = 'setting-live-monitor';
+    state.isProUser = false;
+    state.settingsModalState = { ...state.settingsModalState, open: true };
+    state.proUpgradeModalState = { open: false, errorText: '' };
 
-      document.getElementById(id)!.click();
+    document.getElementById(id)!.click();
 
-      expect(state.settingsModalState.open).toBe(false);
-      expect(state.proUpgradeModalState.open).toBe(true);
-      const ui = await import('../sidepanel/ui');
-      expect(ui.showToast).toHaveBeenCalledWith(
-        'This setting requires Pro. Upgrade to unlock!',
-        'warning'
-      );
-    }
-  );
+    expect(state.settingsModalState.open).toBe(false);
+    expect(state.proUpgradeModalState.open).toBe(true);
+    const ui = await import('../sidepanel/ui');
+    expect(ui.showToast).toHaveBeenCalledWith(
+      'This setting requires Pro. Upgrade to unlock!',
+      'warning'
+    );
+  });
 
   it('Pro user toggling a Pro setting → no interception (settings stays open, no toast)', async () => {
     state.isProUser = true;
@@ -1294,7 +1291,6 @@ describe('saveSettings', () => {
     const scan = await import('../sidepanel/scan');
     expect(scan.fetchImages).not.toHaveBeenCalled();
   });
-
 
   it('isFetching=true: SKIPS applyFilters (avoid flashing "No images found")', async () => {
     buildSettingsFormDOM({});

@@ -27,7 +27,10 @@ const SECRET_PATTERNS = [
   { name: 'Creem Webhook Secret', regex: /\bwhsec_[A-Za-z0-9]{20,}\b/ },
   // Supabase
   { name: 'Supabase Service Role Key', regex: /\bsb_secret_[A-Za-z0-9_-]{20,}\b/ },
-  { name: 'Supabase Legacy JWT', regex: /\beyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}\b/ },
+  {
+    name: 'Supabase Legacy JWT',
+    regex: /\beyJ[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}\.[A-Za-z0-9_-]{20,}\b/,
+  },
   // Generic high-risk
   { name: 'AWS Access Key', regex: /\bAKIA[0-9A-Z]{16}\b/ },
   { name: 'GitHub Token', regex: /\bghp_[A-Za-z0-9]{36}\b/ },
@@ -118,10 +121,10 @@ function main() {
     }
   }
   console.error(
-    `\n${YELLOW}If this is a false positive, bypass with: git commit --no-verify${RESET}`,
+    `\n${YELLOW}If this is a false positive, bypass with: git commit --no-verify${RESET}`
   );
   console.error(
-    `${YELLOW}Better: move the value to .env.local (gitignored) and reference via process.env.${RESET}\n`,
+    `${YELLOW}Better: move the value to .env.local (gitignored) and reference via process.env.${RESET}\n`
   );
   process.exit(1);
 }

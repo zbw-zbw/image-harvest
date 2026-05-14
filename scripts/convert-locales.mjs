@@ -83,8 +83,14 @@ function toChrome() {
     }
     const outDir = resolve(CHROME_DIR, chromeDir);
     mkdirSync(outDir, { recursive: true });
-    writeFileSync(resolve(outDir, 'messages.json'), JSON.stringify(chrome, null, 2) + '\n', 'utf-8');
-    console.log(`✓ locales/${file} → _locales/${chromeDir}/messages.json (${Object.keys(chrome).length} keys)`);
+    writeFileSync(
+      resolve(outDir, 'messages.json'),
+      JSON.stringify(chrome, null, 2) + '\n',
+      'utf-8'
+    );
+    console.log(
+      `✓ locales/${file} → _locales/${chromeDir}/messages.json (${Object.keys(chrome).length} keys)`
+    );
     total++;
   }
   console.log(`\nConverted ${total} locale(s) to Chrome format.`);
