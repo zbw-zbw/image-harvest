@@ -34,9 +34,9 @@ const distAssets = join(repoRoot, 'dist', 'assets');
 // leaving ~10% headroom for legitimate future growth before tripping.
 const BUDGETS = {
   // Sidepanel main entry — see `perf(bundle): jszip lazy import` for the
-  // 73.35 → 43.96 kB drop. Bumped to 75 kB after Creem payment migration +
-  // UX overhaul (scroll animations, new components) brought it to ~70 kB.
-  'init.js': { gzipKb: 75, label: 'sidepanel main' },
+  // 73.35 → 43.96 kB drop. Bumped to 78 kB after v1.0.3 (i18n 15 langs,
+  // storeHook useLayoutEffect fix, onLocaleChange enhancements) ~76 kB.
+  'init.js': { gzipKb: 78, label: 'sidepanel main' },
   // Background service worker entry. Currently ~5.6 kB gzip.
   'index.ts.js': { gzipKb: 12, label: 'background SW' },
   // Content script entry. Currently ~7.7 kB gzip.

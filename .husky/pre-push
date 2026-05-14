@@ -3,5 +3,9 @@ echo "▶ format:check"
 npm run format:check || exit 1
 echo "▶ typecheck"
 npm run typecheck || exit 1
+echo "▶ build"
+npm run build || exit 1
+echo "▶ bundle size check"
+node scripts/check-bundle-size.mjs || exit 1
 echo "▶ test"
 npm test || exit 1
