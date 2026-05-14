@@ -178,6 +178,13 @@ async function init(): Promise<void> {
     // We deliberately delay by one tick so mountPreactComponents() can
     // attach the modal mount point before we flip the visibility flag.
     void (async () => {
+      // E2E tests set this synchronous flag via addInitScript to bypass
+      // the privacy modal without a chrome.storage race condition.
+      if (
+        (window as unknown as { __IH_SKIP_PRIVACY_MODAL__?: boolean }).__IH_SKIP_PRIVACY_MODAL__
+      ) {
+        return;
+      }
       const { _telemetry_opt_in_decided } = await chrome.storage.local.get(
         '_telemetry_opt_in_decided'
       );

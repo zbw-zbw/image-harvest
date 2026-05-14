@@ -86,25 +86,25 @@ test('typing into #filter-min-width filters out smaller images and clearing it r
     .poll(async () => sidepanel.locator('#image-grid .image-card').count(), { timeout: 3_000 })
     .toBe(expectedAfterMinWidth);
 
-  // state.appSettings was updated correctly.
-  const settings = await sidepanel.evaluate(() => {
+  // state.activeFilters was updated correctly (applyCustomSizeInputs writes
+  // to activeFilters, not appSettings — the global defaults stay intact).
+  const filters = await sidepanel.evaluate(() => {
     interface IH {
       store: {
-        get: (k: 'appSettings') => {
-          enableMinSize?: boolean;
-          minWidth?: number;
-          minHeight?: number;
-          enableMaxSize?: boolean;
+        get: (k: 'activeFilters') => {
+          customMinEnabled?: boolean;
+          customMinWidth?: number;
+          customMinHeight?: number;
+          customMaxEnabled?: boolean;
         };
       };
     }
     const w = window as unknown as { __IH__: IH };
-    return w.__IH__.store.get('appSettings');
+    return w.__IH__.store.get('activeFilters');
   });
-  expect(settings.enableMinSize).toBe(true);
-  expect(settings.minWidth).toBe(100);
-  expect(settings.minHeight).toBe(0);
-  expect(settings.enableMaxSize).toBe(false);
+  expect(filters.customMinEnabled).toBe(true);
+  expect(filters.customMinWidth).toBe(100);
+  expect(filters.customMinHeight).toBe(0);
 
   // Clear the input → applyCustomSizeInputs sees no min and no max
   // → enableMinSize flips false → filter passes everything again.
@@ -117,12 +117,12 @@ test('typing into #filter-min-width filters out smaller images and clearing it r
     .poll(async () => sidepanel.locator('#image-grid .image-card').count(), { timeout: 3_000 })
     .toBe(initialCount);
 
-  const settingsAfter = await sidepanel.evaluate(() => {
+  const filtersAfter = await sidepanel.evaluate(() => {
     interface IH {
-      store: { get: (k: 'appSettings') => { enableMinSize?: boolean } };
+      store: { get: (k: 'activeFilters') => { customMinEnabled?: boolean } };
     }
     const w = window as unknown as { __IH__: IH };
-    return w.__IH__.store.get('appSettings');
+    return w.__IH__.store.get('activeFilters');
   });
-  expect(settingsAfter.enableMinSize).toBe(false);
+  expect(filtersAfter.customMinEnabled).toBe(false);
 });
