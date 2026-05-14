@@ -138,7 +138,7 @@ test('selecting a subset and clicking "Copy URLs" copies only the selected URLs'
     .poll(
       () =>
         sidepanel.evaluate(() => {
-          const label = document.querySelector('#btn-batch-copy-urls .select-all-text');
+          const label = document.querySelector('#btn-batch-copy-urls .btn-label');
           return label?.textContent || '';
         }),
       { timeout: 3_000 }

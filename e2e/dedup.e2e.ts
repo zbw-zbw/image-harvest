@@ -75,11 +75,12 @@ test('dedup modal renders one group per SimilarGroup with correct image counts',
     ]);
   });
 
-  // Trigger the dedup button via direct DOM .click(). The Similar button
-  // is now always visible in the status bar — no hidden ancestor to bypass.
-  await sidepanel.evaluate(() => {
-    document.getElementById('btn-dedup')?.click();
+  // Wait for the SimilarInline component to reflect the seeded count,
+  // then click the link to open the dedup modal.
+  await expect(sidepanel.locator('.similar-inline-link:not(.disabled)')).toBeVisible({
+    timeout: 3_000,
   });
+  await sidepanel.locator('.similar-inline-link').click();
 
   // dedup-ui chunk loads + renders. Wait for the first group to appear.
   await expect
@@ -109,9 +110,14 @@ test('dedup modal shows empty message when similarGroups is empty', async () => 
     w.__IH__.store.set('similarGroups', []);
   });
 
-  // Direct DOM click on the always-visible Similar button.
-  await sidepanel.evaluate(() => {
-    document.getElementById('btn-dedup')?.click();
+  // With similarGroups=[], the SimilarInline link is disabled (count===0),
+  // so we call showDedupModal() directly via the __IH__ hook.
+  await sidepanel.evaluate(async () => {
+    interface IH {
+      showDedupModal: () => Promise<void>;
+    }
+    const w = window as unknown as { __IH__: IH };
+    await w.__IH__.showDedupModal();
   });
 
   // dedup-ui's empty branch writes a single <p class="empty-message"> into

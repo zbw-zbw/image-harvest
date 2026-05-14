@@ -1,16 +1,39 @@
 // Dedup (similar-image) modal shell. The inner `#dedup-body` is still
-// populated imperatively by pro-features.ts > showDedupModal — we only
+// populated imperatively by dedup-ui.ts > showDedupModal — we only
 // take ownership of the visibility / overlay / header / footer here so
 // closing/opening becomes a single store mutation.
 //
-// Inner body keeps its `id="dedup-body"` slot so the legacy renderer can
-// keep using `elements.dedupBody.innerHTML = ...` unchanged.
+// IMPORTANT: The `#dedup-body` slot is managed via a ref callback so that
+// Preact never diffs or replaces its children. Without this, any re-render
+// of DedupModal (e.g. from localeTick) would output an empty <div> and
+// wipe whatever showDedupModal() wrote imperatively.
+import { useRef } from 'preact/hooks';
 import { useStoreSelector } from './storeHook';
 import { state } from '../state';
 import { t } from '../../shared/i18n';
 
 function close(): void {
   state.dedupModalState = { open: false };
+}
+
+/**
+ * Imperatively-managed body slot. We use a ref callback + a stable DOM
+ * node that Preact never reconciles against so imperative innerHTML
+ * writes survive re-renders.
+ */
+function DedupBodySlot() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  // Return the container with dangerouslySetInnerHTML set to a single
+  // nbsp — this tells Preact "I own this subtree" and prevents it from
+  // ever diffing children. The real content is written by dedup-ui.ts.
+  return (
+    <div
+      id="dedup-body"
+      class="dedup-body"
+      ref={containerRef}
+      dangerouslySetInnerHTML={{ __html: '' }}
+    />
+  );
 }
 
 export function DedupModal() {
@@ -52,8 +75,7 @@ export function DedupModal() {
           </button>
         </div>
         <div class="modal-body">
-          {/* Body slot — populated by pro-features.ts > showDedupModal. */}
-          <div id="dedup-body" class="dedup-body" />
+          <DedupBodySlot />
         </div>
         <div class="modal-footer">
           <button id="btn-cancel-dedup" class="btn btn-secondary" onClick={close}>

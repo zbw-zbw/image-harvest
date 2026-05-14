@@ -104,10 +104,11 @@ test('free user opens Dedup modal, clicks Remove Duplicates → ProUpgradeModal 
 
   await seedSimilarGroups(sidepanel);
 
-  // Open the dedup modal.
-  await sidepanel.evaluate(() => {
-    document.getElementById('btn-dedup')?.click();
+  // Open the dedup modal via the SimilarInline link (replaces old #btn-dedup).
+  await expect(sidepanel.locator('.similar-inline-link:not(.disabled)')).toBeVisible({
+    timeout: 3_000,
   });
+  await sidepanel.locator('.similar-inline-link').click();
   await expect(sidepanel.locator('#dedup-modal')).not.toHaveClass(/hidden/, {
     timeout: 3_000,
   });
@@ -163,9 +164,11 @@ test('Pro user → Remove Duplicates with no manual selection → confirm dialog
   const expectedRemovals = await seedSimilarGroups(sidepanel);
   expect(expectedRemovals).toBe(3); // (3-1) + (2-1)
 
-  await sidepanel.evaluate(() => {
-    document.getElementById('btn-dedup')?.click();
+  // Open the dedup modal via the SimilarInline link.
+  await expect(sidepanel.locator('.similar-inline-link:not(.disabled)')).toBeVisible({
+    timeout: 3_000,
   });
+  await sidepanel.locator('.similar-inline-link').click();
   await expect(sidepanel.locator('#dedup-modal')).not.toHaveClass(/hidden/);
 
   // Click Remove Duplicates. With no .dedup-image.selected,

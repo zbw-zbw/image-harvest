@@ -1429,6 +1429,12 @@ declare global {
        * exercise their production paths verbatim.
        */
       handleMessage: typeof import('./message').handleMessage;
+      /**
+       * Lazy-load the dedup-ui module and call showDedupModal(). Used by
+       * e2e tests that need to open the dedup modal when the SimilarInline
+       * link is disabled (similarGroups=[]).
+       */
+      showDedupModal: () => Promise<void>;
     };
   }
 }
@@ -1449,6 +1455,10 @@ if (typeof window !== 'undefined' && window.__IH_E2E__) {
       loadMultitab: () => import('./multitab'),
       applyTheme: settingsMod.applyTheme,
       handleMessage: messageMod.handleMessage,
+      showDedupModal: async () => {
+        const { showDedupModal } = await import('./dedup-ui');
+        showDedupModal();
+      },
     };
   });
 }

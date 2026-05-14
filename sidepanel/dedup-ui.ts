@@ -16,25 +16,37 @@ import { state } from './state';
 import { showConfirmDialog, showToast } from './ui';
 
 export function showDedupModal(): void {
-  // Open the Preact-managed shell. The cached `elements.dedupModal` ref may
-  // be stale (Preact replaced the DOM node on mount), so look it up fresh
-  // when we need to scroll the body.
+  // Open the Preact-managed shell. Setting dedupModalState triggers a
+  // Preact re-render that recreates the #dedup-body slot. We must wait
+  // for Preact to finish rendering before writing imperative HTML into it,
+  // otherwise Preact's commit will overwrite our content.
   state.dedupModalState = { open: true };
+
+  // Double-rAF ensures Preact has finished its synchronous commit (which
+  // happens inside the first rAF via useLayoutEffect) before we write
+  // imperative content into the Preact-owned #dedup-body slot.
+  requestAnimationFrame(() => {
+    requestAnimationFrame(() => {
+      populateDedupBody();
+    });
+  });
+}
+
+function populateDedupBody(): void {
   const modalEl = document.getElementById('dedup-modal');
   const modalBody = modalEl?.querySelector('.modal-body');
   if (modalBody) modalBody.scrollTop = 0;
 
-  // Re-resolve the body slot too — it lives inside the Preact-rendered
-  // subtree so the cached ref is unreliable.
   const dedupBody = document.getElementById('dedup-body');
-  if (dedupBody) {
-    if (state.similarGroups.length === 0) {
-      dedupBody.innerHTML = `<p class="empty-message">${t('dedup_no_similar')}</p>`;
-      return;
-    }
-    dedupBody.innerHTML = `${state.similarGroups
-      .map(
-        (group, gi) => `
+  if (!dedupBody) return;
+
+  if (state.similarGroups.length === 0) {
+    dedupBody.innerHTML = `<p class="empty-message">${t('dedup_no_similar')}</p>`;
+    return;
+  }
+  dedupBody.innerHTML = `${state.similarGroups
+    .map(
+      (group, gi) => `
       <div class="dedup-group" data-group="${gi}">
         <div class="dedup-group-title">${t('dedup_group_title', { index: gi + 1, count: group.length })}</div>
         <div class="dedup-group-images">
@@ -52,16 +64,15 @@ export function showDedupModal(): void {
         </div>
       </div>
     `
-      )
-      .join('')}`;
+    )
+    .join('')}`;
 
-    // Click image to toggle selection (mark for removal)
-    dedupBody.querySelectorAll('.dedup-image').forEach((el) => {
-      el.addEventListener('click', () => {
-        el.classList.toggle('selected');
-      });
+  // Click image to toggle selection (mark for removal)
+  dedupBody.querySelectorAll('.dedup-image').forEach((el) => {
+    el.addEventListener('click', () => {
+      el.classList.toggle('selected');
     });
-  }
+  });
 }
 
 export async function removeDuplicates(): Promise<void> {

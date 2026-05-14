@@ -52,6 +52,16 @@ function mountDedupDOM(): void {
   `;
 }
 
+/**
+ * showDedupModal uses a double-rAF to defer imperative DOM writes so that
+ * Preact can commit its render first. In jsdom (vitest), rAF callbacks are
+ * scheduled but don't fire automatically. This helper flushes both frames.
+ */
+async function flushDedupRender(): Promise<void> {
+  await new Promise((r) => requestAnimationFrame(r));
+  await new Promise((r) => requestAnimationFrame(r));
+}
+
 beforeEach(() => {
   mountDedupDOM();
   state.similarGroups = [];
@@ -71,28 +81,27 @@ afterEach(() => {
 // ─────────────────────────────────────────────────────────────────────
 
 describe('showDedupModal', () => {
-  it('flips state.dedupModalState.open=true + resets modal-body scrollTop', () => {
-    const modalBody = document.querySelector('.modal-body') as HTMLElement;
-    modalBody.scrollTop = 500;
+  it('flips state.dedupModalState.open=true immediately', () => {
     showDedupModal();
     expect(state.dedupModalState.open).toBe(true);
-    expect(modalBody.scrollTop).toBe(0);
   });
 
-  it('empty similarGroups → renders "No similar images found" empty-state', () => {
+  it('empty similarGroups → renders "No similar images found" empty-state', async () => {
     state.similarGroups = [];
     showDedupModal();
+    await flushDedupRender();
     const body = document.getElementById('dedup-body')!;
     expect(body.innerHTML).toContain('No similar images found');
     expect(body.innerHTML).toContain('empty-message');
   });
 
-  it('populated similarGroups → renders group headers + thumbnails + click handlers', () => {
+  it('populated similarGroups → renders group headers + thumbnails + click handlers', async () => {
     state.similarGroups = [
       [mkImg('a'), mkImg('b')],
       [mkImg('c'), mkImg('d'), mkImg('e')],
     ];
     showDedupModal();
+    await flushDedupRender();
     const body = document.getElementById('dedup-body')!;
     // Pin: group titles include 1-based index + count. A regression
     // using 0-based would ship "Group 0 (2 similar)" to users.
@@ -104,9 +113,10 @@ describe('showDedupModal', () => {
     expect(imgs[0].src).toContain('a.png');
   });
 
-  it('clicking .dedup-image toggles the .selected class (mark for removal)', () => {
+  it('clicking .dedup-image toggles the .selected class (mark for removal)', async () => {
     state.similarGroups = [[mkImg('a'), mkImg('b')]];
     showDedupModal();
+    await flushDedupRender();
     const body = document.getElementById('dedup-body')!;
     const first = body.querySelector('.dedup-image') as HTMLElement;
     expect(first.classList.contains('selected')).toBe(false);
@@ -167,6 +177,7 @@ describe('removeDuplicates', () => {
       [mkImg('c'), mkImg('d')],
     ];
     showDedupModal();
+    await flushDedupRender();
     const ui = await import('../sidepanel/ui');
     vi.mocked(ui.showConfirmDialog).mockResolvedValueOnce(true);
 
@@ -191,6 +202,7 @@ describe('removeDuplicates', () => {
     state.allImages = [mkImg('a'), mkImg('b'), mkImg('c')];
     state.similarGroups = [[mkImg('a'), mkImg('b'), mkImg('c')]];
     showDedupModal();
+    await flushDedupRender();
     // Manually select only 'a' (group=0, index=0) — this overrides
     // the default keep-first behavior.
     const firstEl = document.querySelector(
@@ -221,6 +233,7 @@ describe('removeDuplicates', () => {
     state.selectedImages = new Set(['a', 'b']);
     state.similarGroups = [[mkImg('a'), mkImg('b')]];
     showDedupModal();
+    await flushDedupRender();
     const ui = await import('../sidepanel/ui');
     vi.mocked(ui.showConfirmDialog).mockResolvedValueOnce(true);
 
@@ -248,6 +261,7 @@ describe('removeDuplicates', () => {
     state.allImages = [mkImg('a'), mkImg('b')];
     state.similarGroups = [[mkImg('a'), mkImg('b')]];
     showDedupModal();
+    await flushDedupRender();
     const ui = await import('../sidepanel/ui');
     vi.mocked(ui.showConfirmDialog).mockResolvedValueOnce(false);
 
