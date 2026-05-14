@@ -289,6 +289,11 @@
   opacity: 1;
 }
 
+/* Push PRO badge to the right edge inside dropdown items */
+.dropdown-item .pro-badge-mini {
+  margin-left: auto;
+}
+
 .dropdown-divider {
   height: 1px;
   margin: 4px 0;
@@ -499,6 +504,11 @@
   transition: all 0.15s;
   user-select: none;
   gap: 8px;
+}
+
+/* Push PRO badge to the right edge inside filter options */
+.filter-option .pro-badge-mini {
+  margin-left: auto;
 }
 
 /* Reserve fixed-width space for check mark on all options so PRO badge stays aligned */

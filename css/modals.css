@@ -388,6 +388,7 @@
   align-items: center;
   gap: 10px;
   padding: 6px 10px;
+  cursor: pointer;
 }
 
 .hotkey-row label {
@@ -1110,10 +1111,14 @@
  * rating-prompt-specific bits below.
  * ────────────────────────────────────────────────────────────────── */
 .rating-prompt-overlay {
-  /* Reuse modal-overlay positioning; we only sit on top of the rest of
-     the modal stack via z-index because both this and ProUpgradeModal
-     mount at body level. */
+  /* This modal is NOT wrapped in a .modal parent, so it needs its own
+     centering layout (other modals inherit it from .modal's flex). */
+  position: fixed;
+  inset: 0;
   z-index: 1100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .rating-prompt-content {

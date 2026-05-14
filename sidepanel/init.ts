@@ -228,6 +228,15 @@ async function init(): Promise<void> {
     applyTranslations();
     updateFilterButtonLabels();
     updateSelectionUI();
+
+    // Refresh license section labels (plan badge, expiry text) that are set
+    // via t() in updateLicenseUI rather than data-i18n attributes, and the
+    // hotkey "Click to set" button label — but only when Settings is open.
+    if (state.settingsModalState.open) {
+      void import('./license-ui').then((mod) => mod.updateLicenseUI());
+      void import('./settings').then((mod) => mod.renderHotkeyDisplay());
+    }
+
     // Bump the localeTick counter so Preact components that call t() re-render
     // with the new translations without requiring a panel reload.
     state.localeTick = (state.localeTick ?? 0) + 1;

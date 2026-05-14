@@ -26,6 +26,8 @@ function close(): void {
 
 export function SettingsModal() {
   const open = useStoreSelector((s) => s.settingsModalState.open);
+  // Re-render when the display language changes so t('settings_title') updates.
+  useStoreSelector((s) => s.localeTick);
 
   return (
     <div id="settings-modal" class={`modal${open ? '' : ' hidden'}`}>

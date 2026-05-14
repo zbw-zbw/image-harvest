@@ -56,6 +56,41 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ## [Unreleased]
 
+## [1.0.3] — 2026-05-14
+
+### 🌍 Expanded Language Support
+
+- **15 languages now supported**: Added Korean, Portuguese, French, German, Italian, Russian, Dutch, Polish, Arabic, and Thai — bringing the total from 5 to 15. Every string in the UI, error messages, and settings is fully translated.
+
+### 🐛 Fixed
+
+- **Side panel image list not rendering on open**: Fixed a race condition where opening the side panel (especially after switching from popup mode) would show "Found 0 images" even though images were cached. Root cause: store subscriptions registered too late to catch synchronous state mutations during initialization.
+- **Settings language switch not updating all labels**: Changing the display language now immediately refreshes the modal title, license plan badge ("Lifetime"), expiry text ("Never expires"), and hotkey button label without needing to close and reopen Settings.
+- **Rating prompt modal not centered**: The "Rate Image Harvest" dialog now appears centered in the viewport, consistent with all other modals.
+- **Hotkey display not updating after change**: The shortcut key shown in Settings now auto-refreshes when you return from `chrome://extensions/shortcuts`; added `cursor: pointer` on the hotkey row to indicate it's clickable.
+- **Image highlights lost after download**: Selection state and page highlights are now preserved after downloading images.
+- **Multi-tab extraction clearing selection**: Selection and highlights no longer disappear after completing a multi-tab extraction.
+- **Highlight positioning for duplicate URLs**: Fixed incorrect highlight overlay placement when the same image URL appears multiple times on a page.
+- **Images behind interaction layers skipped**: Highlight now correctly skips images hidden behind modals/overlays that require user interaction.
+- **Popup mode rendering glitches**: Fixed popup-only rendering issues and removed stale dynamic CSS injection.
+- **Size filter X button default state**: The clear button in size filter inputs now shows the correct initial state.
+- **Tab-switch flicker**: Eliminated a visible flash when switching between tabs with cached image data.
+
+### ⚡ Performance
+
+- **Faster image loading**: Parallelized `ensureImageLoaded` calls, reducing scan-to-render latency by ~30% on image-heavy pages.
+- **Faster settings save**: Optimized settings persistence to avoid redundant writes; UI feedback is now instant.
+
+### 🔄 Changed
+
+- **PRO badge alignment in dropdowns**: All PRO badges in download format, group-by, and settings dropdowns are now right-aligned for visual consistency.
+
+### 🧪 Test Coverage
+
+- Added 14 dedicated test cases for the store→component rendering pipeline (`storeHook.test.tsx`, `imageGrid.test.tsx`) to prevent future regressions in the image list main flow.
+
+---
+
 ## [1.0.2][1.0.2] - 2026-05-08
 
 ### 🌍 Internationalization, Trial & Productivity Update

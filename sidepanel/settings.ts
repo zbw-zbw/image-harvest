@@ -69,6 +69,17 @@ export function openShortcutSettings(): void {
   chrome.tabs.create({ url: 'chrome://extensions/shortcuts' });
 }
 
+// Refresh hotkey display when the user returns from chrome://extensions/shortcuts.
+// Chrome doesn't provide a commands.onChanged event, so we listen for the
+// page becoming visible again while Settings is open.
+if (typeof document !== 'undefined') {
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden && state.settingsModalState.open) {
+      void renderHotkeyDisplay();
+    }
+  });
+}
+
 // ============================================
 // Settings
 // ============================================
