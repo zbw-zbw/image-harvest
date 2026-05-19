@@ -125,9 +125,6 @@
   "pro_feature_blocked_collection": {
     "message": "Collectie is een Pro-functie"
   },
-  "pro_feature_blocked_image_delete": {
-    "message": "Afbeelding verwijderen is een Pro-functie. Upgrade om te ontgrendelen!"
-  },
   "pro_feature_blocked_color_copy": {
     "message": "Kleur kopiëren is een Pro-functie"
   },

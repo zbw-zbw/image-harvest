@@ -125,9 +125,6 @@
   "pro_feature_blocked_collection": {
     "message": "संग्रह एक Pro सुविधा है"
   },
-  "pro_feature_blocked_image_delete": {
-    "message": "छवि हटाना एक Pro सुविधा है। अनलॉक करने के लिए अपग्रेड करें!"
-  },
   "pro_feature_blocked_color_copy": {
     "message": "रंग कॉपी एक Pro सुविधा है"
   },

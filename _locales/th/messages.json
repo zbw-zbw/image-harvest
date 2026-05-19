@@ -125,9 +125,6 @@
   "pro_feature_blocked_collection": {
     "message": "คอลเลกชันเป็นฟีเจอร์ Pro"
   },
-  "pro_feature_blocked_image_delete": {
-    "message": "การลบรูปภาพเป็นฟีเจอร์ Pro อัปเกรดเพื่อปลดล็อก!"
-  },
   "pro_feature_blocked_color_copy": {
     "message": "การคัดลอกสีเป็นฟีเจอร์ Pro"
   },

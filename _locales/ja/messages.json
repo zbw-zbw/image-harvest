@@ -125,9 +125,6 @@
   "pro_feature_blocked_collection": {
     "message": "コレクションは Pro 機能です"
   },
-  "pro_feature_blocked_image_delete": {
-    "message": "画像削除は Pro 機能です。アップグレードで解放!"
-  },
   "pro_feature_blocked_color_copy": {
     "message": "カラーコピーは Pro 機能です"
   },
