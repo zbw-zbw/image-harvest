@@ -330,8 +330,7 @@ export function ImageCard({ img, index }: Props) {
             </button>
             <span class="pro-badge pro-badge-mini">PRO</span>
           </span>
-          <span class="icon-btn-wrapper">
-            <button
+          <button
               class="card-action-btn btn-delete"
               title={t('card_remove_image')}
               data-id={img.id}
@@ -339,8 +338,6 @@ export function ImageCard({ img, index }: Props) {
             >
               <IconTrash />
             </button>
-            <span class="pro-badge pro-badge-mini">PRO</span>
-          </span>
         </div>
       </div>
       <div class="card-url-row">

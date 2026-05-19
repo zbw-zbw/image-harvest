@@ -307,7 +307,7 @@
   align-items: center;
   gap: 6px;
   position: relative;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   min-width: 0;
   overflow: visible;
 }
@@ -315,7 +315,7 @@
 .filter-buttons.filter-row {
   flex: 1 1 0;
   justify-content: flex-start;
-  flex-wrap: nowrap;
+  flex-wrap: wrap;
   min-width: 0;
   overflow: visible;
 }

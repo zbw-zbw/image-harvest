@@ -314,7 +314,7 @@
 
 .toolbar-filters .toolbar-left {
   flex: 1 1 auto;
-  min-width: 200px;
+  min-width: 0;
 }
 
 .toolbar-filters .toolbar-right {

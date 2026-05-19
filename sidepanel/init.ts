@@ -338,11 +338,12 @@ async function init(): Promise<void> {
     });
   }
 
-  // Initial load for the current tab (trigger rescan with progress overlay).
-  // Runs in parallel with proVisibilityPromise — image scanning does not
-  // depend on the Pro status, so there is no reason to wait for the
-  // ~1.2s VALIDATE_LICENSE round-trip before starting the scan.
-  await loadCurrentTab(false);
+  // Initial load for the current tab — always force a fresh scan on panel open.
+  // The session cache (chrome.storage.session) may hold stale data from a
+  // previous panel session where the page content has since changed (lazy-load,
+  // SPA navigation, dynamic content). A full rescan ensures the user always
+  // sees up-to-date images.
+  await loadCurrentTab(true);
 
   // Ensure the Pro visibility promise settles before marking init done,
   // so state.isProUser is resolved and UI badges are correct.
