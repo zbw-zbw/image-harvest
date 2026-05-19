@@ -5,7 +5,6 @@ import type {
   AppSettings,
   FilterConfig,
   ImageItem,
-  LicenseData,
   TabImageCacheEntry,
 } from './types';
 
@@ -46,7 +45,13 @@ export async function getDownloadHistory(): Promise<DownloadRecord[]> {
   }
 }
 
+let historyMutex: Promise<void> = Promise.resolve();
+
 export async function addDownloadRecord(record: DownloadRecord): Promise<boolean> {
+  let release: () => void;
+  const prev = historyMutex;
+  historyMutex = new Promise((r) => { release = r; });
+  await prev;
   try {
     const history = await getDownloadHistory();
     history.unshift(record);
@@ -62,6 +67,8 @@ export async function addDownloadRecord(record: DownloadRecord): Promise<boolean
   } catch (error) {
     console.error('Failed to add download record:', error);
     return false;
+  } finally {
+    release!();
   }
 }
 
@@ -241,36 +248,4 @@ export async function setDisplayMode(useSidePanel: boolean): Promise<boolean> {
   const settings = await getAppSettings();
   settings.useSidePanel = useSidePanel;
   return saveAppSettings(settings);
-}
-
-// ── License data storage ─────────────────────────────────────────────────────
-
-export async function saveLicenseData(data: LicenseData): Promise<boolean> {
-  try {
-    await chrome.storage.local.set({ [STORAGE_KEYS.LICENSE_DATA]: data });
-    return true;
-  } catch (error) {
-    console.error('Failed to save license data:', error);
-    return false;
-  }
-}
-
-export async function getLicenseData(): Promise<LicenseData | null> {
-  try {
-    const result = await chrome.storage.local.get(STORAGE_KEYS.LICENSE_DATA);
-    return (result[STORAGE_KEYS.LICENSE_DATA] as LicenseData) || null;
-  } catch (error) {
-    console.error('Failed to get license data:', error);
-    return null;
-  }
-}
-
-export async function clearLicenseData(): Promise<boolean> {
-  try {
-    await chrome.storage.local.remove(STORAGE_KEYS.LICENSE_DATA);
-    return true;
-  } catch (error) {
-    console.error('Failed to clear license data:', error);
-    return false;
-  }
 }

@@ -172,7 +172,6 @@ export const PRO_FEATURES = [
   'advancedGrouping',
   'advancedPreview',
   'liveMonitoring',
-  'imageDelete',
   'unlimitedZip',
 ] as const;
 
@@ -182,6 +181,8 @@ export const PRO_FEATURES = [
 // Pro paywall trips. The thesis (from /付费转化率拉升方案-从0到1-3): a user
 // who has experienced the feature once is 5-10x more likely to convert
 // than one who only saw it greyed out. Specifically:
+export const VALID_REVERSE_SEARCH_ENGINES = ['google', 'tineye', 'baidu', 'yandex'] as const;
+
 //   - MAX_ZIP_IMAGES: 20 → 30  (covers the long tail of "single page download")
 //   - REVERSE_SEARCH_ENGINES: + 'tineye'  (most useful free engine after Google)
 //   - MAX_COLLECTION_ITEMS: 5  (was: collection fully Pro; now 5 free favorites)
@@ -200,7 +201,7 @@ export const FREE_LIMITS = {
   HIGHLIGHT_BATCH: false,
   PREVIEW_ADVANCED: false,
   LIVE_MONITORING: false,
-  IMAGE_DELETE: false,
+  IMAGE_DELETE: true,
   FORMAT_CONVERSION: false,
   CUSTOM_NAMING: false,
 } as const;

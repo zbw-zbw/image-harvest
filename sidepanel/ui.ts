@@ -480,14 +480,14 @@ export function showError(code: string, message: string, workaround?: string): v
   state.uiScreen = 'error';
 }
 
-export function showEmpty(isNoResults?: boolean): void {
+export function showEmpty(isNoResults?: boolean, hiddenCount?: number): void {
   hideAll();
   // Hide image-grid-wrapper so empty-state can take full flex space and center vertically
   const gridWrapper = document.querySelector('.image-grid-wrapper');
   if (gridWrapper) gridWrapper.classList.add('hidden');
   // <EmptyScreen> derives its title / description / button label from
   // emptyInfo.isNoResults — see StateScreens.tsx.
-  state.emptyInfo = { isNoResults: !!isNoResults };
+  state.emptyInfo = { isNoResults: !!isNoResults, hiddenCount };
   state.uiScreen = 'empty';
 }
 

@@ -449,6 +449,9 @@
   "empty_no_results_desc": {
     "message": "フィルターを調整して、より多くの結果を表示してください。"
   },
+  "empty_hidden_count": {
+    "message": "現在のフィルターにより{count}枚の画像が非表示"
+  },
   "empty_rescan_images": {
     "message": "再スキャン"
   },

@@ -410,15 +410,17 @@ export async function fetchImages(targetTabId?: number): Promise<void> {
     const retryDelays = [500, 1000, 1500];
     let retryCount = 0;
     for (const delay of retryDelays) {
-      // Stop retrying once we have a successful response WITH images
       const hasImages = response?.success && response.images && response.images.length > 0;
       if (hasImages || state.scanAborted) break;
+
+      // If we already received IMAGES_DISCOVERED messages but final response is empty,
+      // the content script is alive and the page genuinely has no new images — skip retry.
+      if (state.scanDiscoveredImages.length > 0 && response?.success) break;
 
       retryCount++;
       await new Promise<void>((resolve) => setTimeout(resolve, delay));
       if (state.scanAborted) break;
 
-      // Abort if the user switched to a different tab during retry
       if (state.currentTabId !== scanTabId) break;
 
       try {
@@ -429,7 +431,6 @@ export async function fetchImages(targetTabId?: number): Promise<void> {
           liveMonitoring: state.appSettings.liveMonitoring !== false,
         });
       } catch {
-        // sendMessage can throw if background SW is still restarting
         response = null;
       }
     }

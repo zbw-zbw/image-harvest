@@ -105,10 +105,28 @@ export async function validateLicenseRemote(licenseKey: string): Promise<License
       throw new Error('License verify failed: HTTP ' + response.status);
     }
 
-    return (await response.json()) as LicenseValidationResult;
+    const data = await response.json();
+    return sanitizeLicenseResult(data);
   } finally {
     clearTimeout(timeout);
   }
+}
+
+const VALID_PLANS = ['monthly', 'yearly', 'lifetime', 'trial'];
+
+function sanitizeLicenseResult(data: unknown): LicenseValidationResult {
+  if (!data || typeof data !== 'object') {
+    return { valid: false, error: 'Invalid response format' };
+  }
+  const obj = data as Record<string, unknown>;
+  const plan = typeof obj.plan === 'string' && VALID_PLANS.includes(obj.plan) ? obj.plan : null;
+  return {
+    valid: Boolean(obj.valid),
+    status: typeof obj.status === 'string' ? obj.status : undefined,
+    plan,
+    expiresAt: typeof obj.expiresAt === 'number' ? obj.expiresAt : null,
+    error: typeof obj.error === 'string' ? obj.error : undefined,
+  };
 }
 
 /**

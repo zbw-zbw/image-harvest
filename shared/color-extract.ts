@@ -115,9 +115,9 @@ function medianCut(pixels: RGB[], depth: number, maxDepth: number): RGB[][] {
     maxRange = bRange;
   }
 
-  pixels.sort((a, b) => a[channel] - b[channel]);
-
   const medianIndex = Math.floor(pixels.length / 2);
+  nthElement(pixels, medianIndex, channel);
+
   const leftPixels = pixels.slice(0, medianIndex);
   const rightPixels = pixels.slice(medianIndex);
 
@@ -125,6 +125,29 @@ function medianCut(pixels: RGB[], depth: number, maxDepth: number): RGB[][] {
   const rightBuckets = medianCut(rightPixels, depth + 1, maxDepth);
 
   return [...leftBuckets, ...rightBuckets];
+}
+
+function nthElement(arr: RGB[], n: number, channel: 'r' | 'g' | 'b'): void {
+  let left = 0;
+  let right = arr.length - 1;
+  while (left < right) {
+    const pivotVal = arr[right][channel];
+    let storeIndex = left;
+    for (let i = left; i < right; i++) {
+      if (arr[i][channel] < pivotVal) {
+        const tmp = arr[i];
+        arr[i] = arr[storeIndex];
+        arr[storeIndex] = tmp;
+        storeIndex++;
+      }
+    }
+    const tmp = arr[right];
+    arr[right] = arr[storeIndex];
+    arr[storeIndex] = tmp;
+    if (storeIndex === n) return;
+    if (storeIndex < n) left = storeIndex + 1;
+    else right = storeIndex - 1;
+  }
 }
 
 /** RGB → `#RRGGBB`. */

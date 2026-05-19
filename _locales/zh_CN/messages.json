@@ -449,6 +449,9 @@
   "empty_no_results_desc": {
     "message": "尝试调整筛选条件以查看更多结果。"
   },
+  "empty_hidden_count": {
+    "message": "{count} 张图片被当前筛选条件隐藏"
+  },
   "empty_rescan_images": {
     "message": "重新扫描"
   },

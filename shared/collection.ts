@@ -10,6 +10,13 @@ const DB_VERSION = 1;
 
 let db: IDBDatabase | null = null;
 
+function requestToPromise<T>(request: IDBRequest<T>): Promise<T> {
+  return new Promise((resolve, reject) => {
+    request.onsuccess = () => resolve(request.result);
+    request.onerror = () => reject(request.error);
+  });
+}
+
 /** Open (or reuse) the IndexedDB connection. */
 export function collectionInit(): Promise<IDBDatabase> {
   return new Promise((resolve, reject) => {
@@ -43,183 +50,99 @@ export function collectionInit(): Promise<IDBDatabase> {
 }
 
 /** Insert a new collection entry. Returns the new ID. */
-export function collectionAdd(item: Partial<CollectionItem>): Promise<string> {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const database = await collectionInit();
-      const transaction = database.transaction([STORE_NAME], 'readwrite');
-      const store = transaction.objectStore(STORE_NAME);
+export async function collectionAdd(item: Partial<CollectionItem>): Promise<string> {
+  const database = await collectionInit();
+  const transaction = database.transaction([STORE_NAME], 'readwrite');
+  const store = transaction.objectStore(STORE_NAME);
 
-      const newItem: CollectionItem = {
-        ...(item as CollectionItem),
-        id: item.id || generateId(),
-        createdAt: item.createdAt || Date.now(),
-      };
+  const newItem: CollectionItem = {
+    ...(item as CollectionItem),
+    id: item.id || generateId(),
+    createdAt: item.createdAt || Date.now(),
+  };
 
-      const request = store.add(newItem);
-
-      request.onsuccess = () => resolve(newItem.id);
-      request.onerror = () => reject(new Error('Failed to add collection item'));
-    } catch (error) {
-      reject(error);
-    }
-  });
+  await requestToPromise(store.add(newItem));
+  return newItem.id;
 }
 
-export function collectionRemove(id: string): Promise<boolean> {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const database = await collectionInit();
-      const transaction = database.transaction([STORE_NAME], 'readwrite');
-      const store = transaction.objectStore(STORE_NAME);
+export async function collectionRemove(id: string): Promise<boolean> {
+  const database = await collectionInit();
+  const transaction = database.transaction([STORE_NAME], 'readwrite');
+  const store = transaction.objectStore(STORE_NAME);
 
-      const request = store.delete(id);
-      request.onsuccess = () => resolve(true);
-      request.onerror = () => reject(new Error('Failed to remove collection item'));
-    } catch (error) {
-      reject(error);
-    }
-  });
+  await requestToPromise(store.delete(id));
+  return true;
 }
 
-export function collectionUpdate(id: string, updates: Partial<CollectionItem>): Promise<boolean> {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const database = await collectionInit();
-      const transaction = database.transaction([STORE_NAME], 'readwrite');
-      const store = transaction.objectStore(STORE_NAME);
+export async function collectionUpdate(
+  id: string,
+  updates: Partial<CollectionItem>
+): Promise<boolean> {
+  const database = await collectionInit();
+  const transaction = database.transaction([STORE_NAME], 'readwrite');
+  const store = transaction.objectStore(STORE_NAME);
 
-      const getRequest = store.get(id);
+  const existingItem = (await requestToPromise(store.get(id))) as CollectionItem | undefined;
+  if (!existingItem) return false;
 
-      getRequest.onsuccess = () => {
-        const existingItem = getRequest.result as CollectionItem | undefined;
-        if (!existingItem) {
-          resolve(false);
-          return;
-        }
+  const updatedItem: CollectionItem = {
+    ...existingItem,
+    ...updates,
+    id: existingItem.id,
+  };
 
-        const updatedItem: CollectionItem = {
-          ...existingItem,
-          ...updates,
-          id: existingItem.id, // Never let updates clobber the ID.
-        };
-
-        const putRequest = store.put(updatedItem);
-        putRequest.onsuccess = () => resolve(true);
-        putRequest.onerror = () => reject(new Error('Failed to update collection item'));
-      };
-
-      getRequest.onerror = () => reject(new Error('Failed to get collection item'));
-    } catch (error) {
-      reject(error);
-    }
-  });
+  await requestToPromise(store.put(updatedItem));
+  return true;
 }
 
-export function collectionGetAll(): Promise<CollectionItem[]> {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const database = await collectionInit();
-      const transaction = database.transaction([STORE_NAME], 'readonly');
-      const store = transaction.objectStore(STORE_NAME);
+export async function collectionGetAll(): Promise<CollectionItem[]> {
+  const database = await collectionInit();
+  const transaction = database.transaction([STORE_NAME], 'readonly');
+  const store = transaction.objectStore(STORE_NAME);
 
-      const request = store.getAll();
-      request.onsuccess = () => resolve((request.result as CollectionItem[]) || []);
-      request.onerror = () => reject(new Error('Failed to get all collections'));
-    } catch (error) {
-      reject(error);
-    }
-  });
+  return ((await requestToPromise(store.getAll())) as CollectionItem[]) || [];
 }
 
-export function collectionGetById(id: string): Promise<CollectionItem | null> {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const database = await collectionInit();
-      const transaction = database.transaction([STORE_NAME], 'readonly');
-      const store = transaction.objectStore(STORE_NAME);
+export async function collectionGetById(id: string): Promise<CollectionItem | null> {
+  const database = await collectionInit();
+  const transaction = database.transaction([STORE_NAME], 'readonly');
+  const store = transaction.objectStore(STORE_NAME);
 
-      const request = store.get(id);
-      request.onsuccess = () => resolve((request.result as CollectionItem) || null);
-      request.onerror = () => reject(new Error('Failed to get collection item by ID'));
-    } catch (error) {
-      reject(error);
-    }
-  });
+  return ((await requestToPromise(store.get(id))) as CollectionItem) || null;
 }
 
 /** Search across tags / sourceUrl / notes / sourceTitle (case-insensitive). */
-export function collectionSearch(query: string): Promise<CollectionItem[]> {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const database = await collectionInit();
-      const transaction = database.transaction([STORE_NAME], 'readonly');
-      const store = transaction.objectStore(STORE_NAME);
+export async function collectionSearch(query: string): Promise<CollectionItem[]> {
+  const allItems = await collectionGetAll();
+  const lowerQuery = query.toLowerCase();
 
-      const request = store.getAll();
-
-      request.onsuccess = () => {
-        const allItems = (request.result as CollectionItem[]) || [];
-        const lowerQuery = query.toLowerCase();
-
-        const results = allItems.filter((item) => {
-          if (item.tags && item.tags.some((tag) => tag.toLowerCase().includes(lowerQuery))) {
-            return true;
-          }
-          if (item.sourceUrl && item.sourceUrl.toLowerCase().includes(lowerQuery)) {
-            return true;
-          }
-          if (item.notes && item.notes.toLowerCase().includes(lowerQuery)) {
-            return true;
-          }
-          if (item.sourceTitle && item.sourceTitle.toLowerCase().includes(lowerQuery)) {
-            return true;
-          }
-          return false;
-        });
-
-        resolve(results);
-      };
-
-      request.onerror = () => reject(new Error('Failed to search collections'));
-    } catch (error) {
-      reject(error);
-    }
+  return allItems.filter((item) => {
+    if (item.tags && item.tags.some((tag) => tag.toLowerCase().includes(lowerQuery))) return true;
+    if (item.sourceUrl && item.sourceUrl.toLowerCase().includes(lowerQuery)) return true;
+    if (item.notes && item.notes.toLowerCase().includes(lowerQuery)) return true;
+    if (item.sourceTitle && item.sourceTitle.toLowerCase().includes(lowerQuery)) return true;
+    return false;
   });
 }
 
 /** Export all collection items as plain JSON (Blob fields stripped). */
-export function collectionExport(): Promise<
+export async function collectionExport(): Promise<
   Array<Omit<CollectionItem, 'thumbnail' | 'fullImage'>>
 > {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const allItems = await collectionGetAll();
-      const exportedItems = allItems.map((item) => {
-        const { thumbnail: _t, fullImage: _f, ...rest } = item;
-        return rest;
-      });
-      resolve(exportedItems);
-    } catch (error) {
-      reject(error);
-    }
+  const allItems = await collectionGetAll();
+  return allItems.map((item) => {
+    const { thumbnail: _t, fullImage: _f, ...rest } = item;
+    return rest;
   });
 }
 
-export function collectionClear(): Promise<boolean> {
-  return new Promise(async (resolve, reject) => {
-    try {
-      const database = await collectionInit();
-      const transaction = database.transaction([STORE_NAME], 'readwrite');
-      const store = transaction.objectStore(STORE_NAME);
+export async function collectionClear(): Promise<boolean> {
+  const database = await collectionInit();
+  const transaction = database.transaction([STORE_NAME], 'readwrite');
+  const store = transaction.objectStore(STORE_NAME);
 
-      const request = store.clear();
-      request.onsuccess = () => resolve(true);
-      request.onerror = () => reject(new Error('Failed to clear collections'));
-    } catch (error) {
-      reject(error);
-    }
-  });
+  await requestToPromise(store.clear());
+  return true;
 }
 
 /** Local fallback ID generator (used when caller doesn't supply one). */

@@ -79,7 +79,7 @@ initTabActivationListener();
 
 chrome.downloads.onChanged.addListener((delta) => {
   if (delta.state?.current === 'complete') {
-    console.log('Download completed:', delta.id);
+    broadcastToPopup({ type: 'DOWNLOAD_COMPLETE', downloadId: delta.id });
   }
 });
 
@@ -127,6 +127,12 @@ async function handleMessage(
           liveMonitoring: message.liveMonitoring !== false,
         });
         sendResponse({ success: true, images });
+        const tabId = message.tabId as number | undefined;
+        if (tabId && images.length > 0) {
+          const text = images.length > 999 ? '999+' : String(images.length);
+          chrome.action.setBadgeText({ text, tabId }).catch(() => {});
+          chrome.action.setBadgeBackgroundColor({ color: '#4CAF50', tabId }).catch(() => {});
+        }
         break;
       }
 
@@ -332,6 +338,10 @@ async function handleMessage(
         break;
 
       case MESSAGE_TYPES.FETCH_IMAGE_DATA: {
+        if (!sender.tab) {
+          sendResponse({ success: false, error: 'Unauthorized: no sender tab' });
+          break;
+        }
         try {
           const dataUrl = await fetchImageData(message.url as string);
           sendResponse({ success: true, dataUrl });

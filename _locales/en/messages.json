@@ -477,6 +477,9 @@
   "empty_no_results_desc": {
     "message": "Try adjusting your filters to see more results."
   },
+  "empty_hidden_count": {
+    "message": "{count} images hidden by current filters"
+  },
   "empty_rescan_images": {
     "message": "Rescan images"
   },

@@ -235,7 +235,7 @@ export async function flushNow(): Promise<void> {
 export async function isOptedIn(): Promise<boolean> {
   if (optInCache !== null) return optInCache;
   const v = await storage.get<boolean>(STORAGE_KEY_OPT_IN);
-  optInCache = v === undefined ? true : Boolean(v);
+  optInCache = v === undefined ? false : Boolean(v);
   return optInCache;
 }
 

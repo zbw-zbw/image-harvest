@@ -200,6 +200,8 @@ export interface ErrorScreenInfo {
 export interface EmptyScreenInfo {
   /** "no results after filtering" vs "no images on this page at all". */
   isNoResults: boolean;
+  /** Number of images hidden by current filters (shown as hint). */
+  hiddenCount?: number;
 }
 
 export interface ScanProgressState {

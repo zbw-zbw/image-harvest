@@ -96,7 +96,9 @@ export function renderImages(options?: { skipScrollReset?: boolean }): void {
     // mid-scan (scan overlay still visible means analysis still in progress).
     if (!state.scanProgress.visible) {
       elements.imageGrid.classList.add('hidden');
-      showEmpty(state.allImages.length > 0);
+      const isNoResults = state.allImages.length > 0;
+      const hiddenCount = isNoResults ? state.allImages.length : undefined;
+      showEmpty(isNoResults, hiddenCount);
     }
     return;
   }

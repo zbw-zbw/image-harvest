@@ -21,11 +21,14 @@ interface LiveMonitorConfig {
   debounceMs?: number;
 }
 
+let lazyLoadController: AbortController | null = null;
+
 // Live monitoring with MutationObserver
 export function startLiveMonitoring(config: LiveMonitorConfig = {}): void {
   stopLiveMonitoring();
 
   const debounceMs = config.debounceMs || 500;
+  lazyLoadController = new AbortController();
 
   // Accumulating buffer: collect all mutations during the debounce window
   // so none are lost (unlike a plain debounce which discards earlier calls).
@@ -68,7 +71,10 @@ export function startLiveMonitoring(config: LiveMonitorConfig = {}): void {
             : Array.from(el.querySelectorAll?.<HTMLImageElement>('img') || []);
         for (const img of lazyImgs) {
           if (!img.complete || img.naturalWidth === 0) {
-            img.addEventListener('load', handleLazyImageLoad, { once: true });
+            img.addEventListener('load', handleLazyImageLoad, {
+              once: true,
+              signal: lazyLoadController!.signal,
+            });
           }
         }
       }
@@ -129,6 +135,10 @@ function handleLazyImageLoad(event: Event): void {
 }
 
 export function stopLiveMonitoring(): void {
+  if (lazyLoadController) {
+    lazyLoadController.abort();
+    lazyLoadController = null;
+  }
   if (state.liveObserver) {
     state.liveObserver.disconnect();
     state.liveObserver = null;

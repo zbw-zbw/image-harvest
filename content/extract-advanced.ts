@@ -479,70 +479,7 @@ export async function extractLazyLoadImages(images: Map<string, ImageItem>): Pro
 }
 
 // Extract images from CSS content property (e.g. ::before / ::after pseudo-elements)
-export async function extractCssContentImages(images: Map<string, ImageItem>): Promise<void> {
-  const elements = document.querySelectorAll('body, body *');
-  const maxElements = Math.min(elements.length, 2000);
-
-  for (let i = 0; i < maxElements; i++) {
-    const el = elements[i];
-    if (skipElement(el)) continue;
-
-    for (const pseudo of ['::before', '::after']) {
-      try {
-        const style = window.getComputedStyle(el, pseudo);
-        const contentValue = style.content;
-        if (
-          !contentValue ||
-          contentValue === 'none' ||
-          contentValue === 'normal' ||
-          contentValue === '""'
-        )
-          continue;
-
-        const urls = extractBackgroundUrls(contentValue);
-        for (const url of urls) {
-          if (!url || isGradient(url)) continue;
-
-          if (isDataUri(url)) {
-            if (!isImageDataUri(url)) continue;
-            const dataKey = generateDataUriKey(url);
-            if (state.seenUrls.has(dataKey)) continue;
-            state.seenUrls.add(dataKey);
-            const rect = el.getBoundingClientRect();
-            images.set(dataKey, {
-              id: generateId(dataKey),
-              url: url,
-              displayWidth: Math.round(rect.width),
-              displayHeight: Math.round(rect.height),
-              type: 'css-content',
-              format: getFileFormat(url),
-              sourceDomain: window.location.hostname,
-              checked: false,
-              timestamp: Date.now(),
-            } as ImageItem);
-            continue;
-          }
-
-          const resolvedUrl = resolveUrl(url);
-          if (state.seenUrls.has(resolvedUrl)) continue;
-          state.seenUrls.add(resolvedUrl);
-
-          const rect = el.getBoundingClientRect();
-          images.set(resolvedUrl, {
-            id: generateId(resolvedUrl),
-            url: resolvedUrl,
-            displayWidth: Math.round(rect.width),
-            displayHeight: Math.round(rect.height),
-            type: 'css-content',
-            format: getFileFormat(resolvedUrl),
-            sourceDomain: getDomain(resolvedUrl),
-            checked: false,
-            timestamp: Date.now(),
-          } as ImageItem);
-        }
-      } catch {
-        // Skip inaccessible pseudo-elements
-      }
-    }
-  }
+// NOTE: Now handled within extractBackgroundImages (merged for single DOM pass).
+export async function extractCssContentImages(_images: Map<string, ImageItem>): Promise<void> {
+  // No-op: merged into extractBackgroundImages for performance (single DOM traversal).
 }

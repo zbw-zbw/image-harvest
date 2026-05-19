@@ -492,6 +492,13 @@ async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Promise<v
   // Save current tab state to cache before switching
   if (state.currentTabId != null && state.currentTabId !== newTabId) {
     const cachedUrl = state.tabCache.get(state.currentTabId)?.url || '';
+
+    const MAX_TAB_CACHE = 10;
+    if (state.tabCache.size >= MAX_TAB_CACHE && !state.tabCache.has(state.currentTabId)) {
+      const oldest = state.tabCache.keys().next().value;
+      if (oldest !== undefined) state.tabCache.delete(oldest);
+    }
+
     state.tabCache.set(state.currentTabId, {
       url: cachedUrl,
       images: [...state.allImages],
@@ -1304,7 +1311,7 @@ function bindEvents(): void {
   // Close modals on overlay click
   document.querySelectorAll('.modal-overlay').forEach((overlay) => {
     overlay.addEventListener('click', () => {
-      const modal = overlay.closest('_modal');
+      const modal = overlay.closest('.modal');
       if (modal) modal.classList.add('hidden');
     });
   });

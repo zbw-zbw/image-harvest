@@ -157,6 +157,15 @@
   max-width: 400px;
 }
 
+.empty-state-hidden-hint {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: -16px 0 20px;
+  padding: 4px 10px;
+  background: var(--bg-secondary);
+  border-radius: 4px;
+}
+
 .empty-state .btn {
   font-size: 12px;
   padding: 8px 20px;
