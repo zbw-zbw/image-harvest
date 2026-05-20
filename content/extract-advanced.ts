@@ -9,8 +9,6 @@ import {
   isDataUri,
   isImageDataUri,
   generateDataUriKey,
-  extractBackgroundUrls,
-  isGradient,
 } from '../shared/utils';
 import type { ImageItem } from '../shared/types';
 import { state } from './state';
@@ -479,7 +477,56 @@ export async function extractLazyLoadImages(images: Map<string, ImageItem>): Pro
 }
 
 // Extract images from CSS content property (e.g. ::before / ::after pseudo-elements)
-// NOTE: Now handled within extractBackgroundImages (merged for single DOM pass).
-export async function extractCssContentImages(_images: Map<string, ImageItem>): Promise<void> {
-  // No-op: merged into extractBackgroundImages for performance (single DOM traversal).
+export async function extractCssContentImages(images: Map<string, ImageItem>): Promise<void> {
+  const elements = document.querySelectorAll('*');
+  for (const el of elements) {
+    if (skipElement(el)) continue;
+    for (const pseudo of ['::before', '::after'] as const) {
+      try {
+        const style = window.getComputedStyle(el, pseudo);
+        const content = style.content;
+        if (!content || content === 'none' || content === 'normal') continue;
+        const urlMatch = content.match(/url\(['"]?([^'")]+)['"]?\)/);
+        if (!urlMatch) continue;
+        const rawUrl = urlMatch[1];
+
+        if (isDataUri(rawUrl)) {
+          if (!isImageDataUri(rawUrl)) continue;
+          const dataKey = generateDataUriKey(rawUrl);
+          if (state.seenUrls.has(dataKey)) continue;
+          state.seenUrls.add(dataKey);
+          const rect = el.getBoundingClientRect();
+          images.set(dataKey, {
+            id: generateId(dataKey),
+            url: rawUrl,
+            displayWidth: Math.round(rect.width) || 0,
+            displayHeight: Math.round(rect.height) || 0,
+            type: 'css-content',
+            format: getFileFormat(rawUrl),
+            sourceDomain: window.location.hostname,
+            checked: false,
+            timestamp: Date.now(),
+          } as ImageItem);
+        } else {
+          const resolvedUrl = resolveUrl(rawUrl);
+          if (!resolvedUrl || state.seenUrls.has(resolvedUrl)) continue;
+          state.seenUrls.add(resolvedUrl);
+          const rect = el.getBoundingClientRect();
+          images.set(resolvedUrl, {
+            id: generateId(resolvedUrl),
+            url: resolvedUrl,
+            displayWidth: Math.round(rect.width) || 0,
+            displayHeight: Math.round(rect.height) || 0,
+            type: 'css-content',
+            format: getFileFormat(resolvedUrl),
+            sourceDomain: getDomain(resolvedUrl),
+            checked: false,
+            timestamp: Date.now(),
+          } as ImageItem);
+        }
+      } catch {
+        // Swallow getComputedStyle exceptions for inaccessible pseudo-elements
+      }
+    }
+  }
 }
