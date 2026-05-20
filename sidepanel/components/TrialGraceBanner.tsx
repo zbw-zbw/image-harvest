@@ -14,9 +14,7 @@ export function TrialGraceBanner() {
 
   return (
     <div class="trial-grace-banner">
-      <span class="trial-grace-text">
-        {t('trial_grace_message', { days: String(daysLeft) })}
-      </span>
+      <span class="trial-grace-text">{t('trial_grace_message', { days: String(daysLeft) })}</span>
       <button class="btn btn-small btn-primary trial-grace-btn" onClick={handleUpgrade}>
         {t('trial_grace_upgrade_btn')}
       </button>

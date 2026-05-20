@@ -363,7 +363,13 @@ async function extractBackgroundImages(images: Map<string, ImageItem>): Promise<
       try {
         const pseudoStyle = window.getComputedStyle(el, pseudo);
         const contentValue = pseudoStyle.content;
-        if (!contentValue || contentValue === 'none' || contentValue === 'normal' || contentValue === '""') continue;
+        if (
+          !contentValue ||
+          contentValue === 'none' ||
+          contentValue === 'normal' ||
+          contentValue === '""'
+        )
+          continue;
 
         const contentUrls = extractBackgroundUrls(contentValue);
         for (const url of contentUrls) {

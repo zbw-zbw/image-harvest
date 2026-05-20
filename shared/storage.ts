@@ -1,12 +1,7 @@
 // Storage management for Image Harvest.
 import { DEFAULT_FILTER_CONFIG, STORAGE_KEYS, LIMITS, DEFAULT_APP_SETTINGS } from './constants';
 import { deepMerge } from './utils';
-import type {
-  AppSettings,
-  FilterConfig,
-  ImageItem,
-  TabImageCacheEntry,
-} from './types';
+import type { AppSettings, FilterConfig, ImageItem, TabImageCacheEntry } from './types';
 
 interface DownloadRecord {
   id: string;
@@ -50,7 +45,9 @@ let historyMutex: Promise<void> = Promise.resolve();
 export async function addDownloadRecord(record: DownloadRecord): Promise<boolean> {
   let release: () => void;
   const prev = historyMutex;
-  historyMutex = new Promise((r) => { release = r; });
+  historyMutex = new Promise((r) => {
+    release = r;
+  });
   await prev;
   try {
     const history = await getDownloadHistory();
