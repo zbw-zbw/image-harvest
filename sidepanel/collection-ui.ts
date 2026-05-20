@@ -93,13 +93,13 @@ export async function loadCollection(searchQuery = ''): Promise<void> {
                 ${fileSize ? `<span class="card-tag filesize">${fileSize}</span>` : ''}
               </div>
               <div class="card-actions">
-                <button class="card-action-btn btn-search-collection" title="Reverse search" data-url="${item.url}">
+                <button class="card-action-btn btn-search-collection" title="${t('menu_reverse_search')}" data-url="${item.url}">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 </button>
                 <button class="card-action-btn btn-dl-collection" data-url="${item.url}" data-format="${item.format || ''}" title="Download">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 </button>
-                <button class="card-action-btn btn-remove-collection" data-id="${item.id}" title="Remove from collection">
+                <button class="card-action-btn btn-remove-collection" data-id="${item.id}" title="${t('card_remove_from_collection')}">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                 </button>
               </div>
@@ -107,10 +107,10 @@ export async function loadCollection(searchQuery = ''): Promise<void> {
             <div class="card-url-row">
               <div class="card-url" title="${item.url}">${item.url}</div>
               <div class="card-url-actions">
-                <button class="card-action-btn btn-copy-collection" data-url="${item.url}" title="Copy URL">
+                <button class="card-action-btn btn-copy-collection" data-url="${item.url}" title="${t('card_copy_url')}">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                 </button>
-                <button class="card-action-btn btn-open-collection" data-url="${item.url}" title="Open in new tab">
+                <button class="card-action-btn btn-open-collection" data-url="${item.url}" title="${t('card_open_in_new_tab')}">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                 </button>
               </div>
@@ -153,9 +153,9 @@ export async function loadCollection(searchQuery = ''): Promise<void> {
         e.stopPropagation();
         try {
           await navigator.clipboard.writeText(btn.dataset.url!);
-          showToast('URL copied', 'success');
+          showToast(t('toast_url_copied_single'), 'success');
         } catch {
-          showToast('Failed to copy URL', 'error');
+          showToast(t('toast_url_copy_failed'), 'error');
         }
       });
     });
@@ -195,7 +195,7 @@ export async function loadCollection(searchQuery = ''): Promise<void> {
     elements.collectionBody.innerHTML = `
       <div class="collection-empty">
         <div class="collection-empty-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
-        <p>Failed to load collection</p>
+        <p>${t('toast_collection_load_failed')}</p>
       </div>`;
   }
 }
@@ -209,13 +209,13 @@ export async function exportCollection(): Promise<void> {
     const items: CollectionItem[] = await collectionGetAll();
 
     if (items.length === 0) {
-      showToast('Collection is empty', 'info');
+      showToast(t('toast_collection_empty'), 'info');
       return;
     }
 
-    showProgress('Exporting collection...', () => {
+    showProgress(t('toast_exporting_collection'), () => {
       aborted = true;
-      showToast('Export cancelled', 'info');
+      showToast(t('toast_export_cancelled'), 'info');
     });
 
     const { default: JSZip } = (await import('jszip')) as { default: typeof JSZipType };
@@ -249,9 +249,9 @@ export async function exportCollection(): Promise<void> {
       saveAs: false,
     });
     URL.revokeObjectURL(blobUrl);
-    showToast('Collection exported', 'success');
+    showToast(t('toast_collection_exported'), 'success');
   } catch {
-    if (!aborted) showToast('Export failed', 'error');
+    if (!aborted) showToast(t('toast_collection_export_failed'), 'error');
   } finally {
     hideProgress();
   }

@@ -28,19 +28,16 @@ import {
 } from '../shared/utils';
 
 describe('generateId', () => {
-  it('returns a deterministic-prefix id for the same URL within the same ms', () => {
+  it('returns a unique UUID string', () => {
     const id1 = generateId('https://example.com/a.png');
     const id2 = generateId('https://example.com/a.png');
-    // hash portion equal; timestamp suffix may differ — assert prefix length
     expect(typeof id1).toBe('string');
-    expect(id1.length).toBeGreaterThan(2);
-    // hash prefix (everything except the trailing date.toString(36)) is stable
-    const hashPrefix = (s: string): string => s.slice(0, s.length - Date.now().toString(36).length);
-    expect(hashPrefix(id1)).toBe(hashPrefix(id2));
+    expect(id1.length).toBe(36);
+    expect(id1).not.toBe(id2);
   });
 
   it('produces different ids for different URLs', () => {
-    expect(generateId('a').slice(0, 4)).not.toBe(generateId('b').slice(0, 4));
+    expect(generateId('a')).not.toBe(generateId('b'));
   });
 });
 

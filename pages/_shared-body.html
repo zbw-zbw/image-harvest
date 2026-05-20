@@ -480,6 +480,63 @@ HTML document — it omits the surrounding
                 />
               </div>
 
+              <button class="filter-btn" data-filter="filesize">File Size▾</button>
+              <div class="filter-dropdown hidden" id="filter-filesize">
+                <div
+                  class="filter-option active"
+                  data-filesize-filter="all"
+                  data-i18n="filter_filesize_all"
+                >
+                  All Sizes
+                </div>
+                <div
+                  class="filter-option"
+                  data-filesize-filter="tiny"
+                  data-i18n="filter_filesize_tiny"
+                >
+                  Tiny &lt;50 KB
+                </div>
+                <div
+                  class="filter-option"
+                  data-filesize-filter="small"
+                  data-i18n="filter_filesize_small"
+                >
+                  Small 50-200 KB
+                </div>
+                <div
+                  class="filter-option"
+                  data-filesize-filter="medium"
+                  data-i18n="filter_filesize_medium"
+                >
+                  Medium 200-500 KB
+                </div>
+                <div
+                  class="filter-option"
+                  data-filesize-filter="large"
+                  data-i18n="filter_filesize_large"
+                >
+                  Large 500 KB-2 MB
+                </div>
+                <div
+                  class="filter-option"
+                  data-filesize-filter="xlarge"
+                  data-i18n="filter_filesize_xlarge"
+                >
+                  XL &gt;2 MB
+                </div>
+                <div class="filter-divider"></div>
+                <div class="filter-custom-size">
+                  <div class="filter-custom-row">
+                    <label data-i18n="filter_filesize_min">Min KB</label>
+                    <input type="number" id="filter-filesize-min" min="0" placeholder="0" />
+                  </div>
+                  <div class="filter-custom-row">
+                    <label data-i18n="filter_filesize_max">Max KB</label>
+                    <input type="number" id="filter-filesize-max" min="0" placeholder="∞" />
+                  </div>
+                </div>
+              </div>
+
               <button class="filter-btn" data-filter="color">
                 Color▾ <span class="pro-badge pro-badge-mini">PRO</span>
               </button>

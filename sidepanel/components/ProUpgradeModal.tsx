@@ -254,6 +254,11 @@ export function ProUpgradeModal() {
                 </ul>
               </>
             )}
+            {!trialEligible && (
+              <div class="pro-upgrade-purchase-header">
+                <p class="pro-upgrade-purchase-desc">{t('pro_purchase_desc')}</p>
+              </div>
+            )}
             <div class="pro-upgrade-cta-row">
               {trialEligible && (
                 <button
@@ -274,7 +279,7 @@ export function ProUpgradeModal() {
                 class={`btn btn-cta ${trialEligible ? 'btn-secondary' : 'btn-primary'}`}
                 onClick={handlePricingClick}
               >
-                {t('pro_pricing_cta')}
+                {trialEligible ? t('pro_pricing_cta') : t('pro_purchase_cta')}
               </button>
             </div>
             {trialEligible && (

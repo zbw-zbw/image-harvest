@@ -528,7 +528,7 @@ export async function fetchImages(targetTabId?: number): Promise<void> {
     console.error('Fetch images error:', error);
     hideLoading();
     const msg = error instanceof Error ? error.message : String(error);
-    showError('FETCH_ERROR', msg, 'Refresh the page and try again');
+    showError('FETCH_ERROR', msg, t('toast_refresh_retry'));
   }
   state.isFetching = false;
 }
@@ -626,7 +626,11 @@ export async function processImageExtras(images: ImageItem[]): Promise<void> {
 
     const batch = imagesToProcess.slice(i, i + batchSize);
     const batchPromises = batch.map(async (img) => {
-      const dataUrl = await fetchImageDataUrl(img.url);
+      // For data: URLs, use them directly — they don't need background
+      // proxying (calculatePHash and extractColorsFromUrl handle them
+      // natively). http/https URLs must go through the background SW to
+      // bypass CORS.
+      const dataUrl = img.url.startsWith('data:') ? img.url : await fetchImageDataUrl(img.url);
       if (!dataUrl) return;
 
       const extraPromises: Array<Promise<unknown>> = [];

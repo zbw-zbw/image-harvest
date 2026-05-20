@@ -22,6 +22,8 @@ import {
 } from './actions';
 import {
   applyCustomSizeInputs,
+  applyFileSizeInputs,
+  applyFileSizePreset,
   applyFilters,
   clearCustomSizeInputs,
   syncCustomSizeInputsFromSettings,
@@ -1028,6 +1030,19 @@ function bindEvents(): void {
     });
   });
 
+  // File size preset options in File Size dropdown
+  document.querySelectorAll<HTMLElement>('[data-filesize-filter]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const preset = btn.dataset.filesizeFilter!;
+      document
+        .querySelectorAll('[data-filesize-filter]')
+        .forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      applyFileSizePreset(preset);
+      closeAllFilterDropdowns();
+    });
+  });
+
   // Custom size inputs in Size dropdown
   ['filter-min-width', 'filter-min-height', 'filter-max-width', 'filter-max-height'].forEach(
     (inputId) => {
@@ -1133,6 +1148,19 @@ function bindEvents(): void {
       if (isComposing) return;
       debouncedUrlFilter((e.target as HTMLInputElement).value);
     });
+  }
+
+  // File size (KB) filter — apply on input change with debounce
+  const fileSizeMinInput = document.getElementById(
+    'filter-filesize-min'
+  ) as HTMLInputElement | null;
+  const fileSizeMaxInput = document.getElementById(
+    'filter-filesize-max'
+  ) as HTMLInputElement | null;
+  if (fileSizeMinInput || fileSizeMaxInput) {
+    const debouncedFileSize = debounce(() => applyFileSizeInputs(), 400);
+    fileSizeMinInput?.addEventListener('input', debouncedFileSize);
+    fileSizeMaxInput?.addEventListener('input', debouncedFileSize);
   }
 
   // Color filter - "All Colors" option
@@ -1271,7 +1299,7 @@ function bindEvents(): void {
       if (checked.length > 0) {
         startMultiTabExtract(checked);
       } else {
-        showToast('Select at least one tab', 'error');
+        showToast(t('toast_select_at_least_one_tab'), 'error');
       }
     });
   }
@@ -1345,7 +1373,7 @@ function bindEvents(): void {
   if (resetBtn) {
     resetBtn.addEventListener('click', () => {
       const resetBtnLabel = resetBtn.querySelector('span');
-      if (resetBtnLabel && resetBtnLabel.textContent?.trim() === 'Rescan Images') {
+      if (resetBtnLabel && resetBtnLabel.textContent?.trim() === t('empty_rescan_images')) {
         // Force reset isFetching so a new scan can start
         state.isFetching = false;
         loadCurrentTab(true, state.currentTabId ?? undefined);
@@ -1367,8 +1395,22 @@ function bindEvents(): void {
         customMaxEnabled: state.appSettings.enableMaxSize,
         customMaxWidth: state.appSettings.maxWidth ?? 8000,
         customMaxHeight: state.appSettings.maxHeight ?? 8000,
+        fileSizeEnabled: false,
+        minFileSizeKB: 0,
+        maxFileSizeKB: Infinity,
+        fileSizePreset: 'all',
       };
       if (elements.filterUrlInput) (elements.filterUrlInput as HTMLInputElement).value = '';
+      // Clear file size inputs
+      const fsMin = document.getElementById('filter-filesize-min') as HTMLInputElement | null;
+      const fsMax = document.getElementById('filter-filesize-max') as HTMLInputElement | null;
+      if (fsMin) fsMin.value = '';
+      if (fsMax) fsMax.value = '';
+      document
+        .querySelectorAll('[data-filesize-filter]')
+        .forEach((o) => o.classList.remove('active'));
+      const defaultFsOption = document.querySelector('[data-filesize-filter="all"]');
+      if (defaultFsOption) defaultFsOption.classList.add('active');
       // Restore custom size input fields from global settings
       syncCustomSizeInputsFromSettings();
       document.querySelectorAll<HTMLInputElement>('.type-checkbox').forEach((cb) => {

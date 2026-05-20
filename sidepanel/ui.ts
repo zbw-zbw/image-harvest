@@ -4,7 +4,12 @@
 // UI组件模块：提供过滤器标签、视图切换、响应式、对话框、通知、加载状态等UI功能
 
 import { hideDownloadDropdown } from './actions';
-import { applyFilters, clearCustomSizeInputs, syncCustomSizeInputsFromSettings } from './filter';
+import {
+  applyFilters,
+  clearCustomSizeInputs,
+  clearFileSizeInputs,
+  syncCustomSizeInputsFromSettings,
+} from './filter';
 import { hideScanOverlay, showScanOverlay } from './scan';
 import { closeAllFilterDropdowns } from './settings';
 import { elements, state } from './state';
@@ -192,6 +197,41 @@ export function updateFilterButtonLabels(): void {
         .querySelectorAll('#color-swatches .color-swatch')
         .forEach((s) => s.classList.remove('active'));
       const allOpt = document.querySelector('[data-color-filter="all"]');
+      if (allOpt) allOpt.classList.add('active');
+      updateFilterButtonLabels();
+      applyFilters();
+    });
+  }
+
+  // File Size button
+  const fileSizeBtn = document.querySelector<HTMLElement>('.filter-btn[data-filter="filesize"]');
+  if (fileSizeBtn) {
+    const hasFileSizeFilter = state.activeFilters.fileSizeEnabled;
+    let label = t('filter_filesize');
+    if (hasFileSizeFilter) {
+      const preset = state.activeFilters.fileSizePreset;
+      if (preset && preset !== 'all' && preset !== 'custom') {
+        label = t(`filter_filesize_${preset}`);
+      } else {
+        const min = state.activeFilters.minFileSizeKB;
+        const max = state.activeFilters.maxFileSizeKB;
+        if (min > 0 && max < Infinity) {
+          label = `${min}-${max} KB`;
+        } else if (min > 0) {
+          label = `≥${min} KB`;
+        } else if (max < Infinity) {
+          label = `≤${max} KB`;
+        }
+      }
+    }
+    fileSizeBtn.textContent = label + '▾';
+    fileSizeBtn.classList.toggle('active', hasFileSizeFilter);
+    toggleClearBtn(fileSizeBtn, hasFileSizeFilter, () => {
+      clearFileSizeInputs();
+      document
+        .querySelectorAll('[data-filesize-filter]')
+        .forEach((o) => o.classList.remove('active'));
+      const allOpt = document.querySelector('[data-filesize-filter="all"]');
       if (allOpt) allOpt.classList.add('active');
       updateFilterButtonLabels();
       applyFilters();

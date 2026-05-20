@@ -5,10 +5,10 @@
 // shouldShowBanner() gate in shared/paywall-state.ts returns true. The
 // banner is non-blocking (no overlay), occupies its own row above the
 // toolbar, and offers two CTAs:
-//   - Primary  "Try Pro Free" — opens the upgrade modal where the trial
-//     CTA lives. We don't start the trial directly from here so users see
-//     the full Pro pitch before committing (even to a free trial).
-//   - Secondary "Maybe later"  — dismiss + start the cooldown window.
+//   - If trial-eligible: Primary "Try Pro Free" — opens the upgrade modal.
+//   - If trial-ineligible (already used trial): Primary "Upgrade Now" — opens
+//     the upgrade modal with purchase-focused messaging.
+//   - Secondary "Maybe later" — dismiss + start the cooldown window.
 //
 // The banner state (visible / hidden) lives in this component as a useState
 // hook because it's purely transient UI and never read by anyone else.
@@ -19,6 +19,7 @@ import { state } from '../state';
 import { track } from '../../shared/telemetry';
 import { EVENTS } from '../../shared/telemetry-events';
 import { t } from '../../shared/i18n';
+import { isTrialEligible } from '../../shared/trial';
 
 /**
  * Open the Pro upgrade modal. We DO NOT call markResolved() here — the
@@ -34,10 +35,12 @@ function openUpgradeModal(): void {
 
 export function SoftPaywallBanner() {
   const [visible, setVisible] = useState(false);
+  const [trialEligible, setTrialEligible] = useState(false);
 
-  // Decide visibility once per mount. The decision is async (chrome.storage
-  // round-trip) so we render hidden first and pop in afterward — visually
-  // identical to "no banner" for users who don't qualify.
+  // Decide visibility and trial eligibility once per mount. The decisions
+  // are async (chrome.storage round-trips) so we render hidden first and
+  // pop in afterward — visually identical to "no banner" for users who
+  // don't qualify.
   useEffect(() => {
     let cancelled = false;
     void (async () => {
@@ -48,6 +51,9 @@ export function SoftPaywallBanner() {
       if (state.isProUser) return;
       const ok = await shouldShowBanner();
       if (cancelled || !ok) return;
+      const eligible = await isTrialEligible();
+      if (cancelled) return;
+      setTrialEligible(eligible);
       await markShown();
       void track(EVENTS.SOFT_PAYWALL_SHOWN);
       setVisible(true);
@@ -76,10 +82,13 @@ export function SoftPaywallBanner() {
 
   if (!visible) return null;
 
+  const ctaKey = trialEligible ? 'paywall_banner_try_cta' : 'paywall_banner_upgrade_cta';
+  const descKey = trialEligible ? 'paywall_banner_desc' : 'paywall_banner_upgrade_desc';
+
   return (
     <div
       id="soft-paywall-banner"
-      class="soft-paywall-banner"
+      class={`soft-paywall-banner${trialEligible ? '' : ' soft-paywall-banner--upgrade'}`}
       role="region"
       aria-label="Pro upgrade suggestion"
     >
@@ -100,16 +109,16 @@ export function SoftPaywallBanner() {
       </div>
       <div class="soft-paywall-banner-text">
         <strong>{t('paywall_banner_title')}</strong>
-        <span>{t('paywall_banner_desc')}</span>
+        <span>{t(descKey)}</span>
       </div>
       <div class="soft-paywall-banner-actions">
         <button
           id="btn-soft-paywall-try"
           type="button"
-          class="btn btn-primary btn-sm"
+          class={`btn btn-primary btn-sm${trialEligible ? '' : ' btn-upgrade-cta'}`}
           onClick={handleTry}
         >
-          {t('paywall_banner_try_cta')}
+          {t(ctaKey)}
         </button>
         <button
           id="btn-soft-paywall-later"

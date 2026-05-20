@@ -21,6 +21,7 @@ import { MultitabModal } from './MultitabModal';
 import { ProUpgradeModal } from './ProUpgradeModal';
 import { PrivacyOptInModal } from './PrivacyOptInModal';
 import { SoftPaywallBanner } from './SoftPaywallBanner';
+import { TrialGraceBanner } from './TrialGraceBanner';
 import { BatchUrlCopyButton } from './BatchUrlCopyButton';
 import { RatingPromptModal } from './RatingPromptModal';
 import { SettingsModal } from './SettingsModal';
@@ -181,6 +182,7 @@ export function mountPreactComponents(): void {
   // it pops in, not below it. Falls back to a body append if the slot
   // is missing (popup variant or hot-reload race).
   mountSoftPaywallBanner();
+  mountTrialGraceBanner();
 
   // Batch URL copy button (Sprint 3.4). Renders into the
   // `#batch-url-copy-mount` slot in toolbar row 2. The slot is a
@@ -217,6 +219,21 @@ function mountSoftPaywallBanner(): void {
   mount.dataset.preactMount = 'soft-paywall-banner-mount';
   app.insertBefore(mount, app.firstChild);
   render(<SoftPaywallBanner />, mount);
+}
+
+function mountTrialGraceBanner(): void {
+  const slot = document.getElementById('trial-grace-banner-mount');
+  if (slot) {
+    render(<TrialGraceBanner />, slot);
+    return;
+  }
+  const app = document.getElementById('app');
+  if (!app) return;
+  const mount = document.createElement('div');
+  mount.id = 'trial-grace-banner-mount';
+  mount.dataset.preactMount = 'trial-grace-banner-mount';
+  app.insertBefore(mount, app.firstChild);
+  render(<TrialGraceBanner />, mount);
 }
 
 /**

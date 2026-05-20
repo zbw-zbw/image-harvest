@@ -125,6 +125,9 @@
   "pro_feature_blocked_collection": {
     "message": "コレクションは Pro 機能です"
   },
+  "pro_feature_blocked_image_delete": {
+    "message": "画像削除は Pro 機能です。アップグレードで解放!"
+  },
   "pro_feature_blocked_color_copy": {
     "message": "カラーコピーは Pro 機能です"
   },
@@ -169,6 +172,33 @@
   },
   "filter_color": {
     "message": "カラー"
+  },
+  "filter_filesize": {
+    "message": "ファイルサイズ"
+  },
+  "filter_filesize_all": {
+    "message": "すべてのサイズ"
+  },
+  "filter_filesize_tiny": {
+    "message": "極小 (<50 KB)"
+  },
+  "filter_filesize_small": {
+    "message": "小 (50-200 KB)"
+  },
+  "filter_filesize_medium": {
+    "message": "中 (200-500 KB)"
+  },
+  "filter_filesize_large": {
+    "message": "大 (500 KB-2 MB)"
+  },
+  "filter_filesize_xlarge": {
+    "message": "特大 (>2 MB)"
+  },
+  "filter_filesize_min": {
+    "message": "最小 KB"
+  },
+  "filter_filesize_max": {
+    "message": "最大 KB"
   },
   "filter_all": {
     "message": "すべて"
@@ -506,6 +536,18 @@
   "paywall_banner_try_cta": {
     "message": "Proを無料で試す"
   },
+  "paywall_banner_upgrade_cta": {
+    "message": "今すぐアップグレード"
+  },
+  "paywall_banner_upgrade_desc": {
+    "message": "試用期間が終了しました。すべてのPro機能を継続利用するにはアップグレードしてください。"
+  },
+  "pro_purchase_desc": {
+    "message": "無料試用期間が終了しました。Proにアップグレードして、一括ダウンロード、カラーフィルタリング、逆画像検索などの機能を引き続きご利用ください。"
+  },
+  "pro_purchase_cta": {
+    "message": "今すぐProを取得"
+  },
   "plan_expires_date": {
     "message": "有効期限：{date}"
   },
@@ -652,6 +694,12 @@
   },
   "pro_trial_unavailable": {
     "message": "トライアルは利用できません"
+  },
+  "trial_grace_message": {
+    "message": "トライアル期間が終了しました。Pro 機能はあと {days} 日間ご利用いただけます。アップグレードしてアクセスを維持しましょう。"
+  },
+  "trial_grace_upgrade_btn": {
+    "message": "今すぐアップグレード"
   },
   "progress_downloading": {
     "message": "ダウンロード中..."
@@ -970,5 +1018,53 @@
   },
   "license_error_activation_failed": {
     "message": "アクティベーションに失敗しました。もう一度お試しください。"
+  },
+  "pro_feature_blocked_dedup": {
+    "message": "重複除去はPro機能です。アップグレードで解放！"
+  },
+  "pro_feature_blocked_multitab": {
+    "message": "マルチタブ抽出はPro機能です。アップグレードで解放！"
+  },
+  "toast_no_duplicates_found": {
+    "message": "重複画像は見つかりませんでした"
+  },
+  "toast_duplicates_removed": {
+    "message": "{count}枚の重複画像を除去しました"
+  },
+  "confirm_remove_duplicates_title": {
+    "message": "重複画像を除去"
+  },
+  "confirm_remove_duplicates_message": {
+    "message": "{count}枚の選択された重複画像を除去しますか？"
+  },
+  "toast_select_at_least_one_tab": {
+    "message": "タブを1つ以上選択してください"
+  },
+  "toast_new_images_discovered": {
+    "message": "{count}枚の新しい画像を発見"
+  },
+  "toast_collection_empty": {
+    "message": "コレクションは空です"
+  },
+  "toast_exporting_collection": {
+    "message": "コレクションをエクスポート中..."
+  },
+  "toast_export_cancelled": {
+    "message": "エクスポートを中止しました"
+  },
+  "toast_collection_exported": {
+    "message": "コレクションをエクスポートしました"
+  },
+  "toast_collection_export_failed": {
+    "message": "エクスポートに失敗しました"
+  },
+  "toast_collection_load_failed": {
+    "message": "コレクションの読み込みに失敗しました"
+  },
+  "toast_multitab_failed_load": {
+    "message": "タブの読み込みに失敗しました"
+  },
+  "toast_refresh_retry": {
+    "message": "ページを更新して再試行してください"
   }
 }

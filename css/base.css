@@ -544,3 +544,42 @@
     flex-direction: column;
   }
 }
+
+/* ============================================
+   Trial Grace Period Banner
+   ============================================ */
+.trial-grace-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #fff3cd, #ffeeba);
+  border-bottom: 1px solid #ffc107;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.trial-grace-text {
+  color: #856404;
+  font-weight: 500;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.trial-grace-btn {
+  flex-shrink: 0;
+  font-size: 11px;
+  padding: 4px 10px;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .trial-grace-banner {
+    background: linear-gradient(135deg, #332b00, #3d3200);
+    border-bottom-color: #665200;
+  }
+  .trial-grace-text {
+    color: #ffd54f;
+  }
+}

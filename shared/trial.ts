@@ -42,6 +42,9 @@ const STORAGE_KEY_TRIAL_EXPIRED_REPORTED = '_trial_expired_reported';
 /** 7 days in milliseconds — kept as a literal to avoid an extra constants import. */
 export const TRIAL_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
 
+/** 3-day grace period after trial expiry — Pro features still work but a banner is shown. */
+export const TRIAL_GRACE_PERIOD_MS = 3 * 24 * 60 * 60 * 1000;
+
 export interface TrialStartResult {
   success: boolean;
   error?: string;
@@ -234,4 +237,28 @@ export async function getTrialState(): Promise<TrialSnapshot | null> {
     expiresAt: license.expiresAt,
     msRemaining,
   };
+}
+
+/**
+ * Check if the trial has expired but is within the 3-day grace period.
+ * During grace period, Pro features are still accessible but a banner urges upgrade.
+ */
+export async function isInTrialGracePeriod(): Promise<{
+  inGrace: boolean;
+  daysRemaining: number;
+}> {
+  const license = await getLicenseData();
+  if (!license || license.plan !== 'trial' || !license.expiresAt) {
+    return { inGrace: false, daysRemaining: 0 };
+  }
+  const now = Date.now();
+  if (license.expiresAt > now) {
+    return { inGrace: false, daysRemaining: 0 };
+  }
+  const elapsed = now - license.expiresAt;
+  if (elapsed <= TRIAL_GRACE_PERIOD_MS) {
+    const daysRemaining = Math.ceil((TRIAL_GRACE_PERIOD_MS - elapsed) / (24 * 60 * 60 * 1000));
+    return { inGrace: true, daysRemaining };
+  }
+  return { inGrace: false, daysRemaining: 0 };
 }

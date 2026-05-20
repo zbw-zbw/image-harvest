@@ -11,6 +11,9 @@ import type {
   LicenseValidationResult,
   ProUserInfo,
 } from './types';
+
+/** 3-day grace period after trial expiry (mirrors trial.ts constant). */
+const TRIAL_EXPIRY_GRACE_MS = 3 * 24 * 60 * 60 * 1000;
 import { track, setEnvelopeMeta, flushNow } from './telemetry';
 import { EVENTS } from './telemetry-events';
 
@@ -333,6 +336,24 @@ export async function isProUser(): Promise<ProUserInfo> {
     }
 
     // Server reachable AND said "not valid" → license really is expired.
+    // For trial licenses, allow a 3-day grace period where Pro features
+    // are still accessible but a banner urges the user to upgrade.
+    if (licenseData.plan === 'trial' && licenseData.expiresAt) {
+      const elapsed = Date.now() - licenseData.expiresAt;
+      if (elapsed >= 0 && elapsed <= TRIAL_EXPIRY_GRACE_MS) {
+        licenseData.status = LICENSE_STATUS.EXPIRED;
+        licenseData.lastVerified = Date.now();
+        await saveLicenseData(licenseData);
+        return {
+          isPro: true,
+          plan: licenseData.plan,
+          expiresAt: licenseData.expiresAt,
+          status: LICENSE_STATUS.EXPIRED,
+          inGracePeriod: true,
+        };
+      }
+    }
+
     // Persist so we don't keep re-asking the network on every check.
     licenseData.status = LICENSE_STATUS.EXPIRED;
     licenseData.lastVerified = Date.now();

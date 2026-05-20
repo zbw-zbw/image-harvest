@@ -125,6 +125,9 @@
   "pro_feature_blocked_collection": {
     "message": "收藏是 Pro 功能"
   },
+  "pro_feature_blocked_image_delete": {
+    "message": "移除图片是 Pro 功能,升级即可解锁!"
+  },
   "pro_feature_blocked_color_copy": {
     "message": "复制颜色是 Pro 功能"
   },
@@ -169,6 +172,33 @@
   },
   "filter_color": {
     "message": "颜色"
+  },
+  "filter_filesize": {
+    "message": "文件大小"
+  },
+  "filter_filesize_all": {
+    "message": "所有大小"
+  },
+  "filter_filesize_tiny": {
+    "message": "极小 (<50 KB)"
+  },
+  "filter_filesize_small": {
+    "message": "小 (50-200 KB)"
+  },
+  "filter_filesize_medium": {
+    "message": "中 (200-500 KB)"
+  },
+  "filter_filesize_large": {
+    "message": "大 (500 KB-2 MB)"
+  },
+  "filter_filesize_xlarge": {
+    "message": "特大 (>2 MB)"
+  },
+  "filter_filesize_min": {
+    "message": "最小 KB"
+  },
+  "filter_filesize_max": {
+    "message": "最大 KB"
   },
   "filter_all": {
     "message": "全部"
@@ -506,6 +536,18 @@
   "paywall_banner_try_cta": {
     "message": "免费试用 Pro"
   },
+  "paywall_banner_upgrade_cta": {
+    "message": "立即升级"
+  },
+  "paywall_banner_upgrade_desc": {
+    "message": "试用已结束，升级以继续使用所有 Pro 功能。"
+  },
+  "pro_purchase_desc": {
+    "message": "免费试用已结束，升级到 Pro 以继续使用批量下载、颜色筛选、以图搜图等功能。"
+  },
+  "pro_purchase_cta": {
+    "message": "立即获取 Pro"
+  },
   "plan_expires_date": {
     "message": "到期时间：{date}"
   },
@@ -652,6 +694,12 @@
   },
   "pro_trial_unavailable": {
     "message": "试用不可用"
+  },
+  "trial_grace_message": {
+    "message": "试用已到期，Pro 功能还可使用 {days} 天。升级以保持使用权限。"
+  },
+  "trial_grace_upgrade_btn": {
+    "message": "立即升级"
   },
   "progress_downloading": {
     "message": "下载中..."
@@ -970,5 +1018,53 @@
   },
   "license_error_activation_failed": {
     "message": "激活失败，请重试。"
+  },
+  "pro_feature_blocked_dedup": {
+    "message": "去重是Pro功能，升级后解锁！"
+  },
+  "pro_feature_blocked_multitab": {
+    "message": "多标签页提取是Pro功能，升级后解锁！"
+  },
+  "toast_no_duplicates_found": {
+    "message": "未找到重复图片"
+  },
+  "toast_duplicates_removed": {
+    "message": "已移除{count}张重复图片"
+  },
+  "confirm_remove_duplicates_title": {
+    "message": "移除重复图片"
+  },
+  "confirm_remove_duplicates_message": {
+    "message": "确定要移除{count}张选中的重复图片吗？"
+  },
+  "toast_select_at_least_one_tab": {
+    "message": "请至少选择一个标签页"
+  },
+  "toast_new_images_discovered": {
+    "message": "发现{count}张新图片"
+  },
+  "toast_collection_empty": {
+    "message": "收藏为空"
+  },
+  "toast_exporting_collection": {
+    "message": "正在导出收藏..."
+  },
+  "toast_export_cancelled": {
+    "message": "导出已取消"
+  },
+  "toast_collection_exported": {
+    "message": "收藏已导出"
+  },
+  "toast_collection_export_failed": {
+    "message": "导出失败"
+  },
+  "toast_collection_load_failed": {
+    "message": "加载收藏失败"
+  },
+  "toast_multitab_failed_load": {
+    "message": "加载标签页失败"
+  },
+  "toast_refresh_retry": {
+    "message": "刷新页面后重试"
   }
 }

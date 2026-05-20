@@ -22,7 +22,8 @@ export function applyFilters(): void {
       filterByUrl(img) &&
       filterByColor(img) &&
       filterBySettingsMinSize(img) &&
-      filterBySettingsMaxSize(img)
+      filterBySettingsMaxSize(img) &&
+      filterByFileSize(img)
     );
   });
 
@@ -202,6 +203,76 @@ export function filterBySettingsMinSize(img: ImageItem): boolean {
     w >= (state.activeFilters.customMinWidth || 0) &&
     h >= (state.activeFilters.customMinHeight || 0)
   );
+}
+
+export function filterByFileSize(img: ImageItem): boolean {
+  if (!state.activeFilters.fileSizeEnabled) return true;
+  const bytes = img.estimatedSize || 0;
+  const kb = bytes / 1024;
+  return kb >= state.activeFilters.minFileSizeKB && kb <= state.activeFilters.maxFileSizeKB;
+}
+
+export const FILESIZE_PRESETS: Record<string, { min: number; max: number }> = {
+  all: { min: 0, max: Infinity },
+  tiny: { min: 0, max: 50 },
+  small: { min: 50, max: 200 },
+  medium: { min: 200, max: 500 },
+  large: { min: 500, max: 2048 },
+  xlarge: { min: 2048, max: Infinity },
+};
+
+export function applyFileSizePreset(preset: string): void {
+  const range = FILESIZE_PRESETS[preset];
+  if (!range) return;
+  state.activeFilters.fileSizePreset = preset;
+  if (preset === 'all') {
+    state.activeFilters.fileSizeEnabled = false;
+    state.activeFilters.minFileSizeKB = 0;
+    state.activeFilters.maxFileSizeKB = Infinity;
+  } else {
+    state.activeFilters.fileSizeEnabled = true;
+    state.activeFilters.minFileSizeKB = range.min;
+    state.activeFilters.maxFileSizeKB = range.max;
+  }
+  const minInput = document.getElementById('filter-filesize-min') as HTMLInputElement | null;
+  const maxInput = document.getElementById('filter-filesize-max') as HTMLInputElement | null;
+  if (minInput) minInput.value = '';
+  if (maxInput) maxInput.value = '';
+  updateFilterButtonLabels();
+  applyFilters();
+}
+
+export function applyFileSizeInputs(): void {
+  const minInput = document.getElementById('filter-filesize-min') as HTMLInputElement | null;
+  const maxInput = document.getElementById('filter-filesize-max') as HTMLInputElement | null;
+  const minVal = minInput?.value ? parseFloat(minInput.value) : 0;
+  const maxVal = maxInput?.value ? parseFloat(maxInput.value) : Infinity;
+
+  const hasFilter = minVal > 0 || (maxVal > 0 && maxVal < Infinity);
+  state.activeFilters.fileSizeEnabled = hasFilter;
+  state.activeFilters.minFileSizeKB = minVal;
+  state.activeFilters.maxFileSizeKB = maxVal > 0 ? maxVal : Infinity;
+
+  if (hasFilter) {
+    state.activeFilters.fileSizePreset = 'custom';
+    document
+      .querySelectorAll('[data-filesize-filter]')
+      .forEach((o) => o.classList.remove('active'));
+  }
+
+  updateFilterButtonLabels();
+  applyFilters();
+}
+
+export function clearFileSizeInputs(): void {
+  const minInput = document.getElementById('filter-filesize-min') as HTMLInputElement | null;
+  const maxInput = document.getElementById('filter-filesize-max') as HTMLInputElement | null;
+  if (minInput) minInput.value = '';
+  if (maxInput) maxInput.value = '';
+  state.activeFilters.fileSizeEnabled = false;
+  state.activeFilters.fileSizePreset = 'all';
+  state.activeFilters.minFileSizeKB = 0;
+  state.activeFilters.maxFileSizeKB = Infinity;
 }
 
 export function filterBySettingsMaxSize(img: ImageItem): boolean {

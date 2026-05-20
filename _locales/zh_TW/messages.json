@@ -125,6 +125,9 @@
   "pro_feature_blocked_collection": {
     "message": "收藏是 Pro 功能"
   },
+  "pro_feature_blocked_image_delete": {
+    "message": "移除圖片是 Pro 功能,升級即可解鎖!"
+  },
   "pro_feature_blocked_color_copy": {
     "message": "複製顏色是 Pro 功能"
   },
@@ -169,6 +172,33 @@
   },
   "filter_color": {
     "message": "顏色"
+  },
+  "filter_filesize": {
+    "message": "檔案大小"
+  },
+  "filter_filesize_all": {
+    "message": "所有大小"
+  },
+  "filter_filesize_tiny": {
+    "message": "極小 (<50 KB)"
+  },
+  "filter_filesize_small": {
+    "message": "小 (50-200 KB)"
+  },
+  "filter_filesize_medium": {
+    "message": "中 (200-500 KB)"
+  },
+  "filter_filesize_large": {
+    "message": "大 (500 KB-2 MB)"
+  },
+  "filter_filesize_xlarge": {
+    "message": "特大 (>2 MB)"
+  },
+  "filter_filesize_min": {
+    "message": "最小 KB"
+  },
+  "filter_filesize_max": {
+    "message": "最大 KB"
   },
   "filter_all": {
     "message": "全部"
@@ -506,6 +536,18 @@
   "paywall_banner_try_cta": {
     "message": "免費試用 Pro"
   },
+  "paywall_banner_upgrade_cta": {
+    "message": "立即升級"
+  },
+  "paywall_banner_upgrade_desc": {
+    "message": "試用已結束，升級以繼續使用所有 Pro 功能。"
+  },
+  "pro_purchase_desc": {
+    "message": "免費試用已結束，升級到 Pro 以繼續使用批次下載、顏色篩選、以圖搜圖等功能。"
+  },
+  "pro_purchase_cta": {
+    "message": "立即取得 Pro"
+  },
   "plan_expires_date": {
     "message": "到期時間：{date}"
   },
@@ -652,6 +694,12 @@
   },
   "pro_trial_unavailable": {
     "message": "試用不可用"
+  },
+  "trial_grace_message": {
+    "message": "試用已到期，Pro 功能還可使用 {days} 天。升級以保持使用權限。"
+  },
+  "trial_grace_upgrade_btn": {
+    "message": "立即升級"
   },
   "progress_downloading": {
     "message": "下載中..."
@@ -970,5 +1018,53 @@
   },
   "license_error_activation_failed": {
     "message": "啟用失敗，請重試。"
+  },
+  "pro_feature_blocked_dedup": {
+    "message": "去重是Pro功能，升級後解鎖！"
+  },
+  "pro_feature_blocked_multitab": {
+    "message": "多分頁擷取是Pro功能，升級後解鎖！"
+  },
+  "toast_no_duplicates_found": {
+    "message": "未找到重複圖片"
+  },
+  "toast_duplicates_removed": {
+    "message": "已移除{count}張重複圖片"
+  },
+  "confirm_remove_duplicates_title": {
+    "message": "移除重複圖片"
+  },
+  "confirm_remove_duplicates_message": {
+    "message": "確定要移除{count}張選中的重複圖片嗎？"
+  },
+  "toast_select_at_least_one_tab": {
+    "message": "請至少選擇一個分頁"
+  },
+  "toast_new_images_discovered": {
+    "message": "發現{count}張新圖片"
+  },
+  "toast_collection_empty": {
+    "message": "收藏為空"
+  },
+  "toast_exporting_collection": {
+    "message": "正在匯出收藏..."
+  },
+  "toast_export_cancelled": {
+    "message": "匯出已取消"
+  },
+  "toast_collection_exported": {
+    "message": "收藏已匯出"
+  },
+  "toast_collection_export_failed": {
+    "message": "匯出失敗"
+  },
+  "toast_collection_load_failed": {
+    "message": "載入收藏失敗"
+  },
+  "toast_multitab_failed_load": {
+    "message": "載入分頁失敗"
+  },
+  "toast_refresh_retry": {
+    "message": "重新整理頁面後重試"
   }
 }

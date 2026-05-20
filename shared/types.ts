@@ -102,6 +102,7 @@ export interface ProUserInfo {
   plan?: string | null;
   expiresAt?: number | null;
   status: LicenseStatusValue;
+  inGracePeriod?: boolean;
 }
 
 // ── Collection (IndexedDB) ──────────────────────────────────────────────────

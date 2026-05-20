@@ -129,6 +129,9 @@
   "pro_feature_blocked_collection": {
     "message": "Collection is a Pro feature"
   },
+  "pro_feature_blocked_image_delete": {
+    "message": "Image removal is a Pro feature. Upgrade to unlock!"
+  },
   "pro_feature_blocked_color_copy": {
     "message": "Color copy is a Pro feature"
   },
@@ -179,6 +182,33 @@
   },
   "filter_color": {
     "message": "Color"
+  },
+  "filter_filesize": {
+    "message": "File Size"
+  },
+  "filter_filesize_all": {
+    "message": "All Sizes"
+  },
+  "filter_filesize_tiny": {
+    "message": "Tiny <50 KB"
+  },
+  "filter_filesize_small": {
+    "message": "Small 50-200 KB"
+  },
+  "filter_filesize_medium": {
+    "message": "Medium 200-500 KB"
+  },
+  "filter_filesize_large": {
+    "message": "Large 500 KB-2 MB"
+  },
+  "filter_filesize_xlarge": {
+    "message": "XL >2 MB"
+  },
+  "filter_filesize_min": {
+    "message": "Min KB"
+  },
+  "filter_filesize_max": {
+    "message": "Max KB"
   },
   "filter_all": {
     "message": "All"
@@ -534,6 +564,18 @@
   "paywall_banner_try_cta": {
     "message": "Try Pro Free"
   },
+  "paywall_banner_upgrade_cta": {
+    "message": "Upgrade Now"
+  },
+  "paywall_banner_upgrade_desc": {
+    "message": "Your trial has ended. Upgrade to keep all Pro features."
+  },
+  "pro_purchase_desc": {
+    "message": "Your free trial has ended. Upgrade to Pro to keep access to batch downloads, color filtering, reverse search, and more."
+  },
+  "pro_purchase_cta": {
+    "message": "Get Pro Now"
+  },
   "plan_expires_date": {
     "message": "Expires: {date}"
   },
@@ -680,6 +722,12 @@
   },
   "pro_trial_unavailable": {
     "message": "Trial not available"
+  },
+  "trial_grace_message": {
+    "message": "Your trial has expired. Pro features available for {days} more day(s). Upgrade to keep access."
+  },
+  "trial_grace_upgrade_btn": {
+    "message": "Upgrade Now"
   },
   "progress_downloading": {
     "message": "Downloading..."
@@ -974,5 +1022,56 @@
   },
   "license_error_activation_failed": {
     "message": "Activation failed. Please try again."
+  },
+  "pro_feature_blocked_dedup": {
+    "message": "Removing duplicates is a Pro feature. Upgrade to unlock!"
+  },
+  "pro_feature_blocked_multitab": {
+    "message": "Multi-Tab Extract is a Pro feature. Upgrade to unlock!"
+  },
+  "toast_no_duplicates_found": {
+    "message": "No duplicate images found"
+  },
+  "toast_duplicates_removed": {
+    "message": "Removed {count} duplicate images",
+    "description": "{count} = number of duplicate images removed"
+  },
+  "confirm_remove_duplicates_title": {
+    "message": "Remove Duplicates"
+  },
+  "confirm_remove_duplicates_message": {
+    "message": "Are you sure you want to remove {count} selected duplicate image(s)?",
+    "description": "{count} = number of images selected for removal"
+  },
+  "toast_select_at_least_one_tab": {
+    "message": "Select at least one tab"
+  },
+  "toast_new_images_discovered": {
+    "message": "{count} new images discovered",
+    "description": "{count} = number of new images found via live monitoring"
+  },
+  "toast_collection_empty": {
+    "message": "Collection is empty"
+  },
+  "toast_exporting_collection": {
+    "message": "Exporting collection..."
+  },
+  "toast_export_cancelled": {
+    "message": "Export cancelled"
+  },
+  "toast_collection_exported": {
+    "message": "Collection exported"
+  },
+  "toast_collection_export_failed": {
+    "message": "Export failed"
+  },
+  "toast_collection_load_failed": {
+    "message": "Failed to load collection"
+  },
+  "toast_multitab_failed_load": {
+    "message": "Failed to load tabs"
+  },
+  "toast_refresh_retry": {
+    "message": "Refresh the page and try again"
   }
 }
