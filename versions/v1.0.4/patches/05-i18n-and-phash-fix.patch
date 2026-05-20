@@ -1,0 +1,760 @@
+diff --git a/_locales/en/messages.json b/_locales/en/messages.json
+index 36a9354..e15d9b1 100644
+--- a/_locales/en/messages.json
++++ b/_locales/en/messages.json
+@@ -186,6 +186,24 @@
+   "filter_filesize": {
+     "message": "File Size"
+   },
++  "filter_filesize_all": {
++    "message": "All Sizes"
++  },
++  "filter_filesize_tiny": {
++    "message": "Tiny <50 KB"
++  },
++  "filter_filesize_small": {
++    "message": "Small 50-200 KB"
++  },
++  "filter_filesize_medium": {
++    "message": "Medium 200-500 KB"
++  },
++  "filter_filesize_large": {
++    "message": "Large 500 KB-2 MB"
++  },
++  "filter_filesize_xlarge": {
++    "message": "XL >2 MB"
++  },
+   "filter_filesize_min": {
+     "message": "Min KB"
+   },
+@@ -546,6 +564,18 @@
+   "paywall_banner_try_cta": {
+     "message": "Try Pro Free"
+   },
++  "paywall_banner_upgrade_cta": {
++    "message": "Upgrade Now"
++  },
++  "paywall_banner_upgrade_desc": {
++    "message": "Your trial has ended. Upgrade to keep all Pro features."
++  },
++  "pro_purchase_desc": {
++    "message": "Your free trial has ended. Upgrade to Pro to keep access to batch downloads, color filtering, reverse search, and more."
++  },
++  "pro_purchase_cta": {
++    "message": "Get Pro Now"
++  },
+   "plan_expires_date": {
+     "message": "Expires: {date}"
+   },
+@@ -992,5 +1022,56 @@
+   },
+   "license_error_activation_failed": {
+     "message": "Activation failed. Please try again."
++  },
++  "pro_feature_blocked_dedup": {
++    "message": "Removing duplicates is a Pro feature. Upgrade to unlock!"
++  },
++  "pro_feature_blocked_multitab": {
++    "message": "Multi-Tab Extract is a Pro feature. Upgrade to unlock!"
++  },
++  "toast_no_duplicates_found": {
++    "message": "No duplicate images found"
++  },
++  "toast_duplicates_removed": {
++    "message": "Removed {count} duplicate images",
++    "description": "{count} = number of duplicate images removed"
++  },
++  "confirm_remove_duplicates_title": {
++    "message": "Remove Duplicates"
++  },
++  "confirm_remove_duplicates_message": {
++    "message": "Are you sure you want to remove {count} selected duplicate image(s)?",
++    "description": "{count} = number of images selected for removal"
++  },
++  "toast_select_at_least_one_tab": {
++    "message": "Select at least one tab"
++  },
++  "toast_new_images_discovered": {
++    "message": "{count} new images discovered",
++    "description": "{count} = number of new images found via live monitoring"
++  },
++  "toast_collection_empty": {
++    "message": "Collection is empty"
++  },
++  "toast_exporting_collection": {
++    "message": "Exporting collection..."
++  },
++  "toast_export_cancelled": {
++    "message": "Export cancelled"
++  },
++  "toast_collection_exported": {
++    "message": "Collection exported"
++  },
++  "toast_collection_export_failed": {
++    "message": "Export failed"
++  },
++  "toast_collection_load_failed": {
++    "message": "Failed to load collection"
++  },
++  "toast_multitab_failed_load": {
++    "message": "Failed to load tabs"
++  },
++  "toast_refresh_retry": {
++    "message": "Refresh the page and try again"
+   }
+ }
+diff --git a/_locales/ja/messages.json b/_locales/ja/messages.json
+index 950e6e6..febc376 100644
+--- a/_locales/ja/messages.json
++++ b/_locales/ja/messages.json
+@@ -176,6 +176,24 @@
+   "filter_filesize": {
+     "message": "ファイルサイズ"
+   },
++  "filter_filesize_all": {
++    "message": "すべてのサイズ"
++  },
++  "filter_filesize_tiny": {
++    "message": "極小 <50 KB"
++  },
++  "filter_filesize_small": {
++    "message": "小 50-200 KB"
++  },
++  "filter_filesize_medium": {
++    "message": "中 200-500 KB"
++  },
++  "filter_filesize_large": {
++    "message": "大 500 KB-2 MB"
++  },
++  "filter_filesize_xlarge": {
++    "message": "特大 >2 MB"
++  },
+   "filter_filesize_min": {
+     "message": "最小 KB"
+   },
+@@ -518,6 +536,18 @@
+   "paywall_banner_try_cta": {
+     "message": "Proを無料で試す"
+   },
++  "paywall_banner_upgrade_cta": {
++    "message": "今すぐアップグレード"
++  },
++  "paywall_banner_upgrade_desc": {
++    "message": "試用期間が終了しました。アップグレードして全Pro機能を維持。"
++  },
++  "pro_purchase_desc": {
++    "message": "無料試用期間が終了しました。Proにアップグレードして、一括ダウンロード、カラーフィルター、逆画像検索などの機能を引き続きご利用ください。"
++  },
++  "pro_purchase_cta": {
++    "message": "Proを購入"
++  },
+   "plan_expires_date": {
+     "message": "有効期限：{date}"
+   },
+@@ -988,5 +1018,53 @@
+   },
+   "license_error_activation_failed": {
+     "message": "アクティベーションに失敗しました。もう一度お試しください。"
++  },
++  "pro_feature_blocked_dedup": {
++    "message": "重複除去はPro機能です。アップグレードで解放！"
++  },
++  "pro_feature_blocked_multitab": {
++    "message": "マルチタブ抽出はPro機能です。アップグレードで解放！"
++  },
++  "toast_no_duplicates_found": {
++    "message": "重複画像は見つかりませんでした"
++  },
++  "toast_duplicates_removed": {
++    "message": "{count}枚の重複画像を除去しました"
++  },
++  "confirm_remove_duplicates_title": {
++    "message": "重複画像を除去"
++  },
++  "confirm_remove_duplicates_message": {
++    "message": "{count}枚の選択された重複画像を除去しますか？"
++  },
++  "toast_select_at_least_one_tab": {
++    "message": "タブを1つ以上選択してください"
++  },
++  "toast_new_images_discovered": {
++    "message": "{count}枚の新しい画像を発見"
++  },
++  "toast_collection_empty": {
++    "message": "コレクションは空です"
++  },
++  "toast_exporting_collection": {
++    "message": "コレクションをエクスポート中..."
++  },
++  "toast_export_cancelled": {
++    "message": "エクスポートを中止しました"
++  },
++  "toast_collection_exported": {
++    "message": "コレクションをエクスポートしました"
++  },
++  "toast_collection_export_failed": {
++    "message": "エクスポートに失敗しました"
++  },
++  "toast_collection_load_failed": {
++    "message": "コレクションの読み込みに失敗しました"
++  },
++  "toast_multitab_failed_load": {
++    "message": "タブの読み込みに失敗しました"
++  },
++  "toast_refresh_retry": {
++    "message": "ページを更新して再試行してください"
+   }
+ }
+diff --git a/_locales/zh_CN/messages.json b/_locales/zh_CN/messages.json
+index 73d186c..e8956e8 100644
+--- a/_locales/zh_CN/messages.json
++++ b/_locales/zh_CN/messages.json
+@@ -176,6 +176,24 @@
+   "filter_filesize": {
+     "message": "文件大小"
+   },
++  "filter_filesize_all": {
++    "message": "所有大小"
++  },
++  "filter_filesize_tiny": {
++    "message": "极小 <50 KB"
++  },
++  "filter_filesize_small": {
++    "message": "小 50-200 KB"
++  },
++  "filter_filesize_medium": {
++    "message": "中 200-500 KB"
++  },
++  "filter_filesize_large": {
++    "message": "大 500 KB-2 MB"
++  },
++  "filter_filesize_xlarge": {
++    "message": "特大 >2 MB"
++  },
+   "filter_filesize_min": {
+     "message": "最小 KB"
+   },
+@@ -518,6 +536,18 @@
+   "paywall_banner_try_cta": {
+     "message": "免费试用 Pro"
+   },
++  "paywall_banner_upgrade_cta": {
++    "message": "立即升级"
++  },
++  "paywall_banner_upgrade_desc": {
++    "message": "试用已结束。升级以保留所有 Pro 功能。"
++  },
++  "pro_purchase_desc": {
++    "message": "免费试用已结束。升级 Pro 以继续使用批量下载、颜色筛选、以图搜图等功能。"
++  },
++  "pro_purchase_cta": {
++    "message": "立即购买 Pro"
++  },
+   "plan_expires_date": {
+     "message": "到期时间：{date}"
+   },
+@@ -988,5 +1018,53 @@
+   },
+   "license_error_activation_failed": {
+     "message": "激活失败，请重试。"
++  },
++  "pro_feature_blocked_dedup": {
++    "message": "去重是Pro功能，升级后解锁！"
++  },
++  "pro_feature_blocked_multitab": {
++    "message": "多标签页提取是Pro功能，升级后解锁！"
++  },
++  "toast_no_duplicates_found": {
++    "message": "未找到重复图片"
++  },
++  "toast_duplicates_removed": {
++    "message": "已移除{count}张重复图片"
++  },
++  "confirm_remove_duplicates_title": {
++    "message": "移除重复图片"
++  },
++  "confirm_remove_duplicates_message": {
++    "message": "确定要移除{count}张选中的重复图片吗？"
++  },
++  "toast_select_at_least_one_tab": {
++    "message": "请至少选择一个标签页"
++  },
++  "toast_new_images_discovered": {
++    "message": "发现{count}张新图片"
++  },
++  "toast_collection_empty": {
++    "message": "收藏为空"
++  },
++  "toast_exporting_collection": {
++    "message": "正在导出收藏..."
++  },
++  "toast_export_cancelled": {
++    "message": "导出已取消"
++  },
++  "toast_collection_exported": {
++    "message": "收藏已导出"
++  },
++  "toast_collection_export_failed": {
++    "message": "导出失败"
++  },
++  "toast_collection_load_failed": {
++    "message": "加载收藏失败"
++  },
++  "toast_multitab_failed_load": {
++    "message": "加载标签页失败"
++  },
++  "toast_refresh_retry": {
++    "message": "刷新页面后重试"
+   }
+ }
+diff --git a/_locales/zh_TW/messages.json b/_locales/zh_TW/messages.json
+index 79a246b..b569196 100644
+--- a/_locales/zh_TW/messages.json
++++ b/_locales/zh_TW/messages.json
+@@ -176,6 +176,24 @@
+   "filter_filesize": {
+     "message": "檔案大小"
+   },
++  "filter_filesize_all": {
++    "message": "所有大小"
++  },
++  "filter_filesize_tiny": {
++    "message": "極小 <50 KB"
++  },
++  "filter_filesize_small": {
++    "message": "小 50-200 KB"
++  },
++  "filter_filesize_medium": {
++    "message": "中 200-500 KB"
++  },
++  "filter_filesize_large": {
++    "message": "大 500 KB-2 MB"
++  },
++  "filter_filesize_xlarge": {
++    "message": "特大 >2 MB"
++  },
+   "filter_filesize_min": {
+     "message": "最小 KB"
+   },
+@@ -518,6 +536,18 @@
+   "paywall_banner_try_cta": {
+     "message": "免費試用 Pro"
+   },
++  "paywall_banner_upgrade_cta": {
++    "message": "立即升級"
++  },
++  "paywall_banner_upgrade_desc": {
++    "message": "試用已結束。升級以保留所有 Pro 功能。"
++  },
++  "pro_purchase_desc": {
++    "message": "免費試用已結束。升級 Pro 以繼續使用批量下載、顏色篩選、以圖搜圖等功能。"
++  },
++  "pro_purchase_cta": {
++    "message": "立即購買 Pro"
++  },
+   "plan_expires_date": {
+     "message": "到期時間：{date}"
+   },
+@@ -988,5 +1018,53 @@
+   },
+   "license_error_activation_failed": {
+     "message": "啟用失敗，請重試。"
++  },
++  "pro_feature_blocked_dedup": {
++    "message": "去重是Pro功能，升級後解鎖！"
++  },
++  "pro_feature_blocked_multitab": {
++    "message": "多分頁擷取是Pro功能，升級後解鎖！"
++  },
++  "toast_no_duplicates_found": {
++    "message": "未找到重複圖片"
++  },
++  "toast_duplicates_removed": {
++    "message": "已移除{count}張重複圖片"
++  },
++  "confirm_remove_duplicates_title": {
++    "message": "移除重複圖片"
++  },
++  "confirm_remove_duplicates_message": {
++    "message": "確定要移除{count}張選中的重複圖片嗎？"
++  },
++  "toast_select_at_least_one_tab": {
++    "message": "請至少選擇一個分頁"
++  },
++  "toast_new_images_discovered": {
++    "message": "發現{count}張新圖片"
++  },
++  "toast_collection_empty": {
++    "message": "收藏為空"
++  },
++  "toast_exporting_collection": {
++    "message": "正在匯出收藏..."
++  },
++  "toast_export_cancelled": {
++    "message": "匯出已取消"
++  },
++  "toast_collection_exported": {
++    "message": "收藏已匯出"
++  },
++  "toast_collection_export_failed": {
++    "message": "匯出失敗"
++  },
++  "toast_collection_load_failed": {
++    "message": "載入收藏失敗"
++  },
++  "toast_multitab_failed_load": {
++    "message": "載入分頁失敗"
++  },
++  "toast_refresh_retry": {
++    "message": "重新整理頁面後重試"
+   }
+ }
+diff --git a/background/index.ts b/background/index.ts
+index 3aba287..12e8fb5 100644
+--- a/background/index.ts
++++ b/background/index.ts
+@@ -18,6 +18,7 @@ import { initLicenseAlarm } from './license';
+ import { initDisplayMode, initTabActivationListener } from './display-mode';
+ import { getImagesFromTab, processMultiTabExtract } from './extractor';
+ import { fetchImageData, reverseSearchUpload } from './reverse-search';
++import { isAllowedFetchUrl } from '../shared/url-validator';
+ 
+ // ── Initialization ──────────────────────────────────────────────────────────
+ 
+@@ -338,12 +339,13 @@ async function handleMessage(
+         break;
+ 
+       case MESSAGE_TYPES.FETCH_IMAGE_DATA: {
+-        if (!sender.tab) {
+-          sendResponse({ success: false, error: 'Unauthorized: no sender tab' });
++        const url = message.url as string;
++        if (!isAllowedFetchUrl(url)) {
++          sendResponse({ success: false, error: 'Blocked: URL not allowed for fetch' });
+           break;
+         }
+         try {
+-          const dataUrl = await fetchImageData(message.url as string);
++          const dataUrl = await fetchImageData(url);
+           sendResponse({ success: true, dataUrl });
+         } catch (error) {
+           sendResponse({ success: false, error: (error as Error).message });
+diff --git a/sidepanel/collection-ui.ts b/sidepanel/collection-ui.ts
+index 724098b..2b860ef 100644
+--- a/sidepanel/collection-ui.ts
++++ b/sidepanel/collection-ui.ts
+@@ -93,13 +93,13 @@ export async function loadCollection(searchQuery = ''): Promise<void> {
+                 ${fileSize ? `<span class="card-tag filesize">${fileSize}</span>` : ''}
+               </div>
+               <div class="card-actions">
+-                <button class="card-action-btn btn-search-collection" title="Reverse search" data-url="${item.url}">
++                <button class="card-action-btn btn-search-collection" title="${t('menu_reverse_search')}" data-url="${item.url}">
+                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+                 </button>
+                 <button class="card-action-btn btn-dl-collection" data-url="${item.url}" data-format="${item.format || ''}" title="Download">
+                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                 </button>
+-                <button class="card-action-btn btn-remove-collection" data-id="${item.id}" title="Remove from collection">
++                <button class="card-action-btn btn-remove-collection" data-id="${item.id}" title="${t('card_remove_from_collection')}">
+                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
+                 </button>
+               </div>
+@@ -107,10 +107,10 @@ export async function loadCollection(searchQuery = ''): Promise<void> {
+             <div class="card-url-row">
+               <div class="card-url" title="${item.url}">${item.url}</div>
+               <div class="card-url-actions">
+-                <button class="card-action-btn btn-copy-collection" data-url="${item.url}" title="Copy URL">
++                <button class="card-action-btn btn-copy-collection" data-url="${item.url}" title="${t('card_copy_url')}">
+                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                 </button>
+-                <button class="card-action-btn btn-open-collection" data-url="${item.url}" title="Open in new tab">
++                <button class="card-action-btn btn-open-collection" data-url="${item.url}" title="${t('card_open_in_new_tab')}">
+                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+                 </button>
+               </div>
+@@ -153,9 +153,9 @@ export async function loadCollection(searchQuery = ''): Promise<void> {
+         e.stopPropagation();
+         try {
+           await navigator.clipboard.writeText(btn.dataset.url!);
+-          showToast('URL copied', 'success');
++          showToast(t('toast_url_copied_single'), 'success');
+         } catch {
+-          showToast('Failed to copy URL', 'error');
++          showToast(t('toast_url_copy_failed'), 'error');
+         }
+       });
+     });
+@@ -195,7 +195,7 @@ export async function loadCollection(searchQuery = ''): Promise<void> {
+     elements.collectionBody.innerHTML = `
+       <div class="collection-empty">
+         <div class="collection-empty-icon"><svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg></div>
+-        <p>Failed to load collection</p>
++        <p>${t('toast_collection_load_failed')}</p>
+       </div>`;
+   }
+ }
+@@ -209,13 +209,13 @@ export async function exportCollection(): Promise<void> {
+     const items: CollectionItem[] = await collectionGetAll();
+ 
+     if (items.length === 0) {
+-      showToast('Collection is empty', 'info');
++      showToast(t('toast_collection_empty'), 'info');
+       return;
+     }
+ 
+-    showProgress('Exporting collection...', () => {
++    showProgress(t('toast_exporting_collection'), () => {
+       aborted = true;
+-      showToast('Export cancelled', 'info');
++      showToast(t('toast_export_cancelled'), 'info');
+     });
+ 
+     const { default: JSZip } = (await import('jszip')) as { default: typeof JSZipType };
+@@ -249,9 +249,9 @@ export async function exportCollection(): Promise<void> {
+       saveAs: false,
+     });
+     URL.revokeObjectURL(blobUrl);
+-    showToast('Collection exported', 'success');
++    showToast(t('toast_collection_exported'), 'success');
+   } catch {
+-    if (!aborted) showToast('Export failed', 'error');
++    if (!aborted) showToast(t('toast_collection_export_failed'), 'error');
+   } finally {
+     hideProgress();
+   }
+diff --git a/sidepanel/dedup-ui.ts b/sidepanel/dedup-ui.ts
+index 712111a..e5d8106 100644
+--- a/sidepanel/dedup-ui.ts
++++ b/sidepanel/dedup-ui.ts
+@@ -78,7 +78,7 @@ function populateDedupBody(): void {
+ export async function removeDuplicates(): Promise<void> {
+   if (!state.isProUser) {
+     closeDedupModal();
+-    showToast('Removing duplicates is a Pro feature. Upgrade to unlock!', 'warning');
++    showToast(t('pro_feature_blocked_dedup'), 'warning');
+     showProUpgradeModal();
+     return;
+   }
+@@ -103,15 +103,15 @@ export async function removeDuplicates(): Promise<void> {
+   }
+ 
+   if (toRemove.size === 0) {
+-    showToast('No duplicate images found', 'info');
++    showToast(t('toast_no_duplicates_found'), 'info');
+     return;
+   }
+ 
+   const confirmed = await showConfirmDialog({
+-    title: 'Remove Duplicates',
+-    message: `Are you sure you want to remove ${toRemove.size} selected duplicate image${toRemove.size > 1 ? 's' : ''}?`,
+-    confirmText: 'Remove',
+-    cancelText: 'Cancel',
++    title: t('confirm_remove_duplicates_title'),
++    message: t('confirm_remove_duplicates_message', { count: toRemove.size }),
++    confirmText: t('common_remove'),
++    cancelText: t('common_cancel'),
+     type: 'danger',
+   });
+   if (!confirmed) return;
+@@ -122,5 +122,5 @@ export async function removeDuplicates(): Promise<void> {
+   closeDedupModal();
+   applyFilters();
+   detectSimilarImages();
+-  showToast(`Removed ${toRemove.size} duplicate images`, 'success');
++  showToast(t('toast_duplicates_removed', { count: toRemove.size }), 'success');
+ }
+diff --git a/sidepanel/init.ts b/sidepanel/init.ts
+index f42b754..89a4410 100644
+--- a/sidepanel/init.ts
++++ b/sidepanel/init.ts
+@@ -23,6 +23,7 @@ import {
+ import {
+   applyCustomSizeInputs,
+   applyFileSizeInputs,
++  applyFileSizePreset,
+   applyFilters,
+   clearCustomSizeInputs,
+   syncCustomSizeInputsFromSettings,
+@@ -1143,8 +1144,21 @@ function bindEvents(): void {
+     const debouncedFileSize = debounce(() => applyFileSizeInputs(), 400);
+     fileSizeMinInput?.addEventListener('input', debouncedFileSize);
+     fileSizeMaxInput?.addEventListener('input', debouncedFileSize);
++    fileSizeMinInput?.addEventListener('click', (e) => e.stopPropagation());
++    fileSizeMaxInput?.addEventListener('click', (e) => e.stopPropagation());
+   }
+ 
++  // File size preset options
++  document.querySelectorAll<HTMLElement>('[data-filesize-filter]').forEach((opt) => {
++    opt.addEventListener('click', () => {
++      const preset = opt.dataset.filesizeFilter || 'all';
++      document.querySelectorAll('[data-filesize-filter]').forEach((o) => o.classList.remove('active'));
++      opt.classList.add('active');
++      applyFileSizePreset(preset);
++      closeAllFilterDropdowns();
++    });
++  });
++
+   // Color filter - "All Colors" option
+   document.querySelectorAll<HTMLElement>('[data-color-filter]').forEach((opt) => {
+     opt.addEventListener('click', (e) => {
+@@ -1281,7 +1295,7 @@ function bindEvents(): void {
+       if (checked.length > 0) {
+         startMultiTabExtract(checked);
+       } else {
+-        showToast('Select at least one tab', 'error');
++        showToast(t('toast_select_at_least_one_tab'), 'error');
+       }
+     });
+   }
+@@ -1355,7 +1369,7 @@ function bindEvents(): void {
+   if (resetBtn) {
+     resetBtn.addEventListener('click', () => {
+       const resetBtnLabel = resetBtn.querySelector('span');
+-      if (resetBtnLabel && resetBtnLabel.textContent?.trim() === 'Rescan Images') {
++      if (resetBtnLabel && resetBtnLabel.textContent?.trim() === t('empty_rescan_images')) {
+         // Force reset isFetching so a new scan can start
+         state.isFetching = false;
+         loadCurrentTab(true, state.currentTabId ?? undefined);
+@@ -1378,6 +1392,7 @@ function bindEvents(): void {
+         customMaxWidth: state.appSettings.maxWidth ?? 8000,
+         customMaxHeight: state.appSettings.maxHeight ?? 8000,
+         fileSizeEnabled: false,
++        fileSizePreset: 'all',
+         minFileSizeKB: 0,
+         maxFileSizeKB: Infinity,
+       };
+@@ -1393,11 +1408,16 @@ function bindEvents(): void {
+         cb.checked = true;
+       });
+       document.querySelectorAll('[data-size-filter]').forEach((o) => o.classList.remove('active'));
++      document
++        .querySelectorAll('[data-filesize-filter]')
++        .forEach((o) => o.classList.remove('active'));
+       document
+         .querySelectorAll('[data-layout-filter]')
+         .forEach((o) => o.classList.remove('active'));
+       const defaultSizeOption = document.querySelector('[data-size-filter="all"]');
+       if (defaultSizeOption) defaultSizeOption.classList.add('active');
++      const defaultFileSizeOption = document.querySelector('[data-filesize-filter="all"]');
++      if (defaultFileSizeOption) defaultFileSizeOption.classList.add('active');
+       const defaultLayoutOption = document.querySelector('[data-layout-filter="all"]');
+       if (defaultLayoutOption) defaultLayoutOption.classList.add('active');
+       document
+diff --git a/sidepanel/message.ts b/sidepanel/message.ts
+index be8692e..f600344 100644
+--- a/sidepanel/message.ts
++++ b/sidepanel/message.ts
+@@ -31,7 +31,7 @@ export function showDiscoveredToastDebounced(addedCount: number): void {
+   if (discoveredToastTimer) clearTimeout(discoveredToastTimer);
+   discoveredToastTimer = setTimeout(() => {
+     if (discoveredToastCount > 0) {
+-      showToast(`${discoveredToastCount} new images discovered`, 'info');
++      showToast(t('toast_new_images_discovered', { count: discoveredToastCount }), 'info');
+       discoveredToastCount = 0;
+     }
+     discoveredToastTimer = null;
+@@ -198,12 +198,12 @@ export function handleMessage(message: IncomingMessage): void {
+ 
+     case MESSAGE_TYPES.DOWNLOAD_COMPLETE:
+       hideProgress();
+-      showToast(`Downloaded ${message.count} images`, 'success');
++      showToast(t('toast_download_completed', { count: message.count ?? 0 }), 'success');
+       break;
+ 
+     case MESSAGE_TYPES.DOWNLOAD_ERROR:
+       hideProgress();
+-      showToast('Download failed: ' + (message.error || 'Unknown error'), 'error');
++      showToast(t('toast_download_failed') + (message.error ? ': ' + message.error : ''), 'error');
+       break;
+ 
+     case MESSAGE_TYPES.CLEAR_SELECTION:
+@@ -248,17 +248,17 @@ export function handleMessage(message: IncomingMessage): void {
+ 
+         applyFilters();
+         closeMultiTabModal();
+-        showToast(`Extracted ${newImages.length} images from ${message.tabCount} tabs`, 'success');
++        showToast(t('toast_extraction_success', { images: newImages.length, tabs: message.tabCount ?? 0 }), 'success');
+ 
+         processImageExtras(newImages);
+       } else {
+-        showToast('Extraction failed', 'error');
++        showToast(t('toast_extraction_failed'), 'error');
+       }
+       break;
+ 
+     case MESSAGE_TYPES.MULTI_TAB_EXTRACT_ERROR:
+       hideProgress();
+-      showToast('Multi-tab extraction failed: ' + (message.error || 'Unknown error'), 'error');
++      showToast(t('toast_multitab_failed') + (message.error ? ': ' + message.error : ''), 'error');
+       break;
+   }
+ }
+diff --git a/sidepanel/multitab.ts b/sidepanel/multitab.ts
+index c0f8834..4bc2ec3 100644
+--- a/sidepanel/multitab.ts
++++ b/sidepanel/multitab.ts
+@@ -118,7 +118,7 @@ export async function loadTabList(): Promise<void> {
+ 
+     updateMultitabSelectAllState();
+   } catch {
+-    elements.multitabList.innerHTML = '<p class="empty-message">Failed to load tabs</p>';
++    elements.multitabList.innerHTML = `<p class="empty-message">${t('toast_multitab_failed_load')}</p>`;
+   }
+ }
+ 
+diff --git a/sidepanel/scan.ts b/sidepanel/scan.ts
+index 2425818..675b7f3 100644
+--- a/sidepanel/scan.ts
++++ b/sidepanel/scan.ts
+@@ -528,7 +528,7 @@ export async function fetchImages(targetTabId?: number): Promise<void> {
+     console.error('Fetch images error:', error);
+     hideLoading();
+     const msg = error instanceof Error ? error.message : String(error);
+-    showError('FETCH_ERROR', msg, 'Refresh the page and try again');
++    showError('FETCH_ERROR', msg, t('toast_refresh_retry'));
+   }
+   state.isFetching = false;
+ }
+@@ -626,7 +626,13 @@ export async function processImageExtras(images: ImageItem[]): Promise<void> {
+ 
+     const batch = imagesToProcess.slice(i, i + batchSize);
+     const batchPromises = batch.map(async (img) => {
+-      const dataUrl = await fetchImageDataUrl(img.url);
++      // For data: URLs, use them directly — they don't need background
++      // proxying (calculatePHash and extractColorsFromUrl handle them
++      // natively). http/https URLs must go through the background SW to
++      // bypass CORS.
++      const dataUrl = img.url.startsWith('data:')
++        ? img.url
++        : await fetchImageDataUrl(img.url);
+       if (!dataUrl) return;
+ 
+       const extraPromises: Array<Promise<unknown>> = [];
+diff --git a/sidepanel/settings.ts b/sidepanel/settings.ts
+index 4752525..d8717ff 100644
+--- a/sidepanel/settings.ts
++++ b/sidepanel/settings.ts
+@@ -675,11 +675,11 @@ export function bindProGuards(): void {
+ 
+   // ---- Pro feature click interception → open upgrade modal ----
+   // Pro feature buttons: open upgrade modal + toast
+-  const proLockedButtons: Array<{ id: string; label: string }> = [
+-    { id: 'btn-collection', label: 'Collection' },
+-    { id: 'btn-multitab', label: 'Multi-Tab Extract' },
++  const proLockedButtons: Array<{ id: string; i18nKey: string }> = [
++    { id: 'btn-collection', i18nKey: 'pro_feature_blocked_collection' },
++    { id: 'btn-multitab', i18nKey: 'pro_feature_blocked_multitab' },
+   ];
+-  proLockedButtons.forEach(({ id, label }) => {
++  proLockedButtons.forEach(({ id, i18nKey }) => {
+     const btn = document.getElementById(id);
+     if (!btn) return;
+     btn.addEventListener(
+@@ -688,7 +688,7 @@ export function bindProGuards(): void {
+         if (!state.isProUser) {
+           e.stopImmediatePropagation();
+           e.preventDefault();
+-          showToast(`${label} is a Pro feature. Upgrade to unlock!`, 'warning');
++          showToast(t(i18nKey), 'warning');
+           // Telemetry: emit BEFORE showProUpgradeModal so the dashboard
+           // can answer "which feature drives the most upsells".
+           // Map id → stable feature key (do not use display label; that

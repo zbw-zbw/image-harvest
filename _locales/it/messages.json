@@ -125,6 +125,9 @@
   "pro_feature_blocked_collection": {
     "message": "La raccolta è una funzione Pro"
   },
+  "pro_feature_blocked_image_delete": {
+    "message": "La rimozione delle immagini è una funzione Pro. Aggiorna per sbloccarla!"
+  },
   "pro_feature_blocked_color_copy": {
     "message": "La copia del colore è una funzione Pro"
   },

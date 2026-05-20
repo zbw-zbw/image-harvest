@@ -300,7 +300,7 @@ describe('loadCollection', () => {
     await new Promise((r) => setTimeout(r, 0));
 
     expect(clipWrite).toHaveBeenCalledWith('https://x.com/a.png');
-    expect(ui.showToast).toHaveBeenCalledWith('URL copied', 'success');
+    expect(ui.showToast).toHaveBeenCalledWith('URL copied!', 'success');
   });
 
   it('copy button: clipboard rejection → error toast (not silently swallowed)', async () => {

@@ -1,0 +1,2203 @@
+diff --git a/_locales/en/messages.json b/_locales/en/messages.json
+index 36a9354..6896ff6 100644
+--- a/_locales/en/messages.json
++++ b/_locales/en/messages.json
+@@ -186,6 +186,24 @@
+   "filter_filesize": {
+     "message": "File Size"
+   },
++  "filter_filesize_all": {
++    "message": "All Sizes"
++  },
++  "filter_filesize_tiny": {
++    "message": "Tiny <50 KB"
++  },
++  "filter_filesize_small": {
++    "message": "Small 50-200 KB"
++  },
++  "filter_filesize_medium": {
++    "message": "Medium 200-500 KB"
++  },
++  "filter_filesize_large": {
++    "message": "Large 500 KB-2 MB"
++  },
++  "filter_filesize_xlarge": {
++    "message": "XL >2 MB"
++  },
+   "filter_filesize_min": {
+     "message": "Min KB"
+   },
+@@ -546,6 +564,18 @@
+   "paywall_banner_try_cta": {
+     "message": "Try Pro Free"
+   },
++  "paywall_banner_upgrade_cta": {
++    "message": "Upgrade Now"
++  },
++  "paywall_banner_upgrade_desc": {
++    "message": "Your trial has ended. Upgrade to keep all Pro features."
++  },
++  "pro_purchase_desc": {
++    "message": "Your free trial has ended. Upgrade to Pro to keep access to batch downloads, color filtering, reverse search, and more."
++  },
++  "pro_purchase_cta": {
++    "message": "Get Pro Now"
++  },
+   "plan_expires_date": {
+     "message": "Expires: {date}"
+   },
+diff --git a/_locales/ja/messages.json b/_locales/ja/messages.json
+index 950e6e6..5811e45 100644
+--- a/_locales/ja/messages.json
++++ b/_locales/ja/messages.json
+@@ -176,6 +176,24 @@
+   "filter_filesize": {
+     "message": "ファイルサイズ"
+   },
++  "filter_filesize_all": {
++    "message": "すべてのサイズ"
++  },
++  "filter_filesize_tiny": {
++    "message": "極小 <50 KB"
++  },
++  "filter_filesize_small": {
++    "message": "小 50-200 KB"
++  },
++  "filter_filesize_medium": {
++    "message": "中 200-500 KB"
++  },
++  "filter_filesize_large": {
++    "message": "大 500 KB-2 MB"
++  },
++  "filter_filesize_xlarge": {
++    "message": "特大 >2 MB"
++  },
+   "filter_filesize_min": {
+     "message": "最小 KB"
+   },
+@@ -518,6 +536,18 @@
+   "paywall_banner_try_cta": {
+     "message": "Proを無料で試す"
+   },
++  "paywall_banner_upgrade_cta": {
++    "message": "今すぐアップグレード"
++  },
++  "paywall_banner_upgrade_desc": {
++    "message": "試用期間が終了しました。アップグレードして全Pro機能を維持。"
++  },
++  "pro_purchase_desc": {
++    "message": "無料試用期間が終了しました。Proにアップグレードして、一括ダウンロード、カラーフィルター、逆画像検索などの機能を引き続きご利用ください。"
++  },
++  "pro_purchase_cta": {
++    "message": "Proを購入"
++  },
+   "plan_expires_date": {
+     "message": "有効期限：{date}"
+   },
+diff --git a/_locales/zh_CN/messages.json b/_locales/zh_CN/messages.json
+index 73d186c..a1a99ca 100644
+--- a/_locales/zh_CN/messages.json
++++ b/_locales/zh_CN/messages.json
+@@ -176,6 +176,24 @@
+   "filter_filesize": {
+     "message": "文件大小"
+   },
++  "filter_filesize_all": {
++    "message": "所有大小"
++  },
++  "filter_filesize_tiny": {
++    "message": "极小 <50 KB"
++  },
++  "filter_filesize_small": {
++    "message": "小 50-200 KB"
++  },
++  "filter_filesize_medium": {
++    "message": "中 200-500 KB"
++  },
++  "filter_filesize_large": {
++    "message": "大 500 KB-2 MB"
++  },
++  "filter_filesize_xlarge": {
++    "message": "特大 >2 MB"
++  },
+   "filter_filesize_min": {
+     "message": "最小 KB"
+   },
+@@ -518,6 +536,18 @@
+   "paywall_banner_try_cta": {
+     "message": "免费试用 Pro"
+   },
++  "paywall_banner_upgrade_cta": {
++    "message": "立即升级"
++  },
++  "paywall_banner_upgrade_desc": {
++    "message": "试用已结束。升级以保留所有 Pro 功能。"
++  },
++  "pro_purchase_desc": {
++    "message": "免费试用已结束。升级 Pro 以继续使用批量下载、颜色筛选、以图搜图等功能。"
++  },
++  "pro_purchase_cta": {
++    "message": "立即购买 Pro"
++  },
+   "plan_expires_date": {
+     "message": "到期时间：{date}"
+   },
+diff --git a/_locales/zh_TW/messages.json b/_locales/zh_TW/messages.json
+index 79a246b..5347590 100644
+--- a/_locales/zh_TW/messages.json
++++ b/_locales/zh_TW/messages.json
+@@ -176,6 +176,24 @@
+   "filter_filesize": {
+     "message": "檔案大小"
+   },
++  "filter_filesize_all": {
++    "message": "所有大小"
++  },
++  "filter_filesize_tiny": {
++    "message": "極小 <50 KB"
++  },
++  "filter_filesize_small": {
++    "message": "小 50-200 KB"
++  },
++  "filter_filesize_medium": {
++    "message": "中 200-500 KB"
++  },
++  "filter_filesize_large": {
++    "message": "大 500 KB-2 MB"
++  },
++  "filter_filesize_xlarge": {
++    "message": "特大 >2 MB"
++  },
+   "filter_filesize_min": {
+     "message": "最小 KB"
+   },
+@@ -518,6 +536,18 @@
+   "paywall_banner_try_cta": {
+     "message": "免費試用 Pro"
+   },
++  "paywall_banner_upgrade_cta": {
++    "message": "立即升級"
++  },
++  "paywall_banner_upgrade_desc": {
++    "message": "試用已結束。升級以保留所有 Pro 功能。"
++  },
++  "pro_purchase_desc": {
++    "message": "免費試用已結束。升級 Pro 以繼續使用批量下載、顏色篩選、以圖搜圖等功能。"
++  },
++  "pro_purchase_cta": {
++    "message": "立即購買 Pro"
++  },
+   "plan_expires_date": {
+     "message": "到期時間：{date}"
+   },
+diff --git a/css/modals.css b/css/modals.css
+index ab19786..a5adac3 100644
+--- a/css/modals.css
++++ b/css/modals.css
+@@ -1083,6 +1083,37 @@
+   background: var(--bg-tertiary);
+ }
+ 
++/* Upgrade-focused banner variant for users who already used their trial.
++   Uses a warmer amber gradient to distinguish from the trial-focused blue. */
++.soft-paywall-banner--upgrade {
++  background: linear-gradient(
++    90deg,
++    color-mix(in srgb, #e67e22 12%, var(--bg-color)) 0%,
++    var(--bg-secondary) 100%
++  );
++}
++
++.soft-paywall-banner--upgrade .btn-upgrade-cta {
++  background: #e67e22;
++  border-color: #e67e22;
++}
++
++.soft-paywall-banner--upgrade .btn-upgrade-cta:hover {
++  background: #d35400;
++  border-color: #d35400;
++}
++
++/* Pro purchase header in the upgrade modal — shown when trial is not available. */
++.pro-upgrade-purchase-header {
++  margin-bottom: 12px;
++}
++
++.pro-upgrade-purchase-desc {
++  color: var(--text-secondary);
++  font-size: 13px;
++  line-height: 1.5;
++}
++
+ /* Narrow viewport: stack actions under text so the banner doesn't push
+    the close X off-screen on the minimum sidebar width. */
+ @media (max-width: 380px) {
+diff --git a/package.json b/package.json
+index 3baf8d5..09c6d7e 100644
+--- a/package.json
++++ b/package.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "image-harvest",
+-  "version": "1.0.3",
++  "version": "1.0.4",
+   "description": "Image Harvest - Download Any Image from Any Webpage (Chrome Extension)",
+   "type": "module",
+   "scripts": {
+diff --git a/pages/_shared-body.html b/pages/_shared-body.html
+index 126409c..3803c23 100644
+--- a/pages/_shared-body.html
++++ b/pages/_shared-body.html
+@@ -480,8 +480,27 @@ HTML document — it omits the surrounding
+                 />
+               </div>
+ 
+-              <button class="filter-btn" data-filter="filesize" data-i18n="filter_filesize">File Size▾</button>
++              <button class="filter-btn" data-filter="filesize">File Size▾</button>
+               <div class="filter-dropdown hidden" id="filter-filesize">
++                <div class="filter-option active" data-filesize-filter="all" data-i18n="filter_filesize_all">
++                  All Sizes
++                </div>
++                <div class="filter-option" data-filesize-filter="tiny" data-i18n="filter_filesize_tiny">
++                  Tiny &lt;50 KB
++                </div>
++                <div class="filter-option" data-filesize-filter="small" data-i18n="filter_filesize_small">
++                  Small 50-200 KB
++                </div>
++                <div class="filter-option" data-filesize-filter="medium" data-i18n="filter_filesize_medium">
++                  Medium 200-500 KB
++                </div>
++                <div class="filter-option" data-filesize-filter="large" data-i18n="filter_filesize_large">
++                  Large 500 KB-2 MB
++                </div>
++                <div class="filter-option" data-filesize-filter="xlarge" data-i18n="filter_filesize_xlarge">
++                  XL &gt;2 MB
++                </div>
++                <div class="filter-divider"></div>
+                 <div class="filter-custom-size">
+                   <div class="filter-custom-row">
+                     <label data-i18n="filter_filesize_min">Min KB</label>
+diff --git a/sidepanel/components/ProUpgradeModal.tsx b/sidepanel/components/ProUpgradeModal.tsx
+index f074628..0564b51 100644
+--- a/sidepanel/components/ProUpgradeModal.tsx
++++ b/sidepanel/components/ProUpgradeModal.tsx
+@@ -254,6 +254,11 @@ export function ProUpgradeModal() {
+                 </ul>
+               </>
+             )}
++            {!trialEligible && (
++              <div class="pro-upgrade-purchase-header">
++                <p class="pro-upgrade-purchase-desc">{t('pro_purchase_desc')}</p>
++              </div>
++            )}
+             <div class="pro-upgrade-cta-row">
+               {trialEligible && (
+                 <button
+@@ -274,7 +279,7 @@ export function ProUpgradeModal() {
+                 class={`btn btn-cta ${trialEligible ? 'btn-secondary' : 'btn-primary'}`}
+                 onClick={handlePricingClick}
+               >
+-                {t('pro_pricing_cta')}
++                {trialEligible ? t('pro_pricing_cta') : t('pro_purchase_cta')}
+               </button>
+             </div>
+             {trialEligible && (
+diff --git a/sidepanel/components/SoftPaywallBanner.tsx b/sidepanel/components/SoftPaywallBanner.tsx
+index 6e23951..7561da7 100644
+--- a/sidepanel/components/SoftPaywallBanner.tsx
++++ b/sidepanel/components/SoftPaywallBanner.tsx
+@@ -5,10 +5,10 @@
+ // shouldShowBanner() gate in shared/paywall-state.ts returns true. The
+ // banner is non-blocking (no overlay), occupies its own row above the
+ // toolbar, and offers two CTAs:
+-//   - Primary  "Try Pro Free" — opens the upgrade modal where the trial
+-//     CTA lives. We don't start the trial directly from here so users see
+-//     the full Pro pitch before committing (even to a free trial).
+-//   - Secondary "Maybe later"  — dismiss + start the cooldown window.
++//   - If trial-eligible: Primary "Try Pro Free" — opens the upgrade modal.
++//   - If trial-ineligible (already used trial): Primary "Upgrade Now" — opens
++//     the upgrade modal with purchase-focused messaging.
++//   - Secondary "Maybe later" — dismiss + start the cooldown window.
+ //
+ // The banner state (visible / hidden) lives in this component as a useState
+ // hook because it's purely transient UI and never read by anyone else.
+@@ -19,6 +19,7 @@ import { state } from '../state';
+ import { track } from '../../shared/telemetry';
+ import { EVENTS } from '../../shared/telemetry-events';
+ import { t } from '../../shared/i18n';
++import { isTrialEligible } from '../../shared/trial';
+ 
+ /**
+  * Open the Pro upgrade modal. We DO NOT call markResolved() here — the
+@@ -34,10 +35,12 @@ function openUpgradeModal(): void {
+ 
+ export function SoftPaywallBanner() {
+   const [visible, setVisible] = useState(false);
++  const [trialEligible, setTrialEligible] = useState(false);
+ 
+-  // Decide visibility once per mount. The decision is async (chrome.storage
+-  // round-trip) so we render hidden first and pop in afterward — visually
+-  // identical to "no banner" for users who don't qualify.
++  // Decide visibility and trial eligibility once per mount. The decisions
++  // are async (chrome.storage round-trips) so we render hidden first and
++  // pop in afterward — visually identical to "no banner" for users who
++  // don't qualify.
+   useEffect(() => {
+     let cancelled = false;
+     void (async () => {
+@@ -48,6 +51,9 @@ export function SoftPaywallBanner() {
+       if (state.isProUser) return;
+       const ok = await shouldShowBanner();
+       if (cancelled || !ok) return;
++      const eligible = await isTrialEligible();
++      if (cancelled) return;
++      setTrialEligible(eligible);
+       await markShown();
+       void track(EVENTS.SOFT_PAYWALL_SHOWN);
+       setVisible(true);
+@@ -76,10 +82,13 @@ export function SoftPaywallBanner() {
+ 
+   if (!visible) return null;
+ 
++  const ctaKey = trialEligible ? 'paywall_banner_try_cta' : 'paywall_banner_upgrade_cta';
++  const descKey = trialEligible ? 'paywall_banner_desc' : 'paywall_banner_upgrade_desc';
++
+   return (
+     <div
+       id="soft-paywall-banner"
+-      class="soft-paywall-banner"
++      class={`soft-paywall-banner${trialEligible ? '' : ' soft-paywall-banner--upgrade'}`}
+       role="region"
+       aria-label="Pro upgrade suggestion"
+     >
+@@ -100,16 +109,16 @@ export function SoftPaywallBanner() {
+       </div>
+       <div class="soft-paywall-banner-text">
+         <strong>{t('paywall_banner_title')}</strong>
+-        <span>{t('paywall_banner_desc')}</span>
++        <span>{t(descKey)}</span>
+       </div>
+       <div class="soft-paywall-banner-actions">
+         <button
+           id="btn-soft-paywall-try"
+           type="button"
+-          class="btn btn-primary btn-sm"
++          class={`btn btn-primary btn-sm${trialEligible ? '' : ' btn-upgrade-cta'}`}
+           onClick={handleTry}
+         >
+-          {t('paywall_banner_try_cta')}
++          {t(ctaKey)}
+         </button>
+         <button
+           id="btn-soft-paywall-later"
+@@ -141,4 +150,4 @@ export function SoftPaywallBanner() {
+       </button>
+     </div>
+   );
+-}
++}
+\ No newline at end of file
+diff --git a/sidepanel/filter.ts b/sidepanel/filter.ts
+index e04a444..7b808a7 100644
+--- a/sidepanel/filter.ts
++++ b/sidepanel/filter.ts
+@@ -212,6 +212,36 @@ export function filterByFileSize(img: ImageItem): boolean {
+   return kb >= state.activeFilters.minFileSizeKB && kb <= state.activeFilters.maxFileSizeKB;
+ }
+ 
++export const FILESIZE_PRESETS: Record<string, { min: number; max: number }> = {
++  all: { min: 0, max: Infinity },
++  tiny: { min: 0, max: 50 },
++  small: { min: 50, max: 200 },
++  medium: { min: 200, max: 500 },
++  large: { min: 500, max: 2048 },
++  xlarge: { min: 2048, max: Infinity },
++};
++
++export function applyFileSizePreset(preset: string): void {
++  const range = FILESIZE_PRESETS[preset];
++  if (!range) return;
++  state.activeFilters.fileSizePreset = preset;
++  if (preset === 'all') {
++    state.activeFilters.fileSizeEnabled = false;
++    state.activeFilters.minFileSizeKB = 0;
++    state.activeFilters.maxFileSizeKB = Infinity;
++  } else {
++    state.activeFilters.fileSizeEnabled = true;
++    state.activeFilters.minFileSizeKB = range.min;
++    state.activeFilters.maxFileSizeKB = range.max;
++  }
++  const minInput = document.getElementById('filter-filesize-min') as HTMLInputElement | null;
++  const maxInput = document.getElementById('filter-filesize-max') as HTMLInputElement | null;
++  if (minInput) minInput.value = '';
++  if (maxInput) maxInput.value = '';
++  updateFilterButtonLabels();
++  applyFilters();
++}
++
+ export function applyFileSizeInputs(): void {
+   const minInput = document.getElementById('filter-filesize-min') as HTMLInputElement | null;
+   const maxInput = document.getElementById('filter-filesize-max') as HTMLInputElement | null;
+@@ -223,6 +253,11 @@ export function applyFileSizeInputs(): void {
+   state.activeFilters.minFileSizeKB = minVal;
+   state.activeFilters.maxFileSizeKB = maxVal > 0 ? maxVal : Infinity;
+ 
++  if (hasFilter) {
++    state.activeFilters.fileSizePreset = 'custom';
++    document.querySelectorAll('[data-filesize-filter]').forEach((o) => o.classList.remove('active'));
++  }
++
+   updateFilterButtonLabels();
+   applyFilters();
+ }
+@@ -233,6 +268,7 @@ export function clearFileSizeInputs(): void {
+   if (minInput) minInput.value = '';
+   if (maxInput) maxInput.value = '';
+   state.activeFilters.fileSizeEnabled = false;
++  state.activeFilters.fileSizePreset = 'all';
+   state.activeFilters.minFileSizeKB = 0;
+   state.activeFilters.maxFileSizeKB = Infinity;
+ }
+diff --git a/sidepanel/init.ts b/sidepanel/init.ts
+index f42b754..77f2b5f 100644
+--- a/sidepanel/init.ts
++++ b/sidepanel/init.ts
+@@ -23,6 +23,7 @@ import {
+ import {
+   applyCustomSizeInputs,
+   applyFileSizeInputs,
++  applyFileSizePreset,
+   applyFilters,
+   clearCustomSizeInputs,
+   syncCustomSizeInputsFromSettings,
+@@ -1143,8 +1144,21 @@ function bindEvents(): void {
+     const debouncedFileSize = debounce(() => applyFileSizeInputs(), 400);
+     fileSizeMinInput?.addEventListener('input', debouncedFileSize);
+     fileSizeMaxInput?.addEventListener('input', debouncedFileSize);
++    fileSizeMinInput?.addEventListener('click', (e) => e.stopPropagation());
++    fileSizeMaxInput?.addEventListener('click', (e) => e.stopPropagation());
+   }
+ 
++  // File size preset options
++  document.querySelectorAll<HTMLElement>('[data-filesize-filter]').forEach((opt) => {
++    opt.addEventListener('click', () => {
++      const preset = opt.dataset.filesizeFilter || 'all';
++      document.querySelectorAll('[data-filesize-filter]').forEach((o) => o.classList.remove('active'));
++      opt.classList.add('active');
++      applyFileSizePreset(preset);
++      closeAllFilterDropdowns();
++    });
++  });
++
+   // Color filter - "All Colors" option
+   document.querySelectorAll<HTMLElement>('[data-color-filter]').forEach((opt) => {
+     opt.addEventListener('click', (e) => {
+@@ -1378,6 +1392,7 @@ function bindEvents(): void {
+         customMaxWidth: state.appSettings.maxWidth ?? 8000,
+         customMaxHeight: state.appSettings.maxHeight ?? 8000,
+         fileSizeEnabled: false,
++        fileSizePreset: 'all',
+         minFileSizeKB: 0,
+         maxFileSizeKB: Infinity,
+       };
+@@ -1393,11 +1408,16 @@ function bindEvents(): void {
+         cb.checked = true;
+       });
+       document.querySelectorAll('[data-size-filter]').forEach((o) => o.classList.remove('active'));
++      document
++        .querySelectorAll('[data-filesize-filter]')
++        .forEach((o) => o.classList.remove('active'));
+       document
+         .querySelectorAll('[data-layout-filter]')
+         .forEach((o) => o.classList.remove('active'));
+       const defaultSizeOption = document.querySelector('[data-size-filter="all"]');
+       if (defaultSizeOption) defaultSizeOption.classList.add('active');
++      const defaultFileSizeOption = document.querySelector('[data-filesize-filter="all"]');
++      if (defaultFileSizeOption) defaultFileSizeOption.classList.add('active');
+       const defaultLayoutOption = document.querySelector('[data-layout-filter="all"]');
+       if (defaultLayoutOption) defaultLayoutOption.classList.add('active');
+       document
+diff --git a/sidepanel/state.ts b/sidepanel/state.ts
+index d936240..016a85c 100644
+--- a/sidepanel/state.ts
++++ b/sidepanel/state.ts
+@@ -39,6 +39,7 @@ export interface ActiveFilters {
+ 
+   // File size (KB) filter
+   fileSizeEnabled: boolean;
++  fileSizePreset: string;
+   minFileSizeKB: number;
+   maxFileSizeKB: number;
+ }
+@@ -429,6 +430,7 @@ function createInitialState(): SidepanelState {
+       customMaxWidth: 99999,
+       customMaxHeight: 99999,
+       fileSizeEnabled: false,
++      fileSizePreset: 'all',
+       minFileSizeKB: 0,
+       maxFileSizeKB: Infinity,
+     },
+diff --git a/sidepanel/ui.ts b/sidepanel/ui.ts
+index ec75592..504c41f 100644
+--- a/sidepanel/ui.ts
++++ b/sidepanel/ui.ts
+@@ -204,20 +204,28 @@ export function updateFilterButtonLabels(): void {
+     const hasFileSizeFilter = state.activeFilters.fileSizeEnabled;
+     let label = t('filter_filesize');
+     if (hasFileSizeFilter) {
+-      const min = state.activeFilters.minFileSizeKB;
+-      const max = state.activeFilters.maxFileSizeKB;
+-      if (min > 0 && max < Infinity) {
+-        label = `${min}-${max} KB`;
+-      } else if (min > 0) {
+-        label = `≥${min} KB`;
+-      } else if (max < Infinity) {
+-        label = `≤${max} KB`;
++      const preset = state.activeFilters.fileSizePreset;
++      if (preset && preset !== 'all' && preset !== 'custom') {
++        label = t(`filter_filesize_${preset}`);
++      } else {
++        const min = state.activeFilters.minFileSizeKB;
++        const max = state.activeFilters.maxFileSizeKB;
++        if (min > 0 && max < Infinity) {
++          label = `${min}-${max} KB`;
++        } else if (min > 0) {
++          label = `≥${min} KB`;
++        } else if (max < Infinity) {
++          label = `≤${max} KB`;
++        }
+       }
+     }
+     fileSizeBtn.textContent = label + '▾';
+     fileSizeBtn.classList.toggle('active', hasFileSizeFilter);
+     toggleClearBtn(fileSizeBtn, hasFileSizeFilter, () => {
+       clearFileSizeInputs();
++      document.querySelectorAll('[data-filesize-filter]').forEach((o) => o.classList.remove('active'));
++      const allOpt = document.querySelector('[data-filesize-filter="all"]');
++      if (allOpt) allOpt.classList.add('active');
+       updateFilterButtonLabels();
+       applyFilters();
+     });
+diff --git a/tests/sidepanel-filter.test.tsx b/tests/sidepanel-filter.test.tsx
+index 1b9975b..05aea71 100644
+--- a/tests/sidepanel-filter.test.tsx
++++ b/tests/sidepanel-filter.test.tsx
+@@ -42,7 +42,9 @@ import {
+   applyFilters,
+   clearCustomSizeInputs,
+   colorDistance,
++  FILESIZE_PRESETS,
+   filterByColor,
++  filterByFileSize,
+   filterByLayout,
+   filterBySettingsMaxSize,
+   filterBySettingsMinSize,
+@@ -844,3 +846,54 @@ describe('renderColorSwatches', () => {
+     ).toBe(true);
+   });
+ });
++
++describe('filterByFileSize', () => {
++  it('passes everything when fileSizeEnabled is false', () => {
++    state.activeFilters.fileSizeEnabled = false;
++    state.activeFilters.minFileSizeKB = 100;
++    state.activeFilters.maxFileSizeKB = 500;
++    expect(filterByFileSize(makeImg({ estimatedSize: 10 }))).toBe(true);
++  });
++
++  it('filters out images below minFileSizeKB', () => {
++    state.activeFilters.fileSizeEnabled = true;
++    state.activeFilters.minFileSizeKB = 100;
++    state.activeFilters.maxFileSizeKB = Infinity;
++    // 50 KB = 51200 bytes → below 100 KB threshold
++    expect(filterByFileSize(makeImg({ estimatedSize: 51200 }))).toBe(false);
++  });
++
++  it('filters out images above maxFileSizeKB', () => {
++    state.activeFilters.fileSizeEnabled = true;
++    state.activeFilters.minFileSizeKB = 0;
++    state.activeFilters.maxFileSizeKB = 200;
++    // 300 KB = 307200 bytes → above 200 KB threshold
++    expect(filterByFileSize(makeImg({ estimatedSize: 307200 }))).toBe(false);
++  });
++
++  it('passes images within range', () => {
++    state.activeFilters.fileSizeEnabled = true;
++    state.activeFilters.minFileSizeKB = 50;
++    state.activeFilters.maxFileSizeKB = 200;
++    // 100 KB = 102400 bytes → within range
++    expect(filterByFileSize(makeImg({ estimatedSize: 102400 }))).toBe(true);
++  });
++
++  it('treats undefined estimatedSize as 0 bytes', () => {
++    state.activeFilters.fileSizeEnabled = true;
++    state.activeFilters.minFileSizeKB = 10;
++    state.activeFilters.maxFileSizeKB = Infinity;
++    expect(filterByFileSize(makeImg({ estimatedSize: undefined }))).toBe(false);
++  });
++
++  it('preset tiny filters correctly (0-50 KB)', () => {
++    state.activeFilters.fileSizeEnabled = true;
++    state.activeFilters.fileSizePreset = 'tiny';
++    state.activeFilters.minFileSizeKB = FILESIZE_PRESETS.tiny.min;
++    state.activeFilters.maxFileSizeKB = FILESIZE_PRESETS.tiny.max;
++    // 30 KB = 30720 bytes → within tiny range
++    expect(filterByFileSize(makeImg({ estimatedSize: 30720 }))).toBe(true);
++    // 60 KB = 61440 bytes → above tiny range
++    expect(filterByFileSize(makeImg({ estimatedSize: 61440 }))).toBe(false);
++  });
++});
+diff --git a/tests/trial.test.ts b/tests/trial.test.ts
+index 2609efa..b33d7da 100644
+--- a/tests/trial.test.ts
++++ b/tests/trial.test.ts
+@@ -481,3 +481,62 @@ describe('reportTrialExpiryIfNeeded', () => {
+     expect(mockTrack).not.toHaveBeenCalled();
+   });
+ });
++
++describe('isInTrialGracePeriod', () => {
++  it('returns inGrace=false when no license data', async () => {
++    mockGetLicenseData.mockResolvedValue(null);
++    const { isInTrialGracePeriod } = await import('../shared/trial');
++    const result = await isInTrialGracePeriod();
++    expect(result.inGrace).toBe(false);
++    expect(result.daysRemaining).toBe(0);
++  });
++
++  it('returns inGrace=false for non-trial plans', async () => {
++    mockGetLicenseData.mockResolvedValue({
++      licenseKey: 'X',
++      plan: 'monthly',
++      expiresAt: Date.now() - 1000,
++    });
++    const { isInTrialGracePeriod } = await import('../shared/trial');
++    const result = await isInTrialGracePeriod();
++    expect(result.inGrace).toBe(false);
++  });
++
++  it('returns inGrace=false when trial is still active (not yet expired)', async () => {
++    mockGetLicenseData.mockResolvedValue({
++      licenseKey: 'X',
++      plan: 'trial',
++      expiresAt: Date.now() + 3 * 24 * 60 * 60 * 1000,
++    });
++    const { isInTrialGracePeriod } = await import('../shared/trial');
++    const result = await isInTrialGracePeriod();
++    expect(result.inGrace).toBe(false);
++    expect(result.daysRemaining).toBe(0);
++  });
++
++  it('returns inGrace=true when within 3-day grace window', async () => {
++    // Trial expired 1 day ago → within grace period
++    mockGetLicenseData.mockResolvedValue({
++      licenseKey: 'X',
++      plan: 'trial',
++      expiresAt: Date.now() - 1 * 24 * 60 * 60 * 1000,
++    });
++    const { isInTrialGracePeriod } = await import('../shared/trial');
++    const result = await isInTrialGracePeriod();
++    expect(result.inGrace).toBe(true);
++    expect(result.daysRemaining).toBe(2);
++  });
++
++  it('returns inGrace=false when past 3-day grace window', async () => {
++    // Trial expired 4 days ago → past grace period
++    mockGetLicenseData.mockResolvedValue({
++      licenseKey: 'X',
++      plan: 'trial',
++      expiresAt: Date.now() - 4 * 24 * 60 * 60 * 1000,
++    });
++    const { isInTrialGracePeriod } = await import('../shared/trial');
++    const result = await isInTrialGracePeriod();
++    expect(result.inGrace).toBe(false);
++    expect(result.daysRemaining).toBe(0);
++  });
++});
+diff --git a/tests/utils.test.ts b/tests/utils.test.ts
+index bd8c5a2..8de69f9 100644
+--- a/tests/utils.test.ts
++++ b/tests/utils.test.ts
+@@ -28,19 +28,16 @@ import {
+ } from '../shared/utils';
+ 
+ describe('generateId', () => {
+-  it('returns a deterministic-prefix id for the same URL within the same ms', () => {
++  it('returns a unique UUID string', () => {
+     const id1 = generateId('https://example.com/a.png');
+     const id2 = generateId('https://example.com/a.png');
+-    // hash portion equal; timestamp suffix may differ — assert prefix length
+     expect(typeof id1).toBe('string');
+-    expect(id1.length).toBeGreaterThan(2);
+-    // hash prefix (everything except the trailing date.toString(36)) is stable
+-    const hashPrefix = (s: string): string => s.slice(0, s.length - Date.now().toString(36).length);
+-    expect(hashPrefix(id1)).toBe(hashPrefix(id2));
++    expect(id1.length).toBe(36);
++    expect(id1).not.toBe(id2);
+   });
+ 
+   it('produces different ids for different URLs', () => {
+-    expect(generateId('a').slice(0, 4)).not.toBe(generateId('b').slice(0, 4));
++    expect(generateId('a')).not.toBe(generateId('b'));
+   });
+ });
+ 
+diff --git a/releases/image-harvest-v1.0.1.zip b/versions/v1.0.1/image-harvest-v1.0.1.zip
+similarity index 100%
+rename from releases/image-harvest-v1.0.1.zip
+rename to versions/v1.0.1/image-harvest-v1.0.1.zip
+diff --git a/releases/v1.0.1-release-notes.md b/versions/v1.0.1/release-notes.md
+similarity index 100%
+rename from releases/v1.0.1-release-notes.md
+rename to versions/v1.0.1/release-notes.md
+diff --git a/releases/image-harvest-v1.0.2.zip b/versions/v1.0.2/image-harvest-v1.0.2.zip
+similarity index 100%
+rename from releases/image-harvest-v1.0.2.zip
+rename to versions/v1.0.2/image-harvest-v1.0.2.zip
+diff --git a/releases/v1.0.2-release-notes.md b/versions/v1.0.2/release-notes.md
+similarity index 100%
+rename from releases/v1.0.2-release-notes.md
+rename to versions/v1.0.2/release-notes.md
+diff --git a/releases/image-harvest-v1.0.3.zip b/versions/v1.0.3/image-harvest-v1.0.3.zip
+similarity index 100%
+rename from releases/image-harvest-v1.0.3.zip
+rename to versions/v1.0.3/image-harvest-v1.0.3.zip
+diff --git a/releases/v1.0.3-release-notes.md b/versions/v1.0.3/release-notes.md
+similarity index 100%
+rename from releases/v1.0.3-release-notes.md
+rename to versions/v1.0.3/release-notes.md
+diff --git a/docs/OPTIMIZATION-DETAIL.md b/versions/v1.0.4/docs/OPTIMIZATION-DETAIL.md
+similarity index 100%
+rename from docs/OPTIMIZATION-DETAIL.md
+rename to versions/v1.0.4/docs/OPTIMIZATION-DETAIL.md
+diff --git a/docs/OPTIMIZATION-SPRINT.md b/versions/v1.0.4/docs/OPTIMIZATION-SPRINT.md
+similarity index 100%
+rename from docs/OPTIMIZATION-SPRINT.md
+rename to versions/v1.0.4/docs/OPTIMIZATION-SPRINT.md
+diff --git a/versions/v1.0.4/patches/task-4.2-4.7-complete.patch b/versions/v1.0.4/patches/task-4.2-4.7-complete.patch
+new file mode 100644
+index 0000000..e5c00e2
+--- /dev/null
++++ b/versions/v1.0.4/patches/task-4.2-4.7-complete.patch
+@@ -0,0 +1,1346 @@
++diff --git a/_locales/en/messages.json b/_locales/en/messages.json
++index 8842bc8..36a9354 100644
++--- a/_locales/en/messages.json
+++++ b/_locales/en/messages.json
++@@ -183,6 +183,15 @@
++   "filter_color": {
++     "message": "Color"
++   },
+++  "filter_filesize": {
+++    "message": "File Size"
+++  },
+++  "filter_filesize_min": {
+++    "message": "Min KB"
+++  },
+++  "filter_filesize_max": {
+++    "message": "Max KB"
+++  },
++   "filter_all": {
++     "message": "All"
++   },
++@@ -684,6 +693,12 @@
++   "pro_trial_unavailable": {
++     "message": "Trial not available"
++   },
+++  "trial_grace_message": {
+++    "message": "Your trial has expired. Pro features available for {days} more day(s). Upgrade to keep access."
+++  },
+++  "trial_grace_upgrade_btn": {
+++    "message": "Upgrade Now"
+++  },
++   "progress_downloading": {
++     "message": "Downloading..."
++   },
++diff --git a/_locales/ja/messages.json b/_locales/ja/messages.json
++index 6afafdc..950e6e6 100644
++--- a/_locales/ja/messages.json
+++++ b/_locales/ja/messages.json
++@@ -173,6 +173,15 @@
++   "filter_color": {
++     "message": "カラー"
++   },
+++  "filter_filesize": {
+++    "message": "ファイルサイズ"
+++  },
+++  "filter_filesize_min": {
+++    "message": "最小 KB"
+++  },
+++  "filter_filesize_max": {
+++    "message": "最大 KB"
+++  },
++   "filter_all": {
++     "message": "すべて"
++   },
++@@ -656,6 +665,12 @@
++   "pro_trial_unavailable": {
++     "message": "トライアルは利用できません"
++   },
+++  "trial_grace_message": {
+++    "message": "トライアル期間が終了しました。Pro 機能はあと {days} 日間ご利用いただけます。アップグレードしてアクセスを維持しましょう。"
+++  },
+++  "trial_grace_upgrade_btn": {
+++    "message": "今すぐアップグレード"
+++  },
++   "progress_downloading": {
++     "message": "ダウンロード中..."
++   },
++diff --git a/_locales/zh_CN/messages.json b/_locales/zh_CN/messages.json
++index f0c835f..73d186c 100644
++--- a/_locales/zh_CN/messages.json
+++++ b/_locales/zh_CN/messages.json
++@@ -173,6 +173,15 @@
++   "filter_color": {
++     "message": "颜色"
++   },
+++  "filter_filesize": {
+++    "message": "文件大小"
+++  },
+++  "filter_filesize_min": {
+++    "message": "最小 KB"
+++  },
+++  "filter_filesize_max": {
+++    "message": "最大 KB"
+++  },
++   "filter_all": {
++     "message": "全部"
++   },
++@@ -656,6 +665,12 @@
++   "pro_trial_unavailable": {
++     "message": "试用不可用"
++   },
+++  "trial_grace_message": {
+++    "message": "试用已到期，Pro 功能还可使用 {days} 天。升级以保持使用权限。"
+++  },
+++  "trial_grace_upgrade_btn": {
+++    "message": "立即升级"
+++  },
++   "progress_downloading": {
++     "message": "下载中..."
++   },
++diff --git a/_locales/zh_TW/messages.json b/_locales/zh_TW/messages.json
++index a2899cd..79a246b 100644
++--- a/_locales/zh_TW/messages.json
+++++ b/_locales/zh_TW/messages.json
++@@ -173,6 +173,15 @@
++   "filter_color": {
++     "message": "顏色"
++   },
+++  "filter_filesize": {
+++    "message": "檔案大小"
+++  },
+++  "filter_filesize_min": {
+++    "message": "最小 KB"
+++  },
+++  "filter_filesize_max": {
+++    "message": "最大 KB"
+++  },
++   "filter_all": {
++     "message": "全部"
++   },
++@@ -656,6 +665,12 @@
++   "pro_trial_unavailable": {
++     "message": "試用不可用"
++   },
+++  "trial_grace_message": {
+++    "message": "試用已到期，Pro 功能還可使用 {days} 天。升級以保持使用權限。"
+++  },
+++  "trial_grace_upgrade_btn": {
+++    "message": "立即升級"
+++  },
++   "progress_downloading": {
++     "message": "下載中..."
++   },
++diff --git a/css/base.css b/css/base.css
++index 1357e94..d25b3f4 100644
++--- a/css/base.css
+++++ b/css/base.css
++@@ -544,3 +544,42 @@
++     flex-direction: column;
++   }
++ }
+++
+++/* ============================================
+++   Trial Grace Period Banner
+++   ============================================ */
+++.trial-grace-banner {
+++  display: flex;
+++  align-items: center;
+++  justify-content: space-between;
+++  gap: 8px;
+++  padding: 8px 12px;
+++  background: linear-gradient(135deg, #fff3cd, #ffeeba);
+++  border-bottom: 1px solid #ffc107;
+++  font-size: 12px;
+++  flex-shrink: 0;
+++}
+++
+++.trial-grace-text {
+++  color: #856404;
+++  font-weight: 500;
+++  flex: 1 1 auto;
+++  min-width: 0;
+++}
+++
+++.trial-grace-btn {
+++  flex-shrink: 0;
+++  font-size: 11px;
+++  padding: 4px 10px;
+++}
+++
+++/* Dark mode */
+++@media (prefers-color-scheme: dark) {
+++  .trial-grace-banner {
+++    background: linear-gradient(135deg, #332b00, #3d3200);
+++    border-bottom-color: #665200;
+++  }
+++  .trial-grace-text {
+++    color: #ffd54f;
+++  }
+++}
++diff --git a/docs/OPTIMIZATION-DETAIL.md b/docs/OPTIMIZATION-DETAIL.md
++index 2c4c133..4b48d47 100644
++--- a/docs/OPTIMIZATION-DETAIL.md
+++++ b/docs/OPTIMIZATION-DETAIL.md
++@@ -572,3 +572,97 @@ case MESSAGE_TYPES.GET_IMAGES: {
++ 修改 (测试):
++   tests/storage.test.ts            — import 路径修正
++ ```
+++
+++---
+++
+++## Commit 5: Task 4.2 + 4.7 — 文件大小筛选 + 试用缓冲期
+++
+++### Task 4.2 — 文件大小（KB）筛选
+++
+++**动机**: 用户需要按文件体积过滤图片（而非仅像素尺寸）。例如过滤掉小于 50KB 的占位图，或只保留 >500KB 的高质量素材。
+++
+++**实现**:
+++
+++1. **状态层** (`sidepanel/state.ts`):
+++   - `ActiveFilters` 新增 `fileSizeEnabled: boolean`、`minFileSizeKB: number`、`maxFileSizeKB: number`
+++   - 初始值: disabled, 0, Infinity
+++
+++2. **过滤逻辑** (`sidepanel/filter.ts`):
+++   - 新增 `filterByFileSize(img)` — 将 `img.estimatedSize` (bytes) 转换为 KB，与阈值比较
+++   - 新增 `applyFileSizeInputs()` — 从 DOM 输入框读取值，设置状态，触发过滤
+++   - 新增 `clearFileSizeInputs()` — 重置输入框和状态
+++
+++3. **UI** (`pages/_shared-body.html`):
+++   - 在 URL 筛选和 Color 筛选之间新增 "File Size▾" 按钮
+++   - 下拉框包含 min KB 和 max KB 两个 number 输入框
+++
+++4. **按钮标签** (`sidepanel/ui.ts`):
+++   - `updateFilterButtonLabels()` 新增 filesize 按钮段落
+++   - 激活时显示具体范围（如 "≥100 KB" 或 "50-200 KB"）
+++   - 支持 "×" 清除按钮
+++
+++5. **事件绑定** (`sidepanel/init.ts`):
+++   - 400ms debounce 绑定两个输入框的 `input` 事件
+++   - 重置所有筛选时同时清除 filesize 状态和输入框
+++
+++6. **i18n**: `filter_filesize`、`filter_filesize_min`、`filter_filesize_max` 四语言
+++
+++### Task 4.7 — 试用到期 3 天缓冲期
+++
+++**动机**: 试用用户到期后立即失去所有 Pro 功能，用户体验差且转化率低。3 天缓冲让用户感知"即将失去"，提升付费动机。
+++
+++**实现**:
+++
+++1. **常量** (`shared/trial.ts`):
+++   - `TRIAL_GRACE_PERIOD_MS = 3 * 24 * 60 * 60 * 1000`
+++   - 新增 `isInTrialGracePeriod()` 辅助函数
+++
+++2. **核心逻辑** (`shared/license.ts`):
+++   - `isProUser()` 中，当服务端返回 trial 过期时：
+++     - 计算 `elapsed = now - expiresAt`
+++     - 若 `elapsed <= TRIAL_EXPIRY_GRACE_MS`，仍返回 `isPro: true` + `inGracePeriod: true`
+++     - 否则正常返回 `isPro: false`
+++   - 新增模块级常量 `TRIAL_EXPIRY_GRACE_MS`（避免与 trial.ts 循环引用）
+++
+++3. **类型** (`shared/types.ts`):
+++   - `ProUserInfo` 新增 `inGracePeriod?: boolean`
+++
+++4. **sidepanel 状态** (`sidepanel/state.ts`):
+++   - 新增 `inTrialGracePeriod: boolean`、`trialGraceDaysRemaining: number`
+++
+++5. **状态同步** (`sidepanel/settings.ts`):
+++   - `applyProFeatureVisibility()` 读取 background 返回的 `inGracePeriod`，计算剩余天数，写入 state
+++
+++6. **UI 组件** (`sidepanel/components/TrialGraceBanner.tsx`):
+++   - Preact 组件，通过 `useStoreSelector` 订阅 grace 状态
+++   - 显示黄色警告条 + "Upgrade Now" 按钮
+++   - 点击按钮打开 ProUpgradeModal
+++
+++7. **挂载** (`sidepanel/components/mount.tsx`):
+++   - `mountTrialGraceBanner()` 渲染到 `#trial-grace-banner-mount` 或 fallback 到 `#app` 顶部
+++
+++8. **样式** (`css/base.css`):
+++   - `.trial-grace-banner` — 黄色渐变背景、flex 布局
+++   - 含 dark mode `@media (prefers-color-scheme: dark)` 适配
+++
+++9. **i18n**: `trial_grace_message`（含 `{days}` 占位符）、`trial_grace_upgrade_btn` 四语言
+++
+++```
+++修改文件清单:
+++  sidepanel/state.ts                    — ActiveFilters 新增 3 字段 + 2 个全局状态
+++  sidepanel/filter.ts                   — filterByFileSize + applyFileSizeInputs + clearFileSizeInputs
+++  sidepanel/init.ts                     — debounce 事件 + reset 逻辑
+++  sidepanel/ui.ts                       — filesize 按钮标签 + import
+++  sidepanel/settings.ts                 — grace period 状态读取
+++  sidepanel/components/TrialGraceBanner.tsx — 新建 banner 组件
+++  sidepanel/components/mount.tsx        — 挂载 banner
+++  pages/_shared-body.html               — filesize 筛选 HTML
+++  shared/types.ts                       — ProUserInfo.inGracePeriod
+++  shared/license.ts                     — grace period 逻辑
+++  shared/trial.ts                       — TRIAL_GRACE_PERIOD_MS + isInTrialGracePeriod()
+++  css/base.css                          — banner + dark mode 样式
+++  _locales/en/messages.json             — 5 keys
+++  _locales/zh_CN/messages.json          — 5 keys
+++  _locales/zh_TW/messages.json          — 5 keys
+++  _locales/ja/messages.json             — 5 keys
+++```
++diff --git a/docs/OPTIMIZATION-SPRINT.md b/docs/OPTIMIZATION-SPRINT.md
++index d726c16..33b9b2e 100644
++--- a/docs/OPTIMIZATION-SPRINT.md
+++++ b/docs/OPTIMIZATION-SPRINT.md
++@@ -75,17 +75,17 @@
++ 
++ ## 未完成 Task 详细说明
++ 
++-### Task 4.2 — 文件大小（KB）筛选
+++### Task 4.2 — 文件大小（KB）筛选 ✅ DONE
++ 
++ **目标**: 让用户按文件体积（而非像素尺寸）过滤图片
++ 
++-**需要做**:
++-1. `shared/types.ts` — `FilterConfig` 添加 `minFileSize` / `maxFileSize` 字段
++-2. `sidepanel/filter.ts` — `applyFilters()` 中按 `estimatedSize` 过滤
++-3. `sidepanel/init.ts` — filter bar UI 添加 KB 输入框
++-4. 需要考虑 `estimatedSize` 可能为 0（未知大小）的情况
++-
++-**预估工作量**: 2-3 小时
+++**已完成**:
+++1. `sidepanel/state.ts` — ActiveFilters 添加 `fileSizeEnabled` / `minFileSizeKB` / `maxFileSizeKB`
+++2. `sidepanel/filter.ts` — 新增 `filterByFileSize()` 谓词、`applyFileSizeInputs()`、`clearFileSizeInputs()`
+++3. `pages/_shared-body.html` — 新增 "File Size" 筛选按钮 + 下拉框（min/max KB 输入）
+++4. `sidepanel/ui.ts` — 按钮标签实时更新（显示当前 KB 范围）
+++5. `sidepanel/init.ts` — debounce 事件绑定 + 重置逻辑
+++6. i18n: EN/ZH_CN/ZH_TW/JA 四语言支持
++ 
++ ---
++ 
++@@ -103,19 +103,20 @@
++ 
++ ---
++ 
++-### Task 4.7 — 试用到期缓冲期
+++### Task 4.7 — 试用到期缓冲期 ✅ DONE
++ 
++ **目标**: 试用到期后给予 3 天缓冲，功能可用但显示升级 banner
++ 
++-**需要做**:
++-1. `shared/trial.ts` — 修改到期判断逻辑，增加 3 天 grace period
++-2. `shared/license.ts` — `isProUser()` 中处理 trial grace period
++-3. `sidepanel/init.ts` — 添加 persistent banner 组件
++-4. 需要新增 i18n 键
++-
++-**预估工作量**: 4-5 小时
++-
++-**注意**: 涉及付费逻辑变更，建议与产品确认后再实施
+++**已完成**:
+++1. `shared/trial.ts` — 新增 `TRIAL_GRACE_PERIOD_MS` (3天) 和 `isInTrialGracePeriod()` 函数
+++2. `shared/license.ts` — `isProUser()` 中检测 trial 过期但在 grace period 内，返回 `inGracePeriod: true`
+++3. `shared/types.ts` — `ProUserInfo` 新增 `inGracePeriod?: boolean`
+++4. `sidepanel/state.ts` — 新增 `inTrialGracePeriod` / `trialGraceDaysRemaining` 状态
+++5. `sidepanel/settings.ts` — `applyProFeatureVisibility()` 中设置 grace 状态
+++6. `sidepanel/components/TrialGraceBanner.tsx` — 新建 Preact 组件，显示警告 + 升级按钮
+++7. `sidepanel/components/mount.tsx` — 挂载 TrialGraceBanner
+++8. `css/base.css` — 新增 `.trial-grace-banner` 样式（含 dark mode）
+++9. i18n: EN/ZH_CN/ZH_TW/JA 四语言支持
++ 
++ ---
++ 
++@@ -148,9 +149,17 @@ git checkout feat/optimization-sprint
++ # 查看已有改动
++ git log --oneline
++ 
++-# 继续实现 Task 4.2 / 4.5 / 4.7
+++# 剩余未完成 Task: 4.5（免费版"滚动后扫描"）
++ # 完成后追加 commit 即可
++ 
++ # 推送到远程
++ git push -u origin feat/optimization-sprint
++ ```
+++
+++## Patch 文件
+++
+++所有变更已导出为 patch 文件，位于 `patches/` 目录。
+++在本地仓库应用:
+++```bash
+++git apply patches/task-4.2-4.7-filesize-filter-grace-period.patch
+++```
++diff --git a/pages/_shared-body.html b/pages/_shared-body.html
++index e89e2e9..126409c 100644
++--- a/pages/_shared-body.html
+++++ b/pages/_shared-body.html
++@@ -480,6 +480,20 @@ HTML document — it omits the surrounding
++                 />
++               </div>
++ 
+++              <button class="filter-btn" data-filter="filesize" data-i18n="filter_filesize">File Size▾</button>
+++              <div class="filter-dropdown hidden" id="filter-filesize">
+++                <div class="filter-custom-size">
+++                  <div class="filter-custom-row">
+++                    <label data-i18n="filter_filesize_min">Min KB</label>
+++                    <input type="number" id="filter-filesize-min" min="0" placeholder="0" />
+++                  </div>
+++                  <div class="filter-custom-row">
+++                    <label data-i18n="filter_filesize_max">Max KB</label>
+++                    <input type="number" id="filter-filesize-max" min="0" placeholder="∞" />
+++                  </div>
+++                </div>
+++              </div>
+++
++               <button class="filter-btn" data-filter="color">
++                 Color▾ <span class="pro-badge pro-badge-mini">PRO</span>
++               </button>
++diff --git a/patches/task-4.2-4.7-filesize-filter-grace-period.patch b/patches/task-4.2-4.7-filesize-filter-grace-period.patch
++new file mode 100644
++index 0000000..02d8d05
++--- /dev/null
+++++ b/patches/task-4.2-4.7-filesize-filter-grace-period.patch
++@@ -0,0 +1,579 @@
+++diff --git a/_locales/en/messages.json b/_locales/en/messages.json
+++index 8842bc8..36a9354 100644
+++--- a/_locales/en/messages.json
++++++ b/_locales/en/messages.json
+++@@ -183,6 +183,15 @@
+++   "filter_color": {
+++     "message": "Color"
+++   },
++++  "filter_filesize": {
++++    "message": "File Size"
++++  },
++++  "filter_filesize_min": {
++++    "message": "Min KB"
++++  },
++++  "filter_filesize_max": {
++++    "message": "Max KB"
++++  },
+++   "filter_all": {
+++     "message": "All"
+++   },
+++@@ -684,6 +693,12 @@
+++   "pro_trial_unavailable": {
+++     "message": "Trial not available"
+++   },
++++  "trial_grace_message": {
++++    "message": "Your trial has expired. Pro features available for {days} more day(s). Upgrade to keep access."
++++  },
++++  "trial_grace_upgrade_btn": {
++++    "message": "Upgrade Now"
++++  },
+++   "progress_downloading": {
+++     "message": "Downloading..."
+++   },
+++diff --git a/_locales/ja/messages.json b/_locales/ja/messages.json
+++index 6afafdc..950e6e6 100644
+++--- a/_locales/ja/messages.json
++++++ b/_locales/ja/messages.json
+++@@ -173,6 +173,15 @@
+++   "filter_color": {
+++     "message": "カラー"
+++   },
++++  "filter_filesize": {
++++    "message": "ファイルサイズ"
++++  },
++++  "filter_filesize_min": {
++++    "message": "最小 KB"
++++  },
++++  "filter_filesize_max": {
++++    "message": "最大 KB"
++++  },
+++   "filter_all": {
+++     "message": "すべて"
+++   },
+++@@ -656,6 +665,12 @@
+++   "pro_trial_unavailable": {
+++     "message": "トライアルは利用できません"
+++   },
++++  "trial_grace_message": {
++++    "message": "トライアル期間が終了しました。Pro 機能はあと {days} 日間ご利用いただけます。アップグレードしてアクセスを維持しましょう。"
++++  },
++++  "trial_grace_upgrade_btn": {
++++    "message": "今すぐアップグレード"
++++  },
+++   "progress_downloading": {
+++     "message": "ダウンロード中..."
+++   },
+++diff --git a/_locales/zh_CN/messages.json b/_locales/zh_CN/messages.json
+++index f0c835f..73d186c 100644
+++--- a/_locales/zh_CN/messages.json
++++++ b/_locales/zh_CN/messages.json
+++@@ -173,6 +173,15 @@
+++   "filter_color": {
+++     "message": "颜色"
+++   },
++++  "filter_filesize": {
++++    "message": "文件大小"
++++  },
++++  "filter_filesize_min": {
++++    "message": "最小 KB"
++++  },
++++  "filter_filesize_max": {
++++    "message": "最大 KB"
++++  },
+++   "filter_all": {
+++     "message": "全部"
+++   },
+++@@ -656,6 +665,12 @@
+++   "pro_trial_unavailable": {
+++     "message": "试用不可用"
+++   },
++++  "trial_grace_message": {
++++    "message": "试用已到期，Pro 功能还可使用 {days} 天。升级以保持使用权限。"
++++  },
++++  "trial_grace_upgrade_btn": {
++++    "message": "立即升级"
++++  },
+++   "progress_downloading": {
+++     "message": "下载中..."
+++   },
+++diff --git a/_locales/zh_TW/messages.json b/_locales/zh_TW/messages.json
+++index a2899cd..79a246b 100644
+++--- a/_locales/zh_TW/messages.json
++++++ b/_locales/zh_TW/messages.json
+++@@ -173,6 +173,15 @@
+++   "filter_color": {
+++     "message": "顏色"
+++   },
++++  "filter_filesize": {
++++    "message": "檔案大小"
++++  },
++++  "filter_filesize_min": {
++++    "message": "最小 KB"
++++  },
++++  "filter_filesize_max": {
++++    "message": "最大 KB"
++++  },
+++   "filter_all": {
+++     "message": "全部"
+++   },
+++@@ -656,6 +665,12 @@
+++   "pro_trial_unavailable": {
+++     "message": "試用不可用"
+++   },
++++  "trial_grace_message": {
++++    "message": "試用已到期，Pro 功能還可使用 {days} 天。升級以保持使用權限。"
++++  },
++++  "trial_grace_upgrade_btn": {
++++    "message": "立即升級"
++++  },
+++   "progress_downloading": {
+++     "message": "下載中..."
+++   },
+++diff --git a/css/base.css b/css/base.css
+++index 1357e94..d25b3f4 100644
+++--- a/css/base.css
++++++ b/css/base.css
+++@@ -544,3 +544,42 @@
+++     flex-direction: column;
+++   }
+++ }
++++
++++/* ============================================
++++   Trial Grace Period Banner
++++   ============================================ */
++++.trial-grace-banner {
++++  display: flex;
++++  align-items: center;
++++  justify-content: space-between;
++++  gap: 8px;
++++  padding: 8px 12px;
++++  background: linear-gradient(135deg, #fff3cd, #ffeeba);
++++  border-bottom: 1px solid #ffc107;
++++  font-size: 12px;
++++  flex-shrink: 0;
++++}
++++
++++.trial-grace-text {
++++  color: #856404;
++++  font-weight: 500;
++++  flex: 1 1 auto;
++++  min-width: 0;
++++}
++++
++++.trial-grace-btn {
++++  flex-shrink: 0;
++++  font-size: 11px;
++++  padding: 4px 10px;
++++}
++++
++++/* Dark mode */
++++@media (prefers-color-scheme: dark) {
++++  .trial-grace-banner {
++++    background: linear-gradient(135deg, #332b00, #3d3200);
++++    border-bottom-color: #665200;
++++  }
++++  .trial-grace-text {
++++    color: #ffd54f;
++++  }
++++}
+++diff --git a/pages/_shared-body.html b/pages/_shared-body.html
+++index e89e2e9..126409c 100644
+++--- a/pages/_shared-body.html
++++++ b/pages/_shared-body.html
+++@@ -480,6 +480,20 @@ HTML document — it omits the surrounding
+++                 />
+++               </div>
+++ 
++++              <button class="filter-btn" data-filter="filesize" data-i18n="filter_filesize">File Size▾</button>
++++              <div class="filter-dropdown hidden" id="filter-filesize">
++++                <div class="filter-custom-size">
++++                  <div class="filter-custom-row">
++++                    <label data-i18n="filter_filesize_min">Min KB</label>
++++                    <input type="number" id="filter-filesize-min" min="0" placeholder="0" />
++++                  </div>
++++                  <div class="filter-custom-row">
++++                    <label data-i18n="filter_filesize_max">Max KB</label>
++++                    <input type="number" id="filter-filesize-max" min="0" placeholder="∞" />
++++                  </div>
++++                </div>
++++              </div>
++++
+++               <button class="filter-btn" data-filter="color">
+++                 Color▾ <span class="pro-badge pro-badge-mini">PRO</span>
+++               </button>
+++diff --git a/shared/license.ts b/shared/license.ts
+++index 2b642b8..8dcf1b2 100644
+++--- a/shared/license.ts
++++++ b/shared/license.ts
+++@@ -11,6 +11,9 @@ import type {
+++   LicenseValidationResult,
+++   ProUserInfo,
+++ } from './types';
++++
++++/** 3-day grace period after trial expiry (mirrors trial.ts constant). */
++++const TRIAL_EXPIRY_GRACE_MS = 3 * 24 * 60 * 60 * 1000;
+++ import { track, setEnvelopeMeta, flushNow } from './telemetry';
+++ import { EVENTS } from './telemetry-events';
+++ 
+++@@ -333,6 +336,24 @@ export async function isProUser(): Promise<ProUserInfo> {
+++     }
+++ 
+++     // Server reachable AND said "not valid" → license really is expired.
++++    // For trial licenses, allow a 3-day grace period where Pro features
++++    // are still accessible but a banner urges the user to upgrade.
++++    if (licenseData.plan === 'trial' && licenseData.expiresAt) {
++++      const elapsed = Date.now() - licenseData.expiresAt;
++++      if (elapsed >= 0 && elapsed <= TRIAL_EXPIRY_GRACE_MS) {
++++        licenseData.status = LICENSE_STATUS.EXPIRED;
++++        licenseData.lastVerified = Date.now();
++++        await saveLicenseData(licenseData);
++++        return {
++++          isPro: true,
++++          plan: licenseData.plan,
++++          expiresAt: licenseData.expiresAt,
++++          status: LICENSE_STATUS.EXPIRED,
++++          inGracePeriod: true,
++++        };
++++      }
++++    }
++++
+++     // Persist so we don't keep re-asking the network on every check.
+++     licenseData.status = LICENSE_STATUS.EXPIRED;
+++     licenseData.lastVerified = Date.now();
+++diff --git a/shared/trial.ts b/shared/trial.ts
+++index 7b7a755..ccfc3ad 100644
+++--- a/shared/trial.ts
++++++ b/shared/trial.ts
+++@@ -42,6 +42,9 @@ const STORAGE_KEY_TRIAL_EXPIRED_REPORTED = '_trial_expired_reported';
+++ /** 7 days in milliseconds — kept as a literal to avoid an extra constants import. */
+++ export const TRIAL_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
+++ 
++++/** 3-day grace period after trial expiry — Pro features still work but a banner is shown. */
++++export const TRIAL_GRACE_PERIOD_MS = 3 * 24 * 60 * 60 * 1000;
++++
+++ export interface TrialStartResult {
+++   success: boolean;
+++   error?: string;
+++@@ -235,3 +238,27 @@ export async function getTrialState(): Promise<TrialSnapshot | null> {
+++     msRemaining,
+++   };
+++ }
++++
++++/**
++++ * Check if the trial has expired but is within the 3-day grace period.
++++ * During grace period, Pro features are still accessible but a banner urges upgrade.
++++ */
++++export async function isInTrialGracePeriod(): Promise<{
++++  inGrace: boolean;
++++  daysRemaining: number;
++++}> {
++++  const license = await getLicenseData();
++++  if (!license || license.plan !== 'trial' || !license.expiresAt) {
++++    return { inGrace: false, daysRemaining: 0 };
++++  }
++++  const now = Date.now();
++++  if (license.expiresAt > now) {
++++    return { inGrace: false, daysRemaining: 0 };
++++  }
++++  const elapsed = now - license.expiresAt;
++++  if (elapsed <= TRIAL_GRACE_PERIOD_MS) {
++++    const daysRemaining = Math.ceil((TRIAL_GRACE_PERIOD_MS - elapsed) / (24 * 60 * 60 * 1000));
++++    return { inGrace: true, daysRemaining };
++++  }
++++  return { inGrace: false, daysRemaining: 0 };
++++}
+++diff --git a/shared/types.ts b/shared/types.ts
+++index 317fe24..007f5c8 100644
+++--- a/shared/types.ts
++++++ b/shared/types.ts
+++@@ -102,6 +102,7 @@ export interface ProUserInfo {
+++   plan?: string | null;
+++   expiresAt?: number | null;
+++   status: LicenseStatusValue;
++++  inGracePeriod?: boolean;
+++ }
+++ 
+++ // ── Collection (IndexedDB) ──────────────────────────────────────────────────
+++diff --git a/sidepanel/components/TrialGraceBanner.tsx b/sidepanel/components/TrialGraceBanner.tsx
+++new file mode 100644
+++index 0000000..a710f16
+++--- /dev/null
++++++ b/sidepanel/components/TrialGraceBanner.tsx
+++@@ -0,0 +1,25 @@
++++import { t } from '../../shared/i18n';
++++import { state } from '../state';
++++import { useStoreSelector } from './storeHook';
++++
++++export function TrialGraceBanner() {
++++  const inGrace = useStoreSelector((s) => s.inTrialGracePeriod);
++++  const daysLeft = useStoreSelector((s) => s.trialGraceDaysRemaining);
++++
++++  if (!inGrace) return null;
++++
++++  const handleUpgrade = () => {
++++    state.proUpgradeModalState = { open: true, errorText: '' };
++++  };
++++
++++  return (
++++    <div class="trial-grace-banner">
++++      <span class="trial-grace-text">
++++        {t('trial_grace_message', { days: String(daysLeft) })}
++++      </span>
++++      <button class="btn btn-small btn-primary trial-grace-btn" onClick={handleUpgrade}>
++++        {t('trial_grace_upgrade_btn')}
++++      </button>
++++    </div>
++++  );
++++}
+++diff --git a/sidepanel/components/mount.tsx b/sidepanel/components/mount.tsx
+++index 5badedf..ebf5083 100644
+++--- a/sidepanel/components/mount.tsx
++++++ b/sidepanel/components/mount.tsx
+++@@ -21,6 +21,7 @@ import { MultitabModal } from './MultitabModal';
+++ import { ProUpgradeModal } from './ProUpgradeModal';
+++ import { PrivacyOptInModal } from './PrivacyOptInModal';
+++ import { SoftPaywallBanner } from './SoftPaywallBanner';
++++import { TrialGraceBanner } from './TrialGraceBanner';
+++ import { BatchUrlCopyButton } from './BatchUrlCopyButton';
+++ import { RatingPromptModal } from './RatingPromptModal';
+++ import { SettingsModal } from './SettingsModal';
+++@@ -181,6 +182,7 @@ export function mountPreactComponents(): void {
+++   // it pops in, not below it. Falls back to a body append if the slot
+++   // is missing (popup variant or hot-reload race).
+++   mountSoftPaywallBanner();
++++  mountTrialGraceBanner();
+++ 
+++   // Batch URL copy button (Sprint 3.4). Renders into the
+++   // `#batch-url-copy-mount` slot in toolbar row 2. The slot is a
+++@@ -219,6 +221,21 @@ function mountSoftPaywallBanner(): void {
+++   render(<SoftPaywallBanner />, mount);
+++ }
+++ 
++++function mountTrialGraceBanner(): void {
++++  const slot = document.getElementById('trial-grace-banner-mount');
++++  if (slot) {
++++    render(<TrialGraceBanner />, slot);
++++    return;
++++  }
++++  const app = document.getElementById('app');
++++  if (!app) return;
++++  const mount = document.createElement('div');
++++  mount.id = 'trial-grace-banner-mount';
++++  mount.dataset.preactMount = 'trial-grace-banner-mount';
++++  app.insertBefore(mount, app.firstChild);
++++  render(<TrialGraceBanner />, mount);
++++}
++++
+++ /**
+++  * Mount a brand-new Preact component that has no legacy DOM slot. Idempotent:
+++  * if a previous mount with the same id exists (hot reload, popup re-init)
+++diff --git a/sidepanel/filter.ts b/sidepanel/filter.ts
+++index bcea39f..e04a444 100644
+++--- a/sidepanel/filter.ts
++++++ b/sidepanel/filter.ts
+++@@ -22,7 +22,8 @@ export function applyFilters(): void {
+++       filterByUrl(img) &&
+++       filterByColor(img) &&
+++       filterBySettingsMinSize(img) &&
+++-      filterBySettingsMaxSize(img)
++++      filterBySettingsMaxSize(img) &&
++++      filterByFileSize(img)
+++     );
+++   });
+++ 
+++@@ -204,6 +205,38 @@ export function filterBySettingsMinSize(img: ImageItem): boolean {
+++   );
+++ }
+++ 
++++export function filterByFileSize(img: ImageItem): boolean {
++++  if (!state.activeFilters.fileSizeEnabled) return true;
++++  const bytes = img.estimatedSize || 0;
++++  const kb = bytes / 1024;
++++  return kb >= state.activeFilters.minFileSizeKB && kb <= state.activeFilters.maxFileSizeKB;
++++}
++++
++++export function applyFileSizeInputs(): void {
++++  const minInput = document.getElementById('filter-filesize-min') as HTMLInputElement | null;
++++  const maxInput = document.getElementById('filter-filesize-max') as HTMLInputElement | null;
++++  const minVal = minInput?.value ? parseFloat(minInput.value) : 0;
++++  const maxVal = maxInput?.value ? parseFloat(maxInput.value) : Infinity;
++++
++++  const hasFilter = minVal > 0 || (maxVal > 0 && maxVal < Infinity);
++++  state.activeFilters.fileSizeEnabled = hasFilter;
++++  state.activeFilters.minFileSizeKB = minVal;
++++  state.activeFilters.maxFileSizeKB = maxVal > 0 ? maxVal : Infinity;
++++
++++  updateFilterButtonLabels();
++++  applyFilters();
++++}
++++
++++export function clearFileSizeInputs(): void {
++++  const minInput = document.getElementById('filter-filesize-min') as HTMLInputElement | null;
++++  const maxInput = document.getElementById('filter-filesize-max') as HTMLInputElement | null;
++++  if (minInput) minInput.value = '';
++++  if (maxInput) maxInput.value = '';
++++  state.activeFilters.fileSizeEnabled = false;
++++  state.activeFilters.minFileSizeKB = 0;
++++  state.activeFilters.maxFileSizeKB = Infinity;
++++}
++++
+++ export function filterBySettingsMaxSize(img: ImageItem): boolean {
+++   if (!state.activeFilters.customMaxEnabled) return true;
+++   const w = img.naturalWidth || img.displayWidth || 0;
+++diff --git a/sidepanel/init.ts b/sidepanel/init.ts
+++index 8a8e93a..f42b754 100644
+++--- a/sidepanel/init.ts
++++++ b/sidepanel/init.ts
+++@@ -22,6 +22,7 @@ import {
+++ } from './actions';
+++ import {
+++   applyCustomSizeInputs,
++++  applyFileSizeInputs,
+++   applyFilters,
+++   clearCustomSizeInputs,
+++   syncCustomSizeInputsFromSettings,
+++@@ -1135,6 +1136,15 @@ function bindEvents(): void {
+++     });
+++   }
+++ 
++++  // File size (KB) filter — apply on input change with debounce
++++  const fileSizeMinInput = document.getElementById('filter-filesize-min') as HTMLInputElement | null;
++++  const fileSizeMaxInput = document.getElementById('filter-filesize-max') as HTMLInputElement | null;
++++  if (fileSizeMinInput || fileSizeMaxInput) {
++++    const debouncedFileSize = debounce(() => applyFileSizeInputs(), 400);
++++    fileSizeMinInput?.addEventListener('input', debouncedFileSize);
++++    fileSizeMaxInput?.addEventListener('input', debouncedFileSize);
++++  }
++++
+++   // Color filter - "All Colors" option
+++   document.querySelectorAll<HTMLElement>('[data-color-filter]').forEach((opt) => {
+++     opt.addEventListener('click', (e) => {
+++@@ -1367,8 +1377,16 @@ function bindEvents(): void {
+++         customMaxEnabled: state.appSettings.enableMaxSize,
+++         customMaxWidth: state.appSettings.maxWidth ?? 8000,
+++         customMaxHeight: state.appSettings.maxHeight ?? 8000,
++++        fileSizeEnabled: false,
++++        minFileSizeKB: 0,
++++        maxFileSizeKB: Infinity,
+++       };
+++       if (elements.filterUrlInput) (elements.filterUrlInput as HTMLInputElement).value = '';
++++      // Clear file size inputs
++++      const fsMin = document.getElementById('filter-filesize-min') as HTMLInputElement | null;
++++      const fsMax = document.getElementById('filter-filesize-max') as HTMLInputElement | null;
++++      if (fsMin) fsMin.value = '';
++++      if (fsMax) fsMax.value = '';
+++       // Restore custom size input fields from global settings
+++       syncCustomSizeInputsFromSettings();
+++       document.querySelectorAll<HTMLInputElement>('.type-checkbox').forEach((cb) => {
+++diff --git a/sidepanel/settings.ts b/sidepanel/settings.ts
+++index dd82c34..4752525 100644
+++--- a/sidepanel/settings.ts
++++++ b/sidepanel/settings.ts
+++@@ -458,8 +458,17 @@ export async function applyProFeatureVisibility(): Promise<void> {
+++   try {
+++     const proStatus = await chrome.runtime.sendMessage({ type: MESSAGE_TYPES.VALIDATE_LICENSE });
+++     state.isProUser = proStatus?.isPro === true;
++++    state.inTrialGracePeriod = proStatus?.inGracePeriod === true;
++++    state.trialGraceDaysRemaining = 0;
++++    if (state.inTrialGracePeriod && proStatus?.expiresAt) {
++++      const elapsed = Date.now() - proStatus.expiresAt;
++++      const graceMs = 3 * 24 * 60 * 60 * 1000;
++++      state.trialGraceDaysRemaining = Math.ceil((graceMs - elapsed) / (24 * 60 * 60 * 1000));
++++    }
+++   } catch {
+++     state.isProUser = false;
++++    state.inTrialGracePeriod = false;
++++    state.trialGraceDaysRemaining = 0;
+++   }
+++ 
+++   // When user just became Pro, auto-enable Pro default features and persist
+++diff --git a/sidepanel/state.ts b/sidepanel/state.ts
+++index 993c04c..d936240 100644
+++--- a/sidepanel/state.ts
++++++ b/sidepanel/state.ts
+++@@ -36,6 +36,11 @@ export interface ActiveFilters {
+++   customMaxEnabled: boolean;
+++   customMaxWidth: number;
+++   customMaxHeight: number;
++++
++++  // File size (KB) filter
++++  fileSizeEnabled: boolean;
++++  minFileSizeKB: number;
++++  maxFileSizeKB: number;
+++ }
+++ 
+++ // ── Per-tab cache entry ─────────────────────────────────────────────────────
+++@@ -335,6 +340,8 @@ export interface SidepanelState {
+++ 
+++   // License
+++   isProUser: boolean;
++++  inTrialGracePeriod: boolean;
++++  trialGraceDaysRemaining: number;
+++ 
+++   // ── Preact-managed UI screens (replaces classList toggles) ───────────────
+++   /** Which "main area" view is active. Mutually exclusive with itself. */
+++@@ -421,6 +428,9 @@ function createInitialState(): SidepanelState {
+++       customMaxEnabled: true,
+++       customMaxWidth: 99999,
+++       customMaxHeight: 99999,
++++      fileSizeEnabled: false,
++++      minFileSizeKB: 0,
++++      maxFileSizeKB: Infinity,
+++     },
+++ 
+++     collapsedGroups: new Set<string>(),
+++@@ -448,6 +458,8 @@ function createInitialState(): SidepanelState {
+++     isMultiTabExtracting: false,
+++ 
+++     isProUser: false,
++++    inTrialGracePeriod: false,
++++    trialGraceDaysRemaining: 0,
+++ 
+++     uiScreen: 'images',
+++     errorInfo: null,
+++diff --git a/sidepanel/ui.ts b/sidepanel/ui.ts
+++index 710546d..ec75592 100644
+++--- a/sidepanel/ui.ts
++++++ b/sidepanel/ui.ts
+++@@ -4,7 +4,7 @@
+++ // UI组件模块：提供过滤器标签、视图切换、响应式、对话框、通知、加载状态等UI功能
+++ 
+++ import { hideDownloadDropdown } from './actions';
+++-import { applyFilters, clearCustomSizeInputs, syncCustomSizeInputsFromSettings } from './filter';
++++import { applyFilters, clearCustomSizeInputs, clearFileSizeInputs, syncCustomSizeInputsFromSettings } from './filter';
+++ import { hideScanOverlay, showScanOverlay } from './scan';
+++ import { closeAllFilterDropdowns } from './settings';
+++ import { elements, state } from './state';
+++@@ -198,6 +198,31 @@ export function updateFilterButtonLabels(): void {
+++     });
+++   }
+++ 
++++  // File Size button
++++  const fileSizeBtn = document.querySelector<HTMLElement>('.filter-btn[data-filter="filesize"]');
++++  if (fileSizeBtn) {
++++    const hasFileSizeFilter = state.activeFilters.fileSizeEnabled;
++++    let label = t('filter_filesize');
++++    if (hasFileSizeFilter) {
++++      const min = state.activeFilters.minFileSizeKB;
++++      const max = state.activeFilters.maxFileSizeKB;
++++      if (min > 0 && max < Infinity) {
++++        label = `${min}-${max} KB`;
++++      } else if (min > 0) {
++++        label = `≥${min} KB`;
++++      } else if (max < Infinity) {
++++        label = `≤${max} KB`;
++++      }
++++    }
++++    fileSizeBtn.textContent = label + '▾';
++++    fileSizeBtn.classList.toggle('active', hasFileSizeFilter);
++++    toggleClearBtn(fileSizeBtn, hasFileSizeFilter, () => {
++++      clearFileSizeInputs();
++++      updateFilterButtonLabels();
++++      applyFilters();
++++    });
++++  }
++++
+++   // Group button (icon-only: toggle active state only)
+++   const groupBtn = document.querySelector<HTMLElement>('.filter-btn[data-filter="group"]');
+++   if (groupBtn) {
++diff --git a/shared/license.ts b/shared/license.ts
++index 2b642b8..8dcf1b2 100644
++--- a/shared/license.ts
+++++ b/shared/license.ts
++@@ -11,6 +11,9 @@ import type {
++   LicenseValidationResult,
++   ProUserInfo,
++ } from './types';
+++
+++/** 3-day grace period after trial expiry (mirrors trial.ts constant). */
+++const TRIAL_EXPIRY_GRACE_MS = 3 * 24 * 60 * 60 * 1000;
++ import { track, setEnvelopeMeta, flushNow } from './telemetry';
++ import { EVENTS } from './telemetry-events';
++ 
++@@ -333,6 +336,24 @@ export async function isProUser(): Promise<ProUserInfo> {
++     }
++ 
++     // Server reachable AND said "not valid" → license really is expired.
+++    // For trial licenses, allow a 3-day grace period where Pro features
+++    // are still accessible but a banner urges the user to upgrade.
+++    if (licenseData.plan === 'trial' && licenseData.expiresAt) {
+++      const elapsed = Date.now() - licenseData.expiresAt;
+++      if (elapsed >= 0 && elapsed <= TRIAL_EXPIRY_GRACE_MS) {
+++        licenseData.status = LICENSE_STATUS.EXPIRED;
+++        licenseData.lastVerified = Date.now();
+++        await saveLicenseData(licenseData);
+++        return {
+++          isPro: true,
+++          plan: licenseData.plan,
+++          expiresAt: licenseData.expiresAt,
+++          status: LICENSE_STATUS.EXPIRED,
+++          inGracePeriod: true,
+++        };
+++      }
+++    }
+++
++     // Persist so we don't keep re-asking the network on every check.
++     licenseData.status = LICENSE_STATUS.EXPIRED;
++     licenseData.lastVerified = Date.now();
++diff --git a/shared/trial.ts b/shared/trial.ts
++index 7b7a755..ccfc3ad 100644
++--- a/shared/trial.ts
+++++ b/shared/trial.ts
++@@ -42,6 +42,9 @@ const STORAGE_KEY_TRIAL_EXPIRED_REPORTED = '_trial_expired_reported';
++ /** 7 days in milliseconds — kept as a literal to avoid an extra constants import. */
++ export const TRIAL_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
++ 
+++/** 3-day grace period after trial expiry — Pro features still work but a banner is shown. */
+++export const TRIAL_GRACE_PERIOD_MS = 3 * 24 * 60 * 60 * 1000;
+++
++ export interface TrialStartResult {
++   success: boolean;
++   error?: string;
++@@ -235,3 +238,27 @@ export async function getTrialState(): Promise<TrialSnapshot | null> {
++     msRemaining,
++   };
++ }
+++
+++/**
+++ * Check if the trial has expired but is within the 3-day grace period.
+++ * During grace period, Pro features are still accessible but a banner urges upgrade.
+++ */
+++export async function isInTrialGracePeriod(): Promise<{
+++  inGrace: boolean;
+++  daysRemaining: number;
+++}> {
+++  const license = await getLicenseData();
+++  if (!license || license.plan !== 'trial' || !license.expiresAt) {
+++    return { inGrace: false, daysRemaining: 0 };
+++  }
+++  const now = Date.now();
+++  if (license.expiresAt > now) {
+++    return { inGrace: false, daysRemaining: 0 };
+++  }
+++  const elapsed = now - license.expiresAt;
+++  if (elapsed <= TRIAL_GRACE_PERIOD_MS) {
+++    const daysRemaining = Math.ceil((TRIAL_GRACE_PERIOD_MS - elapsed) / (24 * 60 * 60 * 1000));
+++    return { inGrace: true, daysRemaining };
+++  }
+++  return { inGrace: false, daysRemaining: 0 };
+++}
++diff --git a/shared/types.ts b/shared/types.ts
++index 317fe24..007f5c8 100644
++--- a/shared/types.ts
+++++ b/shared/types.ts
++@@ -102,6 +102,7 @@ export interface ProUserInfo {
++   plan?: string | null;
++   expiresAt?: number | null;
++   status: LicenseStatusValue;
+++  inGracePeriod?: boolean;
++ }
++ 
++ // ── Collection (IndexedDB) ──────────────────────────────────────────────────
++diff --git a/sidepanel/components/TrialGraceBanner.tsx b/sidepanel/components/TrialGraceBanner.tsx
++new file mode 100644
++index 0000000..a710f16
++--- /dev/null
+++++ b/sidepanel/components/TrialGraceBanner.tsx
++@@ -0,0 +1,25 @@
+++import { t } from '../../shared/i18n';
+++import { state } from '../state';
+++import { useStoreSelector } from './storeHook';
+++
+++export function TrialGraceBanner() {
+++  const inGrace = useStoreSelector((s) => s.inTrialGracePeriod);
+++  const daysLeft = useStoreSelector((s) => s.trialGraceDaysRemaining);
+++
+++  if (!inGrace) return null;
+++
+++  const handleUpgrade = () => {
+++    state.proUpgradeModalState = { open: true, errorText: '' };
+++  };
+++
+++  return (
+++    <div class="trial-grace-banner">
+++      <span class="trial-grace-text">
+++        {t('trial_grace_message', { days: String(daysLeft) })}
+++      </span>
+++      <button class="btn btn-small btn-primary trial-grace-btn" onClick={handleUpgrade}>
+++        {t('trial_grace_upgrade_btn')}
+++      </button>
+++    </div>
+++  );
+++}
++diff --git a/sidepanel/components/mount.tsx b/sidepanel/components/mount.tsx
++index 5badedf..ebf5083 100644
++--- a/sidepanel/components/mount.tsx
+++++ b/sidepanel/components/mount.tsx
++@@ -21,6 +21,7 @@ import { MultitabModal } from './MultitabModal';
++ import { ProUpgradeModal } from './ProUpgradeModal';
++ import { PrivacyOptInModal } from './PrivacyOptInModal';
++ import { SoftPaywallBanner } from './SoftPaywallBanner';
+++import { TrialGraceBanner } from './TrialGraceBanner';
++ import { BatchUrlCopyButton } from './BatchUrlCopyButton';
++ import { RatingPromptModal } from './RatingPromptModal';
++ import { SettingsModal } from './SettingsModal';
++@@ -181,6 +182,7 @@ export function mountPreactComponents(): void {
++   // it pops in, not below it. Falls back to a body append if the slot
++   // is missing (popup variant or hot-reload race).
++   mountSoftPaywallBanner();
+++  mountTrialGraceBanner();
++ 
++   // Batch URL copy button (Sprint 3.4). Renders into the
++   // `#batch-url-copy-mount` slot in toolbar row 2. The slot is a
++@@ -219,6 +221,21 @@ function mountSoftPaywallBanner(): void {
++   render(<SoftPaywallBanner />, mount);
++ }
++ 
+++function mountTrialGraceBanner(): void {
+++  const slot = document.getElementById('trial-grace-banner-mount');
+++  if (slot) {
+++    render(<TrialGraceBanner />, slot);
+++    return;
+++  }
+++  const app = document.getElementById('app');
+++  if (!app) return;
+++  const mount = document.createElement('div');
+++  mount.id = 'trial-grace-banner-mount';
+++  mount.dataset.preactMount = 'trial-grace-banner-mount';
+++  app.insertBefore(mount, app.firstChild);
+++  render(<TrialGraceBanner />, mount);
+++}
+++
++ /**
++  * Mount a brand-new Preact component that has no legacy DOM slot. Idempotent:
++  * if a previous mount with the same id exists (hot reload, popup re-init)
++diff --git a/sidepanel/filter.ts b/sidepanel/filter.ts
++index bcea39f..e04a444 100644
++--- a/sidepanel/filter.ts
+++++ b/sidepanel/filter.ts
++@@ -22,7 +22,8 @@ export function applyFilters(): void {
++       filterByUrl(img) &&
++       filterByColor(img) &&
++       filterBySettingsMinSize(img) &&
++-      filterBySettingsMaxSize(img)
+++      filterBySettingsMaxSize(img) &&
+++      filterByFileSize(img)
++     );
++   });
++ 
++@@ -204,6 +205,38 @@ export function filterBySettingsMinSize(img: ImageItem): boolean {
++   );
++ }
++ 
+++export function filterByFileSize(img: ImageItem): boolean {
+++  if (!state.activeFilters.fileSizeEnabled) return true;
+++  const bytes = img.estimatedSize || 0;
+++  const kb = bytes / 1024;
+++  return kb >= state.activeFilters.minFileSizeKB && kb <= state.activeFilters.maxFileSizeKB;
+++}
+++
+++export function applyFileSizeInputs(): void {
+++  const minInput = document.getElementById('filter-filesize-min') as HTMLInputElement | null;
+++  const maxInput = document.getElementById('filter-filesize-max') as HTMLInputElement | null;
+++  const minVal = minInput?.value ? parseFloat(minInput.value) : 0;
+++  const maxVal = maxInput?.value ? parseFloat(maxInput.value) : Infinity;
+++
+++  const hasFilter = minVal > 0 || (maxVal > 0 && maxVal < Infinity);
+++  state.activeFilters.fileSizeEnabled = hasFilter;
+++  state.activeFilters.minFileSizeKB = minVal;
+++  state.activeFilters.maxFileSizeKB = maxVal > 0 ? maxVal : Infinity;
+++
+++  updateFilterButtonLabels();
+++  applyFilters();
+++}
+++
+++export function clearFileSizeInputs(): void {
+++  const minInput = document.getElementById('filter-filesize-min') as HTMLInputElement | null;
+++  const maxInput = document.getElementById('filter-filesize-max') as HTMLInputElement | null;
+++  if (minInput) minInput.value = '';
+++  if (maxInput) maxInput.value = '';
+++  state.activeFilters.fileSizeEnabled = false;
+++  state.activeFilters.minFileSizeKB = 0;
+++  state.activeFilters.maxFileSizeKB = Infinity;
+++}
+++
++ export function filterBySettingsMaxSize(img: ImageItem): boolean {
++   if (!state.activeFilters.customMaxEnabled) return true;
++   const w = img.naturalWidth || img.displayWidth || 0;
++diff --git a/sidepanel/init.ts b/sidepanel/init.ts
++index 8a8e93a..f42b754 100644
++--- a/sidepanel/init.ts
+++++ b/sidepanel/init.ts
++@@ -22,6 +22,7 @@ import {
++ } from './actions';
++ import {
++   applyCustomSizeInputs,
+++  applyFileSizeInputs,
++   applyFilters,
++   clearCustomSizeInputs,
++   syncCustomSizeInputsFromSettings,
++@@ -1135,6 +1136,15 @@ function bindEvents(): void {
++     });
++   }
++ 
+++  // File size (KB) filter — apply on input change with debounce
+++  const fileSizeMinInput = document.getElementById('filter-filesize-min') as HTMLInputElement | null;
+++  const fileSizeMaxInput = document.getElementById('filter-filesize-max') as HTMLInputElement | null;
+++  if (fileSizeMinInput || fileSizeMaxInput) {
+++    const debouncedFileSize = debounce(() => applyFileSizeInputs(), 400);
+++    fileSizeMinInput?.addEventListener('input', debouncedFileSize);
+++    fileSizeMaxInput?.addEventListener('input', debouncedFileSize);
+++  }
+++
++   // Color filter - "All Colors" option
++   document.querySelectorAll<HTMLElement>('[data-color-filter]').forEach((opt) => {
++     opt.addEventListener('click', (e) => {
++@@ -1367,8 +1377,16 @@ function bindEvents(): void {
++         customMaxEnabled: state.appSettings.enableMaxSize,
++         customMaxWidth: state.appSettings.maxWidth ?? 8000,
++         customMaxHeight: state.appSettings.maxHeight ?? 8000,
+++        fileSizeEnabled: false,
+++        minFileSizeKB: 0,
+++        maxFileSizeKB: Infinity,
++       };
++       if (elements.filterUrlInput) (elements.filterUrlInput as HTMLInputElement).value = '';
+++      // Clear file size inputs
+++      const fsMin = document.getElementById('filter-filesize-min') as HTMLInputElement | null;
+++      const fsMax = document.getElementById('filter-filesize-max') as HTMLInputElement | null;
+++      if (fsMin) fsMin.value = '';
+++      if (fsMax) fsMax.value = '';
++       // Restore custom size input fields from global settings
++       syncCustomSizeInputsFromSettings();
++       document.querySelectorAll<HTMLInputElement>('.type-checkbox').forEach((cb) => {
++diff --git a/sidepanel/settings.ts b/sidepanel/settings.ts
++index dd82c34..4752525 100644
++--- a/sidepanel/settings.ts
+++++ b/sidepanel/settings.ts
++@@ -458,8 +458,17 @@ export async function applyProFeatureVisibility(): Promise<void> {
++   try {
++     const proStatus = await chrome.runtime.sendMessage({ type: MESSAGE_TYPES.VALIDATE_LICENSE });
++     state.isProUser = proStatus?.isPro === true;
+++    state.inTrialGracePeriod = proStatus?.inGracePeriod === true;
+++    state.trialGraceDaysRemaining = 0;
+++    if (state.inTrialGracePeriod && proStatus?.expiresAt) {
+++      const elapsed = Date.now() - proStatus.expiresAt;
+++      const graceMs = 3 * 24 * 60 * 60 * 1000;
+++      state.trialGraceDaysRemaining = Math.ceil((graceMs - elapsed) / (24 * 60 * 60 * 1000));
+++    }
++   } catch {
++     state.isProUser = false;
+++    state.inTrialGracePeriod = false;
+++    state.trialGraceDaysRemaining = 0;
++   }
++ 
++   // When user just became Pro, auto-enable Pro default features and persist
++diff --git a/sidepanel/state.ts b/sidepanel/state.ts
++index 993c04c..d936240 100644
++--- a/sidepanel/state.ts
+++++ b/sidepanel/state.ts
++@@ -36,6 +36,11 @@ export interface ActiveFilters {
++   customMaxEnabled: boolean;
++   customMaxWidth: number;
++   customMaxHeight: number;
+++
+++  // File size (KB) filter
+++  fileSizeEnabled: boolean;
+++  minFileSizeKB: number;
+++  maxFileSizeKB: number;
++ }
++ 
++ // ── Per-tab cache entry ─────────────────────────────────────────────────────
++@@ -335,6 +340,8 @@ export interface SidepanelState {
++ 
++   // License
++   isProUser: boolean;
+++  inTrialGracePeriod: boolean;
+++  trialGraceDaysRemaining: number;
++ 
++   // ── Preact-managed UI screens (replaces classList toggles) ───────────────
++   /** Which "main area" view is active. Mutually exclusive with itself. */
++@@ -421,6 +428,9 @@ function createInitialState(): SidepanelState {
++       customMaxEnabled: true,
++       customMaxWidth: 99999,
++       customMaxHeight: 99999,
+++      fileSizeEnabled: false,
+++      minFileSizeKB: 0,
+++      maxFileSizeKB: Infinity,
++     },
++ 
++     collapsedGroups: new Set<string>(),
++@@ -448,6 +458,8 @@ function createInitialState(): SidepanelState {
++     isMultiTabExtracting: false,
++ 
++     isProUser: false,
+++    inTrialGracePeriod: false,
+++    trialGraceDaysRemaining: 0,
++ 
++     uiScreen: 'images',
++     errorInfo: null,
++diff --git a/sidepanel/ui.ts b/sidepanel/ui.ts
++index 710546d..ec75592 100644
++--- a/sidepanel/ui.ts
+++++ b/sidepanel/ui.ts
++@@ -4,7 +4,7 @@
++ // UI组件模块：提供过滤器标签、视图切换、响应式、对话框、通知、加载状态等UI功能
++ 
++ import { hideDownloadDropdown } from './actions';
++-import { applyFilters, clearCustomSizeInputs, syncCustomSizeInputsFromSettings } from './filter';
+++import { applyFilters, clearCustomSizeInputs, clearFileSizeInputs, syncCustomSizeInputsFromSettings } from './filter';
++ import { hideScanOverlay, showScanOverlay } from './scan';
++ import { closeAllFilterDropdowns } from './settings';
++ import { elements, state } from './state';
++@@ -198,6 +198,31 @@ export function updateFilterButtonLabels(): void {
++     });
++   }
++ 
+++  // File Size button
+++  const fileSizeBtn = document.querySelector<HTMLElement>('.filter-btn[data-filter="filesize"]');
+++  if (fileSizeBtn) {
+++    const hasFileSizeFilter = state.activeFilters.fileSizeEnabled;
+++    let label = t('filter_filesize');
+++    if (hasFileSizeFilter) {
+++      const min = state.activeFilters.minFileSizeKB;
+++      const max = state.activeFilters.maxFileSizeKB;
+++      if (min > 0 && max < Infinity) {
+++        label = `${min}-${max} KB`;
+++      } else if (min > 0) {
+++        label = `≥${min} KB`;
+++      } else if (max < Infinity) {
+++        label = `≤${max} KB`;
+++      }
+++    }
+++    fileSizeBtn.textContent = label + '▾';
+++    fileSizeBtn.classList.toggle('active', hasFileSizeFilter);
+++    toggleClearBtn(fileSizeBtn, hasFileSizeFilter, () => {
+++      clearFileSizeInputs();
+++      updateFilterButtonLabels();
+++      applyFilters();
+++    });
+++  }
+++
++   // Group button (icon-only: toggle active state only)
++   const groupBtn = document.querySelector<HTMLElement>('.filter-btn[data-filter="group"]');
++   if (groupBtn) {
+diff --git a/patches/task-4.2-4.7-filesize-filter-grace-period.patch b/versions/v1.0.4/patches/task-4.2-4.7-filesize-filter-grace-period.patch
+similarity index 100%
+rename from patches/task-4.2-4.7-filesize-filter-grace-period.patch
+rename to versions/v1.0.4/patches/task-4.2-4.7-filesize-filter-grace-period.patch
+diff --git a/versions/v1.0.4/release-notes.md b/versions/v1.0.4/release-notes.md
+new file mode 100644
+index 0000000..589c51d
+--- /dev/null
++++ b/versions/v1.0.4/release-notes.md
+@@ -0,0 +1,65 @@
++# v1.0.4 Release Notes
++
++**Release Date**: 2026-05-19
++
++---
++
++## Bug Fixes
++
++- **File Size filter button**: Fixed ▾ icon disappearing on initial render (caused by `data-i18n` overwriting button text)
++- **generateId test**: Updated test to match `crypto.randomUUID()` behavior (introduced in v1.0.3 Task 1.5)
++
++## New Features
++
++### File Size (KB) Filter Presets
++
++Added preset file size ranges to the File Size filter dropdown, matching the UX of the pixel-size filter:
++
++| Preset | Range |
++|--------|-------|
++| All Sizes | No filter |
++| Tiny | < 50 KB |
++| Small | 50 - 200 KB |
++| Medium | 200 - 500 KB |
++| Large | 500 KB - 2 MB |
++| Extra Large | > 2 MB |
++
++Custom min/max KB inputs remain available below the presets.
++
++### Trial Grace Period (3 days)
++
++Trial users now get a 3-day grace period after expiry:
++- Pro features remain functional during grace period
++- A warning banner displays with days remaining and "Upgrade Now" CTA
++- After 3 days, standard expiry behavior applies
++
++## Tests Added
++
++- `filterByFileSize`: 6 test cases covering disabled state, boundary conditions, undefined size, and preset ranges
++- `isInTrialGracePeriod`: 5 test cases covering no license, non-trial plans, active trials, within grace, and past grace
++
++## i18n
++
++- 6 new file size preset keys in all 4 locales (en, zh_CN, zh_TW, ja)
++- 2 trial grace period keys in all 4 locales
++
++## Directory Restructuring
++
++Moved docs, patches, and release artifacts into `versions/` directory organized by version number.
++
++---
++
++## Files Changed
++
++```
++package.json                          — version bump 1.0.3 → 1.0.4
++pages/_shared-body.html               — filesize presets HTML + bug fix
++sidepanel/state.ts                    — fileSizePreset field
++sidepanel/filter.ts                   — FILESIZE_PRESETS map + applyFileSizePreset()
++sidepanel/ui.ts                       — preset label in button
++sidepanel/init.ts                     — preset click handlers + reset logic
++_locales/{en,zh_CN,zh_TW,ja}/messages.json — 6 new keys each
++tests/sidepanel-filter.test.tsx       — filterByFileSize test suite
++tests/trial.test.ts                   — isInTrialGracePeriod test suite
++tests/utils.test.ts                   — updated generateId test
++```

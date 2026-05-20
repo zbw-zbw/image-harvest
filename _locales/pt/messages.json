@@ -125,6 +125,9 @@
   "pro_feature_blocked_collection": {
     "message": "A coleção é um recurso Pro"
   },
+  "pro_feature_blocked_image_delete": {
+    "message": "A remoção de imagens é um recurso Pro. Assine para desbloquear!"
+  },
   "pro_feature_blocked_color_copy": {
     "message": "A cópia de cores é um recurso Pro"
   },

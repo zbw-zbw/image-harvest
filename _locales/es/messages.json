@@ -125,6 +125,9 @@
   "pro_feature_blocked_collection": {
     "message": "La colección es una función Pro"
   },
+  "pro_feature_blocked_image_delete": {
+    "message": "Eliminar imágenes es una función Pro. ¡Actualiza para desbloquear!"
+  },
   "pro_feature_blocked_color_copy": {
     "message": "Copiar colores es una función Pro"
   },
@@ -967,5 +970,116 @@
   },
   "license_error_activation_failed": {
     "message": "Error de activación. Inténtalo de nuevo."
+  },
+  "pro_feature_blocked_dedup": {
+    "message": "Eliminar duplicados es una función Pro. ¡Actualiza para desbloquear!"
+  },
+  "pro_feature_blocked_multitab": {
+    "message": "La extracción multi-pestaña es una función Pro. ¡Actualiza para desbloquear!"
+  },
+  "toast_no_duplicates_found": {
+    "message": "No se encontraron imágenes duplicadas"
+  },
+  "toast_duplicates_removed": {
+    "message": "Eliminadas {count} imágenes duplicadas",
+    "description": "{count} = número de imágenes duplicadas eliminadas"
+  },
+  "confirm_remove_duplicates_title": {
+    "message": "Eliminar duplicados"
+  },
+  "confirm_remove_duplicates_message": {
+    "message": "¿Está seguro de que desea eliminar {count} imágenes duplicadas seleccionadas?",
+    "description": "{count} = número de imágenes seleccionadas para eliminación"
+  },
+  "toast_select_at_least_one_tab": {
+    "message": "Seleccione al menos una pestaña"
+  },
+  "toast_new_images_discovered": {
+    "message": "{count} nuevas imágenes descubiertas",
+    "description": "{count} = número de nuevas imágenes encontradas vía monitoreo en vivo"
+  },
+  "toast_collection_empty": {
+    "message": "La colección está vacía"
+  },
+  "toast_exporting_collection": {
+    "message": "Exportando colección..."
+  },
+  "toast_export_cancelled": {
+    "message": "Exportación cancelada"
+  },
+  "toast_collection_exported": {
+    "message": "Colección exportada"
+  },
+  "toast_collection_export_failed": {
+    "message": "Error en la exportación"
+  },
+  "toast_collection_load_failed": {
+    "message": "Error al cargar la colección"
+  },
+  "toast_multitab_failed_load": {
+    "message": "Error al cargar las pestañas"
+  },
+  "toast_refresh_retry": {
+    "message": "Actualice la página e intente de nuevo"
+  },
+  "filter_filesize": {
+    "message": "Peso"
+  },
+  "filter_filesize_all": {
+    "message": "Todos los pesos"
+  },
+  "filter_filesize_tiny": {
+    "message": "Muy pequeño <50 KB"
+  },
+  "filter_filesize_small": {
+    "message": "Pequeño 50-200 KB"
+  },
+  "filter_filesize_medium": {
+    "message": "Mediano 200-500 KB"
+  },
+  "filter_filesize_large": {
+    "message": "Grande 500 KB-2 MB"
+  },
+  "filter_filesize_xlarge": {
+    "message": "XL >2 MB"
+  },
+  "filter_filesize_min": {
+    "message": "KB mín"
+  },
+  "filter_filesize_max": {
+    "message": "KB máx"
+  },
+  "paywall_banner_upgrade_cta": {
+    "message": "Actualizar ahora"
+  },
+  "paywall_banner_upgrade_desc": {
+    "message": "Su prueba ha expirado. Actualice para mantener todas las funciones Pro."
+  },
+  "pro_purchase_desc": {
+    "message": "Su prueba gratuita ha expirado. Actualice a Pro para mantener acceso a descargas por lotes, filtrado por color, búsqueda inversa y más."
+  },
+  "pro_purchase_cta": {
+    "message": "Obtener Pro ahora"
+  },
+  "toast_download_failed": {
+    "message": "Descarga fallida"
+  },
+  "toast_multitab_failed": {
+    "message": "Error en la extracción multi-pestaña"
+  },
+  "toast_extraction_success": {
+    "message": "{images} imágenes extraídas de {tabs} pestañas"
+  },
+  "toast_extraction_failed": {
+    "message": "Error en la extracción"
+  },
+  "empty_hidden_count": {
+    "message": "{count} imágenes ocultas por filtros actuales"
+  },
+  "trial_grace_message": {
+    "message": "Su prueba ha expirado. Funciones Pro disponibles por {days} día(s) más. Actualice para mantener acceso."
+  },
+  "trial_grace_upgrade_btn": {
+    "message": "Actualizar ahora"
   }
 }

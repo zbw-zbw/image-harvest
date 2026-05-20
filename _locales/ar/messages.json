@@ -125,6 +125,9 @@
   "pro_feature_blocked_collection": {
     "message": "المجموعة ميزة Pro"
   },
+  "pro_feature_blocked_image_delete": {
+    "message": "إزالة الصور ميزة Pro. قم بالترقية لفتحها!"
+  },
   "pro_feature_blocked_color_copy": {
     "message": "نسخ الألوان ميزة Pro"
   },

@@ -580,7 +580,7 @@ describe('renderImages', () => {
       state.allImages = [];
       renderImages();
       expect(imageGrid.classList.contains('hidden')).toBe(true);
-      expect(showEmpty).toHaveBeenCalledWith(false);
+      expect(showEmpty).toHaveBeenCalledWith(false, undefined);
     });
 
     it('passes allImages-had-some (true) vs all-empty (false) to showEmpty', () => {
@@ -589,7 +589,7 @@ describe('renderImages', () => {
       state.scanProgress.visible = false;
       state.allImages = [{ id: 'a' } as ImageItem];
       renderImages();
-      expect(showEmpty).toHaveBeenCalledWith(true);
+      expect(showEmpty).toHaveBeenCalledWith(true, 1);
     });
 
     it('does NOT hide grid when scan is still in progress (overlay remains)', () => {

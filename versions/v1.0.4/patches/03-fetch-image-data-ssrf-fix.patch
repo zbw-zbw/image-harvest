@@ -1,0 +1,29 @@
+diff --git a/background/index.ts b/background/index.ts
+index 3aba287..12e8fb5 100644
+--- a/background/index.ts
++++ b/background/index.ts
+@@ -18,6 +18,7 @@ import { initLicenseAlarm } from './license';
+ import { initDisplayMode, initTabActivationListener } from './display-mode';
+ import { getImagesFromTab, processMultiTabExtract } from './extractor';
+ import { fetchImageData, reverseSearchUpload } from './reverse-search';
++import { isAllowedFetchUrl } from '../shared/url-validator';
+ 
+ // ── Initialization ──────────────────────────────────────────────────────────
+ 
+@@ -338,12 +339,13 @@ async function handleMessage(
+         break;
+ 
+       case MESSAGE_TYPES.FETCH_IMAGE_DATA: {
+-        if (!sender.tab) {
+-          sendResponse({ success: false, error: 'Unauthorized: no sender tab' });
++        const url = message.url as string;
++        if (!isAllowedFetchUrl(url)) {
++          sendResponse({ success: false, error: 'Blocked: URL not allowed for fetch' });
+           break;
+         }
+         try {
+-          const dataUrl = await fetchImageData(message.url as string);
++          const dataUrl = await fetchImageData(url);
+           sendResponse({ success: true, dataUrl });
+         } catch (error) {
+           sendResponse({ success: false, error: (error as Error).message });

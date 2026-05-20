@@ -125,6 +125,9 @@
   "pro_feature_blocked_collection": {
     "message": "Sammlung ist eine Pro-Funktion"
   },
+  "pro_feature_blocked_image_delete": {
+    "message": "Bildentfernung ist eine Pro-Funktion. Upgraden zum Freischalten!"
+  },
   "pro_feature_blocked_color_copy": {
     "message": "Farbkopie ist eine Pro-Funktion"
   },

@@ -191,8 +191,9 @@ describe('removeDuplicates', () => {
       expect.objectContaining({
         title: 'Remove Duplicates',
         type: 'danger',
-        // 2 images → plural "s"
-        message: expect.stringContaining('2 selected duplicate images'),
+        // i18n key confirm_remove_duplicates_message with {count}=2
+        // produces "Are you sure you want to remove 2 selected duplicate image(s)?"
+        message: expect.stringContaining('2 selected duplicate image'),
       })
     );
   });
@@ -219,10 +220,10 @@ describe('removeDuplicates', () => {
     // keep-first heuristic. Reversing this precedence would delete the
     // user's explicit selection + keep everything else.
     expect(state.allImages.map((i) => i.id)).toEqual(['b', 'c']);
-    // Confirm message uses singular (1 image) via the `s > 1` ternary.
+    // Confirm message uses i18n key with {count}=1
     expect(ui.showConfirmDialog).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: expect.stringContaining('1 selected duplicate image?'),
+        message: expect.stringContaining('1 selected duplicate image'),
       })
     );
   });

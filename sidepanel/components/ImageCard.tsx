@@ -212,6 +212,12 @@ export function ImageCard({ img, index }: Props) {
 
   const handleDelete = async (e: MouseEvent) => {
     e.stopPropagation();
+    // Pro guard: free users see upgrade modal immediately (no confirm dialog).
+    if (!isProUser) {
+      showToast(t('pro_feature_blocked_image_delete'), 'warning');
+      showProUpgradeModal();
+      return;
+    }
     const confirmed = await showConfirmDialog({
       title: t('confirm_remove_image_title'),
       message: t('confirm_remove_image_message'),

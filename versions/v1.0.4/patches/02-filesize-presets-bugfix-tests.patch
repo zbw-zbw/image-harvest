@@ -1,0 +1,503 @@
+diff --git a/_locales/en/messages.json b/_locales/en/messages.json
+index 36a9354..6896ff6 100644
+--- a/_locales/en/messages.json
++++ b/_locales/en/messages.json
+@@ -186,6 +186,24 @@
+   "filter_filesize": {
+     "message": "File Size"
+   },
++  "filter_filesize_all": {
++    "message": "All Sizes"
++  },
++  "filter_filesize_tiny": {
++    "message": "Tiny <50 KB"
++  },
++  "filter_filesize_small": {
++    "message": "Small 50-200 KB"
++  },
++  "filter_filesize_medium": {
++    "message": "Medium 200-500 KB"
++  },
++  "filter_filesize_large": {
++    "message": "Large 500 KB-2 MB"
++  },
++  "filter_filesize_xlarge": {
++    "message": "XL >2 MB"
++  },
+   "filter_filesize_min": {
+     "message": "Min KB"
+   },
+@@ -546,6 +564,18 @@
+   "paywall_banner_try_cta": {
+     "message": "Try Pro Free"
+   },
++  "paywall_banner_upgrade_cta": {
++    "message": "Upgrade Now"
++  },
++  "paywall_banner_upgrade_desc": {
++    "message": "Your trial has ended. Upgrade to keep all Pro features."
++  },
++  "pro_purchase_desc": {
++    "message": "Your free trial has ended. Upgrade to Pro to keep access to batch downloads, color filtering, reverse search, and more."
++  },
++  "pro_purchase_cta": {
++    "message": "Get Pro Now"
++  },
+   "plan_expires_date": {
+     "message": "Expires: {date}"
+   },
+diff --git a/_locales/ja/messages.json b/_locales/ja/messages.json
+index 950e6e6..5811e45 100644
+--- a/_locales/ja/messages.json
++++ b/_locales/ja/messages.json
+@@ -176,6 +176,24 @@
+   "filter_filesize": {
+     "message": "ファイルサイズ"
+   },
++  "filter_filesize_all": {
++    "message": "すべてのサイズ"
++  },
++  "filter_filesize_tiny": {
++    "message": "極小 <50 KB"
++  },
++  "filter_filesize_small": {
++    "message": "小 50-200 KB"
++  },
++  "filter_filesize_medium": {
++    "message": "中 200-500 KB"
++  },
++  "filter_filesize_large": {
++    "message": "大 500 KB-2 MB"
++  },
++  "filter_filesize_xlarge": {
++    "message": "特大 >2 MB"
++  },
+   "filter_filesize_min": {
+     "message": "最小 KB"
+   },
+@@ -518,6 +536,18 @@
+   "paywall_banner_try_cta": {
+     "message": "Proを無料で試す"
+   },
++  "paywall_banner_upgrade_cta": {
++    "message": "今すぐアップグレード"
++  },
++  "paywall_banner_upgrade_desc": {
++    "message": "試用期間が終了しました。アップグレードして全Pro機能を維持。"
++  },
++  "pro_purchase_desc": {
++    "message": "無料試用期間が終了しました。Proにアップグレードして、一括ダウンロード、カラーフィルター、逆画像検索などの機能を引き続きご利用ください。"
++  },
++  "pro_purchase_cta": {
++    "message": "Proを購入"
++  },
+   "plan_expires_date": {
+     "message": "有効期限：{date}"
+   },
+diff --git a/_locales/zh_CN/messages.json b/_locales/zh_CN/messages.json
+index 73d186c..a1a99ca 100644
+--- a/_locales/zh_CN/messages.json
++++ b/_locales/zh_CN/messages.json
+@@ -176,6 +176,24 @@
+   "filter_filesize": {
+     "message": "文件大小"
+   },
++  "filter_filesize_all": {
++    "message": "所有大小"
++  },
++  "filter_filesize_tiny": {
++    "message": "极小 <50 KB"
++  },
++  "filter_filesize_small": {
++    "message": "小 50-200 KB"
++  },
++  "filter_filesize_medium": {
++    "message": "中 200-500 KB"
++  },
++  "filter_filesize_large": {
++    "message": "大 500 KB-2 MB"
++  },
++  "filter_filesize_xlarge": {
++    "message": "特大 >2 MB"
++  },
+   "filter_filesize_min": {
+     "message": "最小 KB"
+   },
+@@ -518,6 +536,18 @@
+   "paywall_banner_try_cta": {
+     "message": "免费试用 Pro"
+   },
++  "paywall_banner_upgrade_cta": {
++    "message": "立即升级"
++  },
++  "paywall_banner_upgrade_desc": {
++    "message": "试用已结束。升级以保留所有 Pro 功能。"
++  },
++  "pro_purchase_desc": {
++    "message": "免费试用已结束。升级 Pro 以继续使用批量下载、颜色筛选、以图搜图等功能。"
++  },
++  "pro_purchase_cta": {
++    "message": "立即购买 Pro"
++  },
+   "plan_expires_date": {
+     "message": "到期时间：{date}"
+   },
+diff --git a/_locales/zh_TW/messages.json b/_locales/zh_TW/messages.json
+index 79a246b..5347590 100644
+--- a/_locales/zh_TW/messages.json
++++ b/_locales/zh_TW/messages.json
+@@ -176,6 +176,24 @@
+   "filter_filesize": {
+     "message": "檔案大小"
+   },
++  "filter_filesize_all": {
++    "message": "所有大小"
++  },
++  "filter_filesize_tiny": {
++    "message": "極小 <50 KB"
++  },
++  "filter_filesize_small": {
++    "message": "小 50-200 KB"
++  },
++  "filter_filesize_medium": {
++    "message": "中 200-500 KB"
++  },
++  "filter_filesize_large": {
++    "message": "大 500 KB-2 MB"
++  },
++  "filter_filesize_xlarge": {
++    "message": "特大 >2 MB"
++  },
+   "filter_filesize_min": {
+     "message": "最小 KB"
+   },
+@@ -518,6 +536,18 @@
+   "paywall_banner_try_cta": {
+     "message": "免費試用 Pro"
+   },
++  "paywall_banner_upgrade_cta": {
++    "message": "立即升級"
++  },
++  "paywall_banner_upgrade_desc": {
++    "message": "試用已結束。升級以保留所有 Pro 功能。"
++  },
++  "pro_purchase_desc": {
++    "message": "免費試用已結束。升級 Pro 以繼續使用批量下載、顏色篩選、以圖搜圖等功能。"
++  },
++  "pro_purchase_cta": {
++    "message": "立即購買 Pro"
++  },
+   "plan_expires_date": {
+     "message": "到期時間：{date}"
+   },
+diff --git a/pages/_shared-body.html b/pages/_shared-body.html
+index 126409c..3803c23 100644
+--- a/pages/_shared-body.html
++++ b/pages/_shared-body.html
+@@ -480,8 +480,27 @@ HTML document — it omits the surrounding
+                 />
+               </div>
+ 
+-              <button class="filter-btn" data-filter="filesize" data-i18n="filter_filesize">File Size▾</button>
++              <button class="filter-btn" data-filter="filesize">File Size▾</button>
+               <div class="filter-dropdown hidden" id="filter-filesize">
++                <div class="filter-option active" data-filesize-filter="all" data-i18n="filter_filesize_all">
++                  All Sizes
++                </div>
++                <div class="filter-option" data-filesize-filter="tiny" data-i18n="filter_filesize_tiny">
++                  Tiny &lt;50 KB
++                </div>
++                <div class="filter-option" data-filesize-filter="small" data-i18n="filter_filesize_small">
++                  Small 50-200 KB
++                </div>
++                <div class="filter-option" data-filesize-filter="medium" data-i18n="filter_filesize_medium">
++                  Medium 200-500 KB
++                </div>
++                <div class="filter-option" data-filesize-filter="large" data-i18n="filter_filesize_large">
++                  Large 500 KB-2 MB
++                </div>
++                <div class="filter-option" data-filesize-filter="xlarge" data-i18n="filter_filesize_xlarge">
++                  XL &gt;2 MB
++                </div>
++                <div class="filter-divider"></div>
+                 <div class="filter-custom-size">
+                   <div class="filter-custom-row">
+                     <label data-i18n="filter_filesize_min">Min KB</label>
+diff --git a/sidepanel/filter.ts b/sidepanel/filter.ts
+index e04a444..7b808a7 100644
+--- a/sidepanel/filter.ts
++++ b/sidepanel/filter.ts
+@@ -212,6 +212,36 @@ export function filterByFileSize(img: ImageItem): boolean {
+   return kb >= state.activeFilters.minFileSizeKB && kb <= state.activeFilters.maxFileSizeKB;
+ }
+ 
++export const FILESIZE_PRESETS: Record<string, { min: number; max: number }> = {
++  all: { min: 0, max: Infinity },
++  tiny: { min: 0, max: 50 },
++  small: { min: 50, max: 200 },
++  medium: { min: 200, max: 500 },
++  large: { min: 500, max: 2048 },
++  xlarge: { min: 2048, max: Infinity },
++};
++
++export function applyFileSizePreset(preset: string): void {
++  const range = FILESIZE_PRESETS[preset];
++  if (!range) return;
++  state.activeFilters.fileSizePreset = preset;
++  if (preset === 'all') {
++    state.activeFilters.fileSizeEnabled = false;
++    state.activeFilters.minFileSizeKB = 0;
++    state.activeFilters.maxFileSizeKB = Infinity;
++  } else {
++    state.activeFilters.fileSizeEnabled = true;
++    state.activeFilters.minFileSizeKB = range.min;
++    state.activeFilters.maxFileSizeKB = range.max;
++  }
++  const minInput = document.getElementById('filter-filesize-min') as HTMLInputElement | null;
++  const maxInput = document.getElementById('filter-filesize-max') as HTMLInputElement | null;
++  if (minInput) minInput.value = '';
++  if (maxInput) maxInput.value = '';
++  updateFilterButtonLabels();
++  applyFilters();
++}
++
+ export function applyFileSizeInputs(): void {
+   const minInput = document.getElementById('filter-filesize-min') as HTMLInputElement | null;
+   const maxInput = document.getElementById('filter-filesize-max') as HTMLInputElement | null;
+@@ -223,6 +253,11 @@ export function applyFileSizeInputs(): void {
+   state.activeFilters.minFileSizeKB = minVal;
+   state.activeFilters.maxFileSizeKB = maxVal > 0 ? maxVal : Infinity;
+ 
++  if (hasFilter) {
++    state.activeFilters.fileSizePreset = 'custom';
++    document.querySelectorAll('[data-filesize-filter]').forEach((o) => o.classList.remove('active'));
++  }
++
+   updateFilterButtonLabels();
+   applyFilters();
+ }
+@@ -233,6 +268,7 @@ export function clearFileSizeInputs(): void {
+   if (minInput) minInput.value = '';
+   if (maxInput) maxInput.value = '';
+   state.activeFilters.fileSizeEnabled = false;
++  state.activeFilters.fileSizePreset = 'all';
+   state.activeFilters.minFileSizeKB = 0;
+   state.activeFilters.maxFileSizeKB = Infinity;
+ }
+diff --git a/sidepanel/init.ts b/sidepanel/init.ts
+index f42b754..77f2b5f 100644
+--- a/sidepanel/init.ts
++++ b/sidepanel/init.ts
+@@ -23,6 +23,7 @@ import {
+ import {
+   applyCustomSizeInputs,
+   applyFileSizeInputs,
++  applyFileSizePreset,
+   applyFilters,
+   clearCustomSizeInputs,
+   syncCustomSizeInputsFromSettings,
+@@ -1143,8 +1144,21 @@ function bindEvents(): void {
+     const debouncedFileSize = debounce(() => applyFileSizeInputs(), 400);
+     fileSizeMinInput?.addEventListener('input', debouncedFileSize);
+     fileSizeMaxInput?.addEventListener('input', debouncedFileSize);
++    fileSizeMinInput?.addEventListener('click', (e) => e.stopPropagation());
++    fileSizeMaxInput?.addEventListener('click', (e) => e.stopPropagation());
+   }
+ 
++  // File size preset options
++  document.querySelectorAll<HTMLElement>('[data-filesize-filter]').forEach((opt) => {
++    opt.addEventListener('click', () => {
++      const preset = opt.dataset.filesizeFilter || 'all';
++      document.querySelectorAll('[data-filesize-filter]').forEach((o) => o.classList.remove('active'));
++      opt.classList.add('active');
++      applyFileSizePreset(preset);
++      closeAllFilterDropdowns();
++    });
++  });
++
+   // Color filter - "All Colors" option
+   document.querySelectorAll<HTMLElement>('[data-color-filter]').forEach((opt) => {
+     opt.addEventListener('click', (e) => {
+@@ -1378,6 +1392,7 @@ function bindEvents(): void {
+         customMaxWidth: state.appSettings.maxWidth ?? 8000,
+         customMaxHeight: state.appSettings.maxHeight ?? 8000,
+         fileSizeEnabled: false,
++        fileSizePreset: 'all',
+         minFileSizeKB: 0,
+         maxFileSizeKB: Infinity,
+       };
+@@ -1393,11 +1408,16 @@ function bindEvents(): void {
+         cb.checked = true;
+       });
+       document.querySelectorAll('[data-size-filter]').forEach((o) => o.classList.remove('active'));
++      document
++        .querySelectorAll('[data-filesize-filter]')
++        .forEach((o) => o.classList.remove('active'));
+       document
+         .querySelectorAll('[data-layout-filter]')
+         .forEach((o) => o.classList.remove('active'));
+       const defaultSizeOption = document.querySelector('[data-size-filter="all"]');
+       if (defaultSizeOption) defaultSizeOption.classList.add('active');
++      const defaultFileSizeOption = document.querySelector('[data-filesize-filter="all"]');
++      if (defaultFileSizeOption) defaultFileSizeOption.classList.add('active');
+       const defaultLayoutOption = document.querySelector('[data-layout-filter="all"]');
+       if (defaultLayoutOption) defaultLayoutOption.classList.add('active');
+       document
+diff --git a/sidepanel/state.ts b/sidepanel/state.ts
+index d936240..016a85c 100644
+--- a/sidepanel/state.ts
++++ b/sidepanel/state.ts
+@@ -39,6 +39,7 @@ export interface ActiveFilters {
+ 
+   // File size (KB) filter
+   fileSizeEnabled: boolean;
++  fileSizePreset: string;
+   minFileSizeKB: number;
+   maxFileSizeKB: number;
+ }
+@@ -429,6 +430,7 @@ function createInitialState(): SidepanelState {
+       customMaxWidth: 99999,
+       customMaxHeight: 99999,
+       fileSizeEnabled: false,
++      fileSizePreset: 'all',
+       minFileSizeKB: 0,
+       maxFileSizeKB: Infinity,
+     },
+diff --git a/sidepanel/ui.ts b/sidepanel/ui.ts
+index ec75592..504c41f 100644
+--- a/sidepanel/ui.ts
++++ b/sidepanel/ui.ts
+@@ -204,20 +204,28 @@ export function updateFilterButtonLabels(): void {
+     const hasFileSizeFilter = state.activeFilters.fileSizeEnabled;
+     let label = t('filter_filesize');
+     if (hasFileSizeFilter) {
+-      const min = state.activeFilters.minFileSizeKB;
+-      const max = state.activeFilters.maxFileSizeKB;
+-      if (min > 0 && max < Infinity) {
+-        label = `${min}-${max} KB`;
+-      } else if (min > 0) {
+-        label = `≥${min} KB`;
+-      } else if (max < Infinity) {
+-        label = `≤${max} KB`;
++      const preset = state.activeFilters.fileSizePreset;
++      if (preset && preset !== 'all' && preset !== 'custom') {
++        label = t(`filter_filesize_${preset}`);
++      } else {
++        const min = state.activeFilters.minFileSizeKB;
++        const max = state.activeFilters.maxFileSizeKB;
++        if (min > 0 && max < Infinity) {
++          label = `${min}-${max} KB`;
++        } else if (min > 0) {
++          label = `≥${min} KB`;
++        } else if (max < Infinity) {
++          label = `≤${max} KB`;
++        }
+       }
+     }
+     fileSizeBtn.textContent = label + '▾';
+     fileSizeBtn.classList.toggle('active', hasFileSizeFilter);
+     toggleClearBtn(fileSizeBtn, hasFileSizeFilter, () => {
+       clearFileSizeInputs();
++      document.querySelectorAll('[data-filesize-filter]').forEach((o) => o.classList.remove('active'));
++      const allOpt = document.querySelector('[data-filesize-filter="all"]');
++      if (allOpt) allOpt.classList.add('active');
+       updateFilterButtonLabels();
+       applyFilters();
+     });
+diff --git a/tests/sidepanel-filter.test.tsx b/tests/sidepanel-filter.test.tsx
+index 1b9975b..05aea71 100644
+--- a/tests/sidepanel-filter.test.tsx
++++ b/tests/sidepanel-filter.test.tsx
+@@ -42,7 +42,9 @@ import {
+   applyFilters,
+   clearCustomSizeInputs,
+   colorDistance,
++  FILESIZE_PRESETS,
+   filterByColor,
++  filterByFileSize,
+   filterByLayout,
+   filterBySettingsMaxSize,
+   filterBySettingsMinSize,
+@@ -844,3 +846,54 @@ describe('renderColorSwatches', () => {
+     ).toBe(true);
+   });
+ });
++
++describe('filterByFileSize', () => {
++  it('passes everything when fileSizeEnabled is false', () => {
++    state.activeFilters.fileSizeEnabled = false;
++    state.activeFilters.minFileSizeKB = 100;
++    state.activeFilters.maxFileSizeKB = 500;
++    expect(filterByFileSize(makeImg({ estimatedSize: 10 }))).toBe(true);
++  });
++
++  it('filters out images below minFileSizeKB', () => {
++    state.activeFilters.fileSizeEnabled = true;
++    state.activeFilters.minFileSizeKB = 100;
++    state.activeFilters.maxFileSizeKB = Infinity;
++    // 50 KB = 51200 bytes → below 100 KB threshold
++    expect(filterByFileSize(makeImg({ estimatedSize: 51200 }))).toBe(false);
++  });
++
++  it('filters out images above maxFileSizeKB', () => {
++    state.activeFilters.fileSizeEnabled = true;
++    state.activeFilters.minFileSizeKB = 0;
++    state.activeFilters.maxFileSizeKB = 200;
++    // 300 KB = 307200 bytes → above 200 KB threshold
++    expect(filterByFileSize(makeImg({ estimatedSize: 307200 }))).toBe(false);
++  });
++
++  it('passes images within range', () => {
++    state.activeFilters.fileSizeEnabled = true;
++    state.activeFilters.minFileSizeKB = 50;
++    state.activeFilters.maxFileSizeKB = 200;
++    // 100 KB = 102400 bytes → within range
++    expect(filterByFileSize(makeImg({ estimatedSize: 102400 }))).toBe(true);
++  });
++
++  it('treats undefined estimatedSize as 0 bytes', () => {
++    state.activeFilters.fileSizeEnabled = true;
++    state.activeFilters.minFileSizeKB = 10;
++    state.activeFilters.maxFileSizeKB = Infinity;
++    expect(filterByFileSize(makeImg({ estimatedSize: undefined }))).toBe(false);
++  });
++
++  it('preset tiny filters correctly (0-50 KB)', () => {
++    state.activeFilters.fileSizeEnabled = true;
++    state.activeFilters.fileSizePreset = 'tiny';
++    state.activeFilters.minFileSizeKB = FILESIZE_PRESETS.tiny.min;
++    state.activeFilters.maxFileSizeKB = FILESIZE_PRESETS.tiny.max;
++    // 30 KB = 30720 bytes → within tiny range
++    expect(filterByFileSize(makeImg({ estimatedSize: 30720 }))).toBe(true);
++    // 60 KB = 61440 bytes → above tiny range
++    expect(filterByFileSize(makeImg({ estimatedSize: 61440 }))).toBe(false);
++  });
++});
+diff --git a/tests/utils.test.ts b/tests/utils.test.ts
+index bd8c5a2..8de69f9 100644
+--- a/tests/utils.test.ts
++++ b/tests/utils.test.ts
+@@ -28,19 +28,16 @@ import {
+ } from '../shared/utils';
+ 
+ describe('generateId', () => {
+-  it('returns a deterministic-prefix id for the same URL within the same ms', () => {
++  it('returns a unique UUID string', () => {
+     const id1 = generateId('https://example.com/a.png');
+     const id2 = generateId('https://example.com/a.png');
+-    // hash portion equal; timestamp suffix may differ — assert prefix length
+     expect(typeof id1).toBe('string');
+-    expect(id1.length).toBeGreaterThan(2);
+-    // hash prefix (everything except the trailing date.toString(36)) is stable
+-    const hashPrefix = (s: string): string => s.slice(0, s.length - Date.now().toString(36).length);
+-    expect(hashPrefix(id1)).toBe(hashPrefix(id2));
++    expect(id1.length).toBe(36);
++    expect(id1).not.toBe(id2);
+   });
+ 
+   it('produces different ids for different URLs', () => {
+-    expect(generateId('a').slice(0, 4)).not.toBe(generateId('b').slice(0, 4));
++    expect(generateId('a')).not.toBe(generateId('b'));
+   });
+ });
+ 

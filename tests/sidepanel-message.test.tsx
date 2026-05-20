@@ -427,14 +427,14 @@ describe('handleMessage — DOWNLOAD branches', () => {
     expect(ui.showToast).toHaveBeenCalledWith('Downloaded 5 images', 'success');
   });
 
-  it('DOWNLOAD_ERROR → hideProgress + error toast with reason (or "Unknown error")', async () => {
+  it('DOWNLOAD_ERROR → hideProgress + error toast with reason (or bare message when no reason)', async () => {
     handleMessage({ type: MESSAGE_TYPES.DOWNLOAD_ERROR, error: 'CORS denied' });
     const ui = await import('../sidepanel/ui');
     expect(ui.showToast).toHaveBeenCalledWith('Download failed: CORS denied', 'error');
 
     vi.clearAllMocks();
     handleMessage({ type: MESSAGE_TYPES.DOWNLOAD_ERROR }); // no reason
-    expect(ui.showToast).toHaveBeenCalledWith('Download failed: Unknown error', 'error');
+    expect(ui.showToast).toHaveBeenCalledWith('Download failed', 'error');
   });
 });
 
@@ -527,10 +527,7 @@ describe('handleMessage — MULTI_TAB_EXTRACT', () => {
 
     vi.clearAllMocks();
     handleMessage({ type: MESSAGE_TYPES.MULTI_TAB_EXTRACT_ERROR });
-    expect(ui.showToast).toHaveBeenCalledWith(
-      'Multi-tab extraction failed: Unknown error',
-      'error'
-    );
+    expect(ui.showToast).toHaveBeenCalledWith('Multi-tab extraction failed', 'error');
   });
 });
 

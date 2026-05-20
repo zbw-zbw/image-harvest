@@ -125,6 +125,9 @@
   "pro_feature_blocked_collection": {
     "message": "Коллекция — функция Pro"
   },
+  "pro_feature_blocked_image_delete": {
+    "message": "Удаление изображений — функция Pro. Обновитесь, чтобы разблокировать!"
+  },
   "pro_feature_blocked_color_copy": {
     "message": "Копирование цвета — функция Pro"
   },
