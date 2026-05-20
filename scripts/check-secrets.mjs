@@ -18,6 +18,10 @@ const YELLOW = '\x1b[33m';
 const GREEN = '\x1b[32m';
 const RESET = '\x1b[0m';
 
+// Lock files contain large base64 blobs (SHA512 integrity hashes) that
+// reliably trigger credential patterns as false positives — skip entirely.
+const SKIP_FILES = new Set(['package-lock.json', 'yarn.lock', 'pnpm-lock.yaml']);
+
 // Patterns that almost-certainly indicate a real secret leaking into the repo.
 const SECRET_PATTERNS = [
   // PayPal
@@ -67,6 +71,7 @@ function scanFile(path) {
     findings.push({ kind: 'forbidden-path', detail: forbidden });
     return findings;
   }
+  if (SKIP_FILES.has(basename(path))) return findings;
   if (!existsSync(path)) return findings;
 
   let content;
