@@ -207,36 +207,39 @@ export function ProUpgradeModal() {
           </button>
         </div>
         <div class="modal-body">
-          {/* ── Section 1: value prop + feature highlights ─────────────── */}
-          <div class="pro-upgrade-hero">
-            <p class="pro-upgrade-desc">{variantSubline(bucket)}</p>
-          </div>
-          <div class="pro-upgrade-features">
-            <ul class="pro-feature-list">
-              <ProFeatureItem
-                title={t('pro_feature_batch_title')}
-                desc={t('pro_feature_batch_desc')}
+          {/* ── Section 1: license key activation form (top priority) ──── */}
+          <div class="pro-upgrade-input-section">
+            <div class="license-input-row">
+              <input
+                type="text"
+                id="pro-modal-key-input"
+                class="license-input"
+                placeholder="XXXX-XXXX-XXXX-XXXX"
+                maxlength={19}
+                spellcheck={false}
+                autocomplete="off"
               />
-              <ProFeatureItem
-                title={t('pro_feature_multitab_title')}
-                desc={t('pro_feature_multitab_desc')}
-              />
-              <ProFeatureItem
-                title={t('pro_feature_reverse_search_title')}
-                desc={t('pro_feature_reverse_search_desc')}
-              />
-              <ProFeatureItem
-                title={t('pro_feature_dedup_title')}
-                desc={t('pro_feature_dedup_desc')}
-              />
-              <ProFeatureItem
-                title={t('pro_feature_color_title')}
-                desc={t('pro_feature_color_desc')}
-              />
-            </ul>
+              <button id="btn-pro-modal-activate" class="btn btn-primary btn-sm">
+                {t('pro_activate')}
+              </button>
+            </div>
+            <p id="pro-modal-error" class={`license-error${ms.errorText ? '' : ' hidden'}`}>
+              {ms.errorText}
+            </p>
+            <p class="pro-upgrade-get-pro-hint">
+              {t('pro_no_key_hint')}{' '}
+              <a
+                id="link-pro-modal-get"
+                href="#"
+                class="license-link"
+                onClick={handleLegacyGetProClick}
+              >
+                {t('pro_get_pro_link')}
+              </a>
+            </p>
           </div>
 
-          {/* ── Section 2: trial / pricing CTAs ─────────────────────────── */}
+          {/* ── Section 2: trial / pricing CTAs ────────────────────────── */}
           <div class="pro-upgrade-cta-section">
             {trialEligible && (
               <>
@@ -289,42 +292,31 @@ export function ProUpgradeModal() {
             )}
           </div>
 
-          {/* ── Section 3: license key activation form ──────────────────── */}
-          <div class="pro-upgrade-divider">
-            <span>{t('pro_already_have_key')}</span>
-          </div>
-          <div class="pro-upgrade-input-section">
-            <div class="license-input-row">
-              {/* Input + activate button keep their original ids so
-                  license-ui.ts > bindLicenseModalEvents continues to work
-                  unchanged. Same for the error <p> + "Get Pro" link below. */}
-              <input
-                type="text"
-                id="pro-modal-key-input"
-                class="license-input"
-                placeholder="XXXX-XXXX-XXXX-XXXX"
-                maxlength={19}
-                spellcheck={false}
-                autocomplete="off"
+          {/* ── Section 3: value prop + feature highlights (reference) ──── */}
+          <div class="pro-upgrade-features" style={{ marginTop: '16px', opacity: 0.85 }}>
+            <p class="pro-upgrade-desc">{variantSubline(bucket)}</p>
+            <ul class="pro-feature-list">
+              <ProFeatureItem
+                title={t('pro_feature_batch_title')}
+                desc={t('pro_feature_batch_desc')}
               />
-              <button id="btn-pro-modal-activate" class="btn btn-primary btn-sm">
-                {t('pro_activate')}
-              </button>
-            </div>
-            <p id="pro-modal-error" class={`license-error${ms.errorText ? '' : ' hidden'}`}>
-              {ms.errorText}
-            </p>
-            <p class="pro-upgrade-get-pro-hint">
-              {t('pro_no_key_hint')}{' '}
-              <a
-                id="link-pro-modal-get"
-                href="#"
-                class="license-link"
-                onClick={handleLegacyGetProClick}
-              >
-                {t('pro_get_pro_link')}
-              </a>
-            </p>
+              <ProFeatureItem
+                title={t('pro_feature_multitab_title')}
+                desc={t('pro_feature_multitab_desc')}
+              />
+              <ProFeatureItem
+                title={t('pro_feature_reverse_search_title')}
+                desc={t('pro_feature_reverse_search_desc')}
+              />
+              <ProFeatureItem
+                title={t('pro_feature_dedup_title')}
+                desc={t('pro_feature_dedup_desc')}
+              />
+              <ProFeatureItem
+                title={t('pro_feature_color_title')}
+                desc={t('pro_feature_color_desc')}
+              />
+            </ul>
           </div>
         </div>
       </div>
