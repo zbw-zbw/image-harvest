@@ -717,7 +717,8 @@ export function showLoading(): void {
     void (gridWrapper as HTMLElement).offsetHeight;
 
     const isListView = elements.imageGrid.classList.contains('list-view');
-    const containerHeight = (gridWrapper as HTMLElement | null)?.clientHeight || 600;
+    const measured = (gridWrapper as HTMLElement | null)?.clientHeight || 0;
+    const containerHeight = measured > 100 ? measured : window.innerHeight;
     const skeletonCount = calcSkeletonCount(containerHeight, isListView);
     // scanSkeletonLimit gates incremental render in message.ts (stop after we
     // fill the visible skeleton slots); scanSkeletonsToShow drives the

@@ -500,15 +500,14 @@ describe('renderProgressiveImages', () => {
     expect(state.scanSkeletonsToShow).toBe(0);
   });
 
-  it('falls back to 600px container height when .image-grid-wrapper is missing', () => {
+  it('falls back to window.innerHeight when .image-grid-wrapper is missing', () => {
     gridWrapper.remove();
     state.allImages = [];
     passAllFilters();
     renderProgressiveImages();
-    // Pin the 600 default. If the wrapper selector fails silently
-    // (common regression when renaming CSS classes), the skeleton-slot
-    // computation should still yield a reasonable number.
-    expect(vi.mocked(calcSkeletonCount)).toHaveBeenCalledWith(600, false);
+    // When the wrapper element is gone, use window.innerHeight (768 in jsdom)
+    // so skeletons fill the visible area instead of under-rendering.
+    expect(vi.mocked(calcSkeletonCount)).toHaveBeenCalledWith(window.innerHeight, false);
   });
 
   it('detects list-view via classList.contains("list-view") and threads it into calcSkeletonCount', () => {
