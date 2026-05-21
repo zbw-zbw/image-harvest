@@ -28,6 +28,7 @@
 //   - #pro-modal-trial-error       — error line for the trial CTA path
 
 import { useEffect, useState } from 'preact/hooks';
+import type { ComponentChildren } from 'preact';
 import { useStoreSelector } from './storeHook';
 import { state } from '../state';
 import { t } from '../../shared/i18n';
@@ -293,30 +294,58 @@ export function ProUpgradeModal() {
           </div>
 
           {/* ── Section 3: value prop + feature highlights (reference) ──── */}
-          <div class="pro-upgrade-features" style={{ marginTop: '16px', opacity: 0.85 }}>
+          <div class="pro-upgrade-features" style={{ marginTop: '16px' }}>
             <p class="pro-upgrade-desc">{variantSubline(bucket)}</p>
-            <ul class="pro-feature-list">
-              <ProFeatureItem
+            <div class="pro-feature-list">
+              <ProFeatureCard
                 title={t('pro_feature_batch_title')}
                 desc={t('pro_feature_batch_desc')}
+                gradient="gradient-blue"
+                icon={<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />}
               />
-              <ProFeatureItem
+              <ProFeatureCard
                 title={t('pro_feature_multitab_title')}
                 desc={t('pro_feature_multitab_desc')}
+                gradient="gradient-purple"
+                icon={
+                  <>
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                    <path d="M8 21h8M12 17v4" />
+                  </>
+                }
               />
-              <ProFeatureItem
+              <ProFeatureCard
                 title={t('pro_feature_reverse_search_title')}
                 desc={t('pro_feature_reverse_search_desc')}
+                gradient="gradient-green"
+                icon={<><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></>}
               />
-              <ProFeatureItem
+              <ProFeatureCard
                 title={t('pro_feature_dedup_title')}
                 desc={t('pro_feature_dedup_desc')}
+                gradient="gradient-amber"
+                icon={
+                  <>
+                    <rect x="3" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="3" width="7" height="7" rx="1" />
+                    <rect x="3" y="14" width="7" height="7" rx="1" />
+                    <rect x="14" y="14" width="7" height="7" rx="1" />
+                  </>
+                }
               />
-              <ProFeatureItem
+              <ProFeatureCard
                 title={t('pro_feature_color_title')}
                 desc={t('pro_feature_color_desc')}
+                gradient="gradient-pink"
+                icon={
+                  <>
+                    <circle cx="13.5" cy="6.5" r="4.5" />
+                    <circle cx="7.5" cy="13.5" r="4.5" />
+                    <circle cx="16.5" cy="16.5" r="4.5" />
+                  </>
+                }
               />
-            </ul>
+            </div>
           </div>
         </div>
       </div>
@@ -324,28 +353,34 @@ export function ProUpgradeModal() {
   );
 }
 
-interface FeatureProps {
+interface FeatureCardProps {
   title: string;
   desc: string;
+  gradient: string;
+  icon: ComponentChildren;
 }
 
-function ProFeatureItem({ title, desc }: FeatureProps) {
+function ProFeatureCard({ title, desc, gradient, icon }: FeatureCardProps) {
   return (
-    <li>
-      <svg
-        width="14"
-        height="14"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2.5"
-      >
-        <polyline points="20 6 9 17 4 12" />
-      </svg>
-      <div>
+    <div class="restricted-feature">
+      <div class={`restricted-feature-icon-wrap ${gradient}`}>
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          {icon}
+        </svg>
+      </div>
+      <div class="restricted-feature-text">
         <strong>{title}</strong>
         <p>{desc}</p>
       </div>
-    </li>
+    </div>
   );
 }

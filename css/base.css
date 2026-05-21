@@ -197,40 +197,7 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-}
-
-.pro-feature-list li {
-  display: flex;
-  align-items: flex-start;
   gap: 10px;
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-
-.pro-feature-list li div {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.pro-feature-list li strong {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.pro-feature-list li p {
-  font-size: 11px;
-  color: var(--text-tertiary);
-  margin: 0;
-  line-height: 1.4;
-}
-
-.pro-feature-list li svg {
-  stroke: var(--primary-color);
-  flex-shrink: 0;
-  margin-top: 2px;
 }
 
 /* Pro Feature Lock — visually indicate locked but keep clickable */
