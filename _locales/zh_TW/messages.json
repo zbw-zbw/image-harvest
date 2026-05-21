@@ -5,413 +5,8 @@
   "app_tagline": {
     "message": "從任意網頁批次下載圖片"
   },
-  "common_cancel": {
-    "message": "取消"
-  },
-  "common_confirm": {
-    "message": "確認"
-  },
-  "common_close": {
-    "message": "關閉"
-  },
-  "common_save": {
-    "message": "儲存"
-  },
-  "common_delete": {
-    "message": "刪除"
-  },
-  "common_copy": {
-    "message": "複製"
-  },
-  "common_download": {
-    "message": "下載"
-  },
-  "common_upgrade": {
-    "message": "升級到 Pro"
-  },
-  "common_maybe_later": {
-    "message": "稍後再說"
-  },
-  "settings_title": {
-    "message": "設定"
-  },
-  "settings_section_appearance": {
-    "message": "外觀"
-  },
-  "settings_section_experience": {
-    "message": "體驗"
-  },
-  "settings_section_scan": {
-    "message": "掃描"
-  },
-  "settings_section_download": {
-    "message": "下載"
-  },
-  "settings_section_language": {
-    "message": "語言"
-  },
-  "settings_language_label": {
-    "message": "介面語言"
-  },
-  "toolbar_select_all": {
-    "message": "全選"
-  },
-  "toolbar_deselect_all": {
-    "message": "取消全選"
-  },
-  "toolbar_copy_urls": {
-    "message": "複製連結"
-  },
-  "toolbar_copy_urls_tooltip": {
-    "message": "複製選取圖片的連結到剪貼簿"
-  },
-  "toolbar_copy_urls_empty": {
-    "message": "請先選取圖片"
-  },
-  "toast_url_copied_single": {
-    "message": "連結已複製！"
-  },
-  "toast_url_copied_batch": {
-    "message": "已複製 {count} 個連結到剪貼簿"
-  },
-  "toast_url_copy_failed": {
-    "message": "複製連結失敗"
-  },
-  "toast_download_started": {
-    "message": "已開始下載"
-  },
-  "toast_download_failed": {
-    "message": "下載失敗"
-  },
-  "toast_download_cancelled": {
-    "message": "已取消下載"
-  },
-  "toast_scan_cancelled": {
-    "message": "掃描已取消"
-  },
-  "toast_download_completed": {
-    "message": "已下載 {count} 張圖片"
-  },
-  "toast_no_images_selected": {
-    "message": "未選取任何圖片"
-  },
-  "toast_image_removed": {
-    "message": "已移除圖片"
-  },
-  "toast_collection_added": {
-    "message": "已加入收藏"
-  },
-  "toast_collection_add_failed": {
-    "message": "加入收藏失敗"
-  },
-  "toast_collection_removed": {
-    "message": "已從收藏移除"
-  },
-  "toast_collection_remove_failed": {
-    "message": "移除失敗"
-  },
-  "toast_color_copied": {
-    "message": "顏色 {hex} 已複製"
-  },
-  "toast_color_copy_failed": {
-    "message": "複製顏色失敗"
-  },
-  "pro_feature_blocked_format_conversion": {
-    "message": "格式轉換是 Pro 功能,升級即可解鎖!"
-  },
-  "pro_feature_blocked_advanced_grouping": {
-    "message": "進階分組是 Pro 功能,升級即可解鎖!"
-  },
-  "pro_feature_blocked_collection": {
-    "message": "收藏是 Pro 功能"
-  },
-  "pro_feature_blocked_image_delete": {
-    "message": "移除圖片是 Pro 功能,升級即可解鎖!"
-  },
-  "pro_feature_blocked_color_copy": {
-    "message": "複製顏色是 Pro 功能"
-  },
-  "pro_feature_blocked_reverse_search": {
-    "message": "{engine} 搜尋需要 Pro,升級即可解鎖!"
-  },
-  "pro_zip_limit": {
-    "message": "免費版每個 ZIP 最多 {max} 張圖片,升級 Pro 解鎖無限!"
-  },
-  "pro_copy_urls_limit": {
-    "message": "免費版單次最多複製 {max} 個連結，升級 Pro 解鎖無限！"
-  },
-  "pro_collection_limit": {
-    "message": "免費版最多收藏 {max} 張,升級 Pro 解鎖無限!"
-  },
-  "toolbar_sort": {
-    "message": "排序"
-  },
-  "toolbar_group": {
-    "message": "分組"
-  },
-  "toolbar_rescan": {
-    "message": "重新掃描"
-  },
-  "toolbar_download_all": {
-    "message": "全部下載"
-  },
-  "toolbar_download_selected": {
-    "message": "下載 ({count})"
-  },
-  "filter_size": {
-    "message": "尺寸"
-  },
-  "filter_type": {
-    "message": "類型"
-  },
-  "filter_layout": {
-    "message": "比例"
-  },
-  "filter_url": {
-    "message": "連結"
-  },
-  "filter_color": {
-    "message": "顏色"
-  },
-  "filter_filesize": {
-    "message": "檔案大小"
-  },
-  "filter_filesize_all": {
-    "message": "所有大小"
-  },
-  "filter_filesize_tiny": {
-    "message": "極小 (<50 KB)"
-  },
-  "filter_filesize_small": {
-    "message": "小 (50-200 KB)"
-  },
-  "filter_filesize_medium": {
-    "message": "中 (200-500 KB)"
-  },
-  "filter_filesize_large": {
-    "message": "大 (500 KB-2 MB)"
-  },
-  "filter_filesize_xlarge": {
-    "message": "特大 (>2 MB)"
-  },
-  "filter_filesize_min": {
-    "message": "最小 KB"
-  },
-  "filter_filesize_max": {
-    "message": "最大 KB"
-  },
-  "filter_all": {
-    "message": "全部"
-  },
-  "filter_min_width": {
-    "message": "最小寬度"
-  },
-  "filter_max_width": {
-    "message": "最大寬度"
-  },
-  "filter_height": {
-    "message": "高度"
-  },
-  "filter_none": {
-    "message": "無"
-  },
-  "filter_format": {
-    "message": "格式"
-  },
-  "filter_domain": {
-    "message": "網域"
-  },
-  "filter_tab": {
-    "message": "分頁"
-  },
-  "sort_none": {
-    "message": "無（頁面順序）"
-  },
-  "sort_size_desc": {
-    "message": "尺寸 ↓（大到小）"
-  },
-  "sort_size_asc": {
-    "message": "尺寸 ↑（小到大）"
-  },
-  "sort_filesize_desc": {
-    "message": "檔案大小 ↓（大到小）"
-  },
-  "sort_filesize_asc": {
-    "message": "檔案大小 ↑（小到大）"
-  },
-  "layout_all": {
-    "message": "全部"
-  },
-  "layout_square": {
-    "message": "方形 (1:1)"
-  },
-  "layout_landscape": {
-    "message": "橫向 (>1:1)"
-  },
-  "layout_portrait": {
-    "message": "直向 (<1:1)"
-  },
-  "layout_panorama": {
-    "message": "全景 (>2:1)"
-  },
-  "size_all": {
-    "message": "全部"
-  },
-  "size_small": {
-    "message": "小 < 100px"
-  },
-  "size_medium": {
-    "message": "中 100-500px"
-  },
-  "size_large": {
-    "message": "大 500-1000px"
-  },
-  "size_xl": {
-    "message": "超大 > 1000px"
-  },
-  "size_btn_small": {
-    "message": "小"
-  },
-  "size_btn_medium": {
-    "message": "中"
-  },
-  "size_btn_large": {
-    "message": "大"
-  },
-  "size_btn_xl": {
-    "message": "超大"
-  },
-  "size_btn_custom": {
-    "message": "自訂"
-  },
-  "layout_btn_square": {
-    "message": "方形"
-  },
-  "layout_btn_landscape": {
-    "message": "橫向"
-  },
-  "layout_btn_portrait": {
-    "message": "縱向"
-  },
-  "layout_btn_panorama": {
-    "message": "全景"
-  },
-  "color_all": {
-    "message": "全部顏色"
-  },
-  "color_no_extracted": {
-    "message": "尚未擷取到顏色"
-  },
-  "filter_url_placeholder": {
-    "message": "按連結關鍵字篩選..."
-  },
-  "settings_display": {
-    "message": "顯示"
-  },
-  "settings_side_panel": {
-    "message": "在側邊面板顯示"
-  },
-  "settings_side_panel_desc": {
-    "message": "在瀏覽器側邊面板而非彈窗中開啟結果"
-  },
-  "settings_density": {
-    "message": "佈局密度:"
-  },
-  "settings_density_compact": {
-    "message": "緊湊"
-  },
-  "settings_density_standard": {
-    "message": "標準"
-  },
-  "settings_density_comfortable": {
-    "message": "寬鬆"
-  },
-  "settings_theme": {
-    "message": "主題:"
-  },
-  "settings_theme_system": {
-    "message": "跟隨系統"
-  },
-  "settings_theme_light": {
-    "message": "淺色"
-  },
-  "settings_theme_dark": {
-    "message": "深色"
-  },
-  "settings_default_group": {
-    "message": "預設分組方式:"
-  },
-  "settings_similar": {
-    "message": "相似圖片偵測"
-  },
-  "settings_color_extract": {
-    "message": "顏色提取"
-  },
-  "settings_all_frames": {
-    "message": "搜尋所有 iframe"
-  },
-  "settings_live_monitor": {
-    "message": "即時監控"
-  },
-  "settings_download_options": {
-    "message": "指定下載選項"
-  },
-  "settings_subfolder": {
-    "message": "子資料夾:"
-  },
-  "settings_filename": {
-    "message": "檔名:"
-  },
-  "settings_convert_format": {
-    "message": "轉換格式:"
-  },
-  "settings_no_warning": {
-    "message": "下載大量檔案時不再提示"
-  },
-  "settings_telemetry": {
-    "message": "分享匿名使用資料"
-  },
-  "settings_save": {
-    "message": "儲存設定"
-  },
-  "settings_reset": {
-    "message": "重設"
-  },
-  "settings_saved": {
-    "message": "設定已儲存"
-  },
-  "settings_save_failed": {
-    "message": "儲存設定失敗"
-  },
-  "status_found_images": {
-    "message": "找到 {count} 張圖片"
-  },
-  "status_similar": {
-    "message": "相似"
-  },
-  "rating_title": {
-    "message": "喜歡 Image Harvest 嗎?"
-  },
-  "rating_desc": {
-    "message": "如果我們幫你節省了時間,在 Chrome 應用商店留下 5 星評價對我們意義重大。"
-  },
-  "rating_rate_now": {
-    "message": "⭐ 到 Chrome 商店評價"
-  },
-  "rating_later": {
-    "message": "稍後再說"
-  },
-  "rating_never": {
-    "message": "不再提示"
-  },
-  "rating_close": {
-    "message": "關閉"
-  },
   "btn_deactivate": {
     "message": "解綁"
-  },
-  "license_deactivating": {
-    "message": "解綁中..."
   },
   "card_add_to_collection": {
     "message": "加入收藏"
@@ -431,20 +26,71 @@
   "card_reverse_search": {
     "message": "以圖搜圖（{engine}）"
   },
+  "collection_empty_hint": {
+    "message": "點擊任意圖片上的星標圖示即可加入收藏夾"
+  },
+  "collection_empty_title": {
+    "message": "收藏夾為空"
+  },
   "collection_export_tooltip": {
     "message": "匯出收藏為 ZIP"
   },
   "collection_modal_title": {
     "message": "收藏"
   },
+  "collection_no_match": {
+    "message": "未找到匹配的圖片"
+  },
+  "collection_no_match_hint": {
+    "message": "請嘗試其他搜尋關鍵詞"
+  },
   "collection_search_placeholder": {
     "message": "搜尋收藏..."
+  },
+  "color_all": {
+    "message": "全部顏色"
+  },
+  "color_no_extracted": {
+    "message": "尚未擷取到顏色"
+  },
+  "common_cancel": {
+    "message": "取消"
+  },
+  "common_close": {
+    "message": "關閉"
+  },
+  "common_confirm": {
+    "message": "確認"
+  },
+  "common_copy": {
+    "message": "複製"
+  },
+  "common_delete": {
+    "message": "刪除"
   },
   "common_dismiss": {
     "message": "關閉"
   },
+  "common_download": {
+    "message": "下載"
+  },
+  "common_maybe_later": {
+    "message": "稍後再說"
+  },
   "common_remove": {
     "message": "移除"
+  },
+  "common_save": {
+    "message": "儲存"
+  },
+  "common_upgrade": {
+    "message": "升級到 Pro"
+  },
+  "confirm_remove_duplicates_message": {
+    "message": "確定要移除{count}張選中的重複圖片嗎？"
+  },
+  "confirm_remove_duplicates_title": {
+    "message": "移除重複圖片"
   },
   "confirm_remove_image_message": {
     "message": "確定從列表中移除此圖片？"
@@ -452,8 +98,14 @@
   "confirm_remove_image_title": {
     "message": "移除圖片"
   },
+  "dedup_group_title": {
+    "message": "第 {index} 組（{count} 張相似）"
+  },
   "dedup_modal_title": {
     "message": "相似圖片"
+  },
+  "dedup_no_similar": {
+    "message": "未找到相似圖片"
   },
   "dedup_remove_duplicates": {
     "message": "移除重複項"
@@ -470,14 +122,14 @@
   "dialog_download_many_title": {
     "message": "批次下載圖片"
   },
+  "empty_hidden_count": {
+    "message": "{count} 張圖片被當前篩選條件隱藏"
+  },
   "empty_no_images_desc": {
     "message": "嘗試捲動頁面或點擊重新掃描以發現更多圖片。"
   },
   "empty_no_results_desc": {
     "message": "嘗試調整篩選條件以查看更多結果。"
-  },
-  "empty_hidden_count": {
-    "message": "{count} 張圖片被當前篩選條件隱藏"
   },
   "empty_rescan_images": {
     "message": "重新掃描"
@@ -494,20 +146,158 @@
   "error_default_message": {
     "message": "發生錯誤"
   },
+  "filter_all": {
+    "message": "全部"
+  },
+  "filter_color": {
+    "message": "顏色"
+  },
+  "filter_domain": {
+    "message": "網域"
+  },
+  "filter_filesize": {
+    "message": "檔案大小"
+  },
+  "filter_filesize_all": {
+    "message": "所有大小"
+  },
+  "filter_filesize_large": {
+    "message": "大 (500 KB-2 MB)"
+  },
+  "filter_filesize_max": {
+    "message": "最大 KB"
+  },
+  "filter_filesize_medium": {
+    "message": "中 (200-500 KB)"
+  },
+  "filter_filesize_min": {
+    "message": "最小 KB"
+  },
+  "filter_filesize_small": {
+    "message": "小 (50-200 KB)"
+  },
+  "filter_filesize_tiny": {
+    "message": "極小 (<50 KB)"
+  },
+  "filter_filesize_xlarge": {
+    "message": "特大 (>2 MB)"
+  },
+  "filter_format": {
+    "message": "格式"
+  },
+  "filter_height": {
+    "message": "高度"
+  },
+  "filter_layout": {
+    "message": "比例"
+  },
+  "filter_max_width": {
+    "message": "最大寬度"
+  },
+  "filter_min_width": {
+    "message": "最小寬度"
+  },
+  "filter_none": {
+    "message": "無"
+  },
+  "filter_size": {
+    "message": "尺寸"
+  },
+  "filter_tab": {
+    "message": "分頁"
+  },
+  "filter_type": {
+    "message": "類型"
+  },
+  "filter_type_other": {
+    "message": "其他"
+  },
+  "filter_url": {
+    "message": "連結"
+  },
+  "filter_url_placeholder": {
+    "message": "按連結關鍵字篩選..."
+  },
+  "format_original": {
+    "message": "原始格式"
+  },
   "grid_current_tab_badge": {
     "message": "目前分頁"
+  },
+  "hotkey_click_to_set": {
+    "message": "點擊設定"
   },
   "hotkey_not_set": {
     "message": "未設定"
   },
-  "hotkey_click_to_set": {
-    "message": "點擊設定"
+  "layout_all": {
+    "message": "全部"
+  },
+  "layout_btn_landscape": {
+    "message": "橫向"
+  },
+  "layout_btn_panorama": {
+    "message": "全景"
+  },
+  "layout_btn_portrait": {
+    "message": "縱向"
+  },
+  "layout_btn_square": {
+    "message": "方形"
+  },
+  "layout_landscape": {
+    "message": "橫向 (>1:1)"
+  },
+  "layout_panorama": {
+    "message": "全景 (>2:1)"
+  },
+  "layout_portrait": {
+    "message": "直向 (<1:1)"
+  },
+  "layout_square": {
+    "message": "方形 (1:1)"
+  },
+  "license_activating": {
+    "message": "啟用中..."
+  },
+  "license_activation_failed": {
+    "message": "啟用失敗"
+  },
+  "license_deactivating": {
+    "message": "解綁中..."
+  },
+  "license_enter_key": {
+    "message": "請輸入授權金鑰"
+  },
+  "license_error_activation_failed": {
+    "message": "啟用失敗，請重試。"
+  },
+  "license_error_invalid_key": {
+    "message": "無效的授權金鑰。"
+  },
+  "license_error_network": {
+    "message": "網路錯誤，請檢查您的網路連線。"
+  },
+  "license_network_error": {
+    "message": "網路錯誤，請重試。"
+  },
+  "license_placeholder": {
+    "message": "輸入授權金鑰"
   },
   "live_indicator_label": {
     "message": "即時"
   },
   "live_indicator_tooltip": {
     "message": "即時監控已啟用 - 自動偵測新圖片"
+  },
+  "menu_reverse_search": {
+    "message": "以圖搜圖"
+  },
+  "multitab_current": {
+    "message": "當前"
+  },
+  "multitab_extracting": {
+    "message": "擷取中..."
   },
   "multitab_modal_title": {
     "message": "多分頁擷取"
@@ -518,8 +308,8 @@
   "multitab_start_extraction": {
     "message": "開始擷取"
   },
-  "multitab_current": {
-    "message": "當前"
+  "multitab_starting": {
+    "message": "開始擷取..."
   },
   "multitab_untitled": {
     "message": "未命名"
@@ -541,12 +331,6 @@
   },
   "paywall_banner_upgrade_desc": {
     "message": "試用已結束，升級以繼續使用所有 Pro 功能。"
-  },
-  "pro_purchase_desc": {
-    "message": "免費試用已結束，升級到 Pro 以繼續使用批次下載、顏色篩選、以圖搜圖等功能。"
-  },
-  "pro_purchase_cta": {
-    "message": "立即取得 Pro"
   },
   "plan_expires_date": {
     "message": "到期時間：{date}"
@@ -611,17 +395,53 @@
   "pro_already_have_key": {
     "message": "已有授權金鑰？"
   },
+  "pro_collection_limit": {
+    "message": "免費版最多收藏 {max} 張,升級 Pro 解鎖無限!"
+  },
+  "pro_copy_urls_limit": {
+    "message": "免費版單次最多複製 {max} 個連結，升級 Pro 解鎖無限！"
+  },
   "pro_deactivate_tooltip": {
     "message": "解綁授權"
   },
   "pro_feature_batch_desc": {
     "message": "一鍵下載所有圖片"
   },
+  "pro_feature_batch_desc_pro": {
+    "message": "不限數量，一次選中全部圖片打包下載為 ZIP"
+  },
   "pro_feature_batch_title": {
     "message": "批次下載"
   },
+  "pro_feature_blocked_advanced_grouping": {
+    "message": "進階分組是 Pro 功能,升級即可解鎖!"
+  },
+  "pro_feature_blocked_collection": {
+    "message": "收藏是 Pro 功能"
+  },
+  "pro_feature_blocked_color_copy": {
+    "message": "複製顏色是 Pro 功能"
+  },
+  "pro_feature_blocked_dedup": {
+    "message": "去重是Pro功能，升級後解鎖！"
+  },
+  "pro_feature_blocked_format_conversion": {
+    "message": "格式轉換是 Pro 功能,升級即可解鎖!"
+  },
+  "pro_feature_blocked_image_delete": {
+    "message": "移除圖片是 Pro 功能,升級即可解鎖!"
+  },
+  "pro_feature_blocked_multitab": {
+    "message": "多分頁擷取是Pro功能，升級後解鎖！"
+  },
+  "pro_feature_blocked_reverse_search": {
+    "message": "{engine} 搜尋需要 Pro,升級即可解鎖!"
+  },
   "pro_feature_color_desc": {
     "message": "按主色調篩選圖片"
+  },
+  "pro_feature_color_desc_pro": {
+    "message": "自動提取主色調，點擊色塊即可複製 HEX 色值"
   },
   "pro_feature_color_title": {
     "message": "顏色篩選"
@@ -629,17 +449,26 @@
   "pro_feature_dedup_desc": {
     "message": "自動偵測並移除重複圖片"
   },
+  "pro_feature_dedup_desc_pro": {
+    "message": "感知雜湊智能去重，避免重複下載浪費空間"
+  },
   "pro_feature_dedup_title": {
     "message": "重複偵測"
   },
   "pro_feature_multitab_desc": {
     "message": "同時從多個分頁擷取圖片"
   },
+  "pro_feature_multitab_desc_pro": {
+    "message": "跨標籤頁批量提取並打包為 ZIP，無需逐頁操作"
+  },
   "pro_feature_multitab_title": {
     "message": "多分頁擷取"
   },
   "pro_feature_reverse_search_desc": {
     "message": "透過以圖搜圖尋找圖片來源"
+  },
+  "pro_feature_reverse_search_desc_pro": {
+    "message": "一鍵在 Google、TinEye、Yandex 等引擎中搜尋任意圖片來源"
   },
   "pro_feature_reverse_search_title": {
     "message": "以圖搜圖"
@@ -659,6 +488,12 @@
   "pro_pricing_cta": {
     "message": "查看價格"
   },
+  "pro_purchase_cta": {
+    "message": "立即取得 Pro"
+  },
+  "pro_purchase_desc": {
+    "message": "免費試用已結束，升級到 Pro 以繼續使用批次下載、顏色篩選、以圖搜圖等功能。"
+  },
   "pro_subline_variant_a": {
     "message": "一次購買，終身更新。"
   },
@@ -671,14 +506,14 @@
   "pro_trial_desc": {
     "message": "免費體驗全部 Pro 功能 7 天，無需任何承諾。"
   },
+  "pro_trial_perk_cancel": {
+    "message": "到期自動結束，無需手動取消"
+  },
   "pro_trial_perk_full_access": {
     "message": "完整使用所有 Pro 功能"
   },
   "pro_trial_perk_no_card": {
     "message": "無需綁定信用卡"
-  },
-  "pro_trial_perk_cancel": {
-    "message": "到期自動結束，無需手動取消"
   },
   "pro_trial_start_cta": {
     "message": "開始免費試用"
@@ -695,20 +530,92 @@
   "pro_trial_unavailable": {
     "message": "試用不可用"
   },
-  "trial_grace_message": {
-    "message": "試用已到期，Pro 功能還可使用 {days} 天。升級以保持使用權限。"
-  },
-  "trial_grace_upgrade_btn": {
-    "message": "立即升級"
+  "pro_zip_limit": {
+    "message": "免費版每個 ZIP 最多 {max} 張圖片,升級 Pro 解鎖無限!"
   },
   "progress_downloading": {
     "message": "下載中..."
   },
+  "progress_multitab_text": {
+    "message": "{current}/{total} 個分頁 · 已發現 {count} 張圖片"
+  },
   "progress_text": {
     "message": "{current} / {total}"
   },
-  "progress_multitab_text": {
-    "message": "{current}/{total} 個分頁 · 已發現 {count} 張圖片"
+  "rating_close": {
+    "message": "關閉"
+  },
+  "rating_desc": {
+    "message": "如果我們幫你節省了時間,在 Chrome 應用商店留下 5 星評價對我們意義重大。"
+  },
+  "rating_later": {
+    "message": "稍後再說"
+  },
+  "rating_never": {
+    "message": "不再提示"
+  },
+  "rating_rate_now": {
+    "message": "⭐ 到 Chrome 商店評價"
+  },
+  "rating_title": {
+    "message": "喜歡 Image Harvest 嗎?"
+  },
+  "restricted_feature_batch_desc": {
+    "message": "一鍵選取並下載任意網頁上的所有圖片。可依尺寸、格式或版面進行篩選。"
+  },
+  "restricted_feature_batch_title": {
+    "message": "批次下載"
+  },
+  "restricted_feature_collection_desc": {
+    "message": "將圖片收藏至持久化集合中，跨工作階段保存。隨時整理與回顧。"
+  },
+  "restricted_feature_collection_title": {
+    "message": "收藏管理"
+  },
+  "restricted_feature_color_desc": {
+    "message": "自動擷取每張圖片的主色調。點擊色塊即可複製十六進位色碼。"
+  },
+  "restricted_feature_color_title": {
+    "message": "色彩擷取"
+  },
+  "restricted_feature_dedup_desc": {
+    "message": "透過感知雜湊自動尋找並移除近似重複的圖片。"
+  },
+  "restricted_feature_dedup_title": {
+    "message": "相似圖片偵測"
+  },
+  "restricted_feature_filter_desc": {
+    "message": "依尺寸、類型、版面、URL 模式或主色調篩選圖片，精準找到所需內容。"
+  },
+  "restricted_feature_filter_title": {
+    "message": "智慧篩選"
+  },
+  "restricted_feature_multitab_desc": {
+    "message": "同時從多個已開啟的分頁中擷取圖片，並打包為 ZIP 下載。"
+  },
+  "restricted_feature_multitab_title": {
+    "message": "多分頁擷取"
+  },
+  "restricted_feature_preview_desc": {
+    "message": "一覽查看高解析度原圖及中繼資料——尺寸、檔案大小和格式。"
+  },
+  "restricted_feature_preview_title": {
+    "message": "即時預覽"
+  },
+  "restricted_feature_reverse_desc": {
+    "message": "一鍵在 Google、TinEye、Yandex 和 Baidu 中搜尋任意圖片。"
+  },
+  "restricted_feature_reverse_title": {
+    "message": "以圖搜圖"
+  },
+  "restricted_features_heading": {
+    "message": "Image Harvest 功能一覽"
+  },
+  "restricted_link_website": {
+    "message": "官方網站"
+  },
+  "restricted_notice": {
+    "message": "此頁面不允許擴充功能注入腳本。請導航至一般網頁（如文章、圖庫或搜尋結果）以開始擷取圖片。"
   },
   "restricted_subtitle": {
     "message": "此頁面限制了內容腳本。請嘗試其他頁面。"
@@ -731,8 +638,227 @@
   "scan_updating": {
     "message": "更新中..."
   },
+  "settings_all_frames": {
+    "message": "搜尋所有 iframe"
+  },
+  "settings_all_frames_desc": {
+    "message": "同時掃描 iframe 和嵌入框架中的圖片"
+  },
+  "settings_color_extract": {
+    "message": "顏色提取"
+  },
+  "settings_color_extract_desc": {
+    "message": "擷取每張圖片的主色調用於篩選"
+  },
+  "settings_convert_format": {
+    "message": "轉換格式:"
+  },
+  "settings_default_group": {
+    "message": "預設分組方式:"
+  },
+  "settings_density": {
+    "message": "佈局密度:"
+  },
+  "settings_density_comfortable": {
+    "message": "寬鬆"
+  },
+  "settings_density_compact": {
+    "message": "緊湊"
+  },
+  "settings_density_standard": {
+    "message": "標準"
+  },
+  "settings_display": {
+    "message": "顯示"
+  },
+  "settings_download_options": {
+    "message": "指定下載選項"
+  },
+  "settings_download_options_desc": {
+    "message": "自訂子資料夾、檔案名稱範本和格式轉換"
+  },
+  "settings_filename": {
+    "message": "檔名:"
+  },
+  "settings_height_gte": {
+    "message": "高度 ≥"
+  },
+  "settings_height_lte": {
+    "message": "高度 ≤"
+  },
+  "settings_hotkey": {
+    "message": "快捷鍵："
+  },
+  "settings_language_label": {
+    "message": "介面語言"
+  },
+  "settings_live_monitor": {
+    "message": "即時監控"
+  },
+  "settings_live_monitor_desc": {
+    "message": "頁面內容變更時自動偵測新圖片"
+  },
+  "settings_max_size": {
+    "message": "啟用最大尺寸篩選"
+  },
+  "settings_max_size_desc": {
+    "message": "隱藏大於指定尺寸的圖片"
+  },
+  "settings_min_size": {
+    "message": "啟用最小尺寸篩選"
+  },
+  "settings_min_size_desc": {
+    "message": "隱藏小於指定尺寸的圖片"
+  },
+  "settings_no_warning": {
+    "message": "下載大量檔案時不再提示"
+  },
+  "settings_no_warning_desc": {
+    "message": "下載多檔案時跳過確認對話框"
+  },
+  "settings_reset": {
+    "message": "重設"
+  },
+  "settings_save": {
+    "message": "儲存設定"
+  },
+  "settings_save_failed": {
+    "message": "儲存設定失敗"
+  },
+  "settings_saved": {
+    "message": "設定已儲存"
+  },
+  "settings_section_account": {
+    "message": "帳號"
+  },
+  "settings_section_appearance": {
+    "message": "外觀"
+  },
+  "settings_section_display": {
+    "message": "顯示"
+  },
+  "settings_section_download": {
+    "message": "下載"
+  },
+  "settings_section_experience": {
+    "message": "體驗"
+  },
+  "settings_section_language": {
+    "message": "語言"
+  },
+  "settings_section_pro": {
+    "message": "Pro"
+  },
+  "settings_section_scan": {
+    "message": "掃描"
+  },
+  "settings_side_panel": {
+    "message": "在側邊面板顯示"
+  },
+  "settings_side_panel_desc": {
+    "message": "在瀏覽器側邊面板而非彈窗中開啟結果"
+  },
+  "settings_similar": {
+    "message": "相似圖片偵測"
+  },
+  "settings_similar_desc": {
+    "message": "尋找並分組視覺相似或重複的圖片"
+  },
+  "settings_subfolder": {
+    "message": "子資料夾:"
+  },
+  "settings_telemetry": {
+    "message": "分享匿名使用資料"
+  },
+  "settings_telemetry_desc": {
+    "message": "傳送匿名功能使用事件。不包含網址、圖片或個人資訊。"
+  },
+  "settings_theme": {
+    "message": "主題:"
+  },
+  "settings_theme_dark": {
+    "message": "深色"
+  },
+  "settings_theme_light": {
+    "message": "淺色"
+  },
+  "settings_theme_system": {
+    "message": "跟隨系統"
+  },
+  "settings_title": {
+    "message": "設定"
+  },
+  "settings_variables_hint": {
+    "message": "變數：{domain}、{index}、{original}、{format}、{width}、{height}"
+  },
+  "settings_width_gte": {
+    "message": "寬度 ≥"
+  },
+  "settings_width_lte": {
+    "message": "寬度 ≤"
+  },
+  "size_all": {
+    "message": "全部"
+  },
+  "size_btn_custom": {
+    "message": "自訂"
+  },
+  "size_btn_large": {
+    "message": "大"
+  },
+  "size_btn_medium": {
+    "message": "中"
+  },
+  "size_btn_small": {
+    "message": "小"
+  },
+  "size_btn_xl": {
+    "message": "超大"
+  },
+  "size_large": {
+    "message": "大 500-1000px"
+  },
+  "size_medium": {
+    "message": "中 100-500px"
+  },
+  "size_small": {
+    "message": "小 < 100px"
+  },
+  "size_xl": {
+    "message": "超大 > 1000px"
+  },
+  "sort_filesize_asc": {
+    "message": "檔案大小 ↑（小到大）"
+  },
+  "sort_filesize_desc": {
+    "message": "檔案大小 ↓（大到小）"
+  },
+  "sort_none": {
+    "message": "無（頁面順序）"
+  },
+  "sort_size_asc": {
+    "message": "尺寸 ↑（小到大）"
+  },
+  "sort_size_desc": {
+    "message": "尺寸 ↓（大到小）"
+  },
+  "status_found_images": {
+    "message": "找到 {count} 張圖片"
+  },
+  "status_found_prefix": {
+    "message": "找到"
+  },
+  "status_found_suffix": {
+    "message": "張圖片"
+  },
   "status_n_selected": {
     "message": "已選 {count} 張"
+  },
+  "status_similar": {
+    "message": "相似"
+  },
+  "status_similar_count": {
+    "message": "{count} 張相似"
   },
   "status_total_images": {
     "message": "共 {count} 張"
@@ -773,134 +899,59 @@
   "title_view_similar": {
     "message": "檢視相似圖片"
   },
+  "toast_collection_add_failed": {
+    "message": "加入收藏失敗"
+  },
+  "toast_collection_added": {
+    "message": "已加入收藏"
+  },
+  "toast_collection_empty": {
+    "message": "收藏為空"
+  },
+  "toast_collection_export_failed": {
+    "message": "匯出失敗"
+  },
+  "toast_collection_exported": {
+    "message": "收藏已匯出"
+  },
+  "toast_collection_load_failed": {
+    "message": "載入收藏失敗"
+  },
+  "toast_collection_remove_failed": {
+    "message": "移除失敗"
+  },
+  "toast_collection_removed": {
+    "message": "已從收藏移除"
+  },
+  "toast_color_copied": {
+    "message": "顏色 {hex} 已複製"
+  },
+  "toast_color_copy_failed": {
+    "message": "複製顏色失敗"
+  },
   "toast_deactivate_failed": {
     "message": "解綁失敗"
   },
-  "toast_license_deactivated": {
-    "message": "授權已解綁"
+  "toast_download_cancelled": {
+    "message": "已取消下載"
   },
-  "toast_n_new": {
-    "message": "{count} 張新增"
+  "toast_download_completed": {
+    "message": "已下載 {count} 張圖片"
   },
-  "toast_n_removed": {
-    "message": "{count} 張移除"
+  "toast_download_failed": {
+    "message": "下載失敗"
   },
-  "toast_pro_color_filter": {
-    "message": "顏色篩選是 Pro 功能，升級以解鎖！"
+  "toast_download_started": {
+    "message": "已開始下載"
   },
-  "toast_pro_naming_locked": {
-    "message": "自訂命名是 Pro 功能，升級以解鎖！"
+  "toast_duplicates_removed": {
+    "message": "已移除{count}張重複圖片"
   },
-  "toast_pro_setting_locked": {
-    "message": "此設定需要 Pro，升級以解鎖！"
+  "toast_export_cancelled": {
+    "message": "匯出已取消"
   },
-  "toast_settings_reset": {
-    "message": "設定已重設為預設值"
-  },
-  "view_grid": {
-    "message": "網格"
-  },
-  "view_list": {
-    "message": "列表"
-  },
-  "format_original": {
-    "message": "原始格式"
-  },
-  "menu_reverse_search": {
-    "message": "以圖搜圖"
-  },
-  "settings_all_frames_desc": {
-    "message": "同時掃描 iframe 和嵌入框架中的圖片"
-  },
-  "settings_color_extract_desc": {
-    "message": "擷取每張圖片的主色調用於篩選"
-  },
-  "settings_download_options_desc": {
-    "message": "自訂子資料夾、檔案名稱範本和格式轉換"
-  },
-  "settings_hotkey": {
-    "message": "快捷鍵："
-  },
-  "settings_live_monitor_desc": {
-    "message": "頁面內容變更時自動偵測新圖片"
-  },
-  "settings_max_size": {
-    "message": "啟用最大尺寸篩選"
-  },
-  "settings_max_size_desc": {
-    "message": "隱藏大於指定尺寸的圖片"
-  },
-  "settings_min_size": {
-    "message": "啟用最小尺寸篩選"
-  },
-  "settings_min_size_desc": {
-    "message": "隱藏小於指定尺寸的圖片"
-  },
-  "settings_no_warning_desc": {
-    "message": "下載多檔案時跳過確認對話框"
-  },
-  "settings_section_display": {
-    "message": "顯示"
-  },
-  "settings_section_pro": {
-    "message": "Pro"
-  },
-  "settings_section_account": {
-    "message": "帳號"
-  },
-  "settings_similar_desc": {
-    "message": "尋找並分組視覺相似或重複的圖片"
-  },
-  "settings_telemetry_desc": {
-    "message": "傳送匿名功能使用事件。不包含網址、圖片或個人資訊。"
-  },
-  "status_found_prefix": {
-    "message": "找到"
-  },
-  "status_found_suffix": {
-    "message": "張圖片"
-  },
-  "filter_type_other": {
-    "message": "其他"
-  },
-  "license_activating": {
-    "message": "啟用中..."
-  },
-  "license_activation_failed": {
-    "message": "啟用失敗"
-  },
-  "license_enter_key": {
-    "message": "請輸入授權金鑰"
-  },
-  "license_network_error": {
-    "message": "網路錯誤，請重試。"
-  },
-  "license_placeholder": {
-    "message": "輸入授權金鑰"
-  },
-  "settings_height_gte": {
-    "message": "高度 ≥"
-  },
-  "settings_height_lte": {
-    "message": "高度 ≤"
-  },
-  "settings_width_gte": {
-    "message": "寬度 ≥"
-  },
-  "settings_width_lte": {
-    "message": "寬度 ≤"
-  },
-  "toast_pro_activated": {
-    "message": "Pro 啟用成功！"
-  },
-  "multitab_extracting": {
-    "message": "擷取中..."
-  },
-  "multitab_starting": {
-    "message": "開始擷取..."
-  },
-  "settings_variables_hint": {
-    "message": "變數：{domain}、{index}、{original}、{format}、{width}、{height}"
+  "toast_exporting_collection": {
+    "message": "正在匯出收藏..."
   },
   "toast_extraction_cancelled": {
     "message": "擷取已取消"
@@ -911,89 +962,98 @@
   "toast_extraction_success": {
     "message": "已從 {tabs} 個分頁擷取 {images} 張圖片"
   },
+  "toast_image_removed": {
+    "message": "已移除圖片"
+  },
+  "toast_license_deactivated": {
+    "message": "授權已解綁"
+  },
   "toast_multitab_failed": {
     "message": "多分頁擷取失敗"
+  },
+  "toast_multitab_failed_load": {
+    "message": "載入分頁失敗"
+  },
+  "toast_n_new": {
+    "message": "{count} 張新增"
+  },
+  "toast_n_removed": {
+    "message": "{count} 張移除"
+  },
+  "toast_new_images_discovered": {
+    "message": "發現{count}張新圖片"
+  },
+  "toast_no_duplicates_found": {
+    "message": "未找到重複圖片"
+  },
+  "toast_no_images_selected": {
+    "message": "未選取任何圖片"
+  },
+  "toast_pro_activated": {
+    "message": "Pro 啟用成功！"
+  },
+  "toast_pro_color_filter": {
+    "message": "顏色篩選是 Pro 功能，升級以解鎖！"
+  },
+  "toast_pro_naming_locked": {
+    "message": "自訂命名是 Pro 功能，升級以解鎖！"
+  },
+  "toast_pro_setting_locked": {
+    "message": "此設定需要 Pro，升級以解鎖！"
+  },
+  "toast_refresh_retry": {
+    "message": "重新整理頁面後重試"
+  },
+  "toast_scan_cancelled": {
+    "message": "掃描已取消"
+  },
+  "toast_select_at_least_one_tab": {
+    "message": "請至少選擇一個分頁"
+  },
+  "toast_settings_reset": {
+    "message": "設定已重設為預設值"
+  },
+  "toast_url_copied_batch": {
+    "message": "已複製 {count} 個連結到剪貼簿"
+  },
+  "toast_url_copied_single": {
+    "message": "連結已複製！"
+  },
+  "toast_url_copy_failed": {
+    "message": "複製連結失敗"
+  },
+  "toolbar_copy_urls": {
+    "message": "複製連結"
+  },
+  "toolbar_copy_urls_empty": {
+    "message": "請先選取圖片"
+  },
+  "toolbar_copy_urls_tooltip": {
+    "message": "複製選取圖片的連結到剪貼簿"
+  },
+  "toolbar_deselect_all": {
+    "message": "取消全選"
+  },
+  "toolbar_download_all": {
+    "message": "全部下載"
+  },
+  "toolbar_download_selected": {
+    "message": "下載 ({count})"
+  },
+  "toolbar_group": {
+    "message": "分組"
+  },
+  "toolbar_rescan": {
+    "message": "重新掃描"
+  },
+  "toolbar_select_all": {
+    "message": "全選"
   },
   "toolbar_similar": {
     "message": "相似"
   },
-  "status_similar_count": {
-    "message": "{count} 張相似"
-  },
-  "dedup_no_similar": {
-    "message": "未找到相似圖片"
-  },
-  "dedup_group_title": {
-    "message": "第 {index} 組（{count} 張相似）"
-  },
-  "collection_no_match": {
-    "message": "未找到匹配的圖片"
-  },
-  "collection_empty_title": {
-    "message": "收藏夾為空"
-  },
-  "collection_no_match_hint": {
-    "message": "請嘗試其他搜尋關鍵詞"
-  },
-  "collection_empty_hint": {
-    "message": "點擊任意圖片上的星標圖示即可加入收藏夾"
-  },
-  "restricted_notice": {
-    "message": "此頁面不允許擴充功能注入腳本。請導航至一般網頁（如文章、圖庫或搜尋結果）以開始擷取圖片。"
-  },
-  "restricted_features_heading": {
-    "message": "Image Harvest 功能一覽"
-  },
-  "restricted_feature_batch_title": {
-    "message": "批次下載"
-  },
-  "restricted_feature_batch_desc": {
-    "message": "一鍵選取並下載任意網頁上的所有圖片。可依尺寸、格式或版面進行篩選。"
-  },
-  "restricted_feature_dedup_title": {
-    "message": "相似圖片偵測"
-  },
-  "restricted_feature_dedup_desc": {
-    "message": "透過感知雜湊自動尋找並移除近似重複的圖片。"
-  },
-  "restricted_feature_reverse_title": {
-    "message": "以圖搜圖"
-  },
-  "restricted_feature_reverse_desc": {
-    "message": "一鍵在 Google、TinEye、Yandex 和 Baidu 中搜尋任意圖片。"
-  },
-  "restricted_feature_multitab_title": {
-    "message": "多分頁擷取"
-  },
-  "restricted_feature_multitab_desc": {
-    "message": "同時從多個已開啟的分頁中擷取圖片，並打包為 ZIP 下載。"
-  },
-  "restricted_feature_color_title": {
-    "message": "色彩擷取"
-  },
-  "restricted_feature_color_desc": {
-    "message": "自動擷取每張圖片的主色調。點擊色塊即可複製十六進位色碼。"
-  },
-  "restricted_feature_filter_title": {
-    "message": "智慧篩選"
-  },
-  "restricted_feature_filter_desc": {
-    "message": "依尺寸、類型、版面、URL 模式或主色調篩選圖片，精準找到所需內容。"
-  },
-  "restricted_feature_collection_title": {
-    "message": "收藏管理"
-  },
-  "restricted_feature_collection_desc": {
-    "message": "將圖片收藏至持久化集合中，跨工作階段保存。隨時整理與回顧。"
-  },
-  "restricted_feature_preview_title": {
-    "message": "即時預覽"
-  },
-  "restricted_feature_preview_desc": {
-    "message": "一覽查看高解析度原圖及中繼資料——尺寸、檔案大小和格式。"
-  },
-  "restricted_link_website": {
-    "message": "官方網站"
+  "toolbar_sort": {
+    "message": "排序"
   },
   "trial_error_already_redeemed": {
     "message": "您已在此安裝中使用過免費試用。"
@@ -1010,61 +1070,16 @@
   "trial_error_server_declined": {
     "message": "伺服器拒絕了試用請求。"
   },
-  "license_error_network": {
-    "message": "網路錯誤，請檢查您的網路連線。"
+  "trial_grace_message": {
+    "message": "試用已到期，Pro 功能還可使用 {days} 天。升級以保持使用權限。"
   },
-  "license_error_invalid_key": {
-    "message": "無效的授權金鑰。"
+  "trial_grace_upgrade_btn": {
+    "message": "立即升級"
   },
-  "license_error_activation_failed": {
-    "message": "啟用失敗，請重試。"
+  "view_grid": {
+    "message": "網格"
   },
-  "pro_feature_blocked_dedup": {
-    "message": "去重是Pro功能，升級後解鎖！"
-  },
-  "pro_feature_blocked_multitab": {
-    "message": "多分頁擷取是Pro功能，升級後解鎖！"
-  },
-  "toast_no_duplicates_found": {
-    "message": "未找到重複圖片"
-  },
-  "toast_duplicates_removed": {
-    "message": "已移除{count}張重複圖片"
-  },
-  "confirm_remove_duplicates_title": {
-    "message": "移除重複圖片"
-  },
-  "confirm_remove_duplicates_message": {
-    "message": "確定要移除{count}張選中的重複圖片嗎？"
-  },
-  "toast_select_at_least_one_tab": {
-    "message": "請至少選擇一個分頁"
-  },
-  "toast_new_images_discovered": {
-    "message": "發現{count}張新圖片"
-  },
-  "toast_collection_empty": {
-    "message": "收藏為空"
-  },
-  "toast_exporting_collection": {
-    "message": "正在匯出收藏..."
-  },
-  "toast_export_cancelled": {
-    "message": "匯出已取消"
-  },
-  "toast_collection_exported": {
-    "message": "收藏已匯出"
-  },
-  "toast_collection_export_failed": {
-    "message": "匯出失敗"
-  },
-  "toast_collection_load_failed": {
-    "message": "載入收藏失敗"
-  },
-  "toast_multitab_failed_load": {
-    "message": "載入分頁失敗"
-  },
-  "toast_refresh_retry": {
-    "message": "重新整理頁面後重試"
+  "view_list": {
+    "message": "列表"
   }
 }

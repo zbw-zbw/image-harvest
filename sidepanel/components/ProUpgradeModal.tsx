@@ -294,18 +294,20 @@ export function ProUpgradeModal() {
           </div>
 
           {/* ── Section 3: value prop + feature highlights (reference) ──── */}
-          <div class="pro-upgrade-features" style={{ marginTop: '16px' }}>
-            <p class="pro-upgrade-desc">{variantSubline(bucket)}</p>
+          <div class="pro-upgrade-features" style={{ marginTop: '20px' }}>
+            <p class="pro-upgrade-desc" style={{ marginBottom: '14px' }}>
+              {variantSubline(bucket)}
+            </p>
             <div class="pro-feature-list">
               <ProFeatureCard
                 title={t('pro_feature_batch_title')}
-                desc={t('pro_feature_batch_desc')}
+                desc={t('pro_feature_batch_desc_pro')}
                 gradient="gradient-blue"
                 icon={<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />}
               />
               <ProFeatureCard
                 title={t('pro_feature_multitab_title')}
-                desc={t('pro_feature_multitab_desc')}
+                desc={t('pro_feature_multitab_desc_pro')}
                 gradient="gradient-purple"
                 icon={
                   <>
@@ -316,13 +318,13 @@ export function ProUpgradeModal() {
               />
               <ProFeatureCard
                 title={t('pro_feature_reverse_search_title')}
-                desc={t('pro_feature_reverse_search_desc')}
+                desc={t('pro_feature_reverse_search_desc_pro')}
                 gradient="gradient-green"
                 icon={<><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></>}
               />
               <ProFeatureCard
                 title={t('pro_feature_dedup_title')}
-                desc={t('pro_feature_dedup_desc')}
+                desc={t('pro_feature_dedup_desc_pro')}
                 gradient="gradient-amber"
                 icon={
                   <>
@@ -335,7 +337,7 @@ export function ProUpgradeModal() {
               />
               <ProFeatureCard
                 title={t('pro_feature_color_title')}
-                desc={t('pro_feature_color_desc')}
+                desc={t('pro_feature_color_desc_pro')}
                 gradient="gradient-pink"
                 icon={
                   <>

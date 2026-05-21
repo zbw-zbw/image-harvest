@@ -645,11 +645,17 @@
   "pro_feature_batch_desc": {
     "message": "Download all images at once with a single click"
   },
+  "pro_feature_batch_desc_pro": {
+    "message": "Unlimited downloads — select all images and export as ZIP in one click"
+  },
   "pro_feature_batch_title": {
     "message": "Batch Download"
   },
   "pro_feature_color_desc": {
     "message": "Filter images by dominant color"
+  },
+  "pro_feature_color_desc_pro": {
+    "message": "Auto-extract dominant colors; click any swatch to copy HEX code instantly"
   },
   "pro_feature_color_title": {
     "message": "Color Filtering"
@@ -657,17 +663,26 @@
   "pro_feature_dedup_desc": {
     "message": "Detect and remove duplicate images automatically"
   },
+  "pro_feature_dedup_desc_pro": {
+    "message": "Perceptual-hash smart dedup — no wasted space from duplicate downloads"
+  },
   "pro_feature_dedup_title": {
     "message": "Duplicate Detection"
   },
   "pro_feature_multitab_desc": {
     "message": "Extract images from multiple tabs at once"
   },
+  "pro_feature_multitab_desc_pro": {
+    "message": "Batch extract from all open tabs and bundle into a single ZIP — no tab switching"
+  },
   "pro_feature_multitab_title": {
     "message": "Multi-Tab Extraction"
   },
   "pro_feature_reverse_search_desc": {
     "message": "Find the source of any image with reverse search"
+  },
+  "pro_feature_reverse_search_desc_pro": {
+    "message": "One-click search on Google, TinEye, Yandex & Baidu to find any image's origin"
   },
   "pro_feature_reverse_search_title": {
     "message": "Reverse Image Search"

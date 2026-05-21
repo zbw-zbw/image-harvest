@@ -617,11 +617,17 @@
   "pro_feature_batch_desc": {
     "message": "一键下载所有图片"
   },
+  "pro_feature_batch_desc_pro": {
+    "message": "不限数量，一次选中全部图片打包下载为 ZIP"
+  },
   "pro_feature_batch_title": {
     "message": "批量下载"
   },
   "pro_feature_color_desc": {
     "message": "按主色调筛选图片"
+  },
+  "pro_feature_color_desc_pro": {
+    "message": "自动提取主色调，点击色块即可复制 HEX 色值"
   },
   "pro_feature_color_title": {
     "message": "颜色筛选"
@@ -629,17 +635,26 @@
   "pro_feature_dedup_desc": {
     "message": "自动检测并移除重复图片"
   },
+  "pro_feature_dedup_desc_pro": {
+    "message": "感知哈希智能去重，避免重复下载浪费空间"
+  },
   "pro_feature_dedup_title": {
     "message": "重复检测"
   },
   "pro_feature_multitab_desc": {
     "message": "同时从多个标签页提取图片"
   },
+  "pro_feature_multitab_desc_pro": {
+    "message": "跨标签页批量提取并打包为 ZIP，无需逐页操作"
+  },
   "pro_feature_multitab_title": {
     "message": "多标签页提取"
   },
   "pro_feature_reverse_search_desc": {
     "message": "通过以图搜图查找图片来源"
+  },
+  "pro_feature_reverse_search_desc_pro": {
+    "message": "一键在 Google、TinEye、Yandex 等引擎中搜索任意图片来源"
   },
   "pro_feature_reverse_search_title": {
     "message": "以图搜图"

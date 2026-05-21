@@ -5,392 +5,8 @@
   "app_tagline": {
     "message": "ดาวน์โหลดรูปภาพจากทุกหน้าเว็บ"
   },
-  "common_cancel": {
-    "message": "ยกเลิก"
-  },
-  "common_confirm": {
-    "message": "ยืนยัน"
-  },
-  "common_close": {
-    "message": "ปิด"
-  },
-  "common_save": {
-    "message": "บันทึก"
-  },
-  "common_delete": {
-    "message": "ลบ"
-  },
-  "common_copy": {
-    "message": "คัดลอก"
-  },
-  "common_download": {
-    "message": "ดาวน์โหลด"
-  },
-  "common_upgrade": {
-    "message": "อัปเกรดเป็น Pro"
-  },
-  "common_maybe_later": {
-    "message": "ไว้ทีหลัง"
-  },
-  "settings_title": {
-    "message": "การตั้งค่า"
-  },
-  "settings_section_appearance": {
-    "message": "ลักษณะ"
-  },
-  "settings_section_experience": {
-    "message": "ประสบการณ์"
-  },
-  "settings_section_scan": {
-    "message": "สแกน"
-  },
-  "settings_section_download": {
-    "message": "ดาวน์โหลด"
-  },
-  "settings_section_language": {
-    "message": "ภาษา"
-  },
-  "settings_language_label": {
-    "message": "ภาษาที่แสดง"
-  },
-  "toolbar_select_all": {
-    "message": "เลือกทั้งหมด"
-  },
-  "toolbar_deselect_all": {
-    "message": "ยกเลิกการเลือกทั้งหมด"
-  },
-  "toolbar_copy_urls": {
-    "message": "คัดลอก URL"
-  },
-  "toolbar_copy_urls_tooltip": {
-    "message": "คัดลอก URL รูปภาพที่เลือกไปยังคลิปบอร์ด"
-  },
-  "toolbar_copy_urls_empty": {
-    "message": "กรุณาเลือกรูปภาพก่อน"
-  },
-  "toast_url_copied_single": {
-    "message": "คัดลอก URL แล้ว!"
-  },
-  "toast_url_copied_batch": {
-    "message": "คัดลอก {count} URL ไปยังคลิปบอร์ดแล้ว"
-  },
-  "toast_url_copy_failed": {
-    "message": "คัดลอก URL ล้มเหลว"
-  },
-  "toast_download_started": {
-    "message": "เริ่มดาวน์โหลดแล้ว"
-  },
-  "toast_download_failed": {
-    "message": "ดาวน์โหลดล้มเหลว"
-  },
-  "toast_download_cancelled": {
-    "message": "ยกเลิกการดาวน์โหลดแล้ว"
-  },
-  "toast_scan_cancelled": {
-    "message": "ยกเลิกการสแกน"
-  },
-  "toast_download_completed": {
-    "message": "ดาวน์โหลด {count} รูปภาพแล้ว"
-  },
-  "toast_no_images_selected": {
-    "message": "ไม่ได้เลือกรูปภาพ"
-  },
-  "toast_image_removed": {
-    "message": "ลบรูปภาพแล้ว"
-  },
-  "toast_collection_added": {
-    "message": "เพิ่มลงคอลเลกชันแล้ว"
-  },
-  "toast_collection_add_failed": {
-    "message": "เพิ่มลงคอลเลกชันล้มเหลว"
-  },
-  "toast_collection_removed": {
-    "message": "ลบออกจากคอลเลกชันแล้ว"
-  },
-  "toast_collection_remove_failed": {
-    "message": "ลบออกล้มเหลว"
-  },
-  "toast_color_copied": {
-    "message": "คัดลอกสี {hex} แล้ว"
-  },
-  "toast_color_copy_failed": {
-    "message": "คัดลอกสีล้มเหลว"
-  },
-  "pro_feature_blocked_format_conversion": {
-    "message": "การแปลงรูปแบบเป็นฟีเจอร์ Pro อัปเกรดเพื่อปลดล็อก!"
-  },
-  "pro_feature_blocked_advanced_grouping": {
-    "message": "การจัดกลุ่มขั้นสูงเป็นฟีเจอร์ Pro อัปเกรดเพื่อปลดล็อก!"
-  },
-  "pro_feature_blocked_collection": {
-    "message": "คอลเลกชันเป็นฟีเจอร์ Pro"
-  },
-  "pro_feature_blocked_image_delete": {
-    "message": "การลบรูปภาพเป็นฟีเจอร์ Pro อัปเกรดเพื่อปลดล็อก!"
-  },
-  "pro_feature_blocked_color_copy": {
-    "message": "การคัดลอกสีเป็นฟีเจอร์ Pro"
-  },
-  "pro_feature_blocked_reverse_search": {
-    "message": "การค้นหาด้วย {engine} ต้องใช้ Pro อัปเกรดเพื่อปลดล็อก!"
-  },
-  "pro_zip_limit": {
-    "message": "แผนฟรีอนุญาตสูงสุด {max} รูปภาพต่อ ZIP อัปเกรดเป็น Pro เพื่อไม่จำกัด!"
-  },
-  "pro_copy_urls_limit": {
-    "message": "แผนฟรีอนุญาตสูงสุด {max} URL ต่อครั้ง อัปเกรดเป็น Pro เพื่อไม่จำกัด!"
-  },
-  "pro_collection_limit": {
-    "message": "แผนฟรีอนุญาตสูงสุด {max} รายการโปรด อัปเกรดเป็น Pro เพื่อไม่จำกัด!"
-  },
-  "toolbar_sort": {
-    "message": "เรียงลำดับ"
-  },
-  "toolbar_group": {
-    "message": "จัดกลุ่ม"
-  },
-  "toolbar_similar": {
-    "message": "คล้ายกัน"
-  },
-  "status_similar_count": {
-    "message": "{count} รูปคล้ายกัน"
-  },
-  "toolbar_rescan": {
-    "message": "สแกนใหม่"
-  },
-  "toolbar_download_all": {
-    "message": "ดาวน์โหลดทั้งหมด"
-  },
-  "toolbar_download_selected": {
-    "message": "ดาวน์โหลด ({count})"
-  },
-  "filter_size": {
-    "message": "ขนาด"
-  },
-  "filter_type": {
-    "message": "ประเภท"
-  },
-  "filter_layout": {
-    "message": "เค้าโครง"
-  },
-  "filter_url": {
-    "message": "URL"
-  },
-  "filter_color": {
-    "message": "สี"
-  },
-  "filter_all": {
-    "message": "ทั้งหมด"
-  },
-  "filter_min_width": {
-    "message": "ความกว้างต่ำสุด"
-  },
-  "filter_max_width": {
-    "message": "ความกว้างสูงสุด"
-  },
-  "filter_height": {
-    "message": "H"
-  },
-  "filter_none": {
-    "message": "ไม่มี"
-  },
-  "filter_format": {
-    "message": "รูปแบบ"
-  },
-  "filter_domain": {
-    "message": "โดเมน"
-  },
-  "filter_tab": {
-    "message": "แท็บ"
-  },
-  "sort_none": {
-    "message": "ไม่มี (ลำดับหน้า)"
-  },
-  "sort_size_desc": {
-    "message": "ขนาด ↓ (ใหญ่ก่อน)"
-  },
-  "sort_size_asc": {
-    "message": "ขนาด ↑ (เล็กก่อน)"
-  },
-  "sort_filesize_desc": {
-    "message": "ขนาดไฟล์ ↓ (ใหญ่ก่อน)"
-  },
-  "sort_filesize_asc": {
-    "message": "ขนาดไฟล์ ↑ (เล็กก่อน)"
-  },
-  "layout_all": {
-    "message": "ทั้งหมด"
-  },
-  "layout_square": {
-    "message": "สี่เหลี่ยมจัตุรัส (1:1)"
-  },
-  "layout_landscape": {
-    "message": "แนวนอน (>1:1)"
-  },
-  "layout_portrait": {
-    "message": "แนวตั้ง (<1:1)"
-  },
-  "layout_panorama": {
-    "message": "พาโนรามา (>2:1)"
-  },
-  "size_all": {
-    "message": "ทั้งหมด"
-  },
-  "size_small": {
-    "message": "เล็ก < 100px"
-  },
-  "size_medium": {
-    "message": "กลาง 100-500px"
-  },
-  "size_large": {
-    "message": "ใหญ่ 500-1000px"
-  },
-  "size_xl": {
-    "message": "XL > 1000px"
-  },
-  "size_btn_small": {
-    "message": "เล็ก"
-  },
-  "size_btn_medium": {
-    "message": "กลาง"
-  },
-  "size_btn_large": {
-    "message": "ใหญ่"
-  },
-  "size_btn_xl": {
-    "message": "XL"
-  },
-  "size_btn_custom": {
-    "message": "กำหนดเอง"
-  },
-  "layout_btn_square": {
-    "message": "สี่เหลี่ยม"
-  },
-  "layout_btn_landscape": {
-    "message": "แนวนอน"
-  },
-  "layout_btn_portrait": {
-    "message": "แนวตั้ง"
-  },
-  "layout_btn_panorama": {
-    "message": "พาโนรามา"
-  },
-  "color_all": {
-    "message": "ทุกสี"
-  },
-  "color_no_extracted": {
-    "message": "ยังไม่ได้ดึงสีออกมา"
-  },
-  "filter_url_placeholder": {
-    "message": "กรองด้วยคำสำคัญ URL..."
-  },
-  "settings_display": {
-    "message": "การแสดงผล"
-  },
-  "settings_side_panel": {
-    "message": "แสดงในแผงด้านข้าง"
-  },
-  "settings_side_panel_desc": {
-    "message": "เปิดผลลัพธ์ในแผงด้านข้างของเบราว์เซอร์แทนหน้าต่างป๊อปอัป"
-  },
-  "settings_density": {
-    "message": "ความหนาแน่นเค้าโครง:"
-  },
-  "settings_density_compact": {
-    "message": "กระชับ"
-  },
-  "settings_density_standard": {
-    "message": "มาตรฐาน"
-  },
-  "settings_density_comfortable": {
-    "message": "สบายตา"
-  },
-  "settings_theme": {
-    "message": "ธีม:"
-  },
-  "settings_theme_system": {
-    "message": "ระบบ"
-  },
-  "settings_theme_light": {
-    "message": "สว่าง"
-  },
-  "settings_theme_dark": {
-    "message": "มืด"
-  },
-  "settings_default_group": {
-    "message": "จัดกลุ่มเริ่มต้น:"
-  },
-  "settings_similar": {
-    "message": "การตรวจจับรูปภาพที่คล้ายกัน"
-  },
-  "settings_color_extract": {
-    "message": "การดึงสี"
-  },
-  "settings_all_frames": {
-    "message": "ค้นหาในทุกเฟรม"
-  },
-  "settings_live_monitor": {
-    "message": "การตรวจสอบแบบเรียลไทม์"
-  },
-  "settings_download_options": {
-    "message": "กำหนดตัวเลือกการดาวน์โหลด"
-  },
-  "settings_subfolder": {
-    "message": "โฟลเดอร์ย่อย:"
-  },
-  "settings_filename": {
-    "message": "ชื่อไฟล์:"
-  },
-  "settings_convert_format": {
-    "message": "แปลงรูปแบบ:"
-  },
-  "settings_no_warning": {
-    "message": "ไม่ต้องเตือนเมื่อดาวน์โหลดไฟล์จำนวนมาก"
-  },
-  "settings_telemetry": {
-    "message": "แชร์ข้อมูลการใช้งานแบบไม่ระบุตัวตน"
-  },
-  "settings_save": {
-    "message": "บันทึกการตั้งค่า"
-  },
-  "settings_reset": {
-    "message": "รีเซ็ต"
-  },
-  "settings_saved": {
-    "message": "บันทึกการตั้งค่าแล้ว"
-  },
-  "settings_save_failed": {
-    "message": "บันทึกการตั้งค่าล้มเหลว"
-  },
-  "status_found_images": {
-    "message": "พบ {count} รูปภาพ"
-  },
-  "status_similar": {
-    "message": "คล้ายกัน"
-  },
-  "rating_title": {
-    "message": "ชอบ Image Harvest ไหม?"
-  },
-  "rating_desc": {
-    "message": "หากเราช่วยประหยัดเวลาของคุณได้ รีวิว 5 ดาวบน Chrome Web Store จะมีความหมายมากสำหรับเรา"
-  },
-  "rating_rate_now": {
-    "message": "⭐ ให้คะแนนบน Chrome Store"
-  },
-  "rating_later": {
-    "message": "ไว้ทีหลัง"
-  },
-  "rating_never": {
-    "message": "ไม่ต้องถามอีก"
-  },
-  "rating_close": {
-    "message": "ปิด"
-  },
   "btn_deactivate": {
     "message": "ปิดใช้งาน"
-  },
-  "license_deactivating": {
-    "message": "กำลังปิดใช้งาน..."
   },
   "card_add_to_collection": {
     "message": "เพิ่มลงคอลเลกชัน"
@@ -410,32 +26,65 @@
   "card_reverse_search": {
     "message": "ค้นหาย้อนกลับ ({engine})"
   },
+  "collection_empty_hint": {
+    "message": "คลิกไอคอนดาวบนรูปภาพเพื่อเพิ่มลงคอลเลกชัน"
+  },
+  "collection_empty_title": {
+    "message": "คอลเลกชันของคุณว่างเปล่า"
+  },
   "collection_export_tooltip": {
     "message": "ส่งออกคอลเลกชันเป็น ZIP"
   },
   "collection_modal_title": {
     "message": "คอลเลกชัน"
   },
-  "collection_search_placeholder": {
-    "message": "ค้นหาในคอลเลกชัน..."
-  },
   "collection_no_match": {
     "message": "ไม่พบรูปภาพที่ตรงกัน"
-  },
-  "collection_empty_title": {
-    "message": "คอลเลกชันของคุณว่างเปล่า"
   },
   "collection_no_match_hint": {
     "message": "ลองใช้คำค้นหาอื่น"
   },
-  "collection_empty_hint": {
-    "message": "คลิกไอคอนดาวบนรูปภาพเพื่อเพิ่มลงคอลเลกชัน"
+  "collection_search_placeholder": {
+    "message": "ค้นหาในคอลเลกชัน..."
+  },
+  "color_all": {
+    "message": "ทุกสี"
+  },
+  "color_no_extracted": {
+    "message": "ยังไม่ได้ดึงสีออกมา"
+  },
+  "common_cancel": {
+    "message": "ยกเลิก"
+  },
+  "common_close": {
+    "message": "ปิด"
+  },
+  "common_confirm": {
+    "message": "ยืนยัน"
+  },
+  "common_copy": {
+    "message": "คัดลอก"
+  },
+  "common_delete": {
+    "message": "ลบ"
   },
   "common_dismiss": {
     "message": "ปิดทิ้ง"
   },
+  "common_download": {
+    "message": "ดาวน์โหลด"
+  },
+  "common_maybe_later": {
+    "message": "ไว้ทีหลัง"
+  },
   "common_remove": {
     "message": "ลบออก"
+  },
+  "common_save": {
+    "message": "บันทึก"
+  },
+  "common_upgrade": {
+    "message": "อัปเกรดเป็น Pro"
   },
   "confirm_remove_image_message": {
     "message": "ลบรูปภาพนี้ออกจากรายการ?"
@@ -443,14 +92,14 @@
   "confirm_remove_image_title": {
     "message": "ลบรูปภาพ"
   },
+  "dedup_group_title": {
+    "message": "กลุ่ม {index} ({count} รูปคล้ายกัน)"
+  },
   "dedup_modal_title": {
     "message": "รูปภาพที่คล้ายกัน"
   },
   "dedup_no_similar": {
     "message": "ไม่พบรูปภาพที่คล้ายกัน"
-  },
-  "dedup_group_title": {
-    "message": "กลุ่ม {index} ({count} รูปคล้ายกัน)"
   },
   "dedup_remove_duplicates": {
     "message": "ลบรูปซ้ำ"
@@ -488,20 +137,131 @@
   "error_default_message": {
     "message": "เกิดข้อผิดพลาด"
   },
+  "filter_all": {
+    "message": "ทั้งหมด"
+  },
+  "filter_color": {
+    "message": "สี"
+  },
+  "filter_domain": {
+    "message": "โดเมน"
+  },
+  "filter_format": {
+    "message": "รูปแบบ"
+  },
+  "filter_height": {
+    "message": "H"
+  },
+  "filter_layout": {
+    "message": "เค้าโครง"
+  },
+  "filter_max_width": {
+    "message": "ความกว้างสูงสุด"
+  },
+  "filter_min_width": {
+    "message": "ความกว้างต่ำสุด"
+  },
+  "filter_none": {
+    "message": "ไม่มี"
+  },
+  "filter_size": {
+    "message": "ขนาด"
+  },
+  "filter_tab": {
+    "message": "แท็บ"
+  },
+  "filter_type": {
+    "message": "ประเภท"
+  },
+  "filter_type_other": {
+    "message": "อื่นๆ"
+  },
+  "filter_url": {
+    "message": "URL"
+  },
+  "filter_url_placeholder": {
+    "message": "กรองด้วยคำสำคัญ URL..."
+  },
+  "format_original": {
+    "message": "ต้นฉบับ"
+  },
   "grid_current_tab_badge": {
     "message": "แท็บปัจจุบัน"
+  },
+  "hotkey_click_to_set": {
+    "message": "คลิกเพื่อตั้งค่า"
   },
   "hotkey_not_set": {
     "message": "ยังไม่ได้ตั้ง"
   },
-  "hotkey_click_to_set": {
-    "message": "คลิกเพื่อตั้งค่า"
+  "layout_all": {
+    "message": "ทั้งหมด"
+  },
+  "layout_btn_landscape": {
+    "message": "แนวนอน"
+  },
+  "layout_btn_panorama": {
+    "message": "พาโนรามา"
+  },
+  "layout_btn_portrait": {
+    "message": "แนวตั้ง"
+  },
+  "layout_btn_square": {
+    "message": "สี่เหลี่ยม"
+  },
+  "layout_landscape": {
+    "message": "แนวนอน (>1:1)"
+  },
+  "layout_panorama": {
+    "message": "พาโนรามา (>2:1)"
+  },
+  "layout_portrait": {
+    "message": "แนวตั้ง (<1:1)"
+  },
+  "layout_square": {
+    "message": "สี่เหลี่ยมจัตุรัส (1:1)"
+  },
+  "license_activating": {
+    "message": "กำลังเปิดใช้งาน..."
+  },
+  "license_activation_failed": {
+    "message": "เปิดใช้งานล้มเหลว"
+  },
+  "license_deactivating": {
+    "message": "กำลังปิดใช้งาน..."
+  },
+  "license_enter_key": {
+    "message": "กรุณาป้อนรหัสใบอนุญาต"
+  },
+  "license_error_activation_failed": {
+    "message": "เปิดใช้งานล้มเหลว กรุณาลองใหม่อีกครั้ง"
+  },
+  "license_error_invalid_key": {
+    "message": "รหัสใบอนุญาตไม่ถูกต้อง"
+  },
+  "license_error_network": {
+    "message": "ข้อผิดพลาดเครือข่าย กรุณาตรวจสอบการเชื่อมต่อ"
+  },
+  "license_network_error": {
+    "message": "ข้อผิดพลาดเครือข่าย กรุณาลองใหม่อีกครั้ง"
+  },
+  "license_placeholder": {
+    "message": "ป้อนรหัสใบอนุญาต"
   },
   "live_indicator_label": {
     "message": "สด"
   },
   "live_indicator_tooltip": {
     "message": "การตรวจสอบแบบเรียลไทม์กำลังทำงาน — ตรวจจับรูปภาพใหม่โดยอัตโนมัติ"
+  },
+  "menu_reverse_search": {
+    "message": "ค้นหาย้อนกลับ"
+  },
+  "multitab_current": {
+    "message": "ปัจจุบัน"
+  },
+  "multitab_extracting": {
+    "message": "กำลังดึงข้อมูล..."
   },
   "multitab_modal_title": {
     "message": "ดึงจากหลายแท็บ"
@@ -512,8 +272,8 @@
   "multitab_start_extraction": {
     "message": "เริ่มดึงข้อมูล"
   },
-  "multitab_current": {
-    "message": "ปัจจุบัน"
+  "multitab_starting": {
+    "message": "กำลังเริ่มดึงข้อมูล..."
   },
   "multitab_untitled": {
     "message": "ไม่มีชื่อ"
@@ -593,17 +353,47 @@
   "pro_already_have_key": {
     "message": "มีรหัสใบอนุญาตแล้ว?"
   },
+  "pro_collection_limit": {
+    "message": "แผนฟรีอนุญาตสูงสุด {max} รายการโปรด อัปเกรดเป็น Pro เพื่อไม่จำกัด!"
+  },
+  "pro_copy_urls_limit": {
+    "message": "แผนฟรีอนุญาตสูงสุด {max} URL ต่อครั้ง อัปเกรดเป็น Pro เพื่อไม่จำกัด!"
+  },
   "pro_deactivate_tooltip": {
     "message": "ปิดใช้งานใบอนุญาต"
   },
   "pro_feature_batch_desc": {
     "message": "ดาวน์โหลดรูปภาพทั้งหมดในคลิกเดียว"
   },
+  "pro_feature_batch_desc_pro": {
+    "message": "Unlimited downloads — select all images and export as ZIP in one click"
+  },
   "pro_feature_batch_title": {
     "message": "ดาวน์โหลดเป็นชุด"
   },
+  "pro_feature_blocked_advanced_grouping": {
+    "message": "การจัดกลุ่มขั้นสูงเป็นฟีเจอร์ Pro อัปเกรดเพื่อปลดล็อก!"
+  },
+  "pro_feature_blocked_collection": {
+    "message": "คอลเลกชันเป็นฟีเจอร์ Pro"
+  },
+  "pro_feature_blocked_color_copy": {
+    "message": "การคัดลอกสีเป็นฟีเจอร์ Pro"
+  },
+  "pro_feature_blocked_format_conversion": {
+    "message": "การแปลงรูปแบบเป็นฟีเจอร์ Pro อัปเกรดเพื่อปลดล็อก!"
+  },
+  "pro_feature_blocked_image_delete": {
+    "message": "การลบรูปภาพเป็นฟีเจอร์ Pro อัปเกรดเพื่อปลดล็อก!"
+  },
+  "pro_feature_blocked_reverse_search": {
+    "message": "การค้นหาด้วย {engine} ต้องใช้ Pro อัปเกรดเพื่อปลดล็อก!"
+  },
   "pro_feature_color_desc": {
     "message": "กรองรูปภาพตามสีหลัก"
+  },
+  "pro_feature_color_desc_pro": {
+    "message": "Auto-extract dominant colors; click any swatch to copy HEX code instantly"
   },
   "pro_feature_color_title": {
     "message": "การกรองสี"
@@ -611,17 +401,26 @@
   "pro_feature_dedup_desc": {
     "message": "ตรวจจับและลบรูปภาพซ้ำโดยอัตโนมัติ"
   },
+  "pro_feature_dedup_desc_pro": {
+    "message": "Perceptual-hash smart dedup — no wasted space from duplicate downloads"
+  },
   "pro_feature_dedup_title": {
     "message": "การตรวจจับรูปซ้ำ"
   },
   "pro_feature_multitab_desc": {
     "message": "ดึงรูปภาพจากหลายแท็บพร้อมกัน"
   },
+  "pro_feature_multitab_desc_pro": {
+    "message": "Batch extract from all open tabs and bundle into a single ZIP — no tab switching"
+  },
   "pro_feature_multitab_title": {
     "message": "การดึงจากหลายแท็บ"
   },
   "pro_feature_reverse_search_desc": {
     "message": "ค้นหาแหล่งที่มาของรูปภาพด้วยการค้นหาย้อนกลับ"
+  },
+  "pro_feature_reverse_search_desc_pro": {
+    "message": "One-click search on Google, TinEye, Yandex & Baidu to find any image's origin"
   },
   "pro_feature_reverse_search_title": {
     "message": "ค้นหารูปภาพย้อนกลับ"
@@ -653,14 +452,14 @@
   "pro_trial_desc": {
     "message": "ทดลองฟีเจอร์ Pro ทั้งหมดฟรี 7 วัน ไม่มีข้อผูกมัด"
   },
+  "pro_trial_perk_cancel": {
+    "message": "หมดอายุอัตโนมัติ — ไม่ต้องยกเลิก"
+  },
   "pro_trial_perk_full_access": {
     "message": "เข้าถึงฟีเจอร์ Pro ทั้งหมด"
   },
   "pro_trial_perk_no_card": {
     "message": "ไม่ต้องใช้บัตรเครดิต"
-  },
-  "pro_trial_perk_cancel": {
-    "message": "หมดอายุอัตโนมัติ — ไม่ต้องยกเลิก"
   },
   "pro_trial_start_cta": {
     "message": "เริ่มทดลองฟรี"
@@ -677,14 +476,92 @@
   "pro_trial_unavailable": {
     "message": "ไม่สามารถทดลองใช้ได้"
   },
+  "pro_zip_limit": {
+    "message": "แผนฟรีอนุญาตสูงสุด {max} รูปภาพต่อ ZIP อัปเกรดเป็น Pro เพื่อไม่จำกัด!"
+  },
   "progress_downloading": {
     "message": "กำลังดาวน์โหลด..."
+  },
+  "progress_multitab_text": {
+    "message": "{current}/{total} แท็บ · พบ {count} รูปภาพ"
   },
   "progress_text": {
     "message": "{current} จาก {total}"
   },
-  "progress_multitab_text": {
-    "message": "{current}/{total} แท็บ · พบ {count} รูปภาพ"
+  "rating_close": {
+    "message": "ปิด"
+  },
+  "rating_desc": {
+    "message": "หากเราช่วยประหยัดเวลาของคุณได้ รีวิว 5 ดาวบน Chrome Web Store จะมีความหมายมากสำหรับเรา"
+  },
+  "rating_later": {
+    "message": "ไว้ทีหลัง"
+  },
+  "rating_never": {
+    "message": "ไม่ต้องถามอีก"
+  },
+  "rating_rate_now": {
+    "message": "⭐ ให้คะแนนบน Chrome Store"
+  },
+  "rating_title": {
+    "message": "ชอบ Image Harvest ไหม?"
+  },
+  "restricted_feature_batch_desc": {
+    "message": "เลือกและดาวน์โหลดรูปภาพทั้งหมดจากหน้าเว็บใดก็ได้ในคลิกเดียว กรองตามขนาด รูปแบบ หรือเค้าโครง"
+  },
+  "restricted_feature_batch_title": {
+    "message": "ดาวน์โหลดเป็นชุด"
+  },
+  "restricted_feature_collection_desc": {
+    "message": "บุ๊กมาร์กรูปภาพลงคอลเลกชันถาวรที่เก็บข้ามเซสชัน จัดระเบียบและกลับมาดูเมื่อไหร่ก็ได้"
+  },
+  "restricted_feature_collection_title": {
+    "message": "คอลเลกชันรายการโปรด"
+  },
+  "restricted_feature_color_desc": {
+    "message": "ดึงสีหลักจากรูปภาพแต่ละรูปโดยอัตโนมัติ คลิกแถบสีเพื่อคัดลอกรหัสเลขฐานสิบหก"
+  },
+  "restricted_feature_color_title": {
+    "message": "การดึงสี"
+  },
+  "restricted_feature_dedup_desc": {
+    "message": "ค้นหาและลบรูปภาพที่ใกล้เคียงซ้ำกันโดยอัตโนมัติด้วย perceptual hashing"
+  },
+  "restricted_feature_dedup_title": {
+    "message": "การตรวจจับรูปภาพที่คล้ายกัน"
+  },
+  "restricted_feature_filter_desc": {
+    "message": "กรองรูปภาพตามขนาด ประเภท เค้าโครง รูปแบบ URL หรือสีหลัก เพื่อค้นหาสิ่งที่คุณต้องการ"
+  },
+  "restricted_feature_filter_title": {
+    "message": "ตัวกรองอัจฉริยะ"
+  },
+  "restricted_feature_multitab_desc": {
+    "message": "ดึงรูปภาพจากหลายแท็บที่เปิดอยู่พร้อมกันและดาวน์โหลดทั้งหมดเป็นไฟล์ ZIP"
+  },
+  "restricted_feature_multitab_title": {
+    "message": "ดึงจากหลายแท็บ"
+  },
+  "restricted_feature_preview_desc": {
+    "message": "ดูรูปภาพความละเอียดเต็มพร้อมข้อมูลเมตา — ขนาด ขนาดไฟล์ และรูปแบบ — ในพริบตา"
+  },
+  "restricted_feature_preview_title": {
+    "message": "แสดงตัวอย่างทันที"
+  },
+  "restricted_feature_reverse_desc": {
+    "message": "ค้นหารูปภาพใดก็ได้ผ่าน Google, TinEye, Yandex และ Baidu ในคลิกเดียว"
+  },
+  "restricted_feature_reverse_title": {
+    "message": "ค้นหารูปภาพย้อนกลับ"
+  },
+  "restricted_features_heading": {
+    "message": "สิ่งที่คุณทำได้ด้วย Image Harvest"
+  },
+  "restricted_link_website": {
+    "message": "เว็บไซต์อย่างเป็นทางการ"
+  },
+  "restricted_notice": {
+    "message": "หน้านี้ไม่อนุญาตให้ส่วนขยายแทรกสคริปต์ ไปที่หน้าเว็บปกติ (เช่น บทความ แกลเลอรี หรือผลการค้นหา) เพื่อเริ่มดึงรูปภาพ"
   },
   "restricted_subtitle": {
     "message": "หน้านี้จำกัดสคริปต์เนื้อหา ลองหน้าอื่น"
@@ -707,8 +584,227 @@
   "scan_updating": {
     "message": "กำลังอัปเดต..."
   },
+  "settings_all_frames": {
+    "message": "ค้นหาในทุกเฟรม"
+  },
+  "settings_all_frames_desc": {
+    "message": "สแกนรูปภาพใน iframe และเฟรมที่ฝังไว้ด้วย"
+  },
+  "settings_color_extract": {
+    "message": "การดึงสี"
+  },
+  "settings_color_extract_desc": {
+    "message": "ดึงสีหลักจากรูปภาพแต่ละรูปเพื่อใช้กรอง"
+  },
+  "settings_convert_format": {
+    "message": "แปลงรูปแบบ:"
+  },
+  "settings_default_group": {
+    "message": "จัดกลุ่มเริ่มต้น:"
+  },
+  "settings_density": {
+    "message": "ความหนาแน่นเค้าโครง:"
+  },
+  "settings_density_comfortable": {
+    "message": "สบายตา"
+  },
+  "settings_density_compact": {
+    "message": "กระชับ"
+  },
+  "settings_density_standard": {
+    "message": "มาตรฐาน"
+  },
+  "settings_display": {
+    "message": "การแสดงผล"
+  },
+  "settings_download_options": {
+    "message": "กำหนดตัวเลือกการดาวน์โหลด"
+  },
+  "settings_download_options_desc": {
+    "message": "กำหนดโฟลเดอร์ย่อย เทมเพลตชื่อไฟล์ และการแปลงรูปแบบ"
+  },
+  "settings_filename": {
+    "message": "ชื่อไฟล์:"
+  },
+  "settings_height_gte": {
+    "message": "ความสูง ≥"
+  },
+  "settings_height_lte": {
+    "message": "ความสูง ≤"
+  },
+  "settings_hotkey": {
+    "message": "ปุ่มลัด:"
+  },
+  "settings_language_label": {
+    "message": "ภาษาที่แสดง"
+  },
+  "settings_live_monitor": {
+    "message": "การตรวจสอบแบบเรียลไทม์"
+  },
+  "settings_live_monitor_desc": {
+    "message": "ตรวจจับรูปภาพใหม่โดยอัตโนมัติเมื่อเนื้อหาหน้าเว็บเปลี่ยนแปลง"
+  },
+  "settings_max_size": {
+    "message": "เปิดตัวกรองขนาดสูงสุด"
+  },
+  "settings_max_size_desc": {
+    "message": "ซ่อนรูปภาพที่ใหญ่กว่าขนาดที่กำหนด"
+  },
+  "settings_min_size": {
+    "message": "เปิดตัวกรองขนาดต่ำสุด"
+  },
+  "settings_min_size_desc": {
+    "message": "ซ่อนรูปภาพที่เล็กกว่าขนาดที่กำหนด"
+  },
+  "settings_no_warning": {
+    "message": "ไม่ต้องเตือนเมื่อดาวน์โหลดไฟล์จำนวนมาก"
+  },
+  "settings_no_warning_desc": {
+    "message": "ข้ามกล่องยืนยันเมื่อดาวน์โหลดไฟล์จำนวนมาก"
+  },
+  "settings_reset": {
+    "message": "รีเซ็ต"
+  },
+  "settings_save": {
+    "message": "บันทึกการตั้งค่า"
+  },
+  "settings_save_failed": {
+    "message": "บันทึกการตั้งค่าล้มเหลว"
+  },
+  "settings_saved": {
+    "message": "บันทึกการตั้งค่าแล้ว"
+  },
+  "settings_section_account": {
+    "message": "บัญชี"
+  },
+  "settings_section_appearance": {
+    "message": "ลักษณะ"
+  },
+  "settings_section_display": {
+    "message": "การแสดงผล"
+  },
+  "settings_section_download": {
+    "message": "ดาวน์โหลด"
+  },
+  "settings_section_experience": {
+    "message": "ประสบการณ์"
+  },
+  "settings_section_language": {
+    "message": "ภาษา"
+  },
+  "settings_section_pro": {
+    "message": "Pro"
+  },
+  "settings_section_scan": {
+    "message": "สแกน"
+  },
+  "settings_side_panel": {
+    "message": "แสดงในแผงด้านข้าง"
+  },
+  "settings_side_panel_desc": {
+    "message": "เปิดผลลัพธ์ในแผงด้านข้างของเบราว์เซอร์แทนหน้าต่างป๊อปอัป"
+  },
+  "settings_similar": {
+    "message": "การตรวจจับรูปภาพที่คล้ายกัน"
+  },
+  "settings_similar_desc": {
+    "message": "ค้นหาและจัดกลุ่มรูปภาพที่คล้ายกันหรือซ้ำกัน"
+  },
+  "settings_subfolder": {
+    "message": "โฟลเดอร์ย่อย:"
+  },
+  "settings_telemetry": {
+    "message": "แชร์ข้อมูลการใช้งานแบบไม่ระบุตัวตน"
+  },
+  "settings_telemetry_desc": {
+    "message": "ส่งข้อมูลการใช้ฟีเจอร์แบบไม่ระบุตัวตน ไม่มี URL ไม่มีรูปภาพ ไม่มีข้อมูลส่วนบุคคล"
+  },
+  "settings_theme": {
+    "message": "ธีม:"
+  },
+  "settings_theme_dark": {
+    "message": "มืด"
+  },
+  "settings_theme_light": {
+    "message": "สว่าง"
+  },
+  "settings_theme_system": {
+    "message": "ระบบ"
+  },
+  "settings_title": {
+    "message": "การตั้งค่า"
+  },
+  "settings_variables_hint": {
+    "message": "ตัวแปร: {domain}, {index}, {original}, {format}, {width}, {height}"
+  },
+  "settings_width_gte": {
+    "message": "ความกว้าง ≥"
+  },
+  "settings_width_lte": {
+    "message": "ความกว้าง ≤"
+  },
+  "size_all": {
+    "message": "ทั้งหมด"
+  },
+  "size_btn_custom": {
+    "message": "กำหนดเอง"
+  },
+  "size_btn_large": {
+    "message": "ใหญ่"
+  },
+  "size_btn_medium": {
+    "message": "กลาง"
+  },
+  "size_btn_small": {
+    "message": "เล็ก"
+  },
+  "size_btn_xl": {
+    "message": "XL"
+  },
+  "size_large": {
+    "message": "ใหญ่ 500-1000px"
+  },
+  "size_medium": {
+    "message": "กลาง 100-500px"
+  },
+  "size_small": {
+    "message": "เล็ก < 100px"
+  },
+  "size_xl": {
+    "message": "XL > 1000px"
+  },
+  "sort_filesize_asc": {
+    "message": "ขนาดไฟล์ ↑ (เล็กก่อน)"
+  },
+  "sort_filesize_desc": {
+    "message": "ขนาดไฟล์ ↓ (ใหญ่ก่อน)"
+  },
+  "sort_none": {
+    "message": "ไม่มี (ลำดับหน้า)"
+  },
+  "sort_size_asc": {
+    "message": "ขนาด ↑ (เล็กก่อน)"
+  },
+  "sort_size_desc": {
+    "message": "ขนาด ↓ (ใหญ่ก่อน)"
+  },
+  "status_found_images": {
+    "message": "พบ {count} รูปภาพ"
+  },
+  "status_found_prefix": {
+    "message": "พบ"
+  },
+  "status_found_suffix": {
+    "message": "รูปภาพ"
+  },
   "status_n_selected": {
     "message": "เลือก {count} รายการ"
+  },
+  "status_similar": {
+    "message": "คล้ายกัน"
+  },
+  "status_similar_count": {
+    "message": "{count} รูปคล้ายกัน"
   },
   "status_total_images": {
     "message": "ทั้งหมด {count}"
@@ -749,134 +845,38 @@
   "title_view_similar": {
     "message": "ดูรูปภาพที่คล้ายกัน"
   },
+  "toast_collection_add_failed": {
+    "message": "เพิ่มลงคอลเลกชันล้มเหลว"
+  },
+  "toast_collection_added": {
+    "message": "เพิ่มลงคอลเลกชันแล้ว"
+  },
+  "toast_collection_remove_failed": {
+    "message": "ลบออกล้มเหลว"
+  },
+  "toast_collection_removed": {
+    "message": "ลบออกจากคอลเลกชันแล้ว"
+  },
+  "toast_color_copied": {
+    "message": "คัดลอกสี {hex} แล้ว"
+  },
+  "toast_color_copy_failed": {
+    "message": "คัดลอกสีล้มเหลว"
+  },
   "toast_deactivate_failed": {
     "message": "ปิดใช้งานล้มเหลว"
   },
-  "toast_license_deactivated": {
-    "message": "ปิดใช้งานใบอนุญาตแล้ว"
+  "toast_download_cancelled": {
+    "message": "ยกเลิกการดาวน์โหลดแล้ว"
   },
-  "toast_n_new": {
-    "message": "{count} รายการใหม่"
+  "toast_download_completed": {
+    "message": "ดาวน์โหลด {count} รูปภาพแล้ว"
   },
-  "toast_n_removed": {
-    "message": "ลบ {count} รายการ"
+  "toast_download_failed": {
+    "message": "ดาวน์โหลดล้มเหลว"
   },
-  "toast_pro_color_filter": {
-    "message": "การกรองสีเป็นฟีเจอร์ Pro อัปเกรดเพื่อกรองตามสี!"
-  },
-  "toast_pro_naming_locked": {
-    "message": "การตั้งชื่อแบบกำหนดเองเป็นฟีเจอร์ Pro อัปเกรดเพื่อปลดล็อก!"
-  },
-  "toast_pro_setting_locked": {
-    "message": "การตั้งค่านี้ต้องใช้ Pro อัปเกรดเพื่อปลดล็อก!"
-  },
-  "toast_settings_reset": {
-    "message": "รีเซ็ตการตั้งค่าเป็นค่าเริ่มต้นแล้ว"
-  },
-  "view_grid": {
-    "message": "ตาราง"
-  },
-  "view_list": {
-    "message": "รายการ"
-  },
-  "format_original": {
-    "message": "ต้นฉบับ"
-  },
-  "menu_reverse_search": {
-    "message": "ค้นหาย้อนกลับ"
-  },
-  "settings_all_frames_desc": {
-    "message": "สแกนรูปภาพใน iframe และเฟรมที่ฝังไว้ด้วย"
-  },
-  "settings_color_extract_desc": {
-    "message": "ดึงสีหลักจากรูปภาพแต่ละรูปเพื่อใช้กรอง"
-  },
-  "settings_download_options_desc": {
-    "message": "กำหนดโฟลเดอร์ย่อย เทมเพลตชื่อไฟล์ และการแปลงรูปแบบ"
-  },
-  "settings_hotkey": {
-    "message": "ปุ่มลัด:"
-  },
-  "settings_live_monitor_desc": {
-    "message": "ตรวจจับรูปภาพใหม่โดยอัตโนมัติเมื่อเนื้อหาหน้าเว็บเปลี่ยนแปลง"
-  },
-  "settings_max_size": {
-    "message": "เปิดตัวกรองขนาดสูงสุด"
-  },
-  "settings_max_size_desc": {
-    "message": "ซ่อนรูปภาพที่ใหญ่กว่าขนาดที่กำหนด"
-  },
-  "settings_min_size": {
-    "message": "เปิดตัวกรองขนาดต่ำสุด"
-  },
-  "settings_min_size_desc": {
-    "message": "ซ่อนรูปภาพที่เล็กกว่าขนาดที่กำหนด"
-  },
-  "settings_no_warning_desc": {
-    "message": "ข้ามกล่องยืนยันเมื่อดาวน์โหลดไฟล์จำนวนมาก"
-  },
-  "settings_section_display": {
-    "message": "การแสดงผล"
-  },
-  "settings_section_pro": {
-    "message": "Pro"
-  },
-  "settings_section_account": {
-    "message": "บัญชี"
-  },
-  "settings_similar_desc": {
-    "message": "ค้นหาและจัดกลุ่มรูปภาพที่คล้ายกันหรือซ้ำกัน"
-  },
-  "settings_telemetry_desc": {
-    "message": "ส่งข้อมูลการใช้ฟีเจอร์แบบไม่ระบุตัวตน ไม่มี URL ไม่มีรูปภาพ ไม่มีข้อมูลส่วนบุคคล"
-  },
-  "status_found_prefix": {
-    "message": "พบ"
-  },
-  "status_found_suffix": {
-    "message": "รูปภาพ"
-  },
-  "filter_type_other": {
-    "message": "อื่นๆ"
-  },
-  "license_activating": {
-    "message": "กำลังเปิดใช้งาน..."
-  },
-  "license_activation_failed": {
-    "message": "เปิดใช้งานล้มเหลว"
-  },
-  "license_enter_key": {
-    "message": "กรุณาป้อนรหัสใบอนุญาต"
-  },
-  "license_network_error": {
-    "message": "ข้อผิดพลาดเครือข่าย กรุณาลองใหม่อีกครั้ง"
-  },
-  "license_placeholder": {
-    "message": "ป้อนรหัสใบอนุญาต"
-  },
-  "settings_height_gte": {
-    "message": "ความสูง ≥"
-  },
-  "settings_height_lte": {
-    "message": "ความสูง ≤"
-  },
-  "settings_width_gte": {
-    "message": "ความกว้าง ≥"
-  },
-  "settings_width_lte": {
-    "message": "ความกว้าง ≤"
-  },
-  "toast_pro_activated": {
-    "message": "เปิดใช้งาน Pro สำเร็จ!"
-  },
-  "multitab_extracting": {
-    "message": "กำลังดึงข้อมูล..."
-  },
-  "multitab_starting": {
-    "message": "กำลังเริ่มดึงข้อมูล..."
-  },
-  "settings_variables_hint": {
-    "message": "ตัวแปร: {domain}, {index}, {original}, {format}, {width}, {height}"
+  "toast_download_started": {
+    "message": "เริ่มดาวน์โหลดแล้ว"
   },
   "toast_extraction_cancelled": {
     "message": "ยกเลิกการดึงข้อมูลแล้ว"
@@ -887,65 +887,83 @@
   "toast_extraction_success": {
     "message": "ดึง {images} รูปภาพจาก {tabs} แท็บแล้ว"
   },
+  "toast_image_removed": {
+    "message": "ลบรูปภาพแล้ว"
+  },
+  "toast_license_deactivated": {
+    "message": "ปิดใช้งานใบอนุญาตแล้ว"
+  },
   "toast_multitab_failed": {
     "message": "การดึงจากหลายแท็บล้มเหลว"
   },
-  "restricted_notice": {
-    "message": "หน้านี้ไม่อนุญาตให้ส่วนขยายแทรกสคริปต์ ไปที่หน้าเว็บปกติ (เช่น บทความ แกลเลอรี หรือผลการค้นหา) เพื่อเริ่มดึงรูปภาพ"
+  "toast_n_new": {
+    "message": "{count} รายการใหม่"
   },
-  "restricted_features_heading": {
-    "message": "สิ่งที่คุณทำได้ด้วย Image Harvest"
+  "toast_n_removed": {
+    "message": "ลบ {count} รายการ"
   },
-  "restricted_feature_batch_title": {
-    "message": "ดาวน์โหลดเป็นชุด"
+  "toast_no_images_selected": {
+    "message": "ไม่ได้เลือกรูปภาพ"
   },
-  "restricted_feature_batch_desc": {
-    "message": "เลือกและดาวน์โหลดรูปภาพทั้งหมดจากหน้าเว็บใดก็ได้ในคลิกเดียว กรองตามขนาด รูปแบบ หรือเค้าโครง"
+  "toast_pro_activated": {
+    "message": "เปิดใช้งาน Pro สำเร็จ!"
   },
-  "restricted_feature_dedup_title": {
-    "message": "การตรวจจับรูปภาพที่คล้ายกัน"
+  "toast_pro_color_filter": {
+    "message": "การกรองสีเป็นฟีเจอร์ Pro อัปเกรดเพื่อกรองตามสี!"
   },
-  "restricted_feature_dedup_desc": {
-    "message": "ค้นหาและลบรูปภาพที่ใกล้เคียงซ้ำกันโดยอัตโนมัติด้วย perceptual hashing"
+  "toast_pro_naming_locked": {
+    "message": "การตั้งชื่อแบบกำหนดเองเป็นฟีเจอร์ Pro อัปเกรดเพื่อปลดล็อก!"
   },
-  "restricted_feature_reverse_title": {
-    "message": "ค้นหารูปภาพย้อนกลับ"
+  "toast_pro_setting_locked": {
+    "message": "การตั้งค่านี้ต้องใช้ Pro อัปเกรดเพื่อปลดล็อก!"
   },
-  "restricted_feature_reverse_desc": {
-    "message": "ค้นหารูปภาพใดก็ได้ผ่าน Google, TinEye, Yandex และ Baidu ในคลิกเดียว"
+  "toast_scan_cancelled": {
+    "message": "ยกเลิกการสแกน"
   },
-  "restricted_feature_multitab_title": {
-    "message": "ดึงจากหลายแท็บ"
+  "toast_settings_reset": {
+    "message": "รีเซ็ตการตั้งค่าเป็นค่าเริ่มต้นแล้ว"
   },
-  "restricted_feature_multitab_desc": {
-    "message": "ดึงรูปภาพจากหลายแท็บที่เปิดอยู่พร้อมกันและดาวน์โหลดทั้งหมดเป็นไฟล์ ZIP"
+  "toast_url_copied_batch": {
+    "message": "คัดลอก {count} URL ไปยังคลิปบอร์ดแล้ว"
   },
-  "restricted_feature_color_title": {
-    "message": "การดึงสี"
+  "toast_url_copied_single": {
+    "message": "คัดลอก URL แล้ว!"
   },
-  "restricted_feature_color_desc": {
-    "message": "ดึงสีหลักจากรูปภาพแต่ละรูปโดยอัตโนมัติ คลิกแถบสีเพื่อคัดลอกรหัสเลขฐานสิบหก"
+  "toast_url_copy_failed": {
+    "message": "คัดลอก URL ล้มเหลว"
   },
-  "restricted_feature_filter_title": {
-    "message": "ตัวกรองอัจฉริยะ"
+  "toolbar_copy_urls": {
+    "message": "คัดลอก URL"
   },
-  "restricted_feature_filter_desc": {
-    "message": "กรองรูปภาพตามขนาด ประเภท เค้าโครง รูปแบบ URL หรือสีหลัก เพื่อค้นหาสิ่งที่คุณต้องการ"
+  "toolbar_copy_urls_empty": {
+    "message": "กรุณาเลือกรูปภาพก่อน"
   },
-  "restricted_feature_collection_title": {
-    "message": "คอลเลกชันรายการโปรด"
+  "toolbar_copy_urls_tooltip": {
+    "message": "คัดลอก URL รูปภาพที่เลือกไปยังคลิปบอร์ด"
   },
-  "restricted_feature_collection_desc": {
-    "message": "บุ๊กมาร์กรูปภาพลงคอลเลกชันถาวรที่เก็บข้ามเซสชัน จัดระเบียบและกลับมาดูเมื่อไหร่ก็ได้"
+  "toolbar_deselect_all": {
+    "message": "ยกเลิกการเลือกทั้งหมด"
   },
-  "restricted_feature_preview_title": {
-    "message": "แสดงตัวอย่างทันที"
+  "toolbar_download_all": {
+    "message": "ดาวน์โหลดทั้งหมด"
   },
-  "restricted_feature_preview_desc": {
-    "message": "ดูรูปภาพความละเอียดเต็มพร้อมข้อมูลเมตา — ขนาด ขนาดไฟล์ และรูปแบบ — ในพริบตา"
+  "toolbar_download_selected": {
+    "message": "ดาวน์โหลด ({count})"
   },
-  "restricted_link_website": {
-    "message": "เว็บไซต์อย่างเป็นทางการ"
+  "toolbar_group": {
+    "message": "จัดกลุ่ม"
+  },
+  "toolbar_rescan": {
+    "message": "สแกนใหม่"
+  },
+  "toolbar_select_all": {
+    "message": "เลือกทั้งหมด"
+  },
+  "toolbar_similar": {
+    "message": "คล้ายกัน"
+  },
+  "toolbar_sort": {
+    "message": "เรียงลำดับ"
   },
   "trial_error_already_redeemed": {
     "message": "คุณใช้สิทธิ์ทดลองฟรีบนการติดตั้งนี้ไปแล้ว"
@@ -962,13 +980,10 @@
   "trial_error_server_declined": {
     "message": "เซิร์ฟเวอร์ปฏิเสธการทดลองใช้"
   },
-  "license_error_network": {
-    "message": "ข้อผิดพลาดเครือข่าย กรุณาตรวจสอบการเชื่อมต่อ"
+  "view_grid": {
+    "message": "ตาราง"
   },
-  "license_error_invalid_key": {
-    "message": "รหัสใบอนุญาตไม่ถูกต้อง"
-  },
-  "license_error_activation_failed": {
-    "message": "เปิดใช้งานล้มเหลว กรุณาลองใหม่อีกครั้ง"
+  "view_list": {
+    "message": "รายการ"
   }
 }
