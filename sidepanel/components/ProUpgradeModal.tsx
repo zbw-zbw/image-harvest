@@ -320,7 +320,12 @@ export function ProUpgradeModal() {
                 title={t('pro_feature_reverse_search_title')}
                 desc={t('pro_feature_reverse_search_desc_pro')}
                 gradient="gradient-green"
-                icon={<><circle cx="11" cy="11" r="8" /><path d="M21 21l-4.35-4.35" /></>}
+                icon={
+                  <>
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="M21 21l-4.35-4.35" />
+                  </>
+                }
               />
               <ProFeatureCard
                 title={t('pro_feature_dedup_title')}
