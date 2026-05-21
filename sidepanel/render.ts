@@ -54,7 +54,7 @@ export function renderProgressiveImages(): void {
   const isListView = elements.imageGrid.classList.contains('list-view');
   const gridWrapper = document.querySelector('.image-grid-wrapper') as HTMLElement | null;
   const measured = gridWrapper?.clientHeight || 0;
-  const containerHeight = measured > 100 ? measured : window.innerHeight;
+  const containerHeight = measured > 200 ? measured : 800;
   const totalSlots = calcSkeletonCount(containerHeight, isListView);
   state.scanSkeletonsToShow = Math.max(0, totalSlots - state.filteredImages.length);
 

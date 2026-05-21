@@ -369,8 +369,25 @@ export function initResizeObserver(): void {
 
   const throttledCheckNarrowMode = throttle(checkNarrowMode, 150);
   const resizeObserver = new ResizeObserver(() => {
-    // Throttle resize events so layout adapts continuously during drag
     throttledCheckNarrowMode();
+
+    // Recalculate skeleton count once the Chrome sidepanel finishes its
+    // opening animation and layout stabilizes. showLoading() may have
+    // used a fallback height (800px) because measurements were unreliable
+    // at init time — now that the resize event fired we have real values.
+    if (state.scanProgress.visible && elements.imageGrid) {
+      const gridWrapper = document.querySelector('.image-grid-wrapper') as HTMLElement | null;
+      const height = gridWrapper?.clientHeight || 0;
+      if (height > 200) {
+        const isListView = elements.imageGrid.classList.contains('list-view');
+        const totalSlots = calcSkeletonCount(height, isListView);
+        const needed = Math.max(0, totalSlots - state.filteredImages.length);
+        if (needed !== state.scanSkeletonsToShow) {
+          state.scanSkeletonsToShow = needed;
+          state.scanSkeletonLimit = totalSlots;
+        }
+      }
+    }
   });
   resizeObserver.observe(appElement);
 
@@ -718,7 +735,11 @@ export function showLoading(): void {
 
     const isListView = elements.imageGrid.classList.contains('list-view');
     const measured = (gridWrapper as HTMLElement | null)?.clientHeight || 0;
-    const containerHeight = measured > 100 ? measured : window.innerHeight;
+    // Chrome sidepanel dimensions are unreliable during the opening
+    // animation — both clientHeight and window.innerHeight can return
+    // tiny values. Fall back to 800px (typical sidepanel height) so
+    // skeletons fill the viewport from the first frame.
+    const containerHeight = measured > 200 ? measured : 800;
     const skeletonCount = calcSkeletonCount(containerHeight, isListView);
     // scanSkeletonLimit gates incremental render in message.ts (stop after we
     // fill the visible skeleton slots); scanSkeletonsToShow drives the

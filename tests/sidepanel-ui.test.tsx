@@ -977,7 +977,7 @@ describe('showLoading / hideLoading', () => {
   });
 
   it('sets scanSkeletonLimit + scanSkeletonsToShow to the calcSkeletonCount result', () => {
-    // jsdom returns 0 for clientHeight; the default (|| 600) kicks in.
+    // jsdom returns 0 for clientHeight; the 800px default kicks in.
     showLoading();
     // Non-zero skeleton count pinned (calcSkeletonCount returns >=1 always).
     expect(state.scanSkeletonLimit).toBeGreaterThan(0);

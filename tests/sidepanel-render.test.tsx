@@ -500,14 +500,15 @@ describe('renderProgressiveImages', () => {
     expect(state.scanSkeletonsToShow).toBe(0);
   });
 
-  it('falls back to window.innerHeight when .image-grid-wrapper is missing', () => {
+  it('falls back to 800px default when .image-grid-wrapper is missing', () => {
     gridWrapper.remove();
     state.allImages = [];
     passAllFilters();
     renderProgressiveImages();
-    // When the wrapper element is gone, use window.innerHeight (768 in jsdom)
-    // so skeletons fill the visible area instead of under-rendering.
-    expect(vi.mocked(calcSkeletonCount)).toHaveBeenCalledWith(window.innerHeight, false);
+    // When the wrapper element is gone (clientHeight=0), use the
+    // hardcoded 800px default — window.innerHeight is equally unreliable
+    // during Chrome sidepanel's opening animation.
+    expect(vi.mocked(calcSkeletonCount)).toHaveBeenCalledWith(800, false);
   });
 
   it('detects list-view via classList.contains("list-view") and threads it into calcSkeletonCount', () => {

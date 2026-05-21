@@ -2,9 +2,8 @@
 // Intentionally conservative — matches the existing code style so adopting
 // Prettier doesn't reformat the entire repo. Tweak if/when the team agrees.
 
-import type { Config } from 'prettier';
-
-const config: Config = {
+/** @type {import('prettier').Config} */
+const config = {
   // Match the existing 2-space indentation already used across the codebase
   tabWidth: 2,
   useTabs: false,
