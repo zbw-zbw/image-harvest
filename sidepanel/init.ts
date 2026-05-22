@@ -595,15 +595,23 @@ async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Promise<v
 
         // Reveal the grid after Preact has finished rendering the new cards.
         // Double-rAF ensures we're past the paint that contains the new DOM.
-        requestAnimationFrame(() => {
+        // Skip this when filteredImages is empty — renderImages() already
+        // called showEmpty() which hides the grid intentionally.
+        if (state.filteredImages.length > 0) {
           requestAnimationFrame(() => {
-            if (gridWrapper) {
-              gridWrapper.style.visibility = '';
-              gridWrapper.classList.remove('hidden');
-              gridWrapper.style.display = '';
-            }
+            requestAnimationFrame(() => {
+              if (gridWrapper) {
+                gridWrapper.style.visibility = '';
+                gridWrapper.classList.remove('hidden');
+                gridWrapper.style.display = '';
+              }
+            });
           });
-        });
+        } else {
+          // Empty state — just clear the visibility override so showEmpty's
+          // layout takes effect without the hidden-for-flicker-prevention.
+          if (gridWrapper) gridWrapper.style.visibility = '';
+        }
       } else {
         // Same content — no re-render needed, just ensure grid is visible.
         if (elements.imageGrid) elements.imageGrid.classList.remove('hidden');

@@ -586,7 +586,7 @@
 .restricted-hero {
   position: relative;
   width: 100%;
-  padding: 32px 24px 28px;
+  padding: 24px 24px 20px;
   text-align: center;
   overflow: visible;
   flex-shrink: 0;
@@ -596,7 +596,6 @@
   position: absolute;
   inset: 0;
   background: var(--bg-color);
-  border-bottom: 1px solid var(--border-color);
 }
 
 .restricted-hero-bg::before {
@@ -629,10 +628,8 @@
   height: 64px;
   border-radius: 16px;
   background: var(--bg-color);
-  border: 1px solid var(--border-color);
   box-shadow: var(--shadow-md);
   margin-bottom: 14px;
-  animation: floatIn 0.6s ease-out;
 }
 
 .restricted-logo {
