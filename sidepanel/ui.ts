@@ -720,6 +720,7 @@ export function showLoading(): void {
   const gridWrapper = document.querySelector<HTMLElement>('.image-grid-wrapper');
   if (gridWrapper) {
     gridWrapper.classList.remove('hidden');
+    gridWrapper.style.removeProperty('display');
     gridWrapper.style.visibility = '';
   }
 

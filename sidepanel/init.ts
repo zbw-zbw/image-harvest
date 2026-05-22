@@ -544,21 +544,27 @@ async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Promise<v
 
   // Immediately hide the grid so stale content from the previous tab
   // isn't visible during async operations (URL check, cache validation).
+  // Use display:none (via class) so it collapses from the flex layout.
   const gridWrapper = document.querySelector('.image-grid-wrapper') as HTMLElement | null;
-  if (gridWrapper) gridWrapper.style.visibility = 'hidden';
+  if (gridWrapper) {
+    gridWrapper.classList.add('hidden');
+    gridWrapper.style.display = 'none';
+  }
 
   // Check in-memory cache synchronously BEFORE any await
   const cached = state.tabCache.get(newTabId);
 
-  // If the cache looks like a restricted tab (no URL, no images), skip
-  // the fast path. The no-cache path below properly checks the URL BEFORE
-  // revealing any UI, preventing toolbar/grid flash on restricted pages.
+  // If the cache looks like a restricted tab (no URL, no images), we can
+  // show the restricted state synchronously — no async URL check needed.
   if (cached && !cached.url && cached.images.length === 0) {
     state.tabCache.delete(newTabId);
+    showRestricted();
+    state.isTabSwitching = false;
+    return;
   }
 
   // Fast path (synchronous)
-  if (cached && state.tabCache.has(newTabId)) {
+  if (cached) {
     try {
       // ── Determine up-front whether the filtered image set changed ──
       const cachedFilteredIds = cached.lastRenderedFilteredIds ?? null;
@@ -607,6 +613,9 @@ async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Promise<v
         if (state.filteredImages.length > 0) {
           requestAnimationFrame(() => {
             requestAnimationFrame(() => {
+              // Guard: if we've switched tabs or entered a non-image screen
+              // since scheduling this rAF, don't reveal the grid.
+              if (state.currentTabId !== newTabId || state.uiScreen !== 'images') return;
               if (gridWrapper) {
                 gridWrapper.style.visibility = '';
                 gridWrapper.classList.remove('hidden');
@@ -672,7 +681,12 @@ async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Promise<v
     return;
   }
 
-  // No cache — check if the target tab is restricted BEFORE showing loading
+  // No cache — check if the target tab is restricted BEFORE showing loading.
+  // Hide toolbars during the async check to prevent a flash of the previous
+  // tab's UI if the target turns out to be a restricted page.
+  document.querySelectorAll('.toolbar, .status-bar').forEach((el) => {
+    el.classList.add('hidden');
+  });
   try {
     let newTab: chrome.tabs.Tab | undefined;
     try {
@@ -694,6 +708,10 @@ async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Promise<v
     // Reset similar groups from previous tab so the status bar doesn't
     // flash a stale count while the new tab is being scanned.
     state.similarGroups = [];
+    // Restore toolbars (hidden at the start of the no-cache path).
+    document.querySelectorAll('.toolbar, .status-bar').forEach((el) => {
+      el.classList.remove('hidden');
+    });
     showLoading();
 
     // Notify background that the side panel is open on this tab
