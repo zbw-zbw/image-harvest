@@ -542,21 +542,28 @@ async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Promise<v
 
   state.currentTabId = newTabId;
 
+  // Immediately hide the grid so stale content from the previous tab
+  // isn't visible during async operations (URL check, cache validation).
+  const gridWrapper = document.querySelector('.image-grid-wrapper') as HTMLElement | null;
+  if (gridWrapper) gridWrapper.style.visibility = 'hidden';
+
   // Check in-memory cache synchronously BEFORE any await
   const cached = state.tabCache.get(newTabId);
+
+  // If the cache looks like a restricted tab (no URL, no images), skip
+  // the fast path. The no-cache path below properly checks the URL BEFORE
+  // revealing any UI, preventing toolbar/grid flash on restricted pages.
+  if (cached && !cached.url && cached.images.length === 0) {
+    state.tabCache.delete(newTabId);
+  }
+
   // Fast path (synchronous)
-  if (cached) {
+  if (cached && state.tabCache.has(newTabId)) {
     try {
       // ── Determine up-front whether the filtered image set changed ──
       const cachedFilteredIds = cached.lastRenderedFilteredIds ?? null;
       const isSameFilteredSet =
         cachedFilteredIds != null && cachedFilteredIds === state.lastRenderedFilteredIds;
-      // ── Only hide the grid when content actually changes, so that
-      // switching back to an already-rendered tab is flicker-free. ──
-      const gridWrapper = document.querySelector('.image-grid-wrapper') as HTMLElement | null;
-      if (!isSameFilteredSet && gridWrapper) {
-        gridWrapper.style.visibility = 'hidden';
-      }
 
       // Batch all state assignments to avoid intermediate Preact renders.
       const patch: Record<string, unknown> = {
@@ -616,6 +623,7 @@ async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Promise<v
         // Same content — no re-render needed, just ensure grid is visible.
         if (elements.imageGrid) elements.imageGrid.classList.remove('hidden');
         if (gridWrapper) {
+          gridWrapper.style.visibility = '';
           gridWrapper.classList.remove('hidden');
           gridWrapper.style.display = '';
         }

@@ -619,11 +619,13 @@ export function hideRestricted(): void {
   });
   // showRestricted() sets both the CSS class AND an inline style on
   // image-grid-wrapper to guarantee immediate hiding. We must clear
-  // both when restoring visibility.
+  // both when restoring visibility. Also clear the preemptive
+  // visibility:hidden that handleTabChange sets at switch-start.
   const wrapper = document.querySelector<HTMLElement>('.image-grid-wrapper');
   if (wrapper) {
     wrapper.classList.remove('hidden');
     wrapper.style.removeProperty('display');
+    wrapper.style.visibility = '';
   }
   // hideAll() (called by showRestricted) adds 'hidden' to #image-grid.
   // When switching back from a restricted tab to a cached normal tab,
@@ -715,8 +717,11 @@ export function showLoading(): void {
   state.lastRenderedFilteredIds = null;
 
   // Ensure image-grid-wrapper is visible
-  const gridWrapper = document.querySelector('.image-grid-wrapper');
-  if (gridWrapper) gridWrapper.classList.remove('hidden');
+  const gridWrapper = document.querySelector<HTMLElement>('.image-grid-wrapper');
+  if (gridWrapper) {
+    gridWrapper.classList.remove('hidden');
+    gridWrapper.style.visibility = '';
+  }
 
   // Drive skeleton rendering through the store: <ImageGrid> reads
   // scanSkeletonsToShow and renders that many <SkeletonCard> nodes after
