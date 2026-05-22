@@ -35,7 +35,13 @@ export function FoundActionCount() {
  * Hidden during scanning to stay consistent with the found-count above.
  */
 export function SimilarInline() {
-  const count = useStoreSelector((s) => s.similarGroups.length);
+  const count = useStoreSelector((s) => {
+    if (s.similarGroups.length === 0) return 0;
+    const filteredIds = new Set(s.filteredImages.map((img) => img.id));
+    return s.similarGroups.filter(
+      (group) => group.filter((img) => filteredIds.has(img.id)).length >= 2
+    ).length;
+  });
   const isScanning = useStoreSelector((s) => s.isScanning);
   useStoreSelector((s) => s.localeTick);
 

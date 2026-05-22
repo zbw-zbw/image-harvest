@@ -61,6 +61,7 @@ import { clearTabImageCache, getTabImageCache, saveTabImageCache } from '../shar
 import { elements, state, store } from './state';
 import {
   applyTranslations,
+  checkNarrowMode,
   handleProgressClose,
   hideLoading,
   hideRestricted,
@@ -420,11 +421,11 @@ async function loadCurrentTab(forceRescan = false, targetTabId?: number): Promis
       // subscriber triggered by the allImages write already sees the
       // correct filtered data (prevents a single-frame flash).
       if (cached.filteredImages && cached.filteredImages.length > 0) {
-        state.filteredImages = cached.filteredImages;
+        state.filteredImages = [...cached.filteredImages];
         state.lastRenderedFilteredIds = cached.lastRenderedFilteredIds ?? null;
       }
-      state.allImages = cached.images;
-      state.selectedImages = cached.selectedImages;
+      state.allImages = [...cached.images];
+      state.selectedImages = new Set(cached.selectedImages);
       hideLoading();
       if (!cached.filteredImages || cached.filteredImages.length === 0) {
         applyFilters();
@@ -553,15 +554,6 @@ async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Promise<v
 
   state.currentTabId = newTabId;
 
-  // Immediately hide the grid so stale content from the previous tab
-  // isn't visible during async operations (URL check, cache validation).
-  // Use display:none (via class) so it collapses from the flex layout.
-  const gridWrapper = document.querySelector('.image-grid-wrapper') as HTMLElement | null;
-  if (gridWrapper) {
-    gridWrapper.classList.add('hidden');
-    gridWrapper.style.display = 'none';
-  }
-
   // Check in-memory cache synchronously BEFORE any await
   const cached = state.tabCache.get(newTabId);
 
@@ -574,120 +566,99 @@ async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Promise<v
     return;
   }
 
-  // Fast path (synchronous)
+  // Fast path: cache exists — verify URL, then restore state in-place.
+  // We intentionally do NOT hide the grid here. Preact's synchronous
+  // re-render swaps the cards atomically after store.setMany(), so the
+  // user never sees a blank frame or stale content.
   if (cached) {
     try {
-      // ── Determine up-front whether the filtered image set changed ──
+      // Verify the tab URL before restoring cached content.
+      // chrome.tabs.get() resolves within ~1ms; during this brief window
+      // the previous tab's images remain visible (not a blank screen).
+      let newTab: chrome.tabs.Tab | undefined;
+      try {
+        newTab = await chrome.tabs.get(newTabId);
+      } catch {
+        // Tab may have been closed
+      }
+      if (state.currentTabId !== newTabId) return;
+      if (!newTab || isRestrictedUrl(newTab.url)) {
+        state.tabCache.delete(newTabId);
+        state.currentTabId = null;
+        state.allImages = [];
+        state.selectedImages.clear();
+        state.filteredImages = [];
+        if (elements.imageGrid) elements.imageGrid.innerHTML = '';
+        showRestricted();
+        return;
+      }
+      if (cached.url && cached.url !== newTab.url) {
+        // URL changed — need a full rescan. Hide grid NOW.
+        state.tabCache.delete(newTabId);
+        const gridWrapper = document.querySelector<HTMLElement>('.image-grid-wrapper');
+        if (gridWrapper) {
+          gridWrapper.classList.add('hidden');
+          gridWrapper.style.display = 'none';
+        }
+        showLoading();
+        await loadCurrentTab(true, newTabId);
+        return;
+      }
+      if (!cached.url && newTab.url) {
+        cached.url = newTab.url;
+      }
+
+      // ── Restore state from cache ──────────────────────────────────────
+      // store.setMany() triggers Preact's useStoreSelector hooks which
+      // synchronously re-render <ImageGrid> — the cards swap in one paint
+      // frame with no blank flash.
       const cachedFilteredIds = cached.lastRenderedFilteredIds ?? null;
       const isSameFilteredSet =
         cachedFilteredIds != null && cachedFilteredIds === state.lastRenderedFilteredIds;
 
-      // Batch all state assignments to avoid intermediate Preact renders.
       const patch: Record<string, unknown> = {
-        allImages: cached.images,
-        selectedImages: cached.selectedImages,
-        similarGroups: cached.similarGroups || [],
+        allImages: [...cached.images],
+        selectedImages: new Set(cached.selectedImages),
+        similarGroups: (cached.similarGroups || []).map((g) => [...g]),
       };
-      // Only assign filteredImages when the content actually changed.
-      // Cached arrays are spread-copies ([...arr]) so their reference
-      // always differs — assigning them unconditionally would trigger
-      // ImageGrid's useStoreSelector to re-render all cards.
       if (!isSameFilteredSet && cached.filteredImages && cached.filteredImages.length > 0) {
-        patch.filteredImages = cached.filteredImages;
+        patch.filteredImages = [...cached.filteredImages];
         patch.lastRenderedFilteredIds = cachedFilteredIds;
       }
       store.setMany(patch as Partial<typeof state>);
 
+      // Ensure the normal-page UI is visible (handles transition from
+      // restricted/empty/loading states set by a previous tab).
       hideLoading();
-      // Restore toolbars and dismiss any state screen (restricted/empty/
-      // error) WITHOUT revealing the grid wrapper — hideRestricted() would
-      // remove the preemptive display:none and flash the old tab's cards
-      // for one frame before Preact re-renders. The grid is revealed later
-      // by the double-rAF (when content changes) or synchronously (when
-      // the filtered set is identical).
       const stateScreensMount = document.querySelector<HTMLElement>(
         '[data-preact-mount="state-screens"]'
       );
       if (stateScreensMount) stateScreensMount.style.display = 'none';
-      if (state.uiScreen !== 'images') state.uiScreen = 'images';
+      state.uiScreen = 'images';
       document.querySelectorAll('.toolbar, .status-bar').forEach((el) => {
         el.classList.remove('hidden');
       });
 
-      // If no cached filteredImages were available, derive them now.
+      // Make sure grid wrapper is visible (showRestricted / showEmpty may
+      // have hidden it on a previous tab switch).
+      const gridWrapper = document.querySelector<HTMLElement>('.image-grid-wrapper');
+      if (gridWrapper) {
+        gridWrapper.classList.remove('hidden');
+        gridWrapper.style.removeProperty('display');
+        gridWrapper.style.visibility = '';
+      }
+      if (elements.imageGrid) elements.imageGrid.classList.remove('hidden');
+
+      // Derive filtered images if no cached set was available.
       if (!isSameFilteredSet && (!cached.filteredImages || cached.filteredImages.length === 0)) {
         applyFilters();
       }
 
-      // Update the found count immediately so the status bar doesn't flash
-      // the previous tab's count.
       if (elements.foundCount) {
         elements.foundCount.textContent = String(state.filteredImages.length);
       }
-
       updateSelectionUI();
-
-      if (!isSameFilteredSet) {
-        renderImages({ skipScrollReset: true });
-
-        // Reveal the grid after Preact has finished rendering the new cards.
-        // Double-rAF ensures we're past the paint that contains the new DOM.
-        // Skip this when filteredImages is empty — renderImages() already
-        // called showEmpty() which hides the grid intentionally.
-        if (state.filteredImages.length > 0) {
-          requestAnimationFrame(() => {
-            requestAnimationFrame(() => {
-              // Guard: if we've switched tabs or entered a non-image screen
-              // since scheduling this rAF, don't reveal the grid.
-              if (state.currentTabId !== newTabId || state.uiScreen !== 'images') return;
-              if (gridWrapper) {
-                gridWrapper.style.visibility = '';
-                gridWrapper.classList.remove('hidden');
-                gridWrapper.style.display = '';
-              }
-            });
-          });
-        } else {
-          // Empty state — just clear the visibility override so showEmpty's
-          // layout takes effect without the hidden-for-flicker-prevention.
-          if (gridWrapper) gridWrapper.style.visibility = '';
-        }
-      } else {
-        // Same content — no re-render needed, just ensure grid is visible.
-        if (elements.imageGrid) elements.imageGrid.classList.remove('hidden');
-        if (gridWrapper) {
-          gridWrapper.style.visibility = '';
-          gridWrapper.classList.remove('hidden');
-          gridWrapper.style.display = '';
-        }
-        state.uiScreen = 'images';
-      }
-
-      // Verify the URL still matches asynchronously
-      try {
-        const newTab = await chrome.tabs.get(newTabId);
-        if (state.currentTabId !== newTabId) return;
-        if (!newTab || isRestrictedUrl(newTab.url)) {
-          state.currentTabId = null;
-          // clearCurrentImages is exported from ui.ts; tolerate absence here
-          state.allImages = [];
-          state.selectedImages.clear();
-          state.filteredImages = [];
-          if (elements.imageGrid) elements.imageGrid.innerHTML = '';
-          showRestricted();
-          return;
-        }
-        if (cached.url && cached.url !== newTab.url) {
-          await loadCurrentTab(true, newTabId);
-          return;
-        }
-        // If cached.url was empty (saved before URL was known), update it now
-        if (!cached.url && newTab.url) {
-          cached.url = newTab.url;
-        }
-      } catch {
-        // Tab may have been closed — ignore
-      }
+      checkNarrowMode();
 
       if (!state.isPopupMode) {
         chrome.runtime
@@ -705,9 +676,14 @@ async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Promise<v
     return;
   }
 
-  // No cache — check if the target tab is restricted BEFORE showing loading.
-  // Hide toolbars during the async check to prevent a flash of the previous
-  // tab's UI if the target turns out to be a restricted page.
+  // No cache — hide the grid and check if the target tab is restricted
+  // BEFORE showing loading. The grid must be hidden here because we have
+  // no cached content to show while the async URL check + scan runs.
+  const gridWrapper = document.querySelector('.image-grid-wrapper') as HTMLElement | null;
+  if (gridWrapper) {
+    gridWrapper.classList.add('hidden');
+    gridWrapper.style.display = 'none';
+  }
   document.querySelectorAll('.toolbar, .status-bar').forEach((el) => {
     el.classList.add('hidden');
   });
