@@ -105,9 +105,16 @@ export function renderImages(options?: { skipScrollReset?: boolean }): void {
   }
 
   // Ensure the grid wrapper is visible (showEmpty hides it to let the
-  // empty-state placeholder take full flex space for vertical centering)
-  const gridWrapper = document.querySelector('.image-grid-wrapper');
-  if (gridWrapper) gridWrapper.classList.remove('hidden');
+  // empty-state placeholder take full flex space for vertical centering).
+  // Clear both the CSS class AND inline styles — handleTabChange's
+  // preemptive hide sets style.display='none' which persists across
+  // filter changes if only the class is removed.
+  const gridWrapper = document.querySelector<HTMLElement>('.image-grid-wrapper');
+  if (gridWrapper) {
+    gridWrapper.classList.remove('hidden');
+    gridWrapper.style.removeProperty('display');
+    gridWrapper.style.visibility = '';
+  }
 
   // Reset uiScreen so Preact's <StateScreens> hides any visible
   // empty/error/restricted screen — prevents the "images + empty state

@@ -7,7 +7,7 @@ import type { ImageItem } from '../shared/types';
 import { updateSelectionUI } from './actions';
 import { renderImages } from './render';
 import { closeAllFilterDropdowns, showProUpgradeModal } from './settings';
-import { state } from './state';
+import { elements, state } from './state';
 import { t } from '../shared/i18n';
 import { showToast } from './ui';
 import { updateFilterButtonLabels } from './ui';
@@ -391,4 +391,46 @@ export function syncCustomSizeInputsFromSettings(): void {
     if (maxWInput) maxWInput.value = '';
     if (maxHInput) maxHInput.value = '';
   }
+}
+
+export function resetAllFilters(): void {
+  state.activeFilters = {
+    size: 'all',
+    sizeMin: 0,
+    sizeMax: Infinity,
+    types: [],
+    layout: 'all',
+    urlKeyword: '',
+    color: null,
+    customMinEnabled: state.appSettings.enableMinSize,
+    customMinWidth: state.appSettings.minWidth ?? 0,
+    customMinHeight: state.appSettings.minHeight ?? 0,
+    customMaxEnabled: state.appSettings.enableMaxSize,
+    customMaxWidth: state.appSettings.maxWidth ?? 8000,
+    customMaxHeight: state.appSettings.maxHeight ?? 8000,
+    fileSizeEnabled: false,
+    minFileSizeKB: 0,
+    maxFileSizeKB: Infinity,
+    fileSizePreset: 'all',
+  };
+  if (elements.filterUrlInput) (elements.filterUrlInput as HTMLInputElement).value = '';
+  const fsMin = document.getElementById('filter-filesize-min') as HTMLInputElement | null;
+  const fsMax = document.getElementById('filter-filesize-max') as HTMLInputElement | null;
+  if (fsMin) fsMin.value = '';
+  if (fsMax) fsMax.value = '';
+  document.querySelectorAll('[data-filesize-filter]').forEach((o) => o.classList.remove('active'));
+  document.querySelector('[data-filesize-filter="all"]')?.classList.add('active');
+  syncCustomSizeInputsFromSettings();
+  document.querySelectorAll<HTMLInputElement>('.type-checkbox').forEach((cb) => {
+    cb.checked = true;
+  });
+  document.querySelectorAll('[data-size-filter]').forEach((o) => o.classList.remove('active'));
+  document.querySelectorAll('[data-layout-filter]').forEach((o) => o.classList.remove('active'));
+  document.querySelector('[data-size-filter="all"]')?.classList.add('active');
+  document.querySelector('[data-layout-filter="all"]')?.classList.add('active');
+  document
+    .querySelectorAll('#color-swatches .color-swatch')
+    .forEach((s) => s.classList.remove('active'));
+  document.querySelector('[data-color-filter="all"]')?.classList.add('active');
+  updateFilterButtonLabels();
 }

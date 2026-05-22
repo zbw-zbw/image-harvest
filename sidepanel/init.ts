@@ -26,6 +26,7 @@ import {
   applyFileSizePreset,
   applyFilters,
   clearCustomSizeInputs,
+  resetAllFilters,
   syncCustomSizeInputsFromSettings,
 } from './filter';
 import { mountPreactComponents } from './components/mount';
@@ -388,6 +389,12 @@ async function loadCurrentTab(forceRescan = false, targetTabId?: number): Promis
 
   const tabId = activeTab.id!;
   const tabUrl = activeTab.url || '';
+
+  // Guard: if another tab switch happened while we were awaiting
+  // chrome.tabs.get / query, abort so we don't overwrite the new tab's
+  // state (e.g. calling hideRestricted() would undo showRestricted()).
+  if (targetTabId != null && state.currentTabId !== targetTabId) return;
+
   state.currentTabId = tabId;
 
   // Notify background that the side panel is open on this tab
@@ -435,6 +442,8 @@ async function loadCurrentTab(forceRescan = false, targetTabId?: number): Promis
   // Check session storage cache (survives popup/sidepanel close-reopen)
   if (!forceRescan) {
     const sessionCached = await getTabImageCache(tabId, tabUrl);
+    // Guard: abort if a tab switch happened during the async storage read.
+    if (targetTabId != null && state.currentTabId !== targetTabId) return;
     if (sessionCached && sessionCached.images && sessionCached.images.length > 0) {
       state.allImages = sessionCached.images.map((img) => ({
         ...img,
@@ -471,6 +480,8 @@ async function loadCurrentTab(forceRescan = false, targetTabId?: number): Promis
   // No cache available — full scan with loading UI.
   // Pass the resolved tabId explicitly so fetchImages never falls back to
   // querying the active tab (which may differ during rapid tab switches).
+  // Guard: skip the scan if a tab switch happened during cache checks.
+  if (targetTabId != null && state.currentTabId !== targetTabId) return;
   await fetchImages(tabId);
 
   // fetchImages already persists to tabCache + sessionStorage using the
@@ -588,7 +599,20 @@ async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Promise<v
       store.setMany(patch as Partial<typeof state>);
 
       hideLoading();
-      hideRestricted();
+      // Restore toolbars and dismiss any state screen (restricted/empty/
+      // error) WITHOUT revealing the grid wrapper — hideRestricted() would
+      // remove the preemptive display:none and flash the old tab's cards
+      // for one frame before Preact re-renders. The grid is revealed later
+      // by the double-rAF (when content changes) or synchronously (when
+      // the filtered set is identical).
+      const stateScreensMount = document.querySelector<HTMLElement>(
+        '[data-preact-mount="state-screens"]'
+      );
+      if (stateScreensMount) stateScreensMount.style.display = 'none';
+      if (state.uiScreen !== 'images') state.uiScreen = 'images';
+      document.querySelectorAll('.toolbar, .status-bar').forEach((el) => {
+        el.classList.remove('hidden');
+      });
 
       // If no cached filteredImages were available, derive them now.
       if (!isSameFilteredSet && (!cached.filteredImages || cached.filteredImages.length === 0)) {
@@ -905,6 +929,7 @@ function bindEvents(): void {
         clearTabImageCache(state.currentTabId);
       }
       state.isFetching = false;
+      resetAllFilters();
       // Show loading overlay immediately to prevent stale content flash
       showLoading();
       loadCurrentTab(true, state.currentTabId ?? undefined);
@@ -1413,57 +1438,7 @@ function bindEvents(): void {
         loadCurrentTab(true, state.currentTabId ?? undefined);
         return;
       }
-      // Reset all filters to defaults, restoring custom size from global
-      // settings (not zero) so the global > local contract is preserved.
-      state.activeFilters = {
-        size: 'all',
-        sizeMin: 0,
-        sizeMax: Infinity,
-        types: [],
-        layout: 'all',
-        urlKeyword: '',
-        color: null,
-        customMinEnabled: state.appSettings.enableMinSize,
-        customMinWidth: state.appSettings.minWidth ?? 0,
-        customMinHeight: state.appSettings.minHeight ?? 0,
-        customMaxEnabled: state.appSettings.enableMaxSize,
-        customMaxWidth: state.appSettings.maxWidth ?? 8000,
-        customMaxHeight: state.appSettings.maxHeight ?? 8000,
-        fileSizeEnabled: false,
-        minFileSizeKB: 0,
-        maxFileSizeKB: Infinity,
-        fileSizePreset: 'all',
-      };
-      if (elements.filterUrlInput) (elements.filterUrlInput as HTMLInputElement).value = '';
-      // Clear file size inputs
-      const fsMin = document.getElementById('filter-filesize-min') as HTMLInputElement | null;
-      const fsMax = document.getElementById('filter-filesize-max') as HTMLInputElement | null;
-      if (fsMin) fsMin.value = '';
-      if (fsMax) fsMax.value = '';
-      document
-        .querySelectorAll('[data-filesize-filter]')
-        .forEach((o) => o.classList.remove('active'));
-      const defaultFsOption = document.querySelector('[data-filesize-filter="all"]');
-      if (defaultFsOption) defaultFsOption.classList.add('active');
-      // Restore custom size input fields from global settings
-      syncCustomSizeInputsFromSettings();
-      document.querySelectorAll<HTMLInputElement>('.type-checkbox').forEach((cb) => {
-        cb.checked = true;
-      });
-      document.querySelectorAll('[data-size-filter]').forEach((o) => o.classList.remove('active'));
-      document
-        .querySelectorAll('[data-layout-filter]')
-        .forEach((o) => o.classList.remove('active'));
-      const defaultSizeOption = document.querySelector('[data-size-filter="all"]');
-      if (defaultSizeOption) defaultSizeOption.classList.add('active');
-      const defaultLayoutOption = document.querySelector('[data-layout-filter="all"]');
-      if (defaultLayoutOption) defaultLayoutOption.classList.add('active');
-      document
-        .querySelectorAll('#color-swatches .color-swatch')
-        .forEach((s) => s.classList.remove('active'));
-      const allColorOption = document.querySelector('[data-color-filter="all"]');
-      if (allColorOption) allColorOption.classList.add('active');
-      updateFilterButtonLabels();
+      resetAllFilters();
       applyFilters();
     });
   }
