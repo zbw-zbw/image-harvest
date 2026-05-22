@@ -187,7 +187,7 @@ export async function silentRescan(tabId: number, tabUrl: string): Promise<void>
       // Update both caches with fresh data
       state.tabCache.set(tabId, {
         url: tabUrl,
-        images: state.allImages,
+        images: [...state.allImages],
         selectedImages: new Set(state.selectedImages),
       });
       saveTabImageCache(tabId, tabUrl, state.allImages);
@@ -310,7 +310,7 @@ export async function rescanWithProgress(tabId: number, tabUrl: string): Promise
       // Update both caches with fresh data
       state.tabCache.set(tabId, {
         url: tabUrl,
-        images: state.allImages,
+        images: [...state.allImages],
         selectedImages: new Set(state.selectedImages),
       });
       saveTabImageCache(tabId, tabUrl, state.allImages);
@@ -505,7 +505,7 @@ export async function fetchImages(targetTabId?: number): Promise<void> {
         const tabUrl = tabInfo?.url || '';
         state.tabCache.set(scanTabId, {
           url: tabUrl,
-          images: state.allImages,
+          images: [...state.allImages],
           selectedImages: new Set(state.selectedImages),
         });
         saveTabImageCache(scanTabId, tabUrl, state.allImages);

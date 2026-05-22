@@ -110,6 +110,33 @@ function isExtensionContextValid(): boolean {
   return true;
 }
 
+const RECONNECT_DELAY_MS = 1000;
+let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+
+function connectToBackground(): void {
+  try {
+    const port = chrome.runtime.connect({ name: 'image-harvest-ui' });
+    port.onMessage.addListener(handleMessage);
+    port.onDisconnect.addListener(() => {
+      if (!chrome.runtime?.id) {
+        extensionContextInvalidated = true;
+        return;
+      }
+      // SW went idle — schedule reconnect
+      if (reconnectTimer) clearTimeout(reconnectTimer);
+      reconnectTimer = setTimeout(connectToBackground, RECONNECT_DELAY_MS);
+    });
+    // Successful connect means runtime is alive
+    extensionContextInvalidated = false;
+  } catch {
+    // SW not ready yet — retry after a delay
+    if (chrome.runtime?.id) {
+      if (reconnectTimer) clearTimeout(reconnectTimer);
+      reconnectTimer = setTimeout(connectToBackground, RECONNECT_DELAY_MS);
+    }
+  }
+}
+
 // ============================================
 // Initialization
 // ============================================
@@ -254,25 +281,12 @@ async function init(): Promise<void> {
   });
 
   // Establish a long-lived connection to background for broadcast messages.
-  // Wrap in try-catch: after extension reload the background service worker
-  // may not be ready yet, which causes chrome.runtime.connect() to throw
-  // synchronously. Without this guard the entire init() would abort and
-  // loadCurrentTab() would never execute — the panel would stay blank.
-  try {
-    const uiPort = chrome.runtime.connect({ name: 'image-harvest-ui' });
-    uiPort.onMessage.addListener(handleMessage);
-    // When the extension is reloaded (e.g. developer clicks the refresh
-    // button on chrome://extensions), the background SW is torn down and
-    // the port disconnects. Without this handler, sidepanel listeners
-    // (onActivated, onUpdated, visibilitychange) keep firing and call
-    // chrome.tabs/runtime APIs on the now-invalid extension context,
-    // which can crash the entire Chrome process.
-    uiPort.onDisconnect.addListener(() => {
-      extensionContextInvalidated = true;
-    });
-  } catch (error) {
-    console.warn('Failed to connect to background — will retry via sendMessage:', error);
-  }
+  // MV3 service workers can go idle after 30s of inactivity, which tears
+  // down the port. We must distinguish that (recoverable) from extension
+  // reload (unrecoverable, chrome.runtime.id disappears). On recoverable
+  // disconnects, reconnect automatically so tab-switch and live-monitoring
+  // keep working.
+  connectToBackground();
 
   // Listen for tab switches / navigations so we can auto-refresh
   if (!state.isPopupMode) {
