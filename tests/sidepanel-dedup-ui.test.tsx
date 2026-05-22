@@ -177,7 +177,8 @@ describe('removeDuplicates', () => {
   it('Pro + no manual selection + populated groups: defaults to "keep first, remove rest"', async () => {
     state.isProUser = true;
     state.allImages = [mkImg('a'), mkImg('b'), mkImg('c'), mkImg('d')];
-    state.filteredImages = state.allImages;    state.similarGroups = [
+    state.filteredImages = state.allImages;
+    state.similarGroups = [
       [mkImg('a'), mkImg('b')],
       [mkImg('c'), mkImg('d')],
     ];
@@ -206,7 +207,8 @@ describe('removeDuplicates', () => {
   it('Pro + manual selection: removes only the ".selected" images (not default keep-first)', async () => {
     state.isProUser = true;
     state.allImages = [mkImg('a'), mkImg('b'), mkImg('c')];
-    state.filteredImages = state.allImages;    state.similarGroups = [[mkImg('a'), mkImg('b'), mkImg('c')]];
+    state.filteredImages = state.allImages;
+    state.similarGroups = [[mkImg('a'), mkImg('b'), mkImg('c')]];
     showDedupModal();
     await flushDedupRender();
     // Manually select only 'a' (group=0, index=0) — this overrides
