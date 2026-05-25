@@ -10,6 +10,28 @@ interface ReverseSearchSuccess {
 
 export type ReverseSearchResult = ReverseSearchSuccess;
 
+/** Lightweight HEAD-only proxy to retrieve content-length and content-type (bypasses CORS). */
+export async function fetchImageMetaProxy(
+  url: string
+): Promise<{ size: number | null; contentType: string }> {
+  if (!isAllowedFetchUrl(url)) {
+    throw new Error('URL not allowed: must be public http/https');
+  }
+  const response = await fetch(url, {
+    method: 'HEAD',
+    headers: { Accept: 'image/*' },
+  });
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`);
+  }
+  const contentLength = response.headers.get('content-length');
+  const contentType = response.headers.get('content-type') || '';
+  return {
+    size: contentLength ? parseInt(contentLength, 10) : null,
+    contentType,
+  };
+}
+
 /** Fetch an image and return it as a `data:` URL (used to bypass CORS in UI). */
 export async function fetchImageData(url: string): Promise<string> {
   if (!isAllowedFetchUrl(url)) {

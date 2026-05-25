@@ -1088,19 +1088,19 @@
 .soft-paywall-banner--upgrade {
   background: linear-gradient(
     90deg,
-    color-mix(in srgb, #e67e22 12%, var(--bg-color)) 0%,
+    color-mix(in srgb, var(--orange-color) 12%, var(--bg-color)) 0%,
     var(--bg-secondary) 100%
   );
 }
 
 .soft-paywall-banner--upgrade .btn-upgrade-cta {
-  background: #e67e22;
-  border-color: #e67e22;
+  background: var(--orange-color);
+  border-color: var(--orange-color);
 }
 
 .soft-paywall-banner--upgrade .btn-upgrade-cta:hover {
-  background: #d35400;
-  border-color: #d35400;
+  background: var(--orange-hover);
+  border-color: var(--orange-hover);
 }
 
 /* Pro purchase header in the upgrade modal — shown when trial is not available. */
@@ -1173,7 +1173,7 @@
   display: flex;
   justify-content: center;
   gap: 4px;
-  color: #f5b400; /* Star yellow — same swatch the Web Store uses */
+  color: var(--star-color);
   margin-bottom: 12px;
 }
 

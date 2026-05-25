@@ -37,7 +37,7 @@
   padding: 3px 10px;
   font-size: 11px;
   font-weight: 700;
-  color: #5a3e00;
+  color: var(--amber-text);
   background: linear-gradient(135deg, #ffd700, #ffb800);
   border: none;
   border-radius: 10px;
@@ -54,7 +54,7 @@
 }
 
 .btn-upgrade-pro svg {
-  stroke: #5a3e00;
+  stroke: var(--amber-text);
   flex-shrink: 0;
 }
 
@@ -76,7 +76,7 @@
   font-size: 11px;
   font-weight: 700;
   line-height: 16px;
-  color: #5a3e00;
+  color: var(--amber-text);
   background: linear-gradient(135deg, #ffd700, #ffb800);
   border-radius: 10px;
   white-space: nowrap;
@@ -85,7 +85,7 @@
 }
 
 .pro-active-badge svg {
-  stroke: #5a3e00;
+  stroke: var(--amber-text);
   flex-shrink: 0;
 }
 
@@ -528,7 +528,7 @@
 }
 
 .trial-grace-text {
-  color: #856404;
+  color: var(--amber-muted);
   font-weight: 500;
   flex: 1 1 auto;
   min-width: 0;
@@ -544,9 +544,9 @@
 @media (prefers-color-scheme: dark) {
   .trial-grace-banner {
     background: linear-gradient(135deg, #332b00, #3d3200);
-    border-bottom-color: #665200;
+    border-bottom-color: var(--amber-text-dark);
   }
   .trial-grace-text {
-    color: #ffd54f;
+    color: var(--amber-light);
   }
 }

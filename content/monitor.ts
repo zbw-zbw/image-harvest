@@ -12,6 +12,7 @@ import {
   extractBackgroundUrls,
   isGradient,
 } from '../shared/utils';
+import { TIMING } from '../shared/constants';
 import type { ImageItem } from '../shared/types';
 import { state, isExtensionContextValid } from './state';
 import { parseSrcset, sendDiscoveredImages } from './utils';
@@ -27,6 +28,9 @@ let lazyLoadController: AbortController | null = null;
 export function startLiveMonitoring(config: LiveMonitorConfig = {}): void {
   stopLiveMonitoring();
 
+  // Clear dedup set so SPA route changes don't block re-discovery of images
+  state.seenUrls.clear();
+
   const debounceMs = config.debounceMs || 500;
   lazyLoadController = new AbortController();
 
@@ -40,6 +44,11 @@ export function startLiveMonitoring(config: LiveMonitorConfig = {}): void {
     if (!isExtensionContextValid()) {
       stopLiveMonitoring();
       return;
+    }
+
+    // Prevent unbounded growth on long-lived SPA pages
+    if (state.seenUrls.size > TIMING.SEEN_URLS_MAX_SIZE) {
+      state.seenUrls.clear();
     }
 
     const mutations = pendingMutations;

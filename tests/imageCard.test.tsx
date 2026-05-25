@@ -211,23 +211,16 @@ describe('ImageCard – click handlers', () => {
     expect(mocks.pro.removeImageById).not.toHaveBeenCalled();
   });
 
-  it('shows the upgrade modal when a free user clicks delete (no confirm dialog)', async () => {
-    // Pins the bug fix: the Pro guard runs BEFORE the confirm dialog
-    // so free users see ProUpgradeModal immediately, not after dismissing
-    // a confirm prompt.
+  it('shows confirm dialog for free users clicking delete (no Pro guard)', async () => {
+    // Delete is free for all users — confirm dialog should appear directly.
     state.isProUser = false;
     const img = makeImage({ id: 'del-3' });
     const { container } = render(<ImageCard img={img} index={0} />);
     fireEvent.click(container.querySelector('.btn-delete')!);
     await waitFor(() => {
-      expect(mocks.ui.showToast).toHaveBeenCalledWith(
-        'Image removal is a Pro feature. Upgrade to unlock!',
-        'warning'
-      );
-      expect(mocks.settings.showProUpgradeModal).toHaveBeenCalled();
+      expect(mocks.ui.showConfirmDialog).toHaveBeenCalled();
     });
-    expect(mocks.ui.showConfirmDialog).not.toHaveBeenCalled();
-    expect(mocks.pro.removeImageById).not.toHaveBeenCalled();
+    expect(mocks.settings.showProUpgradeModal).not.toHaveBeenCalled();
   });
 
   it('blocks color copy for free users and copies for Pro', () => {

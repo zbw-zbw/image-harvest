@@ -53,7 +53,7 @@
 }
 
 .license-error {
-  color: #e53e3e;
+  color: var(--danger-color);
   font-size: 12px;
   margin-top: 6px;
 }
@@ -109,7 +109,7 @@
   font-weight: 700;
   padding: 3px 10px;
   border-radius: 20px;
-  color: #5a3e00;
+  color: var(--amber-text);
   text-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.3);
 }
 
@@ -118,7 +118,7 @@
 }
 
 .license-status-badge.active svg {
-  stroke: #5a3e00;
+  stroke: var(--amber-text);
 }
 
 .license-plan-badge {

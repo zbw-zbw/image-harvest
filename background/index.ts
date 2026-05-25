@@ -17,7 +17,7 @@ import { uiPorts, sidePanelOpenedTabs, getAccessibleTabId, broadcastToPopup } fr
 import { initLicenseAlarm } from './license';
 import { initDisplayMode, initTabActivationListener } from './display-mode';
 import { getImagesFromTab, processMultiTabExtract } from './extractor';
-import { fetchImageData, reverseSearchUpload } from './reverse-search';
+import { fetchImageData, fetchImageMetaProxy, reverseSearchUpload } from './reverse-search';
 import { isAllowedFetchUrl } from '../shared/url-validator';
 
 // ── Initialization ──────────────────────────────────────────────────────────
@@ -347,6 +347,21 @@ async function handleMessage(
         try {
           const dataUrl = await fetchImageData(url);
           sendResponse({ success: true, dataUrl });
+        } catch (error) {
+          sendResponse({ success: false, error: (error as Error).message });
+        }
+        break;
+      }
+
+      case MESSAGE_TYPES.FETCH_IMAGE_META: {
+        const metaUrl = message.url as string;
+        if (!isAllowedFetchUrl(metaUrl)) {
+          sendResponse({ success: false, error: 'Blocked: URL not allowed for fetch' });
+          break;
+        }
+        try {
+          const meta = await fetchImageMetaProxy(metaUrl);
+          sendResponse({ success: true, size: meta.size, contentType: meta.contentType });
         } catch (error) {
           sendResponse({ success: false, error: (error as Error).message });
         }

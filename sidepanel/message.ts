@@ -10,7 +10,7 @@ import {
   selectAll,
 } from './actions';
 import { applyFilters } from './filter';
-import { isWithinTabSwitchGrace } from './init';
+import { isWithinTabSwitchGrace } from './tab-lifecycle';
 import { processImageExtras, updateScanProgress } from './scan';
 import { renderImages } from './render';
 import { applyProFeatureVisibility, closeAllFilterDropdowns, closeSettings } from './settings';
