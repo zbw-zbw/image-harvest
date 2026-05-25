@@ -40,6 +40,14 @@ Save your favorite images to a local collection with custom tags and notes. Brow
 
 Automatically extract the top 5 dominant colors from each image. View color palettes directly in the panel. Pro users can copy HEX color codes for design work, branding analysis, or creative projects.
 
+## 🌍 15 Languages Supported
+
+Image Harvest is fully translated into 15 languages: English, 简体中文, 繁體中文, 日本語, Español, 한국어, Português, Français, Deutsch, Italiano, Русский, Nederlands, Polski, العربية, and ไทย. The UI auto-detects your browser language — no manual setup needed.
+
+## 🆓 7-Day Free Trial
+
+Try every Pro feature free for 7 days — no credit card required. Experience unlimited batch downloads, multi-tab extract, similar image detection, collections, and more before you decide.
+
 ---
 
 ## ✅ FREE vs ⚡ PRO
@@ -71,11 +79,19 @@ Automatically extract the top 5 dominant colors from each image. View color pale
 - Live monitoring (MutationObserver)
 - Advanced grouping (5 modes)
 
+### 💎 Pricing
+
+- Monthly: $2.99
+- Yearly: $19.99 (~44% off)
+- Lifetime: $29.99 (one-time, use forever)
+
+All plans include a 30-day money-back guarantee.
+
 ---
 
 ## 🔒 Privacy First
 
-Image Harvest does **NOT** collect any user data. All processing happens locally in your browser. No analytics, no tracking, no data transmission.
+Image Harvest processes everything locally in your browser. No images, URLs, or personal data ever leave your device. Optional anonymous usage statistics (event counts only — no URLs, no images, no identifiers) can be enabled in Settings → Help Improve; it is **off by default**.
 
 ## ⌨️ Keyboard Shortcuts
 
@@ -87,7 +103,7 @@ Works on Chrome 88+. Built with Manifest V3.
 
 ## 📦 Version
 
-`1.0.1` — Now live on Chrome Web Store. See changelog at [CHANGELOG.md](https://github.com/zbw-zbw/image-harvest/blob/master/CHANGELOG.md).
+`1.0.4` — See changelog at [CHANGELOG.md](https://github.com/zbw-zbw/image-harvest/blob/master/CHANGELOG.md).
 
 ## 🌐 Website
 
