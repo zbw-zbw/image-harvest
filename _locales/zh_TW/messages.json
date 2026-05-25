@@ -428,9 +428,6 @@
   "pro_feature_blocked_format_conversion": {
     "message": "格式轉換是 Pro 功能,升級即可解鎖!"
   },
-  "pro_feature_blocked_image_delete": {
-    "message": "移除圖片是 Pro 功能,升級即可解鎖!"
-  },
   "pro_feature_blocked_multitab": {
     "message": "多分頁擷取是Pro功能，升級後解鎖！"
   },

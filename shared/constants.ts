@@ -260,7 +260,7 @@ export const TELEMETRY_MAX_QUEUE = 100;
 export const PRICING = {
   MONTHLY: 2.99,
   YEARLY: 19.99,
-  LIFETIME: 39.99,
+  LIFETIME: 29.99,
 } as const;
 export const LICENSE_STATUS = {
   ACTIVE: 'active',

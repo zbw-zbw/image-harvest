@@ -129,9 +129,6 @@
   "pro_feature_blocked_collection": {
     "message": "Collection is a Pro feature"
   },
-  "pro_feature_blocked_image_delete": {
-    "message": "Image removal is a Pro feature. Upgrade to unlock!"
-  },
   "pro_feature_blocked_color_copy": {
     "message": "Color copy is a Pro feature"
   },

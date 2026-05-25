@@ -383,9 +383,6 @@
   "pro_feature_blocked_format_conversion": {
     "message": "포맷 변환은 Pro 기능입니다. 업그레이드하여 잠금 해제하세요!"
   },
-  "pro_feature_blocked_image_delete": {
-    "message": "이미지 제거는 Pro 기능입니다. 업그레이드하여 잠금 해제하세요!"
-  },
   "pro_feature_blocked_reverse_search": {
     "message": "{engine} 검색은 Pro가 필요합니다. 업그레이드하여 잠금 해제하세요!"
   },

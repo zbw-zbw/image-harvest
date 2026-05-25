@@ -383,9 +383,6 @@
   "pro_feature_blocked_format_conversion": {
     "message": "Formatkonvertierung ist eine Pro-Funktion. Upgraden zum Freischalten!"
   },
-  "pro_feature_blocked_image_delete": {
-    "message": "Bildentfernung ist eine Pro-Funktion. Upgraden zum Freischalten!"
-  },
   "pro_feature_blocked_reverse_search": {
     "message": "{engine}-Suche erfordert Pro. Upgraden zum Freischalten!"
   },

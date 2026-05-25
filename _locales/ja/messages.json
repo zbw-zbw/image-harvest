@@ -428,9 +428,6 @@
   "pro_feature_blocked_format_conversion": {
     "message": "形式変換は Pro 機能です。アップグレードで解放!"
   },
-  "pro_feature_blocked_image_delete": {
-    "message": "画像削除は Pro 機能です。アップグレードで解放!"
-  },
   "pro_feature_blocked_multitab": {
     "message": "マルチタブ抽出はPro機能です。アップグレードで解放！"
   },

@@ -254,16 +254,6 @@
   opacity: 0.7;
 }
 
-/* Pro-locked delete button on cards */
-.btn-delete.pro-locked {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-
-.btn-delete.pro-locked:hover {
-  opacity: 0.5;
-}
-
 /* Toolbar Row: Select All + View Toggle */
 .toolbar-select-row {
   justify-content: space-between;

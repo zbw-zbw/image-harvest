@@ -125,9 +125,6 @@
   "pro_feature_blocked_collection": {
     "message": "收藏是 Pro 功能"
   },
-  "pro_feature_blocked_image_delete": {
-    "message": "移除图片是 Pro 功能,升级即可解锁!"
-  },
   "pro_feature_blocked_color_copy": {
     "message": "复制颜色是 Pro 功能"
   },

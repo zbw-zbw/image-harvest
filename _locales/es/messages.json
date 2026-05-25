@@ -429,9 +429,6 @@
   "pro_feature_blocked_format_conversion": {
     "message": "La conversión de formato es una función Pro. ¡Actualiza para desbloquear!"
   },
-  "pro_feature_blocked_image_delete": {
-    "message": "Eliminar imágenes es una función Pro. ¡Actualiza para desbloquear!"
-  },
   "pro_feature_blocked_multitab": {
     "message": "La extracción multi-pestaña es una función Pro. ¡Actualiza para desbloquear!"
   },

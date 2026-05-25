@@ -46,7 +46,7 @@
 ### 🔁 Payment Migration: PayPal → Creem
 
 - Better global payment coverage (China mainland, Southeast Asia)
-- Pricing unchanged: Monthly $2.99 / Yearly $19.99 / Lifetime $39.99
+- Pricing unchanged: Monthly $2.99 / Yearly $19.99 / Lifetime $29.99
 - Existing licenses remain valid, no re-activation needed
 
 ### ✨ Anonymous Telemetry (Opt-in)

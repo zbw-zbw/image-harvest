@@ -383,9 +383,6 @@
   "pro_feature_blocked_format_conversion": {
     "message": "La conversion de format est une fonctionnalité Pro. Passez à Pro pour débloquer !"
   },
-  "pro_feature_blocked_image_delete": {
-    "message": "La suppression d'images est une fonctionnalité Pro. Passez à Pro pour débloquer !"
-  },
   "pro_feature_blocked_reverse_search": {
     "message": "La recherche {engine} nécessite Pro. Passez à Pro pour débloquer !"
   },

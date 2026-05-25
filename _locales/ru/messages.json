@@ -383,9 +383,6 @@
   "pro_feature_blocked_format_conversion": {
     "message": "Конвертация форматов — функция Pro. Обновитесь, чтобы разблокировать!"
   },
-  "pro_feature_blocked_image_delete": {
-    "message": "Удаление изображений — функция Pro. Обновитесь, чтобы разблокировать!"
-  },
   "pro_feature_blocked_reverse_search": {
     "message": "Поиск через {engine} требует Pro. Обновитесь, чтобы разблокировать!"
   },

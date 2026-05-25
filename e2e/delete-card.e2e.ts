@@ -1,20 +1,11 @@
 // e2e: clicking the per-card delete (🗑) button.
 //
-// handleDelete (ImageCard.tsx) flow after the Pro-guard refactor:
+// handleDelete (ImageCard.tsx) flow:
 //   1. e.stopPropagation() so the card-click selection toggle doesn't fire
-//   2. Pro guard up-front: if (!isProUser) → showProUpgradeModal +
-//      toast, return immediately. The confirm dialog never appears for
-//      free users — fast-fail UX matching handleFavorite.
-//   3. await showConfirmDialog({ title: 'Remove Image', ... }) which
-//      flips state.confirmDialog to { open: true, ..., resolve: fn }
-//      and the Preact <ConfirmDialog> shell renders #confirm-dialog
-//      without the .hidden class
-//   4. user clicks #confirm-dialog-confirm → ConfirmDialog calls
-//      resolve(true) → handleDelete continues
-//   5. removeImageById(img.id) (pro-features.ts) splices the row
-//      out of state.allImages and re-runs filters → grid re-renders
-//      with one fewer card. removeImageById is now a pure business
-//      inverse with no Pro check inside (callers gate).
+//   2. await showConfirmDialog({ title: 'Remove Image', ... })
+//   3. user clicks confirm → removeImageById splices the row out
+//
+// Image delete is free for all users (no Pro gate).
 import { test, expect } from '@playwright/test';
 import {
   launchExtension,
@@ -132,11 +123,9 @@ test('Pro user: clicking cancel in the confirm dialog leaves the card in place',
   await expect(sidepanel.locator('#image-grid .image-card')).toHaveCount(initialCount);
 });
 
-test('free user clicking 🗑 fast-fails into the ProUpgradeModal without showing the confirm dialog', async () => {
-  // Pins the bug fix that moved the Pro guard from removeImageById's
-  // body up to handleDelete: free users used to dismiss a confirm
-  // dialog only to silently land in the upgrade modal afterwards.
-  // Now the guard runs FIRST so the confirm dialog never appears.
+test('free user can also delete — confirm dialog shows and card is removed on confirm', async () => {
+  // Image delete is now free for all users. Free users see the same
+  // confirm dialog as Pro users.
   const { sidepanel } = await openSidepanelWithImages(ext.context, fixtureServer, ext.extensionId);
 
   const initialCount = await sidepanel.locator('#image-grid .image-card').count();
@@ -150,18 +139,21 @@ test('free user clicking 🗑 fast-fails into the ProUpgradeModal without showin
     document.querySelector<HTMLElement>('#image-grid .image-card .btn-delete')?.click();
   });
 
-  // ProUpgradeModal opens (handleDelete's Pro guard).
-  await expect(sidepanel.locator('#pro-upgrade-modal')).not.toHaveClass(/hidden/, {
+  // ConfirmDialog opens (no Pro gate — free users can delete).
+  await expect(sidepanel.locator('#confirm-dialog')).not.toHaveClass(/hidden/, {
     timeout: 3_000,
   });
 
-  // Confirm dialog must NEVER have appeared. We give it a beat and
-  // assert it stays hidden — the regression we're guarding against
-  // would surface as the confirm dialog showing up briefly before
-  // (or instead of) the upgrade modal.
-  await sidepanel.waitForTimeout(300);
-  await expect(sidepanel.locator('#confirm-dialog')).toHaveClass(/hidden/);
+  // ProUpgradeModal must NOT appear.
+  await expect(sidepanel.locator('#pro-upgrade-modal')).toHaveClass(/hidden/);
 
-  // Card count unchanged.
-  await expect(sidepanel.locator('#image-grid .image-card')).toHaveCount(initialCount);
+  // Confirm the deletion.
+  await sidepanel.evaluate(() => {
+    document.getElementById('confirm-dialog-confirm')?.click();
+  });
+
+  // Card count drops by 1.
+  await expect(sidepanel.locator('#image-grid .image-card')).toHaveCount(initialCount - 1, {
+    timeout: 3_000,
+  });
 });

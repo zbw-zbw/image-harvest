@@ -383,9 +383,6 @@
   "pro_feature_blocked_format_conversion": {
     "message": "A conversão de formato é um recurso Pro. Assine para desbloquear!"
   },
-  "pro_feature_blocked_image_delete": {
-    "message": "A remoção de imagens é um recurso Pro. Assine para desbloquear!"
-  },
   "pro_feature_blocked_reverse_search": {
     "message": "A busca {engine} requer Pro. Assine para desbloquear!"
   },

@@ -383,9 +383,6 @@
   "pro_feature_blocked_format_conversion": {
     "message": "फॉर्मेट कन्वर्शन एक Pro सुविधा है। अनलॉक करने के लिए अपग्रेड करें!"
   },
-  "pro_feature_blocked_image_delete": {
-    "message": "छवि हटाना एक Pro सुविधा है। अनलॉक करने के लिए अपग्रेड करें!"
-  },
   "pro_feature_blocked_reverse_search": {
     "message": "{engine} सर्च के लिए Pro आवश्यक है। अनलॉक करने के लिए अपग्रेड करें!"
   },

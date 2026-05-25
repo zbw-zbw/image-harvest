@@ -383,9 +383,6 @@
   "pro_feature_blocked_format_conversion": {
     "message": "Formaatconversie is een Pro-functie. Upgrade om te ontgrendelen!"
   },
-  "pro_feature_blocked_image_delete": {
-    "message": "Afbeelding verwijderen is een Pro-functie. Upgrade om te ontgrendelen!"
-  },
   "pro_feature_blocked_reverse_search": {
     "message": "{engine}-zoekopdracht vereist Pro. Upgrade om te ontgrendelen!"
   },

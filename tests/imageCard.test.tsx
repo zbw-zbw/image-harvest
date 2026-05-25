@@ -187,8 +187,6 @@ describe('ImageCard – click handlers', () => {
   });
 
   it('confirms before deleting and calls removeImageById (Pro user)', async () => {
-    // After the Pro-guard refactor handleDelete fast-fails for free
-    // users — the confirm dialog never appears unless isProUser is true.
     state.isProUser = true;
     const img = makeImage({ id: 'del-1' });
     const { container } = render(<ImageCard img={img} index={0} />);

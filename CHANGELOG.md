@@ -210,7 +210,7 @@ This release focuses heavily on **tab-switch reliability**, **CORS bypass for fi
 #### 🔁 Changed — 支付系统迁移：PayPal → Creem
 
 - **支付通道从 PayPal 切换到 Creem**：更稳定的全球收款 + 更友好的中国大陆/东南亚地区支持 + 更短的到账周期
-- 三档定价不变（Monthly $2.99 / Yearly $19.99 / Lifetime $39.99），既有用户的许可证持续有效，无需重新激活
+- 三档定价不变（Monthly $2.99 / Yearly $19.99 / Lifetime $29.99），既有用户的许可证持续有效，无需重新激活
 - 客服邮箱从个人 Gmail 改为品牌邮箱（用于 Creem 商户认证）
 - 内部新增促销许可证批量生成脚本（仅维护方使用）
 
@@ -314,7 +314,7 @@ This release focuses heavily on **tab-switch reliability**, **CORS bypass for fi
 #### 📥 Added — Download & Export
 
 - Single-image download (original or converted format)
-- Batch ZIP download via JSZip with streaming blob assembly (free: up to 20 images / Pro: unlimited up to 1000)
+- Batch ZIP download via JSZip with streaming blob assembly (free: up to 30 images / Pro: unlimited up to 1000)
 - Format conversion: PNG ↔ JPG ↔ WebP via Canvas API (Pro)
 - Custom naming templates: `{index}` / `{original}` / `{pageTitle}` / `{pageDomain}` / `{width}` / `{height}` / `{format}` / `{date}` / `{timestamp}` / `{year}` / `{month}` / `{day}` (Pro)
 - Subfolder naming (default: `{domain}`)
@@ -356,7 +356,7 @@ This release focuses heavily on **tab-switch reliability**, **CORS bypass for fi
 
 #### 💎 Added — License System & Pricing
 
-- Three Pro plans: Monthly ($2.99), Yearly ($19.99 / ~44% off), Lifetime ($39.99)
+- Three Pro plans: Monthly ($2.99), Yearly ($19.99 / ~44% off), Lifetime ($29.99)
 - License activation via remote API (`https://image-harvest.kyriewen.cn/api/license`)
 - Local cache in `chrome.storage.local` with 24h periodic re-validation (via `chrome.alarms`)
 - 7-day offline grace period
