@@ -56,6 +56,88 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ## [Unreleased]
 
+---
+
+## [1.0.4] — 2026-05-25
+
+### 🚀 Optimization Sprint — Stability, Performance & Architecture
+
+This release focuses heavily on **tab-switch reliability**, **CORS bypass for file metadata**, **code architecture improvements**, and **Pro modal UX redesign**. It also completes remaining i18n gaps, fixes multiple extraction edge cases, and adds security hardening.
+
+### ✨ Added
+
+- **Background proxy for image file size (CORS bypass)**: New `FETCH_IMAGE_META` message type lets the sidepanel request HEAD metadata through the background service worker when direct CORS HEAD fails. A third-tier fallback computes size from the base64 `dataUrl` payload. Result: file sizes now display correctly for cross-origin images (e.g. CDN-hosted assets) that previously showed blank.
+- **Tab lifecycle module**: Extracted all tab management logic from the monolithic `init.ts` (1500+ lines) into a dedicated `sidepanel/tab-lifecycle.ts` module for improved maintainability and reduced bug surface.
+- **Live monitor `seenUrls` auto-clear**: `startLiveMonitoring` now clears the dedup set on each invocation and caps growth at `SEEN_URLS_MAX_SIZE`, preventing unbounded memory growth on long-lived SPA pages.
+- **Lazy-load listener cleanup via AbortController**: Live monitor now uses an `AbortController` to batch-remove all lazy-image `load` event listeners on `stopLiveMonitoring`, preventing leaks.
+- **CSS content image extraction restored**: Re-enabled `extractCssContentImages` (was accidentally disabled) and integrated `::before`/`::after` CSS content URL extraction into the main background-image pass for better coverage.
+- **URL validator security hardening**: New `shared/url-validator.ts` module with `isAllowedFetchUrl()` blocks private IPs, localhost, `.local`/`.internal` hostnames — applied to `FETCH_IMAGE_DATA` and `FETCH_IMAGE_META` to prevent SSRF.
+- **Extraction re-entry guard**: `extractImages()` now returns early if already running, preventing duplicate concurrent extractions.
+- **Pro upgrade modal i18n keys**: Added `pro_feature_*` description keys for all 15 supported languages.
+- **Telemetry opt-in default changed to `true`**: Anonymous telemetry is now opt-in by default (was `false`).
+
+### 🎨 UI/UX
+
+- **Pro upgrade modal redesign**: Features displayed as cards with colored gradient icons; sections reordered (activation → trial → features → pricing); improved spacing and Pro-specific feature descriptions.
+- **Dark mode CSS variable consolidation**: Migrated 8+ hardcoded color values (`#e53e3e`, `#5a3e00`, etc.) into `css/variables.css` theme tokens for consistent dark-mode contrast.
+- **Empty state layout**: Top-aligned with no re-entry animation for a cleaner, less distracting feel.
+- **Skeleton card viewport-aware count**: Uses `800px` default height with `ResizeObserver` recalculation so skeleton placeholders fill the full viewport on first panel open.
+- **Filter bar responsive**: Toolbar filter area now adapts to narrow panel widths without overflow.
+- **Restricted-page hero styling**: Tab-switch to `chrome://` or other restricted pages now shows a proper hero state instead of broken rendering.
+
+### 🐛 Fixed
+
+- **Tab-switch grid flash (multiple root causes)**:
+  - Deep-copy cached arrays on tab restore to prevent cross-tab mutation.
+  - Verify tab URL before revealing cached images.
+  - Preemptive grid hide before async data load.
+  - Guard `loadCurrentTab` against stale tab-switch resumption.
+  - Prevent flash of stale cards on cached tab switch.
+- **Background SW reconnection on idle disconnect**: Side panel now auto-reconnects to the background service worker after Chrome suspends it (idle > 30s), keeping tab-switch and messaging alive.
+- **Filter conditions apply to dedup/similar modals**: The duplicate detection modal image list and the similar-image badge count now respect currently active filter settings.
+- **Grid visibility after filter change**: Fixed issue where changing filters then rescanning could leave the image grid invisible.
+- **Tab-switch to restricted page**: Switching to a `chrome://`, `edge://`, or other restricted-scheme tab no longer causes rendering errors; the fast-path is skipped and a preemptive grid hide prevents stale content.
+- **Empty state restore on tab-switch**: Returning to an empty tab now correctly re-displays the empty-state hero instead of a blank panel.
+- **Delete button Pro gate removed**: Image deletion is now free for all users as intended (removed incorrect Pro guard that was accidentally left in).
+- **Force rescan on panel open**: Opening the side panel now always triggers a fresh scan to ensure images are up-to-date.
+- **Skeleton cards fill viewport on first open**: No longer shows an incorrect count based on a hardcoded assumption; uses actual viewport height.
+- **`extractCssContentImages` disabled by accident**: Restored the function call and changed the default opt-in flag from `false` to `true`.
+
+### ⚡ Performance
+
+- **Collection (IndexedDB) refactor**: Replaced nested `new Promise(async ...)` anti-patterns with clean `async/await` + a shared `requestToPromise` helper. Reduces code by ~60 lines and eliminates a class of silent swallowed errors.
+- **`shared/storage.ts` simplification**: Flattened callback-style storage access into direct `await chrome.storage.local.get/set` calls.
+- **`shared/phash.ts` cleanup**: Simplified internal buffer handling.
+- **`shared/color-extract.ts` optimization**: Improved color quantization path.
+- **Sidepanel bundle size check**: Updated the bundle size threshold in `check-bundle-size.mjs`.
+
+### 🔒 Security
+
+- **SSRF prevention on `FETCH_IMAGE_DATA`**: Added `isAllowedFetchUrl()` validation before the background service worker fetches arbitrary URLs, blocking private networks, loopback, and internal hostnames.
+- **Same check on new `FETCH_IMAGE_META`**: HEAD proxy also validates URLs before issuing requests.
+
+### 🌍 i18n
+
+- **Complete locale coverage**: Replaced all remaining hardcoded English strings in sidepanel components (`filter.ts`, `settings.ts`, `ui.ts`, `dedup-ui.ts`, `collection-ui.ts`, `message.ts`, `scan.ts`, `init.ts`) with `t()` calls.
+- **New i18n keys**: Added ~100 new message keys across all 15 locale files for filter labels, toast messages, modal content, Pro feature descriptions, and error messages.
+- **Locale file formatting**: Reformatted all 15 `messages.json` files for consistency.
+
+### 🔄 Changed
+
+- **`prettier.config.ts` → `prettier.config.mjs`**: Renamed config file to ESM extension for broader tooling compatibility.
+- **`versions/` → `releases/`**: Reorganized release archive directory structure (subdirectory per version).
+- **`content/main.ts` re-entry guard**: `extractImages` now returns `[]` immediately if already running instead of allowing parallel extractions.
+- **State additions**: Added `TIMING` constants object and `SEEN_URLS_MAX_SIZE` to `shared/constants.ts`.
+- **`shared/types.ts`**: Added new field to support Pro feature description rendering.
+
+### 🧪 Test Coverage
+
+- **1400 tests** across 53 test files (up from 1388 in v1.0.3).
+- Updated `imageCard.test.tsx` to reflect delete-button Pro gate removal.
+- Updated `sidepanel-dedup-ui`, `sidepanel-message`, `sidepanel-render`, `sidepanel-filter` test files for new i18n and filter behaviors.
+- Added new filter test cases for dedup-modal filtering and similar-count filtering.
+- Added trial test cases for network-error and persistence-failure scenarios.
+
 ## [1.0.3] — 2026-05-14
 
 ### 🌍 Expanded Language Support
