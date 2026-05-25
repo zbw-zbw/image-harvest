@@ -500,15 +500,15 @@ describe('renderProgressiveImages', () => {
     expect(state.scanSkeletonsToShow).toBe(0);
   });
 
-  it('falls back to 600px container height when .image-grid-wrapper is missing', () => {
+  it('falls back to 800px default when .image-grid-wrapper is missing', () => {
     gridWrapper.remove();
     state.allImages = [];
     passAllFilters();
     renderProgressiveImages();
-    // Pin the 600 default. If the wrapper selector fails silently
-    // (common regression when renaming CSS classes), the skeleton-slot
-    // computation should still yield a reasonable number.
-    expect(vi.mocked(calcSkeletonCount)).toHaveBeenCalledWith(600, false);
+    // When the wrapper element is gone (clientHeight=0), use the
+    // hardcoded 800px default — window.innerHeight is equally unreliable
+    // during Chrome sidepanel's opening animation.
+    expect(vi.mocked(calcSkeletonCount)).toHaveBeenCalledWith(800, false);
   });
 
   it('detects list-view via classList.contains("list-view") and threads it into calcSkeletonCount', () => {
@@ -580,7 +580,7 @@ describe('renderImages', () => {
       state.allImages = [];
       renderImages();
       expect(imageGrid.classList.contains('hidden')).toBe(true);
-      expect(showEmpty).toHaveBeenCalledWith(false);
+      expect(showEmpty).toHaveBeenCalledWith(false, undefined);
     });
 
     it('passes allImages-had-some (true) vs all-empty (false) to showEmpty', () => {
@@ -589,7 +589,7 @@ describe('renderImages', () => {
       state.scanProgress.visible = false;
       state.allImages = [{ id: 'a' } as ImageItem];
       renderImages();
-      expect(showEmpty).toHaveBeenCalledWith(true);
+      expect(showEmpty).toHaveBeenCalledWith(true, 1);
     });
 
     it('does NOT hide grid when scan is still in progress (overlay remains)', () => {

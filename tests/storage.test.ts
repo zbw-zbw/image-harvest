@@ -12,25 +12,23 @@ import {
 import {
   addDownloadRecord,
   clearDownloadHistory,
-  clearLicenseData,
   clearSessionState,
   clearTabImageCache,
   getAppSettings,
   getDisplayMode,
   getDownloadHistory,
   getFilterConfig,
-  getLicenseData,
   getSessionState,
   getTabImageCache,
   removeDownloadRecord,
   resetAppSettings,
   saveAppSettings,
   saveFilterConfig,
-  saveLicenseData,
   saveSessionState,
   saveTabImageCache,
   setDisplayMode,
 } from '../shared/storage';
+import { saveLicenseData, getLicenseData, clearLicenseData } from '../shared/license';
 import type { ImageItem, LicenseData } from '../shared/types';
 
 beforeEach(() => {

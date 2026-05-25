@@ -14,7 +14,7 @@ Filter by size (Small/Medium/Large/XL/Custom), format (JPG/PNG/WebP/SVG/GIF), la
 
 ## 📥 Batch Download Images
 
-Download individual images or batch download multiple images as a single ZIP file. Track download progress with a visual progress bar. Free users can download up to 20 images per batch; Pro users enjoy unlimited batch downloads.
+Download individual images or batch download multiple images as a single ZIP file. Track download progress with a visual progress bar. Free users can download up to 30 images per batch; Pro users enjoy unlimited batch downloads.
 
 ## 🌐 Multi-Tab Extract
 
@@ -49,8 +49,9 @@ Automatically extract the top 5 dominant colors from each image. View color pale
 - Full smart image extraction
 - Filter by size, format, layout, and URL
 - Sorting and view mode switching
-- ZIP download (up to 20 images)
+- ZIP download (up to 30 images)
 - Single image page highlight
+- Image removal from list
 - Color bars (view only)
 - Reverse search via Google
 - Side Panel & Popup modes
@@ -69,7 +70,6 @@ Automatically extract the top 5 dominant colors from each image. View color pale
 - Image collections with tags & notes
 - Live monitoring (MutationObserver)
 - Advanced grouping (5 modes)
-- Image removal from list
 
 ---
 

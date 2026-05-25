@@ -1083,6 +1083,37 @@
   background: var(--bg-tertiary);
 }
 
+/* Upgrade-focused banner variant for users who already used their trial.
+   Uses a warmer amber gradient to distinguish from the trial-focused blue. */
+.soft-paywall-banner--upgrade {
+  background: linear-gradient(
+    90deg,
+    color-mix(in srgb, var(--orange-color) 12%, var(--bg-color)) 0%,
+    var(--bg-secondary) 100%
+  );
+}
+
+.soft-paywall-banner--upgrade .btn-upgrade-cta {
+  background: var(--orange-color);
+  border-color: var(--orange-color);
+}
+
+.soft-paywall-banner--upgrade .btn-upgrade-cta:hover {
+  background: var(--orange-hover);
+  border-color: var(--orange-hover);
+}
+
+/* Pro purchase header in the upgrade modal — shown when trial is not available. */
+.pro-upgrade-purchase-header {
+  margin-bottom: 12px;
+}
+
+.pro-upgrade-purchase-desc {
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 /* Narrow viewport: stack actions under text so the banner doesn't push
    the close X off-screen on the minimum sidebar width. */
 @media (max-width: 380px) {
@@ -1142,7 +1173,7 @@
   display: flex;
   justify-content: center;
   gap: 4px;
-  color: #f5b400; /* Star yellow — same swatch the Web Store uses */
+  color: var(--star-color);
   margin-bottom: 12px;
 }
 

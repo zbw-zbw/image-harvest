@@ -32,6 +32,13 @@ export function showDedupModal(): void {
   });
 }
 
+function getFilteredSimilarGroups() {
+  const filteredIds = new Set(state.filteredImages.map((img) => img.id));
+  return state.similarGroups
+    .map((group) => group.filter((img) => filteredIds.has(img.id)))
+    .filter((group) => group.length >= 2);
+}
+
 function populateDedupBody(): void {
   const modalEl = document.getElementById('dedup-modal');
   const modalBody = modalEl?.querySelector('.modal-body');
@@ -40,11 +47,13 @@ function populateDedupBody(): void {
   const dedupBody = document.getElementById('dedup-body');
   if (!dedupBody) return;
 
-  if (state.similarGroups.length === 0) {
+  const groups = getFilteredSimilarGroups();
+
+  if (groups.length === 0) {
     dedupBody.innerHTML = `<p class="empty-message">${t('dedup_no_similar')}</p>`;
     return;
   }
-  dedupBody.innerHTML = `${state.similarGroups
+  dedupBody.innerHTML = `${groups
     .map(
       (group, gi) => `
       <div class="dedup-group" data-group="${gi}">
@@ -53,7 +62,7 @@ function populateDedupBody(): void {
           ${group
             .map(
               (img, ii) => `
-            <div class="dedup-image" data-group="${gi}" data-index="${ii}">
+            <div class="dedup-image" data-group="${gi}" data-index="${ii}" data-img-id="${img.id}">
               <div class="dedup-image-thumb">
                 <img src="${img.url}" alt="">
               </div>
@@ -78,24 +87,29 @@ function populateDedupBody(): void {
 export async function removeDuplicates(): Promise<void> {
   if (!state.isProUser) {
     closeDedupModal();
-    showToast('Removing duplicates is a Pro feature. Upgrade to unlock!', 'warning');
+    showToast(t('pro_feature_blocked_dedup'), 'warning');
     showProUpgradeModal();
     return;
   }
 
   const toRemove = new Set<string>();
 
-  state.similarGroups.forEach((group, gi) => {
-    group.forEach((img, ii) => {
+  const groups = getFilteredSimilarGroups();
+
+  groups.forEach((group, gi) => {
+    group.forEach((_img, ii) => {
       const el = document.querySelector(`.dedup-image[data-group="${gi}"][data-index="${ii}"]`);
-      if (el && el.classList.contains('selected')) toRemove.add(img.id);
+      if (el && el.classList.contains('selected')) {
+        const imgId = (el as HTMLElement).dataset.imgId;
+        if (imgId) toRemove.add(imgId);
+      }
     });
   });
 
   // If no images were manually selected, default to removing all duplicates
   // in each similar group (keep the first image, remove the rest).
   if (toRemove.size === 0) {
-    state.similarGroups.forEach((group) => {
+    groups.forEach((group) => {
       for (let i = 1; i < group.length; i++) {
         toRemove.add(group[i].id);
       }
@@ -103,15 +117,15 @@ export async function removeDuplicates(): Promise<void> {
   }
 
   if (toRemove.size === 0) {
-    showToast('No duplicate images found', 'info');
+    showToast(t('toast_no_duplicates_found'), 'info');
     return;
   }
 
   const confirmed = await showConfirmDialog({
-    title: 'Remove Duplicates',
-    message: `Are you sure you want to remove ${toRemove.size} selected duplicate image${toRemove.size > 1 ? 's' : ''}?`,
-    confirmText: 'Remove',
-    cancelText: 'Cancel',
+    title: t('confirm_remove_duplicates_title'),
+    message: t('confirm_remove_duplicates_message', { count: toRemove.size }),
+    confirmText: t('common_remove'),
+    cancelText: t('common_cancel'),
     type: 'danger',
   });
   if (!confirmed) return;
@@ -122,5 +136,5 @@ export async function removeDuplicates(): Promise<void> {
   closeDedupModal();
   applyFilters();
   detectSimilarImages();
-  showToast(`Removed ${toRemove.size} duplicate images`, 'success');
+  showToast(t('toast_duplicates_removed', { count: toRemove.size }), 'success');
 }

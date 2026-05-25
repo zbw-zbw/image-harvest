@@ -10,7 +10,7 @@ import { track } from '../shared/telemetry';
 import { EVENTS } from '../shared/telemetry-events';
 import { updateSelectionUI } from './actions';
 import { applyFilters, renderColorSwatches } from './filter';
-import { isWithinTabSwitchGrace } from './init';
+import { isWithinTabSwitchGrace } from './tab-lifecycle';
 import { detectSimilarImages } from './pro-features';
 import { saveTabImageCache } from '../shared/storage';
 import { elements, state } from './state';
@@ -132,8 +132,6 @@ export async function silentRescan(tabId: number, tabUrl: string): Promise<void>
 
     // Abort if the user switched tabs while we were scanning
     if (state.currentTabId !== tabId) {
-      state.isSilentScanning = false;
-      state.isFetching = false;
       return;
     }
 
@@ -187,7 +185,7 @@ export async function silentRescan(tabId: number, tabUrl: string): Promise<void>
       // Update both caches with fresh data
       state.tabCache.set(tabId, {
         url: tabUrl,
-        images: state.allImages,
+        images: [...state.allImages],
         selectedImages: new Set(state.selectedImages),
       });
       saveTabImageCache(tabId, tabUrl, state.allImages);
@@ -199,9 +197,10 @@ export async function silentRescan(tabId: number, tabUrl: string): Promise<void>
     }
   } catch (error) {
     console.warn('Silent rescan failed:', error);
+  } finally {
+    state.isSilentScanning = false;
+    state.isFetching = false;
   }
-  state.isSilentScanning = false;
-  state.isFetching = false;
 }
 
 /**
@@ -238,7 +237,6 @@ export async function rescanWithProgress(tabId: number, tabUrl: string): Promise
     }
     if (!targetTab || state.currentTabId !== tabId) {
       state.isScanning = false;
-      state.isFetching = false;
       hideScanOverlay();
       return;
     }
@@ -257,13 +255,11 @@ export async function rescanWithProgress(tabId: number, tabUrl: string): Promise
 
     // If the user cancelled the scan, abort silently
     if (state.scanAborted) {
-      state.isFetching = false;
       return;
     }
 
     // Abort if the user switched tabs while we were scanning
     if (state.currentTabId !== tabId) {
-      state.isFetching = false;
       hideScanOverlay();
       return;
     }
@@ -310,7 +306,7 @@ export async function rescanWithProgress(tabId: number, tabUrl: string): Promise
       // Update both caches with fresh data
       state.tabCache.set(tabId, {
         url: tabUrl,
-        images: state.allImages,
+        images: [...state.allImages],
         selectedImages: new Set(state.selectedImages),
       });
       saveTabImageCache(tabId, tabUrl, state.allImages);
@@ -328,13 +324,13 @@ export async function rescanWithProgress(tabId: number, tabUrl: string): Promise
   } catch (error) {
     state.isScanning = false;
     if (state.scanAborted) {
-      state.isFetching = false;
       return;
     }
     console.warn('Rescan with progress failed:', error);
     hideScanOverlay();
+  } finally {
+    state.isFetching = false;
   }
-  state.isFetching = false;
 }
 
 export async function fetchImages(targetTabId?: number): Promise<void> {
@@ -374,7 +370,6 @@ export async function fetchImages(targetTabId?: number): Promise<void> {
         tabInfo = await chrome.tabs.get(scanTabId);
       } catch {
         // Tab may have been closed — abort the scan
-        state.isFetching = false;
         state.isScanning = false;
         hideLoading();
         showEmpty();
@@ -383,7 +378,6 @@ export async function fetchImages(targetTabId?: number): Promise<void> {
     }
     if (!tabInfo) {
       // No valid tab — abort
-      state.isFetching = false;
       state.isScanning = false;
       hideLoading();
       showEmpty();
@@ -410,15 +404,17 @@ export async function fetchImages(targetTabId?: number): Promise<void> {
     const retryDelays = [500, 1000, 1500];
     let retryCount = 0;
     for (const delay of retryDelays) {
-      // Stop retrying once we have a successful response WITH images
       const hasImages = response?.success && response.images && response.images.length > 0;
       if (hasImages || state.scanAborted) break;
+
+      // If we already received IMAGES_DISCOVERED messages but final response is empty,
+      // the content script is alive and the page genuinely has no new images — skip retry.
+      if (state.scanDiscoveredImages.length > 0 && response?.success) break;
 
       retryCount++;
       await new Promise<void>((resolve) => setTimeout(resolve, delay));
       if (state.scanAborted) break;
 
-      // Abort if the user switched to a different tab during retry
       if (state.currentTabId !== scanTabId) break;
 
       try {
@@ -429,7 +425,6 @@ export async function fetchImages(targetTabId?: number): Promise<void> {
           liveMonitoring: state.appSettings.liveMonitoring !== false,
         });
       } catch {
-        // sendMessage can throw if background SW is still restarting
         response = null;
       }
     }
@@ -438,13 +433,11 @@ export async function fetchImages(targetTabId?: number): Promise<void> {
 
     // If the user cancelled the scan while we were waiting, abort silently.
     if (state.scanAborted) {
-      state.isFetching = false;
       return;
     }
 
     // Discard results if the user switched to a different tab during scan
     if (state.currentTabId !== scanTabId) {
-      state.isFetching = false;
       hideLoading();
       return;
     }
@@ -504,7 +497,7 @@ export async function fetchImages(targetTabId?: number): Promise<void> {
         const tabUrl = tabInfo?.url || '';
         state.tabCache.set(scanTabId, {
           url: tabUrl,
-          images: state.allImages,
+          images: [...state.allImages],
           selectedImages: new Set(state.selectedImages),
         });
         saveTabImageCache(scanTabId, tabUrl, state.allImages);
@@ -521,15 +514,15 @@ export async function fetchImages(targetTabId?: number): Promise<void> {
   } catch (error) {
     state.isScanning = false;
     if (state.scanAborted) {
-      state.isFetching = false;
       return;
     }
     console.error('Fetch images error:', error);
     hideLoading();
     const msg = error instanceof Error ? error.message : String(error);
-    showError('FETCH_ERROR', msg, 'Refresh the page and try again');
+    showError('FETCH_ERROR', msg, t('toast_refresh_retry'));
+  } finally {
+    state.isFetching = false;
   }
-  state.isFetching = false;
 }
 
 export async function fetchImageDataUrl(imageUrl: string): Promise<string | null> {
@@ -625,8 +618,23 @@ export async function processImageExtras(images: ImageItem[]): Promise<void> {
 
     const batch = imagesToProcess.slice(i, i + batchSize);
     const batchPromises = batch.map(async (img) => {
-      const dataUrl = await fetchImageDataUrl(img.url);
+      // For data: URLs, use them directly — they don't need background
+      // proxying (calculatePHash and extractColorsFromUrl handle them
+      // natively). http/https URLs must go through the background SW to
+      // bypass CORS.
+      const dataUrl = img.url.startsWith('data:') ? img.url : await fetchImageDataUrl(img.url);
       if (!dataUrl) return;
+
+      // If HEAD requests (direct + proxy) didn't yield a file size,
+      // compute it from the already-downloaded dataUrl base64 payload.
+      if (!img.estimatedSize && dataUrl.startsWith('data:')) {
+        const commaIdx = dataUrl.indexOf(',');
+        if (commaIdx !== -1) {
+          const base64Part = dataUrl.substring(commaIdx + 1);
+          const padding = (base64Part.match(/=+$/) || [''])[0].length;
+          img.estimatedSize = Math.floor((base64Part.length * 3) / 4) - padding;
+        }
+      }
 
       const extraPromises: Array<Promise<unknown>> = [];
       if (!img.phash) {

@@ -95,6 +95,7 @@ export const MESSAGE_TYPES = {
 
   // Image data proxy (bypass CORS)
   FETCH_IMAGE_DATA: 'FETCH_IMAGE_DATA',
+  FETCH_IMAGE_META: 'FETCH_IMAGE_META',
 
   // Reverse image search proxy upload
   REVERSE_SEARCH_UPLOAD: 'REVERSE_SEARCH_UPLOAD',
@@ -136,6 +137,15 @@ export const LIMITS = {
   THUMBNAIL_MAX_SIZE: 200,
 } as const;
 
+export const TIMING = {
+  TAB_SWITCH_GRACE_MS: 2000,
+  RECONNECT_DELAY_MS: 1000,
+  MAX_RECONNECT_ATTEMPTS: 10,
+  VISIBILITY_HIDDEN_THRESHOLD_MS: 1000,
+  TAB_UPDATED_DEBOUNCE_MS: 800,
+  SEEN_URLS_MAX_SIZE: 10000,
+} as const;
+
 // V2.0 Group modes
 export const GROUP_MODES = {
   NONE: 'none',
@@ -172,7 +182,6 @@ export const PRO_FEATURES = [
   'advancedGrouping',
   'advancedPreview',
   'liveMonitoring',
-  'imageDelete',
   'unlimitedZip',
 ] as const;
 
@@ -182,6 +191,8 @@ export const PRO_FEATURES = [
 // Pro paywall trips. The thesis (from /付费转化率拉升方案-从0到1-3): a user
 // who has experienced the feature once is 5-10x more likely to convert
 // than one who only saw it greyed out. Specifically:
+export const VALID_REVERSE_SEARCH_ENGINES = ['google', 'tineye', 'baidu', 'yandex'] as const;
+
 //   - MAX_ZIP_IMAGES: 20 → 30  (covers the long tail of "single page download")
 //   - REVERSE_SEARCH_ENGINES: + 'tineye'  (most useful free engine after Google)
 //   - MAX_COLLECTION_ITEMS: 5  (was: collection fully Pro; now 5 free favorites)
@@ -200,7 +211,7 @@ export const FREE_LIMITS = {
   HIGHLIGHT_BATCH: false,
   PREVIEW_ADVANCED: false,
   LIVE_MONITORING: false,
-  IMAGE_DELETE: false,
+  IMAGE_DELETE: true,
   FORMAT_CONVERSION: false,
   CUSTOM_NAMING: false,
 } as const;

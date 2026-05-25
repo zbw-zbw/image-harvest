@@ -1,5 +1,6 @@
 // Reverse-search proxy upload (CORS bypass).
 import { arrayBufferToBase64 } from './utils';
+import { isAllowedFetchUrl } from '../shared/url-validator';
 
 interface ReverseSearchSuccess {
   success: true;
@@ -9,8 +10,33 @@ interface ReverseSearchSuccess {
 
 export type ReverseSearchResult = ReverseSearchSuccess;
 
+/** Lightweight HEAD-only proxy to retrieve content-length and content-type (bypasses CORS). */
+export async function fetchImageMetaProxy(
+  url: string
+): Promise<{ size: number | null; contentType: string }> {
+  if (!isAllowedFetchUrl(url)) {
+    throw new Error('URL not allowed: must be public http/https');
+  }
+  const response = await fetch(url, {
+    method: 'HEAD',
+    headers: { Accept: 'image/*' },
+  });
+  if (!response.ok) {
+    throw new Error(`HTTP ${response.status}`);
+  }
+  const contentLength = response.headers.get('content-length');
+  const contentType = response.headers.get('content-type') || '';
+  return {
+    size: contentLength ? parseInt(contentLength, 10) : null,
+    contentType,
+  };
+}
+
 /** Fetch an image and return it as a `data:` URL (used to bypass CORS in UI). */
 export async function fetchImageData(url: string): Promise<string> {
+  if (!isAllowedFetchUrl(url)) {
+    throw new Error('URL not allowed: must be public http/https');
+  }
   const imageResponse = await fetch(url, {
     headers: { Accept: 'image/*' },
   });
@@ -19,6 +45,9 @@ export async function fetchImageData(url: string): Promise<string> {
   }
   const arrayBuffer = await imageResponse.arrayBuffer();
   const contentType = imageResponse.headers.get('content-type') || 'image/png';
+  if (!contentType.startsWith('image/')) {
+    throw new Error('Response is not an image');
+  }
   const base64 = arrayBufferToBase64(arrayBuffer);
   return `data:${contentType};base64,${base64}`;
 }
@@ -29,9 +58,20 @@ export async function reverseSearchUpload(
   imageDataUrl: string
 ): Promise<ReverseSearchResult> {
   const dataParts = imageDataUrl.split(',');
+  if (dataParts.length < 2 || !dataParts[1]) {
+    throw new Error('Invalid data URL format');
+  }
   const mimeMatch = dataParts[0].match(/:(.*?);/);
   const mimeType = mimeMatch ? mimeMatch[1] : 'image/png';
-  const binaryStr = atob(dataParts[1]);
+  if (!mimeType.startsWith('image/')) {
+    throw new Error('Data URL is not an image type');
+  }
+  let binaryStr: string;
+  try {
+    binaryStr = atob(dataParts[1]);
+  } catch {
+    throw new Error('Invalid base64 data');
+  }
   const binaryArr = new Uint8Array(binaryStr.length);
   for (let i = 0; i < binaryStr.length; i++) {
     binaryArr[i] = binaryStr.charCodeAt(i);

@@ -1,13 +1,7 @@
 // Utility functions for Image Harvest.
 
-export function generateId(url: string): string {
-  let hash = 0;
-  for (let i = 0; i < url.length; i++) {
-    const char = url.charCodeAt(i);
-    hash = (hash << 5) - hash + char;
-    hash = hash & hash;
-  }
-  return Math.abs(hash).toString(36) + Date.now().toString(36);
+export function generateId(_url: string): string {
+  return crypto.randomUUID();
 }
 
 export function resolveUrl(
@@ -222,12 +216,11 @@ export function debounce<T extends (...args: any[]) => void>(
 ): (...args: Parameters<T>) => void {
   let timeout: ReturnType<typeof setTimeout> | undefined;
   return function executedFunction(...args: Parameters<T>): void {
-    const later = () => {
-      if (timeout !== undefined) clearTimeout(timeout);
-      func(...args);
-    };
     if (timeout !== undefined) clearTimeout(timeout);
-    timeout = setTimeout(later, wait);
+    timeout = setTimeout(() => {
+      timeout = undefined;
+      func(...args);
+    }, wait);
   };
 }
 

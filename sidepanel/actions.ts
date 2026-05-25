@@ -8,11 +8,12 @@
 // out of the main sidepanel bundle by importing on demand. See also
 // pro-features.ts which does the same for exportCollection.
 import type JSZipType from 'jszip';
-import { FREE_LIMITS, MESSAGE_TYPES } from '../shared/constants';
+import { FREE_LIMITS, MESSAGE_TYPES, VALID_REVERSE_SEARCH_ENGINES } from '../shared/constants';
 import { convertImageFormat } from '../shared/converter';
 import { t } from '../shared/i18n';
 import type { ImageItem } from '../shared/types';
 import { isRestrictedUrl } from '../shared/utils';
+import { isSafeImageUrl } from '../shared/url-validator';
 import { track } from '../shared/telemetry';
 import { EVENTS } from '../shared/telemetry-events';
 import { recordDownloads } from '../shared/paywall-state';
@@ -592,9 +593,8 @@ export async function openInNewTab(url: string): Promise<void> {
 // Reverse Image Search (Pro)
 // ============================================
 export function showReverseSearchMenu(imageUrl: string, anchor: HTMLElement): void {
-  // Free tier: reverse search is available but limited to Google only
-  // Menu still opens, but non-Google engines show Pro badge and are blocked
   if (!elements.reverseSearchMenu) return;
+  if (!isSafeImageUrl(imageUrl)) return;
 
   const menu = elements.reverseSearchMenu as HTMLElement;
 
@@ -621,8 +621,7 @@ export function showReverseSearchMenu(imageUrl: string, anchor: HTMLElement): vo
 }
 
 export function reverseSearch(imageUrl: string, engine: string): void {
-  const validEngines = ['google', 'tineye', 'baidu', 'yandex'];
-  if (!validEngines.includes(engine)) return;
+  if (!(VALID_REVERSE_SEARCH_ENGINES as readonly string[]).includes(engine)) return;
 
   // Open the intermediate page which downloads the image via background script
   // and submits it as a form upload to the search engine

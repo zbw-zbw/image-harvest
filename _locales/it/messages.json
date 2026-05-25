@@ -5,392 +5,8 @@
   "app_tagline": {
     "message": "Scarica qualsiasi immagine da qualsiasi pagina web"
   },
-  "common_cancel": {
-    "message": "Annulla"
-  },
-  "common_confirm": {
-    "message": "Conferma"
-  },
-  "common_close": {
-    "message": "Chiudi"
-  },
-  "common_save": {
-    "message": "Salva"
-  },
-  "common_delete": {
-    "message": "Elimina"
-  },
-  "common_copy": {
-    "message": "Copia"
-  },
-  "common_download": {
-    "message": "Scarica"
-  },
-  "common_upgrade": {
-    "message": "Passa a Pro"
-  },
-  "common_maybe_later": {
-    "message": "Forse più tardi"
-  },
-  "settings_title": {
-    "message": "Impostazioni"
-  },
-  "settings_section_appearance": {
-    "message": "Aspetto"
-  },
-  "settings_section_experience": {
-    "message": "Esperienza"
-  },
-  "settings_section_scan": {
-    "message": "Scansione"
-  },
-  "settings_section_download": {
-    "message": "Download"
-  },
-  "settings_section_language": {
-    "message": "Lingua"
-  },
-  "settings_language_label": {
-    "message": "Lingua di visualizzazione"
-  },
-  "toolbar_select_all": {
-    "message": "Seleziona tutto"
-  },
-  "toolbar_deselect_all": {
-    "message": "Deseleziona tutto"
-  },
-  "toolbar_copy_urls": {
-    "message": "Copia URL"
-  },
-  "toolbar_copy_urls_tooltip": {
-    "message": "Copia gli URL delle immagini selezionate negli appunti"
-  },
-  "toolbar_copy_urls_empty": {
-    "message": "Seleziona prima le immagini"
-  },
-  "toast_url_copied_single": {
-    "message": "URL copiato!"
-  },
-  "toast_url_copied_batch": {
-    "message": "{count} URL copiati negli appunti"
-  },
-  "toast_url_copy_failed": {
-    "message": "Impossibile copiare l'URL"
-  },
-  "toast_download_started": {
-    "message": "Download avviato"
-  },
-  "toast_download_failed": {
-    "message": "Download fallito"
-  },
-  "toast_download_cancelled": {
-    "message": "Download annullato"
-  },
-  "toast_scan_cancelled": {
-    "message": "Scansione annullata"
-  },
-  "toast_download_completed": {
-    "message": "{count} immagini scaricate"
-  },
-  "toast_no_images_selected": {
-    "message": "Nessuna immagine selezionata"
-  },
-  "toast_image_removed": {
-    "message": "Immagine rimossa"
-  },
-  "toast_collection_added": {
-    "message": "Aggiunta alla raccolta"
-  },
-  "toast_collection_add_failed": {
-    "message": "Impossibile aggiungere alla raccolta"
-  },
-  "toast_collection_removed": {
-    "message": "Rimossa dalla raccolta"
-  },
-  "toast_collection_remove_failed": {
-    "message": "Impossibile rimuovere"
-  },
-  "toast_color_copied": {
-    "message": "Colore {hex} copiato"
-  },
-  "toast_color_copy_failed": {
-    "message": "Impossibile copiare il colore"
-  },
-  "pro_feature_blocked_format_conversion": {
-    "message": "La conversione di formato è una funzione Pro. Aggiorna per sbloccarla!"
-  },
-  "pro_feature_blocked_advanced_grouping": {
-    "message": "Il raggruppamento avanzato è una funzione Pro. Aggiorna per sbloccarla!"
-  },
-  "pro_feature_blocked_collection": {
-    "message": "La raccolta è una funzione Pro"
-  },
-  "pro_feature_blocked_image_delete": {
-    "message": "La rimozione delle immagini è una funzione Pro. Aggiorna per sbloccarla!"
-  },
-  "pro_feature_blocked_color_copy": {
-    "message": "La copia del colore è una funzione Pro"
-  },
-  "pro_feature_blocked_reverse_search": {
-    "message": "La ricerca {engine} richiede Pro. Aggiorna per sbloccarla!"
-  },
-  "pro_zip_limit": {
-    "message": "Il piano gratuito consente fino a {max} immagini per ZIP. Passa a Pro per illimitato!"
-  },
-  "pro_copy_urls_limit": {
-    "message": "Il piano gratuito consente fino a {max} URL alla volta. Passa a Pro per illimitato!"
-  },
-  "pro_collection_limit": {
-    "message": "Il piano gratuito consente fino a {max} preferiti. Passa a Pro per illimitato!"
-  },
-  "toolbar_sort": {
-    "message": "Ordina"
-  },
-  "toolbar_group": {
-    "message": "Raggruppa"
-  },
-  "toolbar_similar": {
-    "message": "Simili"
-  },
-  "status_similar_count": {
-    "message": "{count} simili"
-  },
-  "toolbar_rescan": {
-    "message": "Riscansiona"
-  },
-  "toolbar_download_all": {
-    "message": "Scarica tutto"
-  },
-  "toolbar_download_selected": {
-    "message": "Scarica ({count})"
-  },
-  "filter_size": {
-    "message": "Dimensione"
-  },
-  "filter_type": {
-    "message": "Tipo"
-  },
-  "filter_layout": {
-    "message": "Layout"
-  },
-  "filter_url": {
-    "message": "URL"
-  },
-  "filter_color": {
-    "message": "Colore"
-  },
-  "filter_all": {
-    "message": "Tutti"
-  },
-  "filter_min_width": {
-    "message": "Larg. min"
-  },
-  "filter_max_width": {
-    "message": "Larg. max"
-  },
-  "filter_height": {
-    "message": "A"
-  },
-  "filter_none": {
-    "message": "Nessuno"
-  },
-  "filter_format": {
-    "message": "Formato"
-  },
-  "filter_domain": {
-    "message": "Dominio"
-  },
-  "filter_tab": {
-    "message": "Scheda"
-  },
-  "sort_none": {
-    "message": "Nessuno (Ordine pagina)"
-  },
-  "sort_size_desc": {
-    "message": "Dimensione ↓ (Prima i grandi)"
-  },
-  "sort_size_asc": {
-    "message": "Dimensione ↑ (Prima i piccoli)"
-  },
-  "sort_filesize_desc": {
-    "message": "Peso file ↓ (Prima i grandi)"
-  },
-  "sort_filesize_asc": {
-    "message": "Peso file ↑ (Prima i piccoli)"
-  },
-  "layout_all": {
-    "message": "Tutti"
-  },
-  "layout_square": {
-    "message": "Quadrato (1:1)"
-  },
-  "layout_landscape": {
-    "message": "Orizzontale (>1:1)"
-  },
-  "layout_portrait": {
-    "message": "Verticale (<1:1)"
-  },
-  "layout_panorama": {
-    "message": "Panorama (>2:1)"
-  },
-  "size_all": {
-    "message": "Tutti"
-  },
-  "size_small": {
-    "message": "Piccolo < 100px"
-  },
-  "size_medium": {
-    "message": "Medio 100-500px"
-  },
-  "size_large": {
-    "message": "Grande 500-1000px"
-  },
-  "size_xl": {
-    "message": "XL > 1000px"
-  },
-  "size_btn_small": {
-    "message": "Piccolo"
-  },
-  "size_btn_medium": {
-    "message": "Medio"
-  },
-  "size_btn_large": {
-    "message": "Grande"
-  },
-  "size_btn_xl": {
-    "message": "XL"
-  },
-  "size_btn_custom": {
-    "message": "Personalizzato"
-  },
-  "layout_btn_square": {
-    "message": "Quadrato"
-  },
-  "layout_btn_landscape": {
-    "message": "Orizzontale"
-  },
-  "layout_btn_portrait": {
-    "message": "Verticale"
-  },
-  "layout_btn_panorama": {
-    "message": "Panorama"
-  },
-  "color_all": {
-    "message": "Tutti i colori"
-  },
-  "color_no_extracted": {
-    "message": "Nessun colore ancora estratto"
-  },
-  "filter_url_placeholder": {
-    "message": "Filtra per parola chiave URL..."
-  },
-  "settings_display": {
-    "message": "Visualizzazione"
-  },
-  "settings_side_panel": {
-    "message": "Mostra nel pannello laterale"
-  },
-  "settings_side_panel_desc": {
-    "message": "Apri i risultati nel pannello laterale del browser invece della finestra popup"
-  },
-  "settings_density": {
-    "message": "Densità layout:"
-  },
-  "settings_density_compact": {
-    "message": "Compatto"
-  },
-  "settings_density_standard": {
-    "message": "Standard"
-  },
-  "settings_density_comfortable": {
-    "message": "Comodo"
-  },
-  "settings_theme": {
-    "message": "Tema:"
-  },
-  "settings_theme_system": {
-    "message": "Sistema"
-  },
-  "settings_theme_light": {
-    "message": "Chiaro"
-  },
-  "settings_theme_dark": {
-    "message": "Scuro"
-  },
-  "settings_default_group": {
-    "message": "Raggruppamento predefinito:"
-  },
-  "settings_similar": {
-    "message": "Rilevamento immagini simili"
-  },
-  "settings_color_extract": {
-    "message": "Estrazione colori"
-  },
-  "settings_all_frames": {
-    "message": "Cerca in tutti i frame"
-  },
-  "settings_live_monitor": {
-    "message": "Monitoraggio in tempo reale"
-  },
-  "settings_download_options": {
-    "message": "Opzioni di download"
-  },
-  "settings_subfolder": {
-    "message": "Sottocartella:"
-  },
-  "settings_filename": {
-    "message": "Nome file:"
-  },
-  "settings_convert_format": {
-    "message": "Converti formato:"
-  },
-  "settings_no_warning": {
-    "message": "Non avvisare quando si scaricano molti file"
-  },
-  "settings_telemetry": {
-    "message": "Condividi dati di utilizzo anonimi"
-  },
-  "settings_save": {
-    "message": "Salva impostazioni"
-  },
-  "settings_reset": {
-    "message": "Ripristina"
-  },
-  "settings_saved": {
-    "message": "Impostazioni salvate"
-  },
-  "settings_save_failed": {
-    "message": "Impossibile salvare le impostazioni"
-  },
-  "status_found_images": {
-    "message": "Trovate {count} immagini"
-  },
-  "status_similar": {
-    "message": "Simili"
-  },
-  "rating_title": {
-    "message": "Ti piace Image Harvest?"
-  },
-  "rating_desc": {
-    "message": "Se ti abbiamo fatto risparmiare tempo, una recensione a 5 stelle sul Chrome Web Store significherebbe molto per noi."
-  },
-  "rating_rate_now": {
-    "message": "⭐ Valuta sul Chrome Store"
-  },
-  "rating_later": {
-    "message": "Forse più tardi"
-  },
-  "rating_never": {
-    "message": "Non chiedere più"
-  },
-  "rating_close": {
-    "message": "Chiudi"
-  },
   "btn_deactivate": {
     "message": "Disattiva"
-  },
-  "license_deactivating": {
-    "message": "Disattivazione..."
   },
   "card_add_to_collection": {
     "message": "Aggiungi alla raccolta"
@@ -410,32 +26,65 @@
   "card_reverse_search": {
     "message": "Ricerca inversa ({engine})"
   },
+  "collection_empty_hint": {
+    "message": "Clicca l'icona stella su qualsiasi immagine per aggiungerla alla raccolta"
+  },
+  "collection_empty_title": {
+    "message": "La tua raccolta è vuota"
+  },
   "collection_export_tooltip": {
     "message": "Esporta raccolta come ZIP"
   },
   "collection_modal_title": {
     "message": "Raccolta"
   },
-  "collection_search_placeholder": {
-    "message": "Cerca nella raccolta..."
-  },
   "collection_no_match": {
     "message": "Nessuna immagine corrispondente trovata"
-  },
-  "collection_empty_title": {
-    "message": "La tua raccolta è vuota"
   },
   "collection_no_match_hint": {
     "message": "Prova con una parola chiave diversa"
   },
-  "collection_empty_hint": {
-    "message": "Clicca l'icona stella su qualsiasi immagine per aggiungerla alla raccolta"
+  "collection_search_placeholder": {
+    "message": "Cerca nella raccolta..."
+  },
+  "color_all": {
+    "message": "Tutti i colori"
+  },
+  "color_no_extracted": {
+    "message": "Nessun colore ancora estratto"
+  },
+  "common_cancel": {
+    "message": "Annulla"
+  },
+  "common_close": {
+    "message": "Chiudi"
+  },
+  "common_confirm": {
+    "message": "Conferma"
+  },
+  "common_copy": {
+    "message": "Copia"
+  },
+  "common_delete": {
+    "message": "Elimina"
   },
   "common_dismiss": {
     "message": "Ignora"
   },
+  "common_download": {
+    "message": "Scarica"
+  },
+  "common_maybe_later": {
+    "message": "Forse più tardi"
+  },
   "common_remove": {
     "message": "Rimuovi"
+  },
+  "common_save": {
+    "message": "Salva"
+  },
+  "common_upgrade": {
+    "message": "Passa a Pro"
   },
   "confirm_remove_image_message": {
     "message": "Rimuovere questa immagine dalla lista?"
@@ -443,14 +92,14 @@
   "confirm_remove_image_title": {
     "message": "Rimuovi immagine"
   },
+  "dedup_group_title": {
+    "message": "Gruppo {index} ({count} simili)"
+  },
   "dedup_modal_title": {
     "message": "Immagini simili"
   },
   "dedup_no_similar": {
     "message": "Nessuna immagine simile trovata"
-  },
-  "dedup_group_title": {
-    "message": "Gruppo {index} ({count} simili)"
   },
   "dedup_remove_duplicates": {
     "message": "Rimuovi duplicati"
@@ -488,20 +137,131 @@
   "error_default_message": {
     "message": "Si è verificato un errore"
   },
+  "filter_all": {
+    "message": "Tutti"
+  },
+  "filter_color": {
+    "message": "Colore"
+  },
+  "filter_domain": {
+    "message": "Dominio"
+  },
+  "filter_format": {
+    "message": "Formato"
+  },
+  "filter_height": {
+    "message": "A"
+  },
+  "filter_layout": {
+    "message": "Layout"
+  },
+  "filter_max_width": {
+    "message": "Larg. max"
+  },
+  "filter_min_width": {
+    "message": "Larg. min"
+  },
+  "filter_none": {
+    "message": "Nessuno"
+  },
+  "filter_size": {
+    "message": "Dimensione"
+  },
+  "filter_tab": {
+    "message": "Scheda"
+  },
+  "filter_type": {
+    "message": "Tipo"
+  },
+  "filter_type_other": {
+    "message": "Altro"
+  },
+  "filter_url": {
+    "message": "URL"
+  },
+  "filter_url_placeholder": {
+    "message": "Filtra per parola chiave URL..."
+  },
+  "format_original": {
+    "message": "Originale"
+  },
   "grid_current_tab_badge": {
     "message": "Scheda corrente"
+  },
+  "hotkey_click_to_set": {
+    "message": "Clicca per impostare"
   },
   "hotkey_not_set": {
     "message": "Non impostato"
   },
-  "hotkey_click_to_set": {
-    "message": "Clicca per impostare"
+  "layout_all": {
+    "message": "Tutti"
+  },
+  "layout_btn_landscape": {
+    "message": "Orizzontale"
+  },
+  "layout_btn_panorama": {
+    "message": "Panorama"
+  },
+  "layout_btn_portrait": {
+    "message": "Verticale"
+  },
+  "layout_btn_square": {
+    "message": "Quadrato"
+  },
+  "layout_landscape": {
+    "message": "Orizzontale (>1:1)"
+  },
+  "layout_panorama": {
+    "message": "Panorama (>2:1)"
+  },
+  "layout_portrait": {
+    "message": "Verticale (<1:1)"
+  },
+  "layout_square": {
+    "message": "Quadrato (1:1)"
+  },
+  "license_activating": {
+    "message": "Attivazione..."
+  },
+  "license_activation_failed": {
+    "message": "Attivazione fallita"
+  },
+  "license_deactivating": {
+    "message": "Disattivazione..."
+  },
+  "license_enter_key": {
+    "message": "Inserisci una chiave di licenza"
+  },
+  "license_error_activation_failed": {
+    "message": "Attivazione fallita. Riprova."
+  },
+  "license_error_invalid_key": {
+    "message": "Chiave di licenza non valida."
+  },
+  "license_error_network": {
+    "message": "Errore di rete. Verifica la connessione."
+  },
+  "license_network_error": {
+    "message": "Errore di rete. Riprova."
+  },
+  "license_placeholder": {
+    "message": "Inserisci chiave di licenza"
   },
   "live_indicator_label": {
     "message": "Live"
   },
   "live_indicator_tooltip": {
     "message": "Il monitoraggio in tempo reale è attivo — le nuove immagini vengono rilevate automaticamente"
+  },
+  "menu_reverse_search": {
+    "message": "Ricerca inversa"
+  },
+  "multitab_current": {
+    "message": "Corrente"
+  },
+  "multitab_extracting": {
+    "message": "Estrazione..."
   },
   "multitab_modal_title": {
     "message": "Estrazione multi-scheda"
@@ -512,8 +272,8 @@
   "multitab_start_extraction": {
     "message": "Avvia estrazione"
   },
-  "multitab_current": {
-    "message": "Corrente"
+  "multitab_starting": {
+    "message": "Avvio estrazione..."
   },
   "multitab_untitled": {
     "message": "Senza titolo"
@@ -593,17 +353,47 @@
   "pro_already_have_key": {
     "message": "Hai già una chiave di licenza?"
   },
+  "pro_collection_limit": {
+    "message": "Il piano gratuito consente fino a {max} preferiti. Passa a Pro per illimitato!"
+  },
+  "pro_copy_urls_limit": {
+    "message": "Il piano gratuito consente fino a {max} URL alla volta. Passa a Pro per illimitato!"
+  },
   "pro_deactivate_tooltip": {
     "message": "Disattiva licenza"
   },
   "pro_feature_batch_desc": {
     "message": "Scarica tutte le immagini in una volta con un solo clic"
   },
+  "pro_feature_batch_desc_pro": {
+    "message": "Unlimited downloads — select all images and export as ZIP in one click"
+  },
   "pro_feature_batch_title": {
     "message": "Download in blocco"
   },
+  "pro_feature_blocked_advanced_grouping": {
+    "message": "Il raggruppamento avanzato è una funzione Pro. Aggiorna per sbloccarla!"
+  },
+  "pro_feature_blocked_collection": {
+    "message": "La raccolta è una funzione Pro"
+  },
+  "pro_feature_blocked_color_copy": {
+    "message": "La copia del colore è una funzione Pro"
+  },
+  "pro_feature_blocked_format_conversion": {
+    "message": "La conversione di formato è una funzione Pro. Aggiorna per sbloccarla!"
+  },
+  "pro_feature_blocked_image_delete": {
+    "message": "La rimozione delle immagini è una funzione Pro. Aggiorna per sbloccarla!"
+  },
+  "pro_feature_blocked_reverse_search": {
+    "message": "La ricerca {engine} richiede Pro. Aggiorna per sbloccarla!"
+  },
   "pro_feature_color_desc": {
     "message": "Filtra le immagini per colore dominante"
+  },
+  "pro_feature_color_desc_pro": {
+    "message": "Auto-extract dominant colors; click any swatch to copy HEX code instantly"
   },
   "pro_feature_color_title": {
     "message": "Filtro colore"
@@ -611,17 +401,26 @@
   "pro_feature_dedup_desc": {
     "message": "Rileva e rimuovi automaticamente le immagini duplicate"
   },
+  "pro_feature_dedup_desc_pro": {
+    "message": "Perceptual-hash smart dedup — no wasted space from duplicate downloads"
+  },
   "pro_feature_dedup_title": {
     "message": "Rilevamento duplicati"
   },
   "pro_feature_multitab_desc": {
     "message": "Estrai immagini da più schede contemporaneamente"
   },
+  "pro_feature_multitab_desc_pro": {
+    "message": "Batch extract from all open tabs and bundle into a single ZIP — no tab switching"
+  },
   "pro_feature_multitab_title": {
     "message": "Estrazione multi-scheda"
   },
   "pro_feature_reverse_search_desc": {
     "message": "Trova la fonte di qualsiasi immagine con la ricerca inversa"
+  },
+  "pro_feature_reverse_search_desc_pro": {
+    "message": "One-click search on Google, TinEye, Yandex & Baidu to find any image's origin"
   },
   "pro_feature_reverse_search_title": {
     "message": "Ricerca inversa immagini"
@@ -653,14 +452,14 @@
   "pro_trial_desc": {
     "message": "Prova tutte le funzioni Pro gratuitamente per 7 giorni. Nessun impegno richiesto."
   },
+  "pro_trial_perk_cancel": {
+    "message": "Scade automaticamente — nessuna cancellazione necessaria"
+  },
   "pro_trial_perk_full_access": {
     "message": "Accesso completo a tutte le funzioni Pro"
   },
   "pro_trial_perk_no_card": {
     "message": "Nessuna carta di credito richiesta"
-  },
-  "pro_trial_perk_cancel": {
-    "message": "Scade automaticamente — nessuna cancellazione necessaria"
   },
   "pro_trial_start_cta": {
     "message": "Inizia la prova gratuita"
@@ -677,14 +476,92 @@
   "pro_trial_unavailable": {
     "message": "Prova non disponibile"
   },
+  "pro_zip_limit": {
+    "message": "Il piano gratuito consente fino a {max} immagini per ZIP. Passa a Pro per illimitato!"
+  },
   "progress_downloading": {
     "message": "Download in corso..."
+  },
+  "progress_multitab_text": {
+    "message": "{current}/{total} schede · {count} immagini trovate"
   },
   "progress_text": {
     "message": "{current} di {total}"
   },
-  "progress_multitab_text": {
-    "message": "{current}/{total} schede · {count} immagini trovate"
+  "rating_close": {
+    "message": "Chiudi"
+  },
+  "rating_desc": {
+    "message": "Se ti abbiamo fatto risparmiare tempo, una recensione a 5 stelle sul Chrome Web Store significherebbe molto per noi."
+  },
+  "rating_later": {
+    "message": "Forse più tardi"
+  },
+  "rating_never": {
+    "message": "Non chiedere più"
+  },
+  "rating_rate_now": {
+    "message": "⭐ Valuta sul Chrome Store"
+  },
+  "rating_title": {
+    "message": "Ti piace Image Harvest?"
+  },
+  "restricted_feature_batch_desc": {
+    "message": "Seleziona e scarica tutte le immagini da qualsiasi pagina web con un clic. Filtra per dimensione, formato o layout."
+  },
+  "restricted_feature_batch_title": {
+    "message": "Download in blocco"
+  },
+  "restricted_feature_collection_desc": {
+    "message": "Aggiungi immagini a una raccolta persistente che resta tra le sessioni. Organizza e rivedi in qualsiasi momento."
+  },
+  "restricted_feature_collection_title": {
+    "message": "Raccolta preferiti"
+  },
+  "restricted_feature_color_desc": {
+    "message": "Estrai automaticamente i colori dominanti da ogni immagine. Clicca su qualsiasi campione per copiare il codice esadecimale."
+  },
+  "restricted_feature_color_title": {
+    "message": "Estrazione colori"
+  },
+  "restricted_feature_dedup_desc": {
+    "message": "Trova e rimuovi automaticamente immagini quasi duplicate utilizzando l'hashing percettivo."
+  },
+  "restricted_feature_dedup_title": {
+    "message": "Rilevamento immagini simili"
+  },
+  "restricted_feature_filter_desc": {
+    "message": "Filtra le immagini per dimensione, tipo, layout, pattern URL o colore dominante per trovare esattamente ciò che cerchi."
+  },
+  "restricted_feature_filter_title": {
+    "message": "Filtri intelligenti"
+  },
+  "restricted_feature_multitab_desc": {
+    "message": "Estrai immagini da più schede aperte contemporaneamente e scaricale tutte in un archivio ZIP."
+  },
+  "restricted_feature_multitab_title": {
+    "message": "Estrazione multi-scheda"
+  },
+  "restricted_feature_preview_desc": {
+    "message": "Visualizza immagini a risoluzione piena con metadati — dimensioni, peso del file e formato — a colpo d'occhio."
+  },
+  "restricted_feature_preview_title": {
+    "message": "Anteprima istantanea"
+  },
+  "restricted_feature_reverse_desc": {
+    "message": "Cerca qualsiasi immagine su Google, TinEye, Yandex e Baidu con un solo clic."
+  },
+  "restricted_feature_reverse_title": {
+    "message": "Ricerca inversa immagini"
+  },
+  "restricted_features_heading": {
+    "message": "Cosa puoi fare con Image Harvest"
+  },
+  "restricted_link_website": {
+    "message": "Sito ufficiale"
+  },
+  "restricted_notice": {
+    "message": "Questa pagina non consente alle estensioni di iniettare script. Naviga verso una pagina web normale (es. un articolo, una galleria o risultati di ricerca) per iniziare a estrarre immagini."
   },
   "restricted_subtitle": {
     "message": "Questa pagina limita gli script di contenuto. Prova una pagina diversa."
@@ -707,8 +584,227 @@
   "scan_updating": {
     "message": "Aggiornamento..."
   },
+  "settings_all_frames": {
+    "message": "Cerca in tutti i frame"
+  },
+  "settings_all_frames_desc": {
+    "message": "Cerca immagini anche negli iframe e nei frame incorporati"
+  },
+  "settings_color_extract": {
+    "message": "Estrazione colori"
+  },
+  "settings_color_extract_desc": {
+    "message": "Estrai i colori dominanti da ogni immagine per il filtraggio"
+  },
+  "settings_convert_format": {
+    "message": "Converti formato:"
+  },
+  "settings_default_group": {
+    "message": "Raggruppamento predefinito:"
+  },
+  "settings_density": {
+    "message": "Densità layout:"
+  },
+  "settings_density_comfortable": {
+    "message": "Comodo"
+  },
+  "settings_density_compact": {
+    "message": "Compatto"
+  },
+  "settings_density_standard": {
+    "message": "Standard"
+  },
+  "settings_display": {
+    "message": "Visualizzazione"
+  },
+  "settings_download_options": {
+    "message": "Opzioni di download"
+  },
+  "settings_download_options_desc": {
+    "message": "Personalizza sottocartella, modello nome file e conversione formato"
+  },
+  "settings_filename": {
+    "message": "Nome file:"
+  },
+  "settings_height_gte": {
+    "message": "Altezza ≥"
+  },
+  "settings_height_lte": {
+    "message": "Altezza ≤"
+  },
+  "settings_hotkey": {
+    "message": "Scorciatoia:"
+  },
+  "settings_language_label": {
+    "message": "Lingua di visualizzazione"
+  },
+  "settings_live_monitor": {
+    "message": "Monitoraggio in tempo reale"
+  },
+  "settings_live_monitor_desc": {
+    "message": "Rileva automaticamente nuove immagini quando il contenuto della pagina cambia"
+  },
+  "settings_max_size": {
+    "message": "Abilita filtro dimensione massima"
+  },
+  "settings_max_size_desc": {
+    "message": "Nascondi le immagini più grandi delle dimensioni specificate"
+  },
+  "settings_min_size": {
+    "message": "Abilita filtro dimensione minima"
+  },
+  "settings_min_size_desc": {
+    "message": "Nascondi le immagini più piccole delle dimensioni specificate"
+  },
+  "settings_no_warning": {
+    "message": "Non avvisare quando si scaricano molti file"
+  },
+  "settings_no_warning_desc": {
+    "message": "Salta la finestra di conferma quando si scaricano molti file"
+  },
+  "settings_reset": {
+    "message": "Ripristina"
+  },
+  "settings_save": {
+    "message": "Salva impostazioni"
+  },
+  "settings_save_failed": {
+    "message": "Impossibile salvare le impostazioni"
+  },
+  "settings_saved": {
+    "message": "Impostazioni salvate"
+  },
+  "settings_section_account": {
+    "message": "Account"
+  },
+  "settings_section_appearance": {
+    "message": "Aspetto"
+  },
+  "settings_section_display": {
+    "message": "Visualizzazione"
+  },
+  "settings_section_download": {
+    "message": "Download"
+  },
+  "settings_section_experience": {
+    "message": "Esperienza"
+  },
+  "settings_section_language": {
+    "message": "Lingua"
+  },
+  "settings_section_pro": {
+    "message": "Pro"
+  },
+  "settings_section_scan": {
+    "message": "Scansione"
+  },
+  "settings_side_panel": {
+    "message": "Mostra nel pannello laterale"
+  },
+  "settings_side_panel_desc": {
+    "message": "Apri i risultati nel pannello laterale del browser invece della finestra popup"
+  },
+  "settings_similar": {
+    "message": "Rilevamento immagini simili"
+  },
+  "settings_similar_desc": {
+    "message": "Trova e raggruppa immagini visivamente simili o duplicate"
+  },
+  "settings_subfolder": {
+    "message": "Sottocartella:"
+  },
+  "settings_telemetry": {
+    "message": "Condividi dati di utilizzo anonimi"
+  },
+  "settings_telemetry_desc": {
+    "message": "Invia eventi anonimi sull'uso delle funzionalità. Nessun URL, nessuna immagine, nessun dato personale."
+  },
+  "settings_theme": {
+    "message": "Tema:"
+  },
+  "settings_theme_dark": {
+    "message": "Scuro"
+  },
+  "settings_theme_light": {
+    "message": "Chiaro"
+  },
+  "settings_theme_system": {
+    "message": "Sistema"
+  },
+  "settings_title": {
+    "message": "Impostazioni"
+  },
+  "settings_variables_hint": {
+    "message": "Variabili: {domain}, {index}, {original}, {format}, {width}, {height}"
+  },
+  "settings_width_gte": {
+    "message": "Larghezza ≥"
+  },
+  "settings_width_lte": {
+    "message": "Larghezza ≤"
+  },
+  "size_all": {
+    "message": "Tutti"
+  },
+  "size_btn_custom": {
+    "message": "Personalizzato"
+  },
+  "size_btn_large": {
+    "message": "Grande"
+  },
+  "size_btn_medium": {
+    "message": "Medio"
+  },
+  "size_btn_small": {
+    "message": "Piccolo"
+  },
+  "size_btn_xl": {
+    "message": "XL"
+  },
+  "size_large": {
+    "message": "Grande 500-1000px"
+  },
+  "size_medium": {
+    "message": "Medio 100-500px"
+  },
+  "size_small": {
+    "message": "Piccolo < 100px"
+  },
+  "size_xl": {
+    "message": "XL > 1000px"
+  },
+  "sort_filesize_asc": {
+    "message": "Peso file ↑ (Prima i piccoli)"
+  },
+  "sort_filesize_desc": {
+    "message": "Peso file ↓ (Prima i grandi)"
+  },
+  "sort_none": {
+    "message": "Nessuno (Ordine pagina)"
+  },
+  "sort_size_asc": {
+    "message": "Dimensione ↑ (Prima i piccoli)"
+  },
+  "sort_size_desc": {
+    "message": "Dimensione ↓ (Prima i grandi)"
+  },
+  "status_found_images": {
+    "message": "Trovate {count} immagini"
+  },
+  "status_found_prefix": {
+    "message": "Trovate"
+  },
+  "status_found_suffix": {
+    "message": "immagini"
+  },
   "status_n_selected": {
     "message": "{count} selezionate"
+  },
+  "status_similar": {
+    "message": "Simili"
+  },
+  "status_similar_count": {
+    "message": "{count} simili"
   },
   "status_total_images": {
     "message": "{count} totali"
@@ -749,134 +845,38 @@
   "title_view_similar": {
     "message": "Visualizza immagini simili"
   },
+  "toast_collection_add_failed": {
+    "message": "Impossibile aggiungere alla raccolta"
+  },
+  "toast_collection_added": {
+    "message": "Aggiunta alla raccolta"
+  },
+  "toast_collection_remove_failed": {
+    "message": "Impossibile rimuovere"
+  },
+  "toast_collection_removed": {
+    "message": "Rimossa dalla raccolta"
+  },
+  "toast_color_copied": {
+    "message": "Colore {hex} copiato"
+  },
+  "toast_color_copy_failed": {
+    "message": "Impossibile copiare il colore"
+  },
   "toast_deactivate_failed": {
     "message": "Impossibile disattivare"
   },
-  "toast_license_deactivated": {
-    "message": "Licenza disattivata"
+  "toast_download_cancelled": {
+    "message": "Download annullato"
   },
-  "toast_n_new": {
-    "message": "{count} nuove"
+  "toast_download_completed": {
+    "message": "{count} immagini scaricate"
   },
-  "toast_n_removed": {
-    "message": "{count} rimosse"
+  "toast_download_failed": {
+    "message": "Download fallito"
   },
-  "toast_pro_color_filter": {
-    "message": "Il filtro colore è una funzione Pro. Aggiorna per filtrare per colore!"
-  },
-  "toast_pro_naming_locked": {
-    "message": "La denominazione personalizzata è una funzione Pro. Aggiorna per sbloccarla!"
-  },
-  "toast_pro_setting_locked": {
-    "message": "Questa impostazione richiede Pro. Aggiorna per sbloccarla!"
-  },
-  "toast_settings_reset": {
-    "message": "Impostazioni ripristinate ai valori predefiniti"
-  },
-  "view_grid": {
-    "message": "Griglia"
-  },
-  "view_list": {
-    "message": "Elenco"
-  },
-  "format_original": {
-    "message": "Originale"
-  },
-  "menu_reverse_search": {
-    "message": "Ricerca inversa"
-  },
-  "settings_all_frames_desc": {
-    "message": "Cerca immagini anche negli iframe e nei frame incorporati"
-  },
-  "settings_color_extract_desc": {
-    "message": "Estrai i colori dominanti da ogni immagine per il filtraggio"
-  },
-  "settings_download_options_desc": {
-    "message": "Personalizza sottocartella, modello nome file e conversione formato"
-  },
-  "settings_hotkey": {
-    "message": "Scorciatoia:"
-  },
-  "settings_live_monitor_desc": {
-    "message": "Rileva automaticamente nuove immagini quando il contenuto della pagina cambia"
-  },
-  "settings_max_size": {
-    "message": "Abilita filtro dimensione massima"
-  },
-  "settings_max_size_desc": {
-    "message": "Nascondi le immagini più grandi delle dimensioni specificate"
-  },
-  "settings_min_size": {
-    "message": "Abilita filtro dimensione minima"
-  },
-  "settings_min_size_desc": {
-    "message": "Nascondi le immagini più piccole delle dimensioni specificate"
-  },
-  "settings_no_warning_desc": {
-    "message": "Salta la finestra di conferma quando si scaricano molti file"
-  },
-  "settings_section_display": {
-    "message": "Visualizzazione"
-  },
-  "settings_section_pro": {
-    "message": "Pro"
-  },
-  "settings_section_account": {
-    "message": "Account"
-  },
-  "settings_similar_desc": {
-    "message": "Trova e raggruppa immagini visivamente simili o duplicate"
-  },
-  "settings_telemetry_desc": {
-    "message": "Invia eventi anonimi sull'uso delle funzionalità. Nessun URL, nessuna immagine, nessun dato personale."
-  },
-  "status_found_prefix": {
-    "message": "Trovate"
-  },
-  "status_found_suffix": {
-    "message": "immagini"
-  },
-  "filter_type_other": {
-    "message": "Altro"
-  },
-  "license_activating": {
-    "message": "Attivazione..."
-  },
-  "license_activation_failed": {
-    "message": "Attivazione fallita"
-  },
-  "license_enter_key": {
-    "message": "Inserisci una chiave di licenza"
-  },
-  "license_network_error": {
-    "message": "Errore di rete. Riprova."
-  },
-  "license_placeholder": {
-    "message": "Inserisci chiave di licenza"
-  },
-  "settings_height_gte": {
-    "message": "Altezza ≥"
-  },
-  "settings_height_lte": {
-    "message": "Altezza ≤"
-  },
-  "settings_width_gte": {
-    "message": "Larghezza ≥"
-  },
-  "settings_width_lte": {
-    "message": "Larghezza ≤"
-  },
-  "toast_pro_activated": {
-    "message": "Pro attivato con successo!"
-  },
-  "multitab_extracting": {
-    "message": "Estrazione..."
-  },
-  "multitab_starting": {
-    "message": "Avvio estrazione..."
-  },
-  "settings_variables_hint": {
-    "message": "Variabili: {domain}, {index}, {original}, {format}, {width}, {height}"
+  "toast_download_started": {
+    "message": "Download avviato"
   },
   "toast_extraction_cancelled": {
     "message": "Estrazione annullata"
@@ -887,65 +887,83 @@
   "toast_extraction_success": {
     "message": "Estratte {images} immagini da {tabs} schede"
   },
+  "toast_image_removed": {
+    "message": "Immagine rimossa"
+  },
+  "toast_license_deactivated": {
+    "message": "Licenza disattivata"
+  },
   "toast_multitab_failed": {
     "message": "Estrazione multi-scheda fallita"
   },
-  "restricted_notice": {
-    "message": "Questa pagina non consente alle estensioni di iniettare script. Naviga verso una pagina web normale (es. un articolo, una galleria o risultati di ricerca) per iniziare a estrarre immagini."
+  "toast_n_new": {
+    "message": "{count} nuove"
   },
-  "restricted_features_heading": {
-    "message": "Cosa puoi fare con Image Harvest"
+  "toast_n_removed": {
+    "message": "{count} rimosse"
   },
-  "restricted_feature_batch_title": {
-    "message": "Download in blocco"
+  "toast_no_images_selected": {
+    "message": "Nessuna immagine selezionata"
   },
-  "restricted_feature_batch_desc": {
-    "message": "Seleziona e scarica tutte le immagini da qualsiasi pagina web con un clic. Filtra per dimensione, formato o layout."
+  "toast_pro_activated": {
+    "message": "Pro attivato con successo!"
   },
-  "restricted_feature_dedup_title": {
-    "message": "Rilevamento immagini simili"
+  "toast_pro_color_filter": {
+    "message": "Il filtro colore è una funzione Pro. Aggiorna per filtrare per colore!"
   },
-  "restricted_feature_dedup_desc": {
-    "message": "Trova e rimuovi automaticamente immagini quasi duplicate utilizzando l'hashing percettivo."
+  "toast_pro_naming_locked": {
+    "message": "La denominazione personalizzata è una funzione Pro. Aggiorna per sbloccarla!"
   },
-  "restricted_feature_reverse_title": {
-    "message": "Ricerca inversa immagini"
+  "toast_pro_setting_locked": {
+    "message": "Questa impostazione richiede Pro. Aggiorna per sbloccarla!"
   },
-  "restricted_feature_reverse_desc": {
-    "message": "Cerca qualsiasi immagine su Google, TinEye, Yandex e Baidu con un solo clic."
+  "toast_scan_cancelled": {
+    "message": "Scansione annullata"
   },
-  "restricted_feature_multitab_title": {
-    "message": "Estrazione multi-scheda"
+  "toast_settings_reset": {
+    "message": "Impostazioni ripristinate ai valori predefiniti"
   },
-  "restricted_feature_multitab_desc": {
-    "message": "Estrai immagini da più schede aperte contemporaneamente e scaricale tutte in un archivio ZIP."
+  "toast_url_copied_batch": {
+    "message": "{count} URL copiati negli appunti"
   },
-  "restricted_feature_color_title": {
-    "message": "Estrazione colori"
+  "toast_url_copied_single": {
+    "message": "URL copiato!"
   },
-  "restricted_feature_color_desc": {
-    "message": "Estrai automaticamente i colori dominanti da ogni immagine. Clicca su qualsiasi campione per copiare il codice esadecimale."
+  "toast_url_copy_failed": {
+    "message": "Impossibile copiare l'URL"
   },
-  "restricted_feature_filter_title": {
-    "message": "Filtri intelligenti"
+  "toolbar_copy_urls": {
+    "message": "Copia URL"
   },
-  "restricted_feature_filter_desc": {
-    "message": "Filtra le immagini per dimensione, tipo, layout, pattern URL o colore dominante per trovare esattamente ciò che cerchi."
+  "toolbar_copy_urls_empty": {
+    "message": "Seleziona prima le immagini"
   },
-  "restricted_feature_collection_title": {
-    "message": "Raccolta preferiti"
+  "toolbar_copy_urls_tooltip": {
+    "message": "Copia gli URL delle immagini selezionate negli appunti"
   },
-  "restricted_feature_collection_desc": {
-    "message": "Aggiungi immagini a una raccolta persistente che resta tra le sessioni. Organizza e rivedi in qualsiasi momento."
+  "toolbar_deselect_all": {
+    "message": "Deseleziona tutto"
   },
-  "restricted_feature_preview_title": {
-    "message": "Anteprima istantanea"
+  "toolbar_download_all": {
+    "message": "Scarica tutto"
   },
-  "restricted_feature_preview_desc": {
-    "message": "Visualizza immagini a risoluzione piena con metadati — dimensioni, peso del file e formato — a colpo d'occhio."
+  "toolbar_download_selected": {
+    "message": "Scarica ({count})"
   },
-  "restricted_link_website": {
-    "message": "Sito ufficiale"
+  "toolbar_group": {
+    "message": "Raggruppa"
+  },
+  "toolbar_rescan": {
+    "message": "Riscansiona"
+  },
+  "toolbar_select_all": {
+    "message": "Seleziona tutto"
+  },
+  "toolbar_similar": {
+    "message": "Simili"
+  },
+  "toolbar_sort": {
+    "message": "Ordina"
   },
   "trial_error_already_redeemed": {
     "message": "Hai già utilizzato la prova gratuita su questa installazione."
@@ -962,13 +980,10 @@
   "trial_error_server_declined": {
     "message": "Il server ha rifiutato la prova."
   },
-  "license_error_network": {
-    "message": "Errore di rete. Verifica la connessione."
+  "view_grid": {
+    "message": "Griglia"
   },
-  "license_error_invalid_key": {
-    "message": "Chiave di licenza non valida."
-  },
-  "license_error_activation_failed": {
-    "message": "Attivazione fallita. Riprova."
+  "view_list": {
+    "message": "Elenco"
   }
 }

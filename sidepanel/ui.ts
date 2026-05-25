@@ -4,7 +4,12 @@
 // UI组件模块：提供过滤器标签、视图切换、响应式、对话框、通知、加载状态等UI功能
 
 import { hideDownloadDropdown } from './actions';
-import { applyFilters, clearCustomSizeInputs, syncCustomSizeInputsFromSettings } from './filter';
+import {
+  applyFilters,
+  clearCustomSizeInputs,
+  clearFileSizeInputs,
+  syncCustomSizeInputsFromSettings,
+} from './filter';
 import { hideScanOverlay, showScanOverlay } from './scan';
 import { closeAllFilterDropdowns } from './settings';
 import { elements, state } from './state';
@@ -198,6 +203,41 @@ export function updateFilterButtonLabels(): void {
     });
   }
 
+  // File Size button
+  const fileSizeBtn = document.querySelector<HTMLElement>('.filter-btn[data-filter="filesize"]');
+  if (fileSizeBtn) {
+    const hasFileSizeFilter = state.activeFilters.fileSizeEnabled;
+    let label = t('filter_filesize');
+    if (hasFileSizeFilter) {
+      const preset = state.activeFilters.fileSizePreset;
+      if (preset && preset !== 'all' && preset !== 'custom') {
+        label = t(`filter_filesize_${preset}`);
+      } else {
+        const min = state.activeFilters.minFileSizeKB;
+        const max = state.activeFilters.maxFileSizeKB;
+        if (min > 0 && max < Infinity) {
+          label = `${min}-${max} KB`;
+        } else if (min > 0) {
+          label = `≥${min} KB`;
+        } else if (max < Infinity) {
+          label = `≤${max} KB`;
+        }
+      }
+    }
+    fileSizeBtn.textContent = label + '▾';
+    fileSizeBtn.classList.toggle('active', hasFileSizeFilter);
+    toggleClearBtn(fileSizeBtn, hasFileSizeFilter, () => {
+      clearFileSizeInputs();
+      document
+        .querySelectorAll('[data-filesize-filter]')
+        .forEach((o) => o.classList.remove('active'));
+      const allOpt = document.querySelector('[data-filesize-filter="all"]');
+      if (allOpt) allOpt.classList.add('active');
+      updateFilterButtonLabels();
+      applyFilters();
+    });
+  }
+
   // Group button (icon-only: toggle active state only)
   const groupBtn = document.querySelector<HTMLElement>('.filter-btn[data-filter="group"]');
   if (groupBtn) {
@@ -329,8 +369,25 @@ export function initResizeObserver(): void {
 
   const throttledCheckNarrowMode = throttle(checkNarrowMode, 150);
   const resizeObserver = new ResizeObserver(() => {
-    // Throttle resize events so layout adapts continuously during drag
     throttledCheckNarrowMode();
+
+    // Recalculate skeleton count once the Chrome sidepanel finishes its
+    // opening animation and layout stabilizes. showLoading() may have
+    // used a fallback height (800px) because measurements were unreliable
+    // at init time — now that the resize event fired we have real values.
+    if (state.scanProgress.visible && elements.imageGrid) {
+      const gridWrapper = document.querySelector('.image-grid-wrapper') as HTMLElement | null;
+      const height = gridWrapper?.clientHeight || 0;
+      if (height > 200) {
+        const isListView = elements.imageGrid.classList.contains('list-view');
+        const totalSlots = calcSkeletonCount(height, isListView);
+        const needed = Math.max(0, totalSlots - state.filteredImages.length);
+        if (needed !== state.scanSkeletonsToShow) {
+          state.scanSkeletonsToShow = needed;
+          state.scanSkeletonLimit = totalSlots;
+        }
+      }
+    }
   });
   resizeObserver.observe(appElement);
 
@@ -480,14 +537,14 @@ export function showError(code: string, message: string, workaround?: string): v
   state.uiScreen = 'error';
 }
 
-export function showEmpty(isNoResults?: boolean): void {
+export function showEmpty(isNoResults?: boolean, hiddenCount?: number): void {
   hideAll();
   // Hide image-grid-wrapper so empty-state can take full flex space and center vertically
   const gridWrapper = document.querySelector('.image-grid-wrapper');
   if (gridWrapper) gridWrapper.classList.add('hidden');
   // <EmptyScreen> derives its title / description / button label from
   // emptyInfo.isNoResults — see StateScreens.tsx.
-  state.emptyInfo = { isNoResults: !!isNoResults };
+  state.emptyInfo = { isNoResults: !!isNoResults, hiddenCount };
   state.uiScreen = 'empty';
 }
 
@@ -562,11 +619,13 @@ export function hideRestricted(): void {
   });
   // showRestricted() sets both the CSS class AND an inline style on
   // image-grid-wrapper to guarantee immediate hiding. We must clear
-  // both when restoring visibility.
+  // both when restoring visibility. Also clear the preemptive
+  // visibility:hidden that handleTabChange sets at switch-start.
   const wrapper = document.querySelector<HTMLElement>('.image-grid-wrapper');
   if (wrapper) {
     wrapper.classList.remove('hidden');
     wrapper.style.removeProperty('display');
+    wrapper.style.visibility = '';
   }
   // hideAll() (called by showRestricted) adds 'hidden' to #image-grid.
   // When switching back from a restricted tab to a cached normal tab,
@@ -658,8 +717,12 @@ export function showLoading(): void {
   state.lastRenderedFilteredIds = null;
 
   // Ensure image-grid-wrapper is visible
-  const gridWrapper = document.querySelector('.image-grid-wrapper');
-  if (gridWrapper) gridWrapper.classList.remove('hidden');
+  const gridWrapper = document.querySelector<HTMLElement>('.image-grid-wrapper');
+  if (gridWrapper) {
+    gridWrapper.classList.remove('hidden');
+    gridWrapper.style.removeProperty('display');
+    gridWrapper.style.visibility = '';
+  }
 
   // Drive skeleton rendering through the store: <ImageGrid> reads
   // scanSkeletonsToShow and renders that many <SkeletonCard> nodes after
@@ -677,7 +740,12 @@ export function showLoading(): void {
     void (gridWrapper as HTMLElement).offsetHeight;
 
     const isListView = elements.imageGrid.classList.contains('list-view');
-    const containerHeight = (gridWrapper as HTMLElement | null)?.clientHeight || 600;
+    const measured = (gridWrapper as HTMLElement | null)?.clientHeight || 0;
+    // Chrome sidepanel dimensions are unreliable during the opening
+    // animation — both clientHeight and window.innerHeight can return
+    // tiny values. Fall back to 800px (typical sidepanel height) so
+    // skeletons fill the viewport from the first frame.
+    const containerHeight = measured > 200 ? measured : 800;
     const skeletonCount = calcSkeletonCount(containerHeight, isListView);
     // scanSkeletonLimit gates incremental render in message.ts (stop after we
     // fill the visible skeleton slots); scanSkeletonsToShow drives the

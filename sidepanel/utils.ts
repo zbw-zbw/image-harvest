@@ -3,7 +3,7 @@
 // ============================================
 // 工具函数模块：提供各种通用工具函数和设置存储功能
 
-import { DEFAULT_FILTER_CONFIG } from '../shared/constants';
+import { DEFAULT_FILTER_CONFIG, MESSAGE_TYPES } from '../shared/constants';
 import { applyNamingTemplate } from '../shared/naming';
 import type { FilterConfig, ImageItem } from '../shared/types';
 import { state } from './state';
@@ -19,6 +19,7 @@ interface PageInfo {
 }
 
 export async function fetchImageMeta(url: string): Promise<ImageMeta> {
+  // 1. Try direct HEAD (fastest — no background round-trip)
   try {
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), 5000);
@@ -31,13 +32,32 @@ export async function fetchImageMeta(url: string): Promise<ImageMeta> {
     clearTimeout(timeoutId);
     const contentLength = response.headers.get('content-length');
     const contentType = response.headers.get('content-type') || '';
-    return {
-      size: contentLength ? parseInt(contentLength, 10) : null,
-      contentType,
-    };
+    if (contentLength) {
+      return { size: parseInt(contentLength, 10), contentType };
+    }
+    if (contentType) {
+      return { size: null, contentType };
+    }
   } catch {
-    // HEAD request failed or timed out, skip
+    // Direct HEAD failed (CORS or network) — fall through to proxy
   }
+
+  // 2. Fallback: background SW proxy HEAD (bypasses CORS)
+  try {
+    const response = await chrome.runtime.sendMessage({
+      type: MESSAGE_TYPES.FETCH_IMAGE_META,
+      url,
+    });
+    if (response && response.success) {
+      return {
+        size: response.size ?? null,
+        contentType: response.contentType || '',
+      };
+    }
+  } catch {
+    // Background proxy also failed
+  }
+
   return { size: null, contentType: '' };
 }
 

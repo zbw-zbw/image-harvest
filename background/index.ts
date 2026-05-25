@@ -17,7 +17,8 @@ import { uiPorts, sidePanelOpenedTabs, getAccessibleTabId, broadcastToPopup } fr
 import { initLicenseAlarm } from './license';
 import { initDisplayMode, initTabActivationListener } from './display-mode';
 import { getImagesFromTab, processMultiTabExtract } from './extractor';
-import { fetchImageData, reverseSearchUpload } from './reverse-search';
+import { fetchImageData, fetchImageMetaProxy, reverseSearchUpload } from './reverse-search';
+import { isAllowedFetchUrl } from '../shared/url-validator';
 
 // ── Initialization ──────────────────────────────────────────────────────────
 
@@ -79,7 +80,7 @@ initTabActivationListener();
 
 chrome.downloads.onChanged.addListener((delta) => {
   if (delta.state?.current === 'complete') {
-    console.log('Download completed:', delta.id);
+    broadcastToPopup({ type: 'DOWNLOAD_COMPLETE', downloadId: delta.id });
   }
 });
 
@@ -127,6 +128,12 @@ async function handleMessage(
           liveMonitoring: message.liveMonitoring !== false,
         });
         sendResponse({ success: true, images });
+        const tabId = message.tabId as number | undefined;
+        if (tabId && images.length > 0) {
+          const text = images.length > 999 ? '999+' : String(images.length);
+          chrome.action.setBadgeText({ text, tabId }).catch(() => {});
+          chrome.action.setBadgeBackgroundColor({ color: '#4CAF50', tabId }).catch(() => {});
+        }
         break;
       }
 
@@ -332,9 +339,29 @@ async function handleMessage(
         break;
 
       case MESSAGE_TYPES.FETCH_IMAGE_DATA: {
+        const url = message.url as string;
+        if (!isAllowedFetchUrl(url)) {
+          sendResponse({ success: false, error: 'Blocked: URL not allowed for fetch' });
+          break;
+        }
         try {
-          const dataUrl = await fetchImageData(message.url as string);
+          const dataUrl = await fetchImageData(url);
           sendResponse({ success: true, dataUrl });
+        } catch (error) {
+          sendResponse({ success: false, error: (error as Error).message });
+        }
+        break;
+      }
+
+      case MESSAGE_TYPES.FETCH_IMAGE_META: {
+        const metaUrl = message.url as string;
+        if (!isAllowedFetchUrl(metaUrl)) {
+          sendResponse({ success: false, error: 'Blocked: URL not allowed for fetch' });
+          break;
+        }
+        try {
+          const meta = await fetchImageMetaProxy(metaUrl);
+          sendResponse({ success: true, size: meta.size, contentType: meta.contentType });
         } catch (error) {
           sendResponse({ success: false, error: (error as Error).message });
         }

@@ -618,7 +618,7 @@
   padding: 1px 6px;
   font-size: 9px;
   font-weight: 700;
-  color: #5a3e00;
+  color: var(--amber-text);
   background: linear-gradient(135deg, #ffd700, #ffb800);
   border-radius: 3px;
   text-transform: uppercase;

@@ -53,7 +53,8 @@ export function renderProgressiveImages(): void {
   // up to scanSkeletonsToShow.
   const isListView = elements.imageGrid.classList.contains('list-view');
   const gridWrapper = document.querySelector('.image-grid-wrapper') as HTMLElement | null;
-  const containerHeight = gridWrapper?.clientHeight || 600;
+  const measured = gridWrapper?.clientHeight || 0;
+  const containerHeight = measured > 200 ? measured : 800;
   const totalSlots = calcSkeletonCount(containerHeight, isListView);
   state.scanSkeletonsToShow = Math.max(0, totalSlots - state.filteredImages.length);
 
@@ -96,15 +97,24 @@ export function renderImages(options?: { skipScrollReset?: boolean }): void {
     // mid-scan (scan overlay still visible means analysis still in progress).
     if (!state.scanProgress.visible) {
       elements.imageGrid.classList.add('hidden');
-      showEmpty(state.allImages.length > 0);
+      const isNoResults = state.allImages.length > 0;
+      const hiddenCount = isNoResults ? state.allImages.length : undefined;
+      showEmpty(isNoResults, hiddenCount);
     }
     return;
   }
 
   // Ensure the grid wrapper is visible (showEmpty hides it to let the
-  // empty-state placeholder take full flex space for vertical centering)
-  const gridWrapper = document.querySelector('.image-grid-wrapper');
-  if (gridWrapper) gridWrapper.classList.remove('hidden');
+  // empty-state placeholder take full flex space for vertical centering).
+  // Clear both the CSS class AND inline styles — handleTabChange's
+  // preemptive hide sets style.display='none' which persists across
+  // filter changes if only the class is removed.
+  const gridWrapper = document.querySelector<HTMLElement>('.image-grid-wrapper');
+  if (gridWrapper) {
+    gridWrapper.classList.remove('hidden');
+    gridWrapper.style.removeProperty('display');
+    gridWrapper.style.visibility = '';
+  }
 
   // Reset uiScreen so Preact's <StateScreens> hides any visible
   // empty/error/restricted screen — prevents the "images + empty state

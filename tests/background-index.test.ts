@@ -654,15 +654,29 @@ describe('handleMessage — side panel bookkeeping', () => {
 describe('handleMessage — reverse search', () => {
   it('FETCH_IMAGE_DATA → forwards URL + returns dataUrl', async () => {
     vi.mocked(bgReverseSearch.fetchImageData).mockResolvedValue('data:abc' as never);
-    const result = await dispatch({ type: MESSAGE_TYPES.FETCH_IMAGE_DATA, url: 'x.jpg' });
-    expect(bgReverseSearch.fetchImageData).toHaveBeenCalledWith('x.jpg');
+    const result = await dispatch({
+      type: MESSAGE_TYPES.FETCH_IMAGE_DATA,
+      url: 'https://example.com/x.jpg',
+    });
+    expect(bgReverseSearch.fetchImageData).toHaveBeenCalledWith('https://example.com/x.jpg');
     expect(result).toEqual({ success: true, dataUrl: 'data:abc' });
   });
 
   it('FETCH_IMAGE_DATA → catches rejection', async () => {
     vi.mocked(bgReverseSearch.fetchImageData).mockRejectedValue(new Error('bad url'));
-    const result = await dispatch({ type: MESSAGE_TYPES.FETCH_IMAGE_DATA, url: 'x' });
+    const result = await dispatch({
+      type: MESSAGE_TYPES.FETCH_IMAGE_DATA,
+      url: 'https://example.com/x',
+    });
     expect(result).toEqual({ success: false, error: 'bad url' });
+  });
+
+  it('FETCH_IMAGE_DATA → blocks non-http URLs (isAllowedFetchUrl gate)', async () => {
+    const result = await dispatch({
+      type: MESSAGE_TYPES.FETCH_IMAGE_DATA,
+      url: 'data:image/png;base64,abc',
+    });
+    expect(result).toEqual({ success: false, error: 'Blocked: URL not allowed for fetch' });
   });
 
   it('REVERSE_SEARCH_UPLOAD → forwards engine + dataUrl', async () => {

@@ -7,7 +7,7 @@ import type { ImageItem } from '../shared/types';
 import { updateSelectionUI } from './actions';
 import { renderImages } from './render';
 import { closeAllFilterDropdowns, showProUpgradeModal } from './settings';
-import { state } from './state';
+import { elements, state } from './state';
 import { t } from '../shared/i18n';
 import { showToast } from './ui';
 import { updateFilterButtonLabels } from './ui';
@@ -22,7 +22,8 @@ export function applyFilters(): void {
       filterByUrl(img) &&
       filterByColor(img) &&
       filterBySettingsMinSize(img) &&
-      filterBySettingsMaxSize(img)
+      filterBySettingsMaxSize(img) &&
+      filterByFileSize(img)
     );
   });
 
@@ -204,6 +205,76 @@ export function filterBySettingsMinSize(img: ImageItem): boolean {
   );
 }
 
+export function filterByFileSize(img: ImageItem): boolean {
+  if (!state.activeFilters.fileSizeEnabled) return true;
+  const bytes = img.estimatedSize || 0;
+  const kb = bytes / 1024;
+  return kb >= state.activeFilters.minFileSizeKB && kb <= state.activeFilters.maxFileSizeKB;
+}
+
+export const FILESIZE_PRESETS: Record<string, { min: number; max: number }> = {
+  all: { min: 0, max: Infinity },
+  tiny: { min: 0, max: 50 },
+  small: { min: 50, max: 200 },
+  medium: { min: 200, max: 500 },
+  large: { min: 500, max: 2048 },
+  xlarge: { min: 2048, max: Infinity },
+};
+
+export function applyFileSizePreset(preset: string): void {
+  const range = FILESIZE_PRESETS[preset];
+  if (!range) return;
+  state.activeFilters.fileSizePreset = preset;
+  if (preset === 'all') {
+    state.activeFilters.fileSizeEnabled = false;
+    state.activeFilters.minFileSizeKB = 0;
+    state.activeFilters.maxFileSizeKB = Infinity;
+  } else {
+    state.activeFilters.fileSizeEnabled = true;
+    state.activeFilters.minFileSizeKB = range.min;
+    state.activeFilters.maxFileSizeKB = range.max;
+  }
+  const minInput = document.getElementById('filter-filesize-min') as HTMLInputElement | null;
+  const maxInput = document.getElementById('filter-filesize-max') as HTMLInputElement | null;
+  if (minInput) minInput.value = '';
+  if (maxInput) maxInput.value = '';
+  updateFilterButtonLabels();
+  applyFilters();
+}
+
+export function applyFileSizeInputs(): void {
+  const minInput = document.getElementById('filter-filesize-min') as HTMLInputElement | null;
+  const maxInput = document.getElementById('filter-filesize-max') as HTMLInputElement | null;
+  const minVal = minInput?.value ? parseFloat(minInput.value) : 0;
+  const maxVal = maxInput?.value ? parseFloat(maxInput.value) : Infinity;
+
+  const hasFilter = minVal > 0 || (maxVal > 0 && maxVal < Infinity);
+  state.activeFilters.fileSizeEnabled = hasFilter;
+  state.activeFilters.minFileSizeKB = minVal;
+  state.activeFilters.maxFileSizeKB = maxVal > 0 ? maxVal : Infinity;
+
+  if (hasFilter) {
+    state.activeFilters.fileSizePreset = 'custom';
+    document
+      .querySelectorAll('[data-filesize-filter]')
+      .forEach((o) => o.classList.remove('active'));
+  }
+
+  updateFilterButtonLabels();
+  applyFilters();
+}
+
+export function clearFileSizeInputs(): void {
+  const minInput = document.getElementById('filter-filesize-min') as HTMLInputElement | null;
+  const maxInput = document.getElementById('filter-filesize-max') as HTMLInputElement | null;
+  if (minInput) minInput.value = '';
+  if (maxInput) maxInput.value = '';
+  state.activeFilters.fileSizeEnabled = false;
+  state.activeFilters.fileSizePreset = 'all';
+  state.activeFilters.minFileSizeKB = 0;
+  state.activeFilters.maxFileSizeKB = Infinity;
+}
+
 export function filterBySettingsMaxSize(img: ImageItem): boolean {
   if (!state.activeFilters.customMaxEnabled) return true;
   const w = img.naturalWidth || img.displayWidth || 0;
@@ -320,4 +391,46 @@ export function syncCustomSizeInputsFromSettings(): void {
     if (maxWInput) maxWInput.value = '';
     if (maxHInput) maxHInput.value = '';
   }
+}
+
+export function resetAllFilters(): void {
+  state.activeFilters = {
+    size: 'all',
+    sizeMin: 0,
+    sizeMax: Infinity,
+    types: [],
+    layout: 'all',
+    urlKeyword: '',
+    color: null,
+    customMinEnabled: state.appSettings.enableMinSize,
+    customMinWidth: state.appSettings.minWidth ?? 0,
+    customMinHeight: state.appSettings.minHeight ?? 0,
+    customMaxEnabled: state.appSettings.enableMaxSize,
+    customMaxWidth: state.appSettings.maxWidth ?? 8000,
+    customMaxHeight: state.appSettings.maxHeight ?? 8000,
+    fileSizeEnabled: false,
+    minFileSizeKB: 0,
+    maxFileSizeKB: Infinity,
+    fileSizePreset: 'all',
+  };
+  if (elements.filterUrlInput) (elements.filterUrlInput as HTMLInputElement).value = '';
+  const fsMin = document.getElementById('filter-filesize-min') as HTMLInputElement | null;
+  const fsMax = document.getElementById('filter-filesize-max') as HTMLInputElement | null;
+  if (fsMin) fsMin.value = '';
+  if (fsMax) fsMax.value = '';
+  document.querySelectorAll('[data-filesize-filter]').forEach((o) => o.classList.remove('active'));
+  document.querySelector('[data-filesize-filter="all"]')?.classList.add('active');
+  syncCustomSizeInputsFromSettings();
+  document.querySelectorAll<HTMLInputElement>('.type-checkbox').forEach((cb) => {
+    cb.checked = true;
+  });
+  document.querySelectorAll('[data-size-filter]').forEach((o) => o.classList.remove('active'));
+  document.querySelectorAll('[data-layout-filter]').forEach((o) => o.classList.remove('active'));
+  document.querySelector('[data-size-filter="all"]')?.classList.add('active');
+  document.querySelector('[data-layout-filter="all"]')?.classList.add('active');
+  document
+    .querySelectorAll('#color-swatches .color-swatch')
+    .forEach((s) => s.classList.remove('active'));
+  document.querySelector('[data-color-filter="all"]')?.classList.add('active');
+  updateFilterButtonLabels();
 }

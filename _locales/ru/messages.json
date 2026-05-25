@@ -5,392 +5,8 @@
   "app_tagline": {
     "message": "Скачивайте любые изображения с любой веб-страницы"
   },
-  "common_cancel": {
-    "message": "Отмена"
-  },
-  "common_confirm": {
-    "message": "Подтвердить"
-  },
-  "common_close": {
-    "message": "Закрыть"
-  },
-  "common_save": {
-    "message": "Сохранить"
-  },
-  "common_delete": {
-    "message": "Удалить"
-  },
-  "common_copy": {
-    "message": "Копировать"
-  },
-  "common_download": {
-    "message": "Скачать"
-  },
-  "common_upgrade": {
-    "message": "Перейти на Pro"
-  },
-  "common_maybe_later": {
-    "message": "Может быть позже"
-  },
-  "settings_title": {
-    "message": "Настройки"
-  },
-  "settings_section_appearance": {
-    "message": "Внешний вид"
-  },
-  "settings_section_experience": {
-    "message": "Опыт"
-  },
-  "settings_section_scan": {
-    "message": "Сканирование"
-  },
-  "settings_section_download": {
-    "message": "Загрузка"
-  },
-  "settings_section_language": {
-    "message": "Язык"
-  },
-  "settings_language_label": {
-    "message": "Язык интерфейса"
-  },
-  "toolbar_select_all": {
-    "message": "Выбрать все"
-  },
-  "toolbar_deselect_all": {
-    "message": "Снять выделение"
-  },
-  "toolbar_copy_urls": {
-    "message": "Копировать URL"
-  },
-  "toolbar_copy_urls_tooltip": {
-    "message": "Копировать URL выбранных изображений в буфер обмена"
-  },
-  "toolbar_copy_urls_empty": {
-    "message": "Сначала выберите изображения"
-  },
-  "toast_url_copied_single": {
-    "message": "URL скопирован!"
-  },
-  "toast_url_copied_batch": {
-    "message": "{count} URL скопировано в буфер обмена"
-  },
-  "toast_url_copy_failed": {
-    "message": "Не удалось скопировать URL"
-  },
-  "toast_download_started": {
-    "message": "Загрузка началась"
-  },
-  "toast_download_failed": {
-    "message": "Ошибка загрузки"
-  },
-  "toast_download_cancelled": {
-    "message": "Загрузка отменена"
-  },
-  "toast_scan_cancelled": {
-    "message": "Сканирование отменено"
-  },
-  "toast_download_completed": {
-    "message": "Скачано {count} изображений"
-  },
-  "toast_no_images_selected": {
-    "message": "Изображения не выбраны"
-  },
-  "toast_image_removed": {
-    "message": "Изображение удалено"
-  },
-  "toast_collection_added": {
-    "message": "Добавлено в коллекцию"
-  },
-  "toast_collection_add_failed": {
-    "message": "Не удалось добавить в коллекцию"
-  },
-  "toast_collection_removed": {
-    "message": "Удалено из коллекции"
-  },
-  "toast_collection_remove_failed": {
-    "message": "Не удалось удалить"
-  },
-  "toast_color_copied": {
-    "message": "Цвет {hex} скопирован"
-  },
-  "toast_color_copy_failed": {
-    "message": "Не удалось скопировать цвет"
-  },
-  "pro_feature_blocked_format_conversion": {
-    "message": "Конвертация форматов — функция Pro. Обновитесь, чтобы разблокировать!"
-  },
-  "pro_feature_blocked_advanced_grouping": {
-    "message": "Расширенная группировка — функция Pro. Обновитесь, чтобы разблокировать!"
-  },
-  "pro_feature_blocked_collection": {
-    "message": "Коллекция — функция Pro"
-  },
-  "pro_feature_blocked_image_delete": {
-    "message": "Удаление изображений — функция Pro. Обновитесь, чтобы разблокировать!"
-  },
-  "pro_feature_blocked_color_copy": {
-    "message": "Копирование цвета — функция Pro"
-  },
-  "pro_feature_blocked_reverse_search": {
-    "message": "Поиск через {engine} требует Pro. Обновитесь, чтобы разблокировать!"
-  },
-  "pro_zip_limit": {
-    "message": "Бесплатный план позволяет до {max} изображений в ZIP. Перейдите на Pro для безлимита!"
-  },
-  "pro_copy_urls_limit": {
-    "message": "Бесплатный план позволяет до {max} URL за раз. Перейдите на Pro для безлимита!"
-  },
-  "pro_collection_limit": {
-    "message": "Бесплатный план позволяет до {max} избранных. Перейдите на Pro для безлимита!"
-  },
-  "toolbar_sort": {
-    "message": "Сортировка"
-  },
-  "toolbar_group": {
-    "message": "Группировка"
-  },
-  "toolbar_similar": {
-    "message": "Похожие"
-  },
-  "status_similar_count": {
-    "message": "{count} похожих"
-  },
-  "toolbar_rescan": {
-    "message": "Пересканировать"
-  },
-  "toolbar_download_all": {
-    "message": "Скачать все"
-  },
-  "toolbar_download_selected": {
-    "message": "Скачать ({count})"
-  },
-  "filter_size": {
-    "message": "Размер"
-  },
-  "filter_type": {
-    "message": "Тип"
-  },
-  "filter_layout": {
-    "message": "Ориентация"
-  },
-  "filter_url": {
-    "message": "URL"
-  },
-  "filter_color": {
-    "message": "Цвет"
-  },
-  "filter_all": {
-    "message": "Все"
-  },
-  "filter_min_width": {
-    "message": "Мин. Ш"
-  },
-  "filter_max_width": {
-    "message": "Макс. Ш"
-  },
-  "filter_height": {
-    "message": "В"
-  },
-  "filter_none": {
-    "message": "Нет"
-  },
-  "filter_format": {
-    "message": "Формат"
-  },
-  "filter_domain": {
-    "message": "Домен"
-  },
-  "filter_tab": {
-    "message": "Вкладка"
-  },
-  "sort_none": {
-    "message": "Нет (порядок страницы)"
-  },
-  "sort_size_desc": {
-    "message": "Размер ↓ (сначала большие)"
-  },
-  "sort_size_asc": {
-    "message": "Размер ↑ (сначала маленькие)"
-  },
-  "sort_filesize_desc": {
-    "message": "Размер файла ↓ (сначала большие)"
-  },
-  "sort_filesize_asc": {
-    "message": "Размер файла ↑ (сначала маленькие)"
-  },
-  "layout_all": {
-    "message": "Все"
-  },
-  "layout_square": {
-    "message": "Квадрат (1:1)"
-  },
-  "layout_landscape": {
-    "message": "Альбомная (>1:1)"
-  },
-  "layout_portrait": {
-    "message": "Портретная (<1:1)"
-  },
-  "layout_panorama": {
-    "message": "Панорама (>2:1)"
-  },
-  "size_all": {
-    "message": "Все"
-  },
-  "size_small": {
-    "message": "Маленькие < 100px"
-  },
-  "size_medium": {
-    "message": "Средние 100-500px"
-  },
-  "size_large": {
-    "message": "Большие 500-1000px"
-  },
-  "size_xl": {
-    "message": "XL > 1000px"
-  },
-  "size_btn_small": {
-    "message": "Маленькие"
-  },
-  "size_btn_medium": {
-    "message": "Средние"
-  },
-  "size_btn_large": {
-    "message": "Большие"
-  },
-  "size_btn_xl": {
-    "message": "XL"
-  },
-  "size_btn_custom": {
-    "message": "Свой"
-  },
-  "layout_btn_square": {
-    "message": "Квадрат"
-  },
-  "layout_btn_landscape": {
-    "message": "Альбомная"
-  },
-  "layout_btn_portrait": {
-    "message": "Портретная"
-  },
-  "layout_btn_panorama": {
-    "message": "Панорама"
-  },
-  "color_all": {
-    "message": "Все цвета"
-  },
-  "color_no_extracted": {
-    "message": "Цвета ещё не извлечены"
-  },
-  "filter_url_placeholder": {
-    "message": "Фильтр по ключевому слову URL..."
-  },
-  "settings_display": {
-    "message": "Отображение"
-  },
-  "settings_side_panel": {
-    "message": "Отображать в боковой панели"
-  },
-  "settings_side_panel_desc": {
-    "message": "Открывать результаты в боковой панели браузера вместо всплывающего окна"
-  },
-  "settings_density": {
-    "message": "Плотность:"
-  },
-  "settings_density_compact": {
-    "message": "Компактная"
-  },
-  "settings_density_standard": {
-    "message": "Стандартная"
-  },
-  "settings_density_comfortable": {
-    "message": "Комфортная"
-  },
-  "settings_theme": {
-    "message": "Тема:"
-  },
-  "settings_theme_system": {
-    "message": "Системная"
-  },
-  "settings_theme_light": {
-    "message": "Светлая"
-  },
-  "settings_theme_dark": {
-    "message": "Тёмная"
-  },
-  "settings_default_group": {
-    "message": "Группировка по умолчанию:"
-  },
-  "settings_similar": {
-    "message": "Поиск похожих изображений"
-  },
-  "settings_color_extract": {
-    "message": "Извлечение цвета"
-  },
-  "settings_all_frames": {
-    "message": "Искать во всех фреймах"
-  },
-  "settings_live_monitor": {
-    "message": "Мониторинг в реальном времени"
-  },
-  "settings_download_options": {
-    "message": "Параметры загрузки"
-  },
-  "settings_subfolder": {
-    "message": "Подпапка:"
-  },
-  "settings_filename": {
-    "message": "Имя файла:"
-  },
-  "settings_convert_format": {
-    "message": "Конвертировать формат:"
-  },
-  "settings_no_warning": {
-    "message": "Не предупреждать при скачивании множества файлов"
-  },
-  "settings_telemetry": {
-    "message": "Отправлять анонимные данные об использовании"
-  },
-  "settings_save": {
-    "message": "Сохранить настройки"
-  },
-  "settings_reset": {
-    "message": "Сбросить"
-  },
-  "settings_saved": {
-    "message": "Настройки сохранены"
-  },
-  "settings_save_failed": {
-    "message": "Не удалось сохранить настройки"
-  },
-  "status_found_images": {
-    "message": "Найдено {count} изображений"
-  },
-  "status_similar": {
-    "message": "Похожие"
-  },
-  "rating_title": {
-    "message": "Нравится Image Harvest?"
-  },
-  "rating_desc": {
-    "message": "Если мы сэкономили вам время, быстрый отзыв на 5 звёзд в Chrome Web Store будет очень значить для нас."
-  },
-  "rating_rate_now": {
-    "message": "⭐ Оценить в Chrome Store"
-  },
-  "rating_later": {
-    "message": "Может быть позже"
-  },
-  "rating_never": {
-    "message": "Больше не спрашивать"
-  },
-  "rating_close": {
-    "message": "Закрыть"
-  },
   "btn_deactivate": {
     "message": "Деактивировать"
-  },
-  "license_deactivating": {
-    "message": "Деактивация..."
   },
   "card_add_to_collection": {
     "message": "Добавить в коллекцию"
@@ -410,32 +26,65 @@
   "card_reverse_search": {
     "message": "Обратный поиск ({engine})"
   },
+  "collection_empty_hint": {
+    "message": "Нажмите на значок звезды на любом изображении, чтобы добавить его в коллекцию"
+  },
+  "collection_empty_title": {
+    "message": "Ваша коллекция пуста"
+  },
   "collection_export_tooltip": {
     "message": "Экспортировать коллекцию в ZIP"
   },
   "collection_modal_title": {
     "message": "Коллекция"
   },
-  "collection_search_placeholder": {
-    "message": "Поиск в коллекции..."
-  },
   "collection_no_match": {
     "message": "Совпадающие изображения не найдены"
-  },
-  "collection_empty_title": {
-    "message": "Ваша коллекция пуста"
   },
   "collection_no_match_hint": {
     "message": "Попробуйте другое ключевое слово"
   },
-  "collection_empty_hint": {
-    "message": "Нажмите на значок звезды на любом изображении, чтобы добавить его в коллекцию"
+  "collection_search_placeholder": {
+    "message": "Поиск в коллекции..."
+  },
+  "color_all": {
+    "message": "Все цвета"
+  },
+  "color_no_extracted": {
+    "message": "Цвета ещё не извлечены"
+  },
+  "common_cancel": {
+    "message": "Отмена"
+  },
+  "common_close": {
+    "message": "Закрыть"
+  },
+  "common_confirm": {
+    "message": "Подтвердить"
+  },
+  "common_copy": {
+    "message": "Копировать"
+  },
+  "common_delete": {
+    "message": "Удалить"
   },
   "common_dismiss": {
     "message": "Отклонить"
   },
+  "common_download": {
+    "message": "Скачать"
+  },
+  "common_maybe_later": {
+    "message": "Может быть позже"
+  },
   "common_remove": {
     "message": "Удалить"
+  },
+  "common_save": {
+    "message": "Сохранить"
+  },
+  "common_upgrade": {
+    "message": "Перейти на Pro"
   },
   "confirm_remove_image_message": {
     "message": "Удалить это изображение из списка?"
@@ -443,14 +92,14 @@
   "confirm_remove_image_title": {
     "message": "Удаление изображения"
   },
+  "dedup_group_title": {
+    "message": "Группа {index} ({count} похожих)"
+  },
   "dedup_modal_title": {
     "message": "Похожие изображения"
   },
   "dedup_no_similar": {
     "message": "Похожие изображения не найдены"
-  },
-  "dedup_group_title": {
-    "message": "Группа {index} ({count} похожих)"
   },
   "dedup_remove_duplicates": {
     "message": "Удалить дубликаты"
@@ -488,20 +137,131 @@
   "error_default_message": {
     "message": "Произошла ошибка"
   },
+  "filter_all": {
+    "message": "Все"
+  },
+  "filter_color": {
+    "message": "Цвет"
+  },
+  "filter_domain": {
+    "message": "Домен"
+  },
+  "filter_format": {
+    "message": "Формат"
+  },
+  "filter_height": {
+    "message": "В"
+  },
+  "filter_layout": {
+    "message": "Ориентация"
+  },
+  "filter_max_width": {
+    "message": "Макс. Ш"
+  },
+  "filter_min_width": {
+    "message": "Мин. Ш"
+  },
+  "filter_none": {
+    "message": "Нет"
+  },
+  "filter_size": {
+    "message": "Размер"
+  },
+  "filter_tab": {
+    "message": "Вкладка"
+  },
+  "filter_type": {
+    "message": "Тип"
+  },
+  "filter_type_other": {
+    "message": "Другое"
+  },
+  "filter_url": {
+    "message": "URL"
+  },
+  "filter_url_placeholder": {
+    "message": "Фильтр по ключевому слову URL..."
+  },
+  "format_original": {
+    "message": "Оригинал"
+  },
   "grid_current_tab_badge": {
     "message": "Текущая вкладка"
+  },
+  "hotkey_click_to_set": {
+    "message": "Нажмите, чтобы задать"
   },
   "hotkey_not_set": {
     "message": "Не задано"
   },
-  "hotkey_click_to_set": {
-    "message": "Нажмите, чтобы задать"
+  "layout_all": {
+    "message": "Все"
+  },
+  "layout_btn_landscape": {
+    "message": "Альбомная"
+  },
+  "layout_btn_panorama": {
+    "message": "Панорама"
+  },
+  "layout_btn_portrait": {
+    "message": "Портретная"
+  },
+  "layout_btn_square": {
+    "message": "Квадрат"
+  },
+  "layout_landscape": {
+    "message": "Альбомная (>1:1)"
+  },
+  "layout_panorama": {
+    "message": "Панорама (>2:1)"
+  },
+  "layout_portrait": {
+    "message": "Портретная (<1:1)"
+  },
+  "layout_square": {
+    "message": "Квадрат (1:1)"
+  },
+  "license_activating": {
+    "message": "Активация..."
+  },
+  "license_activation_failed": {
+    "message": "Ошибка активации"
+  },
+  "license_deactivating": {
+    "message": "Деактивация..."
+  },
+  "license_enter_key": {
+    "message": "Введите лицензионный ключ"
+  },
+  "license_error_activation_failed": {
+    "message": "Ошибка активации. Пожалуйста, попробуйте снова."
+  },
+  "license_error_invalid_key": {
+    "message": "Недействительный лицензионный ключ."
+  },
+  "license_error_network": {
+    "message": "Ошибка сети. Проверьте подключение."
+  },
+  "license_network_error": {
+    "message": "Ошибка сети. Пожалуйста, попробуйте снова."
+  },
+  "license_placeholder": {
+    "message": "Введите лицензионный ключ"
   },
   "live_indicator_label": {
     "message": "Живой"
   },
   "live_indicator_tooltip": {
     "message": "Мониторинг в реальном времени активен — новые изображения обнаруживаются автоматически"
+  },
+  "menu_reverse_search": {
+    "message": "Обратный поиск"
+  },
+  "multitab_current": {
+    "message": "Текущая"
+  },
+  "multitab_extracting": {
+    "message": "Извлечение..."
   },
   "multitab_modal_title": {
     "message": "Извлечение из нескольких вкладок"
@@ -512,8 +272,8 @@
   "multitab_start_extraction": {
     "message": "Начать извлечение"
   },
-  "multitab_current": {
-    "message": "Текущая"
+  "multitab_starting": {
+    "message": "Начало извлечения..."
   },
   "multitab_untitled": {
     "message": "Без названия"
@@ -593,17 +353,47 @@
   "pro_already_have_key": {
     "message": "Уже есть лицензионный ключ?"
   },
+  "pro_collection_limit": {
+    "message": "Бесплатный план позволяет до {max} избранных. Перейдите на Pro для безлимита!"
+  },
+  "pro_copy_urls_limit": {
+    "message": "Бесплатный план позволяет до {max} URL за раз. Перейдите на Pro для безлимита!"
+  },
   "pro_deactivate_tooltip": {
     "message": "Деактивировать лицензию"
   },
   "pro_feature_batch_desc": {
     "message": "Скачайте все изображения одним нажатием"
   },
+  "pro_feature_batch_desc_pro": {
+    "message": "Unlimited downloads — select all images and export as ZIP in one click"
+  },
   "pro_feature_batch_title": {
     "message": "Пакетная загрузка"
   },
+  "pro_feature_blocked_advanced_grouping": {
+    "message": "Расширенная группировка — функция Pro. Обновитесь, чтобы разблокировать!"
+  },
+  "pro_feature_blocked_collection": {
+    "message": "Коллекция — функция Pro"
+  },
+  "pro_feature_blocked_color_copy": {
+    "message": "Копирование цвета — функция Pro"
+  },
+  "pro_feature_blocked_format_conversion": {
+    "message": "Конвертация форматов — функция Pro. Обновитесь, чтобы разблокировать!"
+  },
+  "pro_feature_blocked_image_delete": {
+    "message": "Удаление изображений — функция Pro. Обновитесь, чтобы разблокировать!"
+  },
+  "pro_feature_blocked_reverse_search": {
+    "message": "Поиск через {engine} требует Pro. Обновитесь, чтобы разблокировать!"
+  },
   "pro_feature_color_desc": {
     "message": "Фильтрация изображений по доминирующему цвету"
+  },
+  "pro_feature_color_desc_pro": {
+    "message": "Auto-extract dominant colors; click any swatch to copy HEX code instantly"
   },
   "pro_feature_color_title": {
     "message": "Фильтр по цвету"
@@ -611,17 +401,26 @@
   "pro_feature_dedup_desc": {
     "message": "Автоматическое обнаружение и удаление дубликатов изображений"
   },
+  "pro_feature_dedup_desc_pro": {
+    "message": "Perceptual-hash smart dedup — no wasted space from duplicate downloads"
+  },
   "pro_feature_dedup_title": {
     "message": "Поиск дубликатов"
   },
   "pro_feature_multitab_desc": {
     "message": "Извлечение изображений из нескольких вкладок одновременно"
   },
+  "pro_feature_multitab_desc_pro": {
+    "message": "Batch extract from all open tabs and bundle into a single ZIP — no tab switching"
+  },
   "pro_feature_multitab_title": {
     "message": "Извлечение из нескольких вкладок"
   },
   "pro_feature_reverse_search_desc": {
     "message": "Найдите источник любого изображения с помощью обратного поиска"
+  },
+  "pro_feature_reverse_search_desc_pro": {
+    "message": "One-click search on Google, TinEye, Yandex & Baidu to find any image's origin"
   },
   "pro_feature_reverse_search_title": {
     "message": "Обратный поиск изображений"
@@ -653,14 +452,14 @@
   "pro_trial_desc": {
     "message": "Попробуйте все функции Pro бесплатно в течение 7 дней. Без обязательств."
   },
+  "pro_trial_perk_cancel": {
+    "message": "Автоматически истекает — отмена не требуется"
+  },
   "pro_trial_perk_full_access": {
     "message": "Полный доступ ко всем функциям Pro"
   },
   "pro_trial_perk_no_card": {
     "message": "Кредитная карта не требуется"
-  },
-  "pro_trial_perk_cancel": {
-    "message": "Автоматически истекает — отмена не требуется"
   },
   "pro_trial_start_cta": {
     "message": "Начать бесплатную пробную версию"
@@ -677,14 +476,92 @@
   "pro_trial_unavailable": {
     "message": "Пробный период недоступен"
   },
+  "pro_zip_limit": {
+    "message": "Бесплатный план позволяет до {max} изображений в ZIP. Перейдите на Pro для безлимита!"
+  },
   "progress_downloading": {
     "message": "Загрузка..."
+  },
+  "progress_multitab_text": {
+    "message": "{current}/{total} вкладок · найдено {count} изображений"
   },
   "progress_text": {
     "message": "{current} из {total}"
   },
-  "progress_multitab_text": {
-    "message": "{current}/{total} вкладок · найдено {count} изображений"
+  "rating_close": {
+    "message": "Закрыть"
+  },
+  "rating_desc": {
+    "message": "Если мы сэкономили вам время, быстрый отзыв на 5 звёзд в Chrome Web Store будет очень значить для нас."
+  },
+  "rating_later": {
+    "message": "Может быть позже"
+  },
+  "rating_never": {
+    "message": "Больше не спрашивать"
+  },
+  "rating_rate_now": {
+    "message": "⭐ Оценить в Chrome Store"
+  },
+  "rating_title": {
+    "message": "Нравится Image Harvest?"
+  },
+  "restricted_feature_batch_desc": {
+    "message": "Выберите и скачайте все изображения с любой веб-страницы одним нажатием. Фильтруйте по размеру, формату или ориентации."
+  },
+  "restricted_feature_batch_title": {
+    "message": "Пакетная загрузка"
+  },
+  "restricted_feature_collection_desc": {
+    "message": "Добавляйте изображения в постоянную коллекцию, которая сохраняется между сессиями. Упорядочивайте и просматривайте в любое время."
+  },
+  "restricted_feature_collection_title": {
+    "message": "Коллекция избранного"
+  },
+  "restricted_feature_color_desc": {
+    "message": "Автоматически извлекайте доминирующие цвета из каждого изображения. Нажмите на образец, чтобы скопировать HEX-код."
+  },
+  "restricted_feature_color_title": {
+    "message": "Извлечение цвета"
+  },
+  "restricted_feature_dedup_desc": {
+    "message": "Автоматически находите и удаляйте почти дублирующиеся изображения с помощью перцептивного хеширования."
+  },
+  "restricted_feature_dedup_title": {
+    "message": "Поиск похожих изображений"
+  },
+  "restricted_feature_filter_desc": {
+    "message": "Фильтруйте изображения по размеру, типу, ориентации, шаблону URL или доминирующему цвету, чтобы найти именно то, что нужно."
+  },
+  "restricted_feature_filter_title": {
+    "message": "Умные фильтры"
+  },
+  "restricted_feature_multitab_desc": {
+    "message": "Извлекайте изображения из нескольких открытых вкладок одновременно и скачивайте их все в ZIP-архиве."
+  },
+  "restricted_feature_multitab_title": {
+    "message": "Извлечение из нескольких вкладок"
+  },
+  "restricted_feature_preview_desc": {
+    "message": "Просматривайте изображения в полном разрешении с метаданными — размеры, размер файла и формат — с первого взгляда."
+  },
+  "restricted_feature_preview_title": {
+    "message": "Мгновенный предпросмотр"
+  },
+  "restricted_feature_reverse_desc": {
+    "message": "Ищите любое изображение в Google, TinEye, Yandex и Baidu одним нажатием."
+  },
+  "restricted_feature_reverse_title": {
+    "message": "Обратный поиск изображений"
+  },
+  "restricted_features_heading": {
+    "message": "Что вы можете делать с Image Harvest"
+  },
+  "restricted_link_website": {
+    "message": "Официальный сайт"
+  },
+  "restricted_notice": {
+    "message": "Эта страница не позволяет расширениям внедрять скрипты. Перейдите на обычную веб-страницу (например, статью, галерею или результаты поиска), чтобы начать извлечение изображений."
   },
   "restricted_subtitle": {
     "message": "Эта страница ограничивает выполнение скриптов. Попробуйте другую страницу."
@@ -707,8 +584,227 @@
   "scan_updating": {
     "message": "Обновление..."
   },
+  "settings_all_frames": {
+    "message": "Искать во всех фреймах"
+  },
+  "settings_all_frames_desc": {
+    "message": "Также сканировать изображения в iframe и встроенных фреймах"
+  },
+  "settings_color_extract": {
+    "message": "Извлечение цвета"
+  },
+  "settings_color_extract_desc": {
+    "message": "Извлекать доминирующие цвета из каждого изображения для фильтрации"
+  },
+  "settings_convert_format": {
+    "message": "Конвертировать формат:"
+  },
+  "settings_default_group": {
+    "message": "Группировка по умолчанию:"
+  },
+  "settings_density": {
+    "message": "Плотность:"
+  },
+  "settings_density_comfortable": {
+    "message": "Комфортная"
+  },
+  "settings_density_compact": {
+    "message": "Компактная"
+  },
+  "settings_density_standard": {
+    "message": "Стандартная"
+  },
+  "settings_display": {
+    "message": "Отображение"
+  },
+  "settings_download_options": {
+    "message": "Параметры загрузки"
+  },
+  "settings_download_options_desc": {
+    "message": "Настройка подпапки, шаблона имени файла и конвертации формата"
+  },
+  "settings_filename": {
+    "message": "Имя файла:"
+  },
+  "settings_height_gte": {
+    "message": "Высота ≥"
+  },
+  "settings_height_lte": {
+    "message": "Высота ≤"
+  },
+  "settings_hotkey": {
+    "message": "Горячая клавиша:"
+  },
+  "settings_language_label": {
+    "message": "Язык интерфейса"
+  },
+  "settings_live_monitor": {
+    "message": "Мониторинг в реальном времени"
+  },
+  "settings_live_monitor_desc": {
+    "message": "Автоматически обнаруживать новые изображения при изменении содержимого страницы"
+  },
+  "settings_max_size": {
+    "message": "Включить фильтр максимального размера"
+  },
+  "settings_max_size_desc": {
+    "message": "Скрывать изображения больше указанных размеров"
+  },
+  "settings_min_size": {
+    "message": "Включить фильтр минимального размера"
+  },
+  "settings_min_size_desc": {
+    "message": "Скрывать изображения меньше указанных размеров"
+  },
+  "settings_no_warning": {
+    "message": "Не предупреждать при скачивании множества файлов"
+  },
+  "settings_no_warning_desc": {
+    "message": "Пропускать диалог подтверждения при скачивании множества файлов"
+  },
+  "settings_reset": {
+    "message": "Сбросить"
+  },
+  "settings_save": {
+    "message": "Сохранить настройки"
+  },
+  "settings_save_failed": {
+    "message": "Не удалось сохранить настройки"
+  },
+  "settings_saved": {
+    "message": "Настройки сохранены"
+  },
+  "settings_section_account": {
+    "message": "Аккаунт"
+  },
+  "settings_section_appearance": {
+    "message": "Внешний вид"
+  },
+  "settings_section_display": {
+    "message": "Отображение"
+  },
+  "settings_section_download": {
+    "message": "Загрузка"
+  },
+  "settings_section_experience": {
+    "message": "Опыт"
+  },
+  "settings_section_language": {
+    "message": "Язык"
+  },
+  "settings_section_pro": {
+    "message": "Pro"
+  },
+  "settings_section_scan": {
+    "message": "Сканирование"
+  },
+  "settings_side_panel": {
+    "message": "Отображать в боковой панели"
+  },
+  "settings_side_panel_desc": {
+    "message": "Открывать результаты в боковой панели браузера вместо всплывающего окна"
+  },
+  "settings_similar": {
+    "message": "Поиск похожих изображений"
+  },
+  "settings_similar_desc": {
+    "message": "Находить и группировать визуально похожие или дублирующиеся изображения"
+  },
+  "settings_subfolder": {
+    "message": "Подпапка:"
+  },
+  "settings_telemetry": {
+    "message": "Отправлять анонимные данные об использовании"
+  },
+  "settings_telemetry_desc": {
+    "message": "Отправлять анонимные события использования функций. Без URL, изображений и персональных данных."
+  },
+  "settings_theme": {
+    "message": "Тема:"
+  },
+  "settings_theme_dark": {
+    "message": "Тёмная"
+  },
+  "settings_theme_light": {
+    "message": "Светлая"
+  },
+  "settings_theme_system": {
+    "message": "Системная"
+  },
+  "settings_title": {
+    "message": "Настройки"
+  },
+  "settings_variables_hint": {
+    "message": "Переменные: {domain}, {index}, {original}, {format}, {width}, {height}"
+  },
+  "settings_width_gte": {
+    "message": "Ширина ≥"
+  },
+  "settings_width_lte": {
+    "message": "Ширина ≤"
+  },
+  "size_all": {
+    "message": "Все"
+  },
+  "size_btn_custom": {
+    "message": "Свой"
+  },
+  "size_btn_large": {
+    "message": "Большие"
+  },
+  "size_btn_medium": {
+    "message": "Средние"
+  },
+  "size_btn_small": {
+    "message": "Маленькие"
+  },
+  "size_btn_xl": {
+    "message": "XL"
+  },
+  "size_large": {
+    "message": "Большие 500-1000px"
+  },
+  "size_medium": {
+    "message": "Средние 100-500px"
+  },
+  "size_small": {
+    "message": "Маленькие < 100px"
+  },
+  "size_xl": {
+    "message": "XL > 1000px"
+  },
+  "sort_filesize_asc": {
+    "message": "Размер файла ↑ (сначала маленькие)"
+  },
+  "sort_filesize_desc": {
+    "message": "Размер файла ↓ (сначала большие)"
+  },
+  "sort_none": {
+    "message": "Нет (порядок страницы)"
+  },
+  "sort_size_asc": {
+    "message": "Размер ↑ (сначала маленькие)"
+  },
+  "sort_size_desc": {
+    "message": "Размер ↓ (сначала большие)"
+  },
+  "status_found_images": {
+    "message": "Найдено {count} изображений"
+  },
+  "status_found_prefix": {
+    "message": "Найдено"
+  },
+  "status_found_suffix": {
+    "message": "изображений"
+  },
   "status_n_selected": {
     "message": "{count} выбрано"
+  },
+  "status_similar": {
+    "message": "Похожие"
+  },
+  "status_similar_count": {
+    "message": "{count} похожих"
   },
   "status_total_images": {
     "message": "{count} всего"
@@ -749,134 +845,38 @@
   "title_view_similar": {
     "message": "Просмотреть похожие изображения"
   },
+  "toast_collection_add_failed": {
+    "message": "Не удалось добавить в коллекцию"
+  },
+  "toast_collection_added": {
+    "message": "Добавлено в коллекцию"
+  },
+  "toast_collection_remove_failed": {
+    "message": "Не удалось удалить"
+  },
+  "toast_collection_removed": {
+    "message": "Удалено из коллекции"
+  },
+  "toast_color_copied": {
+    "message": "Цвет {hex} скопирован"
+  },
+  "toast_color_copy_failed": {
+    "message": "Не удалось скопировать цвет"
+  },
   "toast_deactivate_failed": {
     "message": "Не удалось деактивировать"
   },
-  "toast_license_deactivated": {
-    "message": "Лицензия деактивирована"
+  "toast_download_cancelled": {
+    "message": "Загрузка отменена"
   },
-  "toast_n_new": {
-    "message": "{count} новых"
+  "toast_download_completed": {
+    "message": "Скачано {count} изображений"
   },
-  "toast_n_removed": {
-    "message": "{count} удалено"
+  "toast_download_failed": {
+    "message": "Ошибка загрузки"
   },
-  "toast_pro_color_filter": {
-    "message": "Фильтрация по цвету — функция Pro. Обновитесь, чтобы фильтровать по цвету!"
-  },
-  "toast_pro_naming_locked": {
-    "message": "Пользовательские имена файлов — функция Pro. Обновитесь, чтобы разблокировать!"
-  },
-  "toast_pro_setting_locked": {
-    "message": "Эта настройка требует Pro. Обновитесь, чтобы разблокировать!"
-  },
-  "toast_settings_reset": {
-    "message": "Настройки сброшены по умолчанию"
-  },
-  "view_grid": {
-    "message": "Сетка"
-  },
-  "view_list": {
-    "message": "Список"
-  },
-  "format_original": {
-    "message": "Оригинал"
-  },
-  "menu_reverse_search": {
-    "message": "Обратный поиск"
-  },
-  "settings_all_frames_desc": {
-    "message": "Также сканировать изображения в iframe и встроенных фреймах"
-  },
-  "settings_color_extract_desc": {
-    "message": "Извлекать доминирующие цвета из каждого изображения для фильтрации"
-  },
-  "settings_download_options_desc": {
-    "message": "Настройка подпапки, шаблона имени файла и конвертации формата"
-  },
-  "settings_hotkey": {
-    "message": "Горячая клавиша:"
-  },
-  "settings_live_monitor_desc": {
-    "message": "Автоматически обнаруживать новые изображения при изменении содержимого страницы"
-  },
-  "settings_max_size": {
-    "message": "Включить фильтр максимального размера"
-  },
-  "settings_max_size_desc": {
-    "message": "Скрывать изображения больше указанных размеров"
-  },
-  "settings_min_size": {
-    "message": "Включить фильтр минимального размера"
-  },
-  "settings_min_size_desc": {
-    "message": "Скрывать изображения меньше указанных размеров"
-  },
-  "settings_no_warning_desc": {
-    "message": "Пропускать диалог подтверждения при скачивании множества файлов"
-  },
-  "settings_section_display": {
-    "message": "Отображение"
-  },
-  "settings_section_pro": {
-    "message": "Pro"
-  },
-  "settings_section_account": {
-    "message": "Аккаунт"
-  },
-  "settings_similar_desc": {
-    "message": "Находить и группировать визуально похожие или дублирующиеся изображения"
-  },
-  "settings_telemetry_desc": {
-    "message": "Отправлять анонимные события использования функций. Без URL, изображений и персональных данных."
-  },
-  "status_found_prefix": {
-    "message": "Найдено"
-  },
-  "status_found_suffix": {
-    "message": "изображений"
-  },
-  "filter_type_other": {
-    "message": "Другое"
-  },
-  "license_activating": {
-    "message": "Активация..."
-  },
-  "license_activation_failed": {
-    "message": "Ошибка активации"
-  },
-  "license_enter_key": {
-    "message": "Введите лицензионный ключ"
-  },
-  "license_network_error": {
-    "message": "Ошибка сети. Пожалуйста, попробуйте снова."
-  },
-  "license_placeholder": {
-    "message": "Введите лицензионный ключ"
-  },
-  "settings_height_gte": {
-    "message": "Высота ≥"
-  },
-  "settings_height_lte": {
-    "message": "Высота ≤"
-  },
-  "settings_width_gte": {
-    "message": "Ширина ≥"
-  },
-  "settings_width_lte": {
-    "message": "Ширина ≤"
-  },
-  "toast_pro_activated": {
-    "message": "Pro успешно активирован!"
-  },
-  "multitab_extracting": {
-    "message": "Извлечение..."
-  },
-  "multitab_starting": {
-    "message": "Начало извлечения..."
-  },
-  "settings_variables_hint": {
-    "message": "Переменные: {domain}, {index}, {original}, {format}, {width}, {height}"
+  "toast_download_started": {
+    "message": "Загрузка началась"
   },
   "toast_extraction_cancelled": {
     "message": "Извлечение отменено"
@@ -887,65 +887,83 @@
   "toast_extraction_success": {
     "message": "Извлечено {images} изображений из {tabs} вкладок"
   },
+  "toast_image_removed": {
+    "message": "Изображение удалено"
+  },
+  "toast_license_deactivated": {
+    "message": "Лицензия деактивирована"
+  },
   "toast_multitab_failed": {
     "message": "Ошибка извлечения из нескольких вкладок"
   },
-  "restricted_notice": {
-    "message": "Эта страница не позволяет расширениям внедрять скрипты. Перейдите на обычную веб-страницу (например, статью, галерею или результаты поиска), чтобы начать извлечение изображений."
+  "toast_n_new": {
+    "message": "{count} новых"
   },
-  "restricted_features_heading": {
-    "message": "Что вы можете делать с Image Harvest"
+  "toast_n_removed": {
+    "message": "{count} удалено"
   },
-  "restricted_feature_batch_title": {
-    "message": "Пакетная загрузка"
+  "toast_no_images_selected": {
+    "message": "Изображения не выбраны"
   },
-  "restricted_feature_batch_desc": {
-    "message": "Выберите и скачайте все изображения с любой веб-страницы одним нажатием. Фильтруйте по размеру, формату или ориентации."
+  "toast_pro_activated": {
+    "message": "Pro успешно активирован!"
   },
-  "restricted_feature_dedup_title": {
-    "message": "Поиск похожих изображений"
+  "toast_pro_color_filter": {
+    "message": "Фильтрация по цвету — функция Pro. Обновитесь, чтобы фильтровать по цвету!"
   },
-  "restricted_feature_dedup_desc": {
-    "message": "Автоматически находите и удаляйте почти дублирующиеся изображения с помощью перцептивного хеширования."
+  "toast_pro_naming_locked": {
+    "message": "Пользовательские имена файлов — функция Pro. Обновитесь, чтобы разблокировать!"
   },
-  "restricted_feature_reverse_title": {
-    "message": "Обратный поиск изображений"
+  "toast_pro_setting_locked": {
+    "message": "Эта настройка требует Pro. Обновитесь, чтобы разблокировать!"
   },
-  "restricted_feature_reverse_desc": {
-    "message": "Ищите любое изображение в Google, TinEye, Yandex и Baidu одним нажатием."
+  "toast_scan_cancelled": {
+    "message": "Сканирование отменено"
   },
-  "restricted_feature_multitab_title": {
-    "message": "Извлечение из нескольких вкладок"
+  "toast_settings_reset": {
+    "message": "Настройки сброшены по умолчанию"
   },
-  "restricted_feature_multitab_desc": {
-    "message": "Извлекайте изображения из нескольких открытых вкладок одновременно и скачивайте их все в ZIP-архиве."
+  "toast_url_copied_batch": {
+    "message": "{count} URL скопировано в буфер обмена"
   },
-  "restricted_feature_color_title": {
-    "message": "Извлечение цвета"
+  "toast_url_copied_single": {
+    "message": "URL скопирован!"
   },
-  "restricted_feature_color_desc": {
-    "message": "Автоматически извлекайте доминирующие цвета из каждого изображения. Нажмите на образец, чтобы скопировать HEX-код."
+  "toast_url_copy_failed": {
+    "message": "Не удалось скопировать URL"
   },
-  "restricted_feature_filter_title": {
-    "message": "Умные фильтры"
+  "toolbar_copy_urls": {
+    "message": "Копировать URL"
   },
-  "restricted_feature_filter_desc": {
-    "message": "Фильтруйте изображения по размеру, типу, ориентации, шаблону URL или доминирующему цвету, чтобы найти именно то, что нужно."
+  "toolbar_copy_urls_empty": {
+    "message": "Сначала выберите изображения"
   },
-  "restricted_feature_collection_title": {
-    "message": "Коллекция избранного"
+  "toolbar_copy_urls_tooltip": {
+    "message": "Копировать URL выбранных изображений в буфер обмена"
   },
-  "restricted_feature_collection_desc": {
-    "message": "Добавляйте изображения в постоянную коллекцию, которая сохраняется между сессиями. Упорядочивайте и просматривайте в любое время."
+  "toolbar_deselect_all": {
+    "message": "Снять выделение"
   },
-  "restricted_feature_preview_title": {
-    "message": "Мгновенный предпросмотр"
+  "toolbar_download_all": {
+    "message": "Скачать все"
   },
-  "restricted_feature_preview_desc": {
-    "message": "Просматривайте изображения в полном разрешении с метаданными — размеры, размер файла и формат — с первого взгляда."
+  "toolbar_download_selected": {
+    "message": "Скачать ({count})"
   },
-  "restricted_link_website": {
-    "message": "Официальный сайт"
+  "toolbar_group": {
+    "message": "Группировка"
+  },
+  "toolbar_rescan": {
+    "message": "Пересканировать"
+  },
+  "toolbar_select_all": {
+    "message": "Выбрать все"
+  },
+  "toolbar_similar": {
+    "message": "Похожие"
+  },
+  "toolbar_sort": {
+    "message": "Сортировка"
   },
   "trial_error_already_redeemed": {
     "message": "Вы уже использовали бесплатную пробную версию на этой установке."
@@ -962,13 +980,10 @@
   "trial_error_server_declined": {
     "message": "Сервер отклонил пробный период."
   },
-  "license_error_network": {
-    "message": "Ошибка сети. Проверьте подключение."
+  "view_grid": {
+    "message": "Сетка"
   },
-  "license_error_invalid_key": {
-    "message": "Недействительный лицензионный ключ."
-  },
-  "license_error_activation_failed": {
-    "message": "Ошибка активации. Пожалуйста, попробуйте снова."
+  "view_list": {
+    "message": "Список"
   }
 }

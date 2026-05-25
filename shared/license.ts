@@ -11,6 +11,9 @@ import type {
   LicenseValidationResult,
   ProUserInfo,
 } from './types';
+
+/** 3-day grace period after trial expiry (mirrors trial.ts constant). */
+const TRIAL_EXPIRY_GRACE_MS = 3 * 24 * 60 * 60 * 1000;
 import { track, setEnvelopeMeta, flushNow } from './telemetry';
 import { EVENTS } from './telemetry-events';
 
@@ -105,10 +108,28 @@ export async function validateLicenseRemote(licenseKey: string): Promise<License
       throw new Error('License verify failed: HTTP ' + response.status);
     }
 
-    return (await response.json()) as LicenseValidationResult;
+    const data = await response.json();
+    return sanitizeLicenseResult(data);
   } finally {
     clearTimeout(timeout);
   }
+}
+
+const VALID_PLANS = ['monthly', 'yearly', 'lifetime', 'trial'];
+
+function sanitizeLicenseResult(data: unknown): LicenseValidationResult {
+  if (!data || typeof data !== 'object') {
+    return { valid: false, error: 'Invalid response format' };
+  }
+  const obj = data as Record<string, unknown>;
+  const plan = typeof obj.plan === 'string' && VALID_PLANS.includes(obj.plan) ? obj.plan : null;
+  return {
+    valid: Boolean(obj.valid),
+    status: typeof obj.status === 'string' ? obj.status : undefined,
+    plan,
+    expiresAt: typeof obj.expiresAt === 'number' ? obj.expiresAt : null,
+    error: typeof obj.error === 'string' ? obj.error : undefined,
+  };
 }
 
 /**
@@ -315,6 +336,24 @@ export async function isProUser(): Promise<ProUserInfo> {
     }
 
     // Server reachable AND said "not valid" → license really is expired.
+    // For trial licenses, allow a 3-day grace period where Pro features
+    // are still accessible but a banner urges the user to upgrade.
+    if (licenseData.plan === 'trial' && licenseData.expiresAt) {
+      const elapsed = Date.now() - licenseData.expiresAt;
+      if (elapsed >= 0 && elapsed <= TRIAL_EXPIRY_GRACE_MS) {
+        licenseData.status = LICENSE_STATUS.EXPIRED;
+        licenseData.lastVerified = Date.now();
+        await saveLicenseData(licenseData);
+        return {
+          isPro: true,
+          plan: licenseData.plan,
+          expiresAt: licenseData.expiresAt,
+          status: LICENSE_STATUS.EXPIRED,
+          inGracePeriod: true,
+        };
+      }
+    }
+
     // Persist so we don't keep re-asking the network on every check.
     licenseData.status = LICENSE_STATUS.EXPIRED;
     licenseData.lastVerified = Date.now();

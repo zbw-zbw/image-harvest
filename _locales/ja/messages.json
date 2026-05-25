@@ -5,386 +5,8 @@
   "app_tagline": {
     "message": "あらゆるウェブページから画像を一括ダウンロード"
   },
-  "common_cancel": {
-    "message": "キャンセル"
-  },
-  "common_confirm": {
-    "message": "確認"
-  },
-  "common_close": {
-    "message": "閉じる"
-  },
-  "common_save": {
-    "message": "保存"
-  },
-  "common_delete": {
-    "message": "削除"
-  },
-  "common_copy": {
-    "message": "コピー"
-  },
-  "common_download": {
-    "message": "ダウンロード"
-  },
-  "common_upgrade": {
-    "message": "Pro にアップグレード"
-  },
-  "common_maybe_later": {
-    "message": "後で"
-  },
-  "settings_title": {
-    "message": "設定"
-  },
-  "settings_section_appearance": {
-    "message": "外観"
-  },
-  "settings_section_experience": {
-    "message": "エクスペリエンス"
-  },
-  "settings_section_scan": {
-    "message": "スキャン"
-  },
-  "settings_section_download": {
-    "message": "ダウンロード"
-  },
-  "settings_section_language": {
-    "message": "言語"
-  },
-  "settings_language_label": {
-    "message": "表示言語"
-  },
-  "toolbar_select_all": {
-    "message": "すべて選択"
-  },
-  "toolbar_deselect_all": {
-    "message": "選択解除"
-  },
-  "toolbar_copy_urls": {
-    "message": "URL をコピー"
-  },
-  "toolbar_copy_urls_tooltip": {
-    "message": "選択した画像の URL をクリップボードにコピー"
-  },
-  "toolbar_copy_urls_empty": {
-    "message": "先に画像を選択してください"
-  },
-  "toast_url_copied_single": {
-    "message": "URL をコピーしました!"
-  },
-  "toast_url_copied_batch": {
-    "message": "{count} 件の URL をクリップボードにコピーしました"
-  },
-  "toast_url_copy_failed": {
-    "message": "URL のコピーに失敗しました"
-  },
-  "toast_download_started": {
-    "message": "ダウンロードを開始しました"
-  },
-  "toast_download_failed": {
-    "message": "ダウンロードに失敗しました"
-  },
-  "toast_download_cancelled": {
-    "message": "ダウンロードをキャンセルしました"
-  },
-  "toast_scan_cancelled": {
-    "message": "スキャンがキャンセルされました"
-  },
-  "toast_download_completed": {
-    "message": "{count} 枚の画像をダウンロードしました"
-  },
-  "toast_no_images_selected": {
-    "message": "画像が選択されていません"
-  },
-  "toast_image_removed": {
-    "message": "画像を削除しました"
-  },
-  "toast_collection_added": {
-    "message": "コレクションに追加しました"
-  },
-  "toast_collection_add_failed": {
-    "message": "コレクションへの追加に失敗しました"
-  },
-  "toast_collection_removed": {
-    "message": "コレクションから削除しました"
-  },
-  "toast_collection_remove_failed": {
-    "message": "削除に失敗しました"
-  },
-  "toast_color_copied": {
-    "message": "カラー {hex} をコピーしました"
-  },
-  "toast_color_copy_failed": {
-    "message": "カラーのコピーに失敗しました"
-  },
-  "pro_feature_blocked_format_conversion": {
-    "message": "形式変換は Pro 機能です。アップグレードで解放!"
-  },
-  "pro_feature_blocked_advanced_grouping": {
-    "message": "高度なグループ化は Pro 機能です。アップグレードで解放!"
-  },
-  "pro_feature_blocked_collection": {
-    "message": "コレクションは Pro 機能です"
-  },
-  "pro_feature_blocked_image_delete": {
-    "message": "画像削除は Pro 機能です。アップグレードで解放!"
-  },
-  "pro_feature_blocked_color_copy": {
-    "message": "カラーコピーは Pro 機能です"
-  },
-  "pro_feature_blocked_reverse_search": {
-    "message": "{engine} 検索は Pro が必要です。アップグレードで解放!"
-  },
-  "pro_zip_limit": {
-    "message": "無料版は ZIP あたり最大 {max} 枚まで。Pro で無制限に!"
-  },
-  "pro_copy_urls_limit": {
-    "message": "無料版は一度に最大 {max} 件の URL まで。Pro で無制限に!"
-  },
-  "pro_collection_limit": {
-    "message": "無料版はお気に入り最大 {max} 件まで。Pro で無制限に!"
-  },
-  "toolbar_sort": {
-    "message": "並び替え"
-  },
-  "toolbar_group": {
-    "message": "グループ"
-  },
-  "toolbar_rescan": {
-    "message": "再スキャン"
-  },
-  "toolbar_download_all": {
-    "message": "すべてダウンロード"
-  },
-  "toolbar_download_selected": {
-    "message": "ダウンロード ({count})"
-  },
-  "filter_size": {
-    "message": "サイズ"
-  },
-  "filter_type": {
-    "message": "タイプ"
-  },
-  "filter_layout": {
-    "message": "レイアウト"
-  },
-  "filter_url": {
-    "message": "URL"
-  },
-  "filter_color": {
-    "message": "カラー"
-  },
-  "filter_all": {
-    "message": "すべて"
-  },
-  "filter_min_width": {
-    "message": "最小幅"
-  },
-  "filter_max_width": {
-    "message": "最大幅"
-  },
-  "filter_height": {
-    "message": "高さ"
-  },
-  "filter_none": {
-    "message": "なし"
-  },
-  "filter_format": {
-    "message": "形式"
-  },
-  "filter_domain": {
-    "message": "ドメイン"
-  },
-  "filter_tab": {
-    "message": "タブ"
-  },
-  "sort_none": {
-    "message": "なし（ページ順）"
-  },
-  "sort_size_desc": {
-    "message": "サイズ ↓（大きい順）"
-  },
-  "sort_size_asc": {
-    "message": "サイズ ↑（小さい順）"
-  },
-  "sort_filesize_desc": {
-    "message": "ファイルサイズ ↓（大きい順）"
-  },
-  "sort_filesize_asc": {
-    "message": "ファイルサイズ ↑（小さい順）"
-  },
-  "layout_all": {
-    "message": "すべて"
-  },
-  "layout_square": {
-    "message": "正方形 (1:1)"
-  },
-  "layout_landscape": {
-    "message": "横長 (>1:1)"
-  },
-  "layout_portrait": {
-    "message": "縦長 (<1:1)"
-  },
-  "layout_panorama": {
-    "message": "パノラマ (>2:1)"
-  },
-  "size_all": {
-    "message": "すべて"
-  },
-  "size_small": {
-    "message": "小 < 100px"
-  },
-  "size_medium": {
-    "message": "中 100-500px"
-  },
-  "size_large": {
-    "message": "大 500-1000px"
-  },
-  "size_xl": {
-    "message": "特大 > 1000px"
-  },
-  "size_btn_small": {
-    "message": "小"
-  },
-  "size_btn_medium": {
-    "message": "中"
-  },
-  "size_btn_large": {
-    "message": "大"
-  },
-  "size_btn_xl": {
-    "message": "特大"
-  },
-  "size_btn_custom": {
-    "message": "カスタム"
-  },
-  "layout_btn_square": {
-    "message": "正方形"
-  },
-  "layout_btn_landscape": {
-    "message": "横長"
-  },
-  "layout_btn_portrait": {
-    "message": "縦長"
-  },
-  "layout_btn_panorama": {
-    "message": "パノラマ"
-  },
-  "color_all": {
-    "message": "すべての色"
-  },
-  "color_no_extracted": {
-    "message": "まだ色が抽出されていません"
-  },
-  "filter_url_placeholder": {
-    "message": "URLキーワードで絞り込み..."
-  },
-  "settings_display": {
-    "message": "表示"
-  },
-  "settings_side_panel": {
-    "message": "サイドパネルで表示"
-  },
-  "settings_side_panel_desc": {
-    "message": "ポップアップではなくブラウザのサイドパネルで結果を開く"
-  },
-  "settings_density": {
-    "message": "レイアウト密度:"
-  },
-  "settings_density_compact": {
-    "message": "コンパクト"
-  },
-  "settings_density_standard": {
-    "message": "標準"
-  },
-  "settings_density_comfortable": {
-    "message": "ゆったり"
-  },
-  "settings_theme": {
-    "message": "テーマ:"
-  },
-  "settings_theme_system": {
-    "message": "システム"
-  },
-  "settings_theme_light": {
-    "message": "ライト"
-  },
-  "settings_theme_dark": {
-    "message": "ダーク"
-  },
-  "settings_default_group": {
-    "message": "デフォルトのグループ:"
-  },
-  "settings_similar": {
-    "message": "類似画像検出"
-  },
-  "settings_color_extract": {
-    "message": "カラー抽出"
-  },
-  "settings_all_frames": {
-    "message": "すべてのフレームを検索"
-  },
-  "settings_live_monitor": {
-    "message": "ライブモニタリング"
-  },
-  "settings_download_options": {
-    "message": "ダウンロードオプションを指定"
-  },
-  "settings_subfolder": {
-    "message": "サブフォルダ:"
-  },
-  "settings_filename": {
-    "message": "ファイル名:"
-  },
-  "settings_convert_format": {
-    "message": "変換形式:"
-  },
-  "settings_no_warning": {
-    "message": "大量ダウンロード時に警告しない"
-  },
-  "settings_telemetry": {
-    "message": "匿名使用データを共有"
-  },
-  "settings_save": {
-    "message": "設定を保存"
-  },
-  "settings_reset": {
-    "message": "リセット"
-  },
-  "settings_saved": {
-    "message": "設定を保存しました"
-  },
-  "settings_save_failed": {
-    "message": "設定の保存に失敗しました"
-  },
-  "status_found_images": {
-    "message": "{count} 枚の画像を検出"
-  },
-  "status_similar": {
-    "message": "類似"
-  },
-  "rating_title": {
-    "message": "Image Harvest はいかがですか?"
-  },
-  "rating_desc": {
-    "message": "お役に立てたなら、Chrome ウェブストアでの 5 つ星レビューが大きな励みになります。"
-  },
-  "rating_rate_now": {
-    "message": "⭐ Chrome ストアで評価"
-  },
-  "rating_later": {
-    "message": "後で"
-  },
-  "rating_never": {
-    "message": "今後表示しない"
-  },
-  "rating_close": {
-    "message": "閉じる"
-  },
   "btn_deactivate": {
     "message": "無効化"
-  },
-  "license_deactivating": {
-    "message": "無効化中..."
   },
   "card_add_to_collection": {
     "message": "コレクションに追加"
@@ -404,20 +26,71 @@
   "card_reverse_search": {
     "message": "画像検索（{engine}）"
   },
+  "collection_empty_hint": {
+    "message": "画像の星アイコンをクリックしてコレクションに追加"
+  },
+  "collection_empty_title": {
+    "message": "コレクションは空です"
+  },
   "collection_export_tooltip": {
     "message": "コレクションをZIPでエクスポート"
   },
   "collection_modal_title": {
     "message": "コレクション"
   },
+  "collection_no_match": {
+    "message": "一致する画像が見つかりません"
+  },
+  "collection_no_match_hint": {
+    "message": "別の検索キーワードをお試しください"
+  },
   "collection_search_placeholder": {
     "message": "コレクションを検索..."
+  },
+  "color_all": {
+    "message": "すべての色"
+  },
+  "color_no_extracted": {
+    "message": "まだ色が抽出されていません"
+  },
+  "common_cancel": {
+    "message": "キャンセル"
+  },
+  "common_close": {
+    "message": "閉じる"
+  },
+  "common_confirm": {
+    "message": "確認"
+  },
+  "common_copy": {
+    "message": "コピー"
+  },
+  "common_delete": {
+    "message": "削除"
   },
   "common_dismiss": {
     "message": "閉じる"
   },
+  "common_download": {
+    "message": "ダウンロード"
+  },
+  "common_maybe_later": {
+    "message": "後で"
+  },
   "common_remove": {
     "message": "削除"
+  },
+  "common_save": {
+    "message": "保存"
+  },
+  "common_upgrade": {
+    "message": "Pro にアップグレード"
+  },
+  "confirm_remove_duplicates_message": {
+    "message": "{count}枚の選択された重複画像を除去しますか？"
+  },
+  "confirm_remove_duplicates_title": {
+    "message": "重複画像を除去"
   },
   "confirm_remove_image_message": {
     "message": "この画像をリストから削除しますか？"
@@ -425,8 +98,14 @@
   "confirm_remove_image_title": {
     "message": "画像を削除"
   },
+  "dedup_group_title": {
+    "message": "グループ {index}（{count} 枚類似）"
+  },
   "dedup_modal_title": {
     "message": "類似画像"
+  },
+  "dedup_no_similar": {
+    "message": "類似画像は見つかりませんでした"
   },
   "dedup_remove_duplicates": {
     "message": "重複を削除"
@@ -442,6 +121,9 @@
   },
   "dialog_download_many_title": {
     "message": "大量画像のダウンロード"
+  },
+  "empty_hidden_count": {
+    "message": "現在のフィルターにより{count}枚の画像が非表示"
   },
   "empty_no_images_desc": {
     "message": "ページをスクロールするか、再スキャンをクリックしてください。"
@@ -464,20 +146,158 @@
   "error_default_message": {
     "message": "エラーが発生しました"
   },
+  "filter_all": {
+    "message": "すべて"
+  },
+  "filter_color": {
+    "message": "カラー"
+  },
+  "filter_domain": {
+    "message": "ドメイン"
+  },
+  "filter_filesize": {
+    "message": "ファイルサイズ"
+  },
+  "filter_filesize_all": {
+    "message": "すべてのサイズ"
+  },
+  "filter_filesize_large": {
+    "message": "大 (500 KB-2 MB)"
+  },
+  "filter_filesize_max": {
+    "message": "最大 KB"
+  },
+  "filter_filesize_medium": {
+    "message": "中 (200-500 KB)"
+  },
+  "filter_filesize_min": {
+    "message": "最小 KB"
+  },
+  "filter_filesize_small": {
+    "message": "小 (50-200 KB)"
+  },
+  "filter_filesize_tiny": {
+    "message": "極小 (<50 KB)"
+  },
+  "filter_filesize_xlarge": {
+    "message": "特大 (>2 MB)"
+  },
+  "filter_format": {
+    "message": "形式"
+  },
+  "filter_height": {
+    "message": "高さ"
+  },
+  "filter_layout": {
+    "message": "レイアウト"
+  },
+  "filter_max_width": {
+    "message": "最大幅"
+  },
+  "filter_min_width": {
+    "message": "最小幅"
+  },
+  "filter_none": {
+    "message": "なし"
+  },
+  "filter_size": {
+    "message": "サイズ"
+  },
+  "filter_tab": {
+    "message": "タブ"
+  },
+  "filter_type": {
+    "message": "タイプ"
+  },
+  "filter_type_other": {
+    "message": "その他"
+  },
+  "filter_url": {
+    "message": "URL"
+  },
+  "filter_url_placeholder": {
+    "message": "URLキーワードで絞り込み..."
+  },
+  "format_original": {
+    "message": "オリジナル"
+  },
   "grid_current_tab_badge": {
     "message": "現在のタブ"
+  },
+  "hotkey_click_to_set": {
+    "message": "クリックして設定"
   },
   "hotkey_not_set": {
     "message": "未設定"
   },
-  "hotkey_click_to_set": {
-    "message": "クリックして設定"
+  "layout_all": {
+    "message": "すべて"
+  },
+  "layout_btn_landscape": {
+    "message": "横長"
+  },
+  "layout_btn_panorama": {
+    "message": "パノラマ"
+  },
+  "layout_btn_portrait": {
+    "message": "縦長"
+  },
+  "layout_btn_square": {
+    "message": "正方形"
+  },
+  "layout_landscape": {
+    "message": "横長 (>1:1)"
+  },
+  "layout_panorama": {
+    "message": "パノラマ (>2:1)"
+  },
+  "layout_portrait": {
+    "message": "縦長 (<1:1)"
+  },
+  "layout_square": {
+    "message": "正方形 (1:1)"
+  },
+  "license_activating": {
+    "message": "アクティベート中..."
+  },
+  "license_activation_failed": {
+    "message": "アクティベート失敗"
+  },
+  "license_deactivating": {
+    "message": "無効化中..."
+  },
+  "license_enter_key": {
+    "message": "ライセンスキーを入力してください"
+  },
+  "license_error_activation_failed": {
+    "message": "アクティベーションに失敗しました。もう一度お試しください。"
+  },
+  "license_error_invalid_key": {
+    "message": "無効なライセンスキーです。"
+  },
+  "license_error_network": {
+    "message": "ネットワークエラーです。接続を確認してください。"
+  },
+  "license_network_error": {
+    "message": "ネットワークエラー。もう一度お試しください。"
+  },
+  "license_placeholder": {
+    "message": "ライセンスキーを入力"
   },
   "live_indicator_label": {
     "message": "ライブ"
   },
   "live_indicator_tooltip": {
     "message": "ライブ監視が有効 — 新しい画像を自動検出します"
+  },
+  "menu_reverse_search": {
+    "message": "画像検索"
+  },
+  "multitab_current": {
+    "message": "現在"
+  },
+  "multitab_extracting": {
+    "message": "抽出中..."
   },
   "multitab_modal_title": {
     "message": "マルチタブ抽出"
@@ -488,8 +308,8 @@
   "multitab_start_extraction": {
     "message": "抽出を開始"
   },
-  "multitab_current": {
-    "message": "現在"
+  "multitab_starting": {
+    "message": "抽出を開始..."
   },
   "multitab_untitled": {
     "message": "無題"
@@ -505,6 +325,12 @@
   },
   "paywall_banner_try_cta": {
     "message": "Proを無料で試す"
+  },
+  "paywall_banner_upgrade_cta": {
+    "message": "今すぐアップグレード"
+  },
+  "paywall_banner_upgrade_desc": {
+    "message": "試用期間が終了しました。すべてのPro機能を継続利用するにはアップグレードしてください。"
   },
   "plan_expires_date": {
     "message": "有効期限：{date}"
@@ -569,17 +395,53 @@
   "pro_already_have_key": {
     "message": "ライセンスキーをお持ちですか？"
   },
+  "pro_collection_limit": {
+    "message": "無料版はお気に入り最大 {max} 件まで。Pro で無制限に!"
+  },
+  "pro_copy_urls_limit": {
+    "message": "無料版は一度に最大 {max} 件の URL まで。Pro で無制限に!"
+  },
   "pro_deactivate_tooltip": {
     "message": "ライセンスを無効化"
   },
   "pro_feature_batch_desc": {
     "message": "ワンクリックで全画像をダウンロード"
   },
+  "pro_feature_batch_desc_pro": {
+    "message": "無制限 — すべての画像を選択してZIPで一括ダウンロード"
+  },
   "pro_feature_batch_title": {
     "message": "一括ダウンロード"
   },
+  "pro_feature_blocked_advanced_grouping": {
+    "message": "高度なグループ化は Pro 機能です。アップグレードで解放!"
+  },
+  "pro_feature_blocked_collection": {
+    "message": "コレクションは Pro 機能です"
+  },
+  "pro_feature_blocked_color_copy": {
+    "message": "カラーコピーは Pro 機能です"
+  },
+  "pro_feature_blocked_dedup": {
+    "message": "重複除去はPro機能です。アップグレードで解放！"
+  },
+  "pro_feature_blocked_format_conversion": {
+    "message": "形式変換は Pro 機能です。アップグレードで解放!"
+  },
+  "pro_feature_blocked_image_delete": {
+    "message": "画像削除は Pro 機能です。アップグレードで解放!"
+  },
+  "pro_feature_blocked_multitab": {
+    "message": "マルチタブ抽出はPro機能です。アップグレードで解放！"
+  },
+  "pro_feature_blocked_reverse_search": {
+    "message": "{engine} 検索は Pro が必要です。アップグレードで解放!"
+  },
   "pro_feature_color_desc": {
     "message": "主要色で画像をフィルタリング"
+  },
+  "pro_feature_color_desc_pro": {
+    "message": "メインカラーを自動抽出、クリックでHEXコードをコピー"
   },
   "pro_feature_color_title": {
     "message": "カラーフィルタリング"
@@ -587,17 +449,26 @@
   "pro_feature_dedup_desc": {
     "message": "重複画像を自動検出して削除"
   },
+  "pro_feature_dedup_desc_pro": {
+    "message": "パーセプチュアルハッシュでスマート重複検出、無駄なダウンロードを防止"
+  },
   "pro_feature_dedup_title": {
     "message": "重複検出"
   },
   "pro_feature_multitab_desc": {
     "message": "複数のタブから同時に画像を抽出"
   },
+  "pro_feature_multitab_desc_pro": {
+    "message": "複数タブから一括抽出してZIPにまとめる — タブ切替不要"
+  },
   "pro_feature_multitab_title": {
     "message": "マルチタブ抽出"
   },
   "pro_feature_reverse_search_desc": {
     "message": "画像検索で画像の出典を見つける"
+  },
+  "pro_feature_reverse_search_desc_pro": {
+    "message": "Google、TinEye、Yandexなどでワンクリック画像検索"
   },
   "pro_feature_reverse_search_title": {
     "message": "画像検索"
@@ -617,6 +488,12 @@
   "pro_pricing_cta": {
     "message": "価格を見る"
   },
+  "pro_purchase_cta": {
+    "message": "今すぐProを取得"
+  },
+  "pro_purchase_desc": {
+    "message": "無料試用期間が終了しました。Proにアップグレードして、一括ダウンロード、カラーフィルタリング、逆画像検索などの機能を引き続きご利用ください。"
+  },
   "pro_subline_variant_a": {
     "message": "一度の購入で永久アップデート。"
   },
@@ -629,14 +506,14 @@
   "pro_trial_desc": {
     "message": "すべてのPro機能を7日間無料でお試しください。コミットメント不要。"
   },
+  "pro_trial_perk_cancel": {
+    "message": "自動的に期限切れ — キャンセル手続き不要"
+  },
   "pro_trial_perk_full_access": {
     "message": "すべてのPro機能に完全アクセス"
   },
   "pro_trial_perk_no_card": {
     "message": "クレジットカード不要"
-  },
-  "pro_trial_perk_cancel": {
-    "message": "自動的に期限切れ — キャンセル手続き不要"
   },
   "pro_trial_start_cta": {
     "message": "無料トライアルを開始"
@@ -653,14 +530,92 @@
   "pro_trial_unavailable": {
     "message": "トライアルは利用できません"
   },
+  "pro_zip_limit": {
+    "message": "無料版は ZIP あたり最大 {max} 枚まで。Pro で無制限に!"
+  },
   "progress_downloading": {
     "message": "ダウンロード中..."
+  },
+  "progress_multitab_text": {
+    "message": "{current}/{total} タブ · {count}枚発見"
   },
   "progress_text": {
     "message": "{current} / {total}"
   },
-  "progress_multitab_text": {
-    "message": "{current}/{total} タブ · {count}枚発見"
+  "rating_close": {
+    "message": "閉じる"
+  },
+  "rating_desc": {
+    "message": "お役に立てたなら、Chrome ウェブストアでの 5 つ星レビューが大きな励みになります。"
+  },
+  "rating_later": {
+    "message": "後で"
+  },
+  "rating_never": {
+    "message": "今後表示しない"
+  },
+  "rating_rate_now": {
+    "message": "⭐ Chrome ストアで評価"
+  },
+  "rating_title": {
+    "message": "Image Harvest はいかがですか?"
+  },
+  "restricted_feature_batch_desc": {
+    "message": "ワンクリックで任意のウェブページからすべての画像を選択してダウンロード。サイズ、形式、レイアウトでフィルタリング可能。"
+  },
+  "restricted_feature_batch_title": {
+    "message": "一括ダウンロード"
+  },
+  "restricted_feature_collection_desc": {
+    "message": "画像を永続的なコレクションにブックマーク。セッションをまたいで保存され、いつでも整理・閲覧可能。"
+  },
+  "restricted_feature_collection_title": {
+    "message": "お気に入りコレクション"
+  },
+  "restricted_feature_color_desc": {
+    "message": "各画像から主要な色を自動抽出。カラースウォッチをクリックしてHEXコードをコピー。"
+  },
+  "restricted_feature_color_title": {
+    "message": "カラー抽出"
+  },
+  "restricted_feature_dedup_desc": {
+    "message": "パーセプチュアルハッシュを使用して、ほぼ重複した画像を自動的に検出・除去します。"
+  },
+  "restricted_feature_dedup_title": {
+    "message": "類似画像検出"
+  },
+  "restricted_feature_filter_desc": {
+    "message": "サイズ、タイプ、レイアウト、URLパターン、主要色で画像をフィルタリングし、必要な画像を正確に見つけます。"
+  },
+  "restricted_feature_filter_title": {
+    "message": "スマートフィルター"
+  },
+  "restricted_feature_multitab_desc": {
+    "message": "複数の開いているタブから一度に画像を抽出し、ZIPアーカイブとしてダウンロード。"
+  },
+  "restricted_feature_multitab_title": {
+    "message": "マルチタブ抽出"
+  },
+  "restricted_feature_preview_desc": {
+    "message": "フル解像度の画像とメタデータ（サイズ、ファイルサイズ、形式）を一目で確認。"
+  },
+  "restricted_feature_preview_title": {
+    "message": "インスタントプレビュー"
+  },
+  "restricted_feature_reverse_desc": {
+    "message": "Google、TinEye、Yandex、Baiduでワンクリックで任意の画像を検索。"
+  },
+  "restricted_feature_reverse_title": {
+    "message": "画像で検索"
+  },
+  "restricted_features_heading": {
+    "message": "Image Harvest でできること"
+  },
+  "restricted_link_website": {
+    "message": "公式サイト"
+  },
+  "restricted_notice": {
+    "message": "このページでは拡張機能のスクリプト注入が制限されています。通常のウェブページ（記事、ギャラリー、検索結果など）に移動して画像の抽出を開始してください。"
   },
   "restricted_subtitle": {
     "message": "このページはコンテンツスクリプトを制限しています。別のページをお試しください。"
@@ -683,8 +638,227 @@
   "scan_updating": {
     "message": "更新中..."
   },
+  "settings_all_frames": {
+    "message": "すべてのフレームを検索"
+  },
+  "settings_all_frames_desc": {
+    "message": "iframe や埋め込みフレーム内の画像もスキャン"
+  },
+  "settings_color_extract": {
+    "message": "カラー抽出"
+  },
+  "settings_color_extract_desc": {
+    "message": "各画像の主要色を抽出してフィルタリングに使用"
+  },
+  "settings_convert_format": {
+    "message": "変換形式:"
+  },
+  "settings_default_group": {
+    "message": "デフォルトのグループ:"
+  },
+  "settings_density": {
+    "message": "レイアウト密度:"
+  },
+  "settings_density_comfortable": {
+    "message": "ゆったり"
+  },
+  "settings_density_compact": {
+    "message": "コンパクト"
+  },
+  "settings_density_standard": {
+    "message": "標準"
+  },
+  "settings_display": {
+    "message": "表示"
+  },
+  "settings_download_options": {
+    "message": "ダウンロードオプションを指定"
+  },
+  "settings_download_options_desc": {
+    "message": "サブフォルダ、ファイル名テンプレート、形式変換をカスタマイズ"
+  },
+  "settings_filename": {
+    "message": "ファイル名:"
+  },
+  "settings_height_gte": {
+    "message": "高さ ≥"
+  },
+  "settings_height_lte": {
+    "message": "高さ ≤"
+  },
+  "settings_hotkey": {
+    "message": "ホットキー："
+  },
+  "settings_language_label": {
+    "message": "表示言語"
+  },
+  "settings_live_monitor": {
+    "message": "ライブモニタリング"
+  },
+  "settings_live_monitor_desc": {
+    "message": "ページコンテンツの変更時に新しい画像を自動検出"
+  },
+  "settings_max_size": {
+    "message": "最大サイズフィルターを有効化"
+  },
+  "settings_max_size_desc": {
+    "message": "指定サイズより大きい画像を非表示"
+  },
+  "settings_min_size": {
+    "message": "最小サイズフィルターを有効化"
+  },
+  "settings_min_size_desc": {
+    "message": "指定サイズより小さい画像を非表示"
+  },
+  "settings_no_warning": {
+    "message": "大量ダウンロード時に警告しない"
+  },
+  "settings_no_warning_desc": {
+    "message": "大量ファイルダウンロード時に確認ダイアログをスキップ"
+  },
+  "settings_reset": {
+    "message": "リセット"
+  },
+  "settings_save": {
+    "message": "設定を保存"
+  },
+  "settings_save_failed": {
+    "message": "設定の保存に失敗しました"
+  },
+  "settings_saved": {
+    "message": "設定を保存しました"
+  },
+  "settings_section_account": {
+    "message": "アカウント"
+  },
+  "settings_section_appearance": {
+    "message": "外観"
+  },
+  "settings_section_display": {
+    "message": "表示"
+  },
+  "settings_section_download": {
+    "message": "ダウンロード"
+  },
+  "settings_section_experience": {
+    "message": "エクスペリエンス"
+  },
+  "settings_section_language": {
+    "message": "言語"
+  },
+  "settings_section_pro": {
+    "message": "Pro"
+  },
+  "settings_section_scan": {
+    "message": "スキャン"
+  },
+  "settings_side_panel": {
+    "message": "サイドパネルで表示"
+  },
+  "settings_side_panel_desc": {
+    "message": "ポップアップではなくブラウザのサイドパネルで結果を開く"
+  },
+  "settings_similar": {
+    "message": "類似画像検出"
+  },
+  "settings_similar_desc": {
+    "message": "視覚的に類似または重複する画像を検出してグループ化"
+  },
+  "settings_subfolder": {
+    "message": "サブフォルダ:"
+  },
+  "settings_telemetry": {
+    "message": "匿名使用データを共有"
+  },
+  "settings_telemetry_desc": {
+    "message": "匿名の機能使用イベントを送信。URL、画像、個人情報は含まれません。"
+  },
+  "settings_theme": {
+    "message": "テーマ:"
+  },
+  "settings_theme_dark": {
+    "message": "ダーク"
+  },
+  "settings_theme_light": {
+    "message": "ライト"
+  },
+  "settings_theme_system": {
+    "message": "システム"
+  },
+  "settings_title": {
+    "message": "設定"
+  },
+  "settings_variables_hint": {
+    "message": "変数: {domain}, {index}, {original}, {format}, {width}, {height}"
+  },
+  "settings_width_gte": {
+    "message": "幅 ≥"
+  },
+  "settings_width_lte": {
+    "message": "幅 ≤"
+  },
+  "size_all": {
+    "message": "すべて"
+  },
+  "size_btn_custom": {
+    "message": "カスタム"
+  },
+  "size_btn_large": {
+    "message": "大"
+  },
+  "size_btn_medium": {
+    "message": "中"
+  },
+  "size_btn_small": {
+    "message": "小"
+  },
+  "size_btn_xl": {
+    "message": "特大"
+  },
+  "size_large": {
+    "message": "大 500-1000px"
+  },
+  "size_medium": {
+    "message": "中 100-500px"
+  },
+  "size_small": {
+    "message": "小 < 100px"
+  },
+  "size_xl": {
+    "message": "特大 > 1000px"
+  },
+  "sort_filesize_asc": {
+    "message": "ファイルサイズ ↑（小さい順）"
+  },
+  "sort_filesize_desc": {
+    "message": "ファイルサイズ ↓（大きい順）"
+  },
+  "sort_none": {
+    "message": "なし（ページ順）"
+  },
+  "sort_size_asc": {
+    "message": "サイズ ↑（小さい順）"
+  },
+  "sort_size_desc": {
+    "message": "サイズ ↓（大きい順）"
+  },
+  "status_found_images": {
+    "message": "{count} 枚の画像を検出"
+  },
+  "status_found_prefix": {
+    "message": ""
+  },
+  "status_found_suffix": {
+    "message": "枚の画像を発見"
+  },
   "status_n_selected": {
     "message": "{count}枚選択中"
+  },
+  "status_similar": {
+    "message": "類似"
+  },
+  "status_similar_count": {
+    "message": "{count} 枚類似"
   },
   "status_total_images": {
     "message": "合計{count}枚"
@@ -725,134 +899,59 @@
   "title_view_similar": {
     "message": "類似画像を表示"
   },
+  "toast_collection_add_failed": {
+    "message": "コレクションへの追加に失敗しました"
+  },
+  "toast_collection_added": {
+    "message": "コレクションに追加しました"
+  },
+  "toast_collection_empty": {
+    "message": "コレクションは空です"
+  },
+  "toast_collection_export_failed": {
+    "message": "エクスポートに失敗しました"
+  },
+  "toast_collection_exported": {
+    "message": "コレクションをエクスポートしました"
+  },
+  "toast_collection_load_failed": {
+    "message": "コレクションの読み込みに失敗しました"
+  },
+  "toast_collection_remove_failed": {
+    "message": "削除に失敗しました"
+  },
+  "toast_collection_removed": {
+    "message": "コレクションから削除しました"
+  },
+  "toast_color_copied": {
+    "message": "カラー {hex} をコピーしました"
+  },
+  "toast_color_copy_failed": {
+    "message": "カラーのコピーに失敗しました"
+  },
   "toast_deactivate_failed": {
     "message": "無効化に失敗"
   },
-  "toast_license_deactivated": {
-    "message": "ライセンスが無効化されました"
+  "toast_download_cancelled": {
+    "message": "ダウンロードをキャンセルしました"
   },
-  "toast_n_new": {
-    "message": "{count}枚追加"
+  "toast_download_completed": {
+    "message": "{count} 枚の画像をダウンロードしました"
   },
-  "toast_n_removed": {
-    "message": "{count}枚削除"
+  "toast_download_failed": {
+    "message": "ダウンロードに失敗しました"
   },
-  "toast_pro_color_filter": {
-    "message": "カラーフィルタリングはPro機能です。アップグレードして解除！"
+  "toast_download_started": {
+    "message": "ダウンロードを開始しました"
   },
-  "toast_pro_naming_locked": {
-    "message": "カスタム命名はPro機能です。アップグレードして解除！"
+  "toast_duplicates_removed": {
+    "message": "{count}枚の重複画像を除去しました"
   },
-  "toast_pro_setting_locked": {
-    "message": "この設定にはProが必要です。アップグレードして解除！"
+  "toast_export_cancelled": {
+    "message": "エクスポートを中止しました"
   },
-  "toast_settings_reset": {
-    "message": "設定をデフォルトにリセットしました"
-  },
-  "view_grid": {
-    "message": "グリッド"
-  },
-  "view_list": {
-    "message": "リスト"
-  },
-  "format_original": {
-    "message": "オリジナル"
-  },
-  "menu_reverse_search": {
-    "message": "画像検索"
-  },
-  "settings_all_frames_desc": {
-    "message": "iframe や埋め込みフレーム内の画像もスキャン"
-  },
-  "settings_color_extract_desc": {
-    "message": "各画像の主要色を抽出してフィルタリングに使用"
-  },
-  "settings_download_options_desc": {
-    "message": "サブフォルダ、ファイル名テンプレート、形式変換をカスタマイズ"
-  },
-  "settings_hotkey": {
-    "message": "ホットキー："
-  },
-  "settings_live_monitor_desc": {
-    "message": "ページコンテンツの変更時に新しい画像を自動検出"
-  },
-  "settings_max_size": {
-    "message": "最大サイズフィルターを有効化"
-  },
-  "settings_max_size_desc": {
-    "message": "指定サイズより大きい画像を非表示"
-  },
-  "settings_min_size": {
-    "message": "最小サイズフィルターを有効化"
-  },
-  "settings_min_size_desc": {
-    "message": "指定サイズより小さい画像を非表示"
-  },
-  "settings_no_warning_desc": {
-    "message": "大量ファイルダウンロード時に確認ダイアログをスキップ"
-  },
-  "settings_section_display": {
-    "message": "表示"
-  },
-  "settings_section_pro": {
-    "message": "Pro"
-  },
-  "settings_section_account": {
-    "message": "アカウント"
-  },
-  "settings_similar_desc": {
-    "message": "視覚的に類似または重複する画像を検出してグループ化"
-  },
-  "settings_telemetry_desc": {
-    "message": "匿名の機能使用イベントを送信。URL、画像、個人情報は含まれません。"
-  },
-  "status_found_prefix": {
-    "message": ""
-  },
-  "status_found_suffix": {
-    "message": "枚の画像を発見"
-  },
-  "filter_type_other": {
-    "message": "その他"
-  },
-  "license_activating": {
-    "message": "アクティベート中..."
-  },
-  "license_activation_failed": {
-    "message": "アクティベート失敗"
-  },
-  "license_enter_key": {
-    "message": "ライセンスキーを入力してください"
-  },
-  "license_network_error": {
-    "message": "ネットワークエラー。もう一度お試しください。"
-  },
-  "license_placeholder": {
-    "message": "ライセンスキーを入力"
-  },
-  "settings_height_gte": {
-    "message": "高さ ≥"
-  },
-  "settings_height_lte": {
-    "message": "高さ ≤"
-  },
-  "settings_width_gte": {
-    "message": "幅 ≥"
-  },
-  "settings_width_lte": {
-    "message": "幅 ≤"
-  },
-  "toast_pro_activated": {
-    "message": "Proアクティベート成功！"
-  },
-  "multitab_extracting": {
-    "message": "抽出中..."
-  },
-  "multitab_starting": {
-    "message": "抽出を開始..."
-  },
-  "settings_variables_hint": {
-    "message": "変数: {domain}, {index}, {original}, {format}, {width}, {height}"
+  "toast_exporting_collection": {
+    "message": "コレクションをエクスポート中..."
   },
   "toast_extraction_cancelled": {
     "message": "抽出がキャンセルされました"
@@ -863,89 +962,98 @@
   "toast_extraction_success": {
     "message": "{tabs}個のタブから{images}枚の画像を抽出"
   },
+  "toast_image_removed": {
+    "message": "画像を削除しました"
+  },
+  "toast_license_deactivated": {
+    "message": "ライセンスが無効化されました"
+  },
   "toast_multitab_failed": {
     "message": "マルチタブ抽出に失敗"
+  },
+  "toast_multitab_failed_load": {
+    "message": "タブの読み込みに失敗しました"
+  },
+  "toast_n_new": {
+    "message": "{count}枚追加"
+  },
+  "toast_n_removed": {
+    "message": "{count}枚削除"
+  },
+  "toast_new_images_discovered": {
+    "message": "{count}枚の新しい画像を発見"
+  },
+  "toast_no_duplicates_found": {
+    "message": "重複画像は見つかりませんでした"
+  },
+  "toast_no_images_selected": {
+    "message": "画像が選択されていません"
+  },
+  "toast_pro_activated": {
+    "message": "Proアクティベート成功！"
+  },
+  "toast_pro_color_filter": {
+    "message": "カラーフィルタリングはPro機能です。アップグレードして解除！"
+  },
+  "toast_pro_naming_locked": {
+    "message": "カスタム命名はPro機能です。アップグレードして解除！"
+  },
+  "toast_pro_setting_locked": {
+    "message": "この設定にはProが必要です。アップグレードして解除！"
+  },
+  "toast_refresh_retry": {
+    "message": "ページを更新して再試行してください"
+  },
+  "toast_scan_cancelled": {
+    "message": "スキャンがキャンセルされました"
+  },
+  "toast_select_at_least_one_tab": {
+    "message": "タブを1つ以上選択してください"
+  },
+  "toast_settings_reset": {
+    "message": "設定をデフォルトにリセットしました"
+  },
+  "toast_url_copied_batch": {
+    "message": "{count} 件の URL をクリップボードにコピーしました"
+  },
+  "toast_url_copied_single": {
+    "message": "URL をコピーしました!"
+  },
+  "toast_url_copy_failed": {
+    "message": "URL のコピーに失敗しました"
+  },
+  "toolbar_copy_urls": {
+    "message": "URL をコピー"
+  },
+  "toolbar_copy_urls_empty": {
+    "message": "先に画像を選択してください"
+  },
+  "toolbar_copy_urls_tooltip": {
+    "message": "選択した画像の URL をクリップボードにコピー"
+  },
+  "toolbar_deselect_all": {
+    "message": "選択解除"
+  },
+  "toolbar_download_all": {
+    "message": "すべてダウンロード"
+  },
+  "toolbar_download_selected": {
+    "message": "ダウンロード ({count})"
+  },
+  "toolbar_group": {
+    "message": "グループ"
+  },
+  "toolbar_rescan": {
+    "message": "再スキャン"
+  },
+  "toolbar_select_all": {
+    "message": "すべて選択"
   },
   "toolbar_similar": {
     "message": "類似"
   },
-  "status_similar_count": {
-    "message": "{count} 枚類似"
-  },
-  "dedup_no_similar": {
-    "message": "類似画像は見つかりませんでした"
-  },
-  "dedup_group_title": {
-    "message": "グループ {index}（{count} 枚類似）"
-  },
-  "collection_no_match": {
-    "message": "一致する画像が見つかりません"
-  },
-  "collection_empty_title": {
-    "message": "コレクションは空です"
-  },
-  "collection_no_match_hint": {
-    "message": "別の検索キーワードをお試しください"
-  },
-  "collection_empty_hint": {
-    "message": "画像の星アイコンをクリックしてコレクションに追加"
-  },
-  "restricted_notice": {
-    "message": "このページでは拡張機能のスクリプト注入が制限されています。通常のウェブページ（記事、ギャラリー、検索結果など）に移動して画像の抽出を開始してください。"
-  },
-  "restricted_features_heading": {
-    "message": "Image Harvest でできること"
-  },
-  "restricted_feature_batch_title": {
-    "message": "一括ダウンロード"
-  },
-  "restricted_feature_batch_desc": {
-    "message": "ワンクリックで任意のウェブページからすべての画像を選択してダウンロード。サイズ、形式、レイアウトでフィルタリング可能。"
-  },
-  "restricted_feature_dedup_title": {
-    "message": "類似画像検出"
-  },
-  "restricted_feature_dedup_desc": {
-    "message": "パーセプチュアルハッシュを使用して、ほぼ重複した画像を自動的に検出・除去します。"
-  },
-  "restricted_feature_reverse_title": {
-    "message": "画像で検索"
-  },
-  "restricted_feature_reverse_desc": {
-    "message": "Google、TinEye、Yandex、Baiduでワンクリックで任意の画像を検索。"
-  },
-  "restricted_feature_multitab_title": {
-    "message": "マルチタブ抽出"
-  },
-  "restricted_feature_multitab_desc": {
-    "message": "複数の開いているタブから一度に画像を抽出し、ZIPアーカイブとしてダウンロード。"
-  },
-  "restricted_feature_color_title": {
-    "message": "カラー抽出"
-  },
-  "restricted_feature_color_desc": {
-    "message": "各画像から主要な色を自動抽出。カラースウォッチをクリックしてHEXコードをコピー。"
-  },
-  "restricted_feature_filter_title": {
-    "message": "スマートフィルター"
-  },
-  "restricted_feature_filter_desc": {
-    "message": "サイズ、タイプ、レイアウト、URLパターン、主要色で画像をフィルタリングし、必要な画像を正確に見つけます。"
-  },
-  "restricted_feature_collection_title": {
-    "message": "お気に入りコレクション"
-  },
-  "restricted_feature_collection_desc": {
-    "message": "画像を永続的なコレクションにブックマーク。セッションをまたいで保存され、いつでも整理・閲覧可能。"
-  },
-  "restricted_feature_preview_title": {
-    "message": "インスタントプレビュー"
-  },
-  "restricted_feature_preview_desc": {
-    "message": "フル解像度の画像とメタデータ（サイズ、ファイルサイズ、形式）を一目で確認。"
-  },
-  "restricted_link_website": {
-    "message": "公式サイト"
+  "toolbar_sort": {
+    "message": "並び替え"
   },
   "trial_error_already_redeemed": {
     "message": "このインストールでは既に無料トライアルを使用済みです。"
@@ -962,13 +1070,16 @@
   "trial_error_server_declined": {
     "message": "サーバーがトライアルを拒否しました。"
   },
-  "license_error_network": {
-    "message": "ネットワークエラーです。接続を確認してください。"
+  "trial_grace_message": {
+    "message": "トライアル期間が終了しました。Pro 機能はあと {days} 日間ご利用いただけます。アップグレードしてアクセスを維持しましょう。"
   },
-  "license_error_invalid_key": {
-    "message": "無効なライセンスキーです。"
+  "trial_grace_upgrade_btn": {
+    "message": "今すぐアップグレード"
   },
-  "license_error_activation_failed": {
-    "message": "アクティベーションに失敗しました。もう一度お試しください。"
+  "view_grid": {
+    "message": "グリッド"
+  },
+  "view_list": {
+    "message": "リスト"
   }
 }

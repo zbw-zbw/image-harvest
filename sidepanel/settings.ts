@@ -458,8 +458,17 @@ export async function applyProFeatureVisibility(): Promise<void> {
   try {
     const proStatus = await chrome.runtime.sendMessage({ type: MESSAGE_TYPES.VALIDATE_LICENSE });
     state.isProUser = proStatus?.isPro === true;
+    state.inTrialGracePeriod = proStatus?.inGracePeriod === true;
+    state.trialGraceDaysRemaining = 0;
+    if (state.inTrialGracePeriod && proStatus?.expiresAt) {
+      const elapsed = Date.now() - proStatus.expiresAt;
+      const graceMs = 3 * 24 * 60 * 60 * 1000;
+      state.trialGraceDaysRemaining = Math.ceil((graceMs - elapsed) / (24 * 60 * 60 * 1000));
+    }
   } catch {
     state.isProUser = false;
+    state.inTrialGracePeriod = false;
+    state.trialGraceDaysRemaining = 0;
   }
 
   // When user just became Pro, auto-enable Pro default features and persist
@@ -666,11 +675,11 @@ export function bindProGuards(): void {
 
   // ---- Pro feature click interception → open upgrade modal ----
   // Pro feature buttons: open upgrade modal + toast
-  const proLockedButtons: Array<{ id: string; label: string }> = [
-    { id: 'btn-collection', label: 'Collection' },
-    { id: 'btn-multitab', label: 'Multi-Tab Extract' },
+  const proLockedButtons: Array<{ id: string; i18nKey: string }> = [
+    { id: 'btn-collection', i18nKey: 'pro_feature_blocked_collection' },
+    { id: 'btn-multitab', i18nKey: 'pro_feature_blocked_multitab' },
   ];
-  proLockedButtons.forEach(({ id, label }) => {
+  proLockedButtons.forEach(({ id, i18nKey }) => {
     const btn = document.getElementById(id);
     if (!btn) return;
     btn.addEventListener(
@@ -679,7 +688,7 @@ export function bindProGuards(): void {
         if (!state.isProUser) {
           e.stopImmediatePropagation();
           e.preventDefault();
-          showToast(`${label} is a Pro feature. Upgrade to unlock!`, 'warning');
+          showToast(t(i18nKey), 'warning');
           // Telemetry: emit BEFORE showProUpgradeModal so the dashboard
           // can answer "which feature drives the most upsells".
           // Map id → stable feature key (do not use display label; that

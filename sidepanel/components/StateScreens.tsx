@@ -66,6 +66,10 @@ function EmptyScreen({ visible }: ScreenProps) {
   // whether clicking will reset filters or rescan from scratch.
   const desc = info.isNoResults ? t('empty_no_results_desc') : t('empty_no_images_desc');
   const buttonLabel = info.isNoResults ? t('empty_reset_filters') : t('empty_rescan_images');
+  const hiddenHint =
+    info.isNoResults && info.hiddenCount
+      ? t('empty_hidden_count', { count: String(info.hiddenCount) })
+      : null;
   return (
     <div id="empty-state" class={`empty-state${visible ? '' : ' hidden'}`}>
       <div class="empty-state-visual">
@@ -95,6 +99,7 @@ function EmptyScreen({ visible }: ScreenProps) {
       </div>
       <h3 class="empty-state-title">{t('empty_title')}</h3>
       <p class="empty-state-desc">{desc}</p>
+      {hiddenHint && <p class="empty-state-hidden-hint">{hiddenHint}</p>}
       <button id="btn-reset-filters" class="rescan-btn rescan-btn-lg">
         <svg
           width="14"

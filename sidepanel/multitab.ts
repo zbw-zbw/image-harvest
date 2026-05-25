@@ -118,7 +118,7 @@ export async function loadTabList(): Promise<void> {
 
     updateMultitabSelectAllState();
   } catch {
-    elements.multitabList.innerHTML = '<p class="empty-message">Failed to load tabs</p>';
+    elements.multitabList.innerHTML = `<p class="empty-message">${t('toast_multitab_failed_load')}</p>`;
   }
 }
 

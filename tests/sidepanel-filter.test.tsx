@@ -42,7 +42,9 @@ import {
   applyFilters,
   clearCustomSizeInputs,
   colorDistance,
+  FILESIZE_PRESETS,
   filterByColor,
+  filterByFileSize,
   filterByLayout,
   filterBySettingsMaxSize,
   filterBySettingsMinSize,
@@ -842,5 +844,56 @@ describe('renderColorSwatches', () => {
     expect(
       document.querySelector<HTMLElement>('[data-color-filter="all"]')!.classList.contains('active')
     ).toBe(true);
+  });
+});
+
+describe('filterByFileSize', () => {
+  it('passes everything when fileSizeEnabled is false', () => {
+    state.activeFilters.fileSizeEnabled = false;
+    state.activeFilters.minFileSizeKB = 100;
+    state.activeFilters.maxFileSizeKB = 500;
+    expect(filterByFileSize(makeImg({ estimatedSize: 10 }))).toBe(true);
+  });
+
+  it('filters out images below minFileSizeKB', () => {
+    state.activeFilters.fileSizeEnabled = true;
+    state.activeFilters.minFileSizeKB = 100;
+    state.activeFilters.maxFileSizeKB = Infinity;
+    // 50 KB = 51200 bytes → below 100 KB threshold
+    expect(filterByFileSize(makeImg({ estimatedSize: 51200 }))).toBe(false);
+  });
+
+  it('filters out images above maxFileSizeKB', () => {
+    state.activeFilters.fileSizeEnabled = true;
+    state.activeFilters.minFileSizeKB = 0;
+    state.activeFilters.maxFileSizeKB = 200;
+    // 300 KB = 307200 bytes → above 200 KB threshold
+    expect(filterByFileSize(makeImg({ estimatedSize: 307200 }))).toBe(false);
+  });
+
+  it('passes images within range', () => {
+    state.activeFilters.fileSizeEnabled = true;
+    state.activeFilters.minFileSizeKB = 50;
+    state.activeFilters.maxFileSizeKB = 200;
+    // 100 KB = 102400 bytes → within range
+    expect(filterByFileSize(makeImg({ estimatedSize: 102400 }))).toBe(true);
+  });
+
+  it('treats undefined estimatedSize as 0 bytes', () => {
+    state.activeFilters.fileSizeEnabled = true;
+    state.activeFilters.minFileSizeKB = 10;
+    state.activeFilters.maxFileSizeKB = Infinity;
+    expect(filterByFileSize(makeImg({ estimatedSize: undefined }))).toBe(false);
+  });
+
+  it('preset tiny filters correctly (0-50 KB)', () => {
+    state.activeFilters.fileSizeEnabled = true;
+    state.activeFilters.fileSizePreset = 'tiny';
+    state.activeFilters.minFileSizeKB = FILESIZE_PRESETS.tiny.min;
+    state.activeFilters.maxFileSizeKB = FILESIZE_PRESETS.tiny.max;
+    // 30 KB = 30720 bytes → within tiny range
+    expect(filterByFileSize(makeImg({ estimatedSize: 30720 }))).toBe(true);
+    // 60 KB = 61440 bytes → above tiny range
+    expect(filterByFileSize(makeImg({ estimatedSize: 61440 }))).toBe(false);
   });
 });

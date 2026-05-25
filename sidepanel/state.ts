@@ -36,6 +36,12 @@ export interface ActiveFilters {
   customMaxEnabled: boolean;
   customMaxWidth: number;
   customMaxHeight: number;
+
+  // File size (KB) filter
+  fileSizeEnabled: boolean;
+  fileSizePreset: string;
+  minFileSizeKB: number;
+  maxFileSizeKB: number;
 }
 
 // ── Per-tab cache entry ─────────────────────────────────────────────────────
@@ -200,6 +206,8 @@ export interface ErrorScreenInfo {
 export interface EmptyScreenInfo {
   /** "no results after filtering" vs "no images on this page at all". */
   isNoResults: boolean;
+  /** Number of images hidden by current filters (shown as hint). */
+  hiddenCount?: number;
 }
 
 export interface ScanProgressState {
@@ -333,6 +341,8 @@ export interface SidepanelState {
 
   // License
   isProUser: boolean;
+  inTrialGracePeriod: boolean;
+  trialGraceDaysRemaining: number;
 
   // ── Preact-managed UI screens (replaces classList toggles) ───────────────
   /** Which "main area" view is active. Mutually exclusive with itself. */
@@ -419,6 +429,10 @@ function createInitialState(): SidepanelState {
       customMaxEnabled: true,
       customMaxWidth: 99999,
       customMaxHeight: 99999,
+      fileSizeEnabled: false,
+      fileSizePreset: 'all',
+      minFileSizeKB: 0,
+      maxFileSizeKB: Infinity,
     },
 
     collapsedGroups: new Set<string>(),
@@ -446,6 +460,8 @@ function createInitialState(): SidepanelState {
     isMultiTabExtracting: false,
 
     isProUser: false,
+    inTrialGracePeriod: false,
+    trialGraceDaysRemaining: 0,
 
     uiScreen: 'images',
     errorInfo: null,

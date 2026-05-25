@@ -99,18 +99,6 @@
   padding: 48px 24px;
   text-align: center;
   background: var(--bg-color);
-  animation: emptyFadeIn 0.4s ease-out;
-}
-
-@keyframes emptyFadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
 }
 
 .empty-state-visual {
@@ -155,6 +143,15 @@
   margin: 0 0 24px;
   line-height: 1.6;
   max-width: 400px;
+}
+
+.empty-state-hidden-hint {
+  font-size: 12px;
+  color: var(--text-secondary);
+  margin: -16px 0 20px;
+  padding: 4px 10px;
+  background: var(--bg-secondary);
+  border-radius: 4px;
 }
 
 .empty-state .btn {
@@ -577,7 +574,7 @@
 .restricted-hero {
   position: relative;
   width: 100%;
-  padding: 32px 24px 28px;
+  padding: 24px 24px 20px;
   text-align: center;
   overflow: visible;
   flex-shrink: 0;
@@ -587,7 +584,6 @@
   position: absolute;
   inset: 0;
   background: var(--bg-color);
-  border-bottom: 1px solid var(--border-color);
 }
 
 .restricted-hero-bg::before {
@@ -620,10 +616,8 @@
   height: 64px;
   border-radius: 16px;
   background: var(--bg-color);
-  border: 1px solid var(--border-color);
   box-shadow: var(--shadow-md);
   margin-bottom: 14px;
-  animation: floatIn 0.6s ease-out;
 }
 
 .restricted-logo {

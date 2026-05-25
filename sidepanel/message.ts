@@ -10,7 +10,7 @@ import {
   selectAll,
 } from './actions';
 import { applyFilters } from './filter';
-import { isWithinTabSwitchGrace } from './init';
+import { isWithinTabSwitchGrace } from './tab-lifecycle';
 import { processImageExtras, updateScanProgress } from './scan';
 import { renderImages } from './render';
 import { applyProFeatureVisibility, closeAllFilterDropdowns, closeSettings } from './settings';
@@ -31,7 +31,7 @@ export function showDiscoveredToastDebounced(addedCount: number): void {
   if (discoveredToastTimer) clearTimeout(discoveredToastTimer);
   discoveredToastTimer = setTimeout(() => {
     if (discoveredToastCount > 0) {
-      showToast(`${discoveredToastCount} new images discovered`, 'info');
+      showToast(t('toast_new_images_discovered', { count: discoveredToastCount }), 'info');
       discoveredToastCount = 0;
     }
     discoveredToastTimer = null;
@@ -198,12 +198,12 @@ export function handleMessage(message: IncomingMessage): void {
 
     case MESSAGE_TYPES.DOWNLOAD_COMPLETE:
       hideProgress();
-      showToast(`Downloaded ${message.count} images`, 'success');
+      showToast(t('toast_download_completed', { count: message.count ?? 0 }), 'success');
       break;
 
     case MESSAGE_TYPES.DOWNLOAD_ERROR:
       hideProgress();
-      showToast('Download failed: ' + (message.error || 'Unknown error'), 'error');
+      showToast(t('toast_download_failed') + (message.error ? ': ' + message.error : ''), 'error');
       break;
 
     case MESSAGE_TYPES.CLEAR_SELECTION:
@@ -248,17 +248,20 @@ export function handleMessage(message: IncomingMessage): void {
 
         applyFilters();
         closeMultiTabModal();
-        showToast(`Extracted ${newImages.length} images from ${message.tabCount} tabs`, 'success');
+        showToast(
+          t('toast_extraction_success', { images: newImages.length, tabs: message.tabCount ?? 0 }),
+          'success'
+        );
 
         processImageExtras(newImages);
       } else {
-        showToast('Extraction failed', 'error');
+        showToast(t('toast_extraction_failed'), 'error');
       }
       break;
 
     case MESSAGE_TYPES.MULTI_TAB_EXTRACT_ERROR:
       hideProgress();
-      showToast('Multi-tab extraction failed: ' + (message.error || 'Unknown error'), 'error');
+      showToast(t('toast_multitab_failed') + (message.error ? ': ' + message.error : ''), 'error');
       break;
   }
 }

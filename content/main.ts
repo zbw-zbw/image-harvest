@@ -116,7 +116,9 @@ async function handleMessage(
 
 // Main extraction function
 export async function extractImages(options: ExtractOptions = {}): Promise<ImageItem[]> {
-  // Allow new extraction even if a previous one is still running
+  if (state.isExtracting) {
+    return [];
+  }
   state.isExtracting = true;
   state.seenUrls.clear();
 
@@ -354,6 +356,64 @@ async function extractBackgroundImages(images: Map<string, ImageItem>): Promise<
       }
     } catch {
       // Skip elements we can't access (cross-origin iframes, etc.)
+    }
+
+    // Also extract from CSS content (::before / ::after) in the same pass
+    for (const pseudo of ['::before', '::after'] as const) {
+      try {
+        const pseudoStyle = window.getComputedStyle(el, pseudo);
+        const contentValue = pseudoStyle.content;
+        if (
+          !contentValue ||
+          contentValue === 'none' ||
+          contentValue === 'normal' ||
+          contentValue === '""'
+        )
+          continue;
+
+        const contentUrls = extractBackgroundUrls(contentValue);
+        for (const url of contentUrls) {
+          if (!url || isGradient(url)) continue;
+
+          if (isDataUri(url)) {
+            if (!isImageDataUri(url)) continue;
+            const dataKey = generateDataUriKey(url);
+            if (state.seenUrls.has(dataKey)) continue;
+            state.seenUrls.add(dataKey);
+            const rect = el.getBoundingClientRect();
+            images.set(dataKey, {
+              id: generateId(dataKey),
+              url: url,
+              displayWidth: Math.round(rect.width),
+              displayHeight: Math.round(rect.height),
+              type: 'css-content',
+              format: getFileFormat(url),
+              sourceDomain: window.location.hostname,
+              checked: false,
+              timestamp: Date.now(),
+            } as ImageItem);
+            continue;
+          }
+
+          const resolvedUrl = resolveUrl(url);
+          if (state.seenUrls.has(resolvedUrl)) continue;
+          state.seenUrls.add(resolvedUrl);
+          const rect = el.getBoundingClientRect();
+          images.set(resolvedUrl, {
+            id: generateId(resolvedUrl),
+            url: resolvedUrl,
+            displayWidth: Math.round(rect.width),
+            displayHeight: Math.round(rect.height),
+            type: 'css-content',
+            format: getFileFormat(resolvedUrl),
+            sourceDomain: getDomain(resolvedUrl),
+            checked: false,
+            timestamp: Date.now(),
+          } as ImageItem);
+        }
+      } catch {
+        // Skip inaccessible pseudo-elements
+      }
     }
   }
 }

@@ -28,6 +28,7 @@
 //   - #pro-modal-trial-error       — error line for the trial CTA path
 
 import { useEffect, useState } from 'preact/hooks';
+import type { ComponentChildren } from 'preact';
 import { useStoreSelector } from './storeHook';
 import { state } from '../state';
 import { t } from '../../shared/i18n';
@@ -207,92 +208,9 @@ export function ProUpgradeModal() {
           </button>
         </div>
         <div class="modal-body">
-          {/* ── Section 1: value prop + feature highlights ─────────────── */}
-          <div class="pro-upgrade-hero">
-            <p class="pro-upgrade-desc">{variantSubline(bucket)}</p>
-          </div>
-          <div class="pro-upgrade-features">
-            <ul class="pro-feature-list">
-              <ProFeatureItem
-                title={t('pro_feature_batch_title')}
-                desc={t('pro_feature_batch_desc')}
-              />
-              <ProFeatureItem
-                title={t('pro_feature_multitab_title')}
-                desc={t('pro_feature_multitab_desc')}
-              />
-              <ProFeatureItem
-                title={t('pro_feature_reverse_search_title')}
-                desc={t('pro_feature_reverse_search_desc')}
-              />
-              <ProFeatureItem
-                title={t('pro_feature_dedup_title')}
-                desc={t('pro_feature_dedup_desc')}
-              />
-              <ProFeatureItem
-                title={t('pro_feature_color_title')}
-                desc={t('pro_feature_color_desc')}
-              />
-            </ul>
-          </div>
-
-          {/* ── Section 2: trial / pricing CTAs ─────────────────────────── */}
-          <div class="pro-upgrade-cta-section">
-            {trialEligible && (
-              <>
-                <div class="pro-upgrade-trial-header">
-                  <div class="pro-upgrade-trial-badge">
-                    <span aria-hidden="true">🎁</span>
-                    {t('pro_trial_badge')}
-                  </div>
-                  <p class="pro-upgrade-trial-desc">{t('pro_trial_desc')}</p>
-                </div>
-                <ul class="pro-upgrade-trial-perks">
-                  <li>{t('pro_trial_perk_full_access')}</li>
-                  <li>{t('pro_trial_perk_no_card')}</li>
-                  <li>{t('pro_trial_perk_cancel')}</li>
-                </ul>
-              </>
-            )}
-            <div class="pro-upgrade-cta-row">
-              {trialEligible && (
-                <button
-                  id="btn-pro-modal-trial"
-                  type="button"
-                  class="btn btn-primary btn-cta"
-                  disabled={trialLoading}
-                  onClick={() => {
-                    void handleStartTrial(setTrialError, setTrialLoading);
-                  }}
-                >
-                  {trialLoading ? t('pro_trial_starting') : t('pro_trial_start_cta')}
-                </button>
-              )}
-              <button
-                id="btn-pro-modal-pricing"
-                type="button"
-                class={`btn btn-cta ${trialEligible ? 'btn-secondary' : 'btn-primary'}`}
-                onClick={handlePricingClick}
-              >
-                {t('pro_pricing_cta')}
-              </button>
-            </div>
-            {trialEligible && (
-              <p id="pro-modal-trial-error" class={`license-error${trialError ? '' : ' hidden'}`}>
-                {trialError}
-              </p>
-            )}
-          </div>
-
-          {/* ── Section 3: license key activation form ──────────────────── */}
-          <div class="pro-upgrade-divider">
-            <span>{t('pro_already_have_key')}</span>
-          </div>
+          {/* ── Section 1: license key activation form (top priority) ──── */}
           <div class="pro-upgrade-input-section">
             <div class="license-input-row">
-              {/* Input + activate button keep their original ids so
-                  license-ui.ts > bindLicenseModalEvents continues to work
-                  unchanged. Same for the error <p> + "Get Pro" link below. */}
               <input
                 type="text"
                 id="pro-modal-key-input"
@@ -321,34 +239,155 @@ export function ProUpgradeModal() {
               </a>
             </p>
           </div>
+
+          {/* ── Section 2: trial / pricing CTAs ────────────────────────── */}
+          <div class="pro-upgrade-cta-section">
+            {trialEligible && (
+              <>
+                <div class="pro-upgrade-trial-header">
+                  <div class="pro-upgrade-trial-badge">
+                    <span aria-hidden="true">🎁</span>
+                    {t('pro_trial_badge')}
+                  </div>
+                  <p class="pro-upgrade-trial-desc">{t('pro_trial_desc')}</p>
+                </div>
+                <ul class="pro-upgrade-trial-perks">
+                  <li>{t('pro_trial_perk_full_access')}</li>
+                  <li>{t('pro_trial_perk_no_card')}</li>
+                  <li>{t('pro_trial_perk_cancel')}</li>
+                </ul>
+              </>
+            )}
+            {!trialEligible && (
+              <div class="pro-upgrade-purchase-header">
+                <p class="pro-upgrade-purchase-desc">{t('pro_purchase_desc')}</p>
+              </div>
+            )}
+            <div class="pro-upgrade-cta-row">
+              {trialEligible && (
+                <button
+                  id="btn-pro-modal-trial"
+                  type="button"
+                  class="btn btn-primary btn-cta"
+                  disabled={trialLoading}
+                  onClick={() => {
+                    void handleStartTrial(setTrialError, setTrialLoading);
+                  }}
+                >
+                  {trialLoading ? t('pro_trial_starting') : t('pro_trial_start_cta')}
+                </button>
+              )}
+              <button
+                id="btn-pro-modal-pricing"
+                type="button"
+                class={`btn btn-cta ${trialEligible ? 'btn-secondary' : 'btn-primary'}`}
+                onClick={handlePricingClick}
+              >
+                {trialEligible ? t('pro_pricing_cta') : t('pro_purchase_cta')}
+              </button>
+            </div>
+            {trialEligible && (
+              <p id="pro-modal-trial-error" class={`license-error${trialError ? '' : ' hidden'}`}>
+                {trialError}
+              </p>
+            )}
+          </div>
+
+          {/* ── Section 3: value prop + feature highlights (reference) ──── */}
+          <div class="pro-upgrade-features" style={{ marginTop: '20px' }}>
+            <p class="pro-upgrade-desc" style={{ marginBottom: '14px' }}>
+              {variantSubline(bucket)}
+            </p>
+            <div class="pro-feature-list">
+              <ProFeatureCard
+                title={t('pro_feature_batch_title')}
+                desc={t('pro_feature_batch_desc_pro')}
+                gradient="gradient-blue"
+                icon={<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />}
+              />
+              <ProFeatureCard
+                title={t('pro_feature_multitab_title')}
+                desc={t('pro_feature_multitab_desc_pro')}
+                gradient="gradient-purple"
+                icon={
+                  <>
+                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                    <path d="M8 21h8M12 17v4" />
+                  </>
+                }
+              />
+              <ProFeatureCard
+                title={t('pro_feature_reverse_search_title')}
+                desc={t('pro_feature_reverse_search_desc_pro')}
+                gradient="gradient-green"
+                icon={
+                  <>
+                    <circle cx="11" cy="11" r="8" />
+                    <path d="M21 21l-4.35-4.35" />
+                  </>
+                }
+              />
+              <ProFeatureCard
+                title={t('pro_feature_dedup_title')}
+                desc={t('pro_feature_dedup_desc_pro')}
+                gradient="gradient-amber"
+                icon={
+                  <>
+                    <rect x="3" y="3" width="7" height="7" rx="1" />
+                    <rect x="14" y="3" width="7" height="7" rx="1" />
+                    <rect x="3" y="14" width="7" height="7" rx="1" />
+                    <rect x="14" y="14" width="7" height="7" rx="1" />
+                  </>
+                }
+              />
+              <ProFeatureCard
+                title={t('pro_feature_color_title')}
+                desc={t('pro_feature_color_desc_pro')}
+                gradient="gradient-pink"
+                icon={
+                  <>
+                    <circle cx="13.5" cy="6.5" r="4.5" />
+                    <circle cx="7.5" cy="13.5" r="4.5" />
+                    <circle cx="16.5" cy="16.5" r="4.5" />
+                  </>
+                }
+              />
+            </div>
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-interface FeatureProps {
+interface FeatureCardProps {
   title: string;
   desc: string;
+  gradient: string;
+  icon: ComponentChildren;
 }
 
-function ProFeatureItem({ title, desc }: FeatureProps) {
+function ProFeatureCard({ title, desc, gradient, icon }: FeatureCardProps) {
   return (
-    <li>
-      <svg
-        width="14"
-        height="14"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2.5"
-      >
-        <polyline points="20 6 9 17 4 12" />
-      </svg>
-      <div>
+    <div class="restricted-feature">
+      <div class={`restricted-feature-icon-wrap ${gradient}`}>
+        <svg
+          width="18"
+          height="18"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+        >
+          {icon}
+        </svg>
+      </div>
+      <div class="restricted-feature-text">
         <strong>{title}</strong>
         <p>{desc}</p>
       </div>
-    </li>
+    </div>
   );
 }

@@ -87,31 +87,42 @@ export function areSimilar(
 
 // ── Internals ───────────────────────────────────────────────────────────────
 
-function dct2d(matrix: number[], size: number): number[] {
-  const result = new Array(size * size);
-  const N = size;
+const DCT_SIZE = 32;
+const cosTable = new Float64Array(DCT_SIZE * DCT_SIZE);
+const C_coeff = new Float64Array(DCT_SIZE);
 
-  for (let v = 0; v < size; v++) {
+for (let i = 0; i < DCT_SIZE; i++) {
+  C_coeff[i] = i === 0 ? 1 / Math.sqrt(DCT_SIZE) : Math.sqrt(2 / DCT_SIZE);
+  for (let j = 0; j < DCT_SIZE; j++) {
+    cosTable[i * DCT_SIZE + j] = Math.cos(((2 * j + 1) * i * Math.PI) / (2 * DCT_SIZE));
+  }
+}
+
+function dct2d(matrix: number[], size: number): number[] {
+  const temp = new Float64Array(size * size);
+  const result = new Float64Array(size * size);
+
+  for (let row = 0; row < size; row++) {
     for (let u = 0; u < size; u++) {
       let sum = 0;
-
-      for (let y = 0; y < size; y++) {
-        for (let x = 0; x < size; x++) {
-          const pixel = matrix[y * size + x];
-          const cosX = Math.cos(((2 * x + 1) * u * Math.PI) / (2 * N));
-          const cosY = Math.cos(((2 * y + 1) * v * Math.PI) / (2 * N));
-          sum += pixel * cosX * cosY;
-        }
+      for (let x = 0; x < size; x++) {
+        sum += matrix[row * size + x] * cosTable[u * size + x];
       }
-
-      const C_u = u === 0 ? 1 / Math.sqrt(N) : Math.sqrt(2 / N);
-      const C_v = v === 0 ? 1 / Math.sqrt(N) : Math.sqrt(2 / N);
-
-      result[v * size + u] = C_u * C_v * sum;
+      temp[row * size + u] = C_coeff[u] * sum;
     }
   }
 
-  return result;
+  for (let col = 0; col < size; col++) {
+    for (let v = 0; v < size; v++) {
+      let sum = 0;
+      for (let y = 0; y < size; y++) {
+        sum += temp[y * size + col] * cosTable[v * size + y];
+      }
+      result[v * size + col] = C_coeff[v] * sum;
+    }
+  }
+
+  return Array.from(result);
 }
 
 function imageToGrayscale(imageData: Uint8ClampedArray, width: number, height: number): number[] {

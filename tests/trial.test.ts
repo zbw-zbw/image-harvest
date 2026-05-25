@@ -481,3 +481,62 @@ describe('reportTrialExpiryIfNeeded', () => {
     expect(mockTrack).not.toHaveBeenCalled();
   });
 });
+
+describe('isInTrialGracePeriod', () => {
+  it('returns inGrace=false when no license data', async () => {
+    mockGetLicenseData.mockResolvedValue(null);
+    const { isInTrialGracePeriod } = await import('../shared/trial');
+    const result = await isInTrialGracePeriod();
+    expect(result.inGrace).toBe(false);
+    expect(result.daysRemaining).toBe(0);
+  });
+
+  it('returns inGrace=false for non-trial plans', async () => {
+    mockGetLicenseData.mockResolvedValue({
+      licenseKey: 'X',
+      plan: 'monthly',
+      expiresAt: Date.now() - 1000,
+    });
+    const { isInTrialGracePeriod } = await import('../shared/trial');
+    const result = await isInTrialGracePeriod();
+    expect(result.inGrace).toBe(false);
+  });
+
+  it('returns inGrace=false when trial is still active (not yet expired)', async () => {
+    mockGetLicenseData.mockResolvedValue({
+      licenseKey: 'X',
+      plan: 'trial',
+      expiresAt: Date.now() + 3 * 24 * 60 * 60 * 1000,
+    });
+    const { isInTrialGracePeriod } = await import('../shared/trial');
+    const result = await isInTrialGracePeriod();
+    expect(result.inGrace).toBe(false);
+    expect(result.daysRemaining).toBe(0);
+  });
+
+  it('returns inGrace=true when within 3-day grace window', async () => {
+    // Trial expired 1 day ago → within grace period
+    mockGetLicenseData.mockResolvedValue({
+      licenseKey: 'X',
+      plan: 'trial',
+      expiresAt: Date.now() - 1 * 24 * 60 * 60 * 1000,
+    });
+    const { isInTrialGracePeriod } = await import('../shared/trial');
+    const result = await isInTrialGracePeriod();
+    expect(result.inGrace).toBe(true);
+    expect(result.daysRemaining).toBe(2);
+  });
+
+  it('returns inGrace=false when past 3-day grace window', async () => {
+    // Trial expired 4 days ago → past grace period
+    mockGetLicenseData.mockResolvedValue({
+      licenseKey: 'X',
+      plan: 'trial',
+      expiresAt: Date.now() - 4 * 24 * 60 * 60 * 1000,
+    });
+    const { isInTrialGracePeriod } = await import('../shared/trial');
+    const result = await isInTrialGracePeriod();
+    expect(result.inGrace).toBe(false);
+    expect(result.daysRemaining).toBe(0);
+  });
+});

@@ -37,7 +37,7 @@
   padding: 3px 10px;
   font-size: 11px;
   font-weight: 700;
-  color: #5a3e00;
+  color: var(--amber-text);
   background: linear-gradient(135deg, #ffd700, #ffb800);
   border: none;
   border-radius: 10px;
@@ -54,7 +54,7 @@
 }
 
 .btn-upgrade-pro svg {
-  stroke: #5a3e00;
+  stroke: var(--amber-text);
   flex-shrink: 0;
 }
 
@@ -76,7 +76,7 @@
   font-size: 11px;
   font-weight: 700;
   line-height: 16px;
-  color: #5a3e00;
+  color: var(--amber-text);
   background: linear-gradient(135deg, #ffd700, #ffb800);
   border-radius: 10px;
   white-space: nowrap;
@@ -85,7 +85,7 @@
 }
 
 .pro-active-badge svg {
-  stroke: #5a3e00;
+  stroke: var(--amber-text);
   flex-shrink: 0;
 }
 
@@ -197,40 +197,7 @@
   margin: 0;
   display: flex;
   flex-direction: column;
-  gap: 14px;
-}
-
-.pro-feature-list li {
-  display: flex;
-  align-items: flex-start;
   gap: 10px;
-  font-size: 13px;
-  color: var(--text-secondary);
-}
-
-.pro-feature-list li div {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-
-.pro-feature-list li strong {
-  font-size: 12px;
-  font-weight: 600;
-  color: var(--text-primary);
-}
-
-.pro-feature-list li p {
-  font-size: 11px;
-  color: var(--text-tertiary);
-  margin: 0;
-  line-height: 1.4;
-}
-
-.pro-feature-list li svg {
-  stroke: var(--primary-color);
-  flex-shrink: 0;
-  margin-top: 2px;
 }
 
 /* Pro Feature Lock — visually indicate locked but keep clickable */
@@ -314,7 +281,7 @@
 
 .toolbar-filters .toolbar-left {
   flex: 1 1 auto;
-  min-width: 200px;
+  min-width: 0;
 }
 
 .toolbar-filters .toolbar-right {
@@ -542,5 +509,44 @@
 
   .pro-upgrade-cta-row {
     flex-direction: column;
+  }
+}
+
+/* ============================================
+   Trial Grace Period Banner
+   ============================================ */
+.trial-grace-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #fff3cd, #ffeeba);
+  border-bottom: 1px solid #ffc107;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.trial-grace-text {
+  color: var(--amber-muted);
+  font-weight: 500;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.trial-grace-btn {
+  flex-shrink: 0;
+  font-size: 11px;
+  padding: 4px 10px;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  .trial-grace-banner {
+    background: linear-gradient(135deg, #332b00, #3d3200);
+    border-bottom-color: var(--amber-text-dark);
+  }
+  .trial-grace-text {
+    color: var(--amber-light);
   }
 }
