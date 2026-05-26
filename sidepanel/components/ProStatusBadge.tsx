@@ -29,6 +29,7 @@ export interface ProLicenseInfo {
 }
 
 const PLAN_LABELS: Record<string, () => string> = {
+  trial: () => t('plan_trial'),
   monthly: () => t('plan_monthly'),
   yearly: () => t('plan_yearly'),
   lifetime: () => t('plan_lifetime'),

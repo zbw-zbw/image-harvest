@@ -585,6 +585,9 @@
   "plan_never_expires": {
     "message": "Never expires"
   },
+  "plan_trial": {
+    "message": "Trial"
+  },
   "plan_yearly": {
     "message": "Yearly"
   },
@@ -740,6 +743,72 @@
   },
   "trial_grace_upgrade_btn": {
     "message": "Upgrade Now"
+  },
+  "welcome_title": {
+    "message": "Welcome to Image Harvest Pro"
+  },
+  "welcome_subtitle": {
+    "message": "The smartest way to find, filter, and batch-download images from any webpage. Your 7-day Pro trial is now active."
+  },
+  "welcome_trial_active": {
+    "message": "Your Pro Trial is Active"
+  },
+  "welcome_trial_desc": {
+    "message": "All Pro features are unlocked. Explore everything — no credit card required."
+  },
+  "welcome_days_left": {
+    "message": "days left"
+  },
+  "welcome_features_title": {
+    "message": "What's Included in Pro"
+  },
+  "welcome_feature_batch_title": {
+    "message": "Unlimited Batch Download"
+  },
+  "welcome_feature_batch_desc": {
+    "message": "Download up to 1000 images as ZIP. Convert formats on the fly (PNG, JPG, WebP)."
+  },
+  "welcome_feature_multitab_title": {
+    "message": "Multi-Tab Extract"
+  },
+  "welcome_feature_multitab_desc": {
+    "message": "Scan images across multiple open tabs at once. Perfect for research and comparison."
+  },
+  "welcome_feature_similar_title": {
+    "message": "Similar Image Detection"
+  },
+  "welcome_feature_similar_desc": {
+    "message": "Find duplicates and near-duplicates using perceptual hashing (pHash) technology."
+  },
+  "welcome_feature_grouping_title": {
+    "message": "Smart Grouping"
+  },
+  "welcome_feature_grouping_desc": {
+    "message": "Group images by domain, format, size range, or tab. 5 smart grouping modes."
+  },
+  "welcome_feature_color_title": {
+    "message": "Color Palette Extract"
+  },
+  "welcome_feature_color_desc": {
+    "message": "Extract dominant colors from any image. Copy HEX codes and filter by color."
+  },
+  "welcome_feature_collections_title": {
+    "message": "Image Collections"
+  },
+  "welcome_feature_collections_desc": {
+    "message": "Save images with tags and notes. Organize across sessions and export as ZIP."
+  },
+  "welcome_cta_title": {
+    "message": "Ready to Start?"
+  },
+  "welcome_cta_desc": {
+    "message": "Visit any webpage and click the Image Harvest icon to begin scanning."
+  },
+  "welcome_cta_button": {
+    "message": "Start Exploring"
+  },
+  "welcome_footer": {
+    "message": "Your trial ends in 7 days · No credit card required"
   },
   "progress_downloading": {
     "message": "Downloading..."

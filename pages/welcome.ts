@@ -4,7 +4,18 @@
 import { track, flushNow } from '../shared/telemetry';
 import { EVENTS } from '../shared/telemetry-events';
 
+function applyI18n(): void {
+  document.querySelectorAll<HTMLElement>('[data-i18n]').forEach((el) => {
+    const key = el.dataset.i18n;
+    if (!key) return;
+    const msg = chrome.i18n.getMessage(key);
+    if (msg) el.textContent = msg;
+  });
+}
+
 function init(): void {
+  applyI18n();
+
   // Display version
   const versionEl = document.getElementById('version');
   if (versionEl) {

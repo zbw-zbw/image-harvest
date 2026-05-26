@@ -331,8 +331,8 @@
             <polyline points="21 15 16 10 5 21" />
           </svg>
         </div>
-        <h1>Welcome to Image Harvest Pro</h1>
-        <p>
+        <h1 data-i18n="welcome_title">Welcome to Image Harvest Pro</h1>
+        <p data-i18n="welcome_subtitle">
           The smartest way to find, filter, and batch-download images from any webpage. Your 7-day
           Pro trial is now active.
         </p>
@@ -342,17 +342,19 @@
       <div class="trial-banner">
         <div class="trial-banner-icon">🎁</div>
         <div class="trial-banner-text">
-          <h2>Your Pro Trial is Active</h2>
-          <p>All Pro features are unlocked. Explore everything — no credit card required.</p>
+          <h2 data-i18n="welcome_trial_active">Your Pro Trial is Active</h2>
+          <p data-i18n="welcome_trial_desc">
+            All Pro features are unlocked. Explore everything — no credit card required.
+          </p>
         </div>
         <div class="trial-countdown">
           <div class="days" id="countdown-days">7</div>
-          <div class="label">days left</div>
+          <div class="label" data-i18n="welcome_days_left">days left</div>
         </div>
       </div>
 
       <!-- Features grid -->
-      <h3 class="features-title">What's Included in Pro</h3>
+      <h3 class="features-title" data-i18n="welcome_features_title">What's Included in Pro</h3>
       <div class="features-grid">
         <div class="feature-card">
           <div class="feature-card-header">
@@ -361,9 +363,11 @@
                 <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
               </svg>
             </div>
-            <h3>Unlimited Batch Download</h3>
+            <h3 data-i18n="welcome_feature_batch_title">Unlimited Batch Download</h3>
           </div>
-          <p>Download up to 1000 images as ZIP. Convert formats on the fly (PNG, JPG, WebP).</p>
+          <p data-i18n="welcome_feature_batch_desc">
+            Download up to 1000 images as ZIP. Convert formats on the fly (PNG, JPG, WebP).
+          </p>
         </div>
 
         <div class="feature-card">
@@ -374,9 +378,11 @@
                 <path d="M8 21h8M12 17v4" />
               </svg>
             </div>
-            <h3>Multi-Tab Extract</h3>
+            <h3 data-i18n="welcome_feature_multitab_title">Multi-Tab Extract</h3>
           </div>
-          <p>Scan images across multiple open tabs at once. Perfect for research and comparison.</p>
+          <p data-i18n="welcome_feature_multitab_desc">
+            Scan images across multiple open tabs at once. Perfect for research and comparison.
+          </p>
         </div>
 
         <div class="feature-card">
@@ -387,9 +393,11 @@
                 <path d="M21 21l-4.35-4.35" />
               </svg>
             </div>
-            <h3>Similar Image Detection</h3>
+            <h3 data-i18n="welcome_feature_similar_title">Similar Image Detection</h3>
           </div>
-          <p>Find duplicates and near-duplicates using perceptual hashing (pHash) technology.</p>
+          <p data-i18n="welcome_feature_similar_desc">
+            Find duplicates and near-duplicates using perceptual hashing (pHash) technology.
+          </p>
         </div>
 
         <div class="feature-card">
@@ -399,9 +407,11 @@
                 <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
               </svg>
             </div>
-            <h3>Smart Grouping</h3>
+            <h3 data-i18n="welcome_feature_grouping_title">Smart Grouping</h3>
           </div>
-          <p>Group images by domain, format, size range, or tab. 5 smart grouping modes.</p>
+          <p data-i18n="welcome_feature_grouping_desc">
+            Group images by domain, format, size range, or tab. 5 smart grouping modes.
+          </p>
         </div>
 
         <div class="feature-card">
@@ -413,9 +423,11 @@
                 <circle cx="16.5" cy="16.5" r="4.5" />
               </svg>
             </div>
-            <h3>Color Palette Extract</h3>
+            <h3 data-i18n="welcome_feature_color_title">Color Palette Extract</h3>
           </div>
-          <p>Extract dominant colors from any image. Copy HEX codes and filter by color.</p>
+          <p data-i18n="welcome_feature_color_desc">
+            Extract dominant colors from any image. Copy HEX codes and filter by color.
+          </p>
         </div>
 
         <div class="feature-card">
@@ -425,27 +437,33 @@
                 <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
               </svg>
             </div>
-            <h3>Image Collections</h3>
+            <h3 data-i18n="welcome_feature_collections_title">Image Collections</h3>
           </div>
-          <p>Save images with tags and notes. Organize across sessions and export as ZIP.</p>
+          <p data-i18n="welcome_feature_collections_desc">
+            Save images with tags and notes. Organize across sessions and export as ZIP.
+          </p>
         </div>
       </div>
 
       <!-- CTA -->
       <div class="cta-section">
-        <h2>Ready to Start?</h2>
-        <p>Visit any webpage and click the Image Harvest icon to begin scanning.</p>
+        <h2 data-i18n="welcome_cta_title">Ready to Start?</h2>
+        <p data-i18n="welcome_cta_desc">
+          Visit any webpage and click the Image Harvest icon to begin scanning.
+        </p>
         <button class="btn btn-primary" id="btn-explore">
           <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-          Start Exploring
+          <span data-i18n="welcome_cta_button">Start Exploring</span>
         </button>
       </div>
 
       <!-- Footer -->
       <div class="footer">
         <p>
-          Image Harvest v<span id="version"></span> &middot; Your trial ends in 7 days &middot; No
-          credit card required
+          Image Harvest v<span id="version"></span> &middot;
+          <span data-i18n="welcome_footer"
+            >Your trial ends in 7 days &middot; No credit card required</span
+          >
         </p>
       </div>
     </div>

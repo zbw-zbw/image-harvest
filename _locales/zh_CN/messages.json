@@ -557,6 +557,9 @@
   "plan_never_expires": {
     "message": "永不过期"
   },
+  "plan_trial": {
+    "message": "试用中"
+  },
   "plan_yearly": {
     "message": "年付"
   },
@@ -712,6 +715,72 @@
   },
   "trial_grace_upgrade_btn": {
     "message": "立即升级"
+  },
+  "welcome_title": {
+    "message": "欢迎使用 Image Harvest Pro"
+  },
+  "welcome_subtitle": {
+    "message": "最智能的网页图片查找、筛选和批量下载工具。您的 7 天 Pro 试用已激活。"
+  },
+  "welcome_trial_active": {
+    "message": "Pro 试用已激活"
+  },
+  "welcome_trial_desc": {
+    "message": "所有 Pro 功能已解锁。尽情探索，无需信用卡。"
+  },
+  "welcome_days_left": {
+    "message": "天剩余"
+  },
+  "welcome_features_title": {
+    "message": "Pro 包含哪些功能"
+  },
+  "welcome_feature_batch_title": {
+    "message": "无限批量下载"
+  },
+  "welcome_feature_batch_desc": {
+    "message": "一键下载多达 1000 张图片为 ZIP。支持格式转换 (PNG, JPG, WebP)。"
+  },
+  "welcome_feature_multitab_title": {
+    "message": "多标签页提取"
+  },
+  "welcome_feature_multitab_desc": {
+    "message": "同时扫描多个打开的标签页中的图片，非常适合调研和对比。"
+  },
+  "welcome_feature_similar_title": {
+    "message": "相似图片检测"
+  },
+  "welcome_feature_similar_desc": {
+    "message": "使用感知哈希 (pHash) 技术找到重复和近似重复的图片。"
+  },
+  "welcome_feature_grouping_title": {
+    "message": "智能分组"
+  },
+  "welcome_feature_grouping_desc": {
+    "message": "按域名、格式、尺寸范围或标签页分组。5 种智能分组模式。"
+  },
+  "welcome_feature_color_title": {
+    "message": "颜色提取"
+  },
+  "welcome_feature_color_desc": {
+    "message": "从任意图片中提取主色调。复制 HEX 色值并按颜色筛选。"
+  },
+  "welcome_feature_collections_title": {
+    "message": "图片收藏夹"
+  },
+  "welcome_feature_collections_desc": {
+    "message": "通过标签和备注保存图片。跨会话整理并导出为 ZIP。"
+  },
+  "welcome_cta_title": {
+    "message": "准备好了吗？"
+  },
+  "welcome_cta_desc": {
+    "message": "访问任意网页，点击 Image Harvest 图标即可开始扫描。"
+  },
+  "welcome_cta_button": {
+    "message": "开始探索"
+  },
+  "welcome_footer": {
+    "message": "试用 7 天后到期 · 无需信用卡"
   },
   "progress_downloading": {
     "message": "下载中..."
