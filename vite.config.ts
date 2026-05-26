@@ -108,6 +108,7 @@ export default defineConfig(({ mode }) => ({
       // automatically. Adding it as an explicit input ensures Vite bundles it.
       input: {
         'reverse-search': resolve(__dirname, 'pages/reverse-search.html'),
+        welcome: resolve(__dirname, 'pages/welcome.html'),
       },
       output: {
         // crxjs sets these per-input, but we keep an explicit hint for any
