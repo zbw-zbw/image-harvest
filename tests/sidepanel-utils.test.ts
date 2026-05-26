@@ -141,16 +141,14 @@ describe('truncateUrl', () => {
 });
 
 describe('generateId', () => {
-  it('returns an id with the "img_" prefix and two base36 segments', () => {
+  it('returns a valid UUID', () => {
     const id = generateId('https://x.com/a.png');
-    expect(id).toMatch(/^img_[a-z0-9]+_[a-z0-9]+$/);
+    expect(id).toMatch(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/);
   });
 
-  it('produces a stable hash component for the same input within a single tick', () => {
-    // Hash component is deterministic; only the timestamp segment varies.
-    const ids = [generateId('foo'), generateId('foo')];
-    const hashes = ids.map((id) => id.split('_')[1]);
-    expect(hashes[0]).toBe(hashes[1]);
+  it('produces unique IDs for the same input', () => {
+    const ids = new Set([generateId('foo'), generateId('foo'), generateId('foo')]);
+    expect(ids.size).toBe(3);
   });
 });
 

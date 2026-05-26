@@ -120,13 +120,11 @@ export function handleMessage(message: IncomingMessage): void {
         );
 
         const prevCount = state.allImages.length;
-        let addedCount = 0;
-        newImgs.forEach((ni) => {
-          if (!state.allImages.find((img) => img.url === ni.url)) {
-            state.allImages.push(ni);
-            addedCount++;
-          }
-        });
+        const toAdd = newImgs.filter((ni) => !state.allImages.find((img) => img.url === ni.url));
+        if (toAdd.length > 0) {
+          state.allImages = [...state.allImages, ...toAdd];
+        }
+        const addedCount = toAdd.length;
 
         state.scanDiscoveredCount += message.images.length;
         state.scanDiscoveredImages.push(...message.images);
@@ -173,14 +171,10 @@ export function handleMessage(message: IncomingMessage): void {
               phash: null,
             }) as ImageItem
         );
-        let addedCount = 0;
-        newImgs.forEach((ni) => {
-          if (!state.allImages.find((img) => img.url === ni.url)) {
-            state.allImages.push(ni);
-            addedCount++;
-          }
-        });
+        const toAdd = newImgs.filter((ni) => !state.allImages.find((img) => img.url === ni.url));
+        const addedCount = toAdd.length;
         if (addedCount > 0) {
+          state.allImages = [...state.allImages, ...toAdd];
           applyFilters();
           showDiscoveredToastDebounced(addedCount);
         }
@@ -233,11 +227,12 @@ export function handleMessage(message: IncomingMessage): void {
             }) as ImageItem
         );
 
-        newImages.forEach((newImg) => {
-          if (!state.allImages.find((img) => img.url === newImg.url)) {
-            state.allImages.push(newImg);
-          }
-        });
+        const toAdd = newImages.filter(
+          (newImg) => !state.allImages.find((img) => img.url === newImg.url)
+        );
+        if (toAdd.length > 0) {
+          state.allImages = [...state.allImages, ...toAdd];
+        }
 
         state.currentGroupMode = 'tab';
         if (elements.groupMode) (elements.groupMode as HTMLSelectElement).value = 'tab';

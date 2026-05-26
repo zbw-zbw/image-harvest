@@ -577,7 +577,7 @@ describe('applyFilters', () => {
     state.activeFilters = { ...state.activeFilters, size: 'all', types: [], layout: 'all' };
     // Pre-populate cache key matching what applyFilters will compute
     // (after sortImages rearranges; with equal pixels the order is preserved).
-    state.lastRenderedFilteredIds = 'a,b';
+    state.lastRenderedFilteredIds = '2:a:b';
 
     applyFilters();
 
@@ -598,7 +598,7 @@ describe('applyFilters', () => {
 
     applyFilters();
 
-    expect(state.lastRenderedFilteredIds).toBe('a');
+    expect(state.lastRenderedFilteredIds).toBe('1:a:a');
     expect(render.renderImages).toHaveBeenCalledTimes(1);
     expect(actions.updateSelectionUI).toHaveBeenCalledTimes(1);
   });

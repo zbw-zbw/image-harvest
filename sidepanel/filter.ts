@@ -32,7 +32,10 @@ export function applyFilters(): void {
   // Skip renderImages() if the filtered image list is identical to the last
   // render. This avoids unnecessary scrollTop resets and count updates when
   // tab-switch cache restore produces the same filtered set.
-  const currentFilteredIds = state.filteredImages.map((img) => img.id).join(',');
+  const currentFilteredIds =
+    state.filteredImages.length === 0
+      ? ''
+      : `${state.filteredImages.length}:${state.filteredImages[0].id}:${state.filteredImages[state.filteredImages.length - 1].id}`;
   if (currentFilteredIds === state.lastRenderedFilteredIds) {
     // Still update selection UI in case selection state changed
     updateSelectionUI();

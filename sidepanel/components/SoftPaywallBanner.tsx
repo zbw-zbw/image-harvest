@@ -30,7 +30,7 @@ import { isTrialEligible } from '../../shared/trial';
  */
 function openUpgradeModal(): void {
   state.proUpgradeModalState = { open: true, errorText: '' };
-  void track(EVENTS.SOFT_PAYWALL_DISMISSED, { action: 'trial' });
+  void track(EVENTS.SOFT_PAYWALL_CTA_CLICKED, { action: 'trial' });
 }
 
 export function SoftPaywallBanner() {

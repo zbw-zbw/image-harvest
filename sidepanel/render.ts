@@ -7,6 +7,7 @@ import type { ImageItem } from '../shared/types';
 import { updateSelectionUI } from './actions';
 import {
   filterByColor,
+  filterByFileSize,
   filterByLayout,
   filterBySettingsMaxSize,
   filterBySettingsMinSize,
@@ -43,7 +44,8 @@ export function renderProgressiveImages(): void {
       filterByUrl(img) &&
       filterByColor(img) &&
       filterBySettingsMinSize(img) &&
-      filterBySettingsMaxSize(img)
+      filterBySettingsMaxSize(img) &&
+      filterByFileSize(img)
     );
   });
   sortImages();

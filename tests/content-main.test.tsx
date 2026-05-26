@@ -735,13 +735,8 @@ describe('extractPictureSources (via extractImages)', () => {
 // extractFromStylesheets — currently a no-op (touches resolveUrl only)
 // ─────────────────────────────────────────────────────────────────────
 
-describe('extractFromStylesheets (via extractImages)', () => {
-  it('does NOT add stylesheet-only background URLs to results (delegated to getComputedStyle)', async () => {
-    // Pin the current "no-op" semantics: stylesheet-only URLs are
-    // intentionally NOT collected here because per-element
-    // getComputedStyle in extractBackgroundImages catches whatever's
-    // actually applied. Adding them here would produce orphan ImageItems
-    // with no element context (no rect → 0×0 dimensions → bad UX).
+describe('extractFromStylesheets (removed — no-op was deleted in v1.0.5)', () => {
+  it('stylesheet-only background URLs are NOT in results (caught by getComputedStyle)', async () => {
     const styleEl = document.createElement('style');
     styleEl.textContent = ".x { background-image: url('https://example.com/sheet-only.jpg'); }";
     document.head.appendChild(styleEl);
@@ -751,8 +746,6 @@ describe('extractFromStylesheets (via extractImages)', () => {
   });
 
   it('survives cross-origin sheet access errors silently', async () => {
-    // Pin the defensive try/catch — accessing cssRules on cross-origin
-    // sheets throws SecurityError. Must not crash the whole pipeline.
     Object.defineProperty(document, 'styleSheets', {
       value: [
         {
@@ -769,30 +762,6 @@ describe('extractFromStylesheets (via extractImages)', () => {
 
     const extractImages = await getExtractImages();
     await expect(extractImages()).resolves.toBeDefined();
-  });
-
-  it('outer document.styleSheets access throwing → console.warn + continues pipeline', async () => {
-    // Pin: the OUTER try/catch at the top of extractFromStylesheets.
-    // The inner `for (const sheet of ...)` is guarded by its own try,
-    // but `document.styleSheets` itself can throw (iframe contexts,
-    // restricted origins). Without the outer catch the error would
-    // reject the whole extractImages() Promise and surface as "scan
-    // failed" toast to the user.
-    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
-    // Make the ENTIRE styleSheets collection throw on iteration.
-    Object.defineProperty(document, 'styleSheets', {
-      get() {
-        throw new Error('restricted context');
-      },
-      configurable: true,
-    });
-
-    const extractImages = await getExtractImages();
-    await expect(extractImages()).resolves.toBeDefined();
-    // Console warn fired with the documented prefix so debugging is
-    // possible without failing the user-facing operation.
-    expect(warnSpy).toHaveBeenCalledWith('Failed to extract from stylesheets:', expect.any(Error));
-    warnSpy.mockRestore();
   });
 });
 

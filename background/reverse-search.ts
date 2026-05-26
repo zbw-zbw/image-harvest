@@ -123,7 +123,7 @@ async function uploadToBaidu(
     }, 10000);
   });
 
-  await new Promise((r) => setTimeout(r, 1500));
+  await new Promise((r) => setTimeout(r, 300));
 
   await chrome.scripting.executeScript({
     target: { tabId },

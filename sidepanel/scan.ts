@@ -587,8 +587,11 @@ export async function processImageExtras(images: ImageItem[]): Promise<void> {
     if (!hasWidth || !hasHeight) {
       metaPromises.push(
         new Promise<void>((resolve) => {
+          let settled = false;
           const probe = new Image();
           probe.onload = () => {
+            if (settled) return;
+            settled = true;
             if (probe.naturalWidth > 0) {
               img.naturalWidth = probe.naturalWidth;
               img.naturalHeight = probe.naturalHeight;
@@ -597,9 +600,17 @@ export async function processImageExtras(images: ImageItem[]): Promise<void> {
             }
             resolve();
           };
-          probe.onerror = () => resolve();
-          // Timeout after 8 seconds to avoid blocking
-          setTimeout(resolve, 8000);
+          probe.onerror = () => {
+            if (settled) return;
+            settled = true;
+            resolve();
+          };
+          setTimeout(() => {
+            if (settled) return;
+            settled = true;
+            probe.src = '';
+            resolve();
+          }, 8000);
           probe.src = img.url;
         })
       );

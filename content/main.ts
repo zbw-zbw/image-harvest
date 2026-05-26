@@ -134,8 +134,8 @@ export async function extractImages(options: ExtractOptions = {}): Promise<Image
     // 3. Extract picture sources
     await extractPictureSources(images);
 
-    // 4. Extract from CSS rules (limited)
-    await extractFromStylesheets();
+    // 4. (removed: extractFromStylesheets was a no-op — per-element
+    //    getComputedStyle already catches applied background images)
 
     // 5. Extract inline <svg> elements
     await extractInlineSvgs(images);
@@ -486,36 +486,6 @@ async function extractPictureSources(images: Map<string, ImageItem>): Promise<vo
         images.set(resolvedUrl, item);
       }
     }
-  }
-}
-
-// Extract from stylesheets (limited due to CORS) — currently a no-op since
-// per-element getComputedStyle catches what's actually applied.
-async function extractFromStylesheets(): Promise<void> {
-  try {
-    for (const sheet of document.styleSheets) {
-      try {
-        const rules = sheet.cssRules || sheet.rules;
-        if (!rules) continue;
-        for (const rule of rules) {
-          const styleRule = rule as CSSStyleRule;
-          if (styleRule.style && styleRule.style.backgroundImage) {
-            const urls = extractBackgroundUrls(styleRule.style.backgroundImage);
-            for (const url of urls) {
-              if (!url || isGradient(url)) continue;
-              if (isDataUri(url)) continue;
-              // Don't add stylesheet-only images without element context
-              // They'll be caught by getComputedStyle if applied
-              resolveUrl(url); // touch to keep imports satisfied
-            }
-          }
-        }
-      } catch {
-        // Cross-origin stylesheet, skip
-      }
-    }
-  } catch (error) {
-    console.warn('Failed to extract from stylesheets:', error);
   }
 }
 

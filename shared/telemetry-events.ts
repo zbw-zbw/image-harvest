@@ -58,6 +58,7 @@ export const EVENTS = {
   // Soft paywall (Sprint 2)
   SOFT_PAYWALL_SHOWN: 'soft_paywall_shown',
   SOFT_PAYWALL_DISMISSED: 'soft_paywall_dismissed',
+  SOFT_PAYWALL_CTA_CLICKED: 'soft_paywall_cta_clicked',
 
   // Health / errors (counts only, never the message)
   ERROR_OCCURRED: 'error_occurred', // props: { code: string }
@@ -115,7 +116,8 @@ export const EVENT_PROP_SCHEMAS: Record<TelemetryEventName, readonly string[]> =
   [EVENTS.PRO_FEATURE_USED]: ['feature'],
 
   [EVENTS.SOFT_PAYWALL_SHOWN]: ['triggerCount', 'abBucket'], // download count threshold
-  [EVENTS.SOFT_PAYWALL_DISMISSED]: ['action', 'abBucket'], // action: "later" | "trial" | "close"
+  [EVENTS.SOFT_PAYWALL_DISMISSED]: ['action', 'abBucket'], // action: "later" | "close"
+  [EVENTS.SOFT_PAYWALL_CTA_CLICKED]: ['action', 'abBucket'], // action: "trial" | "pricing"
 
   [EVENTS.ERROR_OCCURRED]: ['code'],
 };

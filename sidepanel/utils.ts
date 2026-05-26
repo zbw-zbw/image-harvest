@@ -102,13 +102,8 @@ export function truncateUrl(url: string, maxLen: number): string {
   return url.substring(0, maxLen) + '...';
 }
 
-export function generateId(str: string): string {
-  let hash = 0;
-  for (let i = 0; i < str.length; i++) {
-    hash = (hash << 5) - hash + str.charCodeAt(i);
-    hash = hash & hash;
-  }
-  return 'img_' + Math.abs(hash).toString(36) + '_' + Date.now().toString(36);
+export function generateId(_str: string): string {
+  return crypto.randomUUID();
 }
 
 export function generateFilename(

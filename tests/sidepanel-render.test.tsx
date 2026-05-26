@@ -25,6 +25,7 @@ vi.mock('../sidepanel/actions', () => ({
 }));
 vi.mock('../sidepanel/filter', () => ({
   filterByColor: vi.fn(),
+  filterByFileSize: vi.fn(),
   filterByLayout: vi.fn(),
   filterBySettingsMaxSize: vi.fn(),
   filterBySettingsMinSize: vi.fn(),
@@ -50,6 +51,7 @@ import { calcSkeletonCount, checkNarrowMode, showEmpty } from '../sidepanel/ui';
 import { updateSelectionUI } from '../sidepanel/actions';
 import {
   filterByColor,
+  filterByFileSize,
   filterByLayout,
   filterBySettingsMaxSize,
   filterBySettingsMinSize,
@@ -71,6 +73,7 @@ function passAllFilters(): void {
   vi.mocked(filterByColor).mockReturnValue(true);
   vi.mocked(filterBySettingsMinSize).mockReturnValue(true);
   vi.mocked(filterBySettingsMaxSize).mockReturnValue(true);
+  vi.mocked(filterByFileSize).mockReturnValue(true);
 }
 
 beforeEach(() => {

@@ -116,17 +116,31 @@ export function updateSelectionUI(): void {
 
 export function safeSendMessageToTab<T = unknown>(message: unknown): Promise<T | null> {
   return new Promise((resolve) => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-      const tab = tabs[0];
-      if (!tab || !tab.id || isRestrictedUrl(tab.url)) {
-        resolve(null);
-        return;
-      }
-      chrome.tabs
-        .sendMessage(tab.id, message)
-        .then((resp) => resolve(resp as T))
-        .catch(() => resolve(null));
-    });
+    const tabId = state.currentTabId;
+    if (tabId) {
+      chrome.tabs.get(tabId, (tab) => {
+        if (chrome.runtime.lastError || !tab || isRestrictedUrl(tab.url)) {
+          resolve(null);
+          return;
+        }
+        chrome.tabs
+          .sendMessage(tabId, message)
+          .then((resp) => resolve(resp as T))
+          .catch(() => resolve(null));
+      });
+    } else {
+      chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        const tab = tabs[0];
+        if (!tab || !tab.id || isRestrictedUrl(tab.url)) {
+          resolve(null);
+          return;
+        }
+        chrome.tabs
+          .sendMessage(tab.id, message)
+          .then((resp) => resolve(resp as T))
+          .catch(() => resolve(null));
+      });
+    }
   });
 }
 

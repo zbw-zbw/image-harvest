@@ -27,7 +27,7 @@
 //   - #btn-pro-modal-pricing       — secondary "View Pricing" CTA
 //   - #pro-modal-trial-error       — error line for the trial CTA path
 
-import { useEffect, useState } from 'preact/hooks';
+import { useEffect, useRef, useState } from 'preact/hooks';
 import type { ComponentChildren } from 'preact';
 import { useStoreSelector } from './storeHook';
 import { state } from '../state';
@@ -132,6 +132,32 @@ export function ProUpgradeModal() {
   const [trialError, setTrialError] = useState('');
   const [trialLoading, setTrialLoading] = useState(false);
   const [trialEligible, setTrialEligible] = useState(true);
+  const contentRef = useRef<HTMLDivElement>(null);
+  const previousFocusRef = useRef<HTMLElement | null>(null);
+
+  // Escape key handler + focus management
+  useEffect(() => {
+    if (!ms.open) return;
+    previousFocusRef.current = document.activeElement as HTMLElement | null;
+    const timer = setTimeout(() => {
+      const first = contentRef.current?.querySelector<HTMLElement>(
+        'input, button:not([disabled]), [tabindex]:not([tabindex="-1"])'
+      );
+      first?.focus();
+    }, 50);
+    function onKeyDown(e: KeyboardEvent) {
+      if (e.key === 'Escape') {
+        e.stopPropagation();
+        close();
+      }
+    }
+    document.addEventListener('keydown', onKeyDown, true);
+    return () => {
+      clearTimeout(timer);
+      document.removeEventListener('keydown', onKeyDown, true);
+      previousFocusRef.current?.focus();
+    };
+  }, [ms.open]);
 
   // Resolve A/B bucket + paywall download count + trial eligibility once
   // on mount. All are cheap (cache-hit after first call) and feed the
@@ -175,9 +201,15 @@ export function ProUpgradeModal() {
   return (
     <div id="pro-upgrade-modal" class={`modal${ms.open ? '' : ' hidden'}`}>
       <div class="modal-overlay" onClick={close} />
-      <div class="modal-content pro-upgrade-content">
+      <div
+        class="modal-content pro-upgrade-content"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="pro-modal-title"
+        ref={contentRef}
+      >
         <div class="modal-header">
-          <h2>
+          <h2 id="pro-modal-title">
             <svg
               class="modal-title-icon"
               width="20"

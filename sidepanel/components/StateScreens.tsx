@@ -312,7 +312,7 @@ const RESTRICTED_FEATURES = [
 function RestrictedScreen({ visible }: ScreenProps) {
   // Read version from the extension manifest so it stays in sync with
   // package.json automatically (crxjs injects the version at build time).
-  const version = chrome?.runtime?.getManifest?.()?.version ?? '1.0.2';
+  const version = chrome?.runtime?.getManifest?.()?.version ?? '';
 
   return (
     <div id="restricted-state" class={`restricted-state${visible ? '' : ' hidden'}`}>
