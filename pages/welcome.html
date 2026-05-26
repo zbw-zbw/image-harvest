@@ -5,468 +5,1085 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Welcome to Image Harvest</title>
     <style>
-      :root {
-        --primary: #4f46e5;
-        --primary-light: #eef2ff;
-        --success: #059669;
-        --text: #1f2937;
-        --text-muted: #6b7280;
-        --bg: #ffffff;
-        --card-bg: #f9fafb;
-        --border: #e5e7eb;
-        --radius: 12px;
-      }
-
-      * {
+      /* ============================================
+         Reset & Base
+         ============================================ */
+      *,
+      *::before,
+      *::after {
         margin: 0;
         padding: 0;
         box-sizing: border-box;
       }
 
+      :root {
+        --primary: #60b557;
+        --primary-hover: #4a9a42;
+        --primary-glow: rgba(96, 181, 87, 0.35);
+        --primary-soft: rgba(96, 181, 87, 0.1);
+        --primary-softer: rgba(96, 181, 87, 0.06);
+        --gold-gradient: linear-gradient(135deg, #ffd700, #ffb800);
+        --text-primary: #111827;
+        --text-secondary: #6b7280;
+        --text-tertiary: #9ca3af;
+        --bg: #ffffff;
+        --bg-secondary: #f3f4f6;
+        --bg-tertiary: #e5e7eb;
+        --border: #e5e7eb;
+        --border-subtle: #f3f4f6;
+        --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+        --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        --shadow-green: 0 8px 24px rgba(96, 181, 87, 0.28);
+        --radius-sm: 4px;
+        --radius-md: 6px;
+        --radius-lg: 8px;
+        --radius-xl: 12px;
+        --radius-2xl: 16px;
+        --font:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell,
+          sans-serif;
+      }
+
+      html {
+        scroll-behavior: smooth;
+      }
+
       body {
-        font-family:
-          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
-        background: linear-gradient(135deg, #eef2ff 0%, #faf5ff 50%, #ecfdf5 100%);
-        color: var(--text);
+        font-family: var(--font);
+        background: var(--bg);
+        color: var(--text-primary);
         min-height: 100vh;
-        padding: 40px 20px;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
       }
 
-      .container {
-        max-width: 800px;
+      /* ============================================
+         Keyframe Animations
+         ============================================ */
+      @keyframes floatIn {
+        from {
+          opacity: 0;
+          transform: translateY(16px) scale(0.97);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0) scale(1);
+        }
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes slideInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      @keyframes slideInRight {
+        from {
+          opacity: 0;
+          transform: translateX(16px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+          transform: scale(1);
+        }
+        50% {
+          opacity: 0.55;
+          transform: scale(0.85);
+        }
+      }
+
+      @keyframes shimmer {
+        0% {
+          background-position: 200% 0;
+        }
+        100% {
+          background-position: -200% 0;
+        }
+      }
+
+      @keyframes glow-ring {
+        0%,
+        100% {
+          box-shadow:
+            0 0 0 0 var(--primary-glow),
+            var(--shadow-green);
+        }
+        50% {
+          box-shadow:
+            0 0 0 8px rgba(96, 181, 87, 0),
+            var(--shadow-green);
+        }
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0);
+        }
+        50% {
+          transform: translateY(-5px);
+        }
+      }
+
+      @keyframes sparkle-travel {
+        0% {
+          transform: scaleX(0);
+          transform-origin: left;
+          opacity: 0;
+        }
+        20% {
+          opacity: 1;
+        }
+        80% {
+          opacity: 1;
+        }
+        100% {
+          transform: scaleX(1);
+          transform-origin: left;
+          opacity: 0;
+        }
+      }
+
+      @keyframes spin {
+        to {
+          transform: rotate(360deg);
+        }
+      }
+
+      /* ============================================
+         Page Background — dot-grid + radial glow
+         ============================================ */
+      .page-bg {
+        position: fixed;
+        inset: 0;
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      .page-bg::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(circle at 1px 1px, #d1d5db 0.75px, transparent 0);
+        background-size: 22px 22px;
+        opacity: 0.35;
+      }
+
+      .page-bg::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          ellipse 80% 50% at 50% 0%,
+          rgba(96, 181, 87, 0.09),
+          transparent 70%
+        );
+      }
+
+      /* ============================================
+         Layout
+         ============================================ */
+      .page {
+        position: relative;
+        z-index: 1;
+        max-width: 720px;
         margin: 0 auto;
+        padding: 52px 28px 60px;
       }
 
-      /* Hero */
+      /* ============================================
+         Hero Section
+         ============================================ */
       .hero {
         text-align: center;
-        margin-bottom: 48px;
+        margin-bottom: 40px;
+        animation: floatIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
       }
 
-      .hero-icon {
-        width: 72px;
-        height: 72px;
-        margin: 0 auto 20px;
+      .hero-icon-wrap {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 80px;
+        height: 80px;
+        border-radius: 20px;
         background: var(--primary);
-        border-radius: 18px;
+        box-shadow: var(--shadow-green);
+        margin-bottom: 20px;
+        animation:
+          glow-ring 3s ease-in-out 1s infinite,
+          floatIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
+        position: relative;
+      }
+
+      .hero-icon-wrap::before {
+        content: '';
+        position: absolute;
+        inset: -3px;
+        border-radius: 23px;
+        border: 2px solid rgba(96, 181, 87, 0.3);
+        animation: glow-ring 3s ease-in-out 1s infinite;
+        pointer-events: none;
+      }
+
+      .hero-icon-wrap svg {
+        width: 44px;
+        height: 44px;
+        fill: none;
+        stroke: #ffffff;
+        stroke-width: 1.75;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15));
+      }
+
+      .hero-wordmark {
+        display: inline-flex;
+        align-items: center;
+        gap: 7px;
+        background: var(--bg-secondary);
+        border: 1px solid var(--border);
+        border-radius: 20px;
+        padding: 3px 12px 3px 8px;
+        margin-bottom: 14px;
+        animation: slideInDown 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+      }
+
+      .hero-wordmark-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 50%;
+        background: var(--primary);
+        animation: pulse 2s ease-in-out infinite;
+        flex-shrink: 0;
+      }
+
+      .hero-wordmark-text {
+        font-size: 11px;
+        font-weight: 600;
+        color: var(--text-secondary);
+        letter-spacing: 0.4px;
+        text-transform: uppercase;
+      }
+
+      .hero h1 {
+        font-size: 34px;
+        font-weight: 800;
+        letter-spacing: -0.5px;
+        color: var(--text-primary);
+        line-height: 1.15;
+        margin-bottom: 14px;
+        animation: fadeInUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.18s both;
+      }
+
+      .hero h1 .accent {
+        color: var(--primary);
+      }
+
+      .hero-subtitle {
+        font-size: 16px;
+        color: var(--text-secondary);
+        line-height: 1.65;
+        max-width: 480px;
+        margin: 0 auto;
+        animation: fadeInUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.26s both;
+      }
+
+      /* ============================================
+         Section Divider — animated sparkle line
+         ============================================ */
+      .sparkle-divider {
+        position: relative;
+        height: 2px;
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          var(--border) 20%,
+          var(--border) 80%,
+          transparent 100%
+        );
+        margin: 36px 0;
+        border-radius: 2px;
+        overflow: visible;
+      }
+
+      .sparkle-divider::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(90deg, transparent 0%, var(--primary) 50%, transparent 100%);
+        border-radius: 2px;
+        animation: sparkle-travel 2.8s cubic-bezier(0.4, 0, 0.2, 1) 0.8s both;
+      }
+
+      /* ============================================
+         Trial Banner
+         ============================================ */
+      .trial-banner {
+        display: flex;
+        align-items: center;
+        gap: 0;
+        background: var(--bg);
+        border: 1.5px solid var(--border);
+        border-radius: var(--radius-xl);
+        box-shadow: var(--shadow-md);
+        margin-bottom: 40px;
+        overflow: hidden;
+        animation: slideInDown 0.45s cubic-bezier(0.22, 1, 0.36, 1) 0.35s both;
+      }
+
+      .trial-banner-accent {
+        width: 5px;
+        align-self: stretch;
+        background: linear-gradient(180deg, #60b557 0%, #7cc975 100%);
+        flex-shrink: 0;
+      }
+
+      .trial-banner-body {
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        flex: 1;
+        padding: 18px 20px;
+      }
+
+      .trial-banner-icon-wrap {
         display: flex;
         align-items: center;
         justify-content: center;
-        box-shadow: 0 8px 24px rgba(79, 70, 229, 0.3);
+        width: 44px;
+        height: 44px;
+        border-radius: 12px;
+        background: var(--primary-soft);
+        flex-shrink: 0;
       }
 
-      .hero-icon svg {
-        width: 40px;
-        height: 40px;
+      .trial-banner-icon-wrap svg {
+        width: 22px;
+        height: 22px;
         fill: none;
-        stroke: white;
+        stroke: var(--primary);
         stroke-width: 2;
         stroke-linecap: round;
         stroke-linejoin: round;
       }
 
-      .hero h1 {
-        font-size: 28px;
-        font-weight: 700;
-        margin-bottom: 12px;
-        color: var(--text);
-      }
-
-      .hero p {
-        font-size: 16px;
-        color: var(--text-muted);
-        max-width: 500px;
-        margin: 0 auto;
-        line-height: 1.6;
-      }
-
-      /* Trial banner */
-      .trial-banner {
-        background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
-        color: white;
-        padding: 20px 28px;
-        border-radius: var(--radius);
-        margin-bottom: 40px;
-        display: flex;
-        align-items: center;
-        gap: 16px;
-        box-shadow: 0 4px 16px rgba(79, 70, 229, 0.25);
-      }
-
-      .trial-banner-icon {
-        font-size: 32px;
-        flex-shrink: 0;
+      .trial-banner-text {
+        flex: 1;
+        min-width: 0;
       }
 
       .trial-banner-text h2 {
-        font-size: 18px;
-        font-weight: 600;
-        margin-bottom: 4px;
+        font-size: 15px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 3px;
       }
 
       .trial-banner-text p {
-        font-size: 14px;
-        opacity: 0.9;
+        font-size: 13px;
+        color: var(--text-secondary);
+        line-height: 1.5;
       }
 
       .trial-countdown {
-        margin-left: auto;
-        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: var(--primary-softer);
+        border-left: 1.5px solid var(--border-subtle);
+        padding: 18px 24px;
+        min-width: 88px;
         flex-shrink: 0;
+        align-self: stretch;
       }
 
-      .trial-countdown .days {
-        font-size: 28px;
-        font-weight: 700;
+      .trial-countdown-number {
+        font-size: 36px;
+        font-weight: 900;
+        color: var(--primary);
+        line-height: 1;
+        letter-spacing: -1px;
+        font-variant-numeric: tabular-nums;
       }
 
-      .trial-countdown .label {
-        font-size: 12px;
-        opacity: 0.8;
-        text-transform: uppercase;
-        letter-spacing: 0.5px;
-      }
-
-      /* Features grid */
-      .features-title {
-        font-size: 20px;
+      .trial-countdown-label {
+        font-size: 10px;
         font-weight: 600;
+        color: var(--text-tertiary);
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        margin-top: 2px;
+      }
+
+      .trial-pulse {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        background: var(--primary);
+        animation: pulse 1.8s ease-in-out infinite;
+        margin-right: 6px;
+        vertical-align: middle;
+        position: relative;
+        top: -1px;
+      }
+
+      /* ============================================
+         Features Section
+         ============================================ */
+      .section-header {
         text-align: center;
         margin-bottom: 24px;
       }
 
+      .section-label {
+        display: inline-block;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 1px;
+        text-transform: uppercase;
+        color: var(--primary);
+        margin-bottom: 8px;
+      }
+
+      .section-title {
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: -0.3px;
+        color: var(--text-primary);
+      }
+
       .features-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: 16px;
-        margin-bottom: 48px;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 14px;
+        margin-bottom: 0;
       }
 
       .feature-card {
         background: var(--bg);
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
+        border: 1.5px solid var(--border);
+        border-radius: var(--radius-xl);
         padding: 20px;
+        cursor: default;
         transition:
-          transform 0.2s,
-          box-shadow 0.2s;
+          transform 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+          box-shadow 0.2s cubic-bezier(0.22, 1, 0.36, 1),
+          border-color 0.2s ease;
+        opacity: 0;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .feature-card::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, var(--primary-softer) 0%, transparent 60%);
+        opacity: 0;
+        transition: opacity 0.2s ease;
+        pointer-events: none;
       }
 
       .feature-card:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        transform: translateY(-3px) scale(1.01);
+        box-shadow: var(--shadow-lg);
+        border-color: rgba(96, 181, 87, 0.2);
       }
 
-      .feature-card-header {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        margin-bottom: 10px;
+      .feature-card:hover::before {
+        opacity: 1;
+      }
+
+      /* Staggered float-in on load */
+      .feature-card.animate {
+        animation: floatIn 0.4s cubic-bezier(0.22, 1, 0.36, 1) both;
+        opacity: 1;
+      }
+
+      .feature-card:nth-child(1) {
+        animation-delay: 0.55s;
+      }
+      .feature-card:nth-child(2) {
+        animation-delay: 0.65s;
+      }
+      .feature-card:nth-child(3) {
+        animation-delay: 0.75s;
+      }
+      .feature-card:nth-child(4) {
+        animation-delay: 0.85s;
+      }
+      .feature-card:nth-child(5) {
+        animation-delay: 0.95s;
+      }
+      .feature-card:nth-child(6) {
+        animation-delay: 1.05s;
       }
 
       .feature-icon {
-        width: 36px;
-        height: 36px;
-        border-radius: 8px;
         display: flex;
         align-items: center;
         justify-content: center;
+        width: 42px;
+        height: 42px;
+        border-radius: var(--radius-lg);
+        margin-bottom: 14px;
         flex-shrink: 0;
+        position: relative;
       }
 
       .feature-icon svg {
         width: 20px;
         height: 20px;
         fill: none;
-        stroke: white;
+        stroke: #ffffff;
         stroke-width: 2;
         stroke-linecap: round;
         stroke-linejoin: round;
+        position: relative;
+        z-index: 1;
       }
 
-      .feature-icon.blue {
-        background: #3b82f6;
+      /* Gradient icon backgrounds matching design system */
+      .gradient-blue {
+        background: linear-gradient(135deg, #60b557, #7cc975);
       }
-      .feature-icon.purple {
-        background: #8b5cf6;
+      .gradient-purple {
+        background: linear-gradient(135deg, #8b5cf6, #a78bfa);
       }
-      .feature-icon.green {
-        background: #10b981;
+      .gradient-green {
+        background: linear-gradient(135deg, #10b981, #34d399);
       }
-      .feature-icon.amber {
-        background: #f59e0b;
+      .gradient-amber {
+        background: linear-gradient(135deg, #f59e0b, #fbbf24);
       }
-      .feature-icon.pink {
-        background: #ec4899;
+      .gradient-pink {
+        background: linear-gradient(135deg, #ec4899, #f472b6);
       }
-      .feature-icon.indigo {
-        background: #6366f1;
+      .gradient-teal {
+        background: linear-gradient(135deg, #14b8a6, #2dd4bf);
       }
 
       .feature-card h3 {
-        font-size: 15px;
-        font-weight: 600;
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-primary);
+        margin-bottom: 6px;
+        letter-spacing: -0.1px;
       }
 
       .feature-card p {
         font-size: 13px;
-        color: var(--text-muted);
-        line-height: 1.5;
+        color: var(--text-secondary);
+        line-height: 1.6;
       }
 
       .pro-badge {
-        display: inline-block;
-        background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
-        color: white;
-        font-size: 10px;
-        font-weight: 600;
-        padding: 2px 6px;
-        border-radius: 4px;
-        text-transform: uppercase;
-        letter-spacing: 0.3px;
-      }
-
-      /* CTA */
-      .cta-section {
-        text-align: center;
-        padding: 32px;
-        background: var(--bg);
-        border-radius: var(--radius);
-        border: 1px solid var(--border);
-      }
-
-      .cta-section h2 {
-        font-size: 20px;
-        font-weight: 600;
-        margin-bottom: 8px;
-      }
-
-      .cta-section p {
-        font-size: 14px;
-        color: var(--text-muted);
-        margin-bottom: 20px;
-      }
-
-      .btn {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        padding: 12px 28px;
-        font-size: 15px;
-        font-weight: 600;
-        border-radius: 8px;
-        border: none;
-        cursor: pointer;
-        text-decoration: none;
-        transition:
-          transform 0.15s,
-          box-shadow 0.15s;
+        vertical-align: middle;
+        background: var(--gold-gradient);
+        color: #78350f;
+        font-size: 9px;
+        font-weight: 800;
+        padding: 2px 6px;
+        border-radius: var(--radius-sm);
+        text-transform: uppercase;
+        letter-spacing: 0.4px;
+        margin-left: 5px;
+        line-height: 1;
       }
 
-      .btn:hover {
-        transform: translateY(-1px);
+      /* ============================================
+         CTA Section
+         ============================================ */
+      .cta-section {
+        text-align: center;
+        padding: 44px 32px;
+        background: var(--bg);
+        border: 1.5px solid var(--border);
+        border-radius: var(--radius-2xl);
+        position: relative;
+        overflow: hidden;
+        animation: fadeInUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) 1.15s both;
+        opacity: 0;
       }
 
-      .btn-primary {
-        background: var(--primary);
-        color: white;
-        box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+      .cta-section.animate {
+        opacity: 1;
+        animation: fadeInUp 0.45s cubic-bezier(0.22, 1, 0.36, 1) 1.15s both;
       }
 
-      .btn-primary:hover {
-        box-shadow: 0 4px 16px rgba(79, 70, 229, 0.4);
+      /* Subtle dot-grid inside CTA */
+      .cta-section::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background-image: radial-gradient(circle at 1px 1px, #d1d5db 0.75px, transparent 0);
+        background-size: 18px 18px;
+        opacity: 0.2;
+        pointer-events: none;
       }
 
-      .btn svg {
-        width: 18px;
-        height: 18px;
+      /* Radial green glow inside CTA */
+      .cta-section::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(
+          ellipse 70% 60% at 50% 100%,
+          rgba(96, 181, 87, 0.08),
+          transparent 70%
+        );
+        pointer-events: none;
+      }
+
+      .cta-section-inner {
+        position: relative;
+        z-index: 1;
+      }
+
+      .cta-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 56px;
+        height: 56px;
+        border-radius: 14px;
+        background: var(--primary-soft);
+        margin-bottom: 18px;
+        animation: float 3.5s ease-in-out infinite;
+      }
+
+      .cta-icon svg {
+        width: 26px;
+        height: 26px;
         fill: none;
-        stroke: currentColor;
+        stroke: var(--primary);
         stroke-width: 2;
         stroke-linecap: round;
         stroke-linejoin: round;
       }
 
-      /* Footer */
+      .cta-section h2 {
+        font-size: 24px;
+        font-weight: 800;
+        letter-spacing: -0.35px;
+        color: var(--text-primary);
+        margin-bottom: 10px;
+      }
+
+      .cta-section p {
+        font-size: 14px;
+        color: var(--text-secondary);
+        max-width: 360px;
+        margin: 0 auto 28px;
+        line-height: 1.65;
+      }
+
+      .btn-primary {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        padding: 14px 32px;
+        font-family: var(--font);
+        font-size: 15px;
+        font-weight: 700;
+        color: #ffffff;
+        background: var(--primary);
+        border: none;
+        border-radius: var(--radius-lg);
+        cursor: pointer;
+        text-decoration: none;
+        box-shadow:
+          var(--shadow-green),
+          0 1px 2px rgba(0, 0, 0, 0.08);
+        transition:
+          background 0.15s ease,
+          transform 0.15s cubic-bezier(0.22, 1, 0.36, 1),
+          box-shadow 0.15s ease;
+        letter-spacing: -0.1px;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn-primary::before {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, transparent 60%);
+        pointer-events: none;
+      }
+
+      .btn-primary:hover {
+        background: var(--primary-hover);
+        transform: translateY(-2px);
+        box-shadow:
+          0 12px 32px rgba(96, 181, 87, 0.4),
+          0 1px 2px rgba(0, 0, 0, 0.08);
+      }
+
+      .btn-primary:active {
+        transform: translateY(0);
+        box-shadow: var(--shadow-green);
+      }
+
+      .btn-primary svg {
+        width: 18px;
+        height: 18px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2.5;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        transition: transform 0.2s ease;
+      }
+
+      .btn-primary:hover svg {
+        transform: translateX(3px);
+      }
+
+      /* ============================================
+         Footer
+         ============================================ */
       .footer {
         text-align: center;
         margin-top: 32px;
-        font-size: 13px;
-        color: var(--text-muted);
+        font-size: 12px;
+        color: var(--text-tertiary);
+        animation: fadeInUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) 1.3s both;
+        opacity: 0;
       }
 
-      .footer a {
-        color: var(--primary);
-        text-decoration: none;
+      .footer.animate {
+        opacity: 1;
+        animation: fadeInUp 0.4s cubic-bezier(0.22, 1, 0.36, 1) 1.3s both;
       }
 
-      @media (max-width: 600px) {
-        body {
-          padding: 24px 16px;
+      .footer-inner {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .footer-dot {
+        width: 3px;
+        height: 3px;
+        border-radius: 50%;
+        background: var(--bg-tertiary);
+        display: inline-block;
+        flex-shrink: 0;
+      }
+
+      /* ============================================
+         Responsive
+         ============================================ */
+      @media (max-width: 560px) {
+        .page {
+          padding: 36px 18px 48px;
         }
+
         .hero h1 {
-          font-size: 22px;
+          font-size: 26px;
         }
+
+        .hero-subtitle {
+          font-size: 14px;
+        }
+
         .trial-banner {
+          flex-direction: row;
+        }
+
+        .trial-banner-body {
           flex-direction: column;
-          text-align: center;
+          align-items: flex-start;
+          gap: 10px;
+          padding: 16px;
         }
+
         .trial-countdown {
-          margin-left: 0;
+          padding: 16px 18px;
+          min-width: 72px;
         }
+
+        .trial-countdown-number {
+          font-size: 28px;
+        }
+
         .features-grid {
           grid-template-columns: 1fr;
+        }
+
+        .cta-section {
+          padding: 32px 20px;
+        }
+
+        .cta-section h2 {
+          font-size: 20px;
+        }
+      }
+
+      @media (max-width: 420px) {
+        .trial-banner {
+          flex-direction: column;
+        }
+
+        .trial-banner-accent {
+          width: 100%;
+          height: 4px;
+          align-self: auto;
+        }
+
+        .trial-countdown {
+          border-left: none;
+          border-top: 1.5px solid var(--border-subtle);
+          width: 100%;
+          flex-direction: row;
+          gap: 8px;
+          padding: 12px 16px;
         }
       }
     </style>
   </head>
   <body>
-    <div class="container">
-      <!-- Hero -->
-      <div class="hero">
-        <div class="hero-icon">
+    <!-- Page background (dot-grid + glow) -->
+    <div class="page-bg" aria-hidden="true"></div>
+
+    <div class="page">
+      <!-- ===================== HERO ===================== -->
+      <section class="hero">
+        <div class="hero-wordmark">
+          <span class="hero-wordmark-dot"></span>
+          <span class="hero-wordmark-text">Image Harvest Pro</span>
+        </div>
+
+        <div class="hero-icon-wrap" aria-hidden="true">
+          <!-- Camera / image icon -->
           <svg viewBox="0 0 24 24">
-            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-            <circle cx="8.5" cy="8.5" r="1.5" />
-            <polyline points="21 15 16 10 5 21" />
+            <rect x="3" y="6" width="18" height="14" rx="2" />
+            <circle cx="12" cy="13" r="3.5" />
+            <path d="M9 6l1.5-2h3L15 6" />
+            <circle cx="17.5" cy="9.5" r="1" fill="white" stroke="none" />
           </svg>
         </div>
-        <h1 data-i18n="welcome_title">Welcome to Image Harvest Pro</h1>
-        <p data-i18n="welcome_subtitle">
+
+        <h1 data-i18n="welcome_title">Welcome to Image&nbsp;<span class="accent">Harvest</span></h1>
+        <p class="hero-subtitle" data-i18n="welcome_subtitle">
           The smartest way to find, filter, and batch-download images from any webpage. Your 7-day
-          Pro trial is now active.
+          Pro trial is now active — no credit card required.
         </p>
-      </div>
+      </section>
 
-      <!-- Trial banner -->
-      <div class="trial-banner">
-        <div class="trial-banner-icon">🎁</div>
-        <div class="trial-banner-text">
-          <h2 data-i18n="welcome_trial_active">Your Pro Trial is Active</h2>
-          <p data-i18n="welcome_trial_desc">
-            All Pro features are unlocked. Explore everything — no credit card required.
-          </p>
-        </div>
-        <div class="trial-countdown">
-          <div class="days" id="countdown-days">7</div>
-          <div class="label" data-i18n="welcome_days_left">days left</div>
-        </div>
-      </div>
-
-      <!-- Features grid -->
-      <h3 class="features-title" data-i18n="welcome_features_title">What's Included in Pro</h3>
-      <div class="features-grid">
-        <div class="feature-card">
-          <div class="feature-card-header">
-            <div class="feature-icon blue">
-              <svg viewBox="0 0 24 24">
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
-              </svg>
-            </div>
-            <h3 data-i18n="welcome_feature_batch_title">Unlimited Batch Download</h3>
+      <!-- ===================== TRIAL BANNER ===================== -->
+      <div class="trial-banner" role="status">
+        <div class="trial-banner-accent" aria-hidden="true"></div>
+        <div class="trial-banner-body">
+          <div class="trial-banner-icon-wrap" aria-hidden="true">
+            <!-- Gift / spark icon -->
+            <svg viewBox="0 0 24 24">
+              <polyline points="20 12 20 22 4 22 4 12" />
+              <rect x="2" y="7" width="20" height="5" />
+              <line x1="12" y1="22" x2="12" y2="7" />
+              <path d="M12 7H7.5a2.5 2.5 0 0 1 0-5C11 2 12 7 12 7z" />
+              <path d="M12 7h4.5a2.5 2.5 0 0 0 0-5C13 2 12 7 12 7z" />
+            </svg>
           </div>
+          <div class="trial-banner-text">
+            <h2 data-i18n="welcome_trial_active">
+              <span class="trial-pulse" aria-hidden="true"></span>Your Pro Trial is Active
+            </h2>
+            <p data-i18n="welcome_trial_desc">
+              All Pro features are fully unlocked. Explore everything — no credit card required.
+            </p>
+          </div>
+        </div>
+        <div class="trial-countdown" aria-label="Days remaining in trial">
+          <div class="trial-countdown-number" id="countdown-days">7</div>
+          <div class="trial-countdown-label" data-i18n="welcome_days_left">days left</div>
+        </div>
+      </div>
+
+      <!-- Animated sparkle divider -->
+      <div class="sparkle-divider" aria-hidden="true"></div>
+
+      <!-- ===================== FEATURES ===================== -->
+      <div class="section-header">
+        <div class="section-label" aria-hidden="true">Pro Features</div>
+        <h2 class="section-title" data-i18n="welcome_features_title">
+          Everything Included in Your Trial
+        </h2>
+      </div>
+
+      <div class="features-grid" role="list">
+        <div class="feature-card animate" role="listitem">
+          <div class="feature-icon gradient-blue" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+              <polyline points="7 10 12 15 17 10" />
+              <line x1="12" y1="15" x2="12" y2="3" />
+            </svg>
+          </div>
+          <h3 data-i18n="welcome_feature_batch_title">Unlimited Batch Download</h3>
           <p data-i18n="welcome_feature_batch_desc">
-            Download up to 1000 images as ZIP. Convert formats on the fly (PNG, JPG, WebP).
+            Download up to 1,000 images as a ZIP. Convert formats on the fly — PNG, JPG, WebP.
           </p>
         </div>
 
-        <div class="feature-card">
-          <div class="feature-card-header">
-            <div class="feature-icon purple">
-              <svg viewBox="0 0 24 24">
-                <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-                <path d="M8 21h8M12 17v4" />
-              </svg>
-            </div>
-            <h3 data-i18n="welcome_feature_multitab_title">Multi-Tab Extract</h3>
+        <div class="feature-card animate" role="listitem">
+          <div class="feature-icon gradient-purple" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <rect x="3" y="3" width="18" height="18" rx="2" />
+              <line x1="3" y1="9" x2="21" y2="9" />
+              <line x1="9" y1="21" x2="9" y2="9" />
+            </svg>
           </div>
+          <h3 data-i18n="welcome_feature_multitab_title">
+            Multi-Tab Extract <span class="pro-badge">PRO</span>
+          </h3>
           <p data-i18n="welcome_feature_multitab_desc">
-            Scan images across multiple open tabs at once. Perfect for research and comparison.
+            Scan images across multiple open tabs simultaneously. Perfect for research.
           </p>
         </div>
 
-        <div class="feature-card">
-          <div class="feature-card-header">
-            <div class="feature-icon green">
-              <svg viewBox="0 0 24 24">
-                <circle cx="11" cy="11" r="8" />
-                <path d="M21 21l-4.35-4.35" />
-              </svg>
-            </div>
-            <h3 data-i18n="welcome_feature_similar_title">Similar Image Detection</h3>
+        <div class="feature-card animate" role="listitem">
+          <div class="feature-icon gradient-green" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
           </div>
+          <h3 data-i18n="welcome_feature_similar_title">
+            Similar Image Detection <span class="pro-badge">PRO</span>
+          </h3>
           <p data-i18n="welcome_feature_similar_desc">
             Find duplicates and near-duplicates using perceptual hashing (pHash) technology.
           </p>
         </div>
 
-        <div class="feature-card">
-          <div class="feature-card-header">
-            <div class="feature-icon amber">
-              <svg viewBox="0 0 24 24">
-                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-              </svg>
-            </div>
-            <h3 data-i18n="welcome_feature_grouping_title">Smart Grouping</h3>
+        <div class="feature-card animate" role="listitem">
+          <div class="feature-icon gradient-amber" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <rect x="3" y="3" width="7" height="7" rx="1" />
+              <rect x="14" y="3" width="7" height="7" rx="1" />
+              <rect x="3" y="14" width="18" height="7" rx="1" />
+            </svg>
           </div>
+          <h3 data-i18n="welcome_feature_grouping_title">
+            Smart Grouping <span class="pro-badge">PRO</span>
+          </h3>
           <p data-i18n="welcome_feature_grouping_desc">
-            Group images by domain, format, size range, or tab. 5 smart grouping modes.
+            Group images by domain, format, size range, or tab. Five smart modes.
           </p>
         </div>
 
-        <div class="feature-card">
-          <div class="feature-card-header">
-            <div class="feature-icon pink">
-              <svg viewBox="0 0 24 24">
-                <circle cx="13.5" cy="6.5" r="4.5" />
-                <circle cx="7.5" cy="13.5" r="4.5" />
-                <circle cx="16.5" cy="16.5" r="4.5" />
-              </svg>
-            </div>
-            <h3 data-i18n="welcome_feature_color_title">Color Palette Extract</h3>
+        <div class="feature-card animate" role="listitem">
+          <div class="feature-icon gradient-pink" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <circle cx="8" cy="8" r="4" />
+              <circle cx="16" cy="8" r="4" />
+              <circle cx="12" cy="16" r="4" />
+            </svg>
           </div>
+          <h3 data-i18n="welcome_feature_color_title">
+            Color Palette Extract <span class="pro-badge">PRO</span>
+          </h3>
           <p data-i18n="welcome_feature_color_desc">
             Extract dominant colors from any image. Copy HEX codes and filter by color.
           </p>
         </div>
 
-        <div class="feature-card">
-          <div class="feature-card-header">
-            <div class="feature-icon indigo">
-              <svg viewBox="0 0 24 24">
-                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
-              </svg>
-            </div>
-            <h3 data-i18n="welcome_feature_collections_title">Image Collections</h3>
+        <div class="feature-card animate" role="listitem">
+          <div class="feature-icon gradient-teal" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <polygon
+                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"
+              />
+            </svg>
           </div>
+          <h3 data-i18n="welcome_feature_collections_title">
+            Image Collections <span class="pro-badge">PRO</span>
+          </h3>
           <p data-i18n="welcome_feature_collections_desc">
             Save images with tags and notes. Organize across sessions and export as ZIP.
           </p>
         </div>
       </div>
 
-      <!-- CTA -->
-      <div class="cta-section">
-        <h2 data-i18n="welcome_cta_title">Ready to Start?</h2>
-        <p data-i18n="welcome_cta_desc">
-          Visit any webpage and click the Image Harvest icon to begin scanning.
-        </p>
-        <button class="btn btn-primary" id="btn-explore">
-          <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
-          <span data-i18n="welcome_cta_button">Start Exploring</span>
-        </button>
+      <!-- Animated sparkle divider -->
+      <div class="sparkle-divider" aria-hidden="true" style="margin-top: 40px"></div>
+
+      <!-- ===================== CTA ===================== -->
+      <div class="cta-section animate">
+        <div class="cta-section-inner">
+          <div class="cta-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24">
+              <path
+                d="M4.5 16.5c-1.5 1.26-2 5-2 5s3.74-.5 5-2c.71-.84.7-2.13-.09-2.91a2.18 2.18 0 0 0-2.91-.09z"
+              />
+              <path
+                d="M12 15l-3-3a22 22 0 0 1 2-3.95A12.88 12.88 0 0 1 22 2c0 2.72-.78 7.5-6 11a22.35 22.35 0 0 1-4 2z"
+              />
+              <path d="M9 12H4s.55-3.03 2-4c1.62-1.08 5 0 5 0" />
+              <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
+            </svg>
+          </div>
+          <h2 data-i18n="welcome_cta_title">Ready to Start Harvesting?</h2>
+          <p data-i18n="welcome_cta_desc">
+            Visit any webpage and click the Image Harvest icon in your toolbar to begin.
+          </p>
+          <button class="btn-primary" id="btn-explore" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 12h14" />
+              <path d="M12 5l7 7-7 7" />
+            </svg>
+            <span data-i18n="welcome_cta_button">Start Exploring</span>
+          </button>
+        </div>
       </div>
 
-      <!-- Footer -->
-      <div class="footer">
-        <p>
-          Image Harvest v<span id="version"></span> &middot;
+      <!-- ===================== FOOTER ===================== -->
+      <footer class="footer animate">
+        <div class="footer-inner">
+          <span>Image Harvest v<span id="version"></span></span>
+          <span class="footer-dot" aria-hidden="true"></span>
           <span data-i18n="welcome_footer"
             >Your trial ends in 7 days &middot; No credit card required</span
           >
-        </p>
-      </div>
+        </div>
+      </footer>
     </div>
+    <!-- /.page -->
 
     <script type="module" src="welcome.ts"></script>
   </body>
