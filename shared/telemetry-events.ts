@@ -49,7 +49,12 @@ export const EVENTS = {
   CHECKOUT_STARTED: 'checkout_started', // fired by the marketing site
   LICENSE_ACTIVATED: 'license_activated', // props: { plan: string }
   TRIAL_STARTED: 'trial_started',
+  TRIAL_AUTO_STARTED: 'trial_auto_started', // props: { source: 'install' | 'update' }
   TRIAL_EXPIRED: 'trial_expired',
+
+  // Welcome page (Phase 2)
+  WELCOME_PAGE_VIEWED: 'welcome_page_viewed', // props: { source: string }
+  WELCOME_CTA_CLICKED: 'welcome_cta_clicked', // props: { action: string }
 
   // Pro-feature touchpoints — tells us WHICH paywall is most effective
   PRO_FEATURE_BLOCKED: 'pro_feature_blocked', // props: { feature: string }
@@ -110,7 +115,11 @@ export const EVENT_PROP_SCHEMAS: Record<TelemetryEventName, readonly string[]> =
   [EVENTS.CHECKOUT_STARTED]: ['plan', 'abBucket'],
   [EVENTS.LICENSE_ACTIVATED]: ['plan', 'abBucket'],
   [EVENTS.TRIAL_STARTED]: ['abBucket'],
+  [EVENTS.TRIAL_AUTO_STARTED]: ['source', 'abBucket'],
   [EVENTS.TRIAL_EXPIRED]: ['abBucket'],
+
+  [EVENTS.WELCOME_PAGE_VIEWED]: ['source'],
+  [EVENTS.WELCOME_CTA_CLICKED]: ['action'],
 
   [EVENTS.PRO_FEATURE_BLOCKED]: ['feature', 'abBucket'],
   [EVENTS.PRO_FEATURE_USED]: ['feature'],

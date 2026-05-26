@@ -56,6 +56,7 @@ vi.mock('../background/extractor', () => ({
 
 vi.mock('../background/reverse-search', () => ({
   fetchImageData: vi.fn(),
+  fetchImageMetaProxy: vi.fn(),
   reverseSearchUpload: vi.fn(),
 }));
 
@@ -74,6 +75,11 @@ vi.mock('../shared/telemetry-events', () => ({
     EXTENSION_INSTALLED: 'ext_installed',
     EXTENSION_UPDATED: 'ext_updated',
   },
+}));
+
+vi.mock('../background/auto-trial', () => ({
+  autoStartTrial: vi.fn(() => Promise.resolve()),
+  initAutoTrialAlarm: vi.fn(),
 }));
 
 // ── chrome global mock ──────────────────────────────────────────────
@@ -117,6 +123,7 @@ beforeAll(async () => {
     tabs: {
       sendMessage: vi.fn(),
       query: vi.fn(),
+      create: vi.fn(),
     },
     sidePanel: {
       setPanelBehavior: vi.fn(() => Promise.resolve()),

@@ -1,0 +1,455 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Welcome to Image Harvest</title>
+    <style>
+      :root {
+        --primary: #4f46e5;
+        --primary-light: #eef2ff;
+        --success: #059669;
+        --text: #1f2937;
+        --text-muted: #6b7280;
+        --bg: #ffffff;
+        --card-bg: #f9fafb;
+        --border: #e5e7eb;
+        --radius: 12px;
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        font-family:
+          -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+        background: linear-gradient(135deg, #eef2ff 0%, #faf5ff 50%, #ecfdf5 100%);
+        color: var(--text);
+        min-height: 100vh;
+        padding: 40px 20px;
+      }
+
+      .container {
+        max-width: 800px;
+        margin: 0 auto;
+      }
+
+      /* Hero */
+      .hero {
+        text-align: center;
+        margin-bottom: 48px;
+      }
+
+      .hero-icon {
+        width: 72px;
+        height: 72px;
+        margin: 0 auto 20px;
+        background: var(--primary);
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        box-shadow: 0 8px 24px rgba(79, 70, 229, 0.3);
+      }
+
+      .hero-icon svg {
+        width: 40px;
+        height: 40px;
+        fill: none;
+        stroke: white;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .hero h1 {
+        font-size: 28px;
+        font-weight: 700;
+        margin-bottom: 12px;
+        color: var(--text);
+      }
+
+      .hero p {
+        font-size: 16px;
+        color: var(--text-muted);
+        max-width: 500px;
+        margin: 0 auto;
+        line-height: 1.6;
+      }
+
+      /* Trial banner */
+      .trial-banner {
+        background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+        color: white;
+        padding: 20px 28px;
+        border-radius: var(--radius);
+        margin-bottom: 40px;
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        box-shadow: 0 4px 16px rgba(79, 70, 229, 0.25);
+      }
+
+      .trial-banner-icon {
+        font-size: 32px;
+        flex-shrink: 0;
+      }
+
+      .trial-banner-text h2 {
+        font-size: 18px;
+        font-weight: 600;
+        margin-bottom: 4px;
+      }
+
+      .trial-banner-text p {
+        font-size: 14px;
+        opacity: 0.9;
+      }
+
+      .trial-countdown {
+        margin-left: auto;
+        text-align: center;
+        flex-shrink: 0;
+      }
+
+      .trial-countdown .days {
+        font-size: 28px;
+        font-weight: 700;
+      }
+
+      .trial-countdown .label {
+        font-size: 12px;
+        opacity: 0.8;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      /* Features grid */
+      .features-title {
+        font-size: 20px;
+        font-weight: 600;
+        text-align: center;
+        margin-bottom: 24px;
+      }
+
+      .features-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+        gap: 16px;
+        margin-bottom: 48px;
+      }
+
+      .feature-card {
+        background: var(--bg);
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+        padding: 20px;
+        transition:
+          transform 0.2s,
+          box-shadow 0.2s;
+      }
+
+      .feature-card:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+      }
+
+      .feature-card-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-bottom: 10px;
+      }
+
+      .feature-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .feature-icon svg {
+        width: 20px;
+        height: 20px;
+        fill: none;
+        stroke: white;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      .feature-icon.blue {
+        background: #3b82f6;
+      }
+      .feature-icon.purple {
+        background: #8b5cf6;
+      }
+      .feature-icon.green {
+        background: #10b981;
+      }
+      .feature-icon.amber {
+        background: #f59e0b;
+      }
+      .feature-icon.pink {
+        background: #ec4899;
+      }
+      .feature-icon.indigo {
+        background: #6366f1;
+      }
+
+      .feature-card h3 {
+        font-size: 15px;
+        font-weight: 600;
+      }
+
+      .feature-card p {
+        font-size: 13px;
+        color: var(--text-muted);
+        line-height: 1.5;
+      }
+
+      .pro-badge {
+        display: inline-block;
+        background: linear-gradient(135deg, var(--primary) 0%, #7c3aed 100%);
+        color: white;
+        font-size: 10px;
+        font-weight: 600;
+        padding: 2px 6px;
+        border-radius: 4px;
+        text-transform: uppercase;
+        letter-spacing: 0.3px;
+      }
+
+      /* CTA */
+      .cta-section {
+        text-align: center;
+        padding: 32px;
+        background: var(--bg);
+        border-radius: var(--radius);
+        border: 1px solid var(--border);
+      }
+
+      .cta-section h2 {
+        font-size: 20px;
+        font-weight: 600;
+        margin-bottom: 8px;
+      }
+
+      .cta-section p {
+        font-size: 14px;
+        color: var(--text-muted);
+        margin-bottom: 20px;
+      }
+
+      .btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 28px;
+        font-size: 15px;
+        font-weight: 600;
+        border-radius: 8px;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        transition:
+          transform 0.15s,
+          box-shadow 0.15s;
+      }
+
+      .btn:hover {
+        transform: translateY(-1px);
+      }
+
+      .btn-primary {
+        background: var(--primary);
+        color: white;
+        box-shadow: 0 2px 8px rgba(79, 70, 229, 0.3);
+      }
+
+      .btn-primary:hover {
+        box-shadow: 0 4px 16px rgba(79, 70, 229, 0.4);
+      }
+
+      .btn svg {
+        width: 18px;
+        height: 18px;
+        fill: none;
+        stroke: currentColor;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+      }
+
+      /* Footer */
+      .footer {
+        text-align: center;
+        margin-top: 32px;
+        font-size: 13px;
+        color: var(--text-muted);
+      }
+
+      .footer a {
+        color: var(--primary);
+        text-decoration: none;
+      }
+
+      @media (max-width: 600px) {
+        body {
+          padding: 24px 16px;
+        }
+        .hero h1 {
+          font-size: 22px;
+        }
+        .trial-banner {
+          flex-direction: column;
+          text-align: center;
+        }
+        .trial-countdown {
+          margin-left: 0;
+        }
+        .features-grid {
+          grid-template-columns: 1fr;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <!-- Hero -->
+      <div class="hero">
+        <div class="hero-icon">
+          <svg viewBox="0 0 24 24">
+            <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+            <circle cx="8.5" cy="8.5" r="1.5" />
+            <polyline points="21 15 16 10 5 21" />
+          </svg>
+        </div>
+        <h1>Welcome to Image Harvest Pro</h1>
+        <p>
+          The smartest way to find, filter, and batch-download images from any webpage. Your 7-day
+          Pro trial is now active.
+        </p>
+      </div>
+
+      <!-- Trial banner -->
+      <div class="trial-banner">
+        <div class="trial-banner-icon">🎁</div>
+        <div class="trial-banner-text">
+          <h2>Your Pro Trial is Active</h2>
+          <p>All Pro features are unlocked. Explore everything — no credit card required.</p>
+        </div>
+        <div class="trial-countdown">
+          <div class="days" id="countdown-days">7</div>
+          <div class="label">days left</div>
+        </div>
+      </div>
+
+      <!-- Features grid -->
+      <h3 class="features-title">What's Included in Pro</h3>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-icon blue">
+              <svg viewBox="0 0 24 24">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />
+              </svg>
+            </div>
+            <h3>Unlimited Batch Download</h3>
+          </div>
+          <p>Download up to 1000 images as ZIP. Convert formats on the fly (PNG, JPG, WebP).</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-icon purple">
+              <svg viewBox="0 0 24 24">
+                <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
+                <path d="M8 21h8M12 17v4" />
+              </svg>
+            </div>
+            <h3>Multi-Tab Extract</h3>
+          </div>
+          <p>Scan images across multiple open tabs at once. Perfect for research and comparison.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-icon green">
+              <svg viewBox="0 0 24 24">
+                <circle cx="11" cy="11" r="8" />
+                <path d="M21 21l-4.35-4.35" />
+              </svg>
+            </div>
+            <h3>Similar Image Detection</h3>
+          </div>
+          <p>Find duplicates and near-duplicates using perceptual hashing (pHash) technology.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-icon amber">
+              <svg viewBox="0 0 24 24">
+                <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
+              </svg>
+            </div>
+            <h3>Smart Grouping</h3>
+          </div>
+          <p>Group images by domain, format, size range, or tab. 5 smart grouping modes.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-icon pink">
+              <svg viewBox="0 0 24 24">
+                <circle cx="13.5" cy="6.5" r="4.5" />
+                <circle cx="7.5" cy="13.5" r="4.5" />
+                <circle cx="16.5" cy="16.5" r="4.5" />
+              </svg>
+            </div>
+            <h3>Color Palette Extract</h3>
+          </div>
+          <p>Extract dominant colors from any image. Copy HEX codes and filter by color.</p>
+        </div>
+
+        <div class="feature-card">
+          <div class="feature-card-header">
+            <div class="feature-icon indigo">
+              <svg viewBox="0 0 24 24">
+                <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z" />
+              </svg>
+            </div>
+            <h3>Image Collections</h3>
+          </div>
+          <p>Save images with tags and notes. Organize across sessions and export as ZIP.</p>
+        </div>
+      </div>
+
+      <!-- CTA -->
+      <div class="cta-section">
+        <h2>Ready to Start?</h2>
+        <p>Visit any webpage and click the Image Harvest icon to begin scanning.</p>
+        <button class="btn btn-primary" id="btn-explore">
+          <svg viewBox="0 0 24 24"><path d="M5 12h14M12 5l7 7-7 7" /></svg>
+          Start Exploring
+        </button>
+      </div>
+
+      <!-- Footer -->
+      <div class="footer">
+        <p>
+          Image Harvest v<span id="version"></span> &middot; Your trial ends in 7 days &middot; No
+          credit card required
+        </p>
+      </div>
+    </div>
+
+    <script type="module" src="welcome.ts"></script>
+  </body>
+</html>

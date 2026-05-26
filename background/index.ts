@@ -19,10 +19,12 @@ import { initDisplayMode, initTabActivationListener } from './display-mode';
 import { getImagesFromTab, processMultiTabExtract } from './extractor';
 import { fetchImageData, fetchImageMetaProxy, reverseSearchUpload } from './reverse-search';
 import { isAllowedFetchUrl } from '../shared/url-validator';
+import { autoStartTrial, initAutoTrialAlarm } from './auto-trial';
 
 // ── Initialization ──────────────────────────────────────────────────────────
 
 initLicenseAlarm();
+initAutoTrialAlarm();
 
 // ── Telemetry initialization ────────────────────────────────────────────────
 // Two responsibilities:
@@ -57,11 +59,14 @@ initTelemetry();
 chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'install') {
     void track(EVENTS.EXTENSION_INSTALLED);
+    void autoStartTrial('install');
+    chrome.tabs.create({ url: chrome.runtime.getURL('pages/welcome.html') });
   } else if (details.reason === 'update') {
     void track(EVENTS.EXTENSION_UPDATED, {
       fromVersion: details.previousVersion || 'unknown',
       toVersion: chrome.runtime.getManifest().version || 'unknown',
     });
+    void autoStartTrial('update');
   }
   // SW may go dormant before the 5s flush window — ship immediately.
   void flushNow();
