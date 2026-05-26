@@ -14,6 +14,7 @@ function applyI18n(): void {
 }
 
 function init(): void {
+  window.scrollTo(0, 0);
   applyI18n();
 
   // Display version
@@ -53,6 +54,10 @@ async function updateCountdown(): Promise<void> {
   } catch {
     // Non-critical — default "7" is already in the HTML
   }
+}
+
+if ('scrollRestoration' in history) {
+  history.scrollRestoration = 'manual';
 }
 
 if (document.readyState === 'loading') {

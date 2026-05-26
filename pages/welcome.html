@@ -47,7 +47,7 @@
       }
 
       html {
-        scroll-behavior: smooth;
+        scroll-behavior: auto;
       }
 
       body {
@@ -226,70 +226,45 @@
         animation: floatIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
       }
 
-      .hero-icon-wrap {
+      .hero-brand {
         display: inline-flex;
         align-items: center;
-        justify-content: center;
-        width: 80px;
-        height: 80px;
-        border-radius: 20px;
-        background: var(--primary);
-        box-shadow: var(--shadow-green);
-        margin-bottom: 20px;
-        animation:
-          glow-ring 3s ease-in-out 1s infinite,
-          floatIn 0.5s cubic-bezier(0.22, 1, 0.36, 1) both;
-        position: relative;
-      }
-
-      .hero-icon-wrap::before {
-        content: '';
-        position: absolute;
-        inset: -3px;
-        border-radius: 23px;
-        border: 2px solid rgba(96, 181, 87, 0.3);
-        animation: glow-ring 3s ease-in-out 1s infinite;
-        pointer-events: none;
-      }
-
-      .hero-icon-wrap svg {
-        width: 44px;
-        height: 44px;
-        fill: none;
-        stroke: #ffffff;
-        stroke-width: 1.75;
-        stroke-linecap: round;
-        stroke-linejoin: round;
-        filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.15));
-      }
-
-      .hero-wordmark {
-        display: inline-flex;
-        align-items: center;
-        gap: 7px;
+        gap: 14px;
         background: var(--bg-secondary);
         border: 1px solid var(--border);
-        border-radius: 20px;
-        padding: 3px 12px 3px 8px;
-        margin-bottom: 14px;
+        border-radius: 999px;
+        padding: 10px 24px 10px 12px;
+        margin-bottom: 24px;
         animation: slideInDown 0.4s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
       }
 
-      .hero-wordmark-dot {
-        width: 7px;
-        height: 7px;
-        border-radius: 50%;
-        background: var(--primary);
-        animation: pulse 2s ease-in-out infinite;
-        flex-shrink: 0;
+      .hero-brand-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 8px;
+        box-shadow: var(--shadow-sm);
       }
 
-      .hero-wordmark-text {
-        font-size: 11px;
-        font-weight: 600;
-        color: var(--text-secondary);
-        letter-spacing: 0.4px;
-        text-transform: uppercase;
+      .hero-brand-name {
+        font-size: 14px;
+        font-weight: 700;
+        color: var(--text-primary);
+        letter-spacing: -0.2px;
+      }
+
+      .hero-brand-pro {
+        display: inline-block;
+        background: var(--gold-gradient);
+        color: #78350f;
+        font-size: 9px;
+        font-weight: 800;
+        padding: 2px 5px;
+        border-radius: var(--radius-sm);
+        margin-left: 6px;
+        vertical-align: middle;
+        letter-spacing: 0.5px;
+        position: relative;
+        top: -1px;
       }
 
       .hero h1 {
@@ -883,19 +858,9 @@
     <div class="page">
       <!-- ===================== HERO ===================== -->
       <section class="hero">
-        <div class="hero-wordmark">
-          <span class="hero-wordmark-dot"></span>
-          <span class="hero-wordmark-text">Image Harvest Pro</span>
-        </div>
-
-        <div class="hero-icon-wrap" aria-hidden="true">
-          <!-- Camera / image icon -->
-          <svg viewBox="0 0 24 24">
-            <rect x="3" y="6" width="18" height="14" rx="2" />
-            <circle cx="12" cy="13" r="3.5" />
-            <path d="M9 6l1.5-2h3L15 6" />
-            <circle cx="17.5" cy="9.5" r="1" fill="white" stroke="none" />
-          </svg>
+        <div class="hero-brand">
+          <img src="/icons/icon128.png" alt="Image Harvest" class="hero-brand-icon" />
+          <span class="hero-brand-name">Image Harvest<span class="hero-brand-pro">PRO</span></span>
         </div>
 
         <h1 data-i18n="welcome_title">Welcome to Image&nbsp;<span class="accent">Harvest</span></h1>
