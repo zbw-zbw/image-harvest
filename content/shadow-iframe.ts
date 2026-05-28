@@ -276,79 +276,47 @@ export async function extractFromIframes(images: Map<string, ImageItem>): Promis
 
       const iframeBase = iframe.src || window.location.href;
 
-      // Extract <img> from iframe
+      // Extract <img> from iframe (including srcset and lazy-load attributes)
       const imgs = doc.querySelectorAll('img');
       for (const img of imgs) {
-        const url = img.currentSrc || img.src;
-        if (!url) continue;
-
-        if (isDataUri(url)) {
-          if (!isImageDataUri(url)) continue;
-          const dataKey = generateDataUriKey(url);
-          if (state.seenUrls.has(dataKey)) continue;
-          state.seenUrls.add(dataKey);
-          images.set(dataKey, {
-            id: generateId(dataKey),
-            url: url,
-            displayWidth: img.naturalWidth || img.width || 0,
-            displayHeight: img.naturalHeight || img.height || 0,
-            naturalWidth: img.naturalWidth,
-            naturalHeight: img.naturalHeight,
-            type: 'img',
-            format: getFileFormat(url),
-            sourceDomain: window.location.hostname,
-            checked: false,
-            timestamp: Date.now(),
-          } as ImageItem);
-          continue;
-        }
-
-        const resolvedUrl = resolveUrl(url, iframeBase);
-        if (state.seenUrls.has(resolvedUrl)) continue;
-        state.seenUrls.add(resolvedUrl);
-
-        images.set(resolvedUrl, {
-          id: generateId(resolvedUrl),
-          url: resolvedUrl,
-          displayWidth: img.naturalWidth || img.width || 0,
-          displayHeight: img.naturalHeight || img.height || 0,
-          naturalWidth: img.naturalWidth,
-          naturalHeight: img.naturalHeight,
-          type: 'img',
-          format: getFileFormat(resolvedUrl),
-          sourceDomain: getDomain(resolvedUrl),
-          checked: false,
-          timestamp: Date.now(),
-        } as ImageItem);
-      }
-
-      // Extract background images from iframe
-      const els = doc.querySelectorAll('body, body *');
-      const maxEls = Math.min(els.length, 500);
-      for (let i = 0; i < maxEls; i++) {
         try {
-          const win = iframe.contentWindow;
-          if (!win) continue;
-          const style = win.getComputedStyle(els[i]);
-          const bg = style.backgroundImage;
-          if (!bg || bg === 'none') continue;
-          const urls = extractBackgroundUrls(bg);
-          for (const u of urls) {
-            if (!u || isGradient(u)) continue;
+          const candidateUrls = new Set<string>();
+          if (img.src) candidateUrls.add(img.src);
+          if (img.currentSrc) candidateUrls.add(img.currentSrc);
+          if (img.srcset) {
+            for (const { url: u } of parseSrcset(img.srcset)) {
+              if (u) candidateUrls.add(u);
+            }
+          }
+          for (const attr of ['data-src', 'data-original', 'data-lazy', 'data-lazy-src']) {
+            const val = img.getAttribute(attr);
+            if (val) candidateUrls.add(val);
+          }
+          for (const attr of ['data-srcset', 'data-lazy-srcset']) {
+            const val = img.getAttribute(attr);
+            if (val) {
+              for (const { url: u } of parseSrcset(val)) {
+                if (u) candidateUrls.add(u);
+              }
+            }
+          }
 
-            if (isDataUri(u)) {
-              if (!isImageDataUri(u)) continue;
-              const dataKey = generateDataUriKey(u);
+          for (const url of candidateUrls) {
+            if (!url) continue;
+            if (isDataUri(url)) {
+              if (!isImageDataUri(url)) continue;
+              const dataKey = generateDataUriKey(url);
               if (state.seenUrls.has(dataKey)) continue;
               state.seenUrls.add(dataKey);
-              const rect = els[i].getBoundingClientRect();
               images.set(dataKey, {
                 id: generateId(dataKey),
-                url: u,
-                displayWidth: Math.round(rect.width),
-                displayHeight: Math.round(rect.height),
-                type: 'bg',
-                format: getFileFormat(u),
+                url: url,
+                displayWidth: img.naturalWidth || img.width || 0,
+                displayHeight: img.naturalHeight || img.height || 0,
+                naturalWidth: img.naturalWidth,
+                naturalHeight: img.naturalHeight,
+                type: 'img',
+                format: getFileFormat(url),
                 sourceDomain: window.location.hostname,
                 checked: false,
                 timestamp: Date.now(),
@@ -356,21 +324,204 @@ export async function extractFromIframes(images: Map<string, ImageItem>): Promis
               continue;
             }
 
-            const resolvedUrl = resolveUrl(u, iframeBase);
+            const resolvedUrl = resolveUrl(url, iframeBase);
             if (state.seenUrls.has(resolvedUrl)) continue;
             state.seenUrls.add(resolvedUrl);
-            const rect = els[i].getBoundingClientRect();
             images.set(resolvedUrl, {
               id: generateId(resolvedUrl),
               url: resolvedUrl,
-              displayWidth: Math.round(rect.width),
-              displayHeight: Math.round(rect.height),
-              type: 'bg',
+              displayWidth: img.naturalWidth || img.width || 0,
+              displayHeight: img.naturalHeight || img.height || 0,
+              naturalWidth: img.naturalWidth,
+              naturalHeight: img.naturalHeight,
+              type: 'img',
               format: getFileFormat(resolvedUrl),
               sourceDomain: getDomain(resolvedUrl),
               checked: false,
               timestamp: Date.now(),
             } as ImageItem);
+          }
+        } catch {
+          /* skip */
+        }
+      }
+
+      // Extract <picture> sources from iframe
+      const pictures = doc.querySelectorAll('picture');
+      for (const picture of pictures) {
+        const sources = picture.querySelectorAll('source');
+        const fallbackImg = picture.querySelector('img');
+        for (const source of sources) {
+          const srcset = source.srcset || source.getAttribute('data-srcset');
+          if (srcset) {
+            for (const { url } of parseSrcset(srcset)) {
+              if (!url) continue;
+              const resolvedUrl = resolveUrl(url, iframeBase);
+              if (state.seenUrls.has(resolvedUrl)) continue;
+              state.seenUrls.add(resolvedUrl);
+              images.set(resolvedUrl, {
+                id: generateId(resolvedUrl),
+                url: resolvedUrl,
+                displayWidth: fallbackImg?.naturalWidth || 0,
+                displayHeight: fallbackImg?.naturalHeight || 0,
+                type: 'img',
+                format: getFileFormat(resolvedUrl),
+                sourceDomain: getDomain(resolvedUrl),
+                checked: false,
+                timestamp: Date.now(),
+              } as ImageItem);
+            }
+          }
+          const src = source.src || source.getAttribute('data-src');
+          if (src) {
+            const resolvedUrl = resolveUrl(src, iframeBase);
+            if (!state.seenUrls.has(resolvedUrl)) {
+              state.seenUrls.add(resolvedUrl);
+              images.set(resolvedUrl, {
+                id: generateId(resolvedUrl),
+                url: resolvedUrl,
+                displayWidth: fallbackImg?.naturalWidth || 0,
+                displayHeight: fallbackImg?.naturalHeight || 0,
+                type: 'img',
+                format: getFileFormat(resolvedUrl),
+                sourceDomain: getDomain(resolvedUrl),
+                checked: false,
+                timestamp: Date.now(),
+              } as ImageItem);
+            }
+          }
+        }
+      }
+
+      // Extract inline <svg> from iframe
+      const svgs = doc.querySelectorAll('svg');
+      for (const svg of svgs) {
+        try {
+          const rect = svg.getBoundingClientRect();
+          if (rect.width < 2 || rect.height < 2) continue;
+          const serializer = new XMLSerializer();
+          const svgString = serializer.serializeToString(svg);
+          const dataUri =
+            'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+          const dataKey = generateDataUriKey(dataUri);
+          if (state.seenUrls.has(dataKey)) continue;
+          state.seenUrls.add(dataKey);
+          images.set(dataKey, {
+            id: generateId(dataKey),
+            url: dataUri,
+            displayWidth: Math.round(rect.width),
+            displayHeight: Math.round(rect.height),
+            type: 'svg',
+            format: 'svg',
+            sourceDomain: window.location.hostname,
+            checked: false,
+            timestamp: Date.now(),
+          } as ImageItem);
+        } catch {
+          /* skip */
+        }
+      }
+
+      // Extract background images and CSS content from iframe
+      const els = doc.querySelectorAll('body, body *');
+      const maxEls = Math.min(els.length, 1500);
+      for (let i = 0; i < maxEls; i++) {
+        try {
+          const win = iframe.contentWindow;
+          if (!win) continue;
+          const style = win.getComputedStyle(els[i]);
+          const bg = style.backgroundImage;
+          if (bg && bg !== 'none') {
+            const urls = extractBackgroundUrls(bg);
+            for (const u of urls) {
+              if (!u || isGradient(u)) continue;
+
+              if (isDataUri(u)) {
+                if (!isImageDataUri(u)) continue;
+                const dataKey = generateDataUriKey(u);
+                if (state.seenUrls.has(dataKey)) continue;
+                state.seenUrls.add(dataKey);
+                const rect = els[i].getBoundingClientRect();
+                images.set(dataKey, {
+                  id: generateId(dataKey),
+                  url: u,
+                  displayWidth: Math.round(rect.width),
+                  displayHeight: Math.round(rect.height),
+                  type: 'bg',
+                  format: getFileFormat(u),
+                  sourceDomain: window.location.hostname,
+                  checked: false,
+                  timestamp: Date.now(),
+                } as ImageItem);
+                continue;
+              }
+
+              const resolvedUrl = resolveUrl(u, iframeBase);
+              if (state.seenUrls.has(resolvedUrl)) continue;
+              state.seenUrls.add(resolvedUrl);
+              const rect = els[i].getBoundingClientRect();
+              images.set(resolvedUrl, {
+                id: generateId(resolvedUrl),
+                url: resolvedUrl,
+                displayWidth: Math.round(rect.width),
+                displayHeight: Math.round(rect.height),
+                type: 'bg',
+                format: getFileFormat(resolvedUrl),
+                sourceDomain: getDomain(resolvedUrl),
+                checked: false,
+                timestamp: Date.now(),
+              } as ImageItem);
+            }
+          }
+
+          // CSS content property (::before / ::after)
+          for (const pseudo of ['::before', '::after'] as const) {
+            try {
+              const pseudoStyle = win.getComputedStyle(els[i], pseudo);
+              const content = pseudoStyle.content;
+              if (!content || content === 'none' || content === 'normal' || content === '""')
+                continue;
+              const contentUrls = extractBackgroundUrls(content);
+              for (const u of contentUrls) {
+                if (!u || isGradient(u)) continue;
+                if (isDataUri(u)) {
+                  if (!isImageDataUri(u)) continue;
+                  const dataKey = generateDataUriKey(u);
+                  if (state.seenUrls.has(dataKey)) continue;
+                  state.seenUrls.add(dataKey);
+                  const rect = els[i].getBoundingClientRect();
+                  images.set(dataKey, {
+                    id: generateId(dataKey),
+                    url: u,
+                    displayWidth: Math.round(rect.width),
+                    displayHeight: Math.round(rect.height),
+                    type: 'css-content',
+                    format: getFileFormat(u),
+                    sourceDomain: window.location.hostname,
+                    checked: false,
+                    timestamp: Date.now(),
+                  } as ImageItem);
+                  continue;
+                }
+                const resolvedUrl = resolveUrl(u, iframeBase);
+                if (state.seenUrls.has(resolvedUrl)) continue;
+                state.seenUrls.add(resolvedUrl);
+                const rect = els[i].getBoundingClientRect();
+                images.set(resolvedUrl, {
+                  id: generateId(resolvedUrl),
+                  url: resolvedUrl,
+                  displayWidth: Math.round(rect.width),
+                  displayHeight: Math.round(rect.height),
+                  type: 'css-content',
+                  format: getFileFormat(resolvedUrl),
+                  sourceDomain: getDomain(resolvedUrl),
+                  checked: false,
+                  timestamp: Date.now(),
+                } as ImageItem);
+              }
+            } catch {
+              /* skip */
+            }
           }
         } catch {
           /* skip */

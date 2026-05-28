@@ -55,6 +55,8 @@ export const STORAGE_KEYS = {
   COLLECTION: 'collection',
   LICENSE_DATA: 'licenseData',
   INSTANCE_ID: 'instanceId',
+  AI_QUOTA: 'aiQuota',
+  AI_TAGS: 'aiTags',
 } as const;
 
 export const MESSAGE_TYPES = {
@@ -114,6 +116,12 @@ export const MESSAGE_TYPES = {
   VALIDATE_LICENSE: 'VALIDATE_LICENSE',
   GET_LICENSE_STATUS: 'GET_LICENSE_STATUS',
   LICENSE_STATUS_CHANGED: 'LICENSE_STATUS_CHANGED',
+
+  // Eagle export
+  EXPORT_TO_EAGLE: 'EXPORT_TO_EAGLE',
+
+  // AI tagging
+  AI_TAG_IMAGE: 'AI_TAG_IMAGE',
 } as const;
 
 export type MessageType = (typeof MESSAGE_TYPES)[keyof typeof MESSAGE_TYPES];
@@ -183,6 +191,8 @@ export const PRO_FEATURES = [
   'advancedPreview',
   'liveMonitoring',
   'unlimitedZip',
+  'eagleExport',
+  'aiTagging',
 ] as const;
 
 // Free tier limits (degraded functionality for non-Pro users).
@@ -241,9 +251,12 @@ export const NAMING_VARIABLES = [
   '{timestamp}',
 ] as const;
 
+// Backend base URL — override via VITE_API_BASE in .env.local for local dev.
+const API_BASE = import.meta.env.VITE_API_BASE || 'https://image-harvest.kyriewen.cn';
+
 // License & Payment
-export const LICENSE_API_URL = 'https://image-harvest.kyriewen.cn/api/license';
-export const PRICING_PAGE_URL = 'https://image-harvest.kyriewen.cn/pricing';
+export const LICENSE_API_URL = `${API_BASE}/api/license`;
+export const PRICING_PAGE_URL = `${API_BASE}/pricing`;
 
 // Telemetry (anonymous, opt-in). See shared/telemetry.ts.
 //   - FLUSH_INTERVAL_MS: max time a single event waits in the queue before
@@ -253,7 +266,7 @@ export const PRICING_PAGE_URL = 'https://image-harvest.kyriewen.cn/pricing';
 //     ~64KB Chrome cap on unload-time fetches.
 //   - MAX_QUEUE: hard cap on persisted retry events. Prevents a long server
 //     outage from filling chrome.storage.local indefinitely.
-export const TELEMETRY_API_URL = 'https://image-harvest.kyriewen.cn/api/telemetry';
+export const TELEMETRY_API_URL = `${API_BASE}/api/telemetry`;
 export const TELEMETRY_FLUSH_INTERVAL_MS = 5_000;
 export const TELEMETRY_BATCH_SIZE = 20;
 export const TELEMETRY_MAX_QUEUE = 100;
@@ -271,6 +284,36 @@ export const LICENSE_CHECK_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours
 export const LICENSE_GRACE_PERIOD = 7 * 24 * 60 * 60 * 1000; // 7 days offline grace
 export const MAX_LICENSE_INSTANCES = 1;
 
+// Eagle export (Phase 5) — local API provided by Eagle app.
+export const EAGLE_API_BASE = 'http://localhost:41595';
+export const EAGLE_BATCH_SIZE = 10;
+
+// AI tagging (Phase 4) — backend API + quota.
+export const AI_TAG_API_URL = `${API_BASE}/api/ai/tag`;
+export const AI_QUOTA_LIMIT = 100;
+export const AI_TAG_CATEGORIES = [
+  'photo',
+  'illustration',
+  'icon',
+  'logo',
+  'ui',
+  'background',
+  'texture',
+  'pattern',
+  'screenshot',
+  'diagram',
+  'chart',
+  'banner',
+  'avatar',
+  'product',
+  'typography',
+  'mockup',
+  '3d',
+  'animation',
+  'gradient',
+  'abstract',
+] as const;
+
 export const DEFAULT_APP_SETTINGS: AppSettings = {
   useSidePanel: true,
   density: 'standard',
@@ -280,7 +323,7 @@ export const DEFAULT_APP_SETTINGS: AppSettings = {
   subfolder: '{domain}',
   filenameTemplate: 'img_{index}_{original}.{format}',
   convertFormat: 'none',
-  searchAllFrames: false,
+  searchAllFrames: true,
   liveMonitoring: true,
   enableMinSize: true,
   minWidth: 0,

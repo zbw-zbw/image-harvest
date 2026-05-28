@@ -13,6 +13,7 @@ import { applyFilters, renderColorSwatches } from './filter';
 import { isWithinTabSwitchGrace } from './tab-lifecycle';
 import { detectSimilarImages } from './pro-features';
 import { saveTabImageCache } from '../shared/storage';
+import { loadAiTagsMap } from '../shared/ai-tags-store';
 import { elements, state } from './state';
 import { hideLoading, showEmpty, showError, showLoading, showToast } from './ui';
 import { fetchImageMeta, formatBytes, generateId } from './utils';
@@ -164,6 +165,15 @@ export async function silentRescan(tabId: number, tabUrl: string): Promise<void>
       // Always replace allImages with the authoritative fresh result
       const previousSelection = new Set(state.selectedImages);
       state.allImages = freshImages;
+
+      // Restore persisted AI tags into fresh images
+      const silentTagMap = await loadAiTagsMap();
+      if (Object.keys(silentTagMap).length > 0) {
+        state.allImages = state.allImages.map((img) =>
+          silentTagMap[img.url] ? { ...img, aiTags: silentTagMap[img.url] } : img
+        );
+      }
+
       state.selectedImages = new Set(
         [...previousSelection].filter((id) => freshImages.some((img) => img.id === id))
       );
@@ -293,6 +303,15 @@ export async function rescanWithProgress(tabId: number, tabUrl: string): Promise
 
       const previousSelection = new Set(state.selectedImages);
       state.allImages = mergedImages;
+
+      // Restore persisted AI tags into rescanned images
+      const rescanTagMap = await loadAiTagsMap();
+      if (Object.keys(rescanTagMap).length > 0) {
+        state.allImages = state.allImages.map((img) =>
+          rescanTagMap[img.url] ? { ...img, aiTags: rescanTagMap[img.url] } : img
+        );
+      }
+
       state.selectedImages = new Set(
         [...previousSelection].filter((id) => mergedImages.some((img) => img.id === id))
       );
@@ -471,6 +490,14 @@ export async function fetchImages(targetTabId?: number): Promise<void> {
           phash: null,
         }));
       state.allImages = [...responseImages, ...extraDiscovered];
+
+      // Restore persisted AI tags from previous sessions
+      const tagMap = await loadAiTagsMap();
+      if (Object.keys(tagMap).length > 0) {
+        state.allImages = state.allImages.map((img) =>
+          tagMap[img.url] ? { ...img, aiTags: tagMap[img.url] } : img
+        );
+      }
 
       // Hide scan overlay and re-enable toolbar buttons
       hideLoading();

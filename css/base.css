@@ -37,7 +37,7 @@
   padding: 3px 10px;
   font-size: 11px;
   font-weight: 700;
-  color: var(--amber-text);
+  color: #5a3e00;
   background: linear-gradient(135deg, #ffd700, #ffb800);
   border: none;
   border-radius: 10px;
@@ -54,7 +54,7 @@
 }
 
 .btn-upgrade-pro svg {
-  stroke: var(--amber-text);
+  stroke: #5a3e00;
   flex-shrink: 0;
 }
 
@@ -65,7 +65,6 @@
   gap: 6px;
   flex-wrap: nowrap;
   min-width: 0;
-  overflow: hidden;
 }
 
 .pro-active-badge {
@@ -76,7 +75,7 @@
   font-size: 11px;
   font-weight: 700;
   line-height: 16px;
-  color: var(--amber-text);
+  color: #5a3e00;
   background: linear-gradient(135deg, #ffd700, #ffb800);
   border-radius: 10px;
   white-space: nowrap;
@@ -85,7 +84,7 @@
 }
 
 .pro-active-badge svg {
-  stroke: var(--amber-text);
+  stroke: #5a3e00;
   flex-shrink: 0;
 }
 
@@ -134,32 +133,29 @@
   opacity: 1;
 }
 
-/* Pro status responsive: progressively hide info on narrow panels.
-   Use container query on .toolbar (ancestor) so it works in a
-   side-panel whose width != viewport width. */
-.toolbar:has(.pro-status-area) {
+/* Unified panel-level responsive scaling — 3 tiers (large / medium / small).
+   Chrome side panel ranges ~300-800px+. CSS zoom scales everything proportionally:
+   fonts, padding, gaps, icons — no per-element targeting needed. */
+#app {
   container-type: inline-size;
-  container-name: protoolbar;
+  container-name: panel;
 }
 
-@container protoolbar (max-width: 480px) {
-  .pro-expiry-label {
-    display: none;
-  }
-
-  .pro-status-active {
-    gap: 4px;
+@container panel (max-width: 600px) {
+  .toolbar-actions,
+  .toolbar-select-row,
+  .toolbar-filters,
+  .status-bar {
+    zoom: 0.9;
   }
 }
 
-@container protoolbar (max-width: 300px) {
-  .pro-plan-label {
-    display: none;
-  }
-
-  .pro-active-badge {
-    padding: 2px 6px;
-    font-size: 10px;
+@container panel (max-width: 400px) {
+  .toolbar-actions,
+  .toolbar-select-row,
+  .toolbar-filters,
+  .status-bar {
+    zoom: 0.8;
   }
 }
 
@@ -254,13 +250,59 @@
   opacity: 0.7;
 }
 
-/* Toolbar Row: Select All + View Toggle */
+/* Toolbar Row: Select All + Found Info + Sort/Group */
 .toolbar-select-row {
-  justify-content: space-between;
-  padding: 12px 10px;
-  flex-wrap: wrap;
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  gap: 8px;
+  flex-wrap: nowrap;
 }
 
+.toolbar-found-info {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 13px;
+  color: var(--text-tertiary);
+  flex-shrink: 1;
+  min-width: 70px;
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.toolbar-found-info .rescan-btn {
+  border: none;
+  background: transparent;
+  padding: 2px 4px;
+  font-size: inherit;
+  color: var(--text-tertiary);
+  border-radius: var(--radius-sm);
+  gap: 3px;
+  flex-shrink: 0;
+}
+
+.toolbar-found-info .rescan-btn:hover {
+  background: var(--bg-secondary);
+  color: var(--text-secondary);
+}
+
+.toolbar-found-info .rescan-text {
+  display: none;
+}
+
+.toolbar-found-info .found-info {
+  font-size: inherit;
+  color: var(--text-tertiary);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-width: 0;
+}
+
+.toolbar-select-row .filter-actions-right {
+  margin-left: auto;
+  flex-shrink: 0;
+}
 .toolbar-filters {
   flex-wrap: wrap;
   z-index: 10;
@@ -532,11 +574,20 @@
 
 /* Dark mode */
 @media (prefers-color-scheme: dark) {
-  .trial-grace-banner {
+  :root:not([data-theme]) .trial-grace-banner {
     background: linear-gradient(135deg, #332b00, #3d3200);
     border-bottom-color: var(--amber-text-dark);
   }
-  .trial-grace-text {
+  :root:not([data-theme]) .trial-grace-text {
     color: var(--amber-light);
   }
+}
+
+:root[data-theme='dark'] .trial-grace-banner {
+  background: linear-gradient(135deg, #332b00, #3d3200);
+  border-bottom-color: var(--amber-text-dark);
+}
+
+:root[data-theme='dark'] .trial-grace-text {
+  color: var(--amber-light);
 }

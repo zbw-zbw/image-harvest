@@ -94,6 +94,7 @@ HTML document — it omits the surrounding
             id="live-indicator"
             class="live-indicator hidden"
             title="Live monitoring is active — new images are detected automatically"
+            data-i18n-title="live_indicator_tooltip"
           >
             <span class="live-dot"></span>Live
           </span>
@@ -186,6 +187,34 @@ HTML document — it omits the surrounding
             </span>
             <span class="select-all-text" data-i18n="toolbar_select_all">Select all</span>
           </button>
+          <div class="toolbar-found-info">
+            <button
+              id="btn-refresh"
+              class="rescan-btn"
+              title="Rescan images"
+              data-i18n-title="title_rescan"
+            >
+              <svg
+                width="12"
+                height="12"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
+              >
+                <path d="M23 4v6h-6" />
+                <path d="M1 20v-6h6" />
+                <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
+              </svg>
+              <span class="rescan-text" data-i18n="toolbar_rescan">Rescan</span>
+            </button>
+            <span id="found-info" class="found-info">
+              <span data-i18n="status_found_prefix">Found</span>
+              <span id="found-action-count">0</span>
+              <span data-i18n="status_found_suffix">images</span>
+              <span id="similar-inline-mount" data-preact-mount="similar-inline-mount"></span>
+            </span>
+          </div>
           <div class="filter-buttons filter-actions-right">
             <button
               class="filter-btn"
@@ -863,36 +892,9 @@ HTML document — it omits the surrounding
 
         <!-- Status Bar -->
         <footer class="status-bar">
-          <div class="status-left">
-            <button
-              id="btn-refresh"
-              class="rescan-btn"
-              title="Rescan images"
-              data-i18n-title="title_rescan"
-            >
-              <svg
-                width="12"
-                height="12"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-              >
-                <path d="M23 4v6h-6" />
-                <path d="M1 20v-6h6" />
-                <path d="M3.51 9a9 9 0 0114.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0020.49 15" />
-              </svg>
-              <span class="rescan-text" data-i18n="toolbar_rescan">Rescan</span>
-            </button>
-            <span id="found-info" class="found-info">
-              <span data-i18n="status_found_prefix">Found</span>
-              <span id="found-action-count">0</span>
-              <span data-i18n="status_found_suffix">images</span>
-              <span id="similar-inline-mount" data-preact-mount="similar-inline-mount"></span>
-            </span>
-          </div>
           <div class="status-right">
             <span id="batch-url-copy-mount" data-preact-mount="batch-url-copy-mount"></span>
+            <span id="eagle-export-mount" data-preact-mount="eagle-export-mount"></span>
             <div id="download-group" class="download-group">
               <button
                 id="btn-download"

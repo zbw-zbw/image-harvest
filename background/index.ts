@@ -20,6 +20,10 @@ import { getImagesFromTab, processMultiTabExtract } from './extractor';
 import { fetchImageData, fetchImageMetaProxy, reverseSearchUpload } from './reverse-search';
 import { isAllowedFetchUrl } from '../shared/url-validator';
 import { autoStartTrial, initAutoTrialAlarm } from './auto-trial';
+import { detectEagle, exportToEagle } from '../shared/export-eagle';
+import type { EagleItem } from '../shared/export-eagle';
+import { AI_TAG_API_URL } from '../shared/constants';
+import { getRemainingQuota, setLocalQuotaFromServer } from '../shared/ai-quota';
 
 // ── Initialization ──────────────────────────────────────────────────────────
 
@@ -435,6 +439,77 @@ async function handleMessage(
           sendResponse(licenseInfo);
         } catch (error) {
           sendResponse({ hasLicense: false, error: (error as Error).message });
+        }
+        break;
+      }
+
+      case MESSAGE_TYPES.EXPORT_TO_EAGLE: {
+        try {
+          const { items } = message as { items: EagleItem[] };
+          const detect = await detectEagle();
+          if (!detect.running) {
+            sendResponse({ success: false, error: 'eagle_not_running' });
+            break;
+          }
+          const result = await exportToEagle(items);
+          sendResponse({ success: result.success, added: result.added, failed: result.failed });
+        } catch (error) {
+          sendResponse({ success: false, error: (error as Error).message });
+        }
+        break;
+      }
+
+      case MESSAGE_TYPES.AI_TAG_IMAGE: {
+        try {
+          const { imageUrl } = message as { imageUrl: string };
+          const proInfo = await isProUser();
+          if (!proInfo.isPro) {
+            sendResponse({ success: false, error: 'pro_required' });
+            break;
+          }
+          const remaining = await getRemainingQuota();
+          if (remaining <= 0) {
+            sendResponse({ success: false, error: 'quota_exceeded', quotaRemaining: 0 });
+            break;
+          }
+          const licenseInfo = await getLicenseInfo();
+          if (!licenseInfo.hasLicense) {
+            sendResponse({ success: false, error: 'no_license' });
+            break;
+          }
+          const resp = await fetch(AI_TAG_API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              licenseKey: licenseInfo.licenseKey,
+              instanceId: licenseInfo.instanceId,
+              imageUrl,
+            }),
+          });
+          const data = (await resp.json()) as {
+            success: boolean;
+            tags?: string[];
+            quotaRemaining?: number;
+            error?: string;
+          };
+          if (!resp.ok || !data.success) {
+            sendResponse({
+              success: false,
+              error: data.error || 'ai_tag_failed',
+              quotaRemaining: data.quotaRemaining,
+            });
+            break;
+          }
+          if (typeof data.quotaRemaining === 'number') {
+            await setLocalQuotaFromServer(data.quotaRemaining);
+          }
+          sendResponse({
+            success: true,
+            tags: data.tags || [],
+            quotaRemaining: data.quotaRemaining,
+          });
+        } catch (error) {
+          sendResponse({ success: false, error: (error as Error).message });
         }
         break;
       }

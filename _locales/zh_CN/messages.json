@@ -1147,5 +1147,59 @@
   },
   "toast_refresh_retry": {
     "message": "刷新页面后重试"
+  },
+  "eagle_export_label": {
+    "message": "Eagle"
+  },
+  "eagle_export_tooltip": {
+    "message": "导出图片到 Eagle"
+  },
+  "toast_eagle_exporting": {
+    "message": "正在导出 {count} 张图片到 Eagle..."
+  },
+  "toast_eagle_not_running": {
+    "message": "Eagle 未运行，请先打开 Eagle 再试"
+  },
+  "toast_eagle_failed": {
+    "message": "导出到 Eagle 失败，请重试"
+  },
+  "toast_eagle_success": {
+    "message": "成功导出 {count} 张图片到 Eagle！"
+  },
+  "toast_pro_eagle_export": {
+    "message": "导出到 Eagle 是 Pro 功能"
+  },
+  "card_ai_tag": {
+    "message": "AI 标签"
+  },
+  "toast_pro_ai_tag": {
+    "message": "AI 标签是 Pro 功能"
+  },
+  "toast_ai_tag_success": {
+    "message": "AI 标签已添加"
+  },
+  "toast_ai_tag_failed": {
+    "message": "AI 标签失败，请重试"
+  },
+  "toast_ai_quota_exhausted": {
+    "message": "本月 AI 配额已用完 (100/100)"
+  },
+  "ai_quota_tooltip": {
+    "message": "每月 AI 标签配额"
+  },
+  "ai_tag_filter_label": {
+    "message": "AI 标签"
+  },
+  "ai_tag_filter_no_tags": {
+    "message": "暂无 AI 标签"
+  },
+  "toast_ai_tag_already_tagged": {
+    "message": "该图片已添加标签"
+  },
+  "toast_ai_tagging": {
+    "message": "正在生成 AI 标签…"
+  },
+  "toast_ai_tag_too_small": {
+    "message": "图片尺寸过小，无法进行 AI 标签"
   }
 }

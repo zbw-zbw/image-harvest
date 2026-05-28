@@ -23,7 +23,8 @@ export function applyFilters(): void {
       filterByColor(img) &&
       filterBySettingsMinSize(img) &&
       filterBySettingsMaxSize(img) &&
-      filterByFileSize(img)
+      filterByFileSize(img) &&
+      filterByAiTag(img)
     );
   });
 
@@ -213,6 +214,13 @@ export function filterByFileSize(img: ImageItem): boolean {
   const bytes = img.estimatedSize || 0;
   const kb = bytes / 1024;
   return kb >= state.activeFilters.minFileSizeKB && kb <= state.activeFilters.maxFileSizeKB;
+}
+
+export function filterByAiTag(img: ImageItem): boolean {
+  const tags = state.activeFilters.aiTagFilter;
+  if (tags.length === 0) return true;
+  if (!img.aiTags || img.aiTags.length === 0) return false;
+  return tags.some((t) => img.aiTags!.includes(t));
 }
 
 export const FILESIZE_PRESETS: Record<string, { min: number; max: number }> = {
@@ -415,6 +423,7 @@ export function resetAllFilters(): void {
     minFileSizeKB: 0,
     maxFileSizeKB: Infinity,
     fileSizePreset: 'all',
+    aiTagFilter: [],
   };
   if (elements.filterUrlInput) (elements.filterUrlInput as HTMLInputElement).value = '';
   const fsMin = document.getElementById('filter-filesize-min') as HTMLInputElement | null;

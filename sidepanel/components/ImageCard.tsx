@@ -13,6 +13,7 @@
 // resolve it locally with useEffect and keep it in component state.
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { t } from '../../shared/i18n';
+import { MESSAGE_TYPES } from '../../shared/constants';
 import type { ImageItem } from '../../shared/types';
 import {
   copyImageUrl,
@@ -33,6 +34,9 @@ import { showProUpgradeModal } from '../settings';
 import { showConfirmDialog, showToast } from '../ui';
 import { formatBytes } from '../utils';
 import { useStoreSelector } from './storeHook';
+import { state } from '../state';
+import { applyFilters } from '../filter';
+import { saveAiTags } from '../../shared/ai-tags-store';
 
 interface Props {
   img: ImageItem;
@@ -133,6 +137,20 @@ const IconOpen = () => (
     <line x1="10" y1="14" x2="21" y2="3" />
   </svg>
 );
+const IconAiTag = () => (
+  <svg
+    width="15"
+    height="15"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+  >
+    <path d="M12 2L2 7l10 5 10-5-10-5z" />
+    <path d="M2 17l10 5 10-5" />
+    <path d="M2 12l10 5 10-5" />
+  </svg>
+);
 
 export function ImageCard({ img, index }: Props) {
   const isSelected = useStoreSelector((s) => s.selectedImages.has(img.id));
@@ -145,6 +163,8 @@ export function ImageCard({ img, index }: Props) {
   // per image to seed it eagerly, which would balloon initial render time.
   // Instead each card resolves its own favorite flag asynchronously.
   const [isFavorited, setIsFavorited] = useState(false);
+  const [isAiTagging, setIsAiTagging] = useState(false);
+  const aiTags = img.aiTags || [];
   useEffect(() => {
     let cancelled = false;
     isImageInCollection(img.url).then((found) => {
@@ -243,6 +263,59 @@ export function ImageCard({ img, index }: Props) {
     copyColor(color);
   };
 
+  const handleAiTag = async (e: MouseEvent) => {
+    e.stopPropagation();
+    if (!isProUser) {
+      showToast(t('toast_pro_ai_tag'), 'warning');
+      showProUpgradeModal();
+      return;
+    }
+    if (isAiTagging) return;
+    if (aiTags.length > 0) {
+      showToast(t('toast_ai_tag_already_tagged'), 'info');
+      return;
+    }
+    if (img.format === 'svg' || img.url.endsWith('.svg') || img.url.includes('.svg?')) {
+      showToast('SVG images are not supported for AI tagging', 'warning');
+      return;
+    }
+    const imgW = img.naturalWidth || img.displayWidth || 0;
+    const imgH = img.naturalHeight || img.displayHeight || 0;
+    if ((imgW > 0 && imgW <= 10) || (imgH > 0 && imgH <= 10)) {
+      showToast(t('toast_ai_tag_too_small'), 'warning');
+      return;
+    }
+    setIsAiTagging(true);
+    showToast(t('toast_ai_tagging'), 'info');
+    try {
+      const resp = await chrome.runtime.sendMessage({
+        type: MESSAGE_TYPES.AI_TAG_IMAGE,
+        imageUrl: img.url,
+      });
+      if (resp?.success && Array.isArray(resp.tags)) {
+        state.allImages = state.allImages.map((i) =>
+          i.id === img.id ? { ...i, aiTags: resp.tags } : i
+        );
+        applyFilters();
+        void saveAiTags(img.url, resp.tags);
+        if (typeof resp.quotaRemaining === 'number') {
+          state.aiQuotaRemaining = resp.quotaRemaining;
+        }
+        showToast(t('toast_ai_tag_success'), 'success');
+      } else if (resp?.error === 'quota_exceeded') {
+        showToast(t('toast_ai_quota_exhausted'), 'warning');
+      } else if (resp?.error?.includes('too small')) {
+        showToast(t('toast_ai_tag_too_small'), 'warning');
+      } else {
+        showToast(t('toast_ai_tag_failed'), 'error');
+      }
+    } catch {
+      showToast(t('toast_ai_tag_failed'), 'error');
+    } finally {
+      setIsAiTagging(false);
+    }
+  };
+
   // When not scanning (e.g. restoring from cache on tab switch), skip the
   // skeleton → image load animation by pre-setting the "loaded" class.
   const isNotScanning = useStoreSelector((s) => !s.isScanning && s.scanSkeletonsToShow === 0);
@@ -294,6 +367,15 @@ export function ImageCard({ img, index }: Props) {
           onLoad={handleImgLoad}
           onError={handleImgError}
         />
+        {aiTags.length > 0 && (
+          <div class="card-ai-tags-overlay">
+            {aiTags.map((tag) => (
+              <span key={tag} class="card-tag ai-tag">
+                {tag}
+              </span>
+            ))}
+          </div>
+        )}
       </div>
       <ColorBar colors={colors} isProUser={isProUser} onSwatchClick={handleColorClick} />
       <div class="card-info-bar">
@@ -327,6 +409,18 @@ export function ImageCard({ img, index }: Props) {
               onClick={handleFavorite}
             >
               <IconStar />
+            </button>
+            <span class="pro-badge pro-badge-mini">PRO</span>
+          </span>
+          <span class="icon-btn-wrapper">
+            <button
+              class={`card-action-btn btn-ai-tag${isAiTagging ? ' loading' : ''}${aiTags.length > 0 ? ' tagged' : ''}`}
+              title={t('card_ai_tag')}
+              data-id={img.id}
+              onClick={handleAiTag}
+              disabled={isAiTagging}
+            >
+              <IconAiTag />
             </button>
             <span class="pro-badge pro-badge-mini">PRO</span>
           </span>

@@ -4,6 +4,7 @@
 import { MESSAGE_TYPES, TIMING } from '../shared/constants';
 import { isRestrictedUrl } from '../shared/utils';
 import { clearTabImageCache, getTabImageCache, saveTabImageCache } from '../shared/storage';
+import { loadAiTagsMap } from '../shared/ai-tags-store';
 import { elements, state, store } from './state';
 import { fetchImages, processImageExtras } from './scan';
 import { applyFilters } from './filter';
@@ -111,6 +112,14 @@ export async function loadCurrentTab(forceRescan = false, targetTabId?: number):
         phash: null,
       }));
       state.selectedImages = new Set();
+
+      // Restore persisted AI tags into cached images
+      const tagMap = await loadAiTagsMap();
+      if (Object.keys(tagMap).length > 0) {
+        state.allImages = state.allImages.map((img) =>
+          tagMap[img.url] ? { ...img, aiTags: tagMap[img.url] } : img
+        );
+      }
 
       // Apply filters to compute filteredImages for this restored data
       hideLoading();

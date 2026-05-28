@@ -56,6 +56,17 @@ export const EVENTS = {
   WELCOME_PAGE_VIEWED: 'welcome_page_viewed', // props: { source: string }
   WELCOME_CTA_CLICKED: 'welcome_cta_clicked', // props: { action: string }
 
+  // Eagle export (Phase 5)
+  EXPORT_EAGLE_STARTED: 'export_eagle_started', // props: { count: number }
+  EXPORT_EAGLE_COMPLETED: 'export_eagle_completed', // props: { count, durationMs }
+  EXPORT_EAGLE_FAILED: 'export_eagle_failed', // props: { reason: string }
+
+  // AI tagging (Phase 4)
+  AI_TAG_REQUESTED: 'ai_tag_requested',
+  AI_TAG_COMPLETED: 'ai_tag_completed', // props: { tagCount: number }
+  AI_TAG_FAILED: 'ai_tag_failed', // props: { reason: string }
+  AI_QUOTA_EXHAUSTED: 'ai_quota_exhausted',
+
   // Pro-feature touchpoints — tells us WHICH paywall is most effective
   PRO_FEATURE_BLOCKED: 'pro_feature_blocked', // props: { feature: string }
   PRO_FEATURE_USED: 'pro_feature_used', // props: { feature: string } (Pro users)
@@ -120,6 +131,15 @@ export const EVENT_PROP_SCHEMAS: Record<TelemetryEventName, readonly string[]> =
 
   [EVENTS.WELCOME_PAGE_VIEWED]: ['source'],
   [EVENTS.WELCOME_CTA_CLICKED]: ['action'],
+
+  [EVENTS.EXPORT_EAGLE_STARTED]: ['count'],
+  [EVENTS.EXPORT_EAGLE_COMPLETED]: ['count', 'durationMs'],
+  [EVENTS.EXPORT_EAGLE_FAILED]: ['reason'],
+
+  [EVENTS.AI_TAG_REQUESTED]: [],
+  [EVENTS.AI_TAG_COMPLETED]: ['tagCount'],
+  [EVENTS.AI_TAG_FAILED]: ['reason'],
+  [EVENTS.AI_QUOTA_EXHAUSTED]: [],
 
   [EVENTS.PRO_FEATURE_BLOCKED]: ['feature', 'abBucket'],
   [EVENTS.PRO_FEATURE_USED]: ['feature'],

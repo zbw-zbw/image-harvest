@@ -1051,5 +1051,59 @@
   },
   "welcome_footer": {
     "message": "Your trial ends in 7 days · No credit card required"
+  },
+  "eagle_export_label": {
+    "message": "Eagle"
+  },
+  "eagle_export_tooltip": {
+    "message": "Export images to Eagle app"
+  },
+  "toast_eagle_exporting": {
+    "message": "Exporting {count} images to Eagle..."
+  },
+  "toast_eagle_not_running": {
+    "message": "Eagle is not running. Please open Eagle and try again."
+  },
+  "toast_eagle_failed": {
+    "message": "Eagle export failed. Please try again."
+  },
+  "toast_eagle_success": {
+    "message": "Exported {count} images to Eagle successfully!"
+  },
+  "toast_pro_eagle_export": {
+    "message": "Eagle export is a Pro feature"
+  },
+  "card_ai_tag": {
+    "message": "AI Tag"
+  },
+  "toast_pro_ai_tag": {
+    "message": "AI Tagging is a Pro feature"
+  },
+  "toast_ai_tag_success": {
+    "message": "AI tags added"
+  },
+  "toast_ai_tag_failed": {
+    "message": "AI tagging failed, please try again"
+  },
+  "toast_ai_quota_exhausted": {
+    "message": "Monthly AI quota exhausted (100/100)"
+  },
+  "ai_quota_tooltip": {
+    "message": "Monthly AI tagging quota"
+  },
+  "ai_tag_filter_label": {
+    "message": "AI Tags"
+  },
+  "ai_tag_filter_no_tags": {
+    "message": "No AI tags yet"
+  },
+  "toast_ai_tag_already_tagged": {
+    "message": "इस छवि पर पहले से टैग लगा है"
+  },
+  "toast_ai_tagging": {
+    "message": "AI टैग जनरेट हो रहे हैं…"
+  },
+  "toast_ai_tag_too_small": {
+    "message": "AI टैगिंग के लिए छवि बहुत छोटी है"
   }
 }

@@ -31,6 +31,8 @@ export interface ImageItem {
   colors?: string[];
   /** Perceptual hash (64-bit binary string) */
   phash?: string | null;
+  /** AI-generated category tags (e.g. "photo", "icon", "logo") */
+  aiTags?: string[];
 }
 
 // ── App settings (persisted to chrome.storage.local) ────────────────────────

@@ -63,6 +63,7 @@ export function setProLicenseInfo(info: ProLicenseInfo | null): void {
 export function ProStatusBadge() {
   const isPro = useStoreSelector((s) => s.isProUser);
   const info = useStoreSelector((s) => s.proLicenseInfo);
+  const aiQuota = useStoreSelector((s) => s.aiQuotaRemaining);
   // Subscribe to localeTick so a runtime language switch triggers re-render
   useStoreSelector((s) => s.localeTick);
   const planLabel = info?.plan ? PLAN_LABELS[info.plan]?.() || info.plan : '';
@@ -116,6 +117,9 @@ export function ProStatusBadge() {
             {expiryLabel}
           </span>
         )}
+        <span class="pro-ai-quota" title={t('ai_quota_tooltip')}>
+          AI: {aiQuota}/100
+        </span>
         <button
           id="btn-top-deactivate"
           class="btn-deactivate-inline"

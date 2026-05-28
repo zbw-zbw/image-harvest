@@ -1147,5 +1147,59 @@
   },
   "welcome_footer": {
     "message": "Your trial ends in 7 days · No credit card required"
+  },
+  "eagle_export_label": {
+    "message": "Eagle"
+  },
+  "eagle_export_tooltip": {
+    "message": "Eagle に画像をエクスポート"
+  },
+  "toast_eagle_exporting": {
+    "message": "{count} 枚の画像を Eagle にエクスポート中..."
+  },
+  "toast_eagle_not_running": {
+    "message": "Eagle が起動していません。Eagle を開いてから再試行してください"
+  },
+  "toast_eagle_failed": {
+    "message": "Eagle エクスポートに失敗しました。再試行してください"
+  },
+  "toast_eagle_success": {
+    "message": "{count} 枚の画像を Eagle にエクスポートしました！"
+  },
+  "toast_pro_eagle_export": {
+    "message": "Eagle エクスポートは Pro 機能です"
+  },
+  "card_ai_tag": {
+    "message": "AI タグ"
+  },
+  "toast_pro_ai_tag": {
+    "message": "AI タグは Pro 機能です"
+  },
+  "toast_ai_tag_success": {
+    "message": "AI タグが追加されました"
+  },
+  "toast_ai_tag_failed": {
+    "message": "AI タグに失敗しました。再試行してください"
+  },
+  "toast_ai_quota_exhausted": {
+    "message": "今月の AI 割り当てを使い切りました (100/100)"
+  },
+  "ai_quota_tooltip": {
+    "message": "月間 AI タグ割り当て"
+  },
+  "ai_tag_filter_label": {
+    "message": "AI タグ"
+  },
+  "ai_tag_filter_no_tags": {
+    "message": "AI タグはまだありません"
+  },
+  "toast_ai_tag_already_tagged": {
+    "message": "この画像は既にタグ付けされています"
+  },
+  "toast_ai_tagging": {
+    "message": "AIタグを生成中…"
+  },
+  "toast_ai_tag_too_small": {
+    "message": "画像が小さすぎて AI タグ付けできません"
   }
 }

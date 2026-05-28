@@ -322,6 +322,76 @@
   padding: 1px 4px;
 }
 
+.card-tag.ai-tag {
+  background: var(--primary-color, #60b557);
+  color: #fff;
+  font-weight: 500;
+  font-size: 8px;
+  padding: 1px 4px;
+}
+
+/* AI tags overlay — frosted dark pills, top-right of thumbnail */
+.card-ai-tags-overlay {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 3px;
+  max-width: 70%;
+  justify-content: flex-end;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.card-ai-tags-overlay .card-tag.ai-tag {
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 3px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  background: rgba(0, 0, 0, 0.55);
+  color: rgba(255, 255, 255, 0.92);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  line-height: 1.3;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+}
+
+.btn-ai-tag.tagged {
+  color: var(--primary-color, #60b557);
+}
+
+.btn-ai-tag.loading {
+  opacity: 0.7;
+  pointer-events: none;
+  color: var(--primary-color, #60b557);
+  animation: pulse-spin 0.8s ease-in-out infinite;
+}
+
+@keyframes pulse-spin {
+  0%,
+  100% {
+    opacity: 0.5;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 1;
+    transform: scale(1.15);
+  }
+}
+
+.pro-ai-quota {
+  font-size: 10px;
+  color: var(--text-secondary);
+  margin-left: 4px;
+  padding: 1px 5px;
+  border-radius: 4px;
+  background: var(--bg-secondary, rgba(0, 0, 0, 0.06));
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
 /* Card Thumbnail */
 .card-thumb {
   width: 100%;
@@ -618,7 +688,7 @@
   padding: 1px 6px;
   font-size: 9px;
   font-weight: 700;
-  color: var(--amber-text);
+  color: #5a3e00;
   background: linear-gradient(135deg, #ffd700, #ffb800);
   border-radius: 3px;
   text-transform: uppercase;

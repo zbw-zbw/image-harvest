@@ -42,6 +42,9 @@ export interface ActiveFilters {
   fileSizePreset: string;
   minFileSizeKB: number;
   maxFileSizeKB: number;
+
+  // AI tag filter
+  aiTagFilter: string[];
 }
 
 // ── Per-tab cache entry ─────────────────────────────────────────────────────
@@ -338,11 +341,15 @@ export interface SidepanelState {
 
   // Multi-tab extract lifecycle
   isMultiTabExtracting: boolean;
+  isEagleExporting: boolean;
 
   // License
   isProUser: boolean;
   inTrialGracePeriod: boolean;
   trialGraceDaysRemaining: number;
+
+  // AI tagging
+  aiQuotaRemaining: number;
 
   // ── Preact-managed UI screens (replaces classList toggles) ───────────────
   /** Which "main area" view is active. Mutually exclusive with itself. */
@@ -433,6 +440,7 @@ function createInitialState(): SidepanelState {
       fileSizePreset: 'all',
       minFileSizeKB: 0,
       maxFileSizeKB: Infinity,
+      aiTagFilter: [],
     },
 
     collapsedGroups: new Set<string>(),
@@ -458,10 +466,13 @@ function createInitialState(): SidepanelState {
     scanAborted: false,
 
     isMultiTabExtracting: false,
+    isEagleExporting: false,
 
     isProUser: false,
     inTrialGracePeriod: false,
     trialGraceDaysRemaining: 0,
+
+    aiQuotaRemaining: 100,
 
     uiScreen: 'images',
     errorInfo: null,

@@ -1147,5 +1147,59 @@
   },
   "welcome_footer": {
     "message": "Your trial ends in 7 days · No credit card required"
+  },
+  "eagle_export_label": {
+    "message": "Eagle"
+  },
+  "eagle_export_tooltip": {
+    "message": "匯出圖片到 Eagle"
+  },
+  "toast_eagle_exporting": {
+    "message": "正在匯出 {count} 張圖片到 Eagle..."
+  },
+  "toast_eagle_not_running": {
+    "message": "Eagle 未執行，請先開啟 Eagle 再試"
+  },
+  "toast_eagle_failed": {
+    "message": "匯出到 Eagle 失敗，請重試"
+  },
+  "toast_eagle_success": {
+    "message": "成功匯出 {count} 張圖片到 Eagle！"
+  },
+  "toast_pro_eagle_export": {
+    "message": "匯出到 Eagle 是 Pro 功能"
+  },
+  "card_ai_tag": {
+    "message": "AI 標籤"
+  },
+  "toast_pro_ai_tag": {
+    "message": "AI 標籤是 Pro 功能"
+  },
+  "toast_ai_tag_success": {
+    "message": "AI 標籤已新增"
+  },
+  "toast_ai_tag_failed": {
+    "message": "AI 標籤失敗，請重試"
+  },
+  "toast_ai_quota_exhausted": {
+    "message": "本月 AI 配額已用完 (100/100)"
+  },
+  "ai_quota_tooltip": {
+    "message": "每月 AI 標籤配額"
+  },
+  "ai_tag_filter_label": {
+    "message": "AI 標籤"
+  },
+  "ai_tag_filter_no_tags": {
+    "message": "暫無 AI 標籤"
+  },
+  "toast_ai_tag_already_tagged": {
+    "message": "該圖片已新增標籤"
+  },
+  "toast_ai_tagging": {
+    "message": "正在生成 AI 標籤…"
+  },
+  "toast_ai_tag_too_small": {
+    "message": "圖片尺寸過小，無法進行 AI 標籤"
   }
 }

@@ -246,6 +246,15 @@ async function init(): Promise<void> {
   // and toggles UI badges — none of which blocks image scanning. Running it
   // non-blocking lets loadCurrentTab start immediately, saving ~1.2s.
   const proVisibilityPromise = applyProFeatureVisibility();
+
+  // Start AI quota load early (in parallel with scan) so the badge is ready
+  // by the time image cards render and the user can click AI Tag.
+  const quotaPromise = proVisibilityPromise.then(async () => {
+    if (state.isProUser) {
+      const { getRemainingQuota } = await import('../shared/ai-quota');
+      state.aiQuotaRemaining = await getRemainingQuota();
+    }
+  });
   updateFilterButtonLabels();
   applyTranslations();
   initResizeObserver();
@@ -356,6 +365,8 @@ async function init(): Promise<void> {
   // Ensure the Pro visibility promise settles before marking init done,
   // so state.isProUser is resolved and UI badges are correct.
   await proVisibilityPromise;
+
+  await quotaPromise;
 
   state.isInitialized = true;
 }

@@ -109,7 +109,7 @@
   font-weight: 700;
   padding: 3px 10px;
   border-radius: 20px;
-  color: var(--amber-text);
+  color: #5a3e00;
   text-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.3);
 }
 
@@ -118,7 +118,7 @@
 }
 
 .license-status-badge.active svg {
-  stroke: var(--amber-text);
+  stroke: #5a3e00;
 }
 
 .license-plan-badge {

@@ -150,19 +150,30 @@ export async function injectIntoAllFrames(tabId: number): Promise<void> {
     if (!frames) return;
     const subFrames = frames.filter((frame) => frame.frameId !== 0 && !isRestrictedUrl(frame.url));
 
+    const pingDelayMs = 150;
+    const maxPingAttempts = 3;
+
     for (const frame of subFrames) {
       try {
-        await chrome.tabs.sendMessage(
-          tabId,
-          { type: MESSAGE_TYPES.PING },
-          { frameId: frame.frameId }
-        );
+        await sendMessageToTabWithTimeout(tabId, { type: MESSAGE_TYPES.PING }, 1500, {
+          frameId: frame.frameId,
+        });
       } catch {
         try {
           await chrome.scripting.executeScript({
             target: { tabId, frameIds: [frame.frameId] },
             files: getContentScriptFiles(),
           });
+          for (let attempt = 0; attempt < maxPingAttempts; attempt++) {
+            try {
+              await sendMessageToTabWithTimeout(tabId, { type: MESSAGE_TYPES.PING }, 1500, {
+                frameId: frame.frameId,
+              });
+              break;
+            } catch {
+              await new Promise((resolve) => setTimeout(resolve, pingDelayMs));
+            }
+          }
         } catch (injError) {
           console.warn(
             `Could not inject into frame ${frame.frameId} (${frame.url}):`,

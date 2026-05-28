@@ -82,10 +82,7 @@ async function doGetImagesFromTab(tabId: number, options: ExtractOptions): Promi
 
   const response: ExtractResponse = await chrome.tabs.sendMessage(
     tabId,
-    {
-      type: MESSAGE_TYPES.EXTRACT_IMAGES,
-      skipIframes: searchAllFrames,
-    },
+    { type: MESSAGE_TYPES.EXTRACT_IMAGES },
     { frameId: 0 }
   );
   let allImages: ImageItem[] = response?.images || [];

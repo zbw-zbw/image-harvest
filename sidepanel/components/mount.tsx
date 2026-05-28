@@ -23,6 +23,7 @@ import { PrivacyOptInModal } from './PrivacyOptInModal';
 import { SoftPaywallBanner } from './SoftPaywallBanner';
 import { TrialGraceBanner } from './TrialGraceBanner';
 import { BatchUrlCopyButton } from './BatchUrlCopyButton';
+import { EagleExportButton } from './EagleExportButton';
 import { RatingPromptModal } from './RatingPromptModal';
 import { SettingsModal } from './SettingsModal';
 import { ImageGrid } from './ImageGrid';
@@ -189,6 +190,7 @@ export function mountPreactComponents(): void {
   // permanent layout anchor; the component handles its own
   // enabled/disabled state via store subscriptions.
   mountAt('batch-url-copy-mount', BatchUrlCopyButton);
+  mountAt('eagle-export-mount', EagleExportButton);
 
   // Rating prompt modal (Sprint 3.6). Has no legacy slot — append a
   // fresh container to <body>. The component decides visibility via

@@ -28,6 +28,8 @@ interface HighlightEntry {
 // V2.0: Image Highlight & Locate
 // Multi-highlight state: Map<imageUrl, { element, border, cleanup }>
 const highlightEntries = new Map<string, HighlightEntry>();
+// Track iframe context for elements found inside iframes
+const iframeContextMap = new Map<string, HTMLIFrameElement>();
 let overlayElement: HTMLDivElement | null = null;
 let highlightStyleElement: HTMLStyleElement | null = null;
 let escKeyHandler: ((e: KeyboardEvent) => void) | null = null;
@@ -571,7 +573,129 @@ function findImageElement(url: string): Element | null {
 
   // If we found candidates from the DOM, pick the best one
   if (candidates.length > 0) {
-    return pickBestCandidate(candidates);
+    const best = pickBestCandidate(candidates);
+    if (best) return best;
+  }
+
+  // 10b. Search inside same-origin iframe contentDocuments
+  const iframes = document.querySelectorAll('iframe');
+  for (const iframe of iframes) {
+    try {
+      const iframeDoc = iframe.contentDocument;
+      if (!iframeDoc) continue;
+
+      // Check <img> in iframe (including srcset and lazy-load attributes)
+      const iframeImgs = iframeDoc.querySelectorAll('img');
+      for (const img of iframeImgs) {
+        let matched = false;
+        if (urlMatches(img.currentSrc) || urlMatches(img.src)) matched = true;
+        if (!matched && img.srcset) {
+          for (const { url: u } of parseSrcset(img.srcset)) {
+            if (urlMatches(u)) {
+              matched = true;
+              break;
+            }
+          }
+        }
+        if (!matched) {
+          for (const attr of ['data-src', 'data-original', 'data-lazy', 'data-lazy-src']) {
+            if (urlMatches(img.getAttribute(attr))) {
+              matched = true;
+              break;
+            }
+          }
+        }
+        if (matched) {
+          iframeContextMap.set(url, iframe);
+          return img;
+        }
+      }
+
+      // Check <picture> sources in iframe
+      const iframePictures = iframeDoc.querySelectorAll('picture');
+      for (const picture of iframePictures) {
+        let matched = false;
+        for (const source of picture.querySelectorAll('source')) {
+          for (const attr of ['srcset', 'data-srcset', 'src', 'data-src']) {
+            const val = source.getAttribute(attr);
+            if (!val) continue;
+            if (attr.includes('srcset')) {
+              for (const { url: u } of parseSrcset(val)) {
+                if (urlMatches(u)) {
+                  matched = true;
+                  break;
+                }
+              }
+            } else if (urlMatches(val)) matched = true;
+            if (matched) break;
+          }
+          if (matched) break;
+        }
+        if (matched) {
+          iframeContextMap.set(url, iframe);
+          return picture.querySelector('img') || picture;
+        }
+      }
+
+      // Check background images in iframe
+      const iframeEls = iframeDoc.querySelectorAll('body, body *');
+      const maxEls = Math.min(iframeEls.length, 1500);
+      for (let i = 0; i < maxEls; i++) {
+        try {
+          const win = iframe.contentWindow;
+          if (!win) break;
+          const bg = win.getComputedStyle(iframeEls[i]).backgroundImage;
+          if (bg && bg !== 'none') {
+            for (const u of extractBackgroundUrls(bg)) {
+              if (urlMatches(u)) {
+                iframeContextMap.set(url, iframe);
+                return iframeEls[i];
+              }
+            }
+          }
+          // CSS content (::before/::after) in iframe
+          for (const pseudo of ['::before', '::after']) {
+            try {
+              const pStyle = win.getComputedStyle(iframeEls[i], pseudo);
+              const content = pStyle.content;
+              if (content && content !== 'none' && content !== 'normal' && content !== '""') {
+                for (const u of extractBackgroundUrls(content)) {
+                  if (urlMatches(u)) {
+                    iframeContextMap.set(url, iframe);
+                    return iframeEls[i];
+                  }
+                }
+              }
+            } catch {
+              /* skip */
+            }
+          }
+        } catch {
+          /* skip */
+        }
+      }
+
+      // Check inline SVGs in iframe
+      if (isTargetDataUri && url.startsWith('data:image/svg')) {
+        const iframeSvgs = iframeDoc.querySelectorAll<SVGElement>('svg');
+        for (const svg of iframeSvgs) {
+          try {
+            const serializer = new XMLSerializer();
+            const svgString = serializer.serializeToString(svg);
+            const dataUri =
+              'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgString)));
+            if (generateDataUriKey(dataUri) === targetDataKey) {
+              iframeContextMap.set(url, iframe);
+              return svg;
+            }
+          } catch {
+            /* skip */
+          }
+        }
+      }
+    } catch {
+      // Cross-origin iframe, skip
+    }
   }
 
   // 11. Check <link> elements (favicon, apple-touch-icon, etc.)
@@ -641,7 +765,12 @@ export function addHighlight(imageUrl: string, shouldScroll = true): { found: bo
   createSingleHighlight(imageUrl, target);
 
   if (shouldScroll) {
-    target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const iframe = iframeContextMap.get(imageUrl);
+    if (iframe) {
+      iframe.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else {
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
   }
 
   return { found: true };
@@ -654,6 +783,7 @@ function createSingleHighlight(imageUrl: string, target: Element): void {
 
   const borderWidth = 3;
   const gap = 3;
+  const iframe = iframeContextMap.get(imageUrl);
 
   // Create a fixed-position overlay div that tracks the target element
   const border = document.createElement('div');
@@ -661,11 +791,18 @@ function createSingleHighlight(imageUrl: string, target: Element): void {
   border.dataset.highlightUrl = imageUrl;
 
   const rect = target.getBoundingClientRect();
+  let top = rect.top;
+  let left = rect.left;
+  if (iframe) {
+    const iframeRect = iframe.getBoundingClientRect();
+    top += iframeRect.top;
+    left += iframeRect.left;
+  }
   border.style.cssText = `
     position: fixed;
     box-sizing: border-box;
-    top: ${rect.top - gap}px;
-    left: ${rect.left - gap}px;
+    top: ${top - gap}px;
+    left: ${left - gap}px;
     width: ${rect.width + gap * 2}px;
     height: ${rect.height + gap * 2}px;
     border: ${borderWidth}px solid #60B557;
@@ -685,17 +822,24 @@ function createSingleHighlight(imageUrl: string, target: Element): void {
   const trackPosition = (): void => {
     if (!isTracking) return;
     const r = target.getBoundingClientRect();
+    let rTop = r.top;
+    let rLeft = r.left;
+    if (iframe) {
+      const iframeRect = iframe.getBoundingClientRect();
+      rTop += iframeRect.top;
+      rLeft += iframeRect.left;
+    }
     const viewportWidth = window.innerWidth;
     const viewportHeight = window.innerHeight;
 
     // Hide highlight when element is completely outside the viewport
     const isOutOfView =
-      r.bottom < 0 || r.top > viewportHeight || r.right < 0 || r.left > viewportWidth;
+      rTop + r.height < 0 || rTop > viewportHeight || rLeft + r.width < 0 || rLeft > viewportWidth;
     border.style.display = isOutOfView ? 'none' : '';
 
     if (!isOutOfView) {
-      border.style.top = r.top - gap + 'px';
-      border.style.left = r.left - gap + 'px';
+      border.style.top = rTop - gap + 'px';
+      border.style.left = rLeft - gap + 'px';
       border.style.width = r.width + gap * 2 + 'px';
       border.style.height = r.height + gap * 2 + 'px';
     }
@@ -722,6 +866,7 @@ export function removeSingleHighlight(imageUrl: string): void {
 
   entry.cleanup();
   highlightEntries.delete(imageUrl);
+  iframeContextMap.delete(imageUrl);
 
   // Remove overlay when no highlights remain
   if (highlightEntries.size === 0) {
@@ -754,5 +899,6 @@ export function removeAllHighlights(): void {
     }
   }
   highlightEntries.clear();
+  iframeContextMap.clear();
   removeOverlay();
 }

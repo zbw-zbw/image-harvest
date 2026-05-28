@@ -2,12 +2,12 @@
    Modal & Dialog Styles
    ============================================ */
 
-/* Status Bar */
+/* Status Bar — action buttons only, right-aligned */
 .status-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 10px 16px;
+  justify-content: flex-end;
+  padding: 8px 12px;
   border-top: 1px solid var(--border-color);
   background: var(--bg-color);
   flex-shrink: 0;
@@ -15,80 +15,23 @@
   font-size: 12px;
   overflow: visible;
   min-width: 0;
-  gap: 8px;
-  container-type: inline-size;
-  container-name: statusbar;
+  gap: 6px;
   position: relative;
   z-index: 10;
-}
-
-.status-left {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  flex-shrink: 1;
-  min-width: 0;
-  overflow: hidden;
 }
 
 .status-right {
   display: flex;
   align-items: center;
-  gap: 8px;
-  flex-shrink: 0;
+  gap: 6px;
+  flex-wrap: nowrap;
+  width: 100%;
+  justify-content: flex-end;
 }
 
-/* Status bar progressive shrink via container query.
-   Use .status-bar prefix to ensure higher specificity than the base
-   .dedup-btn / .rescan-btn rules defined later in this file. */
-
-@container statusbar (max-width: 600px) {
-  .status-bar .status-action-btn {
-    padding: 4px 6px;
-    font-size: 11px;
-  }
-
-  .status-bar .btn-small {
-    padding: 4px 8px;
-    font-size: 11px;
-  }
-
-  .download-group .btn-dropdown-toggle {
-    padding: 4px 6px;
-  }
-}
-
-@container statusbar (max-width: 520px) {
-  .status-bar .status-action-btn .btn-label {
-    display: none;
-  }
-
-  .status-bar .btn-small {
-    padding: 3px 6px;
-    font-size: 10px;
-  }
-
-  .download-group .btn-dropdown-toggle {
-    padding: 3px 5px;
-  }
-}
-
-@container statusbar (max-width: 440px) {
-  .status-bar .rescan-text {
-    display: none;
-  }
-
-  .status-bar #download-label {
-    display: none;
-  }
-}
-
-@container statusbar (max-width: 360px) {
-  .status-bar .found-info {
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-  }
+.status-bar .status-action-btn,
+.status-bar .btn-small {
+  white-space: nowrap;
 }
 
 /* Download dropdown opens upward in status bar */
