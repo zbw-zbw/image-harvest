@@ -848,6 +848,9 @@
   "toast_collection_added": {
     "message": "Ajouté à la collection"
   },
+  "toast_collection_already_exists": {
+    "message": "Cette image est déjà dans votre collection"
+  },
   "toast_collection_remove_failed": {
     "message": "Échec de la suppression"
   },
@@ -942,7 +945,7 @@
     "message": "Tout désélectionner"
   },
   "toolbar_download_all": {
-    "message": "Tout télécharger"
+    "message": "Télécharger"
   },
   "toolbar_download_selected": {
     "message": "Télécharger ({count})"
@@ -1105,5 +1108,50 @@
   },
   "toast_ai_tag_too_small": {
     "message": "Image trop petite pour le taggage IA"
+  },
+  "toast_ai_daily_limit": {
+    "message": "Vous avez utilisé vos 3 tags AI gratuits aujourd'hui. Passez à Pro pour 100 tags/mois."
+  },
+  "toast_collection_limit": {
+    "message": "Collection pleine (5/5). Passez à Pro pour des favoris illimités."
+  },
+  "toast_eagle_free_limit": {
+    "message": "Le plan gratuit prend en charge jusqu'à {max} images par export Eagle. Pro pour illimité."
+  },
+  "trial_days_remaining": {
+    "message": "Essai : {days} jours restants"
+  },
+  "trial_grace_banner": {
+    "message": "Votre essai est terminé — {days} jours d'accès Pro restants."
+  },
+  "pro_batch_operation": {
+    "message": "Les opérations en lot sont une fonctionnalité Pro."
+  },
+  "toolbar_batch_favorite": {
+    "message": "Favori"
+  },
+  "toolbar_batch_ai_tag": {
+    "message": "Tag IA"
+  },
+  "toolbar_batch_delete": {
+    "message": "Supprimer"
+  },
+  "toolbar_download": {
+    "message": "Télécharger"
+  },
+  "toast_batch_favorite_done": {
+    "message": "{count} images ajoutées à la collection."
+  },
+  "toast_batch_ai_tag_started": {
+    "message": "Taguage de {count} images avec IA..."
+  },
+  "toast_batch_ai_tag_done": {
+    "message": "{count} images taguées avec IA."
+  },
+  "confirm_batch_delete_title": {
+    "message": "Supprimer {count} images?"
+  },
+  "confirm_batch_delete_message": {
+    "message": "Supprimer {count} images sélectionnées de la liste?"
   }
 }

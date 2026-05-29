@@ -31,7 +31,7 @@ export function MultitabModal() {
               <line x1="3" y1="9" x2="21" y2="9" />
               <line x1="9" y1="21" x2="9" y2="9" />
             </svg>
-            {t('multitab_modal_title')} <span class="pro-badge">PRO</span>
+            {t('multitab_modal_title')}
           </h2>
           <button id="btn-multitab-close" class="icon-btn" onClick={close}>
             <svg
@@ -75,6 +75,11 @@ export function MultitabModal() {
           </button>
           <button id="btn-start-extraction" class="btn btn-primary">
             {t('multitab_start_extraction')}
+            {!state.isProUser && (
+              <span class="pro-badge pro-badge-mini" style={{ marginLeft: '6px' }}>
+                PRO
+              </span>
+            )}
           </button>
           {/* Extraction progress strip — toggled by pro-features.ts via legacy
               classList. We render it static (always present) so the existing

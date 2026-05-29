@@ -848,6 +848,9 @@
   "toast_collection_added": {
     "message": "संग्रह में जोड़ा गया"
   },
+  "toast_collection_already_exists": {
+    "message": "यह छवि पहले से आपके संग्रह में है"
+  },
   "toast_collection_remove_failed": {
     "message": "हटाने में विफल"
   },
@@ -942,7 +945,7 @@
     "message": "सभी अचयनित करें"
   },
   "toolbar_download_all": {
-    "message": "सभी डाउनलोड करें"
+    "message": "डाउनलोड"
   },
   "toolbar_download_selected": {
     "message": "डाउनलोड ({count})"
@@ -1105,5 +1108,50 @@
   },
   "toast_ai_tag_too_small": {
     "message": "AI टैगिंग के लिए छवि बहुत छोटी है"
+  },
+  "toast_ai_daily_limit": {
+    "message": "आज के 3 मुफ़्त AI टैग उपयोग हो चुके हैं। Pro में अपग्रेड करें 100 टैग/माह के लिए।"
+  },
+  "toast_collection_limit": {
+    "message": "संग्रह भरा हुआ (5/5)। असीमित पसंदीदा के लिए Pro में अपग्रेड करें।"
+  },
+  "toast_eagle_free_limit": {
+    "message": "मुफ़्त प्लान प्रति Eagle निर्यात अधिकतम {max} छवियाँ। असीमित के लिए Pro।"
+  },
+  "trial_days_remaining": {
+    "message": "ट्रायल: {days} दिन शेष"
+  },
+  "trial_grace_banner": {
+    "message": "ट्रायल समाप्त — {days} दिन Pro एक्सेस शेष।"
+  },
+  "pro_batch_operation": {
+    "message": "बैच ऑपरेशन Pro फीचर है।"
+  },
+  "toolbar_batch_favorite": {
+    "message": "पसंदीदा"
+  },
+  "toolbar_batch_ai_tag": {
+    "message": "AI टैग"
+  },
+  "toolbar_batch_delete": {
+    "message": "हटाएं"
+  },
+  "toolbar_download": {
+    "message": "डाउनलोड"
+  },
+  "toast_batch_favorite_done": {
+    "message": "{count} छवियां जोड़ी गईं।"
+  },
+  "toast_batch_ai_tag_started": {
+    "message": "{count} छवियों को टैग किया जा रहा है..."
+  },
+  "toast_batch_ai_tag_done": {
+    "message": "{count} छवियों को टैग किया गया।"
+  },
+  "confirm_batch_delete_title": {
+    "message": "{count} छवियां हटाएं?"
+  },
+  "confirm_batch_delete_message": {
+    "message": "सूची से {count} चयनित छवियां हटाएं?"
   }
 }

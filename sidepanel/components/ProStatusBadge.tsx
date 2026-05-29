@@ -60,6 +60,18 @@ export function setProLicenseInfo(info: ProLicenseInfo | null): void {
   state.proLicenseInfo = info;
 }
 
+function trialDaysRemaining(expiresAt: number | string | undefined): number | null {
+  if (!expiresAt) return null;
+  let expMs: number;
+  if (typeof expiresAt === 'string') {
+    expMs = new Date(expiresAt).getTime();
+  } else {
+    expMs = expiresAt > 1e12 ? expiresAt : expiresAt * 1000;
+  }
+  if (Number.isNaN(expMs)) return null;
+  return Math.max(0, Math.ceil((expMs - Date.now()) / 86_400_000));
+}
+
 export function ProStatusBadge() {
   const isPro = useStoreSelector((s) => s.isProUser);
   const info = useStoreSelector((s) => s.proLicenseInfo);
@@ -67,8 +79,10 @@ export function ProStatusBadge() {
   // Subscribe to localeTick so a runtime language switch triggers re-render
   useStoreSelector((s) => s.localeTick);
   const planLabel = info?.plan ? PLAN_LABELS[info.plan]?.() || info.plan : '';
+  const isTrial = info?.plan === 'trial';
+  const daysLeft = isTrial ? trialDaysRemaining(info?.expiresAt) : null;
   let expiryLabel = '';
-  if (info?.plan !== 'lifetime' && info?.expiresAt) {
+  if (info?.plan !== 'lifetime' && info?.expiresAt && !isTrial) {
     expiryLabel = t('plan_expires_date', { date: formatDateYMD(info.expiresAt) });
   }
   return (
@@ -109,7 +123,9 @@ export function ProStatusBadge() {
         </span>
         {planLabel && (
           <span id="pro-plan-label" class="pro-plan-label">
-            {planLabel}
+            {isTrial && daysLeft != null
+              ? t('trial_days_remaining', { days: String(daysLeft) })
+              : planLabel}
           </span>
         )}
         {expiryLabel && (

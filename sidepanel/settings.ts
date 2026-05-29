@@ -675,10 +675,11 @@ export function bindProGuards(): void {
 
   // ---- Pro feature click interception → open upgrade modal ----
   // Pro feature buttons: open upgrade modal + toast
-  const proLockedButtons: Array<{ id: string; i18nKey: string }> = [
-    { id: 'btn-collection', i18nKey: 'pro_feature_blocked_collection' },
-    { id: 'btn-multitab', i18nKey: 'pro_feature_blocked_multitab' },
-  ];
+  // Only fully-locked features (no free tier at all) are intercepted here.
+  // Collection and Multi-Tab are now partially open to free users:
+  //   - Collection: free users can open the modal (limited to 5 saved items)
+  //   - Multi-Tab: free users can open the dialog; extraction is blocked below
+  const proLockedButtons: Array<{ id: string; i18nKey: string }> = [];
   proLockedButtons.forEach(({ id, i18nKey }) => {
     const btn = document.getElementById(id);
     if (!btn) return;
@@ -689,12 +690,8 @@ export function bindProGuards(): void {
           e.stopImmediatePropagation();
           e.preventDefault();
           showToast(t(i18nKey), 'warning');
-          // Telemetry: emit BEFORE showProUpgradeModal so the dashboard
-          // can answer "which feature drives the most upsells".
-          // Map id → stable feature key (do not use display label; that
-          // would couple analytics to copy changes).
           void track(EVENTS.PRO_FEATURE_BLOCKED, {
-            feature: id === 'btn-collection' ? 'collection' : 'multitab',
+            feature: id,
           });
           showProUpgradeModal();
         }
@@ -702,6 +699,26 @@ export function bindProGuards(): void {
       true
     );
   });
+
+  // Multi-tab extraction is Pro-only. Free users can open the dialog and
+  // browse the tab list, but clicking "Start Extraction" is blocked here.
+  const btnStartExtraction = document.getElementById('btn-start-extraction');
+  if (btnStartExtraction) {
+    btnStartExtraction.addEventListener(
+      'click',
+      (e) => {
+        if (!state.isProUser) {
+          e.stopImmediatePropagation();
+          e.preventDefault();
+          state.multitabModalState = { open: false };
+          showToast(t('pro_feature_blocked_multitab'), 'warning');
+          void track(EVENTS.PRO_FEATURE_BLOCKED, { feature: 'multitab_extract' });
+          showProUpgradeModal();
+        }
+      },
+      true
+    );
+  }
 
   // Color filter: free users can open dropdown to see colors, but clicking a swatch triggers Pro upgrade
   // (Pro check is handled in the color swatch click event, not here)

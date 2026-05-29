@@ -726,7 +726,7 @@
     "message": "設定已儲存"
   },
   "settings_section_account": {
-    "message": "帳號"
+    "message": "升級 Pro"
   },
   "settings_section_appearance": {
     "message": "外觀"
@@ -902,6 +902,9 @@
   "toast_collection_added": {
     "message": "已加入收藏"
   },
+  "toast_collection_already_exists": {
+    "message": "該圖片已在收藏中"
+  },
   "toast_collection_empty": {
     "message": "收藏為空"
   },
@@ -1032,7 +1035,7 @@
     "message": "取消全選"
   },
   "toolbar_download_all": {
-    "message": "全部下載"
+    "message": "下載"
   },
   "toolbar_download_selected": {
     "message": "下載 ({count})"
@@ -1201,5 +1204,50 @@
   },
   "toast_ai_tag_too_small": {
     "message": "圖片尺寸過小，無法進行 AI 標籤"
+  },
+  "toast_ai_daily_limit": {
+    "message": "今日 3 次免費 AI 標籤已用完。升級 Pro 享受每月 100 次。"
+  },
+  "toast_collection_limit": {
+    "message": "收藏已滿 (5/5)。升級 Pro 享受無限收藏。"
+  },
+  "toast_eagle_free_limit": {
+    "message": "免費版每次最多匯出 {max} 張到 Eagle。升級 Pro 無限制。"
+  },
+  "trial_days_remaining": {
+    "message": "試用：剩餘 {days} 天"
+  },
+  "trial_grace_banner": {
+    "message": "試用已結束 — 還有 {days} 天 Pro 存取權限。"
+  },
+  "pro_batch_operation": {
+    "message": "批次操作是 Pro 功能。升級 Pro 享受無限生產力。"
+  },
+  "toolbar_batch_favorite": {
+    "message": "收藏"
+  },
+  "toolbar_batch_ai_tag": {
+    "message": "AI 標籤"
+  },
+  "toolbar_batch_delete": {
+    "message": "刪除"
+  },
+  "toolbar_download": {
+    "message": "下載"
+  },
+  "toast_batch_favorite_done": {
+    "message": "已將 {count} 張圖片加入收藏。"
+  },
+  "toast_batch_ai_tag_started": {
+    "message": "正在為 {count} 張圖片進行 AI 標籤..."
+  },
+  "toast_batch_ai_tag_done": {
+    "message": "已為 {count} 張圖片完成 AI 標籤。"
+  },
+  "confirm_batch_delete_title": {
+    "message": "刪除 {count} 張圖片？"
+  },
+  "confirm_batch_delete_message": {
+    "message": "確定從清單中移除 {count} 張選取的圖片？"
   }
 }

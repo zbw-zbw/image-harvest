@@ -434,22 +434,26 @@ describe('bindProGuards — Pro paywall interceptor', () => {
   });
 
   it.each(['btn-collection', 'btn-multitab'])(
-    'free user clicking #%s → upgrade modal opens + warning toast (NOT propagated to feature handler)',
+    'free user clicking #%s → modal opens freely (no Pro gate on toolbar button)',
     async (id) => {
+      // v1.0.5 Round 2: collection and multi-tab modals are now open to free
+      // users. The Pro gate was moved off the toolbar button — free users can
+      // open the dialog to browse. The upgrade prompt fires only when they try
+      // to take a restricted action inside (e.g. Start Extraction).
       state.isProUser = false;
       state.proUpgradeModalState = { open: false, errorText: '' };
 
-      // Add a downstream handler — it should NOT fire because the
-      // capture-phase guard calls stopImmediatePropagation.
       const downstream = vi.fn();
       document.getElementById(id)!.addEventListener('click', downstream);
 
       document.getElementById(id)!.click();
 
-      expect(state.proUpgradeModalState.open).toBe(true);
+      // No upgrade modal — click is not intercepted at toolbar button level.
+      expect(state.proUpgradeModalState.open).toBe(false);
       const ui = await import('../sidepanel/ui');
-      expect(ui.showToast).toHaveBeenCalledWith(expect.stringMatching(/Pro feature/), 'warning');
-      expect(downstream).not.toHaveBeenCalled();
+      expect(ui.showToast).not.toHaveBeenCalled();
+      // Downstream handler fires because stopImmediatePropagation is NOT called.
+      expect(downstream).toHaveBeenCalledTimes(1);
     }
   );
 
@@ -760,7 +764,7 @@ describe('resetSettings', () => {
     expect(state.appSettings.subfolder).toBe('{domain}');
     expect(state.appSettings.filenameTemplate).toBe('img_{index}_{original}.{format}');
     expect(state.appSettings.convertFormat).toBe('none');
-    expect(state.appSettings.searchAllFrames).toBe(false);
+    expect(state.appSettings.searchAllFrames).toBe(true);
     expect(state.appSettings.liveMonitoring).toBe(true);
     expect(state.appSettings.minWidth).toBe(0);
     expect(state.appSettings.maxWidth).toBe(99999);

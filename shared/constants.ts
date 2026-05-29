@@ -57,6 +57,7 @@ export const STORAGE_KEYS = {
   INSTANCE_ID: 'instanceId',
   AI_QUOTA: 'aiQuota',
   AI_TAGS: 'aiTags',
+  AI_FREE_DAILY: 'aiFreeDaily',
 } as const;
 
 export const MESSAGE_TYPES = {
@@ -122,6 +123,7 @@ export const MESSAGE_TYPES = {
 
   // AI tagging
   AI_TAG_IMAGE: 'AI_TAG_IMAGE',
+  AI_TAG_BATCH: 'AI_TAG_BATCH',
 } as const;
 
 export type MessageType = (typeof MESSAGE_TYPES)[keyof typeof MESSAGE_TYPES];
@@ -208,12 +210,10 @@ export const VALID_REVERSE_SEARCH_ENGINES = ['google', 'tineye', 'baidu', 'yande
 //   - MAX_COLLECTION_ITEMS: 5  (was: collection fully Pro; now 5 free favorites)
 export const FREE_LIMITS = {
   MAX_ZIP_IMAGES: 30,
-  // Sprint 3.4 — batch URL copy. Capped on Free to leave a Pro touchpoint;
-  // Pro users bypass entirely (see actions.ts > copyImageUrls).
   MAX_BATCH_COPY_URLS: 20,
-  // Sprint 3.5 — Free users now get a "tasting" amount of favorites (5)
-  // before the Pro paywall trips. See pro-features.ts > addToCollection.
   MAX_COLLECTION_ITEMS: 5,
+  MAX_DAILY_AI_TAGS: 3,
+  MAX_FREE_EAGLE_EXPORT: 5,
   ALLOWED_GROUP_MODES: ['none', 'format'] as const,
   REVERSE_SEARCH_ENGINES: ['google', 'tineye'] as const,
   COLOR_EXTRACT_COPY: false,
@@ -290,6 +290,7 @@ export const EAGLE_BATCH_SIZE = 10;
 
 // AI tagging (Phase 4) — backend API + quota.
 export const AI_TAG_API_URL = `${API_BASE}/api/ai/tag`;
+export const AI_TAG_BATCH_API_URL = `${API_BASE}/api/ai/tag-batch`;
 export const AI_QUOTA_LIMIT = 100;
 export const AI_TAG_CATEGORIES = [
   'photo',

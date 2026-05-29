@@ -848,6 +848,9 @@
   "toast_collection_added": {
     "message": "컬렉션에 추가됨"
   },
+  "toast_collection_already_exists": {
+    "message": "이 이미지는 이미 컬렉션에 있습니다"
+  },
   "toast_collection_remove_failed": {
     "message": "제거 실패"
   },
@@ -942,7 +945,7 @@
     "message": "선택 해제"
   },
   "toolbar_download_all": {
-    "message": "모두 다운로드"
+    "message": "다운로드"
   },
   "toolbar_download_selected": {
     "message": "다운로드 ({count})"
@@ -1105,5 +1108,50 @@
   },
   "toast_ai_tag_too_small": {
     "message": "이미지가 너무 작아 AI 태그를 생성할 수 없습니다"
+  },
+  "toast_ai_daily_limit": {
+    "message": "오늘 무료 AI 태그 3회를 모두 사용했습니다. Pro로 업그레이드하면 월 100회 사용 가능합니다."
+  },
+  "toast_collection_limit": {
+    "message": "컬렉션이 가득 찼습니다 (5/5). Pro로 업그레이드하면 무제한입니다."
+  },
+  "toast_eagle_free_limit": {
+    "message": "무료 플랜은 Eagle 내보내기 시 최대 {max}개까지 지원합니다. Pro로 무제한."
+  },
+  "trial_days_remaining": {
+    "message": "체험판: {days}일 남음"
+  },
+  "trial_grace_banner": {
+    "message": "체험판이 종료되었습니다 — Pro 액세스 {days}일 남음."
+  },
+  "pro_batch_operation": {
+    "message": "일괄 작업은 Pro 기능입니다."
+  },
+  "toolbar_batch_favorite": {
+    "message": "즐겨찾기"
+  },
+  "toolbar_batch_ai_tag": {
+    "message": "AI 태그"
+  },
+  "toolbar_batch_delete": {
+    "message": "삭제"
+  },
+  "toolbar_download": {
+    "message": "다운로드"
+  },
+  "toast_batch_favorite_done": {
+    "message": "{count}개의 이미지가 컬렉션에 추가되었습니다."
+  },
+  "toast_batch_ai_tag_started": {
+    "message": "{count}개의 이미지를 AI로 태그 중..."
+  },
+  "toast_batch_ai_tag_done": {
+    "message": "{count}개의 이미지가 AI로 태그되었습니다."
+  },
+  "confirm_batch_delete_title": {
+    "message": "{count}개의 이미지를 삭제하시겠습니까?"
+  },
+  "confirm_batch_delete_message": {
+    "message": "목록에서 선택한 {count}개의 이미지를 삭제하시겠습니까?"
   }
 }

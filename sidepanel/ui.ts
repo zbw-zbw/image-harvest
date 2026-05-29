@@ -186,10 +186,7 @@ export function updateFilterButtonLabels(): void {
   const colorBtn = document.querySelector<HTMLElement>('.filter-btn[data-filter="color"]');
   if (colorBtn) {
     const hasColorFilter = !!state.activeFilters.color;
-    // Preserve the PRO badge when updating text
-    const badge = colorBtn.querySelector('.pro-badge');
-    colorBtn.textContent = defaults.color + '▾ ';
-    if (badge) colorBtn.appendChild(badge);
+    colorBtn.textContent = defaults.color + '▾';
     colorBtn.classList.toggle('active', hasColorFilter);
     toggleClearBtn(colorBtn, hasColorFilter, () => {
       state.activeFilters.color = null;

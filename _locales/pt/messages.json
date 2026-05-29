@@ -672,7 +672,7 @@
     "message": "Configurações salvas"
   },
   "settings_section_account": {
-    "message": "Conta"
+    "message": "Atualizar para Pro"
   },
   "settings_section_appearance": {
     "message": "Aparência"
@@ -848,6 +848,9 @@
   "toast_collection_added": {
     "message": "Adicionado à coleção"
   },
+  "toast_collection_already_exists": {
+    "message": "Esta imagem já está na sua coleção"
+  },
   "toast_collection_remove_failed": {
     "message": "Falha ao remover"
   },
@@ -942,7 +945,7 @@
     "message": "Desmarcar tudo"
   },
   "toolbar_download_all": {
-    "message": "Baixar tudo"
+    "message": "Baixar"
   },
   "toolbar_download_selected": {
     "message": "Baixar ({count})"
@@ -1105,5 +1108,50 @@
   },
   "toast_ai_tag_too_small": {
     "message": "Imagem muito pequena para marcação por IA"
+  },
+  "toast_ai_daily_limit": {
+    "message": "Você usou todas as 3 tags AI gratuitas de hoje. Atualize para Pro para 100 tags/mês."
+  },
+  "toast_collection_limit": {
+    "message": "Coleção cheia (5/5). Atualize para Pro para favoritos ilimitados."
+  },
+  "toast_eagle_free_limit": {
+    "message": "O plano gratuito suporta até {max} imagens por exportação Eagle. Pro para ilimitado."
+  },
+  "trial_days_remaining": {
+    "message": "Teste: {days} dias restantes"
+  },
+  "trial_grace_banner": {
+    "message": "Seu teste terminou — {days} dias de acesso Pro restantes."
+  },
+  "pro_batch_operation": {
+    "message": "Operações em lote são uma função Pro."
+  },
+  "toolbar_batch_favorite": {
+    "message": "Favorito"
+  },
+  "toolbar_batch_ai_tag": {
+    "message": "Tag IA"
+  },
+  "toolbar_batch_delete": {
+    "message": "Excluir"
+  },
+  "toolbar_download": {
+    "message": "Baixar"
+  },
+  "toast_batch_favorite_done": {
+    "message": "{count} imagens adicionadas à coleção."
+  },
+  "toast_batch_ai_tag_started": {
+    "message": "Marcando {count} imagens com IA..."
+  },
+  "toast_batch_ai_tag_done": {
+    "message": "{count} imagens marcadas com IA."
+  },
+  "confirm_batch_delete_title": {
+    "message": "Excluir {count} imagens?"
+  },
+  "confirm_batch_delete_message": {
+    "message": "Remover {count} imagens selecionadas da lista?"
   }
 }

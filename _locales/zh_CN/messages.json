@@ -101,6 +101,9 @@
   "toast_collection_added": {
     "message": "已添加到收藏"
   },
+  "toast_collection_already_exists": {
+    "message": "该图片已在收藏中"
+  },
   "toast_collection_add_failed": {
     "message": "添加到收藏失败"
   },
@@ -150,7 +153,7 @@
     "message": "重新扫描"
   },
   "toolbar_download_all": {
-    "message": "全部下载"
+    "message": "下载"
   },
   "toolbar_download_selected": {
     "message": "下载 ({count})"
@@ -927,7 +930,7 @@
     "message": "Pro"
   },
   "settings_section_account": {
-    "message": "账号"
+    "message": "升级 Pro"
   },
   "settings_similar_desc": {
     "message": "查找并分组视觉相似或重复的图片"
@@ -1201,5 +1204,50 @@
   },
   "toast_ai_tag_too_small": {
     "message": "图片尺寸过小，无法进行 AI 标签"
+  },
+  "toast_ai_daily_limit": {
+    "message": "今日 3 次免费 AI 标签已用完。升级 Pro 享受每月 100 次。"
+  },
+  "toast_collection_limit": {
+    "message": "收藏已满 (5/5)。升级 Pro 享受无限收藏。"
+  },
+  "toast_eagle_free_limit": {
+    "message": "免费版每次最多导出 {max} 张到 Eagle。升级 Pro 无限制。"
+  },
+  "trial_days_remaining": {
+    "message": "试用：剩余 {days} 天"
+  },
+  "trial_grace_banner": {
+    "message": "试用已结束 — 还有 {days} 天 Pro 访问权限。"
+  },
+  "pro_batch_operation": {
+    "message": "批量操作是 Pro 功能。升级 Pro 享受无限生产力。"
+  },
+  "toolbar_batch_favorite": {
+    "message": "收藏"
+  },
+  "toolbar_batch_ai_tag": {
+    "message": "AI 标签"
+  },
+  "toolbar_batch_delete": {
+    "message": "删除"
+  },
+  "toolbar_download": {
+    "message": "下载"
+  },
+  "toast_batch_favorite_done": {
+    "message": "已将 {count} 张图片添加到收藏。"
+  },
+  "toast_batch_ai_tag_started": {
+    "message": "正在为 {count} 张图片进行 AI 标签..."
+  },
+  "toast_batch_ai_tag_done": {
+    "message": "已为 {count} 张图片完成 AI 标签。"
+  },
+  "confirm_batch_delete_title": {
+    "message": "删除 {count} 张图片？"
+  },
+  "confirm_batch_delete_message": {
+    "message": "确定从列表中移除 {count} 张选中的图片？"
   }
 }

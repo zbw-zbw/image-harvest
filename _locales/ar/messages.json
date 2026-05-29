@@ -672,7 +672,7 @@
     "message": "تم حفظ الإعدادات"
   },
   "settings_section_account": {
-    "message": "الحساب"
+    "message": "ترقية إلى Pro"
   },
   "settings_section_appearance": {
     "message": "المظهر"
@@ -848,6 +848,9 @@
   "toast_collection_added": {
     "message": "تمت الإضافة إلى المجموعة"
   },
+  "toast_collection_already_exists": {
+    "message": "هذه الصورة موجودة بالفعل في مجموعتك"
+  },
   "toast_collection_remove_failed": {
     "message": "فشلت الإزالة"
   },
@@ -942,7 +945,7 @@
     "message": "إلغاء تحديد الكل"
   },
   "toolbar_download_all": {
-    "message": "تحميل الكل"
+    "message": "تحميل"
   },
   "toolbar_download_selected": {
     "message": "تحميل ({count})"
@@ -1105,5 +1108,50 @@
   },
   "toast_ai_tag_too_small": {
     "message": "الصورة صغيرة جدًا لوضع علامات AI"
+  },
+  "toast_ai_daily_limit": {
+    "message": "لقد استخدمت جميع علامات AI المجانية الثلاث لليوم. قم بالترقية إلى Pro للحصول على 100 علامة/شهر."
+  },
+  "toast_collection_limit": {
+    "message": "المجموعة ممتلئة (5/5). قم بالترقية إلى Pro لمفضلات غير محدودة."
+  },
+  "toast_eagle_free_limit": {
+    "message": "الخطة المجانية تدعم حتى {max} صورة لكل تصدير Eagle. Pro لغير محدود."
+  },
+  "trial_days_remaining": {
+    "message": "تجريبي: {days} أيام متبقية"
+  },
+  "trial_grace_banner": {
+    "message": "انتهت الفترة التجريبية — {days} أيام من وصول Pro متبقية."
+  },
+  "pro_batch_operation": {
+    "message": "العمليات الجماعية ميزة Pro."
+  },
+  "toolbar_batch_favorite": {
+    "message": "حفظ"
+  },
+  "toolbar_batch_ai_tag": {
+    "message": "وسم AI"
+  },
+  "toolbar_batch_delete": {
+    "message": "حذف"
+  },
+  "toolbar_download": {
+    "message": "تحميل"
+  },
+  "toast_batch_favorite_done": {
+    "message": "تمت إضافة {count} صور."
+  },
+  "toast_batch_ai_tag_started": {
+    "message": "جارٍ وسم {count} صور..."
+  },
+  "toast_batch_ai_tag_done": {
+    "message": "تم وسم {count} صور."
+  },
+  "confirm_batch_delete_title": {
+    "message": "حذف {count} صور؟"
+  },
+  "confirm_batch_delete_message": {
+    "message": "إزالة {count} صور مختارة من القائمة؟"
   }
 }

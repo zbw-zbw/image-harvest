@@ -903,6 +903,9 @@
   "toast_collection_added": {
     "message": "Añadido a la colección"
   },
+  "toast_collection_already_exists": {
+    "message": "Esta imagen ya está en tu colección"
+  },
   "toast_collection_empty": {
     "message": "La colección está vacía"
   },
@@ -1035,7 +1038,7 @@
     "message": "Deseleccionar todo"
   },
   "toolbar_download_all": {
-    "message": "Descargar todo"
+    "message": "Descargar"
   },
   "toolbar_download_selected": {
     "message": "Descargar ({count})"
@@ -1204,5 +1207,50 @@
   },
   "toast_ai_tag_too_small": {
     "message": "Imagen demasiado pequeña para etiquetado IA"
+  },
+  "toast_ai_daily_limit": {
+    "message": "Has usado las 3 etiquetas AI gratuitas de hoy. Actualiza a Pro para 100 etiquetas/mes."
+  },
+  "toast_collection_limit": {
+    "message": "Colección llena (5/5). Actualiza a Pro para favoritos ilimitados."
+  },
+  "toast_eagle_free_limit": {
+    "message": "El plan gratuito permite hasta {max} imágenes por exportación a Eagle. Pro para ilimitado."
+  },
+  "trial_days_remaining": {
+    "message": "Prueba: {days} días restantes"
+  },
+  "trial_grace_banner": {
+    "message": "Tu prueba ha terminado — {days} días de acceso Pro restantes."
+  },
+  "pro_batch_operation": {
+    "message": "Las operaciones en lote son una función Pro."
+  },
+  "toolbar_batch_favorite": {
+    "message": "Favorito"
+  },
+  "toolbar_batch_ai_tag": {
+    "message": "Etiqueta IA"
+  },
+  "toolbar_batch_delete": {
+    "message": "Eliminar"
+  },
+  "toolbar_download": {
+    "message": "Descargar"
+  },
+  "toast_batch_favorite_done": {
+    "message": "{count} imágenes añadidas."
+  },
+  "toast_batch_ai_tag_started": {
+    "message": "Etiquetando {count} imágenes con IA..."
+  },
+  "toast_batch_ai_tag_done": {
+    "message": "{count} imágenes etiquetadas con IA."
+  },
+  "confirm_batch_delete_title": {
+    "message": "Eliminar {count} imágenes?"
+  },
+  "confirm_batch_delete_message": {
+    "message": "¿Eliminar {count} imágenes seleccionadas de la lista?"
   }
 }

@@ -118,7 +118,6 @@ HTML document — it omits the surrounding
                 />
               </svg>
             </button>
-            <span class="pro-badge pro-badge-mini">PRO</span>
           </span>
           <span class="icon-btn-wrapper">
             <button
@@ -140,7 +139,6 @@ HTML document — it omits the surrounding
                 <line x1="9" y1="21" x2="9" y2="9" />
               </svg>
             </button>
-            <span class="pro-badge pro-badge-mini">PRO</span>
           </span>
           <button
             id="btn-settings"
@@ -566,9 +564,7 @@ HTML document — it omits the surrounding
                 </div>
               </div>
 
-              <button class="filter-btn" data-filter="color">
-                Color▾ <span class="pro-badge pro-badge-mini">PRO</span>
-              </button>
+              <button class="filter-btn" data-filter="color">Color▾</button>
               <div class="filter-dropdown hidden" id="filter-color">
                 <div class="filter-option active" data-color-filter="all" data-i18n="color_all">
                   All Colors
@@ -892,63 +888,62 @@ HTML document — it omits the surrounding
 
         <!-- Status Bar -->
         <footer class="status-bar">
-          <div class="status-right">
-            <span id="batch-url-copy-mount" data-preact-mount="batch-url-copy-mount"></span>
-            <span id="eagle-export-mount" data-preact-mount="eagle-export-mount"></span>
-            <div id="download-group" class="download-group">
-              <button
-                id="btn-download"
-                class="btn btn-primary btn-small"
-                title="Download images"
-                data-i18n-title="title_download"
+          <div class="status-left">
+            <span id="batch-ops-mount" data-preact-mount="batch-ops-mount"></span>
+          </div>
+          <div class="status-buttons"></div>
+          <span id="batch-ops-mount" data-preact-mount="batch-ops-mount"></span>
+          <span id="batch-url-copy-mount" data-preact-mount="batch-url-copy-mount"></span>
+          <span id="eagle-export-mount" data-preact-mount="eagle-export-mount"></span>
+          <div id="download-group" class="download-group">
+            <button
+              id="btn-download"
+              class="btn status-action-btn btn-small"
+              title="Download images"
+              data-i18n-title="title_download"
+            >
+              <svg
+                width="14"
+                height="14"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
               >
-                <svg
-                  width="14"
-                  height="14"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2.5"
-                >
-                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                  <polyline points="7 10 12 15 17 10" />
-                  <line x1="12" y1="15" x2="12" y2="3" />
-                </svg>
-                <span id="download-label" data-i18n="toolbar_download_all">Download All</span>
-              </button>
-              <button
-                id="btn-download-toggle"
-                class="btn btn-primary btn-small btn-dropdown-toggle"
-                title="Download format options"
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="7 10 12 15 17 10" />
+                <line x1="12" y1="15" x2="12" y2="3" />
+              </svg>
+              <span id="download-label" data-i18n="toolbar_download_all">Download</span>
+            </button>
+            <button
+              id="btn-download-toggle"
+              class="btn status-action-btn btn-small btn-dropdown-toggle"
+              title="Download format options"
+            >
+              <svg
+                width="10"
+                height="10"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2.5"
               >
-                <svg
-                  width="10"
-                  height="10"
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  stroke-width="2.5"
-                >
-                  <path d="M6 9l6 6 6-6" />
-                </svg>
-              </button>
-              <div id="download-dropdown" class="dropdown-menu hidden">
-                <div
-                  class="dropdown-item active"
-                  data-format="original"
-                  data-i18n="format_original"
-                >
-                  Original
-                </div>
-                <div class="dropdown-item" data-format="png">
-                  PNG <span class="pro-badge pro-badge-mini">PRO</span>
-                </div>
-                <div class="dropdown-item" data-format="jpg">
-                  JPG <span class="pro-badge pro-badge-mini">PRO</span>
-                </div>
-                <div class="dropdown-item" data-format="webp">
-                  WebP <span class="pro-badge pro-badge-mini">PRO</span>
-                </div>
+                <path d="M6 9l6 6 6-6" />
+              </svg>
+            </button>
+            <div id="download-dropdown" class="dropdown-menu hidden">
+              <div class="dropdown-item active" data-format="original" data-i18n="format_original">
+                Original
+              </div>
+              <div class="dropdown-item" data-format="png">
+                PNG <span class="pro-badge pro-badge-mini">PRO</span>
+              </div>
+              <div class="dropdown-item" data-format="jpg">
+                JPG <span class="pro-badge pro-badge-mini">PRO</span>
+              </div>
+              <div class="dropdown-item" data-format="webp">
+                WebP <span class="pro-badge pro-badge-mini">PRO</span>
               </div>
             </div>
           </div>
@@ -1607,28 +1602,7 @@ HTML document — it omits the surrounding
                     Skip the confirmation dialog when downloading many files
                   </p>
                 </div>
-                <div class="setting-group">
-                  <label class="checkbox-label">
-                    <input type="checkbox" id="setting-telemetry" />
-                    <span class="settings-checkbox"
-                      ><svg
-                        width="12"
-                        height="12"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        stroke-width="3"
-                        class="check-icon"
-                      >
-                        <polyline points="20 6 9 17 4 12" /></svg
-                    ></span>
-                    <span data-i18n="settings_telemetry">Help Improve (Anonymous Usage Data)</span>
-                  </label>
-                  <p class="setting-desc" data-i18n="settings_telemetry_desc">
-                    Send anonymous feature-usage events. No URLs, no images, no personal info.
-                    Off-by-default; you can change this anytime.
-                  </p>
-                </div>
+
                 <div class="setting-group">
                   <div class="hotkey-row" id="hotkey-link">
                     <label data-i18n="settings_hotkey">Hotkey:</label>

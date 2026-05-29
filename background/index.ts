@@ -9,7 +9,13 @@ import {
   getAppSettings,
   saveAppSettings,
 } from '../shared/storage';
-import { activateLicense, deactivateLicense, isProUser, getLicenseInfo } from '../shared/license';
+import {
+  activateLicense,
+  deactivateLicense,
+  isProUser,
+  getLicenseInfo,
+  getOrCreateInstanceId,
+} from '../shared/license';
 import { setEnvelopeMeta, track, flushNow } from '../shared/telemetry';
 import { EVENTS } from '../shared/telemetry-events';
 
@@ -22,8 +28,9 @@ import { isAllowedFetchUrl } from '../shared/url-validator';
 import { autoStartTrial, initAutoTrialAlarm } from './auto-trial';
 import { detectEagle, exportToEagle } from '../shared/export-eagle';
 import type { EagleItem } from '../shared/export-eagle';
-import { AI_TAG_API_URL } from '../shared/constants';
+import { AI_TAG_API_URL, AI_TAG_BATCH_API_URL } from '../shared/constants';
 import { getRemainingQuota, setLocalQuotaFromServer } from '../shared/ai-quota';
+import { getRemainingDailyFreeAiTags, incrementDailyFreeAiTag } from '../shared/ai-free-quota';
 
 // ── Initialization ──────────────────────────────────────────────────────────
 
@@ -463,27 +470,40 @@ async function handleMessage(
         try {
           const { imageUrl } = message as { imageUrl: string };
           const proInfo = await isProUser();
-          if (!proInfo.isPro) {
-            sendResponse({ success: false, error: 'pro_required' });
-            break;
+
+          let licenseKey = '';
+          let instanceId = '';
+
+          if (proInfo.isPro) {
+            const remaining = await getRemainingQuota();
+            if (remaining <= 0) {
+              sendResponse({ success: false, error: 'quota_exceeded', quotaRemaining: 0 });
+              break;
+            }
+            const licenseInfo = await getLicenseInfo();
+            if (!licenseInfo.hasLicense) {
+              sendResponse({ success: false, error: 'no_license' });
+              break;
+            }
+            licenseKey = licenseInfo.licenseKey;
+            instanceId = licenseInfo.instanceId;
+          } else {
+            const freeRemaining = await getRemainingDailyFreeAiTags();
+            if (freeRemaining <= 0) {
+              sendResponse({ success: false, error: 'daily_limit', quotaRemaining: 0 });
+              break;
+            }
+            instanceId = await getOrCreateInstanceId();
           }
-          const remaining = await getRemainingQuota();
-          if (remaining <= 0) {
-            sendResponse({ success: false, error: 'quota_exceeded', quotaRemaining: 0 });
-            break;
-          }
-          const licenseInfo = await getLicenseInfo();
-          if (!licenseInfo.hasLicense) {
-            sendResponse({ success: false, error: 'no_license' });
-            break;
-          }
+
           const resp = await fetch(AI_TAG_API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
-              licenseKey: licenseInfo.licenseKey,
-              instanceId: licenseInfo.instanceId,
+              licenseKey: licenseKey || undefined,
+              instanceId,
               imageUrl,
+              tier: proInfo.isPro ? 'pro' : 'free',
             }),
           });
           const data = (await resp.json()) as {
@@ -500,12 +520,66 @@ async function handleMessage(
             });
             break;
           }
+          if (proInfo.isPro && typeof data.quotaRemaining === 'number') {
+            await setLocalQuotaFromServer(data.quotaRemaining);
+          }
+          if (!proInfo.isPro) {
+            await incrementDailyFreeAiTag();
+          }
+          sendResponse({
+            success: true,
+            tags: data.tags || [],
+            quotaRemaining: data.quotaRemaining,
+          });
+        } catch (error) {
+          sendResponse({ success: false, error: (error as Error).message });
+        }
+        break;
+      }
+
+      case MESSAGE_TYPES.AI_TAG_BATCH: {
+        try {
+          const { imageUrls } = message as { imageUrls: string[] };
+          const proInfo = await isProUser();
+          if (!proInfo.isPro) {
+            sendResponse({ success: false, error: 'pro_required' });
+            break;
+          }
+          const remaining = await getRemainingQuota();
+          if (remaining <= 0) {
+            sendResponse({ success: false, error: 'quota_exceeded', quotaRemaining: 0 });
+            break;
+          }
+          const licenseInfo = await getLicenseInfo();
+          if (!licenseInfo.hasLicense) {
+            sendResponse({ success: false, error: 'no_license' });
+            break;
+          }
+          const resp = await fetch(AI_TAG_BATCH_API_URL, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              licenseKey: licenseInfo.licenseKey,
+              instanceId: licenseInfo.instanceId,
+              imageUrls,
+            }),
+          });
+          const data = (await resp.json()) as {
+            success: boolean;
+            results?: Array<{ url: string; tags: string[]; success: boolean }>;
+            quotaRemaining?: number;
+            error?: string;
+          };
+          if (!resp.ok || !data.success) {
+            sendResponse({ success: false, error: data.error || 'batch_tag_failed' });
+            break;
+          }
           if (typeof data.quotaRemaining === 'number') {
             await setLocalQuotaFromServer(data.quotaRemaining);
           }
           sendResponse({
             success: true,
-            tags: data.tags || [],
+            results: data.results || [],
             quotaRemaining: data.quotaRemaining,
           });
         } catch (error) {

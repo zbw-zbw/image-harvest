@@ -1,6 +1,8 @@
 import { collectionAdd, collectionGetAll, collectionRemove } from '../shared/collection';
 import { FREE_LIMITS } from '../shared/constants';
 import { t } from '../shared/i18n';
+import { track } from '../shared/telemetry';
+import { EVENTS } from '../shared/telemetry-events';
 import { hammingDistance } from '../shared/phash';
 import type { CollectionItem, ImageItem } from '../shared/types';
 import { applyFilters } from './filter';
@@ -132,11 +134,21 @@ export function removeImageById(imageId: string): void {
 // ============================================
 export async function addToCollection(img: ImageItem): Promise<void> {
   try {
-    // Pro guard: collection is a Pro-only feature.
-    if (!state.isProUser) {
-      showToast(t('pro_feature_blocked_collection'), 'warning');
-      showProUpgradeModal();
+    const all = await collectionGetAll();
+
+    if (all.some((c: CollectionItem) => c.url === img.url)) {
+      showToast(t('toast_collection_already_exists'), 'info');
+      void track(EVENTS.COLLECTION_DUPLICATE);
       return;
+    }
+
+    if (!state.isProUser) {
+      if (all.length >= FREE_LIMITS.MAX_COLLECTION_ITEMS) {
+        showToast(t('toast_collection_limit'), 'warning');
+        void track(EVENTS.COLLECTION_FULL);
+        showProUpgradeModal();
+        return;
+      }
     }
 
     // Get the actual page URL from the active tab (not the extension panel URL)
@@ -169,6 +181,7 @@ export async function addToCollection(img: ImageItem): Promise<void> {
       createdAt: Date.now(),
     } as CollectionItem);
     showToast(t('toast_collection_added'), 'success');
+    void track(EVENTS.COLLECTION_ADDED);
   } catch {
     showToast(t('toast_collection_add_failed'), 'error');
   }

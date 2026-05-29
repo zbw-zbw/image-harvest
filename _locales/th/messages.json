@@ -848,6 +848,9 @@
   "toast_collection_added": {
     "message": "เพิ่มลงคอลเลกชันแล้ว"
   },
+  "toast_collection_already_exists": {
+    "message": "รูปภาพนี้อยู่ในคอลเลกชันของคุณแล้ว"
+  },
   "toast_collection_remove_failed": {
     "message": "ลบออกล้มเหลว"
   },
@@ -942,7 +945,7 @@
     "message": "ยกเลิกการเลือกทั้งหมด"
   },
   "toolbar_download_all": {
-    "message": "ดาวน์โหลดทั้งหมด"
+    "message": "ดาวน์โหลด"
   },
   "toolbar_download_selected": {
     "message": "ดาวน์โหลด ({count})"
@@ -1105,5 +1108,50 @@
   },
   "toast_ai_tag_too_small": {
     "message": "รูปภาพเล็กเกินไปสำหรับการแท็ก AI"
+  },
+  "toast_ai_daily_limit": {
+    "message": "คุณใช้แท็ก AI ฟรี 3 ครั้งหมดแล้ววันนี้ อัปเกรดเป็น Pro เพื่อรับ 100 แท็ก/เดือน"
+  },
+  "toast_collection_limit": {
+    "message": "คอลเลกชันเต็ม (5/5) อัปเกรดเป็น Pro เพื่อรับรายการโปรดไม่จำกัด"
+  },
+  "toast_eagle_free_limit": {
+    "message": "แพลนฟรีรองรับสูงสุด {max} รูปต่อการส่งออก Eagle อัปเกรดเป็น Pro ไม่จำกัด"
+  },
+  "trial_days_remaining": {
+    "message": "ทดลองใช้: เหลือ {days} วัน"
+  },
+  "trial_grace_banner": {
+    "message": "ทดลองใช้สิ้นสุดแล้ว — เหลือ {days} วัน Pro"
+  },
+  "pro_batch_operation": {
+    "message": "การดำเนินการเป็นชุดเป็นฟีเจอร์ Pro"
+  },
+  "toolbar_batch_favorite": {
+    "message": "รายการโปรด"
+  },
+  "toolbar_batch_ai_tag": {
+    "message": "แท็ก AI"
+  },
+  "toolbar_batch_delete": {
+    "message": "ลบ"
+  },
+  "toolbar_download": {
+    "message": "ดาวน์โหลด"
+  },
+  "toast_batch_favorite_done": {
+    "message": "เพิ่ม {count} รูปภาพแล้ว"
+  },
+  "toast_batch_ai_tag_started": {
+    "message": "กำลังแท็ก {count} รูปภาพ..."
+  },
+  "toast_batch_ai_tag_done": {
+    "message": "แท็ก {count} รูปภาพแล้ว"
+  },
+  "confirm_batch_delete_title": {
+    "message": "ลบ {count} รูปภาพ?"
+  },
+  "confirm_batch_delete_message": {
+    "message": "ลบ {count} รูปภาพที่เลือกออกจากรายการ?"
   }
 }

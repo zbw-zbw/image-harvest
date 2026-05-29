@@ -306,10 +306,6 @@ export async function downloadSingle(img: ImageItem, format: string | null): Pro
     // SoftPaywallBanner component does the actual `state.isProUser`
     // short-circuit on render.
     void recordDownloads(1);
-    // Rating prompt (Sprint 3.6): independent counter so the rating
-    // modal arms at its own threshold (50) regardless of upsell state.
-    // Pro and Free users both contribute — happy Pro users are exactly
-    // who we want leaving 5-star reviews.
     void recordDownloadForRating(1);
   } catch (error) {
     console.error('Download error:', error);
@@ -331,9 +327,9 @@ export async function downloadSelectedAsZip(targetFormat: string | null): Promis
     return;
   }
 
-  // Free tier: limit ZIP to FREE_LIMITS.MAX_ZIP_IMAGES images
+  // Free tier: per-batch image count limit
   if (!state.isProUser && selected.length > FREE_LIMITS.MAX_ZIP_IMAGES) {
-    showToast(t('pro_zip_limit', { max: FREE_LIMITS.MAX_ZIP_IMAGES }), 'warning');
+    showToast(t('pro_zip_limit', { max: String(FREE_LIMITS.MAX_ZIP_IMAGES) }), 'warning');
     showProUpgradeModal();
     return;
   }
@@ -637,11 +633,79 @@ export function showReverseSearchMenu(imageUrl: string, anchor: HTMLElement): vo
 export function reverseSearch(imageUrl: string, engine: string): void {
   if (!(VALID_REVERSE_SEARCH_ENGINES as readonly string[]).includes(engine)) return;
 
-  // Open the intermediate page which downloads the image via background script
-  // and submits it as a form upload to the search engine
   const searchPageUrl =
     chrome.runtime.getURL('pages/reverse-search.html') +
     `?engine=${encodeURIComponent(engine)}` +
     `&imageUrl=${encodeURIComponent(imageUrl)}`;
   chrome.tabs.create({ url: searchPageUrl, active: true });
+}
+
+// ============================================
+// Batch operations (Pro-only)
+// ============================================
+
+export async function batchAddToCollection(images: ImageItem[]): Promise<void> {
+  if (images.length === 0) return;
+  const { addToCollection } = await import('./pro-features');
+  let added = 0;
+  for (const img of images) {
+    await addToCollection(img);
+    added++;
+  }
+  showToast(t('toast_batch_favorite_done', { count: String(added) }), 'success');
+}
+
+export async function batchAiTag(images: ImageItem[]): Promise<void> {
+  if (images.length === 0) return;
+  const urls = images.map((img) => img.url);
+  showToast(t('toast_batch_ai_tag_started', { count: String(urls.length) }), 'info');
+  try {
+    const resp = await chrome.runtime.sendMessage({
+      type: MESSAGE_TYPES.AI_TAG_BATCH,
+      imageUrls: urls,
+    });
+    if (!resp?.success) {
+      showToast(t('toast_ai_tag_failed'), 'error');
+      return;
+    }
+    const results: Array<{ url: string; tags: string[]; success: boolean }> = resp.results ?? [];
+    let taggedCount = 0;
+    const tagMap = new Map<string, string[]>();
+    for (const result of results) {
+      if (result.success && result.tags.length > 0) {
+        tagMap.set(result.url, result.tags);
+        taggedCount++;
+      }
+    }
+    if (taggedCount > 0) {
+      store.set(
+        'allImages',
+        state.allImages.map((img) => {
+          const tags = tagMap.get(img.url);
+          return tags ? { ...img, aiTags: tags } : img;
+        })
+      );
+    }
+    showToast(t('toast_batch_ai_tag_done', { count: String(taggedCount) }), 'success');
+  } catch {
+    showToast(t('toast_ai_tag_failed'), 'error');
+  }
+}
+
+export async function deleteSelectedImages(ids: string[]): Promise<void> {
+  if (ids.length === 0) return;
+  const confirmed = await showConfirmDialog({
+    title: t('confirm_batch_delete_title', { count: String(ids.length) }),
+    message: t('confirm_batch_delete_message'),
+    confirmLabel: t('common_delete'),
+    cancelLabel: t('common_cancel'),
+  });
+  if (!confirmed) return;
+  const idSet = new Set(ids);
+  store.set(
+    'allImages',
+    state.allImages.filter((img) => !idSet.has(img.id))
+  );
+  store.set('selectedImages', new Set());
+  renderImages();
 }

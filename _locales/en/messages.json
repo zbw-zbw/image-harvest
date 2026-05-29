@@ -105,6 +105,9 @@
   "toast_collection_added": {
     "message": "Added to collection"
   },
+  "toast_collection_already_exists": {
+    "message": "This image is already in your collection"
+  },
   "toast_collection_add_failed": {
     "message": "Failed to add to collection"
   },
@@ -160,7 +163,7 @@
     "message": "Rescan"
   },
   "toolbar_download_all": {
-    "message": "Download All"
+    "message": "Download"
   },
   "toolbar_download_selected": {
     "message": "Download ({count})"
@@ -1208,5 +1211,50 @@
   },
   "toast_ai_tag_too_small": {
     "message": "Image too small for AI tagging"
+  },
+  "toast_ai_daily_limit": {
+    "message": "You've used all 3 free AI tags today. Upgrade to Pro for 100 tags/month."
+  },
+  "toast_collection_limit": {
+    "message": "Collection full (5/5). Upgrade to Pro for unlimited favorites."
+  },
+  "toast_eagle_free_limit": {
+    "message": "Free plan supports up to {max} images per Eagle export. Upgrade to Pro for unlimited."
+  },
+  "trial_days_remaining": {
+    "message": "Trial: {days} days left"
+  },
+  "trial_grace_banner": {
+    "message": "Your trial ended — {days} days of Pro access remaining."
+  },
+  "pro_batch_operation": {
+    "message": "Batch operations are a Pro feature. Upgrade to Pro for unlimited productivity."
+  },
+  "toolbar_batch_favorite": {
+    "message": "Favorite"
+  },
+  "toolbar_batch_ai_tag": {
+    "message": "AI Tag"
+  },
+  "toolbar_batch_delete": {
+    "message": "Delete"
+  },
+  "toolbar_download": {
+    "message": "Download"
+  },
+  "toast_batch_favorite_done": {
+    "message": "Added {count} images to collection."
+  },
+  "toast_batch_ai_tag_started": {
+    "message": "Tagging {count} images with AI..."
+  },
+  "toast_batch_ai_tag_done": {
+    "message": "AI tagged {count} images."
+  },
+  "confirm_batch_delete_title": {
+    "message": "Delete {count} images?"
+  },
+  "confirm_batch_delete_message": {
+    "message": "Remove {count} selected images from the list?"
   }
 }

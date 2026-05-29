@@ -902,6 +902,9 @@
   "toast_collection_added": {
     "message": "コレクションに追加しました"
   },
+  "toast_collection_already_exists": {
+    "message": "この画像はすでにコレクションにあります"
+  },
   "toast_collection_empty": {
     "message": "コレクションは空です"
   },
@@ -1032,7 +1035,7 @@
     "message": "選択解除"
   },
   "toolbar_download_all": {
-    "message": "すべてダウンロード"
+    "message": "ダウンロード"
   },
   "toolbar_download_selected": {
     "message": "ダウンロード ({count})"
@@ -1201,5 +1204,50 @@
   },
   "toast_ai_tag_too_small": {
     "message": "画像が小さすぎて AI タグ付けできません"
+  },
+  "toast_ai_daily_limit": {
+    "message": "本日の無料AIタグ3回を使い切りました。Proにアップグレードして月100回ご利用いただけます。"
+  },
+  "toast_collection_limit": {
+    "message": "コレクションが満杯です (5/5)。Proにアップグレードして無制限に。"
+  },
+  "toast_eagle_free_limit": {
+    "message": "無料プランではEagleへのエクスポートは1回{max}枚までです。Proで無制限に。"
+  },
+  "trial_days_remaining": {
+    "message": "トライアル: 残り{days}日"
+  },
+  "trial_grace_banner": {
+    "message": "トライアル終了 — Pro アクセス残り{days}日。"
+  },
+  "pro_batch_operation": {
+    "message": "一括操作はProの機能です。Proにアップグレードしてください。"
+  },
+  "toolbar_batch_favorite": {
+    "message": "お気に入り"
+  },
+  "toolbar_batch_ai_tag": {
+    "message": "AIタグ"
+  },
+  "toolbar_batch_delete": {
+    "message": "削除"
+  },
+  "toolbar_download": {
+    "message": "ダウンロード"
+  },
+  "toast_batch_favorite_done": {
+    "message": "{count}件の画像をコレクションに追加しました。"
+  },
+  "toast_batch_ai_tag_started": {
+    "message": "{count}件の画像をAIでタグ付け中..."
+  },
+  "toast_batch_ai_tag_done": {
+    "message": "{count}件の画像をAIでタグ付けしました。"
+  },
+  "confirm_batch_delete_title": {
+    "message": "{count}件の画像を削除しますか？"
+  },
+  "confirm_batch_delete_message": {
+    "message": "リストから {count} 件の選択した画像を削除しますか？"
   }
 }

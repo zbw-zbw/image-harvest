@@ -672,7 +672,7 @@
     "message": "Настройки сохранены"
   },
   "settings_section_account": {
-    "message": "Аккаунт"
+    "message": "Обновить до Pro"
   },
   "settings_section_appearance": {
     "message": "Внешний вид"
@@ -848,6 +848,9 @@
   "toast_collection_added": {
     "message": "Добавлено в коллекцию"
   },
+  "toast_collection_already_exists": {
+    "message": "Это изображение уже в вашей коллекции"
+  },
   "toast_collection_remove_failed": {
     "message": "Не удалось удалить"
   },
@@ -942,7 +945,7 @@
     "message": "Снять выделение"
   },
   "toolbar_download_all": {
-    "message": "Скачать все"
+    "message": "Скачать"
   },
   "toolbar_download_selected": {
     "message": "Скачать ({count})"
@@ -1105,5 +1108,50 @@
   },
   "toast_ai_tag_too_small": {
     "message": "Изображение слишком маленькое для AI-тегов"
+  },
+  "toast_ai_daily_limit": {
+    "message": "Вы использовали все 3 бесплатных AI-тега сегодня. Обновитесь до Pro для 100 тегов/месяц."
+  },
+  "toast_collection_limit": {
+    "message": "Коллекция заполнена (5/5). Обновитесь до Pro для неограниченного избранного."
+  },
+  "toast_eagle_free_limit": {
+    "message": "Бесплатный план поддерживает до {max} изображений за один экспорт в Eagle. Pro для безлимита."
+  },
+  "trial_days_remaining": {
+    "message": "Пробный период: {days} дн. осталось"
+  },
+  "trial_grace_banner": {
+    "message": "Пробный период завершён — {days} дн. Pro-доступа осталось."
+  },
+  "pro_batch_operation": {
+    "message": "Пакетные операции — функция Pro."
+  },
+  "toolbar_batch_favorite": {
+    "message": "Избранное"
+  },
+  "toolbar_batch_ai_tag": {
+    "message": "ИИ-тег"
+  },
+  "toolbar_batch_delete": {
+    "message": "Удалить"
+  },
+  "toolbar_download": {
+    "message": "Скачать"
+  },
+  "toast_batch_favorite_done": {
+    "message": "{count} изображений добавлено в коллекцию."
+  },
+  "toast_batch_ai_tag_started": {
+    "message": "Тегирование {count} изображений..."
+  },
+  "toast_batch_ai_tag_done": {
+    "message": "{count} изображений помечено с ИИ."
+  },
+  "confirm_batch_delete_title": {
+    "message": "Удалить {count} изображений?"
+  },
+  "confirm_batch_delete_message": {
+    "message": "Удалить {count} выбранных изображений из списка?"
   }
 }

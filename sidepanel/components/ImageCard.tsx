@@ -37,6 +37,7 @@ import { useStoreSelector } from './storeHook';
 import { state } from '../state';
 import { applyFilters } from '../filter';
 import { saveAiTags } from '../../shared/ai-tags-store';
+import { getRemainingDailyFreeAiTags } from '../../shared/ai-free-quota';
 
 interface Props {
   img: ImageItem;
@@ -213,13 +214,6 @@ export function ImageCard({ img, index }: Props) {
 
   const handleFavorite = async (e: MouseEvent) => {
     e.stopPropagation();
-    // Collection is a Pro-only feature. Non-Pro users see the upgrade
-    // modal immediately — no async work needed.
-    if (!isProUser) {
-      showToast(t('pro_feature_blocked_collection'), 'warning');
-      showProUpgradeModal();
-      return;
-    }
     if (isFavorited) {
       await removeFromCollection(img.id);
       setIsFavorited(false);
@@ -266,9 +260,12 @@ export function ImageCard({ img, index }: Props) {
   const handleAiTag = async (e: MouseEvent) => {
     e.stopPropagation();
     if (!isProUser) {
-      showToast(t('toast_pro_ai_tag'), 'warning');
-      showProUpgradeModal();
-      return;
+      const freeRemaining = await getRemainingDailyFreeAiTags();
+      if (freeRemaining <= 0) {
+        showToast(t('toast_ai_daily_limit'), 'warning');
+        showProUpgradeModal();
+        return;
+      }
     }
     if (isAiTagging) return;
     if (aiTags.length > 0) {
@@ -306,6 +303,9 @@ export function ImageCard({ img, index }: Props) {
         showToast(t('toast_ai_quota_exhausted'), 'warning');
       } else if (resp?.error?.includes('too small')) {
         showToast(t('toast_ai_tag_too_small'), 'warning');
+      } else if (resp?.error === 'daily_limit') {
+        showToast(t('toast_ai_daily_limit'), 'warning');
+        showProUpgradeModal();
       } else {
         showToast(t('toast_ai_tag_failed'), 'error');
       }
@@ -410,7 +410,6 @@ export function ImageCard({ img, index }: Props) {
             >
               <IconStar />
             </button>
-            <span class="pro-badge pro-badge-mini">PRO</span>
           </span>
           <span class="icon-btn-wrapper">
             <button
@@ -422,7 +421,6 @@ export function ImageCard({ img, index }: Props) {
             >
               <IconAiTag />
             </button>
-            <span class="pro-badge pro-badge-mini">PRO</span>
           </span>
           <button
             class="card-action-btn btn-delete"

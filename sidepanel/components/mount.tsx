@@ -19,11 +19,12 @@ import { DedupModal } from './DedupModal';
 import { CollectionModal } from './CollectionModal';
 import { MultitabModal } from './MultitabModal';
 import { ProUpgradeModal } from './ProUpgradeModal';
-import { PrivacyOptInModal } from './PrivacyOptInModal';
+// PrivacyOptInModal removed — telemetry is always opt-in by default
 import { SoftPaywallBanner } from './SoftPaywallBanner';
 import { TrialGraceBanner } from './TrialGraceBanner';
 import { BatchUrlCopyButton } from './BatchUrlCopyButton';
 import { EagleExportButton } from './EagleExportButton';
+import { BatchOpsButton } from './BatchOpsButton';
 import { RatingPromptModal } from './RatingPromptModal';
 import { SettingsModal } from './SettingsModal';
 import { ImageGrid } from './ImageGrid';
@@ -175,7 +176,7 @@ export function mountPreactComponents(): void {
   // added in Sprint 1.4. Append a fresh container to <body> and render
   // there. The modal short-circuits to null when state.open is false, so
   // the cost of always-mounting it is one render of a hidden subtree.
-  mountFreshComponent('privacy-opt-in-modal-mount', PrivacyOptInModal);
+  // PrivacyOptInModal removed
 
   // Soft paywall banner (Sprint 2.1). Has a legacy slot in
   // pages/_shared-body.html (#soft-paywall-banner-mount) sitting just
@@ -191,6 +192,7 @@ export function mountPreactComponents(): void {
   // enabled/disabled state via store subscriptions.
   mountAt('batch-url-copy-mount', BatchUrlCopyButton);
   mountAt('eagle-export-mount', EagleExportButton);
+  mountAt('batch-ops-mount', BatchOpsButton);
 
   // Rating prompt modal (Sprint 3.6). Has no legacy slot — append a
   // fresh container to <body>. The component decides visibility via

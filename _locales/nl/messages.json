@@ -672,7 +672,7 @@
     "message": "Instellingen opgeslagen"
   },
   "settings_section_account": {
-    "message": "Account"
+    "message": "Upgrade naar Pro"
   },
   "settings_section_appearance": {
     "message": "Uiterlijk"
@@ -848,6 +848,9 @@
   "toast_collection_added": {
     "message": "Toegevoegd aan collectie"
   },
+  "toast_collection_already_exists": {
+    "message": "Deze afbeelding staat al in uw collectie"
+  },
   "toast_collection_remove_failed": {
     "message": "Kan niet verwijderen"
   },
@@ -942,7 +945,7 @@
     "message": "Alles deselecteren"
   },
   "toolbar_download_all": {
-    "message": "Alles downloaden"
+    "message": "Downloaden"
   },
   "toolbar_download_selected": {
     "message": "Downloaden ({count})"
@@ -1105,5 +1108,50 @@
   },
   "toast_ai_tag_too_small": {
     "message": "Afbeelding te klein voor AI-tagging"
+  },
+  "toast_ai_daily_limit": {
+    "message": "Je hebt vandaag alle 3 gratis AI-tags gebruikt. Upgrade naar Pro voor 100 tags/maand."
+  },
+  "toast_collection_limit": {
+    "message": "Collectie vol (5/5). Upgrade naar Pro voor onbeperkte favorieten."
+  },
+  "toast_eagle_free_limit": {
+    "message": "Het gratis abonnement ondersteunt maximaal {max} afbeeldingen per Eagle-export. Pro voor onbeperkt."
+  },
+  "trial_days_remaining": {
+    "message": "Proefperiode: {days} dagen over"
+  },
+  "trial_grace_banner": {
+    "message": "Proefperiode beëindigd — nog {days} dagen Pro-toegang."
+  },
+  "pro_batch_operation": {
+    "message": "Batchbewerkingen zijn een Pro-functie."
+  },
+  "toolbar_batch_favorite": {
+    "message": "Favoriet"
+  },
+  "toolbar_batch_ai_tag": {
+    "message": "AI-tag"
+  },
+  "toolbar_batch_delete": {
+    "message": "Verwijderen"
+  },
+  "toolbar_download": {
+    "message": "Downloaden"
+  },
+  "toast_batch_favorite_done": {
+    "message": "{count} afbeeldingen toegevoegd aan collectie."
+  },
+  "toast_batch_ai_tag_started": {
+    "message": "{count} afbeeldingen worden getagd met AI..."
+  },
+  "toast_batch_ai_tag_done": {
+    "message": "{count} afbeeldingen getagd met AI."
+  },
+  "confirm_batch_delete_title": {
+    "message": "{count} afbeeldingen verwijderen?"
+  },
+  "confirm_batch_delete_message": {
+    "message": "{count} geselecteerde afbeeldingen uit de lijst verwijderen?"
   }
 }

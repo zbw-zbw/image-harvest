@@ -835,16 +835,15 @@ describe('updateFilterButtonLabels', () => {
     expect(btn.querySelector('.filter-clear')).not.toBeNull();
   });
 
-  it('PRESERVES the .pro-badge child when updating the color button label', async () => {
-    // Pin: the PRO badge span is re-appended AFTER textContent is set
-    // (textContent wipes children). Without the re-append, free users
-    // would lose the PRO upsell badge the moment a color filter is
-    // applied — breaking the conversion funnel.
+  it('does NOT preserve a .pro-badge on the color button (badge removed in v1.0.5 Round 2)', async () => {
+    // v1.0.5 Round 2: the PRO badge was removed from the color filter button
+    // because free users CAN open the color dropdown — the gate is on swatch
+    // clicks inside the dropdown, not the button itself.
     const { updateFilterButtonLabels } = await import('../sidepanel/ui');
     state.activeFilters = { ...state.activeFilters, color: '#ff0000' };
     updateFilterButtonLabels();
     const btn = document.querySelector<HTMLElement>('.filter-btn[data-filter="color"]')!;
-    expect(btn.querySelector('.pro-badge')).not.toBeNull();
+    expect(btn.querySelector('.pro-badge')).toBeNull();
     expect(btn.classList.contains('active')).toBe(true);
   });
 

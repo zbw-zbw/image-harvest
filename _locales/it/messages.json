@@ -848,6 +848,9 @@
   "toast_collection_added": {
     "message": "Aggiunta alla raccolta"
   },
+  "toast_collection_already_exists": {
+    "message": "Questa immagine è già nella tua raccolta"
+  },
   "toast_collection_remove_failed": {
     "message": "Impossibile rimuovere"
   },
@@ -942,7 +945,7 @@
     "message": "Deseleziona tutto"
   },
   "toolbar_download_all": {
-    "message": "Scarica tutto"
+    "message": "Scarica"
   },
   "toolbar_download_selected": {
     "message": "Scarica ({count})"
@@ -1105,5 +1108,50 @@
   },
   "toast_ai_tag_too_small": {
     "message": "Immagine troppo piccola per il tagging AI"
+  },
+  "toast_ai_daily_limit": {
+    "message": "Hai usato tutti i 3 tag AI gratuiti di oggi. Passa a Pro per 100 tag/mese."
+  },
+  "toast_collection_limit": {
+    "message": "Collezione piena (5/5). Passa a Pro per preferiti illimitati."
+  },
+  "toast_eagle_free_limit": {
+    "message": "Il piano gratuito supporta fino a {max} immagini per esportazione Eagle. Pro per illimitato."
+  },
+  "trial_days_remaining": {
+    "message": "Prova: {days} giorni rimanenti"
+  },
+  "trial_grace_banner": {
+    "message": "La prova è terminata — {days} giorni di accesso Pro rimanenti."
+  },
+  "pro_batch_operation": {
+    "message": "Le operazioni in batch sono una funzione Pro."
+  },
+  "toolbar_batch_favorite": {
+    "message": "Preferiti"
+  },
+  "toolbar_batch_ai_tag": {
+    "message": "Tag AI"
+  },
+  "toolbar_batch_delete": {
+    "message": "Elimina"
+  },
+  "toolbar_download": {
+    "message": "Scarica"
+  },
+  "toast_batch_favorite_done": {
+    "message": "{count} immagini aggiunte alla raccolta."
+  },
+  "toast_batch_ai_tag_started": {
+    "message": "Taggando {count} immagini con AI..."
+  },
+  "toast_batch_ai_tag_done": {
+    "message": "{count} immagini taggate con AI."
+  },
+  "confirm_batch_delete_title": {
+    "message": "Eliminare {count} immagini?"
+  },
+  "confirm_batch_delete_message": {
+    "message": "Rimuovere {count} immagini selezionate dall'elenco?"
   }
 }

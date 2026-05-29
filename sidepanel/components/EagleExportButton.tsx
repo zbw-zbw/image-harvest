@@ -1,5 +1,5 @@
 import { t } from '../../shared/i18n';
-import { MESSAGE_TYPES } from '../../shared/constants';
+import { MESSAGE_TYPES, FREE_LIMITS } from '../../shared/constants';
 import { track } from '../../shared/telemetry';
 import { EVENTS } from '../../shared/telemetry-events';
 import { useStoreSelector } from './storeHook';
@@ -42,8 +42,11 @@ export function EagleExportButton() {
     : t('eagle_export_label') + (effectiveCount > 0 ? ` (${effectiveCount})` : '');
 
   async function handleClick(): Promise<void> {
-    if (!isPro) {
-      showToast(t('toast_pro_eagle_export'), 'warning');
+    if (!isPro && effectiveCount > FREE_LIMITS.MAX_FREE_EAGLE_EXPORT) {
+      showToast(
+        t('toast_eagle_free_limit', { max: String(FREE_LIMITS.MAX_FREE_EAGLE_EXPORT) }),
+        'warning'
+      );
       showProUpgradeModal();
       return;
     }
@@ -63,7 +66,7 @@ export function EagleExportButton() {
           name = img.id;
         }
       }
-      return { url: img.url, name, website: img.tabUrl };
+      return { url: img.url, name, website: img.tabUrl, tags: img.aiTags };
     });
 
     void track(EVENTS.EXPORT_EAGLE_STARTED, { count: items.length });

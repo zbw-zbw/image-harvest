@@ -6,7 +6,7 @@
 .status-bar {
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: space-between;
   padding: 8px 12px;
   border-top: 1px solid var(--border-color);
   background: var(--bg-color);
@@ -20,13 +20,68 @@
   z-index: 10;
 }
 
-.status-right {
+.status-left {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
+  flex-shrink: 0;
+}
+
+.status-buttons {
+  display: flex;
+  align-items: center;
+  gap: 4px;
   flex-wrap: nowrap;
   width: 100%;
   justify-content: flex-end;
+  overflow-x: auto;
+  overflow-y: hidden;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+
+/* Batch operations group */
+.batch-ops-group {
+  display: contents;
+}
+
+.batch-op-btn {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.batch-op-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.batch-op-delete {
+  color: var(--danger, #e05252);
+}
+
+/* On small panels hide batch op text labels, keep icons */
+@media (max-width: 400px) {
+  .batch-op-btn .btn-label,
+  .batch-op-btn .pro-badge {
+    display: none;
+  }
+}
+
+/* Download button: override primary green to match outline style */
+#btn-download.status-action-btn,
+#btn-download-toggle.status-action-btn {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+}
+
+/* Unified font for all status bar buttons */
+.status-bar button {
+  font-size: 12px;
+  font-weight: 500;
+  font-family: inherit;
+  line-height: 1;
 }
 
 .status-bar .status-action-btn,
@@ -1169,4 +1224,8 @@
     width: 20px;
     height: 20px;
   }
+}
+
+.status-buttons::-webkit-scrollbar {
+  display: none;
 }

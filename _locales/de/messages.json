@@ -672,7 +672,7 @@
     "message": "Einstellungen gespeichert"
   },
   "settings_section_account": {
-    "message": "Konto"
+    "message": "Upgrade auf Pro"
   },
   "settings_section_appearance": {
     "message": "Darstellung"
@@ -848,6 +848,9 @@
   "toast_collection_added": {
     "message": "Zur Sammlung hinzugefügt"
   },
+  "toast_collection_already_exists": {
+    "message": "Dieses Bild ist bereits in Ihrer Sammlung"
+  },
   "toast_collection_remove_failed": {
     "message": "Entfernen fehlgeschlagen"
   },
@@ -942,7 +945,7 @@
     "message": "Auswahl aufheben"
   },
   "toolbar_download_all": {
-    "message": "Alle herunterladen"
+    "message": "Herunterladen"
   },
   "toolbar_download_selected": {
     "message": "Herunterladen ({count})"
@@ -1105,5 +1108,50 @@
   },
   "toast_ai_tag_too_small": {
     "message": "Bild zu klein für AI-Tagging"
+  },
+  "toast_ai_daily_limit": {
+    "message": "Sie haben heute alle 3 kostenlosen AI-Tags verbraucht. Upgraden Sie auf Pro für 100 Tags/Monat."
+  },
+  "toast_collection_limit": {
+    "message": "Sammlung voll (5/5). Upgraden Sie auf Pro für unbegrenzte Favoriten."
+  },
+  "toast_eagle_free_limit": {
+    "message": "Der kostenlose Plan unterstützt bis zu {max} Bilder pro Eagle-Export. Pro für unbegrenzt."
+  },
+  "trial_days_remaining": {
+    "message": "Testversion: {days} Tage übrig"
+  },
+  "trial_grace_banner": {
+    "message": "Testversion beendet — noch {days} Tage Pro-Zugang."
+  },
+  "pro_batch_operation": {
+    "message": "Stapeloperationen sind eine Pro-Funktion."
+  },
+  "toolbar_batch_favorite": {
+    "message": "Favorit"
+  },
+  "toolbar_batch_ai_tag": {
+    "message": "KI-Tag"
+  },
+  "toolbar_batch_delete": {
+    "message": "Löschen"
+  },
+  "toolbar_download": {
+    "message": "Herunterladen"
+  },
+  "toast_batch_favorite_done": {
+    "message": "{count} Bilder zur Sammlung hinzugefügt."
+  },
+  "toast_batch_ai_tag_started": {
+    "message": "{count} Bilder werden mit KI getaggt..."
+  },
+  "toast_batch_ai_tag_done": {
+    "message": "{count} Bilder mit KI getaggt."
+  },
+  "confirm_batch_delete_title": {
+    "message": "{count} Bilder löschen?"
+  },
+  "confirm_batch_delete_message": {
+    "message": "{count} ausgewählte Bilder aus der Liste entfernen?"
   }
 }

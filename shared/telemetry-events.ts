@@ -76,6 +76,19 @@ export const EVENTS = {
   SOFT_PAYWALL_DISMISSED: 'soft_paywall_dismissed',
   SOFT_PAYWALL_CTA_CLICKED: 'soft_paywall_cta_clicked',
 
+  // Batch operations (Round 2)
+  BATCH_FAVORITE: 'batch_favorite',
+  BATCH_AI_TAG: 'batch_ai_tag',
+  BATCH_DELETE: 'batch_delete',
+
+  // Collection
+  COLLECTION_ADDED: 'collection_added',
+  COLLECTION_FULL: 'collection_full',
+  COLLECTION_DUPLICATE: 'collection_duplicate',
+
+  // Free tier limits
+  AI_FREE_DAILY_LIMIT: 'ai_free_daily_limit',
+
   // Health / errors (counts only, never the message)
   ERROR_OCCURRED: 'error_occurred', // props: { code: string }
 } as const;
@@ -148,6 +161,13 @@ export const EVENT_PROP_SCHEMAS: Record<TelemetryEventName, readonly string[]> =
   [EVENTS.SOFT_PAYWALL_DISMISSED]: ['action', 'abBucket'], // action: "later" | "close"
   [EVENTS.SOFT_PAYWALL_CTA_CLICKED]: ['action', 'abBucket'], // action: "trial" | "pricing"
 
+  [EVENTS.BATCH_FAVORITE]: ['count'],
+  [EVENTS.BATCH_AI_TAG]: ['count'],
+  [EVENTS.BATCH_DELETE]: ['count'],
+  [EVENTS.COLLECTION_ADDED]: [],
+  [EVENTS.COLLECTION_FULL]: [],
+  [EVENTS.COLLECTION_DUPLICATE]: [],
+  [EVENTS.AI_FREE_DAILY_LIMIT]: [],
   [EVENTS.ERROR_OCCURRED]: ['code'],
 };
 

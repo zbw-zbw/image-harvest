@@ -160,20 +160,17 @@ describe('ImageCard – click handlers', () => {
     );
   });
 
-  it('blocks a free user from clicking favorite and shows upgrade prompt', async () => {
-    // Collection is now a Pro-only feature. Non-Pro users are fully
-    // blocked at the component level — handleFavorite shows a warning
-    // toast and the Pro upgrade modal without calling addToCollection.
+  it('allows a free user to click favorite (delegates to addToCollection)', async () => {
+    // v1.0.5: free users can add up to 5 items. The limit check is inside
+    // addToCollection (pro-features.ts), not in handleFavorite. The component
+    // just calls addToCollection and checks if the item ended up saved.
     state.isProUser = false;
     const img = makeImage({ id: 'fav-free' });
     const { container } = render(<ImageCard img={img} index={0} />);
     fireEvent.click(container.querySelector('.btn-favorite')!);
     await waitFor(() => {
-      expect(mocks.ui.showToast).toHaveBeenCalledWith('Collection is a Pro feature', 'warning');
-      expect(mocks.settings.showProUpgradeModal).toHaveBeenCalled();
+      expect(mocks.pro.addToCollection).toHaveBeenCalledWith(img);
     });
-    // addToCollection must NOT be invoked for free users.
-    expect(mocks.pro.addToCollection).not.toHaveBeenCalled();
   });
 
   it('adds to collection when a Pro user clicks favorite', async () => {
