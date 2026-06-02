@@ -238,7 +238,9 @@ describe('<BatchUrlCopyButton/>', () => {
     const { container } = render(<BatchUrlCopyButton />);
     const btn = container.querySelector<HTMLButtonElement>('#btn-batch-copy-urls');
     expect(btn!.disabled).toBe(false);
-    expect(btn!.querySelector('.btn-label')!.textContent).toBe('Copy URLs (2)');
+    // Label and count render as separate spans (.btn-label + .btn-count);
+    // assert the full button text so the test is robust to that split.
+    expect(btn!.textContent).toContain('Copy URLs (2)');
   });
 
   it('shows the selection count in the label when images are selected', () => {
@@ -249,8 +251,10 @@ describe('<BatchUrlCopyButton/>', () => {
     ];
     state.selectedImages = new Set(['a', 'c']);
     const { container } = render(<BatchUrlCopyButton />);
-    const label = container.querySelector('.btn-label')!;
-    expect(label.textContent).toBe('Copy URLs (2)');
+    // Label and count render as separate spans (.btn-label + .btn-count);
+    // assert the full button text so the test is robust to that split.
+    const btn = container.querySelector<HTMLButtonElement>('#btn-batch-copy-urls')!;
+    expect(btn.textContent).toContain('Copy URLs (2)');
   });
 
   it('invokes copyImageUrls with the URLs from getSelectedOrFilteredUrls on click', () => {
