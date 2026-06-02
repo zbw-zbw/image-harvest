@@ -174,6 +174,10 @@ export async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Pr
       if (oldest !== undefined) state.tabCache.delete(oldest);
     }
 
+    // Save scroll position so we can restore it when switching back
+    const gridWrapper = document.querySelector<HTMLElement>('.image-grid-wrapper');
+    const scrollTop = gridWrapper?.scrollTop ?? 0;
+
     state.tabCache.set(state.currentTabId, {
       url: cachedUrl,
       images: [...state.allImages],
@@ -181,6 +185,7 @@ export async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Pr
       filteredImages: [...state.filteredImages],
       lastRenderedFilteredIds: state.lastRenderedFilteredIds,
       similarGroups: [...state.similarGroups],
+      scrollTop,
     });
     if (cachedUrl) {
       saveTabImageCache(state.currentTabId, cachedUrl, state.allImages);
@@ -228,19 +233,34 @@ export async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Pr
     try {
       // Restore cached state immediately (no await yet) to eliminate flash
       const cachedFilteredIds = cached.lastRenderedFilteredIds ?? null;
-      const isSameFilteredSet =
-        cachedFilteredIds != null && cachedFilteredIds === state.lastRenderedFilteredIds;
 
-      const patch: Record<string, unknown> = {
-        allImages: [...cached.images],
-        selectedImages: new Set(cached.selectedImages),
-        similarGroups: (cached.similarGroups || []).map((g) => [...g]),
-      };
-      if (!isSameFilteredSet && cached.filteredImages && cached.filteredImages.length > 0) {
-        patch.filteredImages = [...cached.filteredImages];
-        patch.lastRenderedFilteredIds = cachedFilteredIds;
+      // Determine if this is a no-op restore: same images already rendered.
+      // Compare by cached ID string (stable per dataset) against what was
+      // last rendered for THIS tab's data — NOT state.lastRenderedFilteredIds
+      // which may have been overwritten by an intermediate tab's loadCurrentTab.
+      const currentImagesMatch =
+        cachedFilteredIds != null &&
+        cached.images.length === state.allImages.length &&
+        cached.images.length > 0 &&
+        cached.images[0]?.id === state.allImages[0]?.id &&
+        cached.images[cached.images.length - 1]?.id ===
+          state.allImages[state.allImages.length - 1]?.id;
+
+      // If the images in memory are already the same as what we cached,
+      // skip store updates to avoid triggering Preact re-renders that
+      // would rebuild the list DOM and reset the scroll position.
+      if (!currentImagesMatch) {
+        const patch: Record<string, unknown> = {
+          allImages: [...cached.images],
+          selectedImages: new Set(cached.selectedImages),
+          similarGroups: (cached.similarGroups || []).map((g) => [...g]),
+        };
+        if (cached.filteredImages && cached.filteredImages.length > 0) {
+          patch.filteredImages = [...cached.filteredImages];
+          patch.lastRenderedFilteredIds = cachedFilteredIds;
+        }
+        store.setMany(patch as Partial<typeof state>);
       }
-      store.setMany(patch as Partial<typeof state>);
 
       // Ensure the normal-page UI is visible
       hideLoading();
@@ -261,7 +281,7 @@ export async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Pr
       }
       if (elements.imageGrid) elements.imageGrid.classList.remove('hidden');
 
-      if (!isSameFilteredSet && (!cached.filteredImages || cached.filteredImages.length === 0)) {
+      if (!currentImagesMatch && (!cached.filteredImages || cached.filteredImages.length === 0)) {
         applyFilters();
       }
 
@@ -270,6 +290,31 @@ export async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Pr
       }
       updateSelectionUI();
       checkNarrowMode();
+
+      // Restore scroll position from cache. We need to wait until Preact
+      // has finished re-rendering the list DOM. Use a MutationObserver on
+      // the grid wrapper — once the children are rebuilt, restore scroll.
+      // Fall back to a timer if no mutation fires (e.g. data was identical).
+      if (cached.scrollTop && gridWrapper) {
+        const savedScroll = cached.scrollTop;
+        let restored = false;
+        const restore = () => {
+          if (restored) return;
+          restored = true;
+          gridWrapper.scrollTop = savedScroll;
+        };
+        const observer = new MutationObserver(() => {
+          observer.disconnect();
+          // Let the browser paint the new DOM, then scroll
+          requestAnimationFrame(restore);
+        });
+        observer.observe(gridWrapper, { childList: true, subtree: true });
+        // Safety fallback: if no mutations within 150ms (data unchanged), restore anyway
+        setTimeout(() => {
+          observer.disconnect();
+          restore();
+        }, 150);
+      }
 
       // Now verify the tab URL asynchronously — roll back if stale
       let newTab: chrome.tabs.Tab | undefined;

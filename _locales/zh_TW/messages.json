@@ -1249,5 +1249,62 @@
   },
   "confirm_batch_delete_message": {
     "message": "確定從清單中移除 {count} 張選取的圖片？"
+  },
+  "search_engine_google": {
+    "message": "Google 圖片"
+  },
+  "search_engine_tineye": {
+    "message": "TinEye"
+  },
+  "search_engine_yandex": {
+    "message": "Yandex"
+  },
+  "search_engine_baidu": {
+    "message": "百度識圖"
+  },
+  "card_tooltip_search": {
+    "message": "在網路上搜尋這張圖片"
+  },
+  "card_tooltip_add_to_collection": {
+    "message": "將這張圖片新增到收藏夾"
+  },
+  "card_tooltip_remove_from_collection": {
+    "message": "將這張圖片從收藏夾中移除"
+  },
+  "card_tooltip_ai_tag": {
+    "message": "為這張圖片產生 AI 標籤"
+  },
+  "card_tooltip_eagle": {
+    "message": "將這張圖片匯出到 Eagle"
+  },
+  "card_tooltip_delete": {
+    "message": "將這張圖片從清單中移除"
+  },
+  "card_tooltip_download": {
+    "message": "下載這張圖片"
+  },
+  "card_tooltip_copy_url": {
+    "message": "複製這張圖片的連結到剪貼簿"
+  },
+  "card_tooltip_open": {
+    "message": "在新分頁開啟這張圖片"
+  },
+  "batch_tooltip_favorite": {
+    "message": "將選取的圖片新增到收藏夾"
+  },
+  "batch_tooltip_ai_tag": {
+    "message": "為選取的圖片產生 AI 標籤"
+  },
+  "batch_tooltip_copy_urls": {
+    "message": "複製選取圖片的連結到剪貼簿"
+  },
+  "batch_tooltip_eagle": {
+    "message": "將選取的圖片匯出到 Eagle"
+  },
+  "batch_tooltip_delete": {
+    "message": "將選取的圖片從清單中移除"
+  },
+  "batch_tooltip_download": {
+    "message": "下載選取的圖片"
   }
 }

@@ -19,7 +19,8 @@ const mocks = vi.hoisted(() => ({
     copyImageUrl: vi.fn(),
     downloadSingle: vi.fn(),
     openInNewTab: vi.fn(),
-    showReverseSearchMenu: vi.fn(),
+    exportSingleToEagle: vi.fn(),
+    reverseSearch: vi.fn(),
   },
   pro: {
     addToCollection: vi.fn().mockResolvedValue(undefined),
@@ -68,11 +69,11 @@ describe('ImageCard – rendering', () => {
     const { container } = render(<ImageCard img={img} index={0} />);
 
     expect(container.querySelector('.image-card')).toBeInTheDocument();
-    expect(screen.getByText('JPG')).toBeInTheDocument();
+    expect(container.querySelector('.card-tag.format')!.textContent).toBe('JPG');
     expect(screen.getByText('1024×768')).toBeInTheDocument();
     expect(screen.getByText(/cat\.jpg/)).toBeInTheDocument();
     // formatBytes(2048) → "2 KB"
-    expect(screen.getByText(/KB|B/)).toBeInTheDocument();
+    expect(container.querySelector('.card-tag.filesize')!.textContent).toMatch(/KB|B/);
   });
 
   it('renders the thumbnail image with the source url', () => {
@@ -154,9 +155,9 @@ describe('ImageCard – click handlers', () => {
     fireEvent.click(container.querySelector('.btn-search')!);
     expect(mocks.actions.copyImageUrl).toHaveBeenCalledWith('https://target.example/img.png');
     expect(mocks.actions.openInNewTab).toHaveBeenCalledWith('https://target.example/img.png');
-    expect(mocks.actions.showReverseSearchMenu).toHaveBeenCalledWith(
+    expect(mocks.actions.reverseSearch).toHaveBeenCalledWith(
       'https://target.example/img.png',
-      expect.any(HTMLElement)
+      'google'
     );
   });
 

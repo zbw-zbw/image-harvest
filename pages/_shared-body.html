@@ -888,62 +888,59 @@ HTML document — it omits the surrounding
 
         <!-- Status Bar -->
         <footer class="status-bar">
-          <div class="status-left">
-            <span id="batch-ops-mount" data-preact-mount="batch-ops-mount"></span>
-          </div>
-          <div class="status-buttons"></div>
-          <span id="batch-ops-mount" data-preact-mount="batch-ops-mount"></span>
-          <span id="batch-url-copy-mount" data-preact-mount="batch-url-copy-mount"></span>
-          <span id="eagle-export-mount" data-preact-mount="eagle-export-mount"></span>
-          <div id="download-group" class="download-group">
-            <button
-              id="btn-download"
-              class="btn status-action-btn btn-small"
-              title="Download images"
-              data-i18n-title="title_download"
-            >
-              <svg
-                width="14"
-                height="14"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
+          <div class="status-buttons">
+            <!-- Copy URLs first (high-frequency), then Favorite + AI Tag + Eagle
+                 grouped together (AI Tag → Eagle is a common workflow), Delete + Download last. -->
+            <span id="batch-url-copy-mount" data-preact-mount="batch-url-copy-mount"></span>
+            <span
+              id="batch-ops-mount"
+              data-preact-mount="batch-ops-mount"
+              style="display: contents"
+            ></span>
+            <span id="eagle-export-mount" data-preact-mount="eagle-export-mount"></span>
+            <span
+              id="batch-delete-mount"
+              data-preact-mount="batch-delete-mount"
+              style="display: contents"
+            ></span>
+            <div id="download-group" class="download-group">
+              <button
+                id="btn-download"
+                class="btn btn-primary btn-small"
+                title="Download images"
+                data-i18n-title="batch_tooltip_download"
               >
-                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                <polyline points="7 10 12 15 17 10" />
-                <line x1="12" y1="15" x2="12" y2="3" />
-              </svg>
-              <span id="download-label" data-i18n="toolbar_download_all">Download</span>
-            </button>
-            <button
-              id="btn-download-toggle"
-              class="btn status-action-btn btn-small btn-dropdown-toggle"
-              title="Download format options"
-            >
-              <svg
-                width="10"
-                height="10"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                stroke-width="2.5"
-              >
-                <path d="M6 9l6 6 6-6" />
-              </svg>
-            </button>
-            <div id="download-dropdown" class="dropdown-menu hidden">
-              <div class="dropdown-item active" data-format="original" data-i18n="format_original">
-                Original
-              </div>
-              <div class="dropdown-item" data-format="png">
-                PNG <span class="pro-badge pro-badge-mini">PRO</span>
-              </div>
-              <div class="dropdown-item" data-format="jpg">
-                JPG <span class="pro-badge pro-badge-mini">PRO</span>
-              </div>
-              <div class="dropdown-item" data-format="webp">
-                WebP <span class="pro-badge pro-badge-mini">PRO</span>
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2.5"
+                >
+                  <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                  <polyline points="7 10 12 15 17 10" />
+                  <line x1="12" y1="15" x2="12" y2="3" />
+                </svg>
+                <span id="download-label" data-i18n="toolbar_download_all">Download</span>
+              </button>
+              <div id="download-dropdown" class="dropdown-menu">
+                <div
+                  class="dropdown-item active"
+                  data-format="original"
+                  data-i18n="format_original"
+                >
+                  Original
+                </div>
+                <div class="dropdown-item" data-format="png">
+                  PNG <span class="pro-badge pro-badge-mini">PRO</span>
+                </div>
+                <div class="dropdown-item" data-format="jpg">
+                  JPG <span class="pro-badge pro-badge-mini">PRO</span>
+                </div>
+                <div class="dropdown-item" data-format="webp">
+                  WebP <span class="pro-badge pro-badge-mini">PRO</span>
+                </div>
               </div>
             </div>
           </div>

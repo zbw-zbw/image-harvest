@@ -65,7 +65,7 @@
     "message": "Copy URLs"
   },
   "toolbar_copy_urls_tooltip": {
-    "message": "Copy selected image URLs to clipboard"
+    "message": "Copy URLs"
   },
   "toolbar_copy_urls_empty": {
     "message": "Select images first"
@@ -1256,5 +1256,62 @@
   },
   "confirm_batch_delete_message": {
     "message": "Remove {count} selected images from the list?"
+  },
+  "search_engine_google": {
+    "message": "Google Images"
+  },
+  "search_engine_tineye": {
+    "message": "TinEye"
+  },
+  "search_engine_yandex": {
+    "message": "Yandex"
+  },
+  "search_engine_baidu": {
+    "message": "Baidu"
+  },
+  "card_tooltip_search": {
+    "message": "Search this image on the web"
+  },
+  "card_tooltip_add_to_collection": {
+    "message": "Add this image to your collection"
+  },
+  "card_tooltip_remove_from_collection": {
+    "message": "Remove this image from your collection"
+  },
+  "card_tooltip_ai_tag": {
+    "message": "Generate AI tags for this image"
+  },
+  "card_tooltip_eagle": {
+    "message": "Export this image to Eagle"
+  },
+  "card_tooltip_delete": {
+    "message": "Remove this image from the list"
+  },
+  "card_tooltip_download": {
+    "message": "Download this image"
+  },
+  "card_tooltip_copy_url": {
+    "message": "Copy this image's URL to clipboard"
+  },
+  "card_tooltip_open": {
+    "message": "Open this image in a new tab"
+  },
+  "batch_tooltip_favorite": {
+    "message": "Add the selected images to your collection"
+  },
+  "batch_tooltip_ai_tag": {
+    "message": "Generate AI tags for the selected images"
+  },
+  "batch_tooltip_copy_urls": {
+    "message": "Copy the selected image URLs to clipboard"
+  },
+  "batch_tooltip_eagle": {
+    "message": "Export the selected images to Eagle"
+  },
+  "batch_tooltip_delete": {
+    "message": "Remove the selected images from the list"
+  },
+  "batch_tooltip_download": {
+    "message": "Download the selected images"
   }
 }

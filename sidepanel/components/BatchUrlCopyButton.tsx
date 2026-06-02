@@ -60,16 +60,10 @@ export function BatchUrlCopyButton() {
   const effectiveCount = selectedSize > 0 ? selectedSize : filteredCount;
   const disabled = effectiveCount === 0;
 
-  // Label collapses to icon-only when nothing is available (consistent
-  // with how the Download button greys out below the toolbar). When at
-  // least one image is available, surface the count so users can verify
-  // BEFORE clicking that they're about to copy what they expect.
-  const label =
-    selectedSize > 0
-      ? t('toolbar_copy_urls') + ` (${selectedSize})`
-      : t('toolbar_copy_urls') + (filteredCount > 0 ? ` (${filteredCount})` : '');
+  const textLabel = t('toolbar_copy_urls');
+  const countLabel = effectiveCount > 0 ? ` (${effectiveCount})` : '';
 
-  const title = disabled ? t('toolbar_copy_urls_empty') : t('toolbar_copy_urls_tooltip');
+  const title = disabled ? t('toolbar_copy_urls_empty') : t('batch_tooltip_copy_urls');
 
   function handleClick(): void {
     if (disabled) return;
@@ -87,7 +81,8 @@ export function BatchUrlCopyButton() {
       onClick={handleClick}
     >
       <IconCopy />
-      <span class="btn-label">{label}</span>
+      <span class="btn-label">{textLabel}</span>
+      {countLabel && <span class="btn-count">{countLabel}</span>}
     </button>
   );
 }

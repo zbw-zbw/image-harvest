@@ -156,8 +156,7 @@
 }
 
 .download-group .btn:first-child {
-  border-top-right-radius: 0;
-  border-bottom-right-radius: 0;
+  border-radius: var(--radius-sm);
 }
 
 /* Download button enabled state - more prominent */
@@ -228,7 +227,7 @@
   position: absolute;
   bottom: 100%;
   right: 0;
-  margin-bottom: 4px;
+  margin-bottom: 0;
   background: var(--bg-color);
   box-shadow: var(--shadow-lg);
   border-radius: var(--radius-sm);
@@ -245,6 +244,16 @@
     transform 0.15s ease,
     visibility 0.15s;
   visibility: visible;
+}
+
+/* Invisible bridge below dropdown to prevent closing when moving between button and menu */
+.dropdown-menu::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  right: 0;
+  height: 8px;
 }
 
 .dropdown-menu.hidden {
@@ -786,4 +795,30 @@
   .batch-url-copy-btn .btn-label {
     display: none;
   }
+}
+
+/* Download group: pure CSS hover (no JS toggle) */
+.download-group .btn-dropdown-toggle {
+  display: none;
+}
+
+/* Download dropdown: JS-controlled via .dl-dropdown-open class.
+   Pure CSS :hover was flashing because Preact re-renders on click
+   momentarily broke the hover chain. JS gives stable control. */
+#download-group > .dropdown-menu {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translateY(4px) scale(0.97);
+  transition:
+    opacity 0.15s,
+    visibility 0.15s,
+    transform 0.15s;
+}
+
+#download-group.dl-dropdown-open > .dropdown-menu {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translateY(0) scale(1);
 }

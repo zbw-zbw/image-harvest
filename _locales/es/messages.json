@@ -1252,5 +1252,62 @@
   },
   "confirm_batch_delete_message": {
     "message": "¿Eliminar {count} imágenes seleccionadas de la lista?"
+  },
+  "search_engine_google": {
+    "message": "Google Imágenes"
+  },
+  "search_engine_tineye": {
+    "message": "TinEye"
+  },
+  "search_engine_yandex": {
+    "message": "Yandex"
+  },
+  "search_engine_baidu": {
+    "message": "Baidu"
+  },
+  "card_tooltip_search": {
+    "message": "Buscar esta imagen en la web"
+  },
+  "card_tooltip_add_to_collection": {
+    "message": "Añadir esta imagen a tu colección"
+  },
+  "card_tooltip_remove_from_collection": {
+    "message": "Quitar esta imagen de tu colección"
+  },
+  "card_tooltip_ai_tag": {
+    "message": "Generar etiquetas IA para esta imagen"
+  },
+  "card_tooltip_eagle": {
+    "message": "Exportar esta imagen a Eagle"
+  },
+  "card_tooltip_delete": {
+    "message": "Quitar esta imagen de la lista"
+  },
+  "card_tooltip_download": {
+    "message": "Descargar esta imagen"
+  },
+  "card_tooltip_copy_url": {
+    "message": "Copiar la URL de esta imagen al portapapeles"
+  },
+  "card_tooltip_open": {
+    "message": "Abrir esta imagen en una nueva pestaña"
+  },
+  "batch_tooltip_favorite": {
+    "message": "Añadir las imágenes seleccionadas a tu colección"
+  },
+  "batch_tooltip_ai_tag": {
+    "message": "Generar etiquetas IA para las imágenes seleccionadas"
+  },
+  "batch_tooltip_copy_urls": {
+    "message": "Copiar las URL de las imágenes seleccionadas al portapapeles"
+  },
+  "batch_tooltip_eagle": {
+    "message": "Exportar las imágenes seleccionadas a Eagle"
+  },
+  "batch_tooltip_delete": {
+    "message": "Quitar las imágenes seleccionadas de la lista"
+  },
+  "batch_tooltip_download": {
+    "message": "Descargar las imágenes seleccionadas"
   }
 }

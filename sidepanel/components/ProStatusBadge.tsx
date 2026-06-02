@@ -134,7 +134,7 @@ export function ProStatusBadge() {
           </span>
         )}
         <span class="pro-ai-quota" title={t('ai_quota_tooltip')}>
-          AI: {aiQuota}/100
+          {t('toolbar_batch_ai_tag')}: {aiQuota}/100
         </span>
         <button
           id="btn-top-deactivate"

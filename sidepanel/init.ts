@@ -325,6 +325,23 @@ async function init(): Promise<void> {
       if (document.visibilityState === 'hidden') {
         lastHiddenTime = Date.now();
       } else if (document.visibilityState === 'visible' && state.isInitialized) {
+        // Close all hover-triggered dropdowns that may have stayed open
+        // while the panel was hidden (browser freezes :hover state).
+        // 1. JS-controlled download dropdown
+        document.getElementById('download-group')?.classList.remove('dl-dropdown-open');
+        // 2. CSS :hover card dropdowns — force browser to recalculate hover
+        document
+          .querySelectorAll<HTMLElement>('.card-search-group, .card-dl-group')
+          .forEach((el) => {
+            el.style.pointerEvents = 'none';
+          });
+        requestAnimationFrame(() => {
+          document
+            .querySelectorAll<HTMLElement>('.card-search-group, .card-dl-group')
+            .forEach((el) => {
+              el.style.pointerEvents = '';
+            });
+        });
         if (state.isTabSwitching || isWithinTabSwitchGrace()) {
           lastHiddenTime = 0;
           return;
@@ -492,7 +509,10 @@ function bindEvents(): void {
   if (elements.btnDownload) {
     elements.btnDownload.addEventListener('click', (e) => {
       e.stopPropagation();
-      hideDownloadDropdown();
+      // Close the dropdown immediately on click — the download starts,
+      // user doesn't need the format menu visible anymore.
+      const dlGroup = document.getElementById('download-group');
+      if (dlGroup) dlGroup.classList.remove('dl-dropdown-open');
       const hasSelection = state.selectedImages.size > 0;
       const imagesToDownload = hasSelection
         ? state.filteredImages.filter((img) => state.selectedImages.has(img.id))
@@ -502,10 +522,14 @@ function bindEvents(): void {
         downloadSingle(imagesToDownload[0], null);
       } else {
         if (!hasSelection) {
+          // Temporarily select all for zip download, then clear
           state.filteredImages.forEach((img) => state.selectedImages.add(img.id));
-          updateSelectionUI();
+          downloadSelectedAsZip(null).finally(() => {
+            state.selectedImages.clear();
+          });
+        } else {
+          downloadSelectedAsZip(null);
         }
-        downloadSelectedAsZip(null);
       }
     });
   }
@@ -528,7 +552,6 @@ function bindEvents(): void {
         if (!state.isProUser && format !== 'original') {
           showToast(t('pro_feature_blocked_format_conversion'), 'warning');
           showProUpgradeModal();
-          hideDownloadDropdown();
           return;
         }
         elements
@@ -540,27 +563,64 @@ function bindEvents(): void {
         if (isZip) {
           if (state.selectedImages.size === 0) {
             state.filteredImages.forEach((img) => state.selectedImages.add(img.id));
-            updateSelectionUI();
+            downloadSelectedAsZip(convertFormat).finally(() => {
+              state.selectedImages.clear();
+            });
+          } else {
+            downloadSelectedAsZip(convertFormat);
           }
-          downloadSelectedAsZip(convertFormat);
         } else {
           const hasSelection = state.selectedImages.size > 0;
           const imagesToDownload = hasSelection
             ? state.filteredImages.filter((img) => state.selectedImages.has(img.id))
             : state.filteredImages;
           if (imagesToDownload.length === 0) return;
-          if (!hasSelection) {
-            state.filteredImages.forEach((img) => state.selectedImages.add(img.id));
-            updateSelectionUI();
-          }
           if (imagesToDownload.length === 1) {
             downloadSingle(imagesToDownload[0], convertFormat);
           } else {
-            downloadSelectedAsZip(convertFormat);
+            if (!hasSelection) {
+              state.filteredImages.forEach((img) => state.selectedImages.add(img.id));
+              downloadSelectedAsZip(convertFormat).finally(() => {
+                state.selectedImages.clear();
+              });
+            } else {
+              downloadSelectedAsZip(convertFormat);
+            }
           }
         }
-        hideDownloadDropdown();
       }
+    });
+  }
+
+  // Download group: JS-controlled hover (replaces CSS :hover which flashed
+  // when Preact re-renders broke the hover chain during click).
+  const dlGroup = document.getElementById('download-group');
+  if (dlGroup) {
+    let dlHideTimer: ReturnType<typeof setTimeout> | null = null;
+    let dlLocked = false; // Lock prevents mouseenter from re-opening after click
+    dlGroup.addEventListener('mouseenter', () => {
+      if (dlLocked) return;
+      if (dlHideTimer) {
+        clearTimeout(dlHideTimer);
+        dlHideTimer = null;
+      }
+      dlGroup.classList.add('dl-dropdown-open');
+    });
+    dlGroup.addEventListener('mouseleave', () => {
+      dlLocked = false; // Unlock when mouse fully leaves the group
+      if (dlHideTimer) {
+        clearTimeout(dlHideTimer);
+        dlHideTimer = null;
+      }
+      dlHideTimer = setTimeout(() => {
+        dlGroup.classList.remove('dl-dropdown-open');
+      }, 100);
+    });
+    // When the download button is clicked, lock the dropdown closed until
+    // the user moves the mouse away and back.
+    dlGroup.addEventListener('click', () => {
+      dlLocked = true;
+      dlGroup.classList.remove('dl-dropdown-open');
     });
   }
 
@@ -948,13 +1008,7 @@ function bindEvents(): void {
   // Close dropdowns on outside click
   document.addEventListener('click', (e) => {
     const target = e.target as HTMLElement;
-    if (
-      !target.closest('.download-group') &&
-      !target.closest('#download-dropdown') &&
-      !target.closest('#btn-download-toggle')
-    ) {
-      hideDownloadDropdown();
-    }
+    // download dropdown is now CSS hover — no JS toggle needed
     if (!target.closest('.filter-btn') && !target.closest('.filter-dropdown')) {
       closeAllFilterDropdowns();
     }

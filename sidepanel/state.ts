@@ -58,6 +58,8 @@ export interface TabCacheEntry {
   lastRenderedFilteredIds?: string | null;
   /** Cached similar-image groups so tab-switch restores the correct count. */
   similarGroups?: SimilarGroup[];
+  /** Scroll position of the image grid when this tab was last active. */
+  scrollTop?: number;
 }
 
 // ── Similar-image group ─────────────────────────────────────────────────────

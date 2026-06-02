@@ -283,6 +283,18 @@ export class EventEmitter<E extends Record<string, unknown[]> = Record<string, u
   }
 }
 
+// Our own extension pages (reverse-search.html etc.) should NOT be treated
+// as restricted — they're intermediate pages that quickly redirect to real
+// URLs. Treating them as restricted causes the image list to be cleared and
+// a full re-render on return.
+const OWN_EXTENSION_ORIGIN = (() => {
+  try {
+    return chrome.runtime?.getURL?.('') || '';
+  } catch {
+    return '';
+  }
+})();
+
 const RESTRICTED_URL_PATTERNS: RegExp[] = [
   /^chrome:\/\//,
   /^chrome-extension:\/\//,
@@ -303,6 +315,10 @@ const RESTRICTED_URL_PATTERNS: RegExp[] = [
 
 export function isRestrictedUrl(url: string | null | undefined): boolean {
   if (!url) return true;
+  // Our own extension pages (e.g. reverse-search.html) are NOT restricted —
+  // they're transient intermediate pages. Treating them as restricted would
+  // clear the image list and force a full re-render when the user returns.
+  if (OWN_EXTENSION_ORIGIN && url.startsWith(OWN_EXTENSION_ORIGIN)) return false;
   return RESTRICTED_URL_PATTERNS.some((pattern) => pattern.test(url));
 }
 

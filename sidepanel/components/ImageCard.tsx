@@ -13,14 +13,15 @@
 // resolve it locally with useEffect and keep it in component state.
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { t } from '../../shared/i18n';
-import { MESSAGE_TYPES } from '../../shared/constants';
+import { MESSAGE_TYPES, FREE_LIMITS } from '../../shared/constants';
 import type { ImageItem } from '../../shared/types';
 import {
   copyImageUrl,
   downloadSingle,
+  exportSingleToEagle,
   openInNewTab,
   setupDragAndDrop,
-  showReverseSearchMenu,
+  reverseSearch,
   toggleSelection,
 } from '../actions';
 import {
@@ -152,6 +153,19 @@ const IconAiTag = () => (
     <path d="M2 12l10 5 10-5" />
   </svg>
 );
+const IconEagle = () => (
+  <svg
+    width="15"
+    height="15"
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+  >
+    <path d="M22 2L13.5 11" />
+    <path d="M22 2L15 22l-4-9-9-4z" />
+  </svg>
+);
 
 export function ImageCard({ img, index }: Props) {
   const isSelected = useStoreSelector((s) => s.selectedImages.has(img.id));
@@ -191,6 +205,18 @@ export function ImageCard({ img, index }: Props) {
   const format = (img.format || 'unknown').toUpperCase();
   const colors = img.colors || [];
 
+  // ── Dropup: auto-flip dropdown direction when near viewport bottom ──
+  const handleDropdownHover = (e: MouseEvent) => {
+    const group = (e.currentTarget as HTMLElement);
+    const dropdown = group.querySelector('.card-dl-dropdown, .card-search-dropdown') as HTMLElement | null;
+    if (!dropdown) return;
+    const rect = group.getBoundingClientRect();
+    const spaceBelow = window.innerHeight - rect.bottom;
+    // Estimate dropdown height; 200px is a safe upper bound for 4-5 items
+    const needsFlip = spaceBelow < 200;
+    dropdown.classList.toggle('dropup', needsFlip);
+  };
+
   // ── Handlers ──────────────────────────────────────────────────────────
   const handleCardClick = (e: MouseEvent) => {
     // Card click toggles selection unless the click originated inside an
@@ -202,14 +228,32 @@ export function ImageCard({ img, index }: Props) {
 
   const handleCheckboxChange = () => toggleSelection(img.id);
 
-  const handleSearch = (e: MouseEvent) => {
+  const handleReverseSearch = (engine: string) => (e: MouseEvent) => {
     e.stopPropagation();
-    showReverseSearchMenu(img.url, e.currentTarget as HTMLElement);
+    if (
+      !state.isProUser &&
+      !(FREE_LIMITS.REVERSE_SEARCH_ENGINES as readonly string[]).includes(engine)
+    ) {
+      showToast(t('pro_feature_blocked_reverse_search', { engine }), 'warning');
+      showProUpgradeModal();
+      return;
+    }
+    reverseSearch(img.url, engine);
   };
 
   const handleDownload = (e: MouseEvent) => {
     e.stopPropagation();
     downloadSingle(img, null);
+  };
+
+  const handleDownloadFormat = (format: string) => (e: MouseEvent) => {
+    e.stopPropagation();
+    downloadSingle(img, format === 'original' ? null : format);
+  };
+
+  const handleEagle = (e: MouseEvent) => {
+    e.stopPropagation();
+    void exportSingleToEagle(img);
   };
 
   const handleFavorite = async (e: MouseEvent) => {
@@ -385,26 +429,38 @@ export function ImageCard({ img, index }: Props) {
           {size && <span class="card-tag filesize">{size}</span>}
         </div>
         <div class="card-actions">
-          <button
-            class="card-action-btn btn-search"
-            title={t('card_reverse_search')}
-            data-url={img.url}
-            onClick={handleSearch}
-          >
-            <IconSearch />
-          </button>
-          <button
-            class="card-action-btn btn-dl"
-            title={t('common_download')}
-            data-id={img.id}
-            onClick={handleDownload}
-          >
-            <IconDownload />
-          </button>
+          <div class="card-search-group" onMouseEnter={handleDropdownHover}>
+            <button
+              class="card-action-btn btn-search"
+              title={t('card_tooltip_search')}
+              data-url={img.url}
+              onClick={handleReverseSearch('google')}
+            >
+              <IconSearch />
+            </button>
+            <div class="card-search-dropdown">
+              <div class="dropdown-item active" onClick={handleReverseSearch('google')}>
+                {t('search_engine_google')}
+              </div>
+              <div class="dropdown-item" onClick={handleReverseSearch('tineye')}>
+                {t('search_engine_tineye')}
+              </div>
+              <div class="dropdown-item" onClick={handleReverseSearch('yandex')}>
+                {t('search_engine_yandex')} <span class="pro-badge pro-badge-mini">PRO</span>
+              </div>
+              <div class="dropdown-item" onClick={handleReverseSearch('baidu')}>
+                {t('search_engine_baidu')} <span class="pro-badge pro-badge-mini">PRO</span>
+              </div>
+            </div>
+          </div>
           <span class="icon-btn-wrapper">
             <button
               class={`card-action-btn btn-favorite${isFavorited ? ' favorited' : ''}`}
-              title={isFavorited ? t('card_remove_from_collection') : t('card_add_to_collection')}
+              title={
+                isFavorited
+                  ? t('card_tooltip_remove_from_collection')
+                  : t('card_tooltip_add_to_collection')
+              }
               data-id={img.id}
               onClick={handleFavorite}
             >
@@ -414,7 +470,7 @@ export function ImageCard({ img, index }: Props) {
           <span class="icon-btn-wrapper">
             <button
               class={`card-action-btn btn-ai-tag${isAiTagging ? ' loading' : ''}${aiTags.length > 0 ? ' tagged' : ''}`}
-              title={t('card_ai_tag')}
+              title={t('card_tooltip_ai_tag')}
               data-id={img.id}
               onClick={handleAiTag}
               disabled={isAiTagging}
@@ -423,13 +479,45 @@ export function ImageCard({ img, index }: Props) {
             </button>
           </span>
           <button
+            class="card-action-btn btn-eagle"
+            title={t('card_tooltip_eagle')}
+            data-id={img.id}
+            onClick={handleEagle}
+          >
+            <IconEagle />
+          </button>
+          <button
             class="card-action-btn btn-delete"
-            title={t('card_remove_image')}
+            title={t('card_tooltip_delete')}
             data-id={img.id}
             onClick={handleDelete}
           >
             <IconTrash />
           </button>
+          <div class="card-dl-group" onMouseEnter={handleDropdownHover}>
+            <button
+              class="card-action-btn btn-dl"
+              title={t('card_tooltip_download')}
+              data-id={img.id}
+              onClick={handleDownload}
+            >
+              <IconDownload />
+            </button>
+            <div class="card-dl-dropdown">
+              <div class="dropdown-item active" onClick={handleDownloadFormat('original')}>
+                {t('format_original') || 'Original'}
+              </div>
+              <div class="dropdown-item" onClick={handleDownloadFormat('png')}>
+                PNG <span class="pro-badge pro-badge-mini">PRO</span>
+              </div>
+              <div class="dropdown-item" onClick={handleDownloadFormat('jpg')}>
+                JPG <span class="pro-badge pro-badge-mini">PRO</span>
+              </div>
+              <div class="dropdown-item" onClick={handleDownloadFormat('webp')}>
+                WebP <span class="pro-badge pro-badge-mini">PRO</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="card-url-row">
@@ -439,7 +527,7 @@ export function ImageCard({ img, index }: Props) {
         <div class="card-url-actions">
           <button
             class="card-action-btn btn-copy-url"
-            title={t('card_copy_url')}
+            title={t('card_tooltip_copy_url')}
             data-url={img.url}
             onClick={handleCopyUrl}
           >
@@ -447,7 +535,7 @@ export function ImageCard({ img, index }: Props) {
           </button>
           <button
             class="card-action-btn btn-open"
-            title={t('card_open_in_new_tab')}
+            title={t('card_tooltip_open')}
             data-url={img.url}
             onClick={handleOpen}
           >

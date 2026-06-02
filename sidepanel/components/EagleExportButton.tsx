@@ -37,9 +37,8 @@ export function EagleExportButton() {
   const effectiveCount = selectedSize > 0 ? selectedSize : filteredCount;
   const disabled = effectiveCount === 0 || isExporting;
 
-  const label = isExporting
-    ? t('eagle_export_label') + '...'
-    : t('eagle_export_label') + (effectiveCount > 0 ? ` (${effectiveCount})` : '');
+  const textLabel = isExporting ? t('eagle_export_label') + '...' : t('eagle_export_label');
+  const countLabel = !isExporting && effectiveCount > 0 ? ` (${effectiveCount})` : '';
 
   async function handleClick(): Promise<void> {
     if (!isPro && effectiveCount > FREE_LIMITS.MAX_FREE_EAGLE_EXPORT) {
@@ -110,12 +109,13 @@ export function EagleExportButton() {
       id="btn-eagle-export"
       class="status-action-btn eagle-export-btn"
       type="button"
-      title={t('eagle_export_tooltip')}
+      title={t('batch_tooltip_eagle')}
       disabled={disabled}
       onClick={() => void handleClick()}
     >
       <IconEagle />
-      <span class="btn-label">{label}</span>
+      <span class="btn-label">{textLabel}</span>
+      {countLabel && <span class="btn-count">{countLabel}</span>}
     </button>
   );
 }

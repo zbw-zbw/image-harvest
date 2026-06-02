@@ -1,13 +1,9 @@
-/* ============================================
-   Modal & Dialog Styles
-   ============================================ */
-
-/* Status Bar — action buttons only, right-aligned */
+/* Status Bar — unified single-row */
 .status-bar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  padding: 8px 12px;
+  justify-content: flex-end;
+  padding: 6px 10px;
   border-top: 1px solid var(--border-color);
   background: var(--bg-color);
   flex-shrink: 0;
@@ -15,73 +11,134 @@
   font-size: 12px;
   overflow: visible;
   min-width: 0;
-  gap: 6px;
   position: relative;
   z-index: 10;
-}
-
-.status-left {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-  flex-shrink: 0;
 }
 
 .status-buttons {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 5px;
   flex-wrap: nowrap;
+  /* width:100% so this flex container always spans the full status-bar.
+     Without it the container shrinks to its content and `justify-content`
+     becomes a no-op in some layout edge cases — which made the icon row
+     drift left instead of staying right-aligned. */
   width: 100%;
   justify-content: flex-end;
-  overflow-x: auto;
-  overflow-y: hidden;
-  -webkit-overflow-scrolling: touch;
+  overflow: visible;
   scrollbar-width: none;
 }
 
-/* Batch operations group */
-.batch-ops-group {
-  display: contents;
-}
-
-.batch-op-btn {
-  color: var(--text-secondary);
-  font-weight: 500;
-}
-
-.batch-op-btn:disabled {
-  opacity: 0.4;
-  cursor: not-allowed;
-  pointer-events: none;
+.status-buttons::-webkit-scrollbar {
+  display: none;
 }
 
 .batch-op-delete {
   color: var(--danger, #e05252);
 }
 
-/* On small panels hide batch op text labels, keep icons */
-@media (max-width: 400px) {
-  .batch-op-btn .btn-label,
-  .batch-op-btn .pro-badge {
-    display: none;
+/* ───────────────────────────────────────────────────────────────────
+ * Status-bar responsive — driven by PANEL width (@container), not the
+ * viewport. The sidepanel can be narrow while the browser window stays
+ * wide, so viewport @media never fired and buttons wrapped. Container
+ * queries react to the actual #app width.
+ *
+ * The labelled row (6 buttons + download, Chinese labels with "(N)" count)
+ * is ~611px wide at full size, so it starts to clip well before 600px.
+ * Breakpoints are therefore pulled EARLIER than the visual width:
+ *
+ * Tier 1 (≤680px): shrink labels/padding — kicks in before the ~611px row
+ *                  would clip in a 600-620px panel.
+ * Tier 2 (≤600px): tighten further — last chance to keep labels.
+ * Tier 3 (≤540px): icon-only.
+ * ─────────────────────────────────────────────────────────────────── */
+@container panel (max-width: 680px) {
+  .status-action-btn {
+    padding: 4px 7px;
+    font-size: 11px;
+    gap: 3px;
+  }
+  .status-buttons {
+    gap: 4px;
+  }
+  .btn-small {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+  #download-label,
+  .status-action-btn .btn-label {
+    font-size: 11px;
   }
 }
 
-/* Download button: override primary green to match outline style */
-#btn-download.status-action-btn,
-#btn-download-toggle.status-action-btn {
-  background: var(--primary-color);
-  color: white;
-  border-color: var(--primary-color);
+@container panel (max-width: 600px) {
+  .status-action-btn {
+    padding: 3px 5px;
+    font-size: 10px;
+    gap: 2px;
+  }
+  .status-buttons {
+    gap: 3px;
+  }
+  .btn-small {
+    padding: 3px 6px;
+    font-size: 10px;
+  }
+  #download-label,
+  .status-action-btn .btn-label {
+    font-size: 10px;
+  }
 }
 
-/* Unified font for all status bar buttons */
-.status-bar button {
-  font-size: 12px;
-  font-weight: 500;
-  font-family: inherit;
-  line-height: 1;
+@container panel (max-width: 540px) {
+  /* Hide text labels on both bottom status-bar AND top toolbar sort/group
+     buttons at the same breakpoint, so the transition feels unified.
+     Keep .btn-count visible so users still see "(3)" next to each icon. */
+  .status-action-btn .btn-label,
+  #download-label > .btn-label,
+  .filter-btn .btn-label {
+    display: none;
+  }
+  .status-bar {
+    padding: 6px 10px;
+  }
+  /* Icon-only: right-aligned with a comfortable gap. Buttons sized to
+     match the per-card action buttons for visual harmony. */
+  .status-buttons {
+    gap: 8px;
+    justify-content: flex-end;
+  }
+  /* Compact buttons: auto width to fit icon + count, small padding */
+  .status-action-btn {
+    width: auto;
+    height: 28px;
+    padding: 0 6px;
+    gap: 3px;
+    justify-content: center;
+  }
+  .status-action-btn svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+  .btn-small {
+    width: auto;
+    height: 28px;
+    padding: 0 6px;
+    gap: 3px;
+    justify-content: center;
+  }
+  .btn-small svg {
+    width: 14px;
+    height: 14px;
+    flex-shrink: 0;
+  }
+  .status-action-btn .btn-count,
+  #download-label > .btn-count {
+    font-size: 10px;
+    line-height: 1;
+  }
 }
 
 .status-bar .status-action-btn,

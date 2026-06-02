@@ -63,7 +63,7 @@
     "message": "复制链接"
   },
   "toolbar_copy_urls_tooltip": {
-    "message": "复制选中图片的链接到剪贴板"
+    "message": "复制链接"
   },
   "toolbar_copy_urls_empty": {
     "message": "请先选择图片"
@@ -1239,15 +1239,72 @@
     "message": "已将 {count} 张图片添加到收藏。"
   },
   "toast_batch_ai_tag_started": {
-    "message": "正在为 {count} 张图片进行 AI 标签..."
+    "message": "正在使用 AI 为 {count} 张图片生成标签…"
   },
   "toast_batch_ai_tag_done": {
-    "message": "已为 {count} 张图片完成 AI 标签。"
+    "message": "已成功为 {count} 张图片生成 AI 标签"
   },
   "confirm_batch_delete_title": {
     "message": "删除 {count} 张图片？"
   },
   "confirm_batch_delete_message": {
     "message": "确定从列表中移除 {count} 张选中的图片？"
+  },
+  "search_engine_google": {
+    "message": "Google 图片"
+  },
+  "search_engine_tineye": {
+    "message": "TinEye"
+  },
+  "search_engine_yandex": {
+    "message": "Yandex"
+  },
+  "search_engine_baidu": {
+    "message": "百度识图"
+  },
+  "card_tooltip_search": {
+    "message": "在网络上搜索这张图片"
+  },
+  "card_tooltip_add_to_collection": {
+    "message": "将这张图片添加到收藏夹"
+  },
+  "card_tooltip_remove_from_collection": {
+    "message": "将这张图片从收藏夹中移除"
+  },
+  "card_tooltip_ai_tag": {
+    "message": "为这张图片生成 AI 标签"
+  },
+  "card_tooltip_eagle": {
+    "message": "将这张图片导出到 Eagle"
+  },
+  "card_tooltip_delete": {
+    "message": "将这张图片从列表中移除"
+  },
+  "card_tooltip_download": {
+    "message": "下载这张图片"
+  },
+  "card_tooltip_copy_url": {
+    "message": "复制这张图片的链接到剪贴板"
+  },
+  "card_tooltip_open": {
+    "message": "在新标签页打开这张图片"
+  },
+  "batch_tooltip_favorite": {
+    "message": "将选中的图片添加到收藏夹"
+  },
+  "batch_tooltip_ai_tag": {
+    "message": "为选中的图片生成 AI 标签"
+  },
+  "batch_tooltip_copy_urls": {
+    "message": "复制选中图片的链接到剪贴板"
+  },
+  "batch_tooltip_eagle": {
+    "message": "将选中的图片导出到 Eagle"
+  },
+  "batch_tooltip_delete": {
+    "message": "将选中的图片从列表中移除"
+  },
+  "batch_tooltip_download": {
+    "message": "下载选中的图片"
   }
 }

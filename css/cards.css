@@ -73,7 +73,7 @@
   background: var(--card-bg);
   border: 1.5px solid var(--card-border);
   border-radius: var(--radius-lg);
-  overflow: hidden;
+  overflow: visible;
   cursor: pointer;
   transition: all 0.2s;
   border-left: 3px solid var(--card-border);
@@ -194,6 +194,156 @@
   padding-right: 6px;
 }
 
+.card-dl-group {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.card-dl-dropdown {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 0;
+  margin-bottom: 0;
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  z-index: 50;
+  min-width: 110px;
+  padding: 4px 0;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.15s,
+    visibility 0.15s;
+  pointer-events: none;
+}
+
+/* Invisible bridge to prevent dropdown closing when moving between button and menu */
+.card-dl-dropdown::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 0;
+  right: 0;
+  height: 8px;
+}
+
+.card-dl-group:hover .card-dl-dropdown {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.card-dl-dropdown .dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  color: var(--text-primary);
+  gap: 8px;
+}
+
+.card-dl-dropdown .dropdown-item:hover {
+  background: var(--bg-secondary);
+}
+
+.card-dl-dropdown .dropdown-item.active {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.card-dl-dropdown .pro-badge-mini {
+  margin-left: auto;
+}
+
+.card-search-group {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.card-search-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  margin-top: 0;
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  box-shadow: var(--shadow-lg);
+  z-index: 50;
+  min-width: 130px;
+  padding: 4px 0;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.15s,
+    visibility 0.15s;
+  pointer-events: none;
+}
+
+/* Invisible bridge to prevent dropdown closing when moving between button and menu */
+.card-search-dropdown::before {
+  content: '';
+  position: absolute;
+  top: -8px;
+  left: 0;
+  right: 0;
+  height: 8px;
+}
+
+.card-search-group:hover .card-search-dropdown {
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+}
+
+.card-search-dropdown .dropdown-item {
+  display: flex;
+  align-items: center;
+  padding: 6px 12px;
+  font-size: 12px;
+  cursor: pointer;
+  white-space: nowrap;
+  color: var(--text-primary);
+  gap: 8px;
+}
+
+.card-search-dropdown .dropdown-item:hover {
+  background: var(--bg-secondary);
+}
+
+.card-search-dropdown .dropdown-item.active {
+  color: var(--primary-color);
+  font-weight: 600;
+}
+
+.card-search-dropdown .pro-badge-mini {
+  margin-left: auto;
+}
+
+/* ── Dropup: auto-flip when near viewport bottom ───────────────────
+   JS adds .dropup on hover when there isn't enough room below. */
+.card-dl-dropdown.dropup,
+.card-search-dropdown.dropup {
+  top: auto;
+  bottom: 100%;
+  margin-top: 0;
+  margin-bottom: 0;
+}
+
+/* Flip the invisible bridge to the bottom edge for dropup */
+.card-dl-dropdown.dropup::before,
+.card-search-dropdown.dropup::before {
+  top: auto;
+  bottom: -8px;
+}
+
 .card-action-btn {
   width: 28px;
   height: 28px;
@@ -250,14 +400,19 @@
   justify-content: flex-end;
 }
 
-/* Compact mode: shrink tags (secondary), keep actions (primary) readable */
+/* Compact mode: scale tags AND action buttons together proportionally.
+   Previously tags shrank a lot (8px) while buttons stayed full-size (28px),
+   so the info row couldn't fit everything and got clipped. Now both shrink
+   moderately: tags stay readable (9px) and buttons drop to 24px with a
+   1px gap — still ≥ the 26px-ish URL-row buttons in feel, but compact
+   enough that format + dims + filesize + all 6 actions fit on narrow panels. */
 .compact-mode .image-grid:not(.list-view) .card-tags {
-  gap: 4px;
+  gap: 3px;
 }
 
 .compact-mode .image-grid:not(.list-view) .card-tag {
-  font-size: 8px;
-  padding: 2px 4px;
+  font-size: 9px;
+  padding: 1px 4px;
   border-radius: 2px;
 }
 
@@ -270,13 +425,13 @@
 }
 
 .compact-mode .image-grid:not(.list-view) .card-action-btn {
-  width: 26px;
-  height: 26px;
+  width: 24px;
+  height: 24px;
 }
 
 .compact-mode .image-grid:not(.list-view) .card-action-btn svg {
-  width: 14px;
-  height: 14px;
+  width: 13px;
+  height: 13px;
 }
 
 .compact-mode .image-grid:not(.list-view) .icon-btn-wrapper .pro-badge-mini {
@@ -294,6 +449,52 @@
 
 .compact-mode .image-grid:not(.list-view) .card-actions .icon-btn-wrapper {
   margin-right: 0;
+}
+
+/* ── List-view compact: same proportional shrink as grid ──────────────
+   List-view was previously EXCLUDED from every compact rule (all selectors
+   used :not(.list-view)), so on narrow panels its info row kept full-size
+   28px buttons + an 8px action gap and the tags (format/dims/filesize) got
+   clipped. Mirror the grid compact treatment here: smaller tags, smaller
+   buttons, tighter gaps — so the whole info row fits. */
+.compact-mode .list-view .card-tags {
+  gap: 3px;
+}
+
+.compact-mode .list-view .card-tag {
+  font-size: 9px;
+  padding: 1px 4px;
+  border-radius: 2px;
+}
+
+.compact-mode .list-view .card-tag.filesize {
+  padding: 1px 3px;
+}
+
+.compact-mode .list-view .card-actions {
+  gap: 2px;
+}
+
+.compact-mode .list-view .card-action-btn {
+  width: 24px;
+  height: 24px;
+}
+
+.compact-mode .list-view .card-action-btn svg {
+  width: 13px;
+  height: 13px;
+}
+
+.compact-mode .list-view .card-actions .icon-btn-wrapper {
+  margin-right: 0;
+}
+
+.compact-mode .list-view .card-actions .icon-btn-wrapper .pro-badge-mini {
+  font-size: 5px;
+  padding: 0px 1.5px;
+  top: 1px;
+  right: -4px;
+  letter-spacing: 0.2px;
 }
 
 .card-tag {
@@ -403,6 +604,7 @@
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
+  border-radius: var(--radius-lg) var(--radius-lg) 0 0;
 }
 
 /* Skeleton shimmer placeholder while image loads */
@@ -736,6 +938,7 @@
   top: 0px;
   right: -8px;
   font-size: 6px;
+  line-height: 1;
   padding: 0px 2px;
 }
 
@@ -752,6 +955,7 @@
   top: 0px;
   right: -6px;
   font-size: 6px;
+  line-height: 1;
   padding: 0px 2px;
 }
 
@@ -762,4 +966,51 @@
   top: 1px;
   right: -4px;
   letter-spacing: 0.2px;
+}
+
+/* Card info-bar responsive: shrink tags + info-bar padding only.
+   Button sizing is intentionally NOT shrunk here — narrow panels are
+   handled by .compact-mode (panel-width driven) which keeps action
+   buttons at a usable 28px. Shrinking them again by viewport made them
+   smaller than the URL-row copy/open buttons and hard to tap. */
+@media (max-width: 500px) {
+  .card-info-bar {
+    padding: 5px 6px;
+    gap: 4px;
+    min-height: 32px;
+  }
+  .card-tags {
+    gap: 3px;
+  }
+  .card-tag {
+    font-size: 9px;
+    padding: 1px 4px;
+  }
+}
+
+@media (max-width: 380px) {
+  .card-info-bar {
+    padding: 4px 4px;
+    gap: 2px;
+    min-height: 28px;
+  }
+  .card-tag {
+    font-size: 8px;
+    padding: 1px 3px;
+  }
+}
+
+/* AI tag overlay responsive — only ONE compact tier. The previous
+   two-tier shrink (7px → 6px) was far too aggressive; tags became
+   unreadable while there was still free space. A single moderate
+   reduction (8px) keeps them legible on narrow panels. */
+.compact-mode .card-ai-tags-overlay {
+  gap: 2px;
+}
+
+.compact-mode .card-ai-tags-overlay .card-tag.ai-tag {
+  font-size: 8px;
+  line-height: 1.2;
+  padding: 1px 3px;
+  border-radius: 2px;
 }

@@ -106,46 +106,62 @@ export function BatchOpsButton() {
   }
 
   return (
-    <div class="batch-ops-group">
+    <div class="batch-ops-group" style="display:contents">
       <button
         class="status-action-btn batch-op-btn"
         type="button"
-        title={t('toolbar_batch_favorite')}
+        title={t('batch_tooltip_favorite')}
         disabled={disabled}
         onClick={handleFavorite}
       >
         <IconStar />
-        <span class="btn-label">
-          {t('toolbar_batch_favorite')}
-          {countLabel}
-        </span>
+        <span class="btn-label">{t('toolbar_batch_favorite')}</span>
+        {countLabel && <span class="btn-count">{countLabel}</span>}
       </button>
       <button
         class="status-action-btn batch-op-btn"
         type="button"
-        title={t('toolbar_batch_ai_tag')}
+        title={t('batch_tooltip_ai_tag')}
         disabled={disabled}
         onClick={handleAiTag}
       >
         <IconAiTag />
-        <span class="btn-label">
-          {t('toolbar_batch_ai_tag')}
-          {countLabel}
-        </span>
-      </button>
-      <button
-        class="status-action-btn batch-op-btn batch-op-delete"
-        type="button"
-        title={t('toolbar_batch_delete')}
-        disabled={disabled}
-        onClick={handleDelete}
-      >
-        <IconTrash />
-        <span class="btn-label">
-          {t('toolbar_batch_delete')}
-          {countLabel}
-        </span>
+        <span class="btn-label">{t('toolbar_batch_ai_tag')}</span>
+        {countLabel && <span class="btn-count">{countLabel}</span>}
       </button>
     </div>
+  );
+}
+
+export function BatchDeleteButton() {
+  const selectedSize = useStoreSelector((s) => s.selectedImages.size);
+  const filteredCount = useStoreSelector((s) => s.filteredImages.length);
+  useStoreSelector((s) => s.localeTick);
+
+  const effectiveCount = selectedSize > 0 ? selectedSize : filteredCount;
+  const disabled = effectiveCount === 0;
+  const countLabel = effectiveCount > 0 ? ` (${effectiveCount})` : '';
+
+  function handleDelete(): void {
+    if (proBlock('batch_delete')) return;
+    const ids =
+      selectedSize > 0
+        ? Array.from(state.selectedImages)
+        : state.filteredImages.map((img) => img.id);
+    void deleteSelectedImages(ids);
+  }
+
+  return (
+    <button
+      class="status-action-btn batch-op-delete"
+      type="button"
+      title={t('batch_tooltip_delete')}
+      disabled={disabled}
+      onClick={handleDelete}
+    >
+      <IconTrash />
+      <span class="btn-label">{t('toolbar_batch_delete')}</span>
+      {countLabel && <span class="btn-count">{countLabel}</span>}
+    </button>
   );
 }

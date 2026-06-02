@@ -18,6 +18,7 @@ import { track } from '../shared/telemetry';
 import { EVENTS } from '../shared/telemetry-events';
 import { recordDownloads } from '../shared/paywall-state';
 import { recordDownloadForRating } from '../shared/rating-prompt-state';
+import { applyFilters } from './filter';
 import { renderImages } from './render';
 import { showProUpgradeModal } from './settings';
 import { elements, state, store } from './state';
@@ -269,6 +270,36 @@ export async function fetchImageBlobWithFallback(url: string): Promise<Blob> {
   return fetchResp.blob();
 }
 
+export async function exportSingleToEagle(img: ImageItem): Promise<void> {
+  let name = img.alt || '';
+  if (!name) {
+    try {
+      name = new URL(img.url).pathname.split('/').pop() || img.id;
+    } catch {
+      name = img.id;
+    }
+  }
+  const items = [{ url: img.url, name, website: img.tabUrl, tags: img.aiTags }];
+  showToast(t('toast_eagle_exporting', { count: '1' }), 'info');
+  try {
+    const response = (await chrome.runtime.sendMessage({
+      type: MESSAGE_TYPES.EXPORT_TO_EAGLE,
+      items,
+    })) as { success: boolean; added?: number; error?: string };
+    if (!response?.success) {
+      const reason = response?.error || 'api_error';
+      showToast(
+        reason === 'eagle_not_running' ? t('toast_eagle_not_running') : t('toast_eagle_failed'),
+        'error'
+      );
+      return;
+    }
+    showToast(t('toast_eagle_success', { count: String(response.added ?? 0) }), 'success');
+  } catch {
+    showToast(t('toast_eagle_failed'), 'error');
+  }
+}
+
 export async function downloadSingle(img: ImageItem, format: string | null): Promise<void> {
   // Pro check: format conversion requires Pro
   if (format && !state.isProUser) {
@@ -439,55 +470,14 @@ export async function downloadSelectedAsZip(targetFormat: string | null): Promis
 }
 
 export function toggleDownloadDropdown(): void {
-  if (!elements.downloadDropdown) return;
-  const wasHidden = elements.downloadDropdown.classList.contains('hidden');
-  elements.downloadDropdown.classList.toggle('hidden');
-
-  // Auto-adjust horizontal position when showing
-  if (wasHidden && !elements.downloadDropdown.classList.contains('hidden')) {
-    const dropdown = elements.downloadDropdown as HTMLElement;
-    const viewportWidth = document.documentElement.clientWidth;
-
-    // Reset position to measure
-    dropdown.style.left = 'auto';
-    dropdown.style.right = '0';
-
-    const dropdownRect = dropdown.getBoundingClientRect();
-
-    // Check if overflows left side of viewport
-    if (dropdownRect.left < 4) {
-      // Switch to left-aligned
-      dropdown.style.right = 'auto';
-      dropdown.style.left = '0';
-
-      // Re-check if it now overflows right
-      const newRect = dropdown.getBoundingClientRect();
-      if (newRect.right > viewportWidth - 4) {
-        // Constrain to viewport with padding
-        const parentRect = dropdown.parentElement?.getBoundingClientRect();
-        if (parentRect) {
-          dropdown.style.left = 4 - parentRect.left + 'px';
-          dropdown.style.right = 'auto';
-        }
-      }
-    }
-    // Check if overflows right side of viewport
-    else if (dropdownRect.right > viewportWidth - 4) {
-      const parentRect = dropdown.parentElement?.getBoundingClientRect();
-      if (parentRect) {
-        const rightOffset = parentRect.right - (viewportWidth - 4);
-        dropdown.style.right = -rightOffset + 'px';
-      }
-    }
-  }
+  return;
 }
-
 export function showDownloadDropdown(): void {
   if (elements.downloadDropdown) elements.downloadDropdown.classList.remove('hidden');
 }
 
 export function hideDownloadDropdown(): void {
-  if (elements.downloadDropdown) elements.downloadDropdown.classList.add('hidden');
+  return;
 }
 
 // ============================================
@@ -685,6 +675,9 @@ export async function batchAiTag(images: ImageItem[]): Promise<void> {
           return tags ? { ...img, aiTags: tags } : img;
         })
       );
+      // Re-filter + re-render so the newly generated AI tags appear on
+      // each card immediately, without requiring a manual refresh.
+      applyFilters();
     }
     showToast(t('toast_batch_ai_tag_done', { count: String(taggedCount) }), 'success');
   } catch {
@@ -696,9 +689,10 @@ export async function deleteSelectedImages(ids: string[]): Promise<void> {
   if (ids.length === 0) return;
   const confirmed = await showConfirmDialog({
     title: t('confirm_batch_delete_title', { count: String(ids.length) }),
-    message: t('confirm_batch_delete_message'),
-    confirmLabel: t('common_delete'),
-    cancelLabel: t('common_cancel'),
+    message: t('confirm_batch_delete_message', { count: String(ids.length) }),
+    confirmText: t('common_remove'),
+    cancelText: t('common_cancel'),
+    type: 'danger',
   });
   if (!confirmed) return;
   const idSet = new Set(ids);

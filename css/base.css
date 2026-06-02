@@ -141,11 +141,14 @@
   container-name: panel;
 }
 
+/* Toolbar rows still use zoom-based scaling. The status-bar is excluded
+   here — it has dedicated @container breakpoints in modals.css that shrink
+   labels then go icon-only, so zoom would double-shrink it and make the
+   action buttons too small to read. */
 @container panel (max-width: 600px) {
   .toolbar-actions,
   .toolbar-select-row,
-  .toolbar-filters,
-  .status-bar {
+  .toolbar-filters {
     zoom: 0.9;
   }
 }
@@ -153,9 +156,16 @@
 @container panel (max-width: 400px) {
   .toolbar-actions,
   .toolbar-select-row,
-  .toolbar-filters,
-  .status-bar {
-    zoom: 0.8;
+  .toolbar-filters {
+    zoom: 0.85;
+  }
+}
+
+@container panel (max-width: 320px) {
+  .toolbar-actions,
+  .toolbar-select-row,
+  .toolbar-filters {
+    zoom: 0.75;
   }
 }
 
@@ -590,4 +600,32 @@
 
 :root[data-theme='dark'] .trial-grace-text {
   color: var(--amber-light);
+}
+
+/* Toolbar responsive — shrink for narrow panels */
+@media (max-width: 500px) {
+  .toolbar-actions .icon-btn {
+    width: 28px;
+    height: 28px;
+  }
+  .toolbar-actions .icon-btn svg {
+    width: 16px;
+    height: 16px;
+  }
+  .toolbar-actions {
+    padding: 6px 8px;
+    gap: 4px;
+  }
+  .toolbar-select-row {
+    padding: 6px 8px;
+    gap: 4px;
+  }
+  .select-all-btn {
+    font-size: 11px;
+    padding: 3px 6px;
+  }
+  .filter-btn {
+    font-size: 10px;
+    padding: 3px 6px;
+  }
 }

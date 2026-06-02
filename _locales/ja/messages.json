@@ -1249,5 +1249,62 @@
   },
   "confirm_batch_delete_message": {
     "message": "リストから {count} 件の選択した画像を削除しますか？"
+  },
+  "search_engine_google": {
+    "message": "Google 画像検索"
+  },
+  "search_engine_tineye": {
+    "message": "TinEye"
+  },
+  "search_engine_yandex": {
+    "message": "Yandex"
+  },
+  "search_engine_baidu": {
+    "message": "Baidu"
+  },
+  "card_tooltip_search": {
+    "message": "この画像をウェブで検索"
+  },
+  "card_tooltip_add_to_collection": {
+    "message": "この画像をコレクションに追加"
+  },
+  "card_tooltip_remove_from_collection": {
+    "message": "この画像をコレクションから削除"
+  },
+  "card_tooltip_ai_tag": {
+    "message": "この画像の AI タグを生成"
+  },
+  "card_tooltip_eagle": {
+    "message": "この画像を Eagle にエクスポート"
+  },
+  "card_tooltip_delete": {
+    "message": "この画像をリストから削除"
+  },
+  "card_tooltip_download": {
+    "message": "この画像をダウンロード"
+  },
+  "card_tooltip_copy_url": {
+    "message": "この画像の URL をクリップボードにコピー"
+  },
+  "card_tooltip_open": {
+    "message": "この画像を新しいタブで開く"
+  },
+  "batch_tooltip_favorite": {
+    "message": "選択した画像をコレクションに追加"
+  },
+  "batch_tooltip_ai_tag": {
+    "message": "選択した画像の AI タグを生成"
+  },
+  "batch_tooltip_copy_urls": {
+    "message": "選択した画像の URL をクリップボードにコピー"
+  },
+  "batch_tooltip_eagle": {
+    "message": "選択した画像を Eagle にエクスポート"
+  },
+  "batch_tooltip_delete": {
+    "message": "選択した画像をリストから削除"
+  },
+  "batch_tooltip_download": {
+    "message": "選択した画像をダウンロード"
   }
 }

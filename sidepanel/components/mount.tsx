@@ -24,7 +24,7 @@ import { SoftPaywallBanner } from './SoftPaywallBanner';
 import { TrialGraceBanner } from './TrialGraceBanner';
 import { BatchUrlCopyButton } from './BatchUrlCopyButton';
 import { EagleExportButton } from './EagleExportButton';
-import { BatchOpsButton } from './BatchOpsButton';
+import { BatchOpsButton, BatchDeleteButton } from './BatchOpsButton';
 import { RatingPromptModal } from './RatingPromptModal';
 import { SettingsModal } from './SettingsModal';
 import { ImageGrid } from './ImageGrid';
@@ -192,7 +192,20 @@ export function mountPreactComponents(): void {
   // enabled/disabled state via store subscriptions.
   mountAt('batch-url-copy-mount', BatchUrlCopyButton);
   mountAt('eagle-export-mount', EagleExportButton);
-  mountAt('batch-ops-mount', BatchOpsButton);
+  {
+    const batchMount = replaceWithMountPoint('batch-ops-mount');
+    if (batchMount) {
+      batchMount.style.display = 'contents';
+      render(<BatchOpsButton />, batchMount);
+    }
+  }
+  {
+    const deleteMount = replaceWithMountPoint('batch-delete-mount');
+    if (deleteMount) {
+      deleteMount.style.display = 'contents';
+      render(<BatchDeleteButton />, deleteMount);
+    }
+  }
 
   // Rating prompt modal (Sprint 3.6). Has no legacy slot — append a
   // fresh container to <body>. The component decides visibility via
