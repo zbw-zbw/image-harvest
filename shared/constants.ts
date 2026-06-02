@@ -271,9 +271,9 @@ export const TELEMETRY_FLUSH_INTERVAL_MS = 5_000;
 export const TELEMETRY_BATCH_SIZE = 20;
 export const TELEMETRY_MAX_QUEUE = 100;
 export const PRICING = {
-  MONTHLY: 2.99,
-  YEARLY: 19.99,
-  LIFETIME: 29.99,
+  MONTHLY: 3.99,
+  YEARLY: 29.99,
+  LIFETIME: 49.99,
 } as const;
 export const LICENSE_STATUS = {
   ACTIVE: 'active',

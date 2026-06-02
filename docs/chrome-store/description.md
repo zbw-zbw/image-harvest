@@ -86,9 +86,9 @@ Try every Pro feature free for 7 days — no credit card required. Experience un
 • Advanced grouping (5 modes)
 
 💎 Pricing:
-• Monthly: $2.99
-• Yearly: $19.99 (~44% off)
-• Lifetime: $29.99 (one-time, use forever)
+• Monthly: $3.99
+• Yearly: $29.99 (~37% off)
+• Lifetime: $49.99 (one-time, use forever)
 All plans include a 30-day money-back guarantee.
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━

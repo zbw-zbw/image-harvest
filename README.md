@@ -352,9 +352,9 @@ Image Harvest is **free to use** with optional Pro plans for power users.
 | Plan         |  Price | Billing             | Best For                                        |
 | ------------ | -----: | ------------------- | ----------------------------------------------- |
 | **Free**     |     $0 | Forever             | Casual users — covers 95% of everyday use cases |
-| **Monthly**  |  $2.99 | per month           | Trying out Pro features short-term              |
-| **Yearly**   | $19.99 | per year (~44% off) | Regular users — best value for ongoing use      |
-| **Lifetime** | $29.99 | one-time            | Pay once, use forever — no subscription         |
+| **Monthly**  |  $3.99 | per month           | Trying out Pro features short-term              |
+| **Yearly**   | $29.99 | per year (~37% off) | Regular users — best value for ongoing use      |
+| **Lifetime** | $49.99 | one-time            | Pay once, use forever — no subscription         |
 
 > 💡 All Pro plans unlock the same features. View the full feature comparison on the [Pricing page](https://image-harvest.kyriewen.cn/pricing).
 
