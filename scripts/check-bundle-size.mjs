@@ -36,7 +36,9 @@ const BUDGETS = {
   // Sidepanel main entry — see `perf(bundle): jszip lazy import` for the
   // 73.35 → 43.96 kB drop. Bumped to 78 kB after v1.0.3 (i18n 15 langs,
   // storeHook useLayoutEffect fix, onLocaleChange enhancements) ~76 kB.
-  'init.js': { gzipKb: 90, label: 'sidepanel main' },
+  // Bumped 90 → 95 kB for v1.0.5: sidepanel component/locale/style updates
+  // pushed init to ~92 kB gzip; growth accepted intentionally, ~3 kB headroom.
+  'init.js': { gzipKb: 95, label: 'sidepanel main' },
   // Background service worker entry. Currently ~5.6 kB gzip.
   'index.ts.js': { gzipKb: 12, label: 'background SW' },
   // Content script entry. Currently ~7.7 kB gzip.
