@@ -58,6 +58,23 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
+## [1.0.5] — 2026-06-02
+
+### ✨ Added
+
+- **AI Image Tagging**: Generate smart tags for images using AI — helps you find and organize images by content. Free users get a daily quota; Pro users enjoy unlimited tagging.
+- **Batch AI Tagging**: Tag multiple selected images at once with a single click.
+- **AI Tag Filtering**: Filter images by AI-generated tags in the search/filter toolbar.
+
+### 🐛 Fixed
+
+- **Dropdown menus stay open after clicking**: The reverse-image-search and download-format dropdown menus now dismiss immediately after clicking a button or menu item, instead of staying open until the cursor leaves.
+- **Image list re-renders after reverse search**: Switching to the reverse-search tab and back no longer causes the image list to re-render (which reset the scroll position to the top).
+- **Loading state stuck after reverse search**: Fixed a race condition where scanning the transient reverse-search extension page could leave the image grid permanently stuck in a loading state.
+- **Status counts flash on tab switch**: Switching between the extension's built-in pages (welcome, reverse-search) and normal tabs no longer triggers a re-render of the "Found N images (N similar)" counter with a fade-in animation.
+
+---
+
 ## [1.0.4] — 2026-05-25
 
 ### 🚀 Optimization Sprint — Stability, Performance & Architecture

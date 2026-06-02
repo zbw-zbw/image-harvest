@@ -74,6 +74,7 @@ import {
   isWithinTabSwitchGrace,
   loadCurrentTab,
 } from './tab-lifecycle';
+import { forgetReverseSearchTab, forgetIgnoredExtensionTab } from './reverse-search-tabs';
 
 // Flag set by uiPort.onDisconnect — signals that the extension has been
 // reloaded and chrome.* APIs are no longer valid. All event listeners
@@ -296,6 +297,8 @@ async function init(): Promise<void> {
       if (!isExtensionContextValid()) return;
       state.tabCache.delete(tabId);
       clearTabImageCache(tabId);
+      forgetReverseSearchTab(tabId);
+      forgetIgnoredExtensionTab(tabId);
     });
   }
 

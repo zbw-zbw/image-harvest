@@ -24,6 +24,7 @@ import { showProUpgradeModal } from './settings';
 import { elements, state, store } from './state';
 import { hideProgress, showConfirmDialog, showProgress, showToast, updateProgress } from './ui';
 import { generateFilename, truncateUrl } from './utils';
+import { armReverseSearchPending, markReverseSearchTab } from './reverse-search-tabs';
 
 export async function toggleSelection(imageId: string): Promise<void> {
   const img = state.allImages.find((i) => i.id === imageId);
@@ -627,7 +628,13 @@ export function reverseSearch(imageUrl: string, engine: string): void {
     chrome.runtime.getURL('pages/reverse-search.html') +
     `?engine=${encodeURIComponent(engine)}` +
     `&imageUrl=${encodeURIComponent(imageUrl)}`;
-  chrome.tabs.create({ url: searchPageUrl, active: true });
+  // Arm the pending flag BEFORE creating the tab. onActivated fires before
+  // the create promise resolves, so handleTabChange needs a synchronous
+  // signal that the next activated tab is our reverse-search page.
+  armReverseSearchPending();
+  chrome.tabs.create({ url: searchPageUrl, active: true }).then((tab) => {
+    if (tab.id != null) markReverseSearchTab(tab.id);
+  });
 }
 
 // ============================================

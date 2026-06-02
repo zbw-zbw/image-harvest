@@ -13,7 +13,14 @@ import { renderImages } from './render';
 import { checkNarrowMode, hideLoading, hideRestricted, showLoading, showRestricted } from './ui';
 import { cancelDiscoveredToast } from './message';
 import { generateId } from './utils';
-
+import {
+  isReverseSearchTab,
+  forgetReverseSearchTab,
+  isOwnExtensionUrl,
+  isIgnoredExtensionTab,
+  markIgnoredExtensionTab,
+  forgetIgnoredExtensionTab,
+} from './reverse-search-tabs';
 // Module-level rescan debounce timer
 let tabUpdatedTimer: ReturnType<typeof setTimeout> | null = null;
 
@@ -25,30 +32,6 @@ let lastTabSwitchTime = 0;
 /** Check if we are still within the grace period after a tab switch. */
 export function isWithinTabSwitchGrace(): boolean {
   return Date.now() - lastTabSwitchTime < TIMING.TAB_SWITCH_GRACE_MS;
-}
-
-// Origin of our own extension pages (e.g. reverse-search.html). Used to
-// detect the transient reverse-search tab so tab-switch handlers can ignore
-// it instead of clearing/rescanning the current tab's image list.
-const OWN_EXTENSION_ORIGIN = (() => {
-  try {
-    return chrome.runtime?.getURL?.('') || '';
-  } catch {
-    return '';
-  }
-})();
-
-/**
- * True when the URL points to one of our own extension pages. Reverse-search
- * opens such a page in a new active tab; switching focus to it must NOT touch
- * the current tab's image state (otherwise returning re-renders the list and
- * resets the scroll position, and scanning the extension page can hang the
- * grid in a permanent loading state).
- */
-function isOwnExtensionTab(tab: chrome.tabs.Tab | undefined): boolean {
-  if (!tab) return false;
-  const url = tab.pendingUrl || tab.url || '';
-  return !!OWN_EXTENSION_ORIGIN && url.startsWith(OWN_EXTENSION_ORIGIN);
 }
 
 export async function loadCurrentTab(forceRescan = false, targetTabId?: number): Promise<void> {
@@ -189,19 +172,16 @@ export async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Pr
   if (!chrome.runtime?.id) return;
   const newTabId = activeInfo.tabId;
 
-  // Ignore activation of our own extension pages (e.g. the transient
-  // reverse-search tab opened by "search by image"). Switching to it must
-  // not clear or rescan the current tab's images — otherwise returning
-  // triggers a full re-render (scroll resets to top) and scanning the
-  // extension page can leave the grid stuck in a loading state.
-  // We only have the tabId here, so resolve the URL first. We do NOT save
-  // or mutate any state before this check resolves.
-  try {
-    const activatedTab = await chrome.tabs.get(newTabId);
-    if (isOwnExtensionTab(activatedTab)) return;
-  } catch {
-    // Tab may have been closed already — fall through to normal handling.
-  }
+  // Synchronously ignore activation of any known extension-owned tab
+  // (reverse-search, welcome page, etc.). This check is intentionally
+  // synchronous (no await) so it does NOT delay or break the synchronous
+  // cache-restore fast path below. Switching to such a tab must not
+  // save/clear/rescan the current tab's images.
+  if (isReverseSearchTab(newTabId) || isIgnoredExtensionTab(newTabId)) return;
+
+  // Remember the previous tabId so we can restore it if the target turns
+  // out to be an extension page discovered only after the async check.
+  const previousTabId = state.currentTabId;
 
   // Save current tab state to cache before switching
   if (state.currentTabId != null && state.currentTabId !== newTabId) {
@@ -411,7 +391,35 @@ export async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Pr
     return;
   }
 
-  // No cache — hide the grid and check if the target tab is restricted
+  // No cache — peek at the target tab's URL FIRST (before hiding anything)
+  // so we can detect our own extension pages (welcome.html, reverse-search.html)
+  // and skip them entirely. These are not scannable pages; switching focus to
+  // one must not clear similarGroups, toggle isScanning, or hide the grid —
+  // all of which cause the current tab's status counts to re-render with a
+  // fade-in animation (and occasionally flash the previous list) on return.
+  let newTab: chrome.tabs.Tab | undefined;
+  try {
+    newTab = await chrome.tabs.get(newTabId);
+  } catch {
+    // Tab may have been closed already
+  }
+
+  if (state.currentTabId !== newTabId) return;
+
+  // Our own extension page (welcome, reverse-search, etc.) — roll back all
+  // state changes made above so the original tab's image list is completely
+  // undisturbed. Remember this tabId so subsequent switches are caught
+  // synchronously by isIgnoredExtensionTab() (no await needed next time).
+  if (newTab && isOwnExtensionUrl(newTab.url)) {
+    markIgnoredExtensionTab(newTabId);
+    // Restore currentTabId so switching back doesn't save a bogus cache
+    // entry for this extension page tab.
+    state.currentTabId = previousTabId;
+    state.isTabSwitching = false;
+    return;
+  }
+
+  // Hide the grid and check if the target tab is restricted
   const gridWrapper = document.querySelector('.image-grid-wrapper') as HTMLElement | null;
   if (gridWrapper) {
     gridWrapper.classList.add('hidden');
@@ -421,15 +429,6 @@ export async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Pr
     el.classList.add('hidden');
   });
   try {
-    let newTab: chrome.tabs.Tab | undefined;
-    try {
-      newTab = await chrome.tabs.get(newTabId);
-    } catch {
-      // Tab may have been closed already
-    }
-
-    if (state.currentTabId !== newTabId) return;
-
     if (!newTab || isRestrictedUrl(newTab.url)) {
       state.currentTabId = null;
       showRestricted();
@@ -466,7 +465,24 @@ export function handleTabUpdated(
   tab: chrome.tabs.Tab
 ): void {
   if (!chrome.runtime?.id) return;
+
+  // Once a tracked reverse-search tab navigates away from our extension page
+  // to the real search engine, stop ignoring it — it's a normal tab now.
+  if (isReverseSearchTab(tabId)) {
+    const updatedUrl = tab?.url || changeInfo.url || '';
+    if (updatedUrl && !updatedUrl.startsWith(chrome.runtime.getURL(''))) {
+      forgetReverseSearchTab(tabId);
+    }
+  }
+
   if (!changeInfo.url && changeInfo.status !== 'complete') return;
+
+  // Our own extension pages (welcome.html, reverse-search.html, …) are not
+  // scannable. Ignore their updates so we never clear/rescan and pollute the
+  // current tab's image state — which would re-render the status counts with
+  // a fade-in animation when the user returns.
+  const updatedUrl = tab?.url || changeInfo.url || '';
+  if (isOwnExtensionUrl(updatedUrl)) return;
 
   if (state.isTabSwitching) return;
 
