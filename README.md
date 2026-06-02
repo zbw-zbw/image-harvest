@@ -87,10 +87,13 @@
 
 ---
 
-## 🆕 What's New
+## 🆕 What's New (v1.0.5)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
+- **🤖 AI Image Tagging** — generate smart content-based tags for any image using AI. Tag single images or batch-tag your entire selection. Free users get a daily quota; Pro users enjoy unlimited tagging.
+- **🔎 AI Tag Filtering** — search and filter images by their AI-generated tags directly from the toolbar.
+- **🐛 Tab-switch stability** — fixed dropdown menus staying open, image list re-rendering on reverse-search return, loading states getting stuck, and status count animations flashing on tab switch.
 - **🎯 Anonymous opt-in telemetry** — understand which features matter most while keeping every URL, image, and identifier strictly local. One toggle in **Settings → Help Improve**, off by default until you opt in.
 - **🌍 5-language UI** — English, 简体中文, 繁體中文, 日本語, Español. Auto-detects browser language; switchable in Settings.
 - **🆓 7-day free trial for Pro** — try every Pro feature with no upfront charge. Cancel during the trial = no bill.
@@ -145,6 +148,13 @@
 - Save images to local IndexedDB with tags, notes, and metadata
 - Browse, search, and filter your collection
 - Batch export collected images as ZIP
+
+### 🤖 AI Image Tagging
+
+- **Smart content tags** — AI analyzes each image and generates descriptive tags (e.g. "landscape", "food", "person")
+- **Batch tagging** — select multiple images and tag them all at once
+- **Tag-based filtering** — search and filter your image list by AI-generated tags
+- Free users get a daily quota; Pro users enjoy unlimited tagging
 
 ### 🔎 Reverse Image Search
 

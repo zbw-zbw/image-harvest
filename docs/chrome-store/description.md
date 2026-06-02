@@ -9,6 +9,10 @@
 以下为复制粘贴区域：
 
 ```text
+🤖 AI Image Tagging (NEW!)
+
+Generate smart tags for any image using AI — instantly know what's in each image without opening it. Tag individual images or batch-tag your entire selection at once. Filter and search images by their AI-generated tags. Free users get a daily quota; Pro users enjoy unlimited tagging.
+
 🔍 Smart Image Extraction
 
 Automatically finds every image on any webpage — including standard images, CSS backgrounds, responsive images, and high-resolution variants. Scans deep into Shadow DOM and iframes for complete coverage. Live monitoring detects new images as you scroll (Pro).
@@ -68,6 +72,7 @@ Try every Pro feature free for 7 days — no credit card required. Experience un
 • 3 layout densities + Light/Dark theme
 
 ⚡ PRO unlocks:
+• Unlimited AI image tagging
 • Unlimited batch ZIP downloads
 • Format conversion (PNG/JPG/WebP)
 • Custom naming templates
@@ -97,7 +102,7 @@ Image Harvest processes everything locally in your browser. No images, URLs, or 
 Ctrl+Shift+S (Cmd+Shift+S on Mac): Toggle Image Harvest
 
 💡 Compatibility: Chrome 88+, Manifest V3
-📦 Version: 1.0.4
+📦 Version: 1.0.5
 🌐 Website: https://image-harvest.kyriewen.cn
 📧 Support: support@kyriewen.cn
 ```

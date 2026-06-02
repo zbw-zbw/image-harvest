@@ -7,7 +7,7 @@
 ## English (current, 132 chars max)
 
 ```
-Batch download images. Multi-tab extract, similar detection, reverse image search, batch highlight, collections, color extract.
+AI image tagging, batch download, multi-tab extract, similar detection, reverse search, collections, color extract. All-in-one.
 ```
 
 字符数：**127 / 132** ✅
