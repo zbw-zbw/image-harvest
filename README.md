@@ -139,18 +139,6 @@
 - **Custom naming templates** — `{index}`, `{original}`, `{pageTitle}`, `{pageDomain}`, `{width}`, `{height}`, `{format}`, `{date}` and more _(Pro)_
 - **Download progress** modal with progress bar
 
-### 🎯 Page Highlight
-
-- Select images in the panel → corresponding images are highlighted on the page
-- Auto-scroll to the highlighted image
-- Synchronized with panel checkbox state
-
-### ⭐ Image Collection _(Pro)_
-
-- Save images to local IndexedDB with tags, notes, and metadata
-- Browse, search, and filter your collection
-- Batch export collected images as ZIP
-
 ### 🤖 AI Image Tagging
 
 - **Smart content tags** — AI analyzes each image and generates descriptive tags (e.g. "landscape", "food", "person")
@@ -170,6 +158,18 @@
 - **Batch AI tag** — generate AI tags for all selected images in one click
 - **Batch delete** — remove unwanted images from the list in bulk
 - Action buttons appear automatically when images are selected
+
+### 🎯 Page Highlight
+
+- Select images in the panel → corresponding images are highlighted on the page
+- Auto-scroll to the highlighted image
+- Synchronized with panel checkbox state
+
+### ⭐ Image Collection _(Pro)_
+
+- Save images to local IndexedDB with tags, notes, and metadata
+- Browse, search, and filter your collection
+- Batch export collected images as ZIP
 
 ### 🔎 Reverse Image Search
 

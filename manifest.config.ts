@@ -22,7 +22,7 @@ export default defineManifest({
   name: 'Image Harvest - Download Any Image from Any Webpage',
   version: pkg.version,
   description:
-    'AI tagging, Eagle export, batch ops, multi-tab extract, similar detection, reverse search, collections, color extract. All-in-one.',
+    'Batch download images. Multi-tab extract, AI tagging, Eagle export, similar detection, reverse search, collections, color extract.',
   default_locale: 'en',
 
   permissions: [

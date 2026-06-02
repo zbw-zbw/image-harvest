@@ -9,6 +9,22 @@
 以下为复制粘贴区域：
 
 ```text
+🔍 Smart Image Extraction
+
+Automatically finds every image on any webpage — including standard images, CSS backgrounds, responsive images, and high-resolution variants. Scans deep into Shadow DOM and iframes for complete coverage. Live monitoring detects new images as you scroll (Pro).
+
+📥 Batch Download Images
+
+Download individual images or batch download multiple images as a single ZIP file. Track download progress with a visual progress bar. Free users can download up to 30 images per batch; Pro users enjoy unlimited batch downloads.
+
+🎛️ Powerful Filtering & Sorting
+
+Filter by size (Small/Medium/Large/XL/Custom), format (JPG/PNG/WebP/SVG/GIF), layout (Square/Landscape/Portrait/Panorama), or URL keywords. Smart grouping by Domain, Format, Size Range, or Tab (Pro). Sort by size, format, or natural order.
+
+🌐 Multi-Tab Extract
+
+Extract images from multiple browser tabs at once. No need to switch tabs one by one — scan all open tabs simultaneously and download everything in one go. Perfect for research, shopping, or content curation across multiple pages.
+
 🤖 AI Image Tagging (NEW!)
 
 Generate smart tags for any image using AI — instantly know what's in each image without opening it. Tag individual images or batch-tag your entire selection at once. Filter and search images by their AI-generated tags. Free users get a daily quota; Pro users enjoy unlimited tagging.
@@ -20,22 +36,6 @@ Send images directly to Eagle — the popular design asset management app. Each 
 ⚡ Batch Operations (NEW!)
 
 Select multiple images and perform actions in bulk: batch favorite (add to collection), batch AI tag, and batch delete. No more one-by-one clicking — streamline your workflow when dealing with large image sets.
-
-🔍 Smart Image Extraction
-
-Automatically finds every image on any webpage — including standard images, CSS backgrounds, responsive images, and high-resolution variants. Scans deep into Shadow DOM and iframes for complete coverage. Live monitoring detects new images as you scroll (Pro).
-
-🎛️ Powerful Filtering & Sorting
-
-Filter by size (Small/Medium/Large/XL/Custom), format (JPG/PNG/WebP/SVG/GIF), layout (Square/Landscape/Portrait/Panorama), or URL keywords. Smart grouping by Domain, Format, Size Range, or Tab (Pro). Sort by size, format, or natural order.
-
-📥 Batch Download Images
-
-Download individual images or batch download multiple images as a single ZIP file. Track download progress with a visual progress bar. Free users can download up to 30 images per batch; Pro users enjoy unlimited batch downloads.
-
-🌐 Multi-Tab Extract
-
-Extract images from multiple browser tabs at once. No need to switch tabs one by one — scan all open tabs simultaneously and download everything in one go. Perfect for research, shopping, or content curation across multiple pages.
 
 🔎 Similar Image Detection
 
