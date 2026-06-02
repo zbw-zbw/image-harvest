@@ -92,6 +92,8 @@
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
 - **🤖 AI Image Tagging** — generate smart content-based tags for any image using AI. Tag single images or batch-tag your entire selection. Free users get a daily quota; Pro users enjoy unlimited tagging.
+- **🦅 Export to Eagle** — one-click export images (with metadata, AI tags, and source URL) to Eagle app. Supports batch export of selected images.
+- **⚡ Batch Operations** — new batch action buttons when images are selected: batch favorite, batch AI tag, and batch delete. Streamlines bulk workflows.
 - **🔎 AI Tag Filtering** — search and filter images by their AI-generated tags directly from the toolbar.
 - **🐛 Tab-switch stability** — fixed dropdown menus staying open, image list re-rendering on reverse-search return, loading states getting stuck, and status count animations flashing on tab switch.
 - **🎯 Anonymous opt-in telemetry** — understand which features matter most while keeping every URL, image, and identifier strictly local. One toggle in **Settings → Help Improve**, off by default until you opt in.
@@ -155,6 +157,19 @@
 - **Batch tagging** — select multiple images and tag them all at once
 - **Tag-based filtering** — search and filter your image list by AI-generated tags
 - Free users get a daily quota; Pro users enjoy unlimited tagging
+
+### 🦅 Export to Eagle
+
+- **One-click export** — send images directly to Eagle (the popular design asset manager) with metadata, AI tags, and source URL
+- **Batch export** — export all selected images at once
+- Free users can export up to 5 images; Pro users enjoy unlimited exports
+
+### ⚡ Batch Operations
+
+- **Batch favorite** — add multiple selected images to your collection at once
+- **Batch AI tag** — generate AI tags for all selected images in one click
+- **Batch delete** — remove unwanted images from the list in bulk
+- Action buttons appear automatically when images are selected
 
 ### 🔎 Reverse Image Search
 

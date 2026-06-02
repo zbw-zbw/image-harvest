@@ -65,6 +65,8 @@ HOW TO ADD A NEW RELEASE ENTRY
 - **AI Image Tagging**: Generate smart tags for images using AI — helps you find and organize images by content. Free users get a daily quota; Pro users enjoy unlimited tagging.
 - **Batch AI Tagging**: Tag multiple selected images at once with a single click.
 - **AI Tag Filtering**: Filter images by AI-generated tags in the search/filter toolbar.
+- **Export to Eagle**: One-click export images (with metadata, tags, and source URL) to Eagle — the popular design asset management app. Supports batch export of selected images. Free users can export up to 5 images; Pro users enjoy unlimited exports.
+- **Batch Operations Toolbar**: New batch action buttons appear when images are selected — batch favorite (add to collection), batch AI tag, and batch delete. Streamlines bulk workflows without opening menus.
 
 ### 🐛 Fixed
 

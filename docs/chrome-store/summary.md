@@ -7,10 +7,10 @@
 ## English (current, 132 chars max)
 
 ```
-AI image tagging, batch download, multi-tab extract, similar detection, reverse search, collections, color extract. All-in-one.
+AI tagging, Eagle export, batch ops, multi-tab extract, similar detection, reverse search, collections, color extract. All-in-one.
 ```
 
-字符数：**127 / 132** ✅
+字符数：**131 / 132** ✅
 
 ---
 

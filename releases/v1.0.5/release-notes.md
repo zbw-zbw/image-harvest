@@ -15,6 +15,15 @@ Generate smart tags for any image using AI. Helps you find, organize, and filter
 • Batch tagging: select multiple images → tag them all at once
 • Tag filtering: search and filter images by their AI-generated tags
 
+🦅 Export to Eagle (NEW!)
+Send images directly to Eagle with metadata, AI tags, and source URL. Batch export all selected images at once. Free: up to 5 images; Pro: unlimited.
+
+⚡ Batch Operations (NEW!)
+Select images → perform bulk actions instantly:
+• Batch favorite (add to collection)
+• Batch AI tag
+• Batch delete
+
 🐛 Bug Fixes
 • Dropdown menus (reverse search & download format) now close immediately after clicking
 • Switching to a reverse-image-search tab and back no longer resets scroll position
@@ -63,11 +72,13 @@ Generate smart tags for any image using AI. Helps you find, organize, and filter
 
 ### ✨ New Features
 
-| Area             | Change                                                         |
-| ---------------- | -------------------------------------------------------------- |
-| AI Image Tagging | Generate smart content-based tags for images using AI          |
-| Batch AI Tagging | Tag multiple selected images in one click                      |
-| AI Tag Filtering | Filter/search images by their AI-generated tags in the toolbar |
+| Area             | Change                                                                       |
+| ---------------- | ---------------------------------------------------------------------------- |
+| AI Image Tagging | Generate smart content-based tags for images using AI                        |
+| Batch AI Tagging | Tag multiple selected images in one click                                    |
+| AI Tag Filtering | Filter/search images by their AI-generated tags in the toolbar               |
+| Export to Eagle  | One-click export images (with metadata, AI tags, source URL) to Eagle app    |
+| Batch Operations | Batch favorite, batch AI tag, batch delete — bulk actions on selected images |
 
 ### 🐛 Bug Fixes
 

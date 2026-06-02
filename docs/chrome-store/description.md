@@ -13,6 +13,14 @@
 
 Generate smart tags for any image using AI — instantly know what's in each image without opening it. Tag individual images or batch-tag your entire selection at once. Filter and search images by their AI-generated tags. Free users get a daily quota; Pro users enjoy unlimited tagging.
 
+🦅 Export to Eagle (NEW!)
+
+Send images directly to Eagle — the popular design asset management app. Each export includes the image, metadata, AI tags, and source URL so your Eagle library stays organized. Batch export all selected images at once. Free users can export up to 5 images; Pro users enjoy unlimited exports.
+
+⚡ Batch Operations (NEW!)
+
+Select multiple images and perform actions in bulk: batch favorite (add to collection), batch AI tag, and batch delete. No more one-by-one clicking — streamline your workflow when dealing with large image sets.
+
 🔍 Smart Image Extraction
 
 Automatically finds every image on any webpage — including standard images, CSS backgrounds, responsive images, and high-resolution variants. Scans deep into Shadow DOM and iframes for complete coverage. Live monitoring detects new images as you scroll (Pro).
@@ -73,6 +81,8 @@ Try every Pro feature free for 7 days — no credit card required. Experience un
 
 ⚡ PRO unlocks:
 • Unlimited AI image tagging
+• Unlimited Eagle export
+• Batch operations (favorite, AI tag, delete)
 • Unlimited batch ZIP downloads
 • Format conversion (PNG/JPG/WebP)
 • Custom naming templates
