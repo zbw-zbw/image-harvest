@@ -60,3 +60,4 @@ dist/
 
 # sync cloud
 sync-code.mjs
+dist.zip
