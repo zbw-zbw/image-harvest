@@ -207,8 +207,10 @@ export function ImageCard({ img, index }: Props) {
 
   // ── Dropup: auto-flip dropdown direction when near viewport bottom ──
   const handleDropdownHover = (e: MouseEvent) => {
-    const group = (e.currentTarget as HTMLElement);
-    const dropdown = group.querySelector('.card-dl-dropdown, .card-search-dropdown') as HTMLElement | null;
+    const group = e.currentTarget as HTMLElement;
+    const dropdown = group.querySelector(
+      '.card-dl-dropdown, .card-search-dropdown'
+    ) as HTMLElement | null;
     if (!dropdown) return;
     const rect = group.getBoundingClientRect();
     const spaceBelow = window.innerHeight - rect.bottom;

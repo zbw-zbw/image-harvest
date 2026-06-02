@@ -88,9 +88,10 @@ export function DownloadLabel() {
   // When images are selected, the i18n string already includes the count
   // (e.g. "下载 (7)"), so we only add a separate count for the unselected
   // "download all" state where the base label is just "下载".
-  const textLabel = selectedSize > 0
-    ? t('toolbar_download_selected', { count: selectedSize })
-    : t('toolbar_download_all');
+  const textLabel =
+    selectedSize > 0
+      ? t('toolbar_download_selected', { count: selectedSize })
+      : t('toolbar_download_all');
   const countLabel = selectedSize === 0 && filteredCount > 0 ? ` (${filteredCount})` : '';
   return (
     <span id="download-label">
