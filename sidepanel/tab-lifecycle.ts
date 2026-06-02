@@ -27,6 +27,30 @@ export function isWithinTabSwitchGrace(): boolean {
   return Date.now() - lastTabSwitchTime < TIMING.TAB_SWITCH_GRACE_MS;
 }
 
+// Origin of our own extension pages (e.g. reverse-search.html). Used to
+// detect the transient reverse-search tab so tab-switch handlers can ignore
+// it instead of clearing/rescanning the current tab's image list.
+const OWN_EXTENSION_ORIGIN = (() => {
+  try {
+    return chrome.runtime?.getURL?.('') || '';
+  } catch {
+    return '';
+  }
+})();
+
+/**
+ * True when the URL points to one of our own extension pages. Reverse-search
+ * opens such a page in a new active tab; switching focus to it must NOT touch
+ * the current tab's image state (otherwise returning re-renders the list and
+ * resets the scroll position, and scanning the extension page can hang the
+ * grid in a permanent loading state).
+ */
+function isOwnExtensionTab(tab: chrome.tabs.Tab | undefined): boolean {
+  if (!tab) return false;
+  const url = tab.pendingUrl || tab.url || '';
+  return !!OWN_EXTENSION_ORIGIN && url.startsWith(OWN_EXTENSION_ORIGIN);
+}
+
 export async function loadCurrentTab(forceRescan = false, targetTabId?: number): Promise<void> {
   let activeTab: chrome.tabs.Tab | undefined;
   try {
@@ -164,6 +188,21 @@ export async function loadCurrentTab(forceRescan = false, targetTabId?: number):
 export async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Promise<void> {
   if (!chrome.runtime?.id) return;
   const newTabId = activeInfo.tabId;
+
+  // Ignore activation of our own extension pages (e.g. the transient
+  // reverse-search tab opened by "search by image"). Switching to it must
+  // not clear or rescan the current tab's images — otherwise returning
+  // triggers a full re-render (scroll resets to top) and scanning the
+  // extension page can leave the grid stuck in a loading state.
+  // We only have the tabId here, so resolve the URL first. We do NOT save
+  // or mutate any state before this check resolves.
+  try {
+    const activatedTab = await chrome.tabs.get(newTabId);
+    if (isOwnExtensionTab(activatedTab)) return;
+  } catch {
+    // Tab may have been closed already — fall through to normal handling.
+  }
+
   // Save current tab state to cache before switching
   if (state.currentTabId != null && state.currentTabId !== newTabId) {
     const cachedUrl = state.tabCache.get(state.currentTabId)?.url || '';

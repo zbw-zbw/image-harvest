@@ -344,6 +344,18 @@
   bottom: -8px;
 }
 
+/* ── Dismissed: force-hide the dropdown right after a click ──────────
+   The menu is :hover-driven, so clicking the trigger/item leaves the
+   cursor inside the group and the menu would stay open. JS adds
+   .dropdown-dismissed on click and removes it on mouseleave, so this
+   must override the :hover rule above (hence the !important). */
+.card-search-group.dropdown-dismissed .card-search-dropdown,
+.card-dl-group.dropdown-dismissed .card-dl-dropdown {
+  opacity: 0 !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+}
+
 .card-action-btn {
   width: 28px;
   height: 28px;

@@ -208,6 +208,9 @@ export function ImageCard({ img, index }: Props) {
   // ── Dropup: auto-flip dropdown direction when near viewport bottom ──
   const handleDropdownHover = (e: MouseEvent) => {
     const group = e.currentTarget as HTMLElement;
+    // Re-entering the group should clear any leftover "dismissed" state so
+    // hovering can re-open the dropdown after a previous click closed it.
+    group.classList.remove('dropdown-dismissed');
     const dropdown = group.querySelector(
       '.card-dl-dropdown, .card-search-dropdown'
     ) as HTMLElement | null;
@@ -217,6 +220,22 @@ export function ImageCard({ img, index }: Props) {
     // Estimate dropdown height; 200px is a safe upper bound for 4-5 items
     const needsFlip = spaceBelow < 200;
     dropdown.classList.toggle('dropup', needsFlip);
+  };
+
+  // ── Dismiss: hide the dropdown immediately after a click ──
+  // The dropdown is pure-CSS :hover driven, so after clicking the trigger
+  // button or a menu item the cursor is still inside the group and the menu
+  // stays open. We add `.dropdown-dismissed` to force-hide it; handleDropdownHover
+  // (onMouseEnter, fires again only after leaving + re-entering) clears it.
+  const dismissDropdown = (e: MouseEvent) => {
+    const group = (e.currentTarget as HTMLElement).closest(
+      '.card-search-group, .card-dl-group'
+    ) as HTMLElement | null;
+    group?.classList.add('dropdown-dismissed');
+  };
+
+  const handleGroupMouseLeave = (e: MouseEvent) => {
+    (e.currentTarget as HTMLElement).classList.remove('dropdown-dismissed');
   };
 
   // ── Handlers ──────────────────────────────────────────────────────────
@@ -431,26 +450,57 @@ export function ImageCard({ img, index }: Props) {
           {size && <span class="card-tag filesize">{size}</span>}
         </div>
         <div class="card-actions">
-          <div class="card-search-group" onMouseEnter={handleDropdownHover}>
+          <div
+            class="card-search-group"
+            onMouseEnter={handleDropdownHover}
+            onMouseLeave={handleGroupMouseLeave}
+          >
             <button
               class="card-action-btn btn-search"
               title={t('card_tooltip_search')}
               data-url={img.url}
-              onClick={handleReverseSearch('google')}
+              onClick={(e) => {
+                dismissDropdown(e);
+                handleReverseSearch('google')(e);
+              }}
             >
               <IconSearch />
             </button>
             <div class="card-search-dropdown">
-              <div class="dropdown-item active" onClick={handleReverseSearch('google')}>
+              <div
+                class="dropdown-item active"
+                onClick={(e) => {
+                  dismissDropdown(e);
+                  handleReverseSearch('google')(e);
+                }}
+              >
                 {t('search_engine_google')}
               </div>
-              <div class="dropdown-item" onClick={handleReverseSearch('tineye')}>
+              <div
+                class="dropdown-item"
+                onClick={(e) => {
+                  dismissDropdown(e);
+                  handleReverseSearch('tineye')(e);
+                }}
+              >
                 {t('search_engine_tineye')}
               </div>
-              <div class="dropdown-item" onClick={handleReverseSearch('yandex')}>
+              <div
+                class="dropdown-item"
+                onClick={(e) => {
+                  dismissDropdown(e);
+                  handleReverseSearch('yandex')(e);
+                }}
+              >
                 {t('search_engine_yandex')} <span class="pro-badge pro-badge-mini">PRO</span>
               </div>
-              <div class="dropdown-item" onClick={handleReverseSearch('baidu')}>
+              <div
+                class="dropdown-item"
+                onClick={(e) => {
+                  dismissDropdown(e);
+                  handleReverseSearch('baidu')(e);
+                }}
+              >
                 {t('search_engine_baidu')} <span class="pro-badge pro-badge-mini">PRO</span>
               </div>
             </div>
@@ -496,26 +546,57 @@ export function ImageCard({ img, index }: Props) {
           >
             <IconTrash />
           </button>
-          <div class="card-dl-group" onMouseEnter={handleDropdownHover}>
+          <div
+            class="card-dl-group"
+            onMouseEnter={handleDropdownHover}
+            onMouseLeave={handleGroupMouseLeave}
+          >
             <button
               class="card-action-btn btn-dl"
               title={t('card_tooltip_download')}
               data-id={img.id}
-              onClick={handleDownload}
+              onClick={(e) => {
+                dismissDropdown(e);
+                handleDownload(e);
+              }}
             >
               <IconDownload />
             </button>
             <div class="card-dl-dropdown">
-              <div class="dropdown-item active" onClick={handleDownloadFormat('original')}>
+              <div
+                class="dropdown-item active"
+                onClick={(e) => {
+                  dismissDropdown(e);
+                  handleDownloadFormat('original')(e);
+                }}
+              >
                 {t('format_original') || 'Original'}
               </div>
-              <div class="dropdown-item" onClick={handleDownloadFormat('png')}>
+              <div
+                class="dropdown-item"
+                onClick={(e) => {
+                  dismissDropdown(e);
+                  handleDownloadFormat('png')(e);
+                }}
+              >
                 PNG <span class="pro-badge pro-badge-mini">PRO</span>
               </div>
-              <div class="dropdown-item" onClick={handleDownloadFormat('jpg')}>
+              <div
+                class="dropdown-item"
+                onClick={(e) => {
+                  dismissDropdown(e);
+                  handleDownloadFormat('jpg')(e);
+                }}
+              >
                 JPG <span class="pro-badge pro-badge-mini">PRO</span>
               </div>
-              <div class="dropdown-item" onClick={handleDownloadFormat('webp')}>
+              <div
+                class="dropdown-item"
+                onClick={(e) => {
+                  dismissDropdown(e);
+                  handleDownloadFormat('webp')(e);
+                }}
+              >
                 WebP <span class="pro-badge pro-badge-mini">PRO</span>
               </div>
             </div>
