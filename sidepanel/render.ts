@@ -14,6 +14,7 @@ import {
   filterBySize,
   filterByType,
   filterByUrl,
+  filterByVisibility,
   sortImages,
 } from './filter';
 import { elements, state } from './state';
@@ -38,6 +39,7 @@ export function renderProgressiveImages(): void {
   // to re-render via its store subscription — no manual innerHTML write.
   state.filteredImages = state.allImages.filter((img) => {
     return (
+      filterByVisibility(img) &&
       filterBySize(img) &&
       filterByType(img) &&
       filterByLayout(img) &&
@@ -53,12 +55,18 @@ export function renderProgressiveImages(): void {
   // Compute remaining skeleton slots so the grid stays visually full while
   // discovery continues. <ImageGrid> renders trailing <SkeletonCard> nodes
   // up to scanSkeletonsToShow.
-  const isListView = elements.imageGrid.classList.contains('list-view');
-  const gridWrapper = document.querySelector('.image-grid-wrapper') as HTMLElement | null;
-  const measured = gridWrapper?.clientHeight || 0;
-  const containerHeight = measured > 200 ? measured : 800;
-  const totalSlots = calcSkeletonCount(containerHeight, isListView);
-  state.scanSkeletonsToShow = Math.max(0, totalSlots - state.filteredImages.length);
+  // When scanning is already complete, clear skeletons immediately to avoid
+  // stale placeholders when filtered images are fewer than total slots.
+  if (!state.scanProgress.visible) {
+    state.scanSkeletonsToShow = 0;
+  } else {
+    const isListView = elements.imageGrid.classList.contains('list-view');
+    const gridWrapper = document.querySelector('.image-grid-wrapper') as HTMLElement | null;
+    const measured = gridWrapper?.clientHeight || 0;
+    const containerHeight = measured > 200 ? measured : 800;
+    const totalSlots = calcSkeletonCount(containerHeight, isListView);
+    state.scanSkeletonsToShow = Math.max(0, totalSlots - state.filteredImages.length);
+  }
 
   elements.imageGrid.classList.remove('hidden');
   // Scroll to top so the user always sees images from the beginning

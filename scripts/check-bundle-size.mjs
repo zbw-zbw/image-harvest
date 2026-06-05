@@ -38,7 +38,10 @@ const BUDGETS = {
   // storeHook useLayoutEffect fix, onLocaleChange enhancements) ~76 kB.
   // Bumped 90 → 95 kB for v1.0.5: sidepanel component/locale/style updates
   // pushed init to ~92 kB gzip; growth accepted intentionally, ~3 kB headroom.
-  'init.js': { gzipKb: 95, label: 'sidepanel main' },
+  // Bumped 95 → 115 kB for v1.0.6: referral system, feature-quota soft limits,
+  // remote-config, QuotaDisplay, ReferralBanner, visibility filter pushed init
+  // to ~106 kB gzip; growth accepted — new user-facing features, ~9 kB headroom.
+  'init.js': { gzipKb: 115, label: 'sidepanel main' },
   // Background service worker entry. Currently ~5.6 kB gzip.
   'index.ts.js': { gzipKb: 12, label: 'background SW' },
   // Content script entry. Currently ~7.7 kB gzip.

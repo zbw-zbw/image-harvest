@@ -19,7 +19,6 @@ import {
   isOwnExtensionUrl,
   isIgnoredExtensionTab,
   markIgnoredExtensionTab,
-  forgetIgnoredExtensionTab,
 } from './reverse-search-tabs';
 // Module-level rescan debounce timer
 let tabUpdatedTimer: ReturnType<typeof setTimeout> | null = null;
@@ -98,12 +97,12 @@ export async function loadCurrentTab(forceRescan = false, targetTabId?: number):
       } else if (!state.isInitialized) {
         state.lastRenderedFilteredIds = null;
         renderImages({ skipScrollReset: true });
-      } else {
       }
+      // Already initialized with valid filtered images — no action needed.
       updateSelectionUI();
       return;
-    } else {
     }
+    // No in-memory cache hit — fall through to session storage / full scan.
   }
 
   // Check session storage cache (survives popup/sidepanel close-reopen)
@@ -147,8 +146,8 @@ export async function loadCurrentTab(forceRescan = false, targetTabId?: number):
       // not persisted in the session-storage cache.
       processImageExtras(state.allImages);
       return;
-    } else {
     }
+    // No session cache hit — fall through to full scan.
   }
 
   // No cache available — full scan with loading UI.

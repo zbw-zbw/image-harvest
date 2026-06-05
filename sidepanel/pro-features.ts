@@ -1,5 +1,5 @@
 import { collectionAdd, collectionGetAll, collectionRemove } from '../shared/collection';
-import { FREE_LIMITS } from '../shared/constants';
+import { getFreeLimits } from '../shared/constants';
 import { t } from '../shared/i18n';
 import { track } from '../shared/telemetry';
 import { EVENTS } from '../shared/telemetry-events';
@@ -7,17 +7,30 @@ import { hammingDistance } from '../shared/phash';
 import type { CollectionItem, ImageItem } from '../shared/types';
 import { applyFilters } from './filter';
 import { showProUpgradeModal } from './settings';
-import { elements, state } from './state';
+import { state } from './state';
 import { showToast } from './ui';
 // ============================================
 // Similar Image Detection (Pro)
 // ============================================
 export function detectSimilarImages(): void {
-  const withHash = state.allImages.filter((img) => img.phash);
-  if (withHash.length < 2) return;
+  const allImages = state.allImages;
+  const withHash = allImages.filter((img) => img.phash);
 
-  const HASH_THRESHOLD = 5;
-  const ASPECT_RATIO_TOLERANCE = 0.15;
+  // Phase 1: URL-based similarity — strip size/resolution params and group
+  // images whose base URLs match. This catches srcset variants that share
+  // the same origin image but differ only by a width/height query param.
+  const urlGroups = new Map<string, ImageItem[]>();
+  for (const img of allImages) {
+    const baseUrl = normalizeImageUrl(img.url);
+    const existing = urlGroups.get(baseUrl);
+    if (existing) existing.push(img);
+    else urlGroups.set(baseUrl, [img]);
+  }
+
+  if (withHash.length < 2 && [...urlGroups.values()].every((g) => g.length < 2)) return;
+
+  const HASH_THRESHOLD = 10;
+  const ASPECT_RATIO_TOLERANCE = 0.25;
 
   function getAspectRatio(img: ImageItem): number {
     const width = img.naturalWidth || img.displayWidth || 0;
@@ -33,22 +46,34 @@ export function detectSimilarImages(): void {
   }
 
   const groups: ImageItem[][] = [];
+  const usedIds = new Set<string>();
+
+  // Phase 1 results: URL-based groups
+  for (const [, urlGroup] of urlGroups) {
+    if (urlGroup.length > 1) {
+      groups.push(urlGroup);
+      for (const img of urlGroup) usedIds.add(img.id);
+    }
+  }
+
+  // Phase 2: pHash-based similarity (only for images not already grouped)
+  const remaining = withHash.filter((img) => !usedIds.has(img.id));
   const used = new Set<number>();
 
-  for (let i = 0; i < withHash.length; i++) {
+  for (let i = 0; i < remaining.length; i++) {
     if (used.has(i)) continue;
-    const group: ImageItem[] = [withHash[i]];
-    const baseRatio = getAspectRatio(withHash[i]);
+    const group: ImageItem[] = [remaining[i]];
+    const baseRatio = getAspectRatio(remaining[i]);
 
-    for (let j = i + 1; j < withHash.length; j++) {
+    for (let j = i + 1; j < remaining.length; j++) {
       if (used.has(j)) continue;
-      const candidateRatio = getAspectRatio(withHash[j]);
-      const isSimilarToAll = group.every((member) => {
-        const dist = hammingDistance(member.phash!, withHash[j].phash!);
+      const candidateRatio = getAspectRatio(remaining[j]);
+      const isSimilarToAny = group.some((member) => {
+        const dist = hammingDistance(member.phash!, remaining[j].phash!);
         return dist <= HASH_THRESHOLD;
       });
-      if (isSimilarToAll && areAspectRatiosSimilar(baseRatio, candidateRatio)) {
-        group.push(withHash[j]);
+      if (isSimilarToAny && areAspectRatiosSimilar(baseRatio, candidateRatio)) {
+        group.push(remaining[j]);
         used.add(j);
       }
     }
@@ -59,18 +84,54 @@ export function detectSimilarImages(): void {
     }
   }
 
-  // Assign the final result in one shot so the Proxy set trap fires and
-  // notifies selector subscribers (e.g. SimilarInline Preact component).
-  // Using state.similarGroups.push() would mutate the array in place
-  // without triggering the Proxy, leaving Preact components stale.
   state.similarGroups = groups;
+}
 
-  // similarCount is now a Preact component (StatusCounts.SimilarCount)
-  // subscribed to state.similarGroups.length.
-
-  // Similar button is now always visible in the status bar. The badge
-  // count is Preact-managed (SimilarCount) and auto-hides when 0.
-  // No imperative DOM toggling needed.
+/** Strip common size/resolution query parameters from image URLs to produce
+ *  a normalized base URL for comparison. This helps detect srcset variants
+ *  (e.g. ?w=200 vs ?w=800) as duplicates. */
+function normalizeImageUrl(url: string): string {
+  try {
+    const parsed = new URL(url);
+    // Remove common CDN size/quality params
+    for (const param of [
+      'w',
+      'h',
+      'width',
+      'height',
+      'size',
+      'resize',
+      'quality',
+      'q',
+      'dpr',
+      'fit',
+      'crop',
+      'sz',
+      's',
+      'dim',
+      'auto',
+      'format',
+      'fm',
+    ]) {
+      parsed.searchParams.delete(param);
+    }
+    // Remove trailing size suffix patterns like -200x300, _200x300
+    parsed.pathname = parsed.pathname.replace(/[-_]\d+x\d+(?=\.\w+$)/, '');
+    // Remove size in path segments like /32x32/ or /icon-32x32/
+    parsed.pathname = parsed.pathname.replace(/[-_]?\d+x\d+\/?/g, '/');
+    // Normalize social sharing image variants (opengraph-image, twitter-image,
+    // og-image, etc.) to a common key so visually identical share images with
+    // different paths are grouped together.
+    parsed.pathname = parsed.pathname.replace(
+      /\/(opengraph-image|twitter-image|og-image|og_image|twitter_image)(?=\/?$|\?)/,
+      '/__social-image__'
+    );
+    // Collapse repeated slashes
+    parsed.pathname = parsed.pathname.replace(/\/+/g, '/');
+    return parsed.toString();
+  } catch {
+    return url;
+  }
 }
 
 // ── Dedup modal — lazy loaded ──────────────────────────────────────────────
@@ -80,6 +141,18 @@ export function detectSimilarImages(): void {
 // rendering + bulk removal pipeline is split out to ./dedup-ui.
 /** Lazy entry: triggered by the "Dedup" toolbar button. */
 export async function showDedupModal(): Promise<void> {
+  if (!state.isProUser) {
+    const { checkFeatureQuota } = await import('../shared/feature-quota');
+    const { allowed, limit } = await checkFeatureQuota('dedup');
+    if (!allowed) {
+      showToast(
+        t('quota_exhausted_monthly', { feature: t('feature_dedup'), limit: String(limit) }),
+        'warning'
+      );
+      showProUpgradeModal();
+      return;
+    }
+  }
   const mod = await import('./dedup-ui');
   mod.showDedupModal();
 }
@@ -123,7 +196,7 @@ export function removeImageById(imageId: string): void {
     next.delete(imageId);
     state.selectedImages = next;
   }
-  applyFilters();
+  applyFilters({ skipScrollReset: true });
   detectSimilarImages();
   showToast(t('toast_image_removed'), 'success');
 }
@@ -143,8 +216,11 @@ export async function addToCollection(img: ImageItem): Promise<void> {
     }
 
     if (!state.isProUser) {
-      if (all.length >= FREE_LIMITS.MAX_COLLECTION_ITEMS) {
-        showToast(t('toast_collection_limit'), 'warning');
+      if (all.length >= getFreeLimits().MAX_COLLECTION_ITEMS) {
+        showToast(
+          t('toast_collection_limit', { max: getFreeLimits().MAX_COLLECTION_ITEMS }),
+          'warning'
+        );
         void track(EVENTS.COLLECTION_FULL);
         showProUpgradeModal();
         return;
@@ -267,6 +343,18 @@ export function closeMultiTabModal(): void {
  * users who never click this).
  */
 export async function showMultiTabModal(): Promise<void> {
+  if (!state.isProUser) {
+    const { checkFeatureQuota } = await import('../shared/feature-quota');
+    const { allowed, limit } = await checkFeatureQuota('multiTab');
+    if (!allowed) {
+      showToast(
+        t('quota_exhausted_monthly', { feature: t('feature_multitab'), limit: String(limit) }),
+        'warning'
+      );
+      showProUpgradeModal();
+      return;
+    }
+  }
   const mod = await import('./multitab');
   mod.showMultiTabModal();
 }

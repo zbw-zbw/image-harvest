@@ -1,6 +1,6 @@
 // Display mode control (side panel vs popup).
 import { getAppSettings } from '../shared/storage';
-import { sidePanelOpenedTabs, uiPorts } from './utils';
+import { sidePanelOpenedTabs } from './utils';
 
 /** Configure the action surface (side panel vs popup) on startup. */
 export async function initDisplayMode(): Promise<void> {

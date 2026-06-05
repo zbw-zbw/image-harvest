@@ -13,7 +13,7 @@
 // resolve it locally with useEffect and keep it in component state.
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { t } from '../../shared/i18n';
-import { MESSAGE_TYPES, FREE_LIMITS } from '../../shared/constants';
+import { MESSAGE_TYPES, getFreeLimits } from '../../shared/constants';
 import type { ImageItem } from '../../shared/types';
 import {
   copyImageUrl,
@@ -38,7 +38,9 @@ import { useStoreSelector } from './storeHook';
 import { state } from '../state';
 import { applyFilters } from '../filter';
 import { saveAiTags } from '../../shared/ai-tags-store';
-import { getRemainingDailyFreeAiTags } from '../../shared/ai-free-quota';
+import { getRemainingMonthlyFreeAiTags } from '../../shared/ai-free-quota';
+import { track } from '../../shared/telemetry';
+import { EVENTS } from '../../shared/telemetry-events';
 
 interface Props {
   img: ImageItem;
@@ -253,7 +255,7 @@ export function ImageCard({ img, index }: Props) {
     e.stopPropagation();
     if (
       !state.isProUser &&
-      !(FREE_LIMITS.REVERSE_SEARCH_ENGINES as readonly string[]).includes(engine)
+      !(getFreeLimits().REVERSE_SEARCH_ENGINES as readonly string[]).includes(engine)
     ) {
       showToast(t('pro_feature_blocked_reverse_search', { engine }), 'warning');
       showProUpgradeModal();
@@ -325,9 +327,13 @@ export function ImageCard({ img, index }: Props) {
   const handleAiTag = async (e: MouseEvent) => {
     e.stopPropagation();
     if (!isProUser) {
-      const freeRemaining = await getRemainingDailyFreeAiTags();
+      const freeRemaining = await getRemainingMonthlyFreeAiTags();
       if (freeRemaining <= 0) {
-        showToast(t('toast_ai_daily_limit'), 'warning');
+        showToast(
+          t('toast_ai_monthly_limit', { max: getFreeLimits().MAX_MONTHLY_AI_TAGS }),
+          'warning'
+        );
+        void track(EVENTS.AI_FREE_MONTHLY_LIMIT);
         showProUpgradeModal();
         return;
       }
@@ -349,6 +355,7 @@ export function ImageCard({ img, index }: Props) {
     }
     setIsAiTagging(true);
     showToast(t('toast_ai_tagging'), 'info');
+    void track(EVENTS.AI_TAG_REQUESTED);
     try {
       const resp = await chrome.runtime.sendMessage({
         type: MESSAGE_TYPES.AI_TAG_IMAGE,
@@ -363,19 +370,35 @@ export function ImageCard({ img, index }: Props) {
         if (typeof resp.quotaRemaining === 'number') {
           state.aiQuotaRemaining = resp.quotaRemaining;
         }
-        showToast(t('toast_ai_tag_success'), 'success');
+        if (isProUser && typeof resp.quotaRemaining === 'number') {
+          showToast(`${t('toast_ai_tag_success')} (${resp.quotaRemaining} remaining)`, 'success');
+        } else {
+          const freeLeft = await getRemainingMonthlyFreeAiTags();
+          showToast(
+            `${t('toast_ai_tag_success')} (${freeLeft}/${getFreeLimits().MAX_MONTHLY_AI_TAGS} remaining)`,
+            'success'
+          );
+        }
+        void track(EVENTS.AI_TAG_COMPLETED, { tagCount: resp.tags.length });
       } else if (resp?.error === 'quota_exceeded') {
         showToast(t('toast_ai_quota_exhausted'), 'warning');
+        void track(EVENTS.AI_QUOTA_EXHAUSTED);
       } else if (resp?.error?.includes('too small')) {
         showToast(t('toast_ai_tag_too_small'), 'warning');
-      } else if (resp?.error === 'daily_limit') {
-        showToast(t('toast_ai_daily_limit'), 'warning');
+      } else if (resp?.error === 'monthly_limit') {
+        showToast(
+          t('toast_ai_monthly_limit', { max: getFreeLimits().MAX_MONTHLY_AI_TAGS }),
+          'warning'
+        );
+        void track(EVENTS.AI_FREE_MONTHLY_LIMIT);
         showProUpgradeModal();
       } else {
         showToast(t('toast_ai_tag_failed'), 'error');
+        void track(EVENTS.AI_TAG_FAILED, { reason: resp?.error || 'unknown' });
       }
-    } catch {
+    } catch (err) {
       showToast(t('toast_ai_tag_failed'), 'error');
+      void track(EVENTS.AI_TAG_FAILED, { reason: (err as Error).message || 'exception' });
     } finally {
       setIsAiTagging(false);
     }

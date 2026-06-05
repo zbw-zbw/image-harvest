@@ -33,6 +33,8 @@ export interface ImageItem {
   phash?: string | null;
   /** AI-generated category tags (e.g. "photo", "icon", "logo") */
   aiTags?: string[];
+  /** Whether the image element is visible in the page viewport */
+  visible?: boolean;
 }
 
 // ── App settings (persisted to chrome.storage.local) ────────────────────────

@@ -59,7 +59,7 @@ export function DedupModal() {
               <rect x="14" y="14" width="8" height="8" rx="1" />
               <path d="M12 2v8M2 12h8M14 12h8M12 14v8" />
             </svg>
-            {t('dedup_modal_title')} <span class="pro-badge">PRO</span>
+            {t('dedup_modal_title')}
           </h2>
           <button id="btn-dedup-close" class="icon-btn" onClick={close}>
             <svg

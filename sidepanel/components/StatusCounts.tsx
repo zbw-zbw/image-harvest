@@ -92,7 +92,10 @@ export function DownloadLabel() {
     selectedSize > 0
       ? t('toolbar_download_selected', { count: selectedSize })
       : t('toolbar_download_all');
-  const countLabel = selectedSize === 0 && filteredCount > 0 ? ` (${filteredCount})` : '';
+  // Show count in .btn-count only for the "download all" state — when
+  // images are selected, the i18n textLabel already includes the count.
+  // .btn-count remains visible on narrow viewports where .btn-label is hidden.
+  const countLabel = selectedSize > 0 ? '' : filteredCount > 0 ? `(${filteredCount})` : '';
   return (
     <span id="download-label">
       <span class="btn-label">{textLabel}</span>

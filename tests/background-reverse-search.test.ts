@@ -81,11 +81,13 @@ describe('fetchImageData', () => {
     expect(fetchCalls[0]?.init?.headers).toEqual({ Accept: 'image/*' });
   });
 
-  it('falls back to image/png when the response omits Content-Type', async () => {
+  it('detects PNG from magic bytes when the response omits Content-Type', async () => {
+    // PNG magic bytes: 89 50 4E 47
+    const pngMagic = new Uint8Array([0x89, 0x50, 0x4e, 0x47, 0x0d, 0x0a, 0x1a, 0x0a]);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (globalThis as any).fetch = vi.fn(async () =>
       makeResponse({
-        body: new Uint8Array([0x41]).buffer,
+        body: pngMagic.buffer,
         headers: {}, // no Content-Type
       })
     );
@@ -93,6 +95,18 @@ describe('fetchImageData', () => {
     const dataUrl = await fetchImageData('https://x.com/a');
 
     expect(dataUrl.startsWith('data:image/png;base64,')).toBe(true);
+  });
+
+  it('throws "Response is not an image" when bytes have no image magic and no Content-Type', async () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (globalThis as any).fetch = vi.fn(async () =>
+      makeResponse({
+        body: new Uint8Array([0x41]).buffer,
+        headers: {}, // no Content-Type, no image magic
+      })
+    );
+
+    await expect(fetchImageData('https://x.com/a')).rejects.toThrow('Response is not an image');
   });
 
   it('throws "HTTP <status>" when the response is not ok', async () => {

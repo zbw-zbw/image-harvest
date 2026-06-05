@@ -87,7 +87,19 @@ export const EVENTS = {
   COLLECTION_DUPLICATE: 'collection_duplicate',
 
   // Free tier limits
-  AI_FREE_DAILY_LIMIT: 'ai_free_daily_limit',
+  AI_FREE_MONTHLY_LIMIT: 'ai_free_monthly_limit',
+
+  // Filter events
+  AI_TAG_FILTER_APPLIED: 'ai_tag_filter_applied',
+  VISIBLE_FILTER_TOGGLED: 'visible_filter_toggled',
+
+  // Similar detection
+  SIMILAR_DETECTION_COMPLETED: 'similar_detection_completed',
+
+  // Referral / Share-to-Earn
+  REFERRAL_LINK_COPIED: 'referral_link_copied',
+  REFERRAL_LINK_SHARED: 'referral_link_shared', // props: { method: string }
+  REFERRAL_CLAIMED: 'referral_claimed', // props: { bonusDays: number }
 
   // Health / errors (counts only, never the message)
   ERROR_OCCURRED: 'error_occurred', // props: { code: string }
@@ -167,7 +179,13 @@ export const EVENT_PROP_SCHEMAS: Record<TelemetryEventName, readonly string[]> =
   [EVENTS.COLLECTION_ADDED]: [],
   [EVENTS.COLLECTION_FULL]: [],
   [EVENTS.COLLECTION_DUPLICATE]: [],
-  [EVENTS.AI_FREE_DAILY_LIMIT]: [],
+  [EVENTS.AI_FREE_MONTHLY_LIMIT]: [],
+  [EVENTS.AI_TAG_FILTER_APPLIED]: ['tag'],
+  [EVENTS.VISIBLE_FILTER_TOGGLED]: ['enabled'],
+  [EVENTS.SIMILAR_DETECTION_COMPLETED]: ['groupCount', 'totalImages'],
+  [EVENTS.REFERRAL_LINK_COPIED]: [],
+  [EVENTS.REFERRAL_LINK_SHARED]: ['method'],
+  [EVENTS.REFERRAL_CLAIMED]: ['bonusDays'],
   [EVENTS.ERROR_OCCURRED]: ['code'],
 };
 

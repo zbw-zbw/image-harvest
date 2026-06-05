@@ -200,3 +200,311 @@
     opacity: 0.6;
   }
 }
+
+/* ============================================
+   Quota Display (Settings → Usage & Quotas)
+   ============================================ */
+
+/* ── Quota comparison table ─────────────────────────────────────────────── */
+.quota-display {
+  margin-top: 12px;
+}
+
+.quota-header {
+  display: grid;
+  grid-template-columns: 1fr 52px 52px;
+  gap: 0;
+  padding: 0 12px 6px;
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-tertiary);
+}
+
+.quota-header-plan {
+  text-align: center;
+}
+
+.quota-header-pro {
+  color: var(--primary-color);
+}
+
+.quota-header-current {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.quota-list {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+/* Group container */
+.quota-group {
+  border-bottom: 1px solid var(--border-color);
+}
+
+.quota-group:last-child {
+  border-bottom: none;
+}
+
+.quota-group-title {
+  padding: 5px 12px 3px;
+  font-size: 9px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-tertiary);
+  background: var(--bg-secondary);
+}
+
+.quota-row {
+  display: grid;
+  grid-template-columns: 1fr 52px 52px;
+  gap: 0;
+  align-items: center;
+  padding: 5px 12px;
+  font-size: 12px;
+  border-bottom: 1px solid color-mix(in srgb, var(--border-color) 50%, transparent);
+}
+
+.quota-group .quota-row:last-child {
+  border-bottom: none;
+}
+
+/* Feature column (left) — compact single-line with inline remaining */
+.quota-cell-feature {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.quota-label {
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+/* Inline remaining count (same line as label) */
+.quota-inline-remaining {
+  font-size: 10px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+  flex-shrink: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.quota-inline-remaining.exhausted {
+  color: var(--danger-color, #e53e3e);
+  font-weight: 600;
+}
+
+.quota-inline-remaining-pro {
+  color: var(--text-tertiary);
+}
+
+/* Plan columns (Free / Pro) */
+.quota-cell-plan {
+  text-align: center;
+}
+
+.quota-limit-text {
+  font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
+  font-size: 10px;
+  color: var(--text-tertiary);
+  white-space: nowrap;
+}
+
+.quota-cell-current .quota-limit-text {
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.quota-cell-pro .quota-limit-text {
+  color: var(--primary-color);
+}
+
+.quota-cell-pro.quota-cell-current .quota-limit-text {
+  color: var(--primary-color);
+  font-weight: 700;
+}
+
+.quota-infinity {
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+/* Legacy progress bar styles removed — replaced by inline remaining count */
+
+/* ============================================
+   Referral Banner
+   ============================================ */
+
+.referral-banner {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  font-size: 11px;
+}
+
+.referral-banner-icon {
+  font-size: 13px;
+  flex-shrink: 0;
+}
+
+.referral-banner-text {
+  flex: 1;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.referral-banner-btn {
+  flex-shrink: 0;
+  padding: 2px 8px;
+  border: 1px solid var(--primary-color, #60b557);
+  border-radius: 4px;
+  background: transparent;
+  color: var(--primary-color, #60b557);
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s;
+}
+
+.referral-banner-btn:hover {
+  background: var(--primary-color, #60b557);
+  color: #fff;
+}
+
+.referral-banner-close {
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  background: none;
+  color: var(--text-tertiary);
+  font-size: 14px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0;
+  border-radius: 2px;
+}
+
+.referral-banner-close:hover {
+  color: var(--text-primary);
+  background: color-mix(in srgb, var(--text-tertiary) 15%, transparent);
+}
+
+/* ── Feature compare cards (Pro upgrade modal) ──────────────────────── */
+
+.pro-features-compare {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.pro-fc-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  background: var(--bg-secondary);
+  transition: background 0.15s;
+}
+
+.pro-fc-card:hover {
+  background: var(--bg-tertiary);
+}
+
+.pro-fc-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex: 1;
+  min-width: 0;
+}
+
+.pro-fc-icon {
+  font-size: 18px;
+  flex-shrink: 0;
+  line-height: 1;
+}
+
+.pro-fc-info {
+  min-width: 0;
+}
+
+.pro-fc-title {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+
+.pro-fc-desc {
+  margin: 2px 0 0;
+  font-size: 10.5px;
+  line-height: 1.4;
+  color: var(--text-tertiary);
+}
+
+.pro-fc-badges {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.pro-fc-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 48px;
+  padding: 3px 8px;
+  border-radius: 5px;
+  font-size: 10px;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.pro-fc-free {
+  background: color-mix(in srgb, var(--text-tertiary) 12%, transparent);
+  color: var(--text-secondary);
+}
+
+.pro-fc-free.pro-fc-na {
+  color: var(--text-tertiary);
+  opacity: 0.5;
+}
+
+.pro-fc-pro {
+  background: color-mix(in srgb, var(--primary-color, #60b557) 15%, transparent);
+  color: var(--primary-color, #60b557);
+}
+
+.pro-fc-pro.pro-fc-check {
+  font-size: 13px;
+}

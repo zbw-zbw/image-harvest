@@ -87,17 +87,19 @@
 
 ---
 
-## 🆕 What's New (v1.0.5)
+## 🆕 What's New (v1.0.6)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
-- **🤖 AI Image Tagging** — generate smart content-based tags for any image using AI. Tag single images or batch-tag your entire selection. Free users get a daily quota; Pro users enjoy unlimited tagging.
-- **🦅 Export to Eagle** — one-click export images (with metadata, AI tags, and source URL) to Eagle app. Supports batch export of selected images.
-- **⚡ Batch Operations** — new batch action buttons when images are selected: batch favorite, batch AI tag, and batch delete. Streamlines bulk workflows.
-- **🔎 AI Tag Filtering** — search and filter images by their AI-generated tags directly from the toolbar.
-- **🐛 Tab-switch stability** — fixed dropdown menus staying open, image list re-rendering on reverse-search return, loading states getting stuck, and status count animations flashing on tab switch.
-- **🎯 Anonymous opt-in telemetry** — understand which features matter most while keeping every URL, image, and identifier strictly local. One toggle in **Settings → Help Improve**, off by default until you opt in.
-- **🌍 5-language UI** — English, 简体中文, 繁體中文, 日本語, Español. Auto-detects browser language; switchable in Settings.
+- **🎁 Referral & Invite System** — share your invite link with friends; both of you earn bonus trial days when they install Image Harvest.
+- **📊 Smart Feature Quotas** — Pro features now use a soft monthly quota instead of hard locks. Free users get meaningful access; Pro removes all limits.
+- **🔧 Remote Feature Configuration** — feature limits are server-controlled with three-tier caching (memory → storage → network), adjustable without releasing a new version.
+- **📈 Quota Display** — new settings panel showing clear Free vs Pro comparison with remaining usage for each feature.
+- **👁️ Visibility Filter** — "Show visible only" toggle filters out hidden/off-screen images using `IntersectionObserver`.
+- **🎨 Color Extraction unlocked** — color palette extraction is now free for all users.
+- **🔍 MIME detection from bytes** — file format detection via magic bytes (PNG/JPEG/GIF/WebP/BMP/ICO/SVG) for reliable identification.
+- **💰 Pricing update** — Monthly $3.99 / Yearly $29.99 / Lifetime $49.99.
+- **🌍 290+ new i18n keys** across all 15 supported languages.
 - **🆓 7-day free trial for Pro** — try every Pro feature with no upfront charge. Cancel during the trial = no bill.
 - **💰 30-day money-back guarantee** — every paid plan refundable for 30 days, no questions asked. See the [Refund Policy](https://image-harvest.kyriewen.cn/refund).
 - **🔍 Reverse image search** — Google + TinEye built into the right-click menu (Free); Baidu + Yandex unlocked with Pro.

@@ -19,6 +19,8 @@
 .toolbar-actions {
   padding: 6px 10px;
   justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 4px 8px;
 }
 
 /* Pro Status Area (toolbar, left side) */
@@ -265,8 +267,8 @@
   display: flex;
   align-items: center;
   padding: 10px 12px;
-  gap: 8px;
-  flex-wrap: nowrap;
+  gap: 4px 8px;
+  flex-wrap: wrap;
 }
 
 .toolbar-found-info {

@@ -149,7 +149,7 @@ describe('t()', () => {
     __test.setActiveLocale('en');
     expect(t('toast_url_copied_batch', { count: 42 })).toBe('42 URLs copied to clipboard');
     expect(t('pro_zip_limit', { max: 30 })).toBe(
-      'Free plan allows up to 30 images per ZIP. Upgrade to Pro for unlimited!'
+      'Free plan: up to 30 images per ZIP. Upgrade to Pro for unlimited!'
     );
   });
 

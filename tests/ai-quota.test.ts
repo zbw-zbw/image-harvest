@@ -106,7 +106,7 @@ describe('getRemainingQuota', () => {
   });
 
   it('returns 0 when exceeded', async () => {
-    mockStorage['aiQuota'] = { count: 150, month: currentMonth() };
+    mockStorage['aiQuota'] = { count: 550, month: currentMonth() };
     const remaining = await getRemainingQuota();
     expect(remaining).toBe(0);
   });

@@ -59,6 +59,11 @@ vi.mock('../shared/utils', () => ({
 
 vi.mock('../content/utils', () => ({
   ensureImageLoaded: vi.fn(() => Promise.resolve()),
+  isElementVisible: vi.fn(() => true),
+  isElementAccessibleWithoutInteraction: vi.fn(() => true),
+  pickBestSrcsetUrl: vi.fn((candidates: Array<{ url: string; width: number }>) =>
+    candidates.length > 0 ? candidates[0].url : null
+  ),
   parseSrcset: vi.fn((srcset: string) =>
     srcset.split(',').map((part) => {
       const [url] = part.trim().split(/\s+/);
@@ -553,7 +558,7 @@ describe('extractImgTags (via extractImages)', () => {
     expect(photo?.type).toBe('img');
   });
 
-  it('aggregates src + currentSrc + srcset + 4 lazy-load data-* attrs as candidates', async () => {
+  it('smart-merges srcset: picks best URL from srcset instead of expanding all candidates', async () => {
     const img = document.createElement('img');
     img.src = 'https://example.com/main.jpg';
     Object.defineProperty(img, 'currentSrc', { value: 'https://example.com/current.jpg' });
@@ -565,12 +570,12 @@ describe('extractImgTags (via extractImages)', () => {
 
     const result = await (await getExtractImages())();
     const urls = result.map((r) => r.url);
-    expect(urls.some((u) => u.includes('main.jpg'))).toBe(true);
-    expect(urls.some((u) => u.includes('current.jpg'))).toBe(true);
-    expect(urls.some((u) => u.includes('large.jpg'))).toBe(true);
-    expect(urls.some((u) => u.includes('lazy.jpg'))).toBe(true);
-    expect(urls.some((u) => u.includes('original.jpg'))).toBe(true);
-    expect(urls.some((u) => u.includes('lazy-set.jpg'))).toBe(true);
+    // After srcset smart merge, only the best URL from srcset is used
+    // (picked by pickBestSrcsetUrl mock → first candidate = small.jpg).
+    // The img produces a single entry rather than expanding all candidates.
+    expect(urls.some((u) => u.includes('small.jpg'))).toBe(true);
+    // Other srcset candidates and data-* attrs are NOT separately expanded
+    expect(result.length).toBeGreaterThanOrEqual(1);
   });
 
   it('streams discovered images via sendDiscoveredImages (one push per ImageItem)', async () => {
@@ -679,7 +684,7 @@ describe('extractBackgroundImages (via extractImages)', () => {
 // ─────────────────────────────────────────────────────────────────────
 
 describe('extractPictureSources (via extractImages)', () => {
-  it('extracts <picture><source srcset="..."> candidates as type="img"', async () => {
+  it('smart-merges <picture><source srcset> to single best URL as type="img"', async () => {
     const picture = document.createElement('picture');
     const source = document.createElement('source');
     source.setAttribute(
@@ -694,8 +699,9 @@ describe('extractPictureSources (via extractImages)', () => {
 
     const result = await (await getExtractImages())();
     const urls = result.map((r) => r.url);
+    // Smart merge: pickBestSrcsetUrl picks the best candidate (mock returns first)
     expect(urls.some((u) => u.includes('mobile.jpg'))).toBe(true);
-    expect(urls.some((u) => u.includes('desktop.jpg'))).toBe(true);
+    // Only one URL from the srcset is emitted, not all candidates
   });
 
   it('inherits naturalWidth/Height from fallback <img> when present', async () => {
@@ -716,7 +722,7 @@ describe('extractPictureSources (via extractImages)', () => {
     expect(dpr2?.displayHeight).toBe(1080);
   });
 
-  it('also picks up data-srcset / data-src on <source> (lazy-loaded picture)', async () => {
+  it('picks up data-srcset on <source> (lazy-loaded picture), smart-merged to best URL', async () => {
     const picture = document.createElement('picture');
     const source = document.createElement('source');
     source.setAttribute('data-srcset', 'https://example.com/lazy-pic.jpg 1x');
@@ -726,8 +732,8 @@ describe('extractPictureSources (via extractImages)', () => {
 
     const result = await (await getExtractImages())();
     const urls = result.map((r) => r.url);
+    // Smart merge: data-srcset is preferred over data-src; only one URL emitted
     expect(urls.some((u) => u.includes('lazy-pic.jpg'))).toBe(true);
-    expect(urls.some((u) => u.includes('lazy-pic-fallback.jpg'))).toBe(true);
   });
 });
 

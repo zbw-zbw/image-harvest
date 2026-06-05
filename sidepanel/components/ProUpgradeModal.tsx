@@ -28,7 +28,6 @@
 //   - #pro-modal-trial-error       — error line for the trial CTA path
 
 import { useEffect, useRef, useState } from 'preact/hooks';
-import type { ComponentChildren } from 'preact';
 import { useStoreSelector } from './storeHook';
 import { state } from '../state';
 import { t } from '../../shared/i18n';
@@ -36,7 +35,7 @@ import { track, flushNow } from '../../shared/telemetry';
 import { EVENTS } from '../../shared/telemetry-events';
 import { getProUpsellBucket, type AbBucket } from '../../shared/ab-experiment';
 import { getState as getPaywallState, markResolved } from '../../shared/paywall-state';
-import { PRICING_PAGE_URL, MESSAGE_TYPES } from '../../shared/constants';
+import { PRICING_PAGE_URL, MESSAGE_TYPES, getFreeLimits } from '../../shared/constants';
 import { showToast } from '../ui';
 import { applyProFeatureVisibility } from '../settings';
 import { startTrial as startTrialFn, isTrialEligible } from '../../shared/trial';
@@ -62,13 +61,6 @@ function variantHeadline(bucket: AbBucket, download: number): string {
     return t('pro_headline_variant_b', { download });
   }
   return t('pro_headline_variant_a');
-}
-
-function variantSubline(bucket: AbBucket): string {
-  if (bucket === 'b') {
-    return t('pro_subline_variant_b');
-  }
-  return t('pro_subline_variant_a');
 }
 
 // ── Trial CTA: kicks off the 7-day free trial flow.
@@ -113,16 +105,6 @@ function handlePricingClick(e: MouseEvent): void {
   e.preventDefault();
   void track(EVENTS.PRO_UPSELL_CTA_CLICKED, { trigger: 'modal', cta: 'pricing' });
   chrome.tabs.create({ url: PRICING_PAGE_URL });
-}
-
-/**
- * Telemetry-only handler for the legacy "Get Pro →" link in the
- * already-have-a-key footer. Navigation is performed by
- * license-ui.ts > bindLicenseModalEvents (it preventDefaults and calls
- * chrome.tabs.create), so we just observe the click here.
- */
-function handleLegacyGetProClick(): void {
-  void track(EVENTS.PRO_UPSELL_CTA_CLICKED, { trigger: 'modal', cta: 'get_pro' });
 }
 
 export function ProUpgradeModal() {
@@ -176,8 +158,7 @@ export function ProUpgradeModal() {
     };
   }, []);
 
-  // Re-check trial eligibility every time the modal opens so users who
-  // have already started or exhausted their trial don't see the CTA.
+  // Re-check trial eligibility every time the modal opens
   useEffect(() => {
     if (!ms.open) {
       setTrialError('');
@@ -189,7 +170,6 @@ export function ProUpgradeModal() {
         const eligible = await isTrialEligible();
         if (!cancelled) setTrialEligible(eligible);
       } catch {
-        // If the trial module fails to load, hide the CTA to be safe.
         if (!cancelled) setTrialEligible(false);
       }
     })();
@@ -261,42 +241,28 @@ export function ProUpgradeModal() {
             </p>
             <p class="pro-upgrade-get-pro-hint">
               {t('pro_no_key_hint')}{' '}
-              <a
-                id="link-pro-modal-get"
-                href="#"
-                class="license-link"
-                onClick={handleLegacyGetProClick}
-              >
+              <a id="link-pro-modal-get" href="#" class="license-link" onClick={handlePricingClick}>
                 {t('pro_get_pro_link')}
               </a>
             </p>
           </div>
 
           {/* ── Section 2: trial / pricing CTAs ────────────────────────── */}
-          <div class="pro-upgrade-cta-section">
-            {trialEligible && (
-              <>
-                <div class="pro-upgrade-trial-header">
-                  <div class="pro-upgrade-trial-badge">
-                    <span aria-hidden="true">🎁</span>
-                    {t('pro_trial_badge')}
-                  </div>
-                  <p class="pro-upgrade-trial-desc">{t('pro_trial_desc')}</p>
+          {trialEligible ? (
+            <div class="pro-upgrade-cta-section">
+              <div class="pro-upgrade-trial-header">
+                <div class="pro-upgrade-trial-badge">
+                  <span aria-hidden="true">🎁</span>
+                  {t('pro_trial_badge')}
                 </div>
-                <ul class="pro-upgrade-trial-perks">
-                  <li>{t('pro_trial_perk_full_access')}</li>
-                  <li>{t('pro_trial_perk_no_card')}</li>
-                  <li>{t('pro_trial_perk_cancel')}</li>
-                </ul>
-              </>
-            )}
-            {!trialEligible && (
-              <div class="pro-upgrade-purchase-header">
-                <p class="pro-upgrade-purchase-desc">{t('pro_purchase_desc')}</p>
+                <p class="pro-upgrade-trial-desc">{t('pro_trial_desc')}</p>
               </div>
-            )}
-            <div class="pro-upgrade-cta-row">
-              {trialEligible && (
+              <ul class="pro-upgrade-trial-perks">
+                <li>{t('pro_trial_perk_full_access')}</li>
+                <li>{t('pro_trial_perk_no_card')}</li>
+                <li>{t('pro_trial_perk_cancel')}</li>
+              </ul>
+              <div class="pro-upgrade-cta-row">
                 <button
                   id="btn-pro-modal-trial"
                   type="button"
@@ -308,118 +274,151 @@ export function ProUpgradeModal() {
                 >
                   {trialLoading ? t('pro_trial_starting') : t('pro_trial_start_cta')}
                 </button>
-              )}
-              <button
-                id="btn-pro-modal-pricing"
-                type="button"
-                class={`btn btn-cta ${trialEligible ? 'btn-secondary' : 'btn-primary'}`}
-                onClick={handlePricingClick}
-              >
-                {trialEligible ? t('pro_pricing_cta') : t('pro_purchase_cta')}
-              </button>
-            </div>
-            {trialEligible && (
+                <button
+                  id="btn-pro-modal-pricing"
+                  type="button"
+                  class="btn btn-cta btn-secondary"
+                  onClick={handlePricingClick}
+                >
+                  {t('pro_pricing_cta')}
+                </button>
+              </div>
               <p id="pro-modal-trial-error" class={`license-error${trialError ? '' : ' hidden'}`}>
                 {trialError}
               </p>
-            )}
-          </div>
-
-          {/* ── Section 3: value prop + feature highlights (reference) ──── */}
-          <div class="pro-upgrade-features" style={{ marginTop: '20px' }}>
-            <p class="pro-upgrade-desc" style={{ marginBottom: '14px' }}>
-              {variantSubline(bucket)}
-            </p>
-            <div class="pro-feature-list">
-              <ProFeatureCard
-                title={t('pro_feature_batch_title')}
-                desc={t('pro_feature_batch_desc_pro')}
-                gradient="gradient-blue"
-                icon={<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3" />}
-              />
-              <ProFeatureCard
-                title={t('pro_feature_multitab_title')}
-                desc={t('pro_feature_multitab_desc_pro')}
-                gradient="gradient-purple"
-                icon={
-                  <>
-                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2" />
-                    <path d="M8 21h8M12 17v4" />
-                  </>
-                }
-              />
-              <ProFeatureCard
-                title={t('pro_feature_reverse_search_title')}
-                desc={t('pro_feature_reverse_search_desc_pro')}
-                gradient="gradient-green"
-                icon={
-                  <>
-                    <circle cx="11" cy="11" r="8" />
-                    <path d="M21 21l-4.35-4.35" />
-                  </>
-                }
-              />
-              <ProFeatureCard
-                title={t('pro_feature_dedup_title')}
-                desc={t('pro_feature_dedup_desc_pro')}
-                gradient="gradient-amber"
-                icon={
-                  <>
-                    <rect x="3" y="3" width="7" height="7" rx="1" />
-                    <rect x="14" y="3" width="7" height="7" rx="1" />
-                    <rect x="3" y="14" width="7" height="7" rx="1" />
-                    <rect x="14" y="14" width="7" height="7" rx="1" />
-                  </>
-                }
-              />
-              <ProFeatureCard
-                title={t('pro_feature_color_title')}
-                desc={t('pro_feature_color_desc_pro')}
-                gradient="gradient-pink"
-                icon={
-                  <>
-                    <circle cx="13.5" cy="6.5" r="4.5" />
-                    <circle cx="7.5" cy="13.5" r="4.5" />
-                    <circle cx="16.5" cy="16.5" r="4.5" />
-                  </>
-                }
-              />
             </div>
-          </div>
+          ) : null}
+
+          {/* ── Section 3: Pro features with Free vs Pro comparison ──── */}
+          <ProFeatureCompareList />
         </div>
       </div>
     </div>
   );
 }
 
-interface FeatureCardProps {
+function FeatureCompareCard({
+  icon,
+  title,
+  desc,
+  free,
+  pro,
+}: {
+  icon: string;
+  gradient: string;
   title: string;
   desc: string;
-  gradient: string;
-  icon: ComponentChildren;
+  free: string;
+  pro: string;
+}) {
+  const isDash = free === '—';
+  const isCheck = pro === '✓';
+  return (
+    <div class="pro-fc-card">
+      <div class="pro-fc-left">
+        <span class="pro-fc-icon" aria-hidden="true">
+          {icon}
+        </span>
+        <div class="pro-fc-info">
+          <strong class="pro-fc-title">{title}</strong>
+          <p class="pro-fc-desc">{desc}</p>
+        </div>
+      </div>
+      <div class="pro-fc-badges">
+        <span class={`pro-fc-badge pro-fc-free${isDash ? ' pro-fc-na' : ''}`}>
+          {isDash ? '✗' : free}
+        </span>
+        <span class={`pro-fc-badge pro-fc-pro${isCheck ? ' pro-fc-check' : ''}`}>
+          {isCheck ? '✓' : pro}
+        </span>
+      </div>
+    </div>
+  );
 }
 
-function ProFeatureCard({ title, desc, gradient, icon }: FeatureCardProps) {
+/** Dynamically builds the feature comparison list from getFreeLimits(). */
+function ProFeatureCompareList() {
+  const limits = getFreeLimits();
+  const perMonth = t('pro_compare_per_month');
+  const perDay = t('pro_compare_per_day');
+  const unlimited = t('pro_compare_unlimited');
+  const allEngines = t('pro_compare_all_engines');
+  const engineCount = limits.REVERSE_SEARCH_ENGINES.length;
+
   return (
-    <div class="restricted-feature">
-      <div class={`restricted-feature-icon-wrap ${gradient}`}>
-        <svg
-          width="18"
-          height="18"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-        >
-          {icon}
-        </svg>
-      </div>
-      <div class="restricted-feature-text">
-        <strong>{title}</strong>
-        <p>{desc}</p>
-      </div>
+    <div class="pro-features-compare" style={{ marginTop: '14px' }}>
+      <FeatureCompareCard
+        icon="📦"
+        gradient="gradient-blue"
+        title={t('pro_feature_batch_title')}
+        desc={t('pro_feature_batch_desc_pro')}
+        free={`${limits.MAX_ZIP_IMAGES} ${perDay}`}
+        pro={unlimited}
+      />
+      <FeatureCompareCard
+        icon="🖥️"
+        gradient="gradient-purple"
+        title={t('pro_feature_multitab_title')}
+        desc={t('pro_feature_multitab_desc_pro')}
+        free={`${limits.MAX_MONTHLY_MULTI_TAB} ${perMonth}`}
+        pro={unlimited}
+      />
+      <FeatureCompareCard
+        icon="🔍"
+        gradient="gradient-green"
+        title={t('pro_feature_reverse_search_title')}
+        desc={t('pro_feature_reverse_search_desc_pro')}
+        free={`${engineCount} ${t('pro_compare_engines')}`}
+        pro={allEngines}
+      />
+      <FeatureCompareCard
+        icon="🏷️"
+        gradient="gradient-cyan"
+        title={t('pro_feature_ai_tag_title')}
+        desc={t('pro_feature_ai_tag_desc_pro')}
+        free={`${limits.MAX_MONTHLY_AI_TAGS} ${perMonth}`}
+        pro={unlimited}
+      />
+      <FeatureCompareCard
+        icon="🦅"
+        gradient="gradient-amber"
+        title={t('pro_feature_eagle_title')}
+        desc={t('pro_feature_eagle_desc_pro')}
+        free={`${limits.MAX_EAGLE_EXPORT_PER_BATCH} ${perMonth}`}
+        pro={unlimited}
+      />
+      <FeatureCompareCard
+        icon="🧹"
+        gradient="gradient-orange"
+        title={t('pro_feature_dedup_title')}
+        desc={t('pro_feature_dedup_desc_pro')}
+        free={`${limits.MAX_MONTHLY_DEDUP} ${perMonth}`}
+        pro={unlimited}
+      />
+      <FeatureCompareCard
+        icon="🎨"
+        gradient="gradient-pink"
+        title={t('pro_feature_color_title')}
+        desc={t('pro_feature_color_desc_pro')}
+        free="—"
+        pro="✓"
+      />
+      <FeatureCompareCard
+        icon="🔄"
+        gradient="gradient-indigo"
+        title={t('pro_feature_format_title')}
+        desc={t('pro_feature_format_desc_pro')}
+        free={`${limits.MAX_MONTHLY_FORMAT_CONVERT} ${perMonth}`}
+        pro={unlimited}
+      />
+      <FeatureCompareCard
+        icon="📡"
+        gradient="gradient-teal"
+        title={t('pro_feature_live_monitor_title')}
+        desc={t('pro_feature_live_monitor_desc_pro')}
+        free={`${limits.MAX_MONTHLY_LIVE_MONITOR} ${perMonth}`}
+        pro={unlimited}
+      />
     </div>
   );
 }

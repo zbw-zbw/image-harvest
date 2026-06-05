@@ -312,6 +312,11 @@
   white-space: nowrap;
 }
 
+.settings-content .setting-inputs label > span:first-child {
+  min-width: 110px;
+  flex-shrink: 0;
+}
+
 .settings-content .setting-inputs label input[type='text'] {
   flex: 1;
   min-width: 0;
@@ -330,13 +335,22 @@
   display: flex;
   align-items: center;
   gap: 8px;
-  padding-left: 10px;
+  padding-left: 0;
 }
 
 .settings-content .setting-inputs .setting-format-row {
   display: flex;
   align-items: center;
   gap: 8px;
+}
+
+.settings-content .setting-inputs .setting-format-row > label {
+  flex-shrink: 0;
+}
+
+.settings-content .setting-inputs > .setting-hint {
+  padding-left: 0;
+  margin-left: 0;
 }
 
 .settings-content .setting-inputs.hidden {

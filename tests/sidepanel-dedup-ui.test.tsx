@@ -142,11 +142,20 @@ describe('showDedupModal', () => {
 // ─────────────────────────────────────────────────────────────────────
 
 describe('removeDuplicates', () => {
-  it('non-Pro user: closes modal + shows warning toast + opens Pro modal + NO state mutation', async () => {
+  it('non-Pro user with exhausted quota: closes modal + shows warning toast + opens Pro modal + NO state mutation', async () => {
     state.isProUser = false;
     state.allImages = [mkImg('a'), mkImg('b')];
     state.filteredImages = state.allImages;
     state.similarGroups = [[mkImg('a'), mkImg('b')]];
+
+    // Mock feature-quota to return exhausted state
+    const featureQuota = await import('../shared/feature-quota');
+    vi.spyOn(featureQuota, 'checkFeatureQuota').mockResolvedValue({
+      allowed: false,
+      remaining: 0,
+      limit: 3,
+      used: 3,
+    });
 
     await removeDuplicates();
 
@@ -154,10 +163,10 @@ describe('removeDuplicates', () => {
     const settings = await import('../sidepanel/settings');
     const ui = await import('../sidepanel/ui');
     expect(pro.closeDedupModal).toHaveBeenCalledTimes(1);
-    expect(ui.showToast).toHaveBeenCalledWith(expect.stringContaining('Pro feature'), 'warning');
+    expect(ui.showToast).toHaveBeenCalled();
     expect(settings.showProUpgradeModal).toHaveBeenCalledTimes(1);
     // Pin: early-return BEFORE touching state. A regression running
-    // the removal pipeline for non-Pro users would silently let them
+    // the removal pipeline when quota exhausted would silently let them
     // bypass the paywall.
     expect(state.allImages).toHaveLength(2);
     expect(ui.showConfirmDialog).not.toHaveBeenCalled();

@@ -475,21 +475,30 @@ describe('bindProGuards — Pro paywall interceptor', () => {
     }
   );
 
-  it('free user clicking Pro toggle #setting-live-monitor → close settings + warning toast + open upgrade modal', async () => {
+  it('free user clicking Pro toggle #setting-live-monitor when quota exhausted → close settings + warning toast + open upgrade modal', async () => {
     const id = 'setting-live-monitor';
     state.isProUser = false;
     state.settingsModalState = { ...state.settingsModalState, open: true };
     state.proUpgradeModalState = { open: false, errorText: '' };
 
-    document.getElementById(id)!.click();
+    // Mock feature-quota to return exhausted state
+    const featureQuota = await import('../shared/feature-quota');
+    vi.spyOn(featureQuota, 'checkFeatureQuota').mockResolvedValue({
+      allowed: false,
+      remaining: 0,
+      limit: 1,
+      used: 1,
+    });
 
-    expect(state.settingsModalState.open).toBe(false);
+    document.getElementById(id)!.click();
+    // Guard is async — need to flush microtasks
+    await vi.waitFor(() => {
+      expect(state.settingsModalState.open).toBe(false);
+    });
+
     expect(state.proUpgradeModalState.open).toBe(true);
     const ui = await import('../sidepanel/ui');
-    expect(ui.showToast).toHaveBeenCalledWith(
-      'This setting requires Pro. Upgrade to unlock!',
-      'warning'
-    );
+    expect(ui.showToast).toHaveBeenCalled();
   });
 
   it('Pro user toggling a Pro setting → no interception (settings stays open, no toast)', async () => {
@@ -504,7 +513,7 @@ describe('bindProGuards — Pro paywall interceptor', () => {
   });
 
   it.each(['setting-subfolder', 'setting-filename'])(
-    'free user focusing Pro input #%s → blur + close settings + warning toast + open modal',
+    'free user focusing input #%s → no blur, no modal (custom naming is now free)',
     async (id) => {
       state.isProUser = false;
       state.settingsModalState = { ...state.settingsModalState, open: true };
@@ -515,30 +524,12 @@ describe('bindProGuards — Pro paywall interceptor', () => {
 
       input.dispatchEvent(new FocusEvent('focus'));
 
-      expect(blurSpy).toHaveBeenCalledTimes(1);
-      expect(state.settingsModalState.open).toBe(false);
-      expect(state.proUpgradeModalState.open).toBe(true);
-      const ui = await import('../sidepanel/ui');
-      expect(ui.showToast).toHaveBeenCalledWith(
-        'Custom naming is a Pro feature. Upgrade to unlock!',
-        'warning'
-      );
+      // Custom naming Pro guard removed — inputs should work freely
+      expect(blurSpy).not.toHaveBeenCalled();
+      expect(state.settingsModalState.open).toBe(true);
+      expect(state.proUpgradeModalState.open).toBe(false);
     }
   );
-
-  it('Pro user focusing a Pro input → no blur, no modal, settings stays open', async () => {
-    state.isProUser = true;
-    state.settingsModalState = { ...state.settingsModalState, open: true };
-
-    const input = document.getElementById('setting-subfolder') as HTMLInputElement;
-    const blurSpy = vi.spyOn(input, 'blur');
-    input.dispatchEvent(new FocusEvent('focus'));
-
-    expect(blurSpy).not.toHaveBeenCalled();
-    expect(state.settingsModalState.open).toBe(true);
-    const ui = await import('../sidepanel/ui');
-    expect(ui.showToast).not.toHaveBeenCalled();
-  });
 });
 
 // ─────────────────────────────────────────────────────────────────────
@@ -816,7 +807,7 @@ describe('showSettings', () => {
     expect((document.getElementById('setting-side-panel') as HTMLInputElement).checked).toBe(true);
   });
 
-  it('forces Pro-only toggles to false for free users (live-monitor)', () => {
+  it('shows live-monitor toggle as-is for free users (no longer forced off)', () => {
     document.body.innerHTML = `
       <input type="checkbox" id="setting-live-monitor" />
     `;
@@ -825,11 +816,10 @@ describe('showSettings', () => {
 
     showSettings();
 
-    // Pin: free users see Pro toggles as OFF in the form, regardless of
-    // the underlying state value. Otherwise free users could see "ON"
-    // in the UI but the feature wouldn't actually work — confusing UX.
+    // Live monitoring is now available to all users — the toggle
+    // reflects the persisted state value for free users too.
     expect((document.getElementById('setting-live-monitor') as HTMLInputElement).checked).toBe(
-      false
+      true
     );
   });
 
@@ -973,7 +963,7 @@ describe('applyProFeatureVisibility', () => {
     );
   });
 
-  it('disables filename + subfolder inputs + adds .pro-locked for free users', async () => {
+  it('keeps filename + subfolder inputs enabled for free users (no Pro gate)', async () => {
     chromeMock.runtime.sendMessage.mockResolvedValue({ isPro: false });
     document.body.innerHTML = `
       <div class="setting-item">
@@ -987,10 +977,10 @@ describe('applyProFeatureVisibility', () => {
     await applyProFeatureVisibility();
     const filename = document.getElementById('setting-filename') as HTMLInputElement;
     const subfolder = document.getElementById('setting-subfolder') as HTMLInputElement;
-    expect(filename.disabled).toBe(true);
-    expect(subfolder.disabled).toBe(true);
-    expect(filename.closest('.setting-item')!.classList.contains('pro-locked')).toBe(true);
-    expect(subfolder.closest('.setting-item')!.classList.contains('pro-locked')).toBe(true);
+    expect(filename.disabled).toBe(false);
+    expect(subfolder.disabled).toBe(false);
+    expect(filename.closest('.setting-item')!.classList.contains('pro-locked')).toBe(false);
+    expect(subfolder.closest('.setting-item')!.classList.contains('pro-locked')).toBe(false);
   });
 
   it('enables filename + subfolder inputs + removes .pro-locked for Pro users', async () => {
@@ -1199,16 +1189,15 @@ describe('saveSettings', () => {
     );
   });
 
-  it('Free tier: liveMonitoring is FORCED to false regardless of toggle state', async () => {
+  it('Free tier: liveMonitoring respects the toggle (no longer forced off)', async () => {
     buildSettingsFormDOM({});
     state.isProUser = false;
-    // Even if the live-monitor toggle was rendered checked, free path
-    // ignores it — pinned because the user can't actually use Live
-    // Monitoring without Pro and persisting `true` would mislead UI.
+    // Live monitoring is now available to all users — the toggle
+    // value is persisted as-is regardless of Pro status.
     document.querySelector<HTMLInputElement>('#setting-live-monitor')!.checked = true;
 
     await saveSettings();
-    expect(state.appSettings.liveMonitoring).toBe(false);
+    expect(state.appSettings.liveMonitoring).toBe(true);
   });
 
   it('Pro tier: liveMonitoring respects the toggle', async () => {

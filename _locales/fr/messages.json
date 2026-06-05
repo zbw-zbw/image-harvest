@@ -354,10 +354,10 @@
     "message": "Vous avez déjà une clé de licence ?"
   },
   "pro_collection_limit": {
-    "message": "Le plan gratuit permet jusqu'à {max} favoris. Passez à Pro pour un accès illimité !"
+    "message": "Free plan: up to {max} favorites. Upgrade to Pro for unlimited!"
   },
   "pro_copy_urls_limit": {
-    "message": "Le plan gratuit permet jusqu'à {max} URL à la fois. Passez à Pro pour un accès illimité !"
+    "message": "Free plan: up to {max} URLs per batch. Upgrade to Pro for unlimited!"
   },
   "pro_deactivate_tooltip": {
     "message": "Désactiver la licence"
@@ -372,19 +372,19 @@
     "message": "Téléchargement par lot"
   },
   "pro_feature_blocked_advanced_grouping": {
-    "message": "Le regroupement avancé est une fonctionnalité Pro. Passez à Pro pour débloquer !"
+    "message": "Advanced grouping is a Pro feature. Upgrade to unlock!"
   },
   "pro_feature_blocked_collection": {
-    "message": "La collection est une fonctionnalité Pro"
+    "message": "Collection is a Pro feature. Upgrade to unlock!"
   },
   "pro_feature_blocked_color_copy": {
-    "message": "La copie de couleur est une fonctionnalité Pro"
+    "message": "Color copy is a Pro feature. Upgrade to unlock!"
   },
   "pro_feature_blocked_format_conversion": {
-    "message": "La conversion de format est une fonctionnalité Pro. Passez à Pro pour débloquer !"
+    "message": "Free plan: up to {max} format conversions per month. Upgrade to Pro for unlimited!"
   },
   "pro_feature_blocked_reverse_search": {
-    "message": "La recherche {engine} nécessite Pro. Passez à Pro pour débloquer !"
+    "message": "{engine} reverse search is a Pro feature. Upgrade to unlock!"
   },
   "pro_feature_color_desc": {
     "message": "Filtrer les images par couleur dominante"
@@ -474,7 +474,7 @@
     "message": "Essai non disponible"
   },
   "pro_zip_limit": {
-    "message": "Le plan gratuit permet jusqu'à {max} images par ZIP. Passez à Pro pour un accès illimité !"
+    "message": "Free plan: up to {max} images per ZIP. Upgrade to Pro for unlimited!"
   },
   "progress_downloading": {
     "message": "Téléchargement en cours..."
@@ -909,13 +909,13 @@
     "message": "Pro activé avec succès !"
   },
   "toast_pro_color_filter": {
-    "message": "Le filtrage par couleur est une fonctionnalité Pro. Passez à Pro pour filtrer par couleur !"
+    "message": "Color filtering is a Pro feature. Upgrade to unlock!"
   },
   "toast_pro_naming_locked": {
-    "message": "Le nommage personnalisé est une fonctionnalité Pro. Passez à Pro pour débloquer !"
+    "message": "Custom naming is a Pro feature. Upgrade to unlock!"
   },
   "toast_pro_setting_locked": {
-    "message": "Ce paramètre nécessite Pro. Passez à Pro pour débloquer !"
+    "message": "This setting is a Pro feature. Upgrade to unlock!"
   },
   "toast_scan_cancelled": {
     "message": "Scan annulé"
@@ -1074,13 +1074,13 @@
     "message": "Exported {count} images to Eagle successfully!"
   },
   "toast_pro_eagle_export": {
-    "message": "Eagle export is a Pro feature"
+    "message": "Free plan: up to {max} images per Eagle export. Upgrade to Pro for unlimited!"
   },
   "card_ai_tag": {
     "message": "AI Tag"
   },
   "toast_pro_ai_tag": {
-    "message": "AI Tagging is a Pro feature"
+    "message": "Free plan: up to {max} AI tags per month. Upgrade to Pro for unlimited!"
   },
   "toast_ai_tag_success": {
     "message": "AI tags added"
@@ -1089,7 +1089,7 @@
     "message": "AI tagging failed, please try again"
   },
   "toast_ai_quota_exhausted": {
-    "message": "Monthly AI quota exhausted (100/100)"
+    "message": "Quota IA mensuel épuisé"
   },
   "ai_quota_tooltip": {
     "message": "Monthly AI tagging quota"
@@ -1110,13 +1110,13 @@
     "message": "Image trop petite pour le taggage IA"
   },
   "toast_ai_daily_limit": {
-    "message": "Vous avez utilisé vos 3 tags AI gratuits aujourd'hui. Passez à Pro pour 100 tags/mois."
+    "message": "Free plan: up to {max} AI tags per month. Upgrade to Pro for unlimited!"
   },
   "toast_collection_limit": {
-    "message": "Collection pleine (5/5). Passez à Pro pour des favoris illimités."
+    "message": "Free plan: up to {max} favorites. Upgrade to Pro for unlimited!"
   },
   "toast_eagle_free_limit": {
-    "message": "Le plan gratuit prend en charge jusqu'à {max} images par export Eagle. Pro pour illimité."
+    "message": "Free plan: up to {max} images per Eagle export. Upgrade to Pro for unlimited!"
   },
   "trial_days_remaining": {
     "message": "Essai : {days} jours restants"
@@ -1125,7 +1125,7 @@
     "message": "Votre essai est terminé — {days} jours d'accès Pro restants."
   },
   "pro_batch_operation": {
-    "message": "Les opérations en lot sont une fonctionnalité Pro."
+    "message": "Batch AI tagging is a Pro feature. Upgrade to unlock!"
   },
   "toolbar_batch_favorite": {
     "message": "Favori"
@@ -1210,5 +1210,272 @@
   },
   "batch_tooltip_download": {
     "message": "Download the selected images"
+  },
+  "toast_ai_monthly_limit": {
+    "message": "Free plan: up to {max} AI tags per month. Upgrade to Pro for unlimited!"
+  },
+  "filter_visible_only": {
+    "message": "Visibles uniquement"
+  },
+  "filter_visible_tooltip": {
+    "message": "Afficher uniquement les images visibles sur la page"
+  },
+  "toast_visible_only_on": {
+    "message": "Affichage de {visible} images visibles ({hidden} masquées filtrées)"
+  },
+  "toast_visible_only_off": {
+    "message": "Filter removed — showing all {total} images"
+  },
+  "settings_section_quotas": {
+    "message": "Utilisation et quotas"
+  },
+  "quota_ai_tags": {
+    "message": "Tags IA"
+  },
+  "quota_zip_download": {
+    "message": "Téléchargement ZIP"
+  },
+  "quota_batch_copy": {
+    "message": "Copier les URLs en lot"
+  },
+  "quota_collection": {
+    "message": "Collection"
+  },
+  "quota_eagle_export": {
+    "message": "Export Eagle"
+  },
+  "quota_batch_delete": {
+    "message": "Suppression en lot"
+  },
+  "quota_batch_favorite": {
+    "message": "Favori en lot"
+  },
+  "quota_unlimited": {
+    "message": "Illimité"
+  },
+  "quota_per_month": {
+    "message": "/mois"
+  },
+  "quota_per_batch": {
+    "message": "/lot"
+  },
+  "quota_upgrade_hint": {
+    "message": "Passez à Pro pour un accès illimité"
+  },
+  "quota_header_feature": {
+    "message": "Fonction"
+  },
+  "quota_remaining": {
+    "message": "restants"
+  },
+  "quota_used_count": {
+    "message": "{used}/{max} utilisés"
+  },
+  "toast_batch_limit": {
+    "message": "Free plan: up to {limit} items per batch. Upgrade to Pro for unlimited!"
+  },
+  "restricted_section_title": {
+    "message": "Que peut faire Image Harvest ?"
+  },
+  "restricted_feature_ai_tag_title": {
+    "message": "Étiquetage intelligent IA"
+  },
+  "restricted_feature_ai_tag_desc": {
+    "message": "Étiquetage automatique par IA — catégorisez et recherchez facilement."
+  },
+  "restricted_feature_eagle_title": {
+    "message": "Export Eagle"
+  },
+  "restricted_feature_eagle_desc": {
+    "message": "Export en un clic vers Eagle — gérez votre bibliothèque visuelle en toute fluidité."
+  },
+  "restricted_feature_format_title": {
+    "message": "Conversion de format"
+  },
+  "restricted_feature_format_desc": {
+    "message": "Convertissez les images entre PNG, JPG et WebP avant le téléchargement."
+  },
+  "restricted_feature_live_title": {
+    "message": "Surveillance en direct"
+  },
+  "restricted_feature_live_desc": {
+    "message": "Surveillance de page en temps réel — capturez automatiquement les nouvelles images."
+  },
+  "pro_modal_ai_tag_title": {
+    "message": "Étiquetage intelligent IA"
+  },
+  "pro_modal_ai_tag_desc": {
+    "message": "Étiquetage automatique par IA — catégorisez et recherchez facilement."
+  },
+  "pro_modal_eagle_title": {
+    "message": "Export Eagle"
+  },
+  "pro_modal_eagle_desc": {
+    "message": "Export en un clic vers Eagle avec tags, dossiers et métadonnées préservés."
+  },
+  "pro_modal_format_title": {
+    "message": "Conversion de format"
+  },
+  "pro_modal_format_desc": {
+    "message": "Convertissez les images entre PNG, JPG et WebP avant le téléchargement."
+  },
+  "pro_modal_live_title": {
+    "message": "Surveillance en direct"
+  },
+  "pro_modal_live_desc": {
+    "message": "Surveillance de page en temps réel — capturez automatiquement les nouvelles images."
+  },
+  "pro_modal_batch_title": {
+    "message": "Téléchargement par lots illimité"
+  },
+  "pro_modal_batch_desc": {
+    "message": "Sélectionnez et téléchargez des images illimitées en une fois en fichiers individuels ou ZIP."
+  },
+  "pro_modal_dedup_title": {
+    "message": "Détection des doublons"
+  },
+  "pro_modal_dedup_desc": {
+    "message": "Trouvez et regroupez automatiquement les images visuellement similaires ou en double."
+  },
+  "quota_unit_items": {
+    "message": " items"
+  },
+  "quota_usage_title": {
+    "message": "Your usage this month"
+  },
+  "referral_cta_title": {
+    "message": "Share & Get 3 Days Pro"
+  },
+  "referral_cta_desc": {
+    "message": "Invite a friend — you both get 3 extra days of Pro access"
+  },
+  "referral_cta_button": {
+    "message": "Copy Link"
+  },
+  "referral_link_copied": {
+    "message": "Referral link copied to clipboard!"
+  },
+  "quota_exhausted_monthly": {
+    "message": "Free plan: up to {limit} {feature} per month. Upgrade to Pro for unlimited!"
+  },
+  "feature_multitab": {
+    "message": "Multi-Tab Extract"
+  },
+  "feature_dedup": {
+    "message": "Similar Image Detection"
+  },
+  "feature_format_convert": {
+    "message": "Format Conversion"
+  },
+  "feature_live_monitor": {
+    "message": "Live Monitoring"
+  },
+  "quota_multitab": {
+    "message": "Multi-Tab Extract"
+  },
+  "quota_dedup": {
+    "message": "Duplicate Detection"
+  },
+  "quota_format_convert": {
+    "message": "Format Conversion"
+  },
+  "quota_live_monitor": {
+    "message": "Live Monitor"
+  },
+  "quota_batch_highlight": {
+    "message": "Batch Highlight"
+  },
+  "quota_reverse_search": {
+    "message": "Reverse Search"
+  },
+  "quota_group_core": {
+    "message": "Core Pro"
+  },
+  "quota_group_ai": {
+    "message": "AI"
+  },
+  "quota_group_batch": {
+    "message": "Batch Operations"
+  },
+  "quota_group_storage": {
+    "message": "Storage & Conversion"
+  },
+  "quota_per_day": {
+    "message": "/day"
+  },
+  "quota_engines": {
+    "message": "engines"
+  },
+  "referral_banner_text": {
+    "message": "Share & get 3 days Pro free"
+  },
+  "referral_banner_copy": {
+    "message": "Copy Link"
+  },
+  "referral_match_success": {
+    "message": "Welcome! You earned {days} days of Pro from a friend's invite."
+  },
+  "pro_feature_ai_tag_title": {
+    "message": "AI Smart Tagging"
+  },
+  "pro_feature_ai_tag_desc_pro": {
+    "message": "Auto-tag images with AI descriptions. Search and organize instantly."
+  },
+  "pro_feature_eagle_title": {
+    "message": "Eagle Export"
+  },
+  "pro_feature_eagle_desc_pro": {
+    "message": "Send images directly to Eagle app with tags and metadata preserved."
+  },
+  "pro_feature_format_title": {
+    "message": "Format Conversion"
+  },
+  "pro_feature_format_desc_pro": {
+    "message": "Convert images to PNG, JPG, or WebP before downloading."
+  },
+  "pro_feature_live_monitor_title": {
+    "message": "Live Monitoring"
+  },
+  "pro_feature_live_monitor_desc_pro": {
+    "message": "Auto-detect new images as they load on the page in real time."
+  },
+  "pro_compare_feature": {
+    "message": "Feature"
+  },
+  "pro_compare_free": {
+    "message": "Free"
+  },
+  "pro_compare_pro": {
+    "message": "Pro"
+  },
+  "pro_compare_batch_free": {
+    "message": "20/day"
+  },
+  "pro_compare_batch_pro": {
+    "message": "Unlimited"
+  },
+  "pro_compare_search_free": {
+    "message": "2 engines"
+  },
+  "pro_compare_search_pro": {
+    "message": "All engines"
+  },
+  "pro_compare_ai_free": {
+    "message": "5/day"
+  },
+  "pro_compare_per_month": {
+    "message": "/mo"
+  },
+  "pro_compare_per_day": {
+    "message": "/day"
+  },
+  "pro_compare_unlimited": {
+    "message": "Unlimited"
+  },
+  "pro_compare_all_engines": {
+    "message": "All engines"
+  },
+  "pro_compare_engines": {
+    "message": "engines"
   }
 }

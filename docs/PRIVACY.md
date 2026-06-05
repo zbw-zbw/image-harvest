@@ -166,7 +166,45 @@ own** privacy policies; we link to them in the engine selector.
 **What we send to _our_ servers:** nothing. Reverse search bypasses our
 backend entirely.
 
-### 3.4 Image bytes you choose to download
+### 3.4 Referral system — `image-harvest.kyriewen.cn/api/referral/*`
+
+**When:** when you share your invite link and a friend visits it, or
+when a new installation checks for a matching referral on first launch.
+
+**Sent:**
+
+- A random per-install `instanceId` (same one used for license checks —
+  not tied to your identity).
+- A browser fingerprint hash (canvas + WebGL + UA string, hashed
+  client-side into a single opaque string). This is used **only** to
+  match an invite-page visit to a subsequent extension install within
+  the same browser. It is **not** used for tracking or advertising.
+- The referrer's `instanceId` (so we know who invited whom).
+
+**Not sent:**
+
+- ❌ No browsing history, URLs, page titles, or image data.
+- ❌ No email addresses, names, or social identifiers.
+- ❌ The fingerprint hash cannot be reversed to recover its inputs.
+
+**Data retention:** pending referral records expire after 7 days.
+Completed referral records are kept to prevent duplicate claims but
+contain only opaque install IDs and timestamps.
+
+**Source:** `shared/referral.ts > matchReferral / copyReferralLink / claimReferral`.
+
+### 3.5 Remote feature configuration — `image-harvest.kyriewen.cn/api/config/limits`
+
+**When:** periodically (at most once per hour) to fetch current feature
+quotas (e.g. how many free AI tags per month).
+
+**Sent:** a standard HTTPS GET request with no body, no auth token, and
+no user-identifying information. The response is a public JSON object
+listing feature limits — the same data shown on our pricing page.
+
+**Source:** `shared/remote-config.ts > fetchRemoteConfig`.
+
+### 3.6 Image bytes you choose to download
 
 When you save an image, Chrome's `downloads.download()` fetches the
 URL. Some pages serve images that require HTTPS (or block CORS), so the

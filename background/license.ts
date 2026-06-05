@@ -16,7 +16,6 @@ export function initLicenseAlarm(): void {
 
   chrome.alarms.onAlarm.addListener(async (alarm) => {
     if (alarm.name !== LICENSE_ALARM_NAME) return;
-    console.log('[License] Periodic license check triggered');
     const result = await periodicLicenseCheck();
     // `periodicLicenseCheck` may return either { isPro: false } or full ProUserInfo.
     // Forward whatever fields exist; `plan`/`status` may be undefined for the

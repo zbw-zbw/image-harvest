@@ -2,6 +2,53 @@
 import { arrayBufferToBase64 } from './utils';
 import { isAllowedFetchUrl } from '../shared/url-validator';
 
+/** Detect image MIME type from the first few bytes (magic number). */
+function detectImageMimeFromBytes(bytes: Uint8Array): string | null {
+  if (bytes.length < 4) return null;
+  // PNG: 89 50 4E 47
+  if (bytes[0] === 0x89 && bytes[1] === 0x50 && bytes[2] === 0x4e && bytes[3] === 0x47) {
+    return 'image/png';
+  }
+  // JPEG: FF D8 FF
+  if (bytes[0] === 0xff && bytes[1] === 0xd8 && bytes[2] === 0xff) {
+    return 'image/jpeg';
+  }
+  // GIF: 47 49 46
+  if (bytes[0] === 0x47 && bytes[1] === 0x49 && bytes[2] === 0x46) {
+    return 'image/gif';
+  }
+  // WebP: 52 49 46 46 ... 57 45 42 50
+  if (
+    bytes.length >= 12 &&
+    bytes[0] === 0x52 &&
+    bytes[1] === 0x49 &&
+    bytes[2] === 0x46 &&
+    bytes[3] === 0x46 &&
+    bytes[8] === 0x57 &&
+    bytes[9] === 0x45 &&
+    bytes[10] === 0x42 &&
+    bytes[11] === 0x50
+  ) {
+    return 'image/webp';
+  }
+  // BMP: 42 4D
+  if (bytes[0] === 0x42 && bytes[1] === 0x4d) {
+    return 'image/bmp';
+  }
+  // ICO: 00 00 01 00
+  if (bytes[0] === 0x00 && bytes[1] === 0x00 && bytes[2] === 0x01 && bytes[3] === 0x00) {
+    return 'image/x-icon';
+  }
+  // SVG: starts with < (text-based)
+  if (bytes[0] === 0x3c) {
+    const header = new TextDecoder().decode(bytes.slice(0, 256));
+    if (header.includes('<svg') || header.includes('<?xml')) {
+      return 'image/svg+xml';
+    }
+  }
+  return null;
+}
+
 interface ReverseSearchSuccess {
   success: true;
   injected?: boolean;
@@ -44,10 +91,18 @@ export async function fetchImageData(url: string): Promise<string> {
     throw new Error(`HTTP ${imageResponse.status}`);
   }
   const arrayBuffer = await imageResponse.arrayBuffer();
-  const contentType = imageResponse.headers.get('content-type') || 'image/png';
+  let contentType = imageResponse.headers.get('content-type') || '';
+
+  // If content-type is not image/*, try to detect from magic bytes
   if (!contentType.startsWith('image/')) {
-    throw new Error('Response is not an image');
+    const detected = detectImageMimeFromBytes(new Uint8Array(arrayBuffer));
+    if (detected) {
+      contentType = detected;
+    } else {
+      throw new Error('Response is not an image');
+    }
   }
+
   const base64 = arrayBufferToBase64(arrayBuffer);
   return `data:${contentType};base64,${base64}`;
 }
@@ -187,14 +242,11 @@ async function uploadToYandex(
     },
   });
 
-  console.log('[ReverseSearch] Yandex response status:', yandexResp.status);
-
   if (!yandexResp.ok) {
     throw new Error(`Yandex HTTP ${yandexResp.status}`);
   }
 
   const yandexResult = (await yandexResp.json()) as YandexResponse;
-  console.log('[ReverseSearch] Yandex upload response:', yandexResult);
 
   const cbirParams = yandexResult?.blocks?.[0]?.params;
   if (cbirParams?.cbirId) {

@@ -8,7 +8,7 @@ import { fetchImages, processImageExtras } from './scan';
 import { state } from './state';
 import { track, isOptedIn, setOptIn } from '../shared/telemetry';
 import { EVENTS } from '../shared/telemetry-events';
-import { getLocale, setLocale, t, type Locale } from '../shared/i18n';
+import { getLocale, t } from '../shared/i18n';
 import { checkNarrowMode, showConfirmDialog, showToast, updateFilterButtonLabels } from './ui';
 
 // ============================================
@@ -110,10 +110,18 @@ export function showSettings(): void {
   );
   setSelect('setting-convert-format', (state.appSettings.convertFormat as string) || 'none');
   setToggle('setting-all-frames', !!state.appSettings.searchAllFrames);
-  setToggle(
-    'setting-live-monitor',
-    state.isProUser ? state.appSettings.liveMonitoring !== false : false
-  );
+  setToggle('setting-live-monitor', state.appSettings.liveMonitoring !== false);
+  // If the free user's live-monitor quota is exhausted, force the toggle off
+  // so the UI reflects reality instead of showing a stale "checked" state.
+  if (!state.isProUser && state.appSettings.liveMonitoring !== false) {
+    void import('../shared/feature-quota').then(({ checkFeatureQuota }) =>
+      checkFeatureQuota('liveMonitor').then(({ allowed }) => {
+        if (!allowed) {
+          setToggle('setting-live-monitor', false);
+        }
+      })
+    );
+  }
   setToggle('setting-min-size', !!state.appSettings.enableMinSize);
   setInput(
     'setting-min-width',
@@ -191,8 +199,7 @@ export async function saveSettings(): Promise<void> {
     | 'jpeg'
     | 'webp';
   state.appSettings.searchAllFrames = getToggle('setting-all-frames');
-  // Free tier: Live Monitoring requires Pro
-  state.appSettings.liveMonitoring = state.isProUser ? getToggle('setting-live-monitor') : false;
+  state.appSettings.liveMonitoring = getToggle('setting-live-monitor');
   state.appSettings.enableMinSize = getToggle('setting-min-size');
   const parsedMinWidth = parseInt(getInput('setting-min-width'));
   state.appSettings.minWidth = isNaN(parsedMinWidth)
@@ -500,28 +507,18 @@ export async function applyProFeatureVisibility(): Promise<void> {
   // Download format dropdown: Pro items are not disabled, just show PRO badge
   // Pro check is handled in the click event
 
-  // Custom Naming: disable filename template input for free users
+  // Custom Naming: now free for all users (CUSTOM_NAMING: true in FREE_LIMITS).
+  // Ensure inputs are always enabled and never show pro-locked styling.
   const filenameInput = document.getElementById('setting-filename') as HTMLInputElement | null;
   if (filenameInput) {
-    if (state.isProUser) {
-      filenameInput.disabled = false;
-      filenameInput.closest('.setting-item')?.classList.remove('pro-locked');
-    } else {
-      filenameInput.disabled = true;
-      filenameInput.closest('.setting-item')?.classList.add('pro-locked');
-    }
+    filenameInput.disabled = false;
+    filenameInput.closest('.setting-item')?.classList.remove('pro-locked');
   }
 
-  // Subfolder naming: disable for free users
   const subfolderInput = document.getElementById('setting-subfolder') as HTMLInputElement | null;
   if (subfolderInput) {
-    if (state.isProUser) {
-      subfolderInput.disabled = false;
-      subfolderInput.closest('.setting-item')?.classList.remove('pro-locked');
-    } else {
-      subfolderInput.disabled = true;
-      subfolderInput.closest('.setting-item')?.classList.add('pro-locked');
-    }
+    subfolderInput.disabled = false;
+    subfolderInput.closest('.setting-item')?.classList.remove('pro-locked');
   }
 
   // Group mode, reverse search, delete buttons: no visual disable
@@ -700,20 +697,31 @@ export function bindProGuards(): void {
     );
   });
 
-  // Multi-tab extraction is Pro-only. Free users can open the dialog and
-  // browse the tab list, but clicking "Start Extraction" is blocked here.
+  // Multi-tab extraction — free users get a monthly quota.
+  // The primary quota gate lives in pro-features.ts > showMultiTabModal(),
+  // but we keep a secondary guard on the "Start Extraction" button as well
+  // so the user gets immediate feedback if their quota ran out mid-session.
   const btnStartExtraction = document.getElementById('btn-start-extraction');
   if (btnStartExtraction) {
     btnStartExtraction.addEventListener(
       'click',
-      (e) => {
+      async (e) => {
         if (!state.isProUser) {
-          e.stopImmediatePropagation();
           e.preventDefault();
-          state.multitabModalState = { open: false };
-          showToast(t('pro_feature_blocked_multitab'), 'warning');
-          void track(EVENTS.PRO_FEATURE_BLOCKED, { feature: 'multitab_extract' });
-          showProUpgradeModal();
+          const { checkFeatureQuota } = await import('../shared/feature-quota');
+          const { allowed, limit } = await checkFeatureQuota('multiTab');
+          if (!allowed) {
+            state.multitabModalState = { open: false };
+            showToast(
+              t('quota_exhausted_monthly', {
+                feature: t('feature_multitab'),
+                limit: String(limit),
+              }),
+              'warning'
+            );
+            void track(EVENTS.PRO_FEATURE_BLOCKED, { feature: 'multitab_extract' });
+            showProUpgradeModal();
+          }
         }
       },
       true
@@ -723,42 +731,58 @@ export function bindProGuards(): void {
   // Color filter: free users can open dropdown to see colors, but clicking a swatch triggers Pro upgrade
   // (Pro check is handled in the color swatch click event, not here)
 
-  // Settings: Pro toggle interception (Live Monitor)
+  // Settings: Live Monitor — free users get a monthly quota.
+  // When quota is exhausted, block toggle and show Pro upgrade.
+  // When quota is available, let the toggle work and increment usage.
   const liveMonitorSetting = document.getElementById('setting-live-monitor');
   if (liveMonitorSetting) {
     liveMonitorSetting.addEventListener(
       'click',
-      (e) => {
+      async (e) => {
         if (!state.isProUser) {
+          const checkbox = liveMonitorSetting as HTMLInputElement;
+          // If the user is turning the feature OFF, always allow it — no
+          // quota check needed. Chrome toggles the checkbox *before*
+          // firing the click event, so `checked === false` at this point
+          // means the user just unchecked it (turning OFF).
+          if (!checkbox.checked) {
+            // Let the browser keep the unchecked state (turning OFF)
+            return;
+          }
+
           e.preventDefault();
           e.stopImmediatePropagation();
-          closeSettings();
-          showToast(t('toast_pro_setting_locked'), 'warning');
-          void track(EVENTS.PRO_FEATURE_BLOCKED, { feature: 'live_monitor' });
-          showProUpgradeModal();
+          const { checkFeatureQuota, incrementFeatureUsage } =
+            await import('../shared/feature-quota');
+          const { allowed, limit } = await checkFeatureQuota('liveMonitor');
+          if (!allowed) {
+            closeSettings();
+            showToast(
+              t('quota_exhausted_monthly', {
+                feature: t('feature_live_monitor'),
+                limit: String(limit),
+              }),
+              'warning'
+            );
+            void track(EVENTS.PRO_FEATURE_BLOCKED, { feature: 'live_monitor' });
+            showProUpgradeModal();
+          } else {
+            // Quota available — manually toggle and count usage
+            checkbox.checked = !checkbox.checked;
+            if (checkbox.checked) {
+              await incrementFeatureUsage('liveMonitor');
+            }
+            // Trigger change so saveSettings picks it up
+            checkbox.dispatchEvent(new Event('change', { bubbles: true }));
+          }
         }
       },
       true
     );
   }
 
-  // Settings: Pro input fields interception (Subfolder, Filename Template)
-  ['setting-subfolder', 'setting-filename'].forEach((id) => {
-    const input = document.getElementById(id) as HTMLInputElement | null;
-    if (!input) return;
-    input.addEventListener('focus', (e) => {
-      if (!state.isProUser) {
-        e.preventDefault();
-        input.blur();
-        closeSettings();
-        showToast(t('toast_pro_naming_locked'), 'warning');
-        // Telemetry: subfolder + filename templates share the same Pro
-        // gate so we group them under 'custom_naming' in the funnel.
-        void track(EVENTS.PRO_FEATURE_BLOCKED, { feature: 'custom_naming' });
-        showProUpgradeModal();
-      }
-    });
-  });
+  // Custom naming (subfolder / filename template) is now free for all users.
+  // Pro guard removed — CUSTOM_NAMING: true in FREE_LIMITS.
 }
 
 // activateLicenseFromInput / bindLicenseKeyFormatter / formatDateYMD /

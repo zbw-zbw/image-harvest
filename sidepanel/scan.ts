@@ -16,7 +16,7 @@ import { saveTabImageCache } from '../shared/storage';
 import { loadAiTagsMap } from '../shared/ai-tags-store';
 import { elements, state } from './state';
 import { hideLoading, showEmpty, showError, showLoading, showToast } from './ui';
-import { fetchImageMeta, formatBytes, generateId } from './utils';
+import { fetchImageMeta, generateId } from './utils';
 
 // ============================================
 // Scan Overlay Control
@@ -421,7 +421,6 @@ export async function fetchImages(targetTabId?: number): Promise<void> {
     // "response failed" (content script not ready) and "0 images" (SPA
     // hasn't rendered yet) scenarios.
     const retryDelays = [500, 1000, 1500];
-    let retryCount = 0;
     for (const delay of retryDelays) {
       const hasImages = response?.success && response.images && response.images.length > 0;
       if (hasImages || state.scanAborted) break;
@@ -429,8 +428,6 @@ export async function fetchImages(targetTabId?: number): Promise<void> {
       // If we already received IMAGES_DISCOVERED messages but final response is empty,
       // the content script is alive and the page genuinely has no new images — skip retry.
       if (state.scanDiscoveredImages.length > 0 && response?.success) break;
-
-      retryCount++;
       await new Promise<void>((resolve) => setTimeout(resolve, delay));
       if (state.scanAborted) break;
 

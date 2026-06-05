@@ -351,6 +351,12 @@ export async function startMultiTabExtract(tabIds: number[]): Promise<void> {
 
       if (addedCount > 0) {
         processImageExtras(newImages);
+        // Increment quota usage only after successful extraction
+        if (!state.isProUser) {
+          import('../shared/feature-quota').then(({ incrementFeatureUsage }) =>
+            incrementFeatureUsage('multiTab')
+          );
+        }
       }
     } else {
       showToast(

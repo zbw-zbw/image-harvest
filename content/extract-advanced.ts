@@ -303,6 +303,7 @@ export async function extractMetaAndLinkImages(images: Map<string, ImageItem>): 
       sourceDomain: getDomain(resolvedUrl),
       checked: false,
       timestamp: Date.now(),
+      visible: false,
     } as ImageItem);
   }
 
@@ -333,6 +334,7 @@ export async function extractMetaAndLinkImages(images: Map<string, ImageItem>): 
       sourceDomain: getDomain(resolvedUrl),
       checked: false,
       timestamp: Date.now(),
+      visible: false,
     } as ImageItem);
   }
 }

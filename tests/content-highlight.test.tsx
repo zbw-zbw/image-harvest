@@ -30,6 +30,7 @@ vi.mock('../content/utils', () => ({
       return { url, width: 0 };
     })
   ),
+  isElementAccessibleWithoutInteraction: vi.fn(() => true),
 }));
 
 vi.mock('../content/shadow-iframe', () => ({
@@ -830,6 +831,11 @@ describe('overlay lifecycle — ESC / click-to-dismiss', () => {
     addHighlight('https://example.com/click-target.jpg');
     const overlay = document.querySelector('.image-harvest-overlay') as HTMLDivElement;
     expect(overlay).not.toBeNull();
+
+    // The click listener is registered inside a setTimeout(…, 0) to avoid
+    // the triggering click from immediately dismissing. Flush the timer
+    // so the listener is active before we click.
+    await new Promise((r) => setTimeout(r, 0));
 
     overlay.click();
 

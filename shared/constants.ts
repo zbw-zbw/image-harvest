@@ -57,7 +57,11 @@ export const STORAGE_KEYS = {
   INSTANCE_ID: 'instanceId',
   AI_QUOTA: 'aiQuota',
   AI_TAGS: 'aiTags',
-  AI_FREE_DAILY: 'aiFreeDaily',
+  AI_FREE_MONTHLY: 'aiFreeMonthly',
+  EAGLE_FREE_MONTHLY: 'eagleFreeMonthly',
+  SHOW_VISIBLE_ONLY: 'showVisibleOnly',
+  FEATURE_QUOTA: 'featureQuota',
+  TRIAL_START: 'trialStart',
 } as const;
 
 export const MESSAGE_TYPES = {
@@ -124,6 +128,9 @@ export const MESSAGE_TYPES = {
   // AI tagging
   AI_TAG_IMAGE: 'AI_TAG_IMAGE',
   AI_TAG_BATCH: 'AI_TAG_BATCH',
+
+  // Visibility re-check (side panel → content script)
+  CHECK_VISIBILITY: 'CHECK_VISIBILITY',
 } as const;
 
 export type MessageType = (typeof MESSAGE_TYPES)[keyof typeof MESSAGE_TYPES];
@@ -187,10 +194,8 @@ export const PRO_FEATURES = [
   'collection',
   'multiTabExtract',
   'formatConversion',
-  'customNaming',
   'batchHighlight',
   'advancedGrouping',
-  'advancedPreview',
   'liveMonitoring',
   'unlimitedZip',
   'eagleExport',
@@ -210,21 +215,101 @@ export const VALID_REVERSE_SEARCH_ENGINES = ['google', 'tineye', 'baidu', 'yande
 //   - MAX_COLLECTION_ITEMS: 5  (was: collection fully Pro; now 5 free favorites)
 export const FREE_LIMITS = {
   MAX_ZIP_IMAGES: 30,
-  MAX_BATCH_COPY_URLS: 20,
-  MAX_COLLECTION_ITEMS: 5,
-  MAX_DAILY_AI_TAGS: 3,
-  MAX_FREE_EAGLE_EXPORT: 5,
+  MAX_BATCH_COPY_URLS: 10,
+  MAX_COLLECTION_ITEMS: 10,
+  MAX_MONTHLY_AI_TAGS: 10,
+  MAX_EAGLE_EXPORT_PER_BATCH: 10,
+  MAX_BATCH_DELETE: 15,
+  MAX_BATCH_FAVORITE: 15,
   ALLOWED_GROUP_MODES: ['none', 'format'] as const,
   REVERSE_SEARCH_ENGINES: ['google', 'tineye'] as const,
   COLOR_EXTRACT_COPY: false,
-  COLOR_EXTRACT_FILTER: false,
+  COLOR_EXTRACT_FILTER: true,
   HIGHLIGHT_BATCH: false,
-  PREVIEW_ADVANCED: false,
   LIVE_MONITORING: false,
   IMAGE_DELETE: true,
   FORMAT_CONVERSION: false,
-  CUSTOM_NAMING: false,
+  CUSTOM_NAMING: true,
+  // Monthly quota for features that were previously fully locked.
+  // These give free users limited access so they can experience the value.
+  MAX_MONTHLY_MULTI_TAB: 3,
+  MAX_MONTHLY_DEDUP: 3,
+  MAX_MONTHLY_FORMAT_CONVERT: 5,
+  MAX_MONTHLY_LIVE_MONITOR: 1,
+  MAX_DAILY_BATCH_HIGHLIGHT: 3,
 } as const;
+
+/**
+ * Get effective free-tier limits, merging remote config over hardcoded defaults.
+ * Use this instead of accessing FREE_LIMITS directly when the value may be
+ * overridden from the admin dashboard.
+ *
+ * Returns synchronously — uses whatever remote config is already in memory.
+ * The remote config is populated by the Service Worker on startup.
+ */
+export function getFreeLimits(): typeof FREE_LIMITS {
+  // Lazy import to avoid circular dependency at module load time
+  // eslint-disable-next-line @typescript-eslint/no-require-imports
+  try {
+    // Dynamic import won't work synchronously, so we use a global cache
+    // that remote-config.ts populates on sync.
+    const remote = (globalThis as Record<string, unknown>).__remoteConfig as
+      | Record<string, unknown>
+      | undefined;
+    if (!remote) return FREE_LIMITS;
+
+    return {
+      ...FREE_LIMITS,
+      MAX_ZIP_IMAGES: (typeof remote.maxZipImages === 'number'
+        ? remote.maxZipImages
+        : FREE_LIMITS.MAX_ZIP_IMAGES) as typeof FREE_LIMITS.MAX_ZIP_IMAGES,
+      MAX_BATCH_COPY_URLS: (typeof remote.maxBatchCopyUrls === 'number'
+        ? remote.maxBatchCopyUrls
+        : FREE_LIMITS.MAX_BATCH_COPY_URLS) as typeof FREE_LIMITS.MAX_BATCH_COPY_URLS,
+      MAX_COLLECTION_ITEMS: (typeof remote.maxCollectionItems === 'number'
+        ? remote.maxCollectionItems
+        : FREE_LIMITS.MAX_COLLECTION_ITEMS) as typeof FREE_LIMITS.MAX_COLLECTION_ITEMS,
+      MAX_MONTHLY_AI_TAGS: (typeof remote.maxMonthlyAiTags === 'number'
+        ? remote.maxMonthlyAiTags
+        : FREE_LIMITS.MAX_MONTHLY_AI_TAGS) as typeof FREE_LIMITS.MAX_MONTHLY_AI_TAGS,
+      MAX_EAGLE_EXPORT_PER_BATCH: (typeof remote.maxEagleExportPerBatch === 'number'
+        ? remote.maxEagleExportPerBatch
+        : FREE_LIMITS.MAX_EAGLE_EXPORT_PER_BATCH) as typeof FREE_LIMITS.MAX_EAGLE_EXPORT_PER_BATCH,
+      MAX_BATCH_DELETE: (typeof remote.maxBatchDelete === 'number'
+        ? remote.maxBatchDelete
+        : FREE_LIMITS.MAX_BATCH_DELETE) as typeof FREE_LIMITS.MAX_BATCH_DELETE,
+      MAX_BATCH_FAVORITE: (typeof remote.maxBatchFavorite === 'number'
+        ? remote.maxBatchFavorite
+        : FREE_LIMITS.MAX_BATCH_FAVORITE) as typeof FREE_LIMITS.MAX_BATCH_FAVORITE,
+      MAX_MONTHLY_MULTI_TAB: (typeof remote.maxMonthlyMultiTab === 'number'
+        ? remote.maxMonthlyMultiTab
+        : FREE_LIMITS.MAX_MONTHLY_MULTI_TAB) as typeof FREE_LIMITS.MAX_MONTHLY_MULTI_TAB,
+      MAX_MONTHLY_DEDUP: (typeof remote.maxMonthlyDedup === 'number'
+        ? remote.maxMonthlyDedup
+        : FREE_LIMITS.MAX_MONTHLY_DEDUP) as typeof FREE_LIMITS.MAX_MONTHLY_DEDUP,
+      MAX_MONTHLY_FORMAT_CONVERT: (typeof remote.maxMonthlyFormatConvert === 'number'
+        ? remote.maxMonthlyFormatConvert
+        : FREE_LIMITS.MAX_MONTHLY_FORMAT_CONVERT) as typeof FREE_LIMITS.MAX_MONTHLY_FORMAT_CONVERT,
+      MAX_MONTHLY_LIVE_MONITOR: (typeof remote.maxMonthlyLiveMonitor === 'number'
+        ? remote.maxMonthlyLiveMonitor
+        : FREE_LIMITS.MAX_MONTHLY_LIVE_MONITOR) as typeof FREE_LIMITS.MAX_MONTHLY_LIVE_MONITOR,
+      MAX_DAILY_BATCH_HIGHLIGHT: (typeof remote.maxDailyBatchHighlight === 'number'
+        ? remote.maxDailyBatchHighlight
+        : FREE_LIMITS.MAX_DAILY_BATCH_HIGHLIGHT) as typeof FREE_LIMITS.MAX_DAILY_BATCH_HIGHLIGHT,
+      ALLOWED_GROUP_MODES: Array.isArray(remote.allowedGroupModes)
+        ? (remote.allowedGroupModes as unknown as typeof FREE_LIMITS.ALLOWED_GROUP_MODES)
+        : FREE_LIMITS.ALLOWED_GROUP_MODES,
+      REVERSE_SEARCH_ENGINES: Array.isArray(remote.reverseSearchEngines)
+        ? (remote.reverseSearchEngines as unknown as typeof FREE_LIMITS.REVERSE_SEARCH_ENGINES)
+        : FREE_LIMITS.REVERSE_SEARCH_ENGINES,
+    };
+  } catch {
+    return FREE_LIMITS;
+  }
+}
+
+// Default filter setting for visible-only images
+export const DEFAULT_SHOW_VISIBLE_ONLY = true;
 
 // V2.0 Reverse search engines
 export const SEARCH_ENGINES = {
@@ -257,6 +342,7 @@ const API_BASE = import.meta.env.VITE_API_BASE || 'https://image-harvest.kyriewe
 // License & Payment
 export const LICENSE_API_URL = `${API_BASE}/api/license`;
 export const PRICING_PAGE_URL = `${API_BASE}/pricing`;
+export const INVITE_PAGE_URL = `${API_BASE}/invite`;
 
 // Telemetry (anonymous, opt-in). See shared/telemetry.ts.
 //   - FLUSH_INTERVAL_MS: max time a single event waits in the queue before
@@ -291,7 +377,22 @@ export const EAGLE_BATCH_SIZE = 10;
 // AI tagging (Phase 4) — backend API + quota.
 export const AI_TAG_API_URL = `${API_BASE}/api/ai/tag`;
 export const AI_TAG_BATCH_API_URL = `${API_BASE}/api/ai/tag-batch`;
-export const AI_QUOTA_LIMIT = 100;
+/** Fallback Pro AI quota when remote config is unavailable. Must match backend default. */
+export const AI_QUOTA_LIMIT_FALLBACK = 100;
+
+/**
+ * Get the effective Pro AI monthly quota limit from remote config,
+ * falling back to the hardcoded default if remote config is unavailable.
+ */
+export function getProAiQuotaLimit(): number {
+  const remote = (globalThis as Record<string, unknown>).__remoteConfig as
+    | Record<string, unknown>
+    | undefined;
+  if (remote && typeof remote.proAiMonthlyQuota === 'number') {
+    return remote.proAiMonthlyQuota;
+  }
+  return AI_QUOTA_LIMIT_FALLBACK;
+}
 export const AI_TAG_CATEGORIES = [
   'photo',
   'illustration',

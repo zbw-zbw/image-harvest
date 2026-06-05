@@ -38,6 +38,7 @@
  * then set an explicit pixel height so overflow-y: auto can trigger.
  */
 function adjustImageGridHeight(): void {
+  if (typeof document === 'undefined') return;
   const app = document.getElementById('app');
   const gridWrapper = document.querySelector<HTMLElement>('.image-grid-wrapper');
   const grid = document.getElementById('image-grid');

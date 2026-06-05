@@ -1,5 +1,5 @@
 import { t } from '../../shared/i18n';
-import { MESSAGE_TYPES, FREE_LIMITS } from '../../shared/constants';
+import { MESSAGE_TYPES, getFreeLimits } from '../../shared/constants';
 import { track } from '../../shared/telemetry';
 import { EVENTS } from '../../shared/telemetry-events';
 import { useStoreSelector } from './storeHook';
@@ -41,13 +41,16 @@ export function EagleExportButton() {
   const countLabel = !isExporting && effectiveCount > 0 ? ` (${effectiveCount})` : '';
 
   async function handleClick(): Promise<void> {
-    if (!isPro && effectiveCount > FREE_LIMITS.MAX_FREE_EAGLE_EXPORT) {
-      showToast(
-        t('toast_eagle_free_limit', { max: String(FREE_LIMITS.MAX_FREE_EAGLE_EXPORT) }),
-        'warning'
-      );
-      showProUpgradeModal();
-      return;
+    if (!isPro) {
+      // Check single-batch size limit
+      if (effectiveCount > getFreeLimits().MAX_EAGLE_EXPORT_PER_BATCH) {
+        showToast(
+          t('toast_eagle_free_limit', { max: String(getFreeLimits().MAX_EAGLE_EXPORT_PER_BATCH) }),
+          'warning'
+        );
+        showProUpgradeModal();
+        return;
+      }
     }
     if (disabled) return;
 

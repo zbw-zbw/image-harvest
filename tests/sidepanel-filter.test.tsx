@@ -35,6 +35,7 @@ vi.mock('../sidepanel/settings', () => ({
 vi.mock('../sidepanel/ui', () => ({
   showToast: vi.fn(),
   updateFilterButtonLabels: vi.fn(),
+  updateFilterDropdownCounts: vi.fn(),
 }));
 
 import {
@@ -74,6 +75,7 @@ function makeImg(overrides: Partial<ImageItem> = {}): ImageItem {
     naturalWidth: 800,
     naturalHeight: 600,
     format: 'jpg',
+    visible: true,
     ...overrides,
   } as ImageItem;
 }
@@ -769,9 +771,9 @@ describe('renderColorSwatches', () => {
     expect(greenSwatch.classList.contains('active')).toBe(false);
   });
 
-  it('click by FREE user → Pro upgrade modal + activeFilters.color untouched', async () => {
+  it('click by FREE user → color filter activates normally (no Pro gate)', async () => {
+    const renderMod = await import('../sidepanel/render');
     const settingsMod = await import('../sidepanel/settings');
-    const uiMod = await import('../sidepanel/ui');
     const container = mountContainer();
     state.isProUser = false;
     state.activeFilters = { ...state.activeFilters, color: null };
@@ -779,14 +781,17 @@ describe('renderColorSwatches', () => {
       makeImg({ id: 'a', colors: ['#ff0000'] }),
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     ] as any;
+    state.lastRenderedFilteredIds = null;
     renderColorSwatches();
 
     container.querySelector<HTMLElement>('.color-swatch')!.click();
 
-    // Pro upsell fired; filter state NOT mutated (pin: conversion funnel).
-    expect(uiMod.showToast).toHaveBeenCalledWith(expect.stringContaining('Pro feature'), 'warning');
-    expect(settingsMod.showProUpgradeModal).toHaveBeenCalledTimes(1);
-    expect(state.activeFilters.color).toBeNull();
+    // Color filter is now available to all users — no Pro gate.
+    expect(state.activeFilters.color).toBe('#ff0000');
+    expect(settingsMod.showProUpgradeModal).not.toHaveBeenCalled();
+    expect(updateFilterButtonLabels).toHaveBeenCalled();
+    expect(renderMod.renderImages).toHaveBeenCalled();
+    expect(settingsMod.closeAllFilterDropdowns).toHaveBeenCalled();
   });
 
   it('click by PRO user → activates swatch + updates state + triggers applyFilters pipeline', async () => {

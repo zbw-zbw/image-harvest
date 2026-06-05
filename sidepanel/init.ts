@@ -2,7 +2,14 @@
 // This is the single entry point loaded by sidepanel.html / popup.html.
 // Importing the other modules below ensures they are bundled together.
 
-import { FREE_LIMITS, MESSAGE_TYPES, TIMING } from '../shared/constants';
+import {
+  FREE_LIMITS,
+  getFreeLimits,
+  MESSAGE_TYPES,
+  TIMING,
+  STORAGE_KEYS,
+  DEFAULT_SHOW_VISIBLE_ONLY,
+} from '../shared/constants';
 import { setEnvelopeMeta, track, flushNow } from '../shared/telemetry';
 import { EVENTS } from '../shared/telemetry-events';
 import { isProUser } from '../shared/license';
@@ -12,7 +19,6 @@ import {
   clearSelection,
   downloadSelectedAsZip,
   downloadSingle,
-  hideDownloadDropdown,
   removeAllHighlightsOnPage,
   reverseSearch,
   selectAll,
@@ -25,6 +31,7 @@ import {
   applyFileSizePreset,
   applyFilters,
   clearCustomSizeInputs,
+  refreshVisibility,
   resetAllFilters,
   syncCustomSizeInputsFromSettings,
 } from './filter';
@@ -252,7 +259,11 @@ async function init(): Promise<void> {
   // by the time image cards render and the user can click AI Tag.
   const quotaPromise = proVisibilityPromise.then(async () => {
     if (state.isProUser) {
-      const { getRemainingQuota } = await import('../shared/ai-quota');
+      const [{ getRemainingQuota }, { getProAiQuotaLimit }] = await Promise.all([
+        import('../shared/ai-quota'),
+        import('../shared/constants'),
+      ]);
+      state.aiQuotaLimit = getProAiQuotaLimit();
       state.aiQuotaRemaining = await getRemainingQuota();
     }
   });
@@ -365,8 +376,37 @@ async function init(): Promise<void> {
         }
 
         // If we already have images for the current tab (either in memory
-        // cache or currently displayed), skip the rescan.
+        // cache or currently displayed), skip the rescan — but force-reload
+        // any lazy images that the browser may have evicted while hidden.
         if (state.tabCache.has(state.currentTabId) || state.allImages.length > 0) {
+          // Nudge the browser to re-evaluate lazy images that may have been
+          // evicted while the sidepanel was hidden (e.g. user opens a new
+          // window and comes back). Instead of removing and re-assigning
+          // src (which causes a visible flash and can leave images stuck),
+          // temporarily switch loading from "lazy" to "eager" so the
+          // browser bypasses IntersectionObserver and fetches immediately,
+          // then restore "lazy" for future scroll-based loading.
+          requestAnimationFrame(() => {
+            const staleImages: HTMLImageElement[] = [];
+            document
+              .querySelectorAll<HTMLImageElement>('.card-thumb img[loading="lazy"]')
+              .forEach((img) => {
+                if (!img.complete || img.naturalWidth === 0) {
+                  staleImages.push(img);
+                }
+              });
+            if (staleImages.length === 0) return;
+            for (const img of staleImages) {
+              img.loading = 'eager';
+            }
+            // Restore lazy loading after a short delay so future images
+            // outside the viewport remain lazily loaded.
+            setTimeout(() => {
+              for (const img of staleImages) {
+                img.loading = 'lazy';
+              }
+            }, 500);
+          });
           return;
         }
 
@@ -524,15 +564,8 @@ function bindEvents(): void {
       if (imagesToDownload.length === 1) {
         downloadSingle(imagesToDownload[0], null);
       } else {
-        if (!hasSelection) {
-          // Temporarily select all for zip download, then clear
-          state.filteredImages.forEach((img) => state.selectedImages.add(img.id));
-          downloadSelectedAsZip(null).finally(() => {
-            state.selectedImages.clear();
-          });
-        } else {
-          downloadSelectedAsZip(null);
-        }
+        // Pass images directly — no need to temporarily mutate selectedImages
+        downloadSelectedAsZip(null, imagesToDownload);
       }
     });
   }
@@ -547,49 +580,41 @@ function bindEvents(): void {
 
   // Download dropdown items
   if (elements.downloadDropdown) {
-    elements.downloadDropdown.addEventListener('click', (e) => {
+    elements.downloadDropdown.addEventListener('click', async (e) => {
       const item = (e.target as HTMLElement).closest<HTMLElement>('[data-format]');
       if (item) {
         const format = item.dataset.format;
-        // Pro check: non-original formats require Pro
+        // Quota check: non-original formats use monthly formatConvert quota
         if (!state.isProUser && format !== 'original') {
-          showToast(t('pro_feature_blocked_format_conversion'), 'warning');
-          showProUpgradeModal();
-          return;
+          const { checkFeatureQuota } = await import('../shared/feature-quota');
+          const { allowed, limit } = await checkFeatureQuota('formatConvert');
+          if (!allowed) {
+            showToast(
+              t('quota_exhausted_monthly', {
+                feature: t('feature_format_convert'),
+                limit: String(limit),
+              }),
+              'warning'
+            );
+            showProUpgradeModal();
+            return;
+          }
         }
         elements
           .downloadDropdown!.querySelectorAll('.dropdown-item')
           .forEach((el) => el.classList.remove('active'));
         item.classList.add('active');
         const convertFormat = format === 'original' ? null : (format ?? null);
-        const isZip = item.dataset.zip === 'true';
-        if (isZip) {
-          if (state.selectedImages.size === 0) {
-            state.filteredImages.forEach((img) => state.selectedImages.add(img.id));
-            downloadSelectedAsZip(convertFormat).finally(() => {
-              state.selectedImages.clear();
-            });
-          } else {
-            downloadSelectedAsZip(convertFormat);
-          }
+        const hasSelection = state.selectedImages.size > 0;
+        const imagesToDownload = hasSelection
+          ? state.filteredImages.filter((img) => state.selectedImages.has(img.id))
+          : state.filteredImages;
+        if (imagesToDownload.length === 0) return;
+        if (imagesToDownload.length === 1) {
+          downloadSingle(imagesToDownload[0], convertFormat);
         } else {
-          const hasSelection = state.selectedImages.size > 0;
-          const imagesToDownload = hasSelection
-            ? state.filteredImages.filter((img) => state.selectedImages.has(img.id))
-            : state.filteredImages;
-          if (imagesToDownload.length === 0) return;
-          if (imagesToDownload.length === 1) {
-            downloadSingle(imagesToDownload[0], convertFormat);
-          } else {
-            if (!hasSelection) {
-              state.filteredImages.forEach((img) => state.selectedImages.add(img.id));
-              downloadSelectedAsZip(convertFormat).finally(() => {
-                state.selectedImages.clear();
-              });
-            } else {
-              downloadSelectedAsZip(convertFormat);
-            }
-          }
+          // Pass images directly — no need to temporarily mutate selectedImages
+          downloadSelectedAsZip(convertFormat, imagesToDownload);
         }
       }
     });
@@ -760,7 +785,10 @@ function bindEvents(): void {
     opt.addEventListener('click', () => {
       const val = opt.dataset.groupFilter || 'none';
       // Free tier: only 'none' and 'format' grouping allowed
-      if (!state.isProUser && !FREE_LIMITS.ALLOWED_GROUP_MODES.includes(val as 'none' | 'format')) {
+      if (
+        !state.isProUser &&
+        !getFreeLimits().ALLOWED_GROUP_MODES.includes(val as 'none' | 'format')
+      ) {
         showToast(t('pro_feature_blocked_advanced_grouping'), 'warning');
         showProUpgradeModal();
         closeAllFilterDropdowns();
@@ -787,6 +815,48 @@ function bindEvents(): void {
       closeAllFilterDropdowns();
     });
   });
+
+  // Visible-only filter toggle
+  const visibleCheckbox = document.getElementById(
+    'filter-visible-checkbox'
+  ) as HTMLInputElement | null;
+  if (visibleCheckbox) {
+    // Restore persisted state
+    chrome.storage.local.get(STORAGE_KEYS.SHOW_VISIBLE_ONLY).then((result) => {
+      const saved = result[STORAGE_KEYS.SHOW_VISIBLE_ONLY];
+      const isOn = saved !== undefined ? Boolean(saved) : DEFAULT_SHOW_VISIBLE_ONLY;
+      visibleCheckbox.checked = isOn;
+      state.activeFilters.showVisibleOnly = isOn;
+      // Re-apply filters after restoring persisted preference so the image
+      // list reflects the saved visible-only state on first render.
+      applyFilters();
+    });
+    visibleCheckbox.addEventListener('change', () => {
+      state.activeFilters.showVisibleOnly = visibleCheckbox.checked;
+      void chrome.storage.local.set({ [STORAGE_KEYS.SHOW_VISIBLE_ONLY]: visibleCheckbox.checked });
+
+      if (visibleCheckbox.checked) {
+        // Real-time visibility refresh: ask the content script to re-check
+        // which images are currently accessible without interaction, then
+        // apply filters with the updated visibility map. This ensures the
+        // filter result matches the set of images that can be highlighted.
+        void refreshVisibility().then(() => {
+          applyFilters();
+          const visibleCount = state.allImages.filter((img) => img.visible === true).length;
+          const totalCount = state.allImages.length;
+          const hiddenCount = totalCount - visibleCount;
+          showToast(
+            t('toast_visible_only_on', { visible: visibleCount, hidden: hiddenCount }),
+            'info'
+          );
+        });
+      } else {
+        applyFilters();
+        const totalCount = state.allImages.length;
+        showToast(t('toast_visible_only_off', { total: totalCount }), 'info');
+      }
+    });
+  }
 
   // URL filter (with IME composition awareness and debounce)
   if (elements.filterUrlInput) {
@@ -889,7 +959,7 @@ function bindEvents(): void {
         dropdown.classList.toggle('hidden');
       });
       dropdown.querySelectorAll<HTMLElement>('.setting-select-option').forEach((opt) => {
-        opt.addEventListener('click', (e) => {
+        opt.addEventListener('click', async (e) => {
           e.stopPropagation();
           const value = opt.dataset.value || '';
           // Pro check for setting-default-group: Domain/Size/Tab require Pro
@@ -904,17 +974,27 @@ function bindEvents(): void {
             showProUpgradeModal();
             return;
           }
-          // Pro check for setting-convert-format: PNG/JPG/WebP require Pro
+          // Quota check for setting-convert-format: PNG/JPG/WebP use monthly quota
           if (
             selectEl.id === 'setting-convert-format' &&
             !state.isProUser &&
             ['png', 'jpg', 'webp'].includes(value)
           ) {
-            dropdown.classList.add('hidden');
-            closeSettings();
-            showToast(t('pro_feature_blocked_format_conversion'), 'warning');
-            showProUpgradeModal();
-            return;
+            const { checkFeatureQuota } = await import('../shared/feature-quota');
+            const { allowed, limit } = await checkFeatureQuota('formatConvert');
+            if (!allowed) {
+              dropdown.classList.add('hidden');
+              closeSettings();
+              showToast(
+                t('quota_exhausted_monthly', {
+                  feature: t('feature_format_convert'),
+                  limit: String(limit),
+                }),
+                'warning'
+              );
+              showProUpgradeModal();
+              return;
+            }
           }
           setSelect(selectEl.id, value);
           dropdown.classList.add('hidden');
@@ -981,7 +1061,7 @@ function bindEvents(): void {
       // Free tier: only engines in FREE_LIMITS.REVERSE_SEARCH_ENGINES are allowed
       if (
         !state.isProUser &&
-        !FREE_LIMITS.REVERSE_SEARCH_ENGINES.includes(
+        !getFreeLimits().REVERSE_SEARCH_ENGINES.includes(
           engine as (typeof FREE_LIMITS.REVERSE_SEARCH_ENGINES)[number]
         )
       ) {

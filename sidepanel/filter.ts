@@ -4,18 +4,19 @@
 // 过滤和排序模块：提供图片过滤、排序、颜色过滤等功能
 
 import type { ImageItem } from '../shared/types';
+import { MESSAGE_TYPES } from '../shared/constants';
 import { updateSelectionUI } from './actions';
 import { renderImages } from './render';
-import { closeAllFilterDropdowns, showProUpgradeModal } from './settings';
+import { closeAllFilterDropdowns } from './settings';
 import { elements, state } from './state';
 import { t } from '../shared/i18n';
-import { showToast } from './ui';
-import { updateFilterButtonLabels } from './ui';
+import { updateFilterButtonLabels, updateFilterDropdownCounts } from './ui';
 import { getAspectRatioCategory } from './utils';
 
-export function applyFilters(): void {
+export function applyFilters(options?: { skipScrollReset?: boolean }): void {
   state.filteredImages = state.allImages.filter((img) => {
     return (
+      filterByVisibility(img) &&
       filterBySize(img) &&
       filterByType(img) &&
       filterByLayout(img) &&
@@ -38,14 +39,21 @@ export function applyFilters(): void {
       ? ''
       : `${state.filteredImages.length}:${state.filteredImages[0].id}:${state.filteredImages[state.filteredImages.length - 1].id}`;
   if (currentFilteredIds === state.lastRenderedFilteredIds) {
-    // Still update selection UI in case selection state changed
+    // Still update selection UI in case selection state changed.
+    // Also clear stale skeletons — they may linger after a tab switch
+    // or visibility re-check even though the filtered set didn't change.
+    if (!state.scanProgress.visible) {
+      state.scanSkeletonsToShow = 0;
+    }
     updateSelectionUI();
+    updateFilterDropdownCounts();
     return;
   }
   state.lastRenderedFilteredIds = currentFilteredIds;
 
-  renderImages();
+  renderImages(options?.skipScrollReset ? { skipScrollReset: true } : undefined);
   updateSelectionUI();
+  updateFilterDropdownCounts();
 }
 
 export function sortImages(): void {
@@ -174,11 +182,6 @@ export function renderColorSwatches(): void {
   container.querySelectorAll<HTMLElement>('.color-swatch').forEach((swatch) => {
     swatch.addEventListener('click', (e) => {
       e.stopPropagation();
-      if (!state.isProUser) {
-        showToast(t('toast_pro_color_filter'), 'warning');
-        showProUpgradeModal();
-        return;
-      }
       const color = swatch.dataset.colorValue || null;
       if (state.activeFilters.color === color) {
         // Deselect
@@ -214,6 +217,63 @@ export function filterByFileSize(img: ImageItem): boolean {
   const bytes = img.estimatedSize || 0;
   const kb = bytes / 1024;
   return kb >= state.activeFilters.minFileSizeKB && kb <= state.activeFilters.maxFileSizeKB;
+}
+
+export function filterByVisibility(img: ImageItem): boolean {
+  if (!state.activeFilters.showVisibleOnly) return true;
+  // When "visible only" is on, only show images explicitly marked as visible.
+  // Images without a visible flag (meta, link-icon, svg, canvas, etc.) are hidden.
+  return img.visible === true;
+}
+
+/**
+ * Re-check visibility of all images in real-time by asking the content script
+ * to run `isElementAccessibleWithoutInteraction` on each image's DOM element.
+ * Updates `img.visible` in-place so subsequent `filterByVisibility` calls
+ * reflect the current page state (not the stale scan-time snapshot).
+ *
+ * Only non-data-URI images are sent for re-check (data URIs are typically
+ * inline SVGs/canvas whose visibility rarely changes, and transmitting their
+ * full content would bloat the Chrome message payload).
+ *
+ * Call this before `applyFilters()` when `showVisibleOnly` is toggled ON.
+ */
+export async function refreshVisibility(): Promise<void> {
+  // Data-URI images are inline (SVG, canvas) and always considered visible
+  // since they don't correspond to a discoverable DOM element in the same
+  // way network-loaded images do. Mark them explicitly so
+  // filterByVisibility doesn't drop them (visible defaults to undefined).
+  for (const img of state.allImages) {
+    if (img.url?.startsWith('data:') && img.visible === undefined) {
+      img.visible = true;
+    }
+  }
+
+  // Only check non-data-URI images to avoid message size issues.
+  const checkableImages = state.allImages.filter((img) => img.url && !img.url.startsWith('data:'));
+  if (checkableImages.length === 0) return;
+
+  const imageUrls = checkableImages.map((img) => img.url);
+
+  try {
+    const response = await chrome.runtime.sendMessage({
+      type: MESSAGE_TYPES.CHECK_VISIBILITY,
+      imageUrls,
+      tabId: state.currentTabId,
+    });
+
+    if (response?.success && response.visibilityMap) {
+      const visibilityMap = response.visibilityMap as Record<string, boolean>;
+      for (const img of checkableImages) {
+        if (img.url in visibilityMap) {
+          img.visible = visibilityMap[img.url];
+        }
+      }
+    }
+  } catch {
+    // If the content script is unreachable (e.g. tab navigated away),
+    // fall back to the existing scan-time snapshot — no-op.
+  }
 }
 
 export function filterByAiTag(img: ImageItem): boolean {
@@ -405,6 +465,9 @@ export function syncCustomSizeInputsFromSettings(): void {
 }
 
 export function resetAllFilters(): void {
+  // Preserve showVisibleOnly across resets — it is a persistent user preference
+  // stored in chrome.storage, not a transient filter like size/type/layout.
+  const preservedShowVisibleOnly = state.activeFilters.showVisibleOnly;
   state.activeFilters = {
     size: 'all',
     sizeMin: 0,
@@ -424,6 +487,7 @@ export function resetAllFilters(): void {
     maxFileSizeKB: Infinity,
     fileSizePreset: 'all',
     aiTagFilter: [],
+    showVisibleOnly: preservedShowVisibleOnly,
   };
   if (elements.filterUrlInput) (elements.filterUrlInput as HTMLInputElement).value = '';
   const fsMin = document.getElementById('filter-filesize-min') as HTMLInputElement | null;

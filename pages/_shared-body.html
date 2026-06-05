@@ -20,6 +20,7 @@ HTML document — it omits the surrounding
              Permanent layout slot above the toolbar; the Preact component
              short-circuits to null when not eligible, so the slot is a no-op
              height-zero div in the common case. -->
+        <div id="referral-banner-mount" data-preact-mount="referral-banner-mount"></div>
         <div id="soft-paywall-banner-mount" data-preact-mount="soft-paywall-banner-mount"></div>
         <!-- Toolbar Row 1: Pro status (left) + Live + PRO actions + Settings (right) -->
         <div class="toolbar toolbar-actions">
@@ -573,6 +574,20 @@ HTML document — it omits the surrounding
                   <!-- Color swatches will be rendered dynamically -->
                 </div>
               </div>
+
+              <label
+                class="filter-toggle-label"
+                id="filter-visible-toggle"
+                title="Show only images visible on the page"
+                data-i18n-title="filter_visible_tooltip"
+              >
+                <input type="checkbox" id="filter-visible-checkbox" checked />
+                <span class="filter-checkbox-icon"
+                  ><svg viewBox="0 0 24 24" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12" /></svg
+                ></span>
+                <span class="filter-toggle-text" data-i18n="filter_visible_only">Visible only</span>
+              </label>
             </div>
           </div>
           <div class="toolbar-right">
@@ -764,7 +779,7 @@ HTML document — it omits the surrounding
                 /></span>
               </div>
               <h2 class="restricted-title">
-                Image Harvest <span class="restricted-version">v1.0.0</span>
+                Image Harvest <span class="restricted-version">v1.0.5</span>
               </h2>
               <p class="restricted-subtitle">
                 Intelligently capture, preview, and batch download all images from any webpage
@@ -792,30 +807,10 @@ HTML document — it omits the surrounding
           </div>
 
           <div class="restricted-body">
-            <h3 class="restricted-section-title">What can Image Harvest do?</h3>
+            <h3 class="restricted-section-title" data-i18n="restricted_section_title">
+              What can Image Harvest do?
+            </h3>
             <div class="restricted-features">
-              <div class="restricted-feature">
-                <div class="restricted-feature-icon-wrap gradient-blue">
-                  <svg
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    stroke-width="2"
-                  >
-                    <circle cx="11" cy="11" r="8" />
-                    <line x1="21" y1="21" x2="16.65" y2="16.65" />
-                  </svg>
-                </div>
-                <div class="restricted-feature-text">
-                  <strong>Smart Scan</strong>
-                  <p>
-                    Auto-detect all images including background images, CSS images, and lazy-loaded
-                    content.
-                  </p>
-                </div>
-              </div>
               <div class="restricted-feature">
                 <div class="restricted-feature-icon-wrap gradient-purple">
                   <svg
@@ -826,14 +821,43 @@ HTML document — it omits the surrounding
                     stroke="currentColor"
                     stroke-width="2"
                   >
-                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                    <path d="M12 2a4 4 0 0 0-4 4c0 2 2 3 2 5h4c0-2 2-3 2-5a4 4 0 0 0-4-4z" />
+                    <line x1="10" y1="15" x2="14" y2="15" />
+                    <line x1="10" y1="18" x2="14" y2="18" />
+                    <path d="M10 21h4" />
                   </svg>
                 </div>
                 <div class="restricted-feature-text">
-                  <strong>Powerful Filters</strong>
-                  <p>
-                    Filter by size, type, layout, URL keyword and more to find exactly what you
-                    need.
+                  <strong data-i18n="restricted_feature_ai_tag_title">AI Smart Tagging</strong>
+                  <p data-i18n="restricted_feature_ai_tag_desc">
+                    AI-powered auto-tagging for every image — categorize and search effortlessly.
+                  </p>
+                </div>
+              </div>
+              <div class="restricted-feature">
+                <div class="restricted-feature-icon-wrap gradient-blue">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <path
+                      d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"
+                    />
+                    <polyline points="7.5 4.21 12 6.81 16.5 4.21" />
+                    <polyline points="7.5 19.79 7.5 14.6 3 12" />
+                    <polyline points="21 12 16.5 14.6 16.5 19.79" />
+                    <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
+                    <line x1="12" y1="22.08" x2="12" y2="12" />
+                  </svg>
+                </div>
+                <div class="restricted-feature-text">
+                  <strong data-i18n="restricted_feature_eagle_title">Eagle Export</strong>
+                  <p data-i18n="restricted_feature_eagle_desc">
+                    One-click export to Eagle app — organize your visual library seamlessly.
                   </p>
                 </div>
               </div>
@@ -853,8 +877,8 @@ HTML document — it omits the surrounding
                   </svg>
                 </div>
                 <div class="restricted-feature-text">
-                  <strong>Batch Download</strong>
-                  <p>
+                  <strong data-i18n="restricted_feature_batch_title">Batch Download</strong>
+                  <p data-i18n="restricted_feature_batch_desc">
                     Select multiple images and download them all at once as individual files or a
                     ZIP archive.
                   </p>
@@ -870,15 +894,105 @@ HTML document — it omits the surrounding
                     stroke="currentColor"
                     stroke-width="2"
                   >
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+                    <polyline points="14 2 14 8 20 8" />
+                    <path d="M9 15l2 2 4-4" />
+                  </svg>
+                </div>
+                <div class="restricted-feature-text">
+                  <strong data-i18n="restricted_feature_format_title">Format Conversion</strong>
+                  <p data-i18n="restricted_feature_format_desc">
+                    Convert images between PNG, JPG, and WebP formats before downloading.
+                  </p>
+                </div>
+              </div>
+              <div class="restricted-feature">
+                <div class="restricted-feature-icon-wrap gradient-blue">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
                     <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
                     <circle cx="8.5" cy="8.5" r="1.5" />
                     <polyline points="21 15 16 10 5 21" />
                   </svg>
                 </div>
                 <div class="restricted-feature-text">
-                  <strong>Dedup & Collection</strong>
-                  <p>
-                    Detect similar images, manage your favorites, and export collections with ease.
+                  <strong data-i18n="restricted_feature_dedup_title"
+                    >Similar Image Detection</strong
+                  >
+                  <p data-i18n="restricted_feature_dedup_desc">
+                    Automatically find and group visually similar or duplicate images.
+                  </p>
+                </div>
+              </div>
+              <div class="restricted-feature">
+                <div class="restricted-feature-icon-wrap gradient-purple">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="2" y1="12" x2="22" y2="12" />
+                    <path
+                      d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"
+                    />
+                  </svg>
+                </div>
+                <div class="restricted-feature-text">
+                  <strong data-i18n="restricted_feature_reverse_title">Reverse Image Search</strong>
+                  <p data-i18n="restricted_feature_reverse_desc">
+                    Search any image across Google, TinEye, Baidu, and Yandex with one click.
+                  </p>
+                </div>
+              </div>
+              <div class="restricted-feature">
+                <div class="restricted-feature-icon-wrap gradient-green">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                  </svg>
+                </div>
+                <div class="restricted-feature-text">
+                  <strong data-i18n="restricted_feature_live_title">Live Monitoring</strong>
+                  <p data-i18n="restricted_feature_live_desc">
+                    Real-time page monitoring — automatically capture new images as they appear.
+                  </p>
+                </div>
+              </div>
+              <div class="restricted-feature">
+                <div class="restricted-feature-icon-wrap gradient-amber">
+                  <svg
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                  >
+                    <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+                  </svg>
+                </div>
+                <div class="restricted-feature-text">
+                  <strong data-i18n="restricted_feature_filter_title">Smart Filters</strong>
+                  <p data-i18n="restricted_feature_filter_desc">
+                    Filter by size, type, layout, URL keyword and more to find exactly what you
+                    need.
                   </p>
                 </div>
               </div>
@@ -1033,10 +1147,10 @@ HTML document — it omits the surrounding
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
                     <div>
-                      <strong>Similar &amp; Duplicate Detection</strong>
-                      <p>
-                        Automatically find and group visually similar or duplicate images using
-                        perceptual hashing.
+                      <strong data-i18n="pro_modal_ai_tag_title">AI Smart Tagging</strong>
+                      <p data-i18n="pro_modal_ai_tag_desc">
+                        AI-powered auto-tagging for every image — categorize and search
+                        effortlessly.
                       </p>
                     </div>
                   </li>
@@ -1052,25 +1166,9 @@ HTML document — it omits the surrounding
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
                     <div>
-                      <strong>Color Extraction &amp; Filtering</strong>
-                      <p>Extract dominant colors from each image and filter by color palette.</p>
-                    </div>
-                  </li>
-                  <li>
-                    <svg
-                      width="14"
-                      height="14"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      stroke-width="2.5"
-                    >
-                      <polyline points="20 6 9 17 4 12" />
-                    </svg>
-                    <div>
-                      <strong>Reverse Image Search</strong>
-                      <p>
-                        Search any image across Google, TinEye, Baidu, and Yandex with one click.
+                      <strong data-i18n="pro_modal_eagle_title">Eagle Export</strong>
+                      <p data-i18n="pro_modal_eagle_desc">
+                        One-click export to Eagle app with tags, folders, and metadata preserved.
                       </p>
                     </div>
                   </li>
@@ -1086,9 +1184,9 @@ HTML document — it omits the surrounding
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
                     <div>
-                      <strong>Image Collection</strong>
-                      <p>
-                        Save favorite images to a persistent collection across browsing sessions.
+                      <strong data-i18n="pro_modal_format_title">Format Conversion</strong>
+                      <p data-i18n="pro_modal_format_desc">
+                        Convert images between PNG, JPG, and WebP formats before downloading.
                       </p>
                     </div>
                   </li>
@@ -1104,9 +1202,45 @@ HTML document — it omits the surrounding
                       <polyline points="20 6 9 17 4 12" />
                     </svg>
                     <div>
-                      <strong>Multi-Tab Extraction</strong>
-                      <p>
-                        Extract images from multiple open tabs simultaneously and merge results.
+                      <strong data-i18n="pro_modal_live_title">Live Monitoring</strong>
+                      <p data-i18n="pro_modal_live_desc">
+                        Real-time page monitoring — automatically capture new images as they appear.
+                      </p>
+                    </div>
+                  </li>
+                  <li>
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    <div>
+                      <strong data-i18n="pro_modal_batch_title">Unlimited Batch Download</strong>
+                      <p data-i18n="pro_modal_batch_desc">
+                        Select and download unlimited images at once as individual files or ZIP.
+                      </p>
+                    </div>
+                  </li>
+                  <li>
+                    <svg
+                      width="14"
+                      height="14"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2.5"
+                    >
+                      <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                    <div>
+                      <strong data-i18n="pro_modal_dedup_title">Duplicate Detection</strong>
+                      <p data-i18n="pro_modal_dedup_desc">
+                        Automatically find and group visually similar or duplicate images.
                       </p>
                     </div>
                   </li>
@@ -1152,7 +1286,7 @@ HTML document — it omits the surrounding
               </button>
             </div>
             <div class="modal-body">
-              <!-- Pro & License (top of settings) -->
+              <!-- License / Pro Activation -->
               <div class="settings-section settings-pro-section">
                 <h3 data-i18n="settings_section_account">Account</h3>
                 <div id="license-section">
@@ -1230,6 +1364,12 @@ HTML document — it omits the surrounding
                     </div>
                   </div>
                 </div>
+              </div>
+
+              <!-- Usage & Quotas (separate section) -->
+              <div class="settings-section">
+                <h3 data-i18n="settings_section_quotas">Usage & Quotas</h3>
+                <span id="quota-display-mount" data-preact-mount="quota-display-mount"></span>
               </div>
 
               <!-- Display Settings -->
@@ -1406,12 +1546,10 @@ HTML document — it omits the surrounding
                   <div class="setting-inputs hidden" id="download-options-inputs">
                     <label
                       ><span data-i18n="settings_subfolder">Subfolder Name:</span>
-                      <span class="pro-badge pro-badge-mini">PRO</span>
                       <input type="text" id="setting-subfolder" value="{domain}"
                     /></label>
                     <label
                       ><span data-i18n="settings_filename">File Name Template:</span>
-                      <span class="pro-badge pro-badge-mini">PRO</span>
                       <input
                         type="text"
                         id="setting-filename"
@@ -1422,8 +1560,7 @@ HTML document — it omits the surrounding
                     </p>
                     <div class="setting-format-row">
                       <label
-                        ><span data-i18n="settings_convert_format">Convert Format:</span>
-                        <span class="pro-badge pro-badge-mini">PRO</span></label
+                        ><span data-i18n="settings_convert_format">Convert Format:</span></label
                       >
                       <div class="setting-select" id="setting-convert-format" data-value="none">
                         <button class="setting-select-btn" type="button">
@@ -1447,15 +1584,9 @@ HTML document — it omits the surrounding
                           >
                             None
                           </div>
-                          <div class="setting-select-option" data-value="png">
-                            PNG <span class="pro-badge pro-badge-mini">PRO</span>
-                          </div>
-                          <div class="setting-select-option" data-value="jpg">
-                            JPG <span class="pro-badge pro-badge-mini">PRO</span>
-                          </div>
-                          <div class="setting-select-option" data-value="webp">
-                            WebP <span class="pro-badge pro-badge-mini">PRO</span>
-                          </div>
+                          <div class="setting-select-option" data-value="png">PNG</div>
+                          <div class="setting-select-option" data-value="jpg">JPG</div>
+                          <div class="setting-select-option" data-value="webp">WebP</div>
                         </div>
                       </div>
                     </div>
@@ -1483,7 +1614,6 @@ HTML document — it omits the surrounding
                         <polyline points="20 6 9 17 4 12" /></svg
                     ></span>
                     <span data-i18n="settings_live_monitor">Enable Live Monitoring</span>
-                    <span class="pro-badge pro-badge-mini">PRO</span>
                   </label>
                   <p class="setting-desc" data-i18n="settings_live_monitor_desc">
                     Automatically detect new images as the page content changes

@@ -759,6 +759,18 @@
   background: linear-gradient(135deg, #14b8a6, #2dd4bf);
 }
 
+.restricted-feature-icon-wrap.gradient-cyan {
+  background: linear-gradient(135deg, #06b6d4, #22d3ee);
+}
+
+.restricted-feature-icon-wrap.gradient-orange {
+  background: linear-gradient(135deg, #ea580c, #f97316);
+}
+
+.restricted-feature-icon-wrap.gradient-indigo {
+  background: linear-gradient(135deg, #6366f1, #818cf8);
+}
+
 .restricted-feature-icon-wrap.gradient-indigo {
   background: linear-gradient(135deg, #6366f1, #818cf8);
 }

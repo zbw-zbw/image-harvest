@@ -15,7 +15,14 @@ import {
 } from '../shared/utils';
 import type { ImageItem } from '../shared/types';
 import { state, isExtensionContextValid } from './state';
-import { ensureImageLoaded, parseSrcset, skipElement, sendDiscoveredImages } from './utils';
+import {
+  ensureImageLoaded,
+  parseSrcset,
+  skipElement,
+  sendDiscoveredImages,
+  isElementAccessibleWithoutInteraction,
+  pickBestSrcsetUrl,
+} from './utils';
 import {
   extractInlineSvgs,
   extractCanvasElements,
@@ -33,6 +40,7 @@ import {
   syncHighlights,
   removeAllHighlights,
   removeFAB,
+  checkImagesVisibility,
 } from './highlight';
 import { startLiveMonitoring, stopLiveMonitoring } from './monitor';
 
@@ -108,6 +116,12 @@ async function handleMessage(
       removeAllHighlights();
       sendResponse({ success: true });
       break;
+
+    case MESSAGE_TYPES.CHECK_VISIBILITY: {
+      const visibilityMap = checkImagesVisibility((message.imageUrls as string[]) || []);
+      sendResponse({ success: true, visibilityMap });
+      break;
+    }
 
     default:
       sendResponse({ success: false, error: 'Unknown message type' });
@@ -194,84 +208,81 @@ async function extractImgTags(images: Map<string, ImageItem>): Promise<void> {
 
   for (const img of imgElements) {
     try {
-      // Collect all candidate URLs from this <img>
-      const candidateUrls = new Set<string>();
+      const visible = isElementAccessibleWithoutInteraction(img);
 
-      if (img.src) candidateUrls.add(img.src);
-      if (img.currentSrc) candidateUrls.add(img.currentSrc);
+      // Smart srcset merge: pick only the best (highest resolution) URL
+      // instead of expanding every candidate into a separate entry.
+      let bestUrl: string | null = null;
 
-      // Parse srcset for all resolution candidates
-      if (img.srcset) {
-        const srcsetUrls = parseSrcset(img.srcset);
-        for (const { url: srcsetUrl } of srcsetUrls) {
-          if (srcsetUrl) candidateUrls.add(srcsetUrl);
-        }
+      // 1. srcset / data-srcset — pick highest resolution only
+      const srcsetAttr =
+        img.srcset || img.getAttribute('data-srcset') || img.getAttribute('data-lazy-srcset') || '';
+      if (srcsetAttr) {
+        const parsed = parseSrcset(srcsetAttr);
+        bestUrl = pickBestSrcsetUrl(parsed);
       }
 
-      // Check lazy-load data attributes
-      for (const attr of ['data-src', 'data-original', 'data-lazy', 'data-lazy-src']) {
-        const val = img.getAttribute(attr);
-        if (val) candidateUrls.add(val);
-      }
-      for (const attr of ['data-srcset', 'data-lazy-srcset']) {
-        const val = img.getAttribute(attr);
-        if (val) {
-          const parsed = parseSrcset(val);
-          for (const { url: srcsetUrl } of parsed) {
-            if (srcsetUrl) candidateUrls.add(srcsetUrl);
+      // 2. Fallback to currentSrc > src > lazy-load attrs
+      if (!bestUrl) bestUrl = img.currentSrc || img.src || null;
+      if (!bestUrl) {
+        for (const attr of ['data-src', 'data-original', 'data-lazy', 'data-lazy-src']) {
+          const val = img.getAttribute(attr);
+          if (val) {
+            bestUrl = val;
+            break;
           }
         }
       }
 
-      for (const url of candidateUrls) {
-        if (!url) continue;
+      if (!bestUrl) continue;
 
-        // Handle data URI images
-        if (isDataUri(url)) {
-          if (!isImageDataUri(url)) continue;
-          const dataKey = generateDataUriKey(url);
-          if (state.seenUrls.has(dataKey)) continue;
-          state.seenUrls.add(dataKey);
-
-          const item: ImageItem = {
-            id: generateId(dataKey),
-            url: url,
-            displayWidth: img.naturalWidth || img.width || 0,
-            displayHeight: img.naturalHeight || img.height || 0,
-            naturalWidth: img.naturalWidth,
-            naturalHeight: img.naturalHeight,
-            type: 'img',
-            format: getFileFormat(url),
-            sourceDomain: window.location.hostname,
-            checked: false,
-            timestamp: Date.now(),
-          } as ImageItem;
-          images.set(dataKey, item);
-          sendDiscoveredImages([item]);
-          continue;
-        }
-
-        const resolvedUrl = resolveUrl(url);
-        if (state.seenUrls.has(resolvedUrl)) continue;
-        state.seenUrls.add(resolvedUrl);
+      // Handle data URI images
+      if (isDataUri(bestUrl)) {
+        if (!isImageDataUri(bestUrl)) continue;
+        const dataKey = generateDataUriKey(bestUrl);
+        if (state.seenUrls.has(dataKey)) continue;
+        state.seenUrls.add(dataKey);
 
         const item: ImageItem = {
-          id: generateId(resolvedUrl),
-          url: resolvedUrl,
+          id: generateId(dataKey),
+          url: bestUrl,
           displayWidth: img.naturalWidth || img.width || 0,
           displayHeight: img.naturalHeight || img.height || 0,
           naturalWidth: img.naturalWidth,
           naturalHeight: img.naturalHeight,
           type: 'img',
-          format: getFileFormat(resolvedUrl),
-          sourceDomain: getDomain(resolvedUrl),
+          format: getFileFormat(bestUrl),
+          sourceDomain: window.location.hostname,
+          visible,
           checked: false,
           timestamp: Date.now(),
         } as ImageItem;
-
-        images.set(resolvedUrl, item);
+        images.set(dataKey, item);
         sendDiscoveredImages([item]);
+        continue;
       }
+
+      const resolvedUrl = resolveUrl(bestUrl);
+      if (state.seenUrls.has(resolvedUrl)) continue;
+      state.seenUrls.add(resolvedUrl);
+
+      const item: ImageItem = {
+        id: generateId(resolvedUrl),
+        url: resolvedUrl,
+        displayWidth: img.naturalWidth || img.width || 0,
+        displayHeight: img.naturalHeight || img.height || 0,
+        naturalWidth: img.naturalWidth,
+        naturalHeight: img.naturalHeight,
+        type: 'img',
+        format: getFileFormat(resolvedUrl),
+        sourceDomain: getDomain(resolvedUrl),
+        visible,
+        checked: false,
+        timestamp: Date.now(),
+      } as ImageItem;
+
+      images.set(resolvedUrl, item);
+      sendDiscoveredImages([item]);
     } catch (error) {
       console.warn('Failed to extract img:', error);
     }
@@ -318,6 +329,7 @@ async function extractBackgroundImages(images: Map<string, ImageItem>): Promise<
             sourceDomain: window.location.hostname,
             checked: false,
             timestamp: Date.now(),
+            visible: isElementAccessibleWithoutInteraction(el),
           } as ImageItem);
           continue;
         }
@@ -350,6 +362,7 @@ async function extractBackgroundImages(images: Map<string, ImageItem>): Promise<
           sourceDomain: getDomain(resolvedUrl),
           checked: false,
           timestamp: Date.now(),
+          visible: isElementAccessibleWithoutInteraction(el),
         } as ImageItem;
 
         images.set(resolvedUrl, item);
@@ -418,74 +431,114 @@ async function extractBackgroundImages(images: Map<string, ImageItem>): Promise<
   }
 }
 
-// Extract from <picture> elements (both src and srcset on <source>)
+// Extract from <picture> elements — smart merge: for each <picture>, pick
+// only the best format (WebP/AVIF > PNG/JPEG) at the highest resolution,
+// instead of expanding every <source> into separate entries.
 async function extractPictureSources(images: Map<string, ImageItem>): Promise<void> {
   const pictures = document.querySelectorAll('picture');
+
+  // Format priority: prefer modern formats
+  const formatPriority: Record<string, number> = {
+    avif: 4,
+    webp: 3,
+    png: 2,
+    jpg: 1,
+    jpeg: 1,
+    gif: 0,
+  };
 
   for (const picture of pictures) {
     const sources = picture.querySelectorAll('source');
     const fallbackImg = picture.querySelector('img');
+    const visible = fallbackImg ? isElementAccessibleWithoutInteraction(fallbackImg) : false;
+
+    // Collect best URL from each source, ranked by format priority
+    let bestUrl: string | null = null;
+    let bestPriority = -1;
 
     for (const source of sources) {
-      // Collect all candidate URLs from srcset, src, and lazy-load variants
-      const candidateUrls: string[] = [];
-
       const srcset = source.srcset || source.getAttribute('data-srcset');
+      const src = source.src || source.getAttribute('data-src');
+      const mimeType = source.type || '';
+
+      // Determine format priority from MIME type or URL
+      let priority = 0;
+      if (mimeType.includes('avif')) priority = 4;
+      else if (mimeType.includes('webp')) priority = 3;
+      else if (mimeType.includes('png')) priority = 2;
+      else if (mimeType.includes('jpeg') || mimeType.includes('jpg')) priority = 1;
+
+      let candidateUrl: string | null = null;
       if (srcset) {
         const parsed = parseSrcset(srcset);
-        for (const { url } of parsed) {
-          if (url) candidateUrls.push(url);
-        }
+        candidateUrl = pickBestSrcsetUrl(parsed);
+      }
+      if (!candidateUrl && src) {
+        candidateUrl = src;
       }
 
-      const src = source.src || source.getAttribute('data-src');
-      if (src) candidateUrls.push(src);
-
-      for (const url of candidateUrls) {
-        if (!url) continue;
-
-        if (isDataUri(url)) {
-          if (!isImageDataUri(url)) continue;
-          const dataKey = generateDataUriKey(url);
-          if (state.seenUrls.has(dataKey)) continue;
-          state.seenUrls.add(dataKey);
-          images.set(dataKey, {
-            id: generateId(dataKey),
-            url: url,
-            displayWidth: fallbackImg?.naturalWidth || 0,
-            displayHeight: fallbackImg?.naturalHeight || 0,
-            naturalWidth: fallbackImg?.naturalWidth,
-            naturalHeight: fallbackImg?.naturalHeight,
-            type: 'img',
-            format: getFileFormat(url),
-            sourceDomain: window.location.hostname,
-            checked: false,
-            timestamp: Date.now(),
-          } as ImageItem);
-          continue;
+      if (candidateUrl) {
+        // If format not determined from MIME, infer from URL
+        if (priority === 0) {
+          const fmt = getFileFormat(candidateUrl).toLowerCase();
+          priority = formatPriority[fmt] ?? 0;
         }
-
-        const resolvedUrl = resolveUrl(url);
-        if (state.seenUrls.has(resolvedUrl)) continue;
-        state.seenUrls.add(resolvedUrl);
-
-        const item: ImageItem = {
-          id: generateId(resolvedUrl),
-          url: resolvedUrl,
-          displayWidth: fallbackImg?.naturalWidth || 0,
-          displayHeight: fallbackImg?.naturalHeight || 0,
-          naturalWidth: fallbackImg?.naturalWidth,
-          naturalHeight: fallbackImg?.naturalHeight,
-          type: 'img',
-          format: getFileFormat(resolvedUrl),
-          sourceDomain: getDomain(resolvedUrl),
-          checked: false,
-          timestamp: Date.now(),
-        } as ImageItem;
-
-        images.set(resolvedUrl, item);
+        if (priority > bestPriority) {
+          bestPriority = priority;
+          bestUrl = candidateUrl;
+        }
       }
     }
+
+    // Fallback to <img> inside <picture> if no <source> matched
+    if (!bestUrl && fallbackImg) {
+      bestUrl = fallbackImg.currentSrc || fallbackImg.src || null;
+    }
+
+    if (!bestUrl) continue;
+
+    if (isDataUri(bestUrl)) {
+      if (!isImageDataUri(bestUrl)) continue;
+      const dataKey = generateDataUriKey(bestUrl);
+      if (state.seenUrls.has(dataKey)) continue;
+      state.seenUrls.add(dataKey);
+      images.set(dataKey, {
+        id: generateId(dataKey),
+        url: bestUrl,
+        displayWidth: fallbackImg?.naturalWidth || 0,
+        displayHeight: fallbackImg?.naturalHeight || 0,
+        naturalWidth: fallbackImg?.naturalWidth,
+        naturalHeight: fallbackImg?.naturalHeight,
+        type: 'img',
+        format: getFileFormat(bestUrl),
+        sourceDomain: window.location.hostname,
+        visible,
+        checked: false,
+        timestamp: Date.now(),
+      } as ImageItem);
+      continue;
+    }
+
+    const resolvedUrl = resolveUrl(bestUrl);
+    if (state.seenUrls.has(resolvedUrl)) continue;
+    state.seenUrls.add(resolvedUrl);
+
+    const item: ImageItem = {
+      id: generateId(resolvedUrl),
+      url: resolvedUrl,
+      displayWidth: fallbackImg?.naturalWidth || 0,
+      displayHeight: fallbackImg?.naturalHeight || 0,
+      naturalWidth: fallbackImg?.naturalWidth,
+      naturalHeight: fallbackImg?.naturalHeight,
+      type: 'img',
+      format: getFileFormat(resolvedUrl),
+      sourceDomain: getDomain(resolvedUrl),
+      visible,
+      checked: false,
+      timestamp: Date.now(),
+    } as ImageItem;
+
+    images.set(resolvedUrl, item);
   }
 }
 

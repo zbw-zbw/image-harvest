@@ -120,28 +120,28 @@
     "message": "复制颜色失败"
   },
   "pro_feature_blocked_format_conversion": {
-    "message": "格式转换是 Pro 功能,升级即可解锁!"
+    "message": "免费版：每月最多 {max} 次格式转换，升级 Pro 无限使用！"
   },
   "pro_feature_blocked_advanced_grouping": {
-    "message": "高级分组是 Pro 功能,升级即可解锁!"
+    "message": "高级分组是 Pro 功能，升级即可解锁！"
   },
   "pro_feature_blocked_collection": {
-    "message": "收藏是 Pro 功能"
+    "message": "收藏是 Pro 功能，升级即可解锁！"
   },
   "pro_feature_blocked_color_copy": {
-    "message": "复制颜色是 Pro 功能"
+    "message": "复制颜色是 Pro 功能，升级即可解锁！"
   },
   "pro_feature_blocked_reverse_search": {
-    "message": "{engine} 搜索需要 Pro,升级即可解锁!"
+    "message": "{engine}以图搜图是 Pro 功能，升级即可解锁！"
   },
   "pro_zip_limit": {
-    "message": "免费版每个 ZIP 最多 {max} 张图片,升级 Pro 解锁无限!"
+    "message": "免费版：每个 ZIP 最多 {max} 张图片，升级 Pro 无限使用！"
   },
   "pro_copy_urls_limit": {
-    "message": "免费版单次最多复制 {max} 个链接，升级 Pro 解锁无限！"
+    "message": "免费版：单次最多复制 {max} 个链接，升级 Pro 无限使用！"
   },
   "pro_collection_limit": {
-    "message": "免费版最多收藏 {max} 张,升级 Pro 解锁无限!"
+    "message": "免费版：最多收藏 {max} 张，升级 Pro 无限使用！"
   },
   "toolbar_sort": {
     "message": "排序"
@@ -870,13 +870,13 @@
     "message": "{count} 张移除"
   },
   "toast_pro_color_filter": {
-    "message": "颜色筛选是 Pro 功能，升级以解锁！"
+    "message": "颜色筛选是 Pro 功能，升级即可解锁！"
   },
   "toast_pro_naming_locked": {
-    "message": "自定义命名是 Pro 功能，升级以解锁！"
+    "message": "自定义命名是 Pro 功能，升级即可解锁！"
   },
   "toast_pro_setting_locked": {
-    "message": "此设置需要 Pro，升级以解锁！"
+    "message": "此设置是 Pro 功能，升级即可解锁！"
   },
   "toast_settings_reset": {
     "message": "设置已重置为默认值"
@@ -930,7 +930,7 @@
     "message": "Pro"
   },
   "settings_section_account": {
-    "message": "升级 Pro"
+    "message": "账户"
   },
   "settings_similar_desc": {
     "message": "查找并分组视觉相似或重复的图片"
@@ -1104,10 +1104,10 @@
     "message": "激活失败，请重试。"
   },
   "pro_feature_blocked_dedup": {
-    "message": "去重是Pro功能，升级后解锁！"
+    "message": "免费版：每月最多 {max} 次去重检测，升级 Pro 无限使用！"
   },
   "pro_feature_blocked_multitab": {
-    "message": "多标签页提取是Pro功能，升级后解锁！"
+    "message": "免费版：每月最多 {max} 次多标签页提取，升级 Pro 无限使用！"
   },
   "toast_no_duplicates_found": {
     "message": "未找到重复图片"
@@ -1170,13 +1170,13 @@
     "message": "成功导出 {count} 张图片到 Eagle！"
   },
   "toast_pro_eagle_export": {
-    "message": "导出到 Eagle 是 Pro 功能"
+    "message": "免费版：每次最多导出 {max} 张到 Eagle，升级 Pro 无限使用！"
   },
   "card_ai_tag": {
     "message": "AI 标签"
   },
   "toast_pro_ai_tag": {
-    "message": "AI 标签是 Pro 功能"
+    "message": "免费版：每月最多 {max} 次 AI 标签，升级 Pro 无限使用！"
   },
   "toast_ai_tag_success": {
     "message": "AI 标签已添加"
@@ -1185,7 +1185,7 @@
     "message": "AI 标签失败，请重试"
   },
   "toast_ai_quota_exhausted": {
-    "message": "本月 AI 配额已用完 (100/100)"
+    "message": "本月 AI 配额已用完"
   },
   "ai_quota_tooltip": {
     "message": "每月 AI 标签配额"
@@ -1206,13 +1206,13 @@
     "message": "图片尺寸过小，无法进行 AI 标签"
   },
   "toast_ai_daily_limit": {
-    "message": "今日 3 次免费 AI 标签已用完。升级 Pro 享受每月 100 次。"
+    "message": "免费版：每月最多 {max} 次 AI 标签，升级 Pro 无限使用！"
   },
   "toast_collection_limit": {
-    "message": "收藏已满 (5/5)。升级 Pro 享受无限收藏。"
+    "message": "免费版：最多收藏 {max} 张，升级 Pro 无限使用！"
   },
   "toast_eagle_free_limit": {
-    "message": "免费版每次最多导出 {max} 张到 Eagle。升级 Pro 无限制。"
+    "message": "免费版：每次最多导出 {max} 张到 Eagle，升级 Pro 无限使用！"
   },
   "trial_days_remaining": {
     "message": "试用：剩余 {days} 天"
@@ -1221,7 +1221,7 @@
     "message": "试用已结束 — 还有 {days} 天 Pro 访问权限。"
   },
   "pro_batch_operation": {
-    "message": "批量操作是 Pro 功能。升级 Pro 享受无限生产力。"
+    "message": "批量 AI 标签是 Pro 功能，升级即可解锁！"
   },
   "toolbar_batch_favorite": {
     "message": "收藏"
@@ -1237,6 +1237,9 @@
   },
   "toast_batch_favorite_done": {
     "message": "已将 {count} 张图片添加到收藏。"
+  },
+  "toast_batch_delete_done": {
+    "message": "已删除 {count} 张图片。"
   },
   "toast_batch_ai_tag_started": {
     "message": "正在使用 AI 为 {count} 张图片生成标签…"
@@ -1306,5 +1309,272 @@
   },
   "batch_tooltip_download": {
     "message": "下载选中的图片"
+  },
+  "toast_ai_monthly_limit": {
+    "message": "免费版：每月最多 {max} 次 AI 标签，升级 Pro 无限使用！"
+  },
+  "filter_visible_only": {
+    "message": "仅显示可见"
+  },
+  "filter_visible_tooltip": {
+    "message": "仅显示页面上可见的图片"
+  },
+  "toast_visible_only_on": {
+    "message": "显示 {visible} 张可见图片（已过滤 {hidden} 张隐藏）"
+  },
+  "toast_visible_only_off": {
+    "message": "已取消过滤 — 显示全部 {total} 张图片"
+  },
+  "settings_section_quotas": {
+    "message": "用量与配额"
+  },
+  "quota_ai_tags": {
+    "message": "AI 标签"
+  },
+  "quota_zip_download": {
+    "message": "ZIP 下载"
+  },
+  "quota_batch_copy": {
+    "message": "批量复制链接"
+  },
+  "quota_collection": {
+    "message": "收藏"
+  },
+  "quota_eagle_export": {
+    "message": "Eagle 导出"
+  },
+  "quota_batch_delete": {
+    "message": "批量删除"
+  },
+  "quota_batch_favorite": {
+    "message": "批量收藏"
+  },
+  "quota_unlimited": {
+    "message": "不限"
+  },
+  "quota_per_month": {
+    "message": "次/月"
+  },
+  "quota_per_batch": {
+    "message": "张/次"
+  },
+  "quota_unit_items": {
+    "message": "张"
+  },
+  "quota_usage_title": {
+    "message": "本月使用情况"
+  },
+  "referral_cta_title": {
+    "message": "分享得 3 天 Pro 体验"
+  },
+  "referral_cta_desc": {
+    "message": "邀请好友安装，双方各得 3 天 Pro 权益"
+  },
+  "referral_cta_button": {
+    "message": "复制链接"
+  },
+  "referral_link_copied": {
+    "message": "邀请链接已复制到剪贴板！"
+  },
+  "quota_upgrade_hint": {
+    "message": "升级 Pro 解锁无限使用"
+  },
+  "quota_header_feature": {
+    "message": "功能"
+  },
+  "quota_remaining": {
+    "message": "剩余"
+  },
+  "quota_used_count": {
+    "message": "已用 {used}/{max}"
+  },
+  "toast_batch_limit": {
+    "message": "免费版：单次最多处理 {limit} 项，升级 Pro 无限使用！"
+  },
+  "restricted_section_title": {
+    "message": "Image Harvest 能做什么？"
+  },
+  "restricted_feature_ai_tag_title": {
+    "message": "AI 智能标签"
+  },
+  "restricted_feature_ai_tag_desc": {
+    "message": "AI 驱动的自动标签 — 轻松分类和搜索每张图片。"
+  },
+  "restricted_feature_eagle_title": {
+    "message": "Eagle 导出"
+  },
+  "restricted_feature_eagle_desc": {
+    "message": "一键导出到 Eagle 应用 — 无缝管理您的视觉素材库。"
+  },
+  "restricted_feature_format_title": {
+    "message": "格式转换"
+  },
+  "restricted_feature_format_desc": {
+    "message": "下载前在 PNG、JPG 和 WebP 格式之间转换图片。"
+  },
+  "restricted_feature_live_title": {
+    "message": "实时监控"
+  },
+  "restricted_feature_live_desc": {
+    "message": "实时页面监控 — 自动捕获新出现的图片。"
+  },
+  "pro_modal_ai_tag_title": {
+    "message": "AI 智能标签"
+  },
+  "pro_modal_ai_tag_desc": {
+    "message": "AI 驱动的自动标签 — 轻松分类和搜索每张图片。"
+  },
+  "pro_modal_eagle_title": {
+    "message": "Eagle 导出"
+  },
+  "pro_modal_eagle_desc": {
+    "message": "一键导出到 Eagle 应用，保留标签、文件夹和元数据。"
+  },
+  "pro_modal_format_title": {
+    "message": "格式转换"
+  },
+  "pro_modal_format_desc": {
+    "message": "下载前在 PNG、JPG 和 WebP 格式之间转换图片。"
+  },
+  "pro_modal_live_title": {
+    "message": "实时监控"
+  },
+  "pro_modal_live_desc": {
+    "message": "实时页面监控 — 自动捕获新出现的图片。"
+  },
+  "pro_modal_batch_title": {
+    "message": "无限批量下载"
+  },
+  "pro_modal_batch_desc": {
+    "message": "一次性选择和下载无限量图片，支持单文件或 ZIP。"
+  },
+  "pro_modal_dedup_title": {
+    "message": "重复检测"
+  },
+  "pro_modal_dedup_desc": {
+    "message": "自动查找和分组视觉相似或重复的图片。"
+  },
+  "quota_exhausted_monthly": {
+    "message": "免费版：每月最多 {limit} 次{feature}，升级 Pro 无限使用！"
+  },
+  "feature_multitab": {
+    "message": "多标签页提取"
+  },
+  "feature_dedup": {
+    "message": "相似图片检测"
+  },
+  "feature_format_convert": {
+    "message": "格式转换"
+  },
+  "feature_live_monitor": {
+    "message": "实时监控"
+  },
+  "quota_multitab": {
+    "message": "多标签页提取"
+  },
+  "quota_dedup": {
+    "message": "重复检测"
+  },
+  "quota_format_convert": {
+    "message": "格式转换"
+  },
+  "quota_live_monitor": {
+    "message": "实时监控"
+  },
+  "quota_batch_highlight": {
+    "message": "批量高亮"
+  },
+  "quota_reverse_search": {
+    "message": "以图搜图"
+  },
+  "quota_group_core": {
+    "message": "核心 Pro 功能"
+  },
+  "quota_group_ai": {
+    "message": "AI 功能"
+  },
+  "quota_group_batch": {
+    "message": "批量操作"
+  },
+  "quota_group_storage": {
+    "message": "存储与转换"
+  },
+  "quota_per_day": {
+    "message": "次/天"
+  },
+  "quota_engines": {
+    "message": "个引擎"
+  },
+  "referral_banner_text": {
+    "message": "分享得 3 天 Pro 体验"
+  },
+  "referral_banner_copy": {
+    "message": "复制链接"
+  },
+  "referral_match_success": {
+    "message": "欢迎！通过好友邀请，你获得了 {days} 天 Pro 体验。"
+  },
+  "pro_feature_ai_tag_title": {
+    "message": "AI 智能标签"
+  },
+  "pro_feature_ai_tag_desc_pro": {
+    "message": "AI 自动为图片生成描述标签，快速搜索和整理。"
+  },
+  "pro_feature_eagle_title": {
+    "message": "Eagle 导出"
+  },
+  "pro_feature_eagle_desc_pro": {
+    "message": "一键发送图片到 Eagle，标签和元数据完整保留。"
+  },
+  "pro_feature_format_title": {
+    "message": "格式转换"
+  },
+  "pro_feature_format_desc_pro": {
+    "message": "下载前将图片转换为 PNG、JPG 或 WebP 格式。"
+  },
+  "pro_feature_live_monitor_title": {
+    "message": "实时监控"
+  },
+  "pro_feature_live_monitor_desc_pro": {
+    "message": "自动检测页面上新加载的图片，实时更新。"
+  },
+  "pro_compare_feature": {
+    "message": "功能"
+  },
+  "pro_compare_free": {
+    "message": "免费版"
+  },
+  "pro_compare_pro": {
+    "message": "Pro"
+  },
+  "pro_compare_batch_free": {
+    "message": "20次/天"
+  },
+  "pro_compare_batch_pro": {
+    "message": "无限制"
+  },
+  "pro_compare_search_free": {
+    "message": "2 引擎"
+  },
+  "pro_compare_search_pro": {
+    "message": "全引擎"
+  },
+  "pro_compare_ai_free": {
+    "message": "5次/天"
+  },
+  "pro_compare_per_month": {
+    "message": "/月"
+  },
+  "pro_compare_per_day": {
+    "message": "/天"
+  },
+  "pro_compare_unlimited": {
+    "message": "无限制"
+  },
+  "pro_compare_all_engines": {
+    "message": "全引擎"
+  },
+  "pro_compare_engines": {
+    "message": "引擎"
   }
 }

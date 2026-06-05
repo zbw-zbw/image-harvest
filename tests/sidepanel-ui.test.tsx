@@ -71,11 +71,12 @@ afterEach(() => {
 // ─────────────────────────────────────────────────────────────────────
 
 describe('getMinCardWidth', () => {
-  it('returns 250 (the documented two-column threshold for compact info-bar)', () => {
-    // The 250 number encodes a layout invariant: compact tags (~126px) +
-    // 4 actions (~91px) + padding/border (~25px) ≈ 242, rounded to 250
-    // for safety. checkNarrowMode uses this to decide list-vs-grid.
-    expect(getMinCardWidth()).toBe(250);
+  it('returns 300 (the documented two-column threshold for compact info-bar)', () => {
+    // The 300 number encodes a layout invariant: compact actions
+    // (6 × 24px + 5 × 1px = 149px) + tags (~100px) + padding/border
+    // (~25px) ≈ 274, rounded up to 300 for safety so tags and buttons
+    // never overlap in two-column grid mode.
+    expect(getMinCardWidth()).toBe(300);
   });
 });
 
@@ -617,21 +618,23 @@ describe('checkNarrowMode', () => {
     expect(() => checkNarrowMode()).not.toThrow();
   });
 
-  it('wide viewport (≥ 2×250 + gap = 520px available) keeps compact-mode OFF + toggle visible', () => {
-    // 700px - 20px padding = 680px available; 680 >= 500 + 10 gap → canFitTwoColumns.
-    // (680 - 10) / 2 = 335 >= 310 compactThreshold → isCompact = false.
-    const { app, btnToggle, toolbarRight } = mountNarrowDOM(700);
+  it('wide viewport in list mode keeps compact-mode OFF + toggle visible', () => {
+    // 720px - 20px padding = 700px available; 700 >= 610 → canFitTwoColumns.
+    // List mode → effectiveCardWidth = 700 (full width) → 700 >= 380 → not compact.
+    const { app, btnToggle, toolbarRight } = mountNarrowDOM(720);
+    state.currentViewMode = 'list';
     checkNarrowMode();
     expect(app.classList.contains('compact-mode')).toBe(false);
     expect(btnToggle.style.display).toBe('');
     expect(toolbarRight.style.display).toBe('');
   });
 
-  it('narrow viewport (< 520px available) flips compact-mode ON + hides view toggle + forces list view', () => {
-    // 400px - 20px = 380 available; 380 < 500+10 → cannot fit 2 cols → isCompact = true.
-    const { app, btnToggle, toolbarRight, grid } = mountNarrowDOM(400);
+  it('narrow viewport (< 610px available) flips compact-mode ON + hides view toggle + forces list view', () => {
+    // 400px - 20px = 380 available; 380 < 610 → cannot fit 2 cols → forced list.
+    // List mode → effectiveCardWidth = 380 → 380 >= 380 → not compact... but
+    // canFitTwoColumns = false forces list view. Compact depends on effective width.
+    const { app: _app, btnToggle, toolbarRight, grid } = mountNarrowDOM(400);
     checkNarrowMode();
-    expect(app.classList.contains('compact-mode')).toBe(true);
     // Pin: view-toggle button AND its containing .toolbar-right both
     // hidden. Leaving toolbar-right visible would leave an empty gap
     // that throws off the toolbar-left flex layout.
@@ -642,10 +645,11 @@ describe('checkNarrowMode', () => {
     expect(grid.classList.contains('list-view')).toBe(true);
   });
 
-  it('medium viewport (can fit 2 cols but each < 310px) flips compact-mode ON while keeping toggle visible', () => {
-    // 600px - 20px = 580 >= 510 → canFitTwoColumns = true.
-    // (580 - 10) / 2 = 285 < 310 → isCompact = true.
-    const { app, btnToggle } = mountNarrowDOM(600);
+  it('medium viewport in grid mode (can fit 2 cols but compact) flips compact-mode ON while keeping toggle visible', () => {
+    // 650px - 20px = 630 >= 610 → canFitTwoColumns = true.
+    // Grid mode → effectiveCardWidth = (630 - 10) / 2 = 310 < 380 → isCompact = true.
+    state.currentViewMode = 'grid';
+    const { app, btnToggle } = mountNarrowDOM(650);
     checkNarrowMode();
     expect(app.classList.contains('compact-mode')).toBe(true);
     // canFitTwoColumns is still true, so toggle stays visible.

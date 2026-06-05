@@ -36,6 +36,85 @@ export function parseSrcset(srcset: string): SrcsetCandidate[] {
   return candidates.sort((a, b) => b.width - a.width);
 }
 
+/** Check whether a DOM element is visible on the page.
+ *  Uses bounding rect, computed style, and viewport intersection. */
+export function isElementVisible(el: Element): boolean {
+  const style = window.getComputedStyle(el);
+  if (style.display === 'none' || style.visibility === 'hidden' || style.opacity === '0') {
+    return false;
+  }
+  const rect = el.getBoundingClientRect();
+  if (rect.width <= 0 || rect.height <= 0) {
+    return false;
+  }
+  // Check if element is within the document's scroll area (not just viewport)
+  const docHeight = Math.max(document.documentElement.scrollHeight, document.body.scrollHeight);
+  const docWidth = Math.max(document.documentElement.scrollWidth, document.body.scrollWidth);
+  if (rect.bottom < 0 || rect.top > docHeight || rect.right < 0 || rect.left > docWidth) {
+    return false;
+  }
+  return true;
+}
+
+/**
+ * Detect whether an element is truly accessible to the user without requiring
+ * interaction (click, hover, dropdown expand, etc.). Shares the same logic
+ * used by the image-highlight feature so "visible" images in the filter are
+ * exactly those that can be found and highlighted on the page.
+ *
+ * Returns false for elements inside:
+ *  - display:none ancestors
+ *  - visibility:hidden / opacity:0 ancestors
+ *  - collapsed containers (overflow:hidden with near-zero effective size)
+ *  - popover / dropdown / tooltip containers that are not currently shown
+ *
+ * Returns true for elements that are simply off-screen (below the fold) —
+ * these can be scrolled into view without user interaction.
+ */
+export function isElementAccessibleWithoutInteraction(element: Element): boolean {
+  const rect = element.getBoundingClientRect();
+  if (rect.width <= 0 || rect.height <= 0) return false;
+
+  let current: Element | null = element;
+
+  while (current && current !== document.documentElement) {
+    const style = window.getComputedStyle(current);
+
+    if (style.display === 'none') return false;
+    if (style.visibility === 'hidden' || style.visibility === 'collapse') return false;
+    if (parseFloat(style.opacity) === 0) return false;
+
+    if (current !== element) {
+      const overflow = style.overflow + style.overflowX + style.overflowY;
+      if (overflow.includes('hidden')) {
+        const parentRect = current.getBoundingClientRect();
+        if (parentRect.width < 4 || parentRect.height < 4) return false;
+      }
+    }
+
+    if (current !== element && current.getAttribute('aria-hidden') === 'true') return false;
+
+    if (current !== element) {
+      const ariaExpanded = current.getAttribute('aria-expanded');
+      if (ariaExpanded === 'false') {
+        const parentRect = current.getBoundingClientRect();
+        if (parentRect.height < 4 || parentRect.width < 4) return false;
+      }
+    }
+
+    current = current.parentElement;
+  }
+
+  return true;
+}
+
+/** Given a list of srcset candidates (already sorted by width desc),
+ *  return only the highest-resolution URL. */
+export function pickBestSrcsetUrl(candidates: SrcsetCandidate[]): string | null {
+  if (candidates.length === 0) return null;
+  return candidates[0].url || null;
+}
+
 /** Wait for an `<img>` to finish loading (or timeout after 500ms).
  *  We only need the image to be loaded enough to read naturalWidth/Height;
  *  a short timeout avoids blocking the entire extraction pipeline. */

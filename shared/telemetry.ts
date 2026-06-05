@@ -409,6 +409,9 @@ export const __test = {
    * sure no fire-and-forget Promise from `track()`'s high-water-mark
    * branch leaks into the next test case's mock fetch capture. */
   async waitForIdle(): Promise<void> {
+    // inFlight is mutated inside the async IIFE assigned to inFlightPromise,
+    // so `await` yields control and the variable *is* updated between iterations.
+    // eslint-disable-next-line no-unmodified-loop-condition
     while (inFlight) {
       await inFlightPromise;
     }

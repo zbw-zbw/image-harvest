@@ -7,6 +7,17 @@ import type { RGB } from './types';
  */
 export function extractColors(imageUrl: string, colorCount: number = 5): Promise<string[]> {
   return new Promise((resolve) => {
+    // ICO files are multi-resolution container formats that Canvas cannot
+    // reliably render — skip color extraction to avoid silent failures.
+    if (
+      imageUrl.match(/\.ico(\?|$)/i) ||
+      imageUrl.includes('image/x-icon') ||
+      imageUrl.includes('image/vnd.microsoft.icon')
+    ) {
+      resolve([]);
+      return;
+    }
+
     const img = new Image();
     if (!imageUrl.startsWith('data:')) {
       img.crossOrigin = 'anonymous';

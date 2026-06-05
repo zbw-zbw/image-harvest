@@ -86,10 +86,14 @@ function populateDedupBody(): void {
 
 export async function removeDuplicates(): Promise<void> {
   if (!state.isProUser) {
-    closeDedupModal();
-    showToast(t('pro_feature_blocked_dedup'), 'warning');
-    showProUpgradeModal();
-    return;
+    const { checkFeatureQuota } = await import('../shared/feature-quota');
+    const { allowed, limit } = await checkFeatureQuota('dedup');
+    if (!allowed) {
+      closeDedupModal();
+      showToast(t('quota_exhausted_monthly', { feature: t('feature_dedup'), limit }), 'warning');
+      showProUpgradeModal();
+      return;
+    }
   }
 
   const toRemove = new Set<string>();
@@ -137,4 +141,11 @@ export async function removeDuplicates(): Promise<void> {
   applyFilters();
   detectSimilarImages();
   showToast(t('toast_duplicates_removed', { count: toRemove.size }), 'success');
+
+  // Increment dedup quota usage after successful operation
+  if (!state.isProUser) {
+    import('../shared/feature-quota').then(({ incrementFeatureUsage }) =>
+      incrementFeatureUsage('dedup')
+    );
+  }
 }

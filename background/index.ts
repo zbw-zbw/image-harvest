@@ -30,12 +30,17 @@ import { detectEagle, exportToEagle } from '../shared/export-eagle';
 import type { EagleItem } from '../shared/export-eagle';
 import { AI_TAG_API_URL, AI_TAG_BATCH_API_URL } from '../shared/constants';
 import { getRemainingQuota, setLocalQuotaFromServer } from '../shared/ai-quota';
-import { getRemainingDailyFreeAiTags, incrementDailyFreeAiTag } from '../shared/ai-free-quota';
+import { getRemainingMonthlyFreeAiTags, incrementMonthlyFreeAiTag } from '../shared/ai-free-quota';
+import { syncRemoteConfig, getRemoteConfig } from '../shared/remote-config';
 
 // ── Initialization ──────────────────────────────────────────────────────────
 
 initLicenseAlarm();
 initAutoTrialAlarm();
+
+// ── Remote Config ───────────────────────────────────────────────────────────
+// Restore cached config into memory on SW startup, then refresh in background.
+void getRemoteConfig().then(() => void syncRemoteConfig());
 
 // ── Telemetry initialization ────────────────────────────────────────────────
 // Two responsibilities:
@@ -71,6 +76,15 @@ chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'install') {
     void track(EVENTS.EXTENSION_INSTALLED);
     void autoStartTrial('install');
+    // Attempt to match a pending referral (from the invite landing page).
+    // Runs async in background — non-blocking, best-effort.
+    void import('../shared/referral').then(({ matchReferral }) =>
+      matchReferral().then((result) => {
+        if (result) {
+          void track(EVENTS.REFERRAL_CLAIMED, { bonusDays: result.bonusDays });
+        }
+      })
+    );
     chrome.tabs.create({ url: chrome.runtime.getURL('pages/welcome.html') });
   } else if (details.reason === 'update') {
     void track(EVENTS.EXTENSION_UPDATED, {
@@ -183,6 +197,18 @@ async function handleMessage(
         sendResponse({ success: true });
         break;
 
+      // ── DEV-ONLY: manually trigger referral match for testing ──
+      case 'TEST_MATCH_REFERRAL': {
+        if (import.meta.env.DEV) {
+          const { matchReferral } = await import('../shared/referral');
+          const result = await matchReferral();
+          sendResponse({ success: true, result });
+        } else {
+          sendResponse({ success: false, error: 'dev_only' });
+        }
+        break;
+      }
+
       case MESSAGE_TYPES.TOGGLE_SIDEBAR:
         sendResponse({
           success: false,
@@ -249,6 +275,24 @@ async function handleMessage(
           sendResponse({ success: true });
         } catch (error) {
           sendResponse({ success: false, error: (error as Error).message });
+        }
+        break;
+      }
+
+      case MESSAGE_TYPES.CHECK_VISIBILITY: {
+        try {
+          const tabId = await getAccessibleTabId(message.tabId as number | undefined);
+          if (tabId) {
+            const response = await chrome.tabs.sendMessage(tabId, {
+              type: MESSAGE_TYPES.CHECK_VISIBILITY,
+              imageUrls: message.imageUrls,
+            });
+            sendResponse({ success: true, visibilityMap: response?.visibilityMap ?? {} });
+          } else {
+            sendResponse({ success: true, visibilityMap: {} });
+          }
+        } catch (error) {
+          sendResponse({ success: false, visibilityMap: {}, error: (error as Error).message });
         }
         break;
       }
@@ -488,23 +532,27 @@ async function handleMessage(
             licenseKey = licenseInfo.licenseKey;
             instanceId = licenseInfo.instanceId;
           } else {
-            const freeRemaining = await getRemainingDailyFreeAiTags();
+            const freeRemaining = await getRemainingMonthlyFreeAiTags();
             if (freeRemaining <= 0) {
-              sendResponse({ success: false, error: 'daily_limit', quotaRemaining: 0 });
+              sendResponse({ success: false, error: 'monthly_limit', quotaRemaining: 0 });
               break;
             }
             instanceId = await getOrCreateInstanceId();
           }
 
+          const requestBody: Record<string, unknown> = {
+            instanceId,
+            imageUrl,
+            tier: proInfo.isPro ? 'pro' : 'free',
+          };
+          if (proInfo.isPro && licenseKey) {
+            requestBody.licenseKey = licenseKey;
+          }
+
           const resp = await fetch(AI_TAG_API_URL, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              licenseKey: licenseKey || undefined,
-              instanceId,
-              imageUrl,
-              tier: proInfo.isPro ? 'pro' : 'free',
-            }),
+            body: JSON.stringify(requestBody),
           });
           const data = (await resp.json()) as {
             success: boolean;
@@ -524,7 +572,7 @@ async function handleMessage(
             await setLocalQuotaFromServer(data.quotaRemaining);
           }
           if (!proInfo.isPro) {
-            await incrementDailyFreeAiTag();
+            await incrementMonthlyFreeAiTag();
           }
           sendResponse({
             success: true,

@@ -791,7 +791,7 @@
 }
 
 /* Below 320px (cramped sidepanel), drop the label and keep just the icon. */
-@media (max-width: 320px) {
+@container panel (max-width: 320px) {
   .batch-url-copy-btn .btn-label {
     display: none;
   }
@@ -821,4 +821,83 @@
   visibility: visible;
   pointer-events: auto;
   transform: translateY(0) scale(1);
+}
+
+/* ── Visible-only toggle ──────────────────────────────────────────── */
+.filter-toggle-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 10px;
+  font-size: 12px;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  background: var(--bg-color);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+  flex-shrink: 0;
+  min-height: 30px;
+  box-sizing: border-box;
+  user-select: none;
+}
+
+.filter-toggle-label:hover {
+  background: var(--bg-secondary);
+}
+
+.filter-toggle-label:has(input:checked) {
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  background: var(--selected-bg);
+}
+
+.filter-toggle-label input[type='checkbox'] {
+  /* Hide native checkbox, replaced by custom .filter-checkbox-icon */
+  display: none;
+}
+
+.filter-checkbox-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  border: 2px solid var(--border-color);
+  border-radius: 4px;
+  background: transparent;
+  transition: all 0.15s;
+  flex-shrink: 0;
+}
+
+.filter-toggle-label:has(input:checked) .filter-checkbox-icon {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+}
+
+.filter-checkbox-icon svg {
+  width: 10px;
+  height: 10px;
+  stroke: #fff;
+  stroke-width: 3;
+  fill: none;
+  opacity: 0;
+  transition: opacity 0.15s;
+}
+
+.filter-toggle-label:has(input:checked) .filter-checkbox-icon svg {
+  opacity: 1;
+}
+
+.filter-toggle-text {
+  line-height: 1;
+}
+
+/* Filter option count badge */
+.filter-count {
+  margin-left: auto;
+  font-size: 11px;
+  color: var(--text-tertiary);
+  font-weight: 400;
 }

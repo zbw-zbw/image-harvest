@@ -365,7 +365,7 @@ describe('Close interactions', () => {
     expect(state.proUpgradeModalState.open).toBe(false);
   });
 
-  test('legacy "Get Pro →" link click fires CTA_CLICKED with cta=get_pro', async () => {
+  test('legacy "Get Pro →" link click fires CTA_CLICKED with cta=pricing', async () => {
     await openModal();
     const { ProUpgradeModal } = await import('../sidepanel/components/ProUpgradeModal');
     render(<ProUpgradeModal />);
@@ -373,12 +373,10 @@ describe('Close interactions', () => {
     const link = document.getElementById('link-pro-modal-get')!;
     fireEvent.click(link);
 
-    // Pin: navigation itself is delegated to license-ui.ts
-    // bindLicenseModalEvents (preventDefault + chrome.tabs.create); the
-    // component's onClick is telemetry-only.
+    // The link's onClick is handlePricingClick which fires cta:'pricing'.
     expect(mockTrack).toHaveBeenCalledWith(
       'pro_upsell_cta_clicked',
-      expect.objectContaining({ cta: 'get_pro' })
+      expect.objectContaining({ cta: 'pricing' })
     );
   });
 });

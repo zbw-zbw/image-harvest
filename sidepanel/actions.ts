@@ -8,7 +8,7 @@
 // out of the main sidepanel bundle by importing on demand. See also
 // pro-features.ts which does the same for exportCollection.
 import type JSZipType from 'jszip';
-import { FREE_LIMITS, MESSAGE_TYPES, VALID_REVERSE_SEARCH_ENGINES } from '../shared/constants';
+import { getFreeLimits, MESSAGE_TYPES, VALID_REVERSE_SEARCH_ENGINES } from '../shared/constants';
 import { convertImageFormat } from '../shared/converter';
 import { t } from '../shared/i18n';
 import type { ImageItem } from '../shared/types';
@@ -53,7 +53,7 @@ export function selectAll(): void {
   state.filteredImages.forEach((img) => state.selectedImages.add(img.id));
   // Trigger Proxy set trap so Preact components re-render with updated size
   store.set('selectedImages', state.selectedImages);
-  renderImages();
+  renderImages({ skipScrollReset: true });
   updateSelectionUI();
 }
 
@@ -62,7 +62,7 @@ export function clearSelection(): void {
   // Trigger Proxy set trap so Preact components re-render with updated size
   store.set('selectedImages', state.selectedImages);
   removeAllHighlightsOnPage();
-  renderImages();
+  renderImages({ skipScrollReset: true });
   updateSelectionUI();
 }
 
@@ -302,11 +302,21 @@ export async function exportSingleToEagle(img: ImageItem): Promise<void> {
 }
 
 export async function downloadSingle(img: ImageItem, format: string | null): Promise<void> {
-  // Pro check: format conversion requires Pro
+  // Quota check: format conversion uses monthly quota for free users
   if (format && !state.isProUser) {
-    showToast(t('pro_feature_blocked_format_conversion'), 'warning');
-    showProUpgradeModal();
-    return;
+    const { checkFeatureQuota } = await import('../shared/feature-quota');
+    const { allowed, limit } = await checkFeatureQuota('formatConvert');
+    if (!allowed) {
+      showToast(
+        t('quota_exhausted_monthly', {
+          feature: t('feature_format_convert'),
+          limit: String(limit),
+        }),
+        'warning'
+      );
+      showProUpgradeModal();
+      return;
+    }
   }
 
   let downloadUrl = img.url;
@@ -339,29 +349,48 @@ export async function downloadSingle(img: ImageItem, format: string | null): Pro
     // short-circuit on render.
     void recordDownloads(1);
     void recordDownloadForRating(1);
+    // Increment format conversion quota after successful download
+    if (format && !state.isProUser) {
+      import('../shared/feature-quota').then(({ incrementFeatureUsage }) =>
+        incrementFeatureUsage('formatConvert')
+      );
+    }
   } catch (error) {
     console.error('Download error:', error);
     showToast(t('toast_download_failed'), 'error');
   }
 }
 
-export async function downloadSelectedAsZip(targetFormat: string | null): Promise<void> {
-  const selected = state.filteredImages.filter((img) => state.selectedImages.has(img.id));
+export async function downloadSelectedAsZip(
+  targetFormat: string | null,
+  images?: ImageItem[]
+): Promise<void> {
+  const selected = images ?? state.filteredImages.filter((img) => state.selectedImages.has(img.id));
   if (selected.length === 0) {
     showToast(t('toast_no_images_selected'), 'error');
     return;
   }
 
-  // Pro check: format conversion requires Pro
+  // Quota check: format conversion uses monthly quota for free users
   if (targetFormat && !state.isProUser) {
-    showToast(t('pro_feature_blocked_format_conversion'), 'warning');
-    showProUpgradeModal();
-    return;
+    const { checkFeatureQuota } = await import('../shared/feature-quota');
+    const { allowed, limit } = await checkFeatureQuota('formatConvert');
+    if (!allowed) {
+      showToast(
+        t('quota_exhausted_monthly', {
+          feature: t('feature_format_convert'),
+          limit: String(limit),
+        }),
+        'warning'
+      );
+      showProUpgradeModal();
+      return;
+    }
   }
 
   // Free tier: per-batch image count limit
-  if (!state.isProUser && selected.length > FREE_LIMITS.MAX_ZIP_IMAGES) {
-    showToast(t('pro_zip_limit', { max: String(FREE_LIMITS.MAX_ZIP_IMAGES) }), 'warning');
+  if (!state.isProUser && selected.length > getFreeLimits().MAX_ZIP_IMAGES) {
+    showToast(t('pro_zip_limit', { max: String(getFreeLimits().MAX_ZIP_IMAGES) }), 'warning');
     showProUpgradeModal();
     return;
   }
@@ -460,6 +489,12 @@ export async function downloadSelectedAsZip(targetFormat: string | null): Promis
     // Rating prompt — same batch contribution rule (success count, not
     // selected count). See DOWNLOAD_SINGLE call above for rationale.
     if (successCount > 0) void recordDownloadForRating(successCount);
+    // Increment format conversion quota after successful zip download
+    if (targetFormat && !state.isProUser) {
+      import('../shared/feature-quota').then(({ incrementFeatureUsage }) =>
+        incrementFeatureUsage('formatConvert')
+      );
+    }
   } catch (error) {
     if (!aborted) {
       console.error('ZIP download error:', error);
@@ -504,8 +539,8 @@ export async function copyImageUrl(url: string): Promise<void> {
  * count.
  *
  * Free-tier guard: an additional Pro touchpoint. We cap at
- * FREE_LIMITS.MAX_BATCH_COPY_URLS (currently 20) to leave headroom for the
- * "select 30 → upgrade" funnel without making the feature feel useless on
+ * FREE_LIMITS.MAX_BATCH_COPY_URLS (currently 10) to leave headroom for the
+ * "select → upgrade" funnel without making the feature feel useless on
  * Free. Pro users bypass the cap entirely.
  *
  * Why a separate function rather than overloading copyImageUrl(string |
@@ -525,8 +560,8 @@ export async function copyImageUrls(urls: string[]): Promise<boolean> {
     return false;
   }
   // Free-tier copy cap — same guard pattern as downloadSelectedAsZip.
-  if (!state.isProUser && urls.length > FREE_LIMITS.MAX_BATCH_COPY_URLS) {
-    showToast(t('pro_copy_urls_limit', { max: FREE_LIMITS.MAX_BATCH_COPY_URLS }), 'warning');
+  if (!state.isProUser && urls.length > getFreeLimits().MAX_BATCH_COPY_URLS) {
+    showToast(t('pro_copy_urls_limit', { max: getFreeLimits().MAX_BATCH_COPY_URLS }), 'warning');
     showProUpgradeModal();
     return false;
   }
@@ -650,6 +685,7 @@ export async function batchAddToCollection(images: ImageItem[]): Promise<void> {
     added++;
   }
   showToast(t('toast_batch_favorite_done', { count: String(added) }), 'success');
+  void track(EVENTS.BATCH_FAVORITE, { count: added });
 }
 
 export async function batchAiTag(images: ImageItem[]): Promise<void> {
@@ -687,6 +723,7 @@ export async function batchAiTag(images: ImageItem[]): Promise<void> {
       applyFilters();
     }
     showToast(t('toast_batch_ai_tag_done', { count: String(taggedCount) }), 'success');
+    void track(EVENTS.BATCH_AI_TAG, { count: taggedCount });
   } catch {
     showToast(t('toast_ai_tag_failed'), 'error');
   }
@@ -708,5 +745,7 @@ export async function deleteSelectedImages(ids: string[]): Promise<void> {
     state.allImages.filter((img) => !idSet.has(img.id))
   );
   store.set('selectedImages', new Set());
-  renderImages();
+  renderImages({ skipScrollReset: true });
+  showToast(t('toast_batch_delete_done', { count: String(ids.length) }), 'success');
+  void track(EVENTS.BATCH_DELETE, { count: ids.length });
 }

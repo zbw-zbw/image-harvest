@@ -2,7 +2,7 @@
 // Handles image highlighting and locating functionality
 
 import { resolveUrl, isDataUri, generateDataUriKey, extractBackgroundUrls } from '../shared/utils';
-import { parseSrcset } from './utils';
+import { parseSrcset, isElementAccessibleWithoutInteraction } from './utils';
 import { collectShadowRoots } from './shadow-iframe';
 
 // V2.0: FAB removed due to Chrome API limitation
@@ -30,9 +30,37 @@ interface HighlightEntry {
 const highlightEntries = new Map<string, HighlightEntry>();
 // Track iframe context for elements found inside iframes
 const iframeContextMap = new Map<string, HTMLIFrameElement>();
+let highlightHost: HTMLDivElement | null = null;
 let overlayElement: HTMLDivElement | null = null;
 let highlightStyleElement: HTMLStyleElement | null = null;
 let escKeyHandler: ((e: KeyboardEvent) => void) | null = null;
+let overlayClickHandler: ((e: MouseEvent) => void) | null = null;
+
+/** Lazily create a fixed host container for the overlay and highlight borders.
+ *  Using a dedicated host prevents overlay/border elements from interfering
+ *  with the page layout (e.g. causing extra scrollable area or breaking
+ *  sticky/fixed elements like decorative backgrounds). */
+function ensureHighlightHost(): HTMLDivElement {
+  if (highlightHost) return highlightHost;
+  highlightHost = document.createElement('div');
+  highlightHost.id = 'image-harvest-highlight-host';
+  highlightHost.style.cssText = `
+    position: fixed;
+    inset: 0;
+    z-index: 2147483646;
+    pointer-events: none;
+    overflow: hidden;
+  `;
+  document.documentElement.appendChild(highlightHost);
+  return highlightHost;
+}
+
+function removeHighlightHost(): void {
+  if (highlightHost) {
+    highlightHost.remove();
+    highlightHost = null;
+  }
+}
 
 function ensureHighlightStyles(): void {
   if (highlightStyleElement) return;
@@ -72,26 +100,37 @@ function removeHighlightStyles(): void {
 function ensureOverlay(): void {
   if (overlayElement) return;
   ensureHighlightStyles();
+  const host = ensureHighlightHost();
   overlayElement = document.createElement('div');
   overlayElement.className = 'image-harvest-overlay';
+  // pointer-events: none lets scroll/interaction pass through to the page.
+  // Dismissing is handled by a document-level click listener instead.
   overlayElement.style.cssText = `
     position: fixed;
     top: 0;
     left: 0;
-    width: 100vw;
-    height: 100vh;
+    width: 100%;
+    height: 100%;
     background: rgba(0, 0, 0, 0.5);
-    z-index: 2147483646;
-    pointer-events: auto;
-    cursor: pointer;
+    pointer-events: none;
   `;
 
-  // Click overlay to dismiss all highlights
-  overlayElement.addEventListener('click', () => {
-    dismissAllHighlights();
-  });
+  host.appendChild(overlayElement);
 
-  document.documentElement.appendChild(overlayElement);
+  // Click anywhere on the page (that isn't a highlight border) to dismiss
+  if (!overlayClickHandler) {
+    overlayClickHandler = (e: MouseEvent) => {
+      const target = e.target as Element | null;
+      // Ignore clicks on the highlight borders themselves
+      if (target?.closest?.('.image-harvest-highlight-border')) return;
+      dismissAllHighlights();
+    };
+    // Use setTimeout so the click that triggered the highlight doesn't
+    // immediately dismiss it
+    setTimeout(() => {
+      document.addEventListener('click', overlayClickHandler!, true);
+    }, 0);
+  }
 
   // ESC key to dismiss all highlights (capture phase to intercept before page handlers)
   if (!escKeyHandler) {
@@ -123,71 +162,15 @@ function removeOverlay(): void {
     document.removeEventListener('keydown', escKeyHandler, true);
     escKeyHandler = null;
   }
-  removeHighlightStyles();
-}
-
-/**
- * Detect whether an element is truly visible to the user without requiring
- * interaction (click, hover, dropdown expand, etc.).
- *
- * Returns false for elements inside:
- *  - display:none ancestors
- *  - visibility:hidden / opacity:0 ancestors
- *  - collapsed containers (overflow:hidden with near-zero effective size)
- *  - popover / dropdown / tooltip containers that are not currently shown
- *
- * Returns true for elements that are simply off-screen (next-page / below
- * the fold) — these can be scrolled into view without user interaction.
- */
-function isElementAccessibleWithoutInteraction(element: Element): boolean {
-  let current: Element | null = element;
-
-  while (current && current !== document.documentElement) {
-    const style = window.getComputedStyle(current);
-
-    // display:none — element is completely removed from layout
-    if (style.display === 'none') return false;
-
-    // visibility:hidden or collapse — element occupies space but is invisible
-    if (style.visibility === 'hidden' || style.visibility === 'collapse') return false;
-
-    // opacity:0 — fully transparent (often used for hidden interactive elements)
-    if (parseFloat(style.opacity) === 0) return false;
-
-    // Check for clipped-away content: an ancestor with overflow:hidden and
-    // a very small size that effectively hides children. This catches
-    // collapsed accordion panels, unexpanded dropdowns, etc.
-    // Exception: the element itself (we already checked its rect in the caller)
-    if (current !== element) {
-      const overflow = style.overflow + style.overflowX + style.overflowY;
-      if (overflow.includes('hidden')) {
-        const rect = current.getBoundingClientRect();
-        // If the clipping container is tiny (< 4px in either dimension),
-        // children are effectively invisible to the user.
-        if (rect.width < 4 || rect.height < 4) return false;
-      }
-    }
-
-    // Common patterns for hidden interactive containers:
-    // aria-hidden="true" on an ancestor means it's not presented to the user
-    if (current !== element && current.getAttribute('aria-hidden') === 'true') return false;
-
-    // Popover / dropdown / collapse patterns: check for closed state
-    if (current !== element) {
-      const ariaExpanded = current.getAttribute('aria-expanded');
-      // If this container explicitly says it's collapsed, skip
-      if (ariaExpanded === 'false') {
-        // Only treat as hidden if the container is also small / clipped
-        const rect = current.getBoundingClientRect();
-        if (rect.height < 4 || rect.width < 4) return false;
-      }
-    }
-
-    current = current.parentElement;
+  if (overlayClickHandler) {
+    document.removeEventListener('click', overlayClickHandler, true);
+    overlayClickHandler = null;
   }
-
-  return true;
+  removeHighlightStyles();
+  removeHighlightHost();
 }
+
+// isElementAccessibleWithoutInteraction is now imported from ./utils
 
 /**
  * Pick the best element from a list of candidates matching the same image URL.
@@ -807,13 +790,13 @@ function createSingleHighlight(imageUrl: string, target: Element): void {
     height: ${rect.height + gap * 2}px;
     border: ${borderWidth}px solid #60B557;
     border-radius: 6px;
-    z-index: 2147483647;
+    z-index: 1;
     pointer-events: none;
     box-shadow: 0 0 8px 2px rgba(96, 181, 87, 0.7),
                 0 0 20px 6px rgba(96, 181, 87, 0.35);
   `;
 
-  document.documentElement.appendChild(border);
+  ensureHighlightHost().appendChild(border);
 
   // Continuously track position via rAF — handles any scroll container, resize, etc.
   let rafId: number | null = null;
@@ -901,4 +884,51 @@ export function removeAllHighlights(): void {
   highlightEntries.clear();
   iframeContextMap.clear();
   removeOverlay();
+}
+
+/**
+ * Check visibility of multiple images by finding their DOM elements and
+ * running `isElementAccessibleWithoutInteraction` in real-time.
+ * Returns a map of imageUrl → visible (true/false).
+ * This aligns "visible only" filtering with the highlight logic: an image
+ * is considered visible iff it can be highlighted (i.e. findImageElement
+ * returns a valid candidate via pickBestCandidate).
+ *
+ * Performance note: findImageElement does heavy DOM traversal for each URL.
+ * For large image lists we yield to the main thread periodically to avoid
+ * blocking user interaction.
+ */
+export function checkImagesVisibility(imageUrls: string[]): Record<string, boolean> {
+  const result: Record<string, boolean> = {};
+
+  for (const url of imageUrls) {
+    const element = findImageElement(url);
+    if (!element) {
+      result[url] = false;
+      continue;
+    }
+
+    // Apply the same extra checks as addHighlight so "visible only"
+    // filtering matches the highlight behaviour exactly.
+
+    // Metadata elements (<link>, <meta>) exist in <head> — they are
+    // "found" but not visually present on the page, so mark invisible.
+    if (isMetadataElement(element)) {
+      result[url] = false;
+      continue;
+    }
+
+    // Zero-size or origin-pinned tiny elements are not truly visible.
+    const rect = element.getBoundingClientRect();
+    const hasZeroSize = rect.width < 2 || rect.height < 2;
+    const isAtOriginSmall =
+      rect.top === 0 && rect.left === 0 && rect.width < 10 && rect.height < 10;
+    if (hasZeroSize || isAtOriginSmall) {
+      result[url] = false;
+      continue;
+    }
+
+    result[url] = true;
+  }
+  return result;
 }

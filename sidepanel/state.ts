@@ -45,6 +45,9 @@ export interface ActiveFilters {
 
   // AI tag filter
   aiTagFilter: string[];
+
+  // Visibility filter — show only images visible on the page
+  showVisibleOnly: boolean;
 }
 
 // ── Per-tab cache entry ─────────────────────────────────────────────────────
@@ -352,6 +355,8 @@ export interface SidepanelState {
 
   // AI tagging
   aiQuotaRemaining: number;
+  /** Pro AI monthly quota limit — fetched from remote config, fallback to default */
+  aiQuotaLimit: number;
 
   // ── Preact-managed UI screens (replaces classList toggles) ───────────────
   /** Which "main area" view is active. Mutually exclusive with itself. */
@@ -443,6 +448,7 @@ function createInitialState(): SidepanelState {
       minFileSizeKB: 0,
       maxFileSizeKB: Infinity,
       aiTagFilter: [],
+      showVisibleOnly: true,
     },
 
     collapsedGroups: new Set<string>(),
@@ -475,6 +481,7 @@ function createInitialState(): SidepanelState {
     trialGraceDaysRemaining: 0,
 
     aiQuotaRemaining: 100,
+    aiQuotaLimit: 100,
 
     uiScreen: 'images',
     errorInfo: null,

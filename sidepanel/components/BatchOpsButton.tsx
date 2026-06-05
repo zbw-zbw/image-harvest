@@ -1,5 +1,8 @@
-// Batch operations toolbar — Pro-only actions (favorite, AI tag, delete)
+// Batch operations toolbar — favorite, AI tag, delete.
+// Free users can use batch delete/favorite with a per-batch limit;
+// AI tag remains Pro-only.
 import { t } from '../../shared/i18n';
+import { getFreeLimits } from '../../shared/constants';
 import { useStoreSelector } from './storeHook';
 import { state } from '../state';
 import { showToast } from '../ui';
@@ -59,6 +62,9 @@ function IconTrash() {
   );
 }
 
+/**
+ * Block Pro-only features outright (e.g. batch AI tag).
+ */
 function proBlock(feature: string): boolean {
   if (!state.isProUser) {
     showToast(t('pro_batch_operation'), 'warning');
@@ -67,6 +73,45 @@ function proBlock(feature: string): boolean {
     return true;
   }
   return false;
+}
+
+/**
+ * Resolve which images the batch action targets, applying the free-tier
+ * per-batch limit when the user is not Pro.
+ */
+/**
+ * Resolve target images. If the count exceeds the free limit, block the
+ * operation entirely and show the Pro upgrade modal instead of silently
+ * truncating to the first N items.
+ */
+function resolveTargetImages(
+  limit?: number
+): ReturnType<typeof state.filteredImages.filter> | null {
+  const selectedSize = state.selectedImages.size;
+  const images =
+    selectedSize > 0
+      ? state.filteredImages.filter((img) => state.selectedImages.has(img.id))
+      : state.filteredImages;
+  if (!state.isProUser && limit && images.length > limit) {
+    showProUpgradeModal();
+    return null;
+  }
+  return images;
+}
+
+/**
+ * Resolve target IDs. If the count exceeds the free limit, block the
+ * operation entirely and show the Pro upgrade modal.
+ */
+function resolveTargetIds(limit?: number): string[] | null {
+  const selectedSize = state.selectedImages.size;
+  const ids =
+    selectedSize > 0 ? Array.from(state.selectedImages) : state.filteredImages.map((img) => img.id);
+  if (!state.isProUser && limit && ids.length > limit) {
+    showProUpgradeModal();
+    return null;
+  }
+  return ids;
 }
 
 export function BatchOpsButton() {
@@ -79,11 +124,10 @@ export function BatchOpsButton() {
   const countLabel = effectiveCount > 0 ? ` (${effectiveCount})` : '';
 
   function handleFavorite(): void {
-    if (proBlock('batch_favorite')) return;
-    const images =
-      selectedSize > 0
-        ? state.filteredImages.filter((img) => state.selectedImages.has(img.id))
-        : state.filteredImages;
+    const limits = getFreeLimits();
+    const freeLimit = state.isProUser ? undefined : limits.MAX_BATCH_FAVORITE;
+    const images = resolveTargetImages(freeLimit);
+    if (!images || images.length === 0) return;
     void batchAddToCollection(images);
   }
 
@@ -94,15 +138,6 @@ export function BatchOpsButton() {
         ? state.filteredImages.filter((img) => state.selectedImages.has(img.id))
         : state.filteredImages;
     void batchAiTag(images);
-  }
-
-  function handleDelete(): void {
-    if (proBlock('batch_delete')) return;
-    const ids =
-      selectedSize > 0
-        ? Array.from(state.selectedImages)
-        : state.filteredImages.map((img) => img.id);
-    void deleteSelectedImages(ids);
   }
 
   return (
@@ -143,11 +178,10 @@ export function BatchDeleteButton() {
   const countLabel = effectiveCount > 0 ? ` (${effectiveCount})` : '';
 
   function handleDelete(): void {
-    if (proBlock('batch_delete')) return;
-    const ids =
-      selectedSize > 0
-        ? Array.from(state.selectedImages)
-        : state.filteredImages.map((img) => img.id);
+    const limits = getFreeLimits();
+    const freeLimit = state.isProUser ? undefined : limits.MAX_BATCH_DELETE;
+    const ids = resolveTargetIds(freeLimit);
+    if (!ids || ids.length === 0) return;
     void deleteSelectedImages(ids);
   }
 

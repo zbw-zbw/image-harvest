@@ -354,10 +354,10 @@
     "message": "पहले से लाइसेंस कुंजी है?"
   },
   "pro_collection_limit": {
-    "message": "मुफ्त योजना अधिकतम {max} पसंदीदा की अनुमति देती है। असीमित के लिए Pro में अपग्रेड करें!"
+    "message": "Free plan: up to {max} favorites. Upgrade to Pro for unlimited!"
   },
   "pro_copy_urls_limit": {
-    "message": "मुफ्त योजना एक बार में अधिकतम {max} URL की अनुमति देती है। असीमित के लिए Pro में अपग्रेड करें!"
+    "message": "Free plan: up to {max} URLs per batch. Upgrade to Pro for unlimited!"
   },
   "pro_deactivate_tooltip": {
     "message": "लाइसेंस निष्क्रिय करें"
@@ -372,19 +372,19 @@
     "message": "बैच डाउनलोड"
   },
   "pro_feature_blocked_advanced_grouping": {
-    "message": "उन्नत ग्रुपिंग एक Pro सुविधा है। अनलॉक करने के लिए अपग्रेड करें!"
+    "message": "Advanced grouping is a Pro feature. Upgrade to unlock!"
   },
   "pro_feature_blocked_collection": {
-    "message": "संग्रह एक Pro सुविधा है"
+    "message": "Collection is a Pro feature. Upgrade to unlock!"
   },
   "pro_feature_blocked_color_copy": {
-    "message": "रंग कॉपी एक Pro सुविधा है"
+    "message": "Color copy is a Pro feature. Upgrade to unlock!"
   },
   "pro_feature_blocked_format_conversion": {
-    "message": "फॉर्मेट कन्वर्शन एक Pro सुविधा है। अनलॉक करने के लिए अपग्रेड करें!"
+    "message": "Free plan: up to {max} format conversions per month. Upgrade to Pro for unlimited!"
   },
   "pro_feature_blocked_reverse_search": {
-    "message": "{engine} सर्च के लिए Pro आवश्यक है। अनलॉक करने के लिए अपग्रेड करें!"
+    "message": "{engine} reverse search is a Pro feature. Upgrade to unlock!"
   },
   "pro_feature_color_desc": {
     "message": "प्रमुख रंग के अनुसार छवियां फ़िल्टर करें"
@@ -474,7 +474,7 @@
     "message": "ट्रायल उपलब्ध नहीं"
   },
   "pro_zip_limit": {
-    "message": "मुफ्त योजना प्रति ZIP अधिकतम {max} छवियों की अनुमति देती है। असीमित के लिए Pro में अपग्रेड करें!"
+    "message": "Free plan: up to {max} images per ZIP. Upgrade to Pro for unlimited!"
   },
   "progress_downloading": {
     "message": "डाउनलोड हो रहा है..."
@@ -909,13 +909,13 @@
     "message": "Pro सफलतापूर्वक सक्रिय!"
   },
   "toast_pro_color_filter": {
-    "message": "रंग फ़िल्टरिंग एक Pro सुविधा है। रंग से फ़िल्टर करने के लिए अपग्रेड करें!"
+    "message": "Color filtering is a Pro feature. Upgrade to unlock!"
   },
   "toast_pro_naming_locked": {
-    "message": "कस्टम नामकरण एक Pro सुविधा है। अनलॉक करने के लिए अपग्रेड करें!"
+    "message": "Custom naming is a Pro feature. Upgrade to unlock!"
   },
   "toast_pro_setting_locked": {
-    "message": "इस सेटिंग के लिए Pro आवश्यक है। अनलॉक करने के लिए अपग्रेड करें!"
+    "message": "This setting is a Pro feature. Upgrade to unlock!"
   },
   "toast_scan_cancelled": {
     "message": "स्कैन रद्द किया गया"
@@ -1074,13 +1074,13 @@
     "message": "Exported {count} images to Eagle successfully!"
   },
   "toast_pro_eagle_export": {
-    "message": "Eagle export is a Pro feature"
+    "message": "Free plan: up to {max} images per Eagle export. Upgrade to Pro for unlimited!"
   },
   "card_ai_tag": {
     "message": "AI Tag"
   },
   "toast_pro_ai_tag": {
-    "message": "AI Tagging is a Pro feature"
+    "message": "Free plan: up to {max} AI tags per month. Upgrade to Pro for unlimited!"
   },
   "toast_ai_tag_success": {
     "message": "AI tags added"
@@ -1089,7 +1089,7 @@
     "message": "AI tagging failed, please try again"
   },
   "toast_ai_quota_exhausted": {
-    "message": "Monthly AI quota exhausted (100/100)"
+    "message": "मासिक AI कोटा समाप्त"
   },
   "ai_quota_tooltip": {
     "message": "Monthly AI tagging quota"
@@ -1110,13 +1110,13 @@
     "message": "AI टैगिंग के लिए छवि बहुत छोटी है"
   },
   "toast_ai_daily_limit": {
-    "message": "आज के 3 मुफ़्त AI टैग उपयोग हो चुके हैं। Pro में अपग्रेड करें 100 टैग/माह के लिए।"
+    "message": "Free plan: up to {max} AI tags per month. Upgrade to Pro for unlimited!"
   },
   "toast_collection_limit": {
-    "message": "संग्रह भरा हुआ (5/5)। असीमित पसंदीदा के लिए Pro में अपग्रेड करें।"
+    "message": "Free plan: up to {max} favorites. Upgrade to Pro for unlimited!"
   },
   "toast_eagle_free_limit": {
-    "message": "मुफ़्त प्लान प्रति Eagle निर्यात अधिकतम {max} छवियाँ। असीमित के लिए Pro।"
+    "message": "Free plan: up to {max} images per Eagle export. Upgrade to Pro for unlimited!"
   },
   "trial_days_remaining": {
     "message": "ट्रायल: {days} दिन शेष"
@@ -1125,7 +1125,7 @@
     "message": "ट्रायल समाप्त — {days} दिन Pro एक्सेस शेष।"
   },
   "pro_batch_operation": {
-    "message": "बैच ऑपरेशन Pro फीचर है।"
+    "message": "Batch AI tagging is a Pro feature. Upgrade to unlock!"
   },
   "toolbar_batch_favorite": {
     "message": "पसंदीदा"
@@ -1210,5 +1210,272 @@
   },
   "batch_tooltip_download": {
     "message": "Download the selected images"
+  },
+  "toast_ai_monthly_limit": {
+    "message": "Free plan: up to {max} AI tags per month. Upgrade to Pro for unlimited!"
+  },
+  "filter_visible_only": {
+    "message": "केवल दृश्यमान"
+  },
+  "filter_visible_tooltip": {
+    "message": "केवल पृष्ठ पर दिखाई देने वाली छवियाँ दिखाएँ"
+  },
+  "toast_visible_only_on": {
+    "message": "{visible} दृश्यमान चित्र दिखा रहे हैं ({hidden} छिपे हुए फ़िल्टर किए गए)"
+  },
+  "toast_visible_only_off": {
+    "message": "Filter removed — showing all {total} images"
+  },
+  "settings_section_quotas": {
+    "message": "उपयोग और कोटा"
+  },
+  "quota_ai_tags": {
+    "message": "AI टैग"
+  },
+  "quota_zip_download": {
+    "message": "ZIP डाउनलोड"
+  },
+  "quota_batch_copy": {
+    "message": "बैच URL कॉपी"
+  },
+  "quota_collection": {
+    "message": "संग्रह"
+  },
+  "quota_eagle_export": {
+    "message": "Eagle निर्यात"
+  },
+  "quota_batch_delete": {
+    "message": "बैच हटाएं"
+  },
+  "quota_batch_favorite": {
+    "message": "बैच पसंदीदा"
+  },
+  "quota_unlimited": {
+    "message": "असीमित"
+  },
+  "quota_per_month": {
+    "message": "/माह"
+  },
+  "quota_per_batch": {
+    "message": "/बैच"
+  },
+  "quota_upgrade_hint": {
+    "message": "असीमित पहुंच के लिए Pro में अपग्रेड करें"
+  },
+  "quota_header_feature": {
+    "message": "सुविधा"
+  },
+  "quota_remaining": {
+    "message": "शेष"
+  },
+  "quota_used_count": {
+    "message": "{used}/{max} उपयोग किया"
+  },
+  "toast_batch_limit": {
+    "message": "Free plan: up to {limit} items per batch. Upgrade to Pro for unlimited!"
+  },
+  "restricted_section_title": {
+    "message": "Image Harvest क्या कर सकता है?"
+  },
+  "restricted_feature_ai_tag_title": {
+    "message": "AI स्मार्ट टैगिंग"
+  },
+  "restricted_feature_ai_tag_desc": {
+    "message": "AI-संचालित ऑटो-टैगिंग — आसानी से वर्गीकृत और खोजें।"
+  },
+  "restricted_feature_eagle_title": {
+    "message": "Eagle निर्यात"
+  },
+  "restricted_feature_eagle_desc": {
+    "message": "एक क्लिक में Eagle ऐप में निर्यात — अपनी विज़ुअल लाइब्रेरी को सहजता से प्रबंधित करें।"
+  },
+  "restricted_feature_format_title": {
+    "message": "फॉर्मेट रूपांतरण"
+  },
+  "restricted_feature_format_desc": {
+    "message": "डाउनलोड से पहले PNG, JPG और WebP फॉर्मेट के बीच चित्र कन्वर्ट करें।"
+  },
+  "restricted_feature_live_title": {
+    "message": "लाइव मॉनिटरिंग"
+  },
+  "restricted_feature_live_desc": {
+    "message": "रीयल-टाइम पेज मॉनिटरिंग — नए चित्रों को स्वचालित रूप से कैप्चर करें।"
+  },
+  "pro_modal_ai_tag_title": {
+    "message": "AI स्मार्ट टैगिंग"
+  },
+  "pro_modal_ai_tag_desc": {
+    "message": "AI-संचालित ऑटो-टैगिंग — आसानी से वर्गीकृत और खोजें।"
+  },
+  "pro_modal_eagle_title": {
+    "message": "Eagle निर्यात"
+  },
+  "pro_modal_eagle_desc": {
+    "message": "टैग, फ़ोल्डर और मेटाडेटा के साथ Eagle में एक क्लिक में निर्यात।"
+  },
+  "pro_modal_format_title": {
+    "message": "फॉर्मेट रूपांतरण"
+  },
+  "pro_modal_format_desc": {
+    "message": "डाउनलोड से पहले PNG, JPG और WebP फॉर्मेट के बीच चित्र कन्वर्ट करें।"
+  },
+  "pro_modal_live_title": {
+    "message": "लाइव मॉनिटरिंग"
+  },
+  "pro_modal_live_desc": {
+    "message": "रीयल-टाइम पेज मॉनिटरिंग — नए चित्रों को स्वचालित रूप से कैप्चर करें।"
+  },
+  "pro_modal_batch_title": {
+    "message": "असीमित बैच डाउनलोड"
+  },
+  "pro_modal_batch_desc": {
+    "message": "असीमित चित्रों को एक बार में चुनें और डाउनलोड करें, व्यक्तिगत फ़ाइलें या ZIP के रूप में।"
+  },
+  "pro_modal_dedup_title": {
+    "message": "डुप्लिकेट डिटेक्शन"
+  },
+  "pro_modal_dedup_desc": {
+    "message": "स्वचालित रूप से दृश्य रूप से समान या डुप्लिकेट चित्रों को खोजें और समूहित करें।"
+  },
+  "quota_unit_items": {
+    "message": " आइटम"
+  },
+  "quota_usage_title": {
+    "message": "Your usage this month"
+  },
+  "referral_cta_title": {
+    "message": "Share & Get 3 Days Pro"
+  },
+  "referral_cta_desc": {
+    "message": "Invite a friend — you both get 3 extra days of Pro access"
+  },
+  "referral_cta_button": {
+    "message": "Copy Link"
+  },
+  "referral_link_copied": {
+    "message": "Referral link copied to clipboard!"
+  },
+  "quota_exhausted_monthly": {
+    "message": "Free plan: up to {limit} {feature} per month. Upgrade to Pro for unlimited!"
+  },
+  "feature_multitab": {
+    "message": "Multi-Tab Extract"
+  },
+  "feature_dedup": {
+    "message": "Similar Image Detection"
+  },
+  "feature_format_convert": {
+    "message": "Format Conversion"
+  },
+  "feature_live_monitor": {
+    "message": "Live Monitoring"
+  },
+  "quota_multitab": {
+    "message": "Multi-Tab Extract"
+  },
+  "quota_dedup": {
+    "message": "Duplicate Detection"
+  },
+  "quota_format_convert": {
+    "message": "Format Conversion"
+  },
+  "quota_live_monitor": {
+    "message": "Live Monitor"
+  },
+  "quota_batch_highlight": {
+    "message": "Batch Highlight"
+  },
+  "quota_reverse_search": {
+    "message": "Reverse Search"
+  },
+  "quota_group_core": {
+    "message": "Core Pro"
+  },
+  "quota_group_ai": {
+    "message": "AI"
+  },
+  "quota_group_batch": {
+    "message": "Batch Operations"
+  },
+  "quota_group_storage": {
+    "message": "Storage & Conversion"
+  },
+  "quota_per_day": {
+    "message": "/day"
+  },
+  "quota_engines": {
+    "message": "engines"
+  },
+  "referral_banner_text": {
+    "message": "Share & get 3 days Pro free"
+  },
+  "referral_banner_copy": {
+    "message": "Copy Link"
+  },
+  "referral_match_success": {
+    "message": "Welcome! You earned {days} days of Pro from a friend's invite."
+  },
+  "pro_feature_ai_tag_title": {
+    "message": "AI Smart Tagging"
+  },
+  "pro_feature_ai_tag_desc_pro": {
+    "message": "Auto-tag images with AI descriptions. Search and organize instantly."
+  },
+  "pro_feature_eagle_title": {
+    "message": "Eagle Export"
+  },
+  "pro_feature_eagle_desc_pro": {
+    "message": "Send images directly to Eagle app with tags and metadata preserved."
+  },
+  "pro_feature_format_title": {
+    "message": "Format Conversion"
+  },
+  "pro_feature_format_desc_pro": {
+    "message": "Convert images to PNG, JPG, or WebP before downloading."
+  },
+  "pro_feature_live_monitor_title": {
+    "message": "Live Monitoring"
+  },
+  "pro_feature_live_monitor_desc_pro": {
+    "message": "Auto-detect new images as they load on the page in real time."
+  },
+  "pro_compare_feature": {
+    "message": "Feature"
+  },
+  "pro_compare_free": {
+    "message": "Free"
+  },
+  "pro_compare_pro": {
+    "message": "Pro"
+  },
+  "pro_compare_batch_free": {
+    "message": "20/day"
+  },
+  "pro_compare_batch_pro": {
+    "message": "Unlimited"
+  },
+  "pro_compare_search_free": {
+    "message": "2 engines"
+  },
+  "pro_compare_search_pro": {
+    "message": "All engines"
+  },
+  "pro_compare_ai_free": {
+    "message": "5/day"
+  },
+  "pro_compare_per_month": {
+    "message": "/mo"
+  },
+  "pro_compare_per_day": {
+    "message": "/day"
+  },
+  "pro_compare_unlimited": {
+    "message": "Unlimited"
+  },
+  "pro_compare_all_engines": {
+    "message": "All engines"
+  },
+  "pro_compare_engines": {
+    "message": "engines"
   }
 }

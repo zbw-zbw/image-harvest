@@ -225,7 +225,10 @@ describe('ImageCard – click handlers', () => {
       <ImageCard img={makeImage({ colors: ['#abcdef'] })} index={0} />
     );
     fireEvent.click(container.querySelector('.card-color-bar')!);
-    expect(mocks.ui.showToast).toHaveBeenCalledWith('Color copy is a Pro feature', 'warning');
+    expect(mocks.ui.showToast).toHaveBeenCalledWith(
+      'Color copy is a Pro feature. Upgrade to unlock!',
+      'warning'
+    );
     expect(mocks.pro.copyColor).not.toHaveBeenCalled();
 
     state.isProUser = true;

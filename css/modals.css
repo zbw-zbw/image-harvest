@@ -18,8 +18,8 @@
 .status-buttons {
   display: flex;
   align-items: center;
-  gap: 5px;
-  flex-wrap: nowrap;
+  gap: 4px 5px;
+  flex-wrap: wrap;
   /* width:100% so this flex container always spans the full status-bar.
      Without it the container shrinks to its content and `justify-content`
      becomes a no-op in some layout edge cases — which made the icon row
@@ -99,6 +99,13 @@
   #download-label > .btn-label,
   .filter-btn .btn-label {
     display: none;
+  }
+  /* Icon-only filter buttons: shrink padding and min-height to match
+     per-card action buttons (28×28) for visual consistency. */
+  .filter-btn {
+    padding: 4px 6px;
+    min-height: 28px;
+    gap: 3px;
   }
   .status-bar {
     padding: 6px 10px;
@@ -428,6 +435,8 @@
   font-size: 11px;
   color: var(--text-tertiary);
   margin-top: 2px;
+  /* Align with input fields: label span min-width (110px) + gap (8px) */
+  padding-left: 118px;
 }
 
 .setting-desc {

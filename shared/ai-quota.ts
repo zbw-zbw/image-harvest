@@ -1,4 +1,4 @@
-import { STORAGE_KEYS, AI_QUOTA_LIMIT } from './constants';
+import { STORAGE_KEYS, getProAiQuotaLimit } from './constants';
 
 interface AiQuotaData {
   count: number;
@@ -26,16 +26,16 @@ export async function incrementLocalQuota(): Promise<number> {
   const quota = await getLocalQuota();
   quota.count += 1;
   await chrome.storage.local.set({ [STORAGE_KEYS.AI_QUOTA]: quota });
-  return Math.max(0, AI_QUOTA_LIMIT - quota.count);
+  return Math.max(0, getProAiQuotaLimit() - quota.count);
 }
 
 export async function setLocalQuotaFromServer(remaining: number): Promise<void> {
   const month = currentMonth();
-  const count = Math.max(0, AI_QUOTA_LIMIT - remaining);
+  const count = Math.max(0, getProAiQuotaLimit() - remaining);
   await chrome.storage.local.set({ [STORAGE_KEYS.AI_QUOTA]: { count, month } });
 }
 
 export async function getRemainingQuota(): Promise<number> {
   const quota = await getLocalQuota();
-  return Math.max(0, AI_QUOTA_LIMIT - quota.count);
+  return Math.max(0, getProAiQuotaLimit() - quota.count);
 }

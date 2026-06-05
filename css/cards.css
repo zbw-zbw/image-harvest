@@ -169,21 +169,22 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
   padding: 8px 10px;
   padding-right: 14px;
   border-top: 1px solid var(--card-border);
   border-bottom: 1px solid var(--card-border);
   background: var(--card-bg);
-  gap: 8px;
+  gap: 4px 8px;
   min-height: 38px;
 }
 
-/* Compact mode: smaller info-bar for narrow panels, match URL row height */
-.compact-mode .image-grid:not(.list-view) .card-info-bar {
-  padding: 4px 6px;
-  padding-right: 10px;
-  gap: 2px;
-  min-height: 36px;
+/* Compact mode: tighter info-bar for narrow panels (both grid and list). */
+.compact-mode .card-info-bar {
+  padding: 3px 4px;
+  padding-right: 4px;
+  gap: 2px 4px;
+  min-height: 24px;
 }
 
 .card-actions {
@@ -192,6 +193,7 @@
   align-items: center;
   flex-shrink: 0;
   padding-right: 6px;
+  margin-left: auto;
 }
 
 .card-dl-group {
@@ -409,44 +411,87 @@
   flex-shrink: 1;
   min-width: 0;
   overflow: hidden;
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
 
 /* Compact mode: scale tags AND action buttons together proportionally.
-   Previously tags shrank a lot (8px) while buttons stayed full-size (28px),
-   so the info row couldn't fit everything and got clipped. Now both shrink
-   moderately: tags stay readable (9px) and buttons drop to 24px with a
-   1px gap — still ≥ the 26px-ish URL-row buttons in feel, but compact
-   enough that format + dims + filesize + all 6 actions fit on narrow panels. */
-.compact-mode .image-grid:not(.list-view) .card-tags {
+   With flex-wrap on info-bar, elements auto-wrap when space is tight —
+   compact just shrinks sizes for a tidier look, no overflow risk. */
+/* ── Tier 1: compact (~15% shrink) ── */
+.compact-mode .card-info-bar {
+  padding: 5px 8px;
+  padding-right: 10px;
+  gap: 2px 4px;
+  min-height: 34px;
+}
+
+.compact-mode .card-tags {
   gap: 3px;
 }
 
-.compact-mode .image-grid:not(.list-view) .card-tag {
-  font-size: 9px;
+.compact-mode .card-tag {
+  font-size: 8.5px;
   padding: 1px 4px;
   border-radius: 2px;
 }
 
-.compact-mode .image-grid:not(.list-view) .card-tag.filesize {
+.compact-mode .card-tag.filesize {
   padding: 1px 3px;
 }
 
-.compact-mode .image-grid:not(.list-view) .card-actions {
+.compact-mode .card-actions {
   gap: 1px;
+  padding-right: 2px;
 }
 
-.compact-mode .image-grid:not(.list-view) .card-action-btn {
+.compact-mode .card-action-btn {
   width: 24px;
   height: 24px;
 }
 
-.compact-mode .image-grid:not(.list-view) .card-action-btn svg {
+.compact-mode .card-action-btn svg {
   width: 13px;
   height: 13px;
 }
 
-.compact-mode .image-grid:not(.list-view) .icon-btn-wrapper .pro-badge-mini {
+/* ── Tier 2: ultra-compact (~30% shrink) ── */
+.ultra-compact-mode .card-info-bar {
+  padding: 3px 4px;
+  padding-right: 4px;
+  gap: 2px 3px;
+  min-height: 28px;
+}
+
+.ultra-compact-mode .card-tags {
+  gap: 2px;
+}
+
+.ultra-compact-mode .card-tag {
+  font-size: 7.5px;
+  padding: 0px 3px;
+  border-radius: 2px;
+}
+
+.ultra-compact-mode .card-tag.filesize {
+  padding: 0px 2px;
+}
+
+.ultra-compact-mode .card-actions {
+  gap: 0px;
+  padding-right: 0;
+}
+
+.ultra-compact-mode .card-action-btn {
+  width: 22px;
+  height: 22px;
+}
+
+.ultra-compact-mode .card-action-btn svg {
+  width: 12px;
+  height: 12px;
+}
+
+.compact-mode .icon-btn-wrapper .pro-badge-mini {
   font-size: 5px;
   padding: 0px 1.5px;
   top: 1px;
@@ -454,60 +499,18 @@
   letter-spacing: 0.2px;
 }
 
-.compact-mode .image-grid:not(.list-view) .card-actions .icon-btn-wrapper .pro-badge-mini {
+.compact-mode .card-actions .icon-btn-wrapper .pro-badge-mini {
   top: 1px;
   right: -4px;
 }
 
-.compact-mode .image-grid:not(.list-view) .card-actions .icon-btn-wrapper {
+.compact-mode .card-actions .icon-btn-wrapper {
   margin-right: 0;
 }
 
 /* ── List-view compact: same proportional shrink as grid ──────────────
-   List-view was previously EXCLUDED from every compact rule (all selectors
-   used :not(.list-view)), so on narrow panels its info row kept full-size
-   28px buttons + an 8px action gap and the tags (format/dims/filesize) got
-   clipped. Mirror the grid compact treatment here: smaller tags, smaller
-   buttons, tighter gaps — so the whole info row fits. */
-.compact-mode .list-view .card-tags {
-  gap: 3px;
-}
-
-.compact-mode .list-view .card-tag {
-  font-size: 9px;
-  padding: 1px 4px;
-  border-radius: 2px;
-}
-
-.compact-mode .list-view .card-tag.filesize {
-  padding: 1px 3px;
-}
-
-.compact-mode .list-view .card-actions {
-  gap: 2px;
-}
-
-.compact-mode .list-view .card-action-btn {
-  width: 24px;
-  height: 24px;
-}
-
-.compact-mode .list-view .card-action-btn svg {
-  width: 13px;
-  height: 13px;
-}
-
-.compact-mode .list-view .card-actions .icon-btn-wrapper {
-  margin-right: 0;
-}
-
-.compact-mode .list-view .card-actions .icon-btn-wrapper .pro-badge-mini {
-  font-size: 5px;
-  padding: 0px 1.5px;
-  top: 1px;
-  right: -4px;
-  letter-spacing: 0.2px;
-}
+   List-view compact rules are now merged into the unified .compact-mode
+   selectors above — no separate list-view overrides needed. */
 
 .card-tag {
   padding: 2px 5px;
@@ -985,10 +988,10 @@
    handled by .compact-mode (panel-width driven) which keeps action
    buttons at a usable 28px. Shrinking them again by viewport made them
    smaller than the URL-row copy/open buttons and hard to tap. */
-@media (max-width: 500px) {
+@container panel (max-width: 500px) {
   .card-info-bar {
     padding: 5px 6px;
-    gap: 4px;
+    gap: 2px 4px;
     min-height: 32px;
   }
   .card-tags {
@@ -1000,10 +1003,10 @@
   }
 }
 
-@media (max-width: 380px) {
+@container panel (max-width: 380px) {
   .card-info-bar {
     padding: 4px 4px;
-    gap: 2px;
+    gap: 2px 3px;
     min-height: 28px;
   }
   .card-tag {

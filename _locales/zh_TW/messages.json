@@ -396,10 +396,10 @@
     "message": "已有授權金鑰？"
   },
   "pro_collection_limit": {
-    "message": "免費版最多收藏 {max} 張,升級 Pro 解鎖無限!"
+    "message": "免費版：最多收藏 {max} 張，升級 Pro 無限使用！"
   },
   "pro_copy_urls_limit": {
-    "message": "免費版單次最多複製 {max} 個連結，升級 Pro 解鎖無限！"
+    "message": "免費版：單次最多複製 {max} 個連結，升級 Pro 無限使用！"
   },
   "pro_deactivate_tooltip": {
     "message": "解綁授權"
@@ -414,25 +414,25 @@
     "message": "批次下載"
   },
   "pro_feature_blocked_advanced_grouping": {
-    "message": "進階分組是 Pro 功能,升級即可解鎖!"
+    "message": "進階分組是 Pro 功能，升級即可解鎖！"
   },
   "pro_feature_blocked_collection": {
-    "message": "收藏是 Pro 功能"
+    "message": "收藏是 Pro 功能，升級即可解鎖！"
   },
   "pro_feature_blocked_color_copy": {
-    "message": "複製顏色是 Pro 功能"
+    "message": "複製顏色是 Pro 功能，升級即可解鎖！"
   },
   "pro_feature_blocked_dedup": {
-    "message": "去重是Pro功能，升級後解鎖！"
+    "message": "免費版：每月最多 {max} 次去重檢測，升級 Pro 無限使用！"
   },
   "pro_feature_blocked_format_conversion": {
-    "message": "格式轉換是 Pro 功能,升級即可解鎖!"
+    "message": "免費版：每月最多 {max} 次格式轉換，升級 Pro 無限使用！"
   },
   "pro_feature_blocked_multitab": {
-    "message": "多分頁擷取是Pro功能，升級後解鎖！"
+    "message": "免費版：每月最多 {max} 次多標籤頁提取，升級 Pro 無限使用！"
   },
   "pro_feature_blocked_reverse_search": {
-    "message": "{engine} 搜尋需要 Pro,升級即可解鎖!"
+    "message": "{engine}以圖搜圖是 Pro 功能，升級即可解鎖！"
   },
   "pro_feature_color_desc": {
     "message": "按主色調篩選圖片"
@@ -528,7 +528,7 @@
     "message": "試用不可用"
   },
   "pro_zip_limit": {
-    "message": "免費版每個 ZIP 最多 {max} 張圖片,升級 Pro 解鎖無限!"
+    "message": "免費版：每個 ZIP 最多 {max} 張圖片，升級 Pro 無限使用！"
   },
   "progress_downloading": {
     "message": "下載中..."
@@ -726,7 +726,7 @@
     "message": "設定已儲存"
   },
   "settings_section_account": {
-    "message": "升級 Pro"
+    "message": "帳戶"
   },
   "settings_section_appearance": {
     "message": "外觀"
@@ -993,13 +993,13 @@
     "message": "Pro 啟用成功！"
   },
   "toast_pro_color_filter": {
-    "message": "顏色篩選是 Pro 功能，升級以解鎖！"
+    "message": "顏色篩選是 Pro 功能，升級即可解鎖！"
   },
   "toast_pro_naming_locked": {
-    "message": "自訂命名是 Pro 功能，升級以解鎖！"
+    "message": "自訂命名是 Pro 功能，升級即可解鎖！"
   },
   "toast_pro_setting_locked": {
-    "message": "此設定需要 Pro，升級以解鎖！"
+    "message": "此設定是 Pro 功能，升級即可解鎖！"
   },
   "toast_refresh_retry": {
     "message": "重新整理頁面後重試"
@@ -1170,13 +1170,13 @@
     "message": "成功匯出 {count} 張圖片到 Eagle！"
   },
   "toast_pro_eagle_export": {
-    "message": "匯出到 Eagle 是 Pro 功能"
+    "message": "免費版：每次最多匯出 {max} 張到 Eagle，升級 Pro 無限使用！"
   },
   "card_ai_tag": {
     "message": "AI 標籤"
   },
   "toast_pro_ai_tag": {
-    "message": "AI 標籤是 Pro 功能"
+    "message": "免費版：每月最多 {max} 次 AI 標籤，升級 Pro 無限使用！"
   },
   "toast_ai_tag_success": {
     "message": "AI 標籤已新增"
@@ -1185,7 +1185,7 @@
     "message": "AI 標籤失敗，請重試"
   },
   "toast_ai_quota_exhausted": {
-    "message": "本月 AI 配額已用完 (100/100)"
+    "message": "本月 AI 配額已用完"
   },
   "ai_quota_tooltip": {
     "message": "每月 AI 標籤配額"
@@ -1206,13 +1206,13 @@
     "message": "圖片尺寸過小，無法進行 AI 標籤"
   },
   "toast_ai_daily_limit": {
-    "message": "今日 3 次免費 AI 標籤已用完。升級 Pro 享受每月 100 次。"
+    "message": "免費版：每月最多 {max} 次 AI 標籤，升級 Pro 無限使用！"
   },
   "toast_collection_limit": {
-    "message": "收藏已滿 (5/5)。升級 Pro 享受無限收藏。"
+    "message": "免費版：最多收藏 {max} 張，升級 Pro 無限使用！"
   },
   "toast_eagle_free_limit": {
-    "message": "免費版每次最多匯出 {max} 張到 Eagle。升級 Pro 無限制。"
+    "message": "免費版：每次最多匯出 {max} 張到 Eagle，升級 Pro 無限使用！"
   },
   "trial_days_remaining": {
     "message": "試用：剩餘 {days} 天"
@@ -1221,7 +1221,7 @@
     "message": "試用已結束 — 還有 {days} 天 Pro 存取權限。"
   },
   "pro_batch_operation": {
-    "message": "批次操作是 Pro 功能。升級 Pro 享受無限生產力。"
+    "message": "批量 AI 標籤是 Pro 功能，升級即可解鎖！"
   },
   "toolbar_batch_favorite": {
     "message": "收藏"
@@ -1237,6 +1237,9 @@
   },
   "toast_batch_favorite_done": {
     "message": "已將 {count} 張圖片加入收藏。"
+  },
+  "toast_batch_delete_done": {
+    "message": "已刪除 {count} 張圖片。"
   },
   "toast_batch_ai_tag_started": {
     "message": "正在為 {count} 張圖片進行 AI 標籤..."
@@ -1306,5 +1309,272 @@
   },
   "batch_tooltip_download": {
     "message": "下載選取的圖片"
+  },
+  "toast_ai_monthly_limit": {
+    "message": "免費版：每月最多 {max} 次 AI 標籤，升級 Pro 無限使用！"
+  },
+  "filter_visible_only": {
+    "message": "僅顯示可見"
+  },
+  "filter_visible_tooltip": {
+    "message": "僅顯示頁面上可見的圖片"
+  },
+  "toast_visible_only_on": {
+    "message": "顯示 {visible} 張可見圖片（已過濾 {hidden} 張隱藏）"
+  },
+  "toast_visible_only_off": {
+    "message": "已取消過濾 — 顯示全部 {total} 張圖片"
+  },
+  "settings_section_quotas": {
+    "message": "用量與配額"
+  },
+  "quota_ai_tags": {
+    "message": "AI 標籤"
+  },
+  "quota_zip_download": {
+    "message": "ZIP 下載"
+  },
+  "quota_batch_copy": {
+    "message": "批量複製連結"
+  },
+  "quota_collection": {
+    "message": "收藏"
+  },
+  "quota_eagle_export": {
+    "message": "Eagle 匯出"
+  },
+  "quota_batch_delete": {
+    "message": "批量刪除"
+  },
+  "quota_batch_favorite": {
+    "message": "批量收藏"
+  },
+  "quota_unlimited": {
+    "message": "不限"
+  },
+  "quota_per_month": {
+    "message": "次/月"
+  },
+  "quota_per_batch": {
+    "message": "張/次"
+  },
+  "quota_upgrade_hint": {
+    "message": "升級 Pro 解鎖無限使用"
+  },
+  "quota_header_feature": {
+    "message": "功能"
+  },
+  "quota_remaining": {
+    "message": "剩餘"
+  },
+  "quota_used_count": {
+    "message": "已用 {used}/{max}"
+  },
+  "toast_batch_limit": {
+    "message": "免費版：單次最多處理 {limit} 項，升級 Pro 無限使用！"
+  },
+  "restricted_section_title": {
+    "message": "Image Harvest 能做什麼？"
+  },
+  "restricted_feature_ai_tag_title": {
+    "message": "AI 智慧標籤"
+  },
+  "restricted_feature_ai_tag_desc": {
+    "message": "AI 驅動的自動標籤 — 輕鬆分類和搜尋每張圖片。"
+  },
+  "restricted_feature_eagle_title": {
+    "message": "Eagle 匯出"
+  },
+  "restricted_feature_eagle_desc": {
+    "message": "一鍵匯出到 Eagle 應用 — 無縫管理您的視覺素材庫。"
+  },
+  "restricted_feature_format_title": {
+    "message": "格式轉換"
+  },
+  "restricted_feature_format_desc": {
+    "message": "下載前在 PNG、JPG 和 WebP 格式之間轉換圖片。"
+  },
+  "restricted_feature_live_title": {
+    "message": "即時監控"
+  },
+  "restricted_feature_live_desc": {
+    "message": "即時頁面監控 — 自動捕獲新出現的圖片。"
+  },
+  "pro_modal_ai_tag_title": {
+    "message": "AI 智慧標籤"
+  },
+  "pro_modal_ai_tag_desc": {
+    "message": "AI 驅動的自動標籤 — 輕鬆分類和搜尋每張圖片。"
+  },
+  "pro_modal_eagle_title": {
+    "message": "Eagle 匯出"
+  },
+  "pro_modal_eagle_desc": {
+    "message": "一鍵匯出到 Eagle 應用，保留標籤、資料夾和中繼資料。"
+  },
+  "pro_modal_format_title": {
+    "message": "格式轉換"
+  },
+  "pro_modal_format_desc": {
+    "message": "下載前在 PNG、JPG 和 WebP 格式之間轉換圖片。"
+  },
+  "pro_modal_live_title": {
+    "message": "即時監控"
+  },
+  "pro_modal_live_desc": {
+    "message": "即時頁面監控 — 自動捕獲新出現的圖片。"
+  },
+  "pro_modal_batch_title": {
+    "message": "無限批量下載"
+  },
+  "pro_modal_batch_desc": {
+    "message": "一次性選擇和下載無限量圖片，支援單檔或 ZIP。"
+  },
+  "pro_modal_dedup_title": {
+    "message": "重複檢測"
+  },
+  "pro_modal_dedup_desc": {
+    "message": "自動查找和分組視覺相似或重複的圖片。"
+  },
+  "quota_unit_items": {
+    "message": "張"
+  },
+  "quota_usage_title": {
+    "message": "Your usage this month"
+  },
+  "referral_cta_title": {
+    "message": "Share & Get 3 Days Pro"
+  },
+  "referral_cta_desc": {
+    "message": "Invite a friend — you both get 3 extra days of Pro access"
+  },
+  "referral_cta_button": {
+    "message": "Copy Link"
+  },
+  "referral_link_copied": {
+    "message": "Referral link copied to clipboard!"
+  },
+  "quota_exhausted_monthly": {
+    "message": "免費版：每月最多 {limit} 次{feature}，升級 Pro 無限使用！"
+  },
+  "feature_multitab": {
+    "message": "Multi-Tab Extract"
+  },
+  "feature_dedup": {
+    "message": "Similar Image Detection"
+  },
+  "feature_format_convert": {
+    "message": "Format Conversion"
+  },
+  "feature_live_monitor": {
+    "message": "Live Monitoring"
+  },
+  "quota_multitab": {
+    "message": "多標籤頁提取"
+  },
+  "quota_dedup": {
+    "message": "重複檢測"
+  },
+  "quota_format_convert": {
+    "message": "格式轉換"
+  },
+  "quota_live_monitor": {
+    "message": "即時監控"
+  },
+  "quota_batch_highlight": {
+    "message": "批量高亮"
+  },
+  "quota_reverse_search": {
+    "message": "以圖搜圖"
+  },
+  "quota_group_core": {
+    "message": "核心 Pro 功能"
+  },
+  "quota_group_ai": {
+    "message": "AI 功能"
+  },
+  "quota_group_batch": {
+    "message": "批量操作"
+  },
+  "quota_group_storage": {
+    "message": "儲存與轉換"
+  },
+  "quota_per_day": {
+    "message": "次/天"
+  },
+  "quota_engines": {
+    "message": "個引擎"
+  },
+  "referral_banner_text": {
+    "message": "分享得 3 天 Pro 體驗"
+  },
+  "referral_banner_copy": {
+    "message": "複製連結"
+  },
+  "referral_match_success": {
+    "message": "歡迎！透過好友邀請，你獲得了 {days} 天 Pro 體驗。"
+  },
+  "pro_feature_ai_tag_title": {
+    "message": "AI 智慧標籤"
+  },
+  "pro_feature_ai_tag_desc_pro": {
+    "message": "AI 自動為圖片生成描述標籤，快速搜尋和整理。"
+  },
+  "pro_feature_eagle_title": {
+    "message": "Eagle 匯出"
+  },
+  "pro_feature_eagle_desc_pro": {
+    "message": "一鍵發送圖片到 Eagle，標籤和中繼資料完整保留。"
+  },
+  "pro_feature_format_title": {
+    "message": "格式轉換"
+  },
+  "pro_feature_format_desc_pro": {
+    "message": "下載前將圖片轉換為 PNG、JPG 或 WebP 格式。"
+  },
+  "pro_feature_live_monitor_title": {
+    "message": "即時監控"
+  },
+  "pro_feature_live_monitor_desc_pro": {
+    "message": "自動偵測頁面上新載入的圖片，即時更新。"
+  },
+  "pro_compare_feature": {
+    "message": "功能"
+  },
+  "pro_compare_free": {
+    "message": "免費版"
+  },
+  "pro_compare_pro": {
+    "message": "Pro"
+  },
+  "pro_compare_batch_free": {
+    "message": "20次/天"
+  },
+  "pro_compare_batch_pro": {
+    "message": "無限制"
+  },
+  "pro_compare_search_free": {
+    "message": "2 引擎"
+  },
+  "pro_compare_search_pro": {
+    "message": "全引擎"
+  },
+  "pro_compare_ai_free": {
+    "message": "5次/天"
+  },
+  "pro_compare_per_month": {
+    "message": "/月"
+  },
+  "pro_compare_per_day": {
+    "message": "/天"
+  },
+  "pro_compare_unlimited": {
+    "message": "無限制"
+  },
+  "pro_compare_all_engines": {
+    "message": "全引擎"
+  },
+  "pro_compare_engines": {
+    "message": "引擎"
   }
 }

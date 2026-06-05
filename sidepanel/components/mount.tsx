@@ -26,8 +26,10 @@ import { BatchUrlCopyButton } from './BatchUrlCopyButton';
 import { EagleExportButton } from './EagleExportButton';
 import { BatchOpsButton, BatchDeleteButton } from './BatchOpsButton';
 import { RatingPromptModal } from './RatingPromptModal';
+import { ReferralBanner } from './ReferralBanner';
 import { SettingsModal } from './SettingsModal';
 import { ImageGrid } from './ImageGrid';
+import { QuotaDisplay } from './QuotaDisplay';
 
 /**
  * Replace a legacy DOM element with an empty `<tag>` mount point.
@@ -170,6 +172,9 @@ export function mountPreactComponents(): void {
   mountAt('multitab-modal', MultitabModal, 'div');
   mountAt('pro-upgrade-modal', ProUpgradeModal, 'div');
   mountSettingsModal();
+  // Quota display — renders into the settings modal body after
+  // mountSettingsModal() has planted the legacy body subtree.
+  mountAt('quota-display-mount', QuotaDisplay);
   mountImageGrid();
   mountStateScreens();
   // Privacy opt-in modal has no legacy slot — it's a brand-new component
@@ -185,6 +190,7 @@ export function mountPreactComponents(): void {
   // is missing (popup variant or hot-reload race).
   mountSoftPaywallBanner();
   mountTrialGraceBanner();
+  mountReferralBanner();
 
   // Batch URL copy button (Sprint 3.4). Renders into the
   // `#batch-url-copy-mount` slot in toolbar row 2. The slot is a
@@ -251,6 +257,21 @@ function mountTrialGraceBanner(): void {
   mount.dataset.preactMount = 'trial-grace-banner-mount';
   app.insertBefore(mount, app.firstChild);
   render(<TrialGraceBanner />, mount);
+}
+
+function mountReferralBanner(): void {
+  const slot = document.getElementById('referral-banner-mount');
+  if (slot) {
+    render(<ReferralBanner />, slot);
+    return;
+  }
+  const app = document.getElementById('app');
+  if (!app) return;
+  const mount = document.createElement('div');
+  mount.id = 'referral-banner-mount';
+  mount.dataset.preactMount = 'referral-banner-mount';
+  app.insertBefore(mount, app.firstChild);
+  render(<ReferralBanner />, mount);
 }
 
 /**

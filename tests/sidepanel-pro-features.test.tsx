@@ -127,21 +127,45 @@ describe('detectSimilarImages — algorithm', () => {
     expect(state.similarGroups[0].map((i) => i.id).sort()).toEqual(['a', 'b', 'c']);
   });
 
-  it('does NOT group images with same phash but very different aspect ratios', () => {
+  it('does NOT group images with same phash but very different aspect ratios (different URLs)', () => {
     const phashA = 'a'.repeat(16);
     state.allImages = [
-      makeImg({ id: 'a', phash: phashA, naturalWidth: 800, naturalHeight: 600 }), // 4:3
-      makeImg({ id: 'b', phash: phashA, naturalWidth: 200, naturalHeight: 800 }), // 1:4 (tall)
+      makeImg({
+        id: 'a',
+        url: 'https://example.com/photo-a.jpg',
+        phash: phashA,
+        naturalWidth: 800,
+        naturalHeight: 600,
+      }), // 4:3
+      makeImg({
+        id: 'b',
+        url: 'https://example.com/photo-b.jpg',
+        phash: phashA,
+        naturalWidth: 200,
+        naturalHeight: 800,
+      }), // 1:4 (tall)
     ];
     detectSimilarImages();
-    // Aspect-ratio tolerance is 0.15 (15%); 4/3 vs 1/4 fails the test.
+    // Aspect-ratio tolerance is 0.25 (25%); 4/3 vs 1/4 still fails the check.
     expect(state.similarGroups).toEqual([]);
   });
 
-  it('does NOT group images with different phash even when ratios match', () => {
+  it('does NOT group images with different phash even when ratios match (different URLs)', () => {
     state.allImages = [
-      makeImg({ id: 'a', phash: 'a'.repeat(16), naturalWidth: 800, naturalHeight: 600 }),
-      makeImg({ id: 'b', phash: 'b'.repeat(16), naturalWidth: 800, naturalHeight: 600 }),
+      makeImg({
+        id: 'a',
+        url: 'https://example.com/photo-a.jpg',
+        phash: 'a'.repeat(16),
+        naturalWidth: 800,
+        naturalHeight: 600,
+      }),
+      makeImg({
+        id: 'b',
+        url: 'https://example.com/photo-b.jpg',
+        phash: 'b'.repeat(16),
+        naturalWidth: 800,
+        naturalHeight: 600,
+      }),
     ];
     detectSimilarImages();
     expect(state.similarGroups).toEqual([]);
@@ -169,9 +193,9 @@ describe('detectSimilarImages — algorithm', () => {
 
   it('discards single-image groups (only emits groups of 2+)', () => {
     state.allImages = [
-      makeImg({ id: 'a', phash: 'a'.repeat(16) }),
-      makeImg({ id: 'b', phash: 'b'.repeat(16) }), // unique
-      makeImg({ id: 'c', phash: 'a'.repeat(16) }), // pairs with 'a'
+      makeImg({ id: 'a', url: 'https://example.com/photo-a.jpg', phash: 'a'.repeat(16) }),
+      makeImg({ id: 'b', url: 'https://example.com/photo-b.jpg', phash: 'b'.repeat(16) }), // unique
+      makeImg({ id: 'c', url: 'https://example.com/photo-c.jpg', phash: 'a'.repeat(16) }), // pairs with 'a'
     ];
     detectSimilarImages();
     expect(state.similarGroups).toHaveLength(1);
@@ -202,11 +226,11 @@ describe('detectSimilarImages — UI side effects', () => {
 
   it('sets similarGroups correctly based on duplicate detection', () => {
     // No groups (algo runs but finds no duplicates).
-    // Use 2 images with DIFFERENT phash so withHash.length >= 2
-    // (so the early-return guard is bypassed) but no group forms.
+    // Use 2 images with DIFFERENT phash AND different URLs so
+    // neither URL-based nor pHash-based grouping fires.
     state.allImages = [
-      makeImg({ id: 'a', phash: 'a'.repeat(16) }),
-      makeImg({ id: 'b', phash: 'b'.repeat(16) }),
+      makeImg({ id: 'a', url: 'https://example.com/photo-a.jpg', phash: 'a'.repeat(16) }),
+      makeImg({ id: 'b', url: 'https://example.com/photo-b.jpg', phash: 'b'.repeat(16) }),
     ];
     detectSimilarImages();
     expect(state.similarGroups).toEqual([]);

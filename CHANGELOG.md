@@ -58,6 +58,54 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
+## [1.0.6] — 2026-06-05
+
+### ✨ Added
+
+- **Referral & Invite System**: Share your unique invite link with friends. When they install Image Harvest, both you and your friend earn bonus trial days. Includes a new in-panel `ReferralBanner` for free users and a dedicated invite landing page on the website.
+- **Remote Feature Configuration**: Feature limits (free quotas, Pro caps) are now fetched from the server and cached locally, allowing real-time adjustments without releasing a new extension version. Three-tier cache: memory → chrome.storage → network with 1-hour TTL.
+- **Quota Display Panel**: New `QuotaDisplay` component in settings shows a clear Free vs Pro comparison table, grouped into Core Pro / AI / Batch Ops / Storage categories. Free users see remaining quota; Pro users see used/total.
+- **Visibility Filter**: New "Show visible only" toggle filters out images that are off-screen or hidden behind overlays. Uses real-time `IntersectionObserver` + `getComputedStyle` checks in the content script.
+- **Color Extraction now free**: Color palette extraction is no longer a Pro-only feature — all users can see dominant colors for every image.
+- **Image MIME detection from bytes**: `detectImageMimeFromBytes` inspects file magic bytes (PNG/JPEG/GIF/WebP/BMP/ICO/SVG) for reliable format identification, replacing extension-based guessing.
+
+### 🔄 Changed
+
+- **Pro features → soft quota model**: Instead of hard-blocking free users, Pro features now use a monthly/daily quota system (`feature-quota.ts`). Free users get a limited number of uses per month; Pro users get unlimited access. Affected features: multi-tab extraction, dedup detection, format conversion, live monitor, batch highlight.
+- **AI quota from daily to monthly**: Free AI tagging quota changed from per-day to per-month, giving users more flexibility in how they use their allowance.
+- **srcset handling**: `extractImgTags` now picks the single highest-resolution URL from `srcset` instead of listing every candidate — significantly reduces duplicate entries.
+- **Pricing updated**: Monthly $3.99 / Yearly $29.99 / Lifetime $49.99 (previously $2.99/$19.99/$29.99).
+- **ProUpgradeModal redesign**: Rewritten upgrade modal with improved UX — clearer feature comparison, better visual hierarchy, and smoother animations (241 lines of changes).
+- **Content script refactor**: `content/main.ts` restructured for better maintainability (+275 lines), with new utility functions extracted to `content/utils.ts`.
+- **Init flow optimization**: `sidepanel/init.ts` expanded (+188 lines) with improved startup sequence, remote config sync, and referral matching on first install.
+- **Settings improvements**: Enhanced settings panel with new options and better organization (+132 lines).
+
+### 🎨 UI/UX
+
+- **License page restyled**: Completely new license activation/management CSS (+308 lines) with modern card layout.
+- **Toolbar refinements**: Updated toolbar styling (+81 lines) with better spacing and icon alignment.
+- **Cards & grid polish**: Minor visual improvements to image card rendering and grid layout.
+
+### 🐛 Fixed
+
+- **Highlight overlay positioning**: Improved accuracy of highlight overlays for images in complex layouts (scrollable containers, CSS transforms).
+- **Highlight click dismiss**: Overlay click handler rewritten to use document-level capture with `pointer-events: none` on overlays, fixing issues where clicks wouldn't register on overlaid content.
+
+### 🌍 i18n
+
+- **290+ new translation keys per language**: All 15 language files updated with comprehensive translations for referral system, quota display, visibility filter, updated Pro features, and revised upgrade modal content.
+
+### 🧪 Test Coverage
+
+- **11 test files updated**: Tests synchronized with quota model changes, visibility filter, referral system, and pricing updates.
+
+### ⚠️ Known Issues
+
+- **4 debug `console.log` statements** remain in `background/license.ts:19`, `background/reverse-search.ts:245,252`, `background/index.ts:204` — should be cleaned before final submission.
+- **`TEST_MATCH_REFERRAL` message handler** in `background/index.ts` lacks a production environment guard — consider wrapping in `__DEV__` check.
+
+---
+
 ## [1.0.5] — 2026-06-02
 
 ### ✨ Added

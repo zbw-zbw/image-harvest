@@ -32,6 +32,7 @@ vi.mock('../sidepanel/filter', () => ({
   filterBySize: vi.fn(),
   filterByType: vi.fn(),
   filterByUrl: vi.fn(),
+  filterByVisibility: vi.fn(),
   sortImages: vi.fn(),
 }));
 vi.mock('../sidepanel/ui', () => ({
@@ -58,6 +59,7 @@ import {
   filterBySize,
   filterByType,
   filterByUrl,
+  filterByVisibility,
   sortImages,
 } from '../sidepanel/filter';
 import type { ImageItem } from '../shared/types';
@@ -66,6 +68,7 @@ import type { ImageItem } from '../shared/types';
 // inside renderProgressiveImages resolves true for every input image.
 // Centralized so each case stays focused on the one axis it's pinning.
 function passAllFilters(): void {
+  vi.mocked(filterByVisibility).mockReturnValue(true);
   vi.mocked(filterBySize).mockReturnValue(true);
   vi.mocked(filterByType).mockReturnValue(true);
   vi.mocked(filterByLayout).mockReturnValue(true);
@@ -479,6 +482,7 @@ describe('renderProgressiveImages', () => {
 
   it('computes scanSkeletonsToShow = max(0, totalSlots - filteredImages.length)', () => {
     vi.mocked(calcSkeletonCount).mockReturnValue(10);
+    state.scanProgress.visible = true;
     state.allImages = Array.from({ length: 3 }, (_, i) => ({
       id: String(i),
       url: `https://x.com/${i}.png`,
@@ -505,6 +509,7 @@ describe('renderProgressiveImages', () => {
 
   it('falls back to 800px default when .image-grid-wrapper is missing', () => {
     gridWrapper.remove();
+    state.scanProgress.visible = true;
     state.allImages = [];
     passAllFilters();
     renderProgressiveImages();
@@ -516,6 +521,7 @@ describe('renderProgressiveImages', () => {
 
   it('detects list-view via classList.contains("list-view") and threads it into calcSkeletonCount', () => {
     imageGrid.classList.add('list-view');
+    state.scanProgress.visible = true;
     state.allImages = [];
     passAllFilters();
     renderProgressiveImages();

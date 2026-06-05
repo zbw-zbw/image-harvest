@@ -354,10 +354,10 @@
     "message": "이미 라이선스 키가 있으신가요?"
   },
   "pro_collection_limit": {
-    "message": "무료 플랜은 최대 {max}개의 즐겨찾기만 허용합니다. Pro로 업그레이드하면 무제한!"
+    "message": "Free plan: up to {max} favorites. Upgrade to Pro for unlimited!"
   },
   "pro_copy_urls_limit": {
-    "message": "무료 플랜은 한 번에 최대 {max}개의 URL만 허용합니다. Pro로 업그레이드하면 무제한!"
+    "message": "Free plan: up to {max} URLs per batch. Upgrade to Pro for unlimited!"
   },
   "pro_deactivate_tooltip": {
     "message": "라이선스 비활성화"
@@ -372,19 +372,19 @@
     "message": "일괄 다운로드"
   },
   "pro_feature_blocked_advanced_grouping": {
-    "message": "고급 그룹화는 Pro 기능입니다. 업그레이드하여 잠금 해제하세요!"
+    "message": "Advanced grouping is a Pro feature. Upgrade to unlock!"
   },
   "pro_feature_blocked_collection": {
-    "message": "컬렉션은 Pro 기능입니다"
+    "message": "Collection is a Pro feature. Upgrade to unlock!"
   },
   "pro_feature_blocked_color_copy": {
-    "message": "색상 복사는 Pro 기능입니다"
+    "message": "Color copy is a Pro feature. Upgrade to unlock!"
   },
   "pro_feature_blocked_format_conversion": {
-    "message": "포맷 변환은 Pro 기능입니다. 업그레이드하여 잠금 해제하세요!"
+    "message": "Free plan: up to {max} format conversions per month. Upgrade to Pro for unlimited!"
   },
   "pro_feature_blocked_reverse_search": {
-    "message": "{engine} 검색은 Pro가 필요합니다. 업그레이드하여 잠금 해제하세요!"
+    "message": "{engine} reverse search is a Pro feature. Upgrade to unlock!"
   },
   "pro_feature_color_desc": {
     "message": "주요 색상별로 이미지 필터링"
@@ -474,7 +474,7 @@
     "message": "체험을 이용할 수 없습니다"
   },
   "pro_zip_limit": {
-    "message": "무료 플랜은 ZIP당 최대 {max}개의 이미지만 허용합니다. Pro로 업그레이드하면 무제한!"
+    "message": "Free plan: up to {max} images per ZIP. Upgrade to Pro for unlimited!"
   },
   "progress_downloading": {
     "message": "다운로드 중..."
@@ -909,13 +909,13 @@
     "message": "Pro가 성공적으로 활성화되었습니다!"
   },
   "toast_pro_color_filter": {
-    "message": "색상 필터링은 Pro 기능입니다. 업그레이드하여 색상별 필터링을 이용하세요!"
+    "message": "Color filtering is a Pro feature. Upgrade to unlock!"
   },
   "toast_pro_naming_locked": {
-    "message": "사용자 지정 파일명은 Pro 기능입니다. 업그레이드하여 잠금 해제하세요!"
+    "message": "Custom naming is a Pro feature. Upgrade to unlock!"
   },
   "toast_pro_setting_locked": {
-    "message": "이 설정은 Pro가 필요합니다. 업그레이드하여 잠금 해제하세요!"
+    "message": "This setting is a Pro feature. Upgrade to unlock!"
   },
   "toast_scan_cancelled": {
     "message": "스캔이 취소되었습니다"
@@ -1074,13 +1074,13 @@
     "message": "Exported {count} images to Eagle successfully!"
   },
   "toast_pro_eagle_export": {
-    "message": "Eagle export is a Pro feature"
+    "message": "Free plan: up to {max} images per Eagle export. Upgrade to Pro for unlimited!"
   },
   "card_ai_tag": {
     "message": "AI Tag"
   },
   "toast_pro_ai_tag": {
-    "message": "AI Tagging is a Pro feature"
+    "message": "Free plan: up to {max} AI tags per month. Upgrade to Pro for unlimited!"
   },
   "toast_ai_tag_success": {
     "message": "AI tags added"
@@ -1089,7 +1089,7 @@
     "message": "AI tagging failed, please try again"
   },
   "toast_ai_quota_exhausted": {
-    "message": "Monthly AI quota exhausted (100/100)"
+    "message": "월간 AI 할당량 소진"
   },
   "ai_quota_tooltip": {
     "message": "Monthly AI tagging quota"
@@ -1110,13 +1110,13 @@
     "message": "이미지가 너무 작아 AI 태그를 생성할 수 없습니다"
   },
   "toast_ai_daily_limit": {
-    "message": "오늘 무료 AI 태그 3회를 모두 사용했습니다. Pro로 업그레이드하면 월 100회 사용 가능합니다."
+    "message": "Free plan: up to {max} AI tags per month. Upgrade to Pro for unlimited!"
   },
   "toast_collection_limit": {
-    "message": "컬렉션이 가득 찼습니다 (5/5). Pro로 업그레이드하면 무제한입니다."
+    "message": "Free plan: up to {max} favorites. Upgrade to Pro for unlimited!"
   },
   "toast_eagle_free_limit": {
-    "message": "무료 플랜은 Eagle 내보내기 시 최대 {max}개까지 지원합니다. Pro로 무제한."
+    "message": "Free plan: up to {max} images per Eagle export. Upgrade to Pro for unlimited!"
   },
   "trial_days_remaining": {
     "message": "체험판: {days}일 남음"
@@ -1125,7 +1125,7 @@
     "message": "체험판이 종료되었습니다 — Pro 액세스 {days}일 남음."
   },
   "pro_batch_operation": {
-    "message": "일괄 작업은 Pro 기능입니다."
+    "message": "Batch AI tagging is a Pro feature. Upgrade to unlock!"
   },
   "toolbar_batch_favorite": {
     "message": "즐겨찾기"
@@ -1210,5 +1210,272 @@
   },
   "batch_tooltip_download": {
     "message": "Download the selected images"
+  },
+  "toast_ai_monthly_limit": {
+    "message": "Free plan: up to {max} AI tags per month. Upgrade to Pro for unlimited!"
+  },
+  "filter_visible_only": {
+    "message": "표시된 것만"
+  },
+  "filter_visible_tooltip": {
+    "message": "페이지에서 보이는 이미지만 표시"
+  },
+  "toast_visible_only_on": {
+    "message": "{visible}개의 표시된 이미지 표시 중 ({hidden}개 숨겨진 이미지 필터링)"
+  },
+  "toast_visible_only_off": {
+    "message": "Filter removed — showing all {total} images"
+  },
+  "settings_section_quotas": {
+    "message": "사용량 및 할당량"
+  },
+  "quota_ai_tags": {
+    "message": "AI 태그"
+  },
+  "quota_zip_download": {
+    "message": "ZIP 다운로드"
+  },
+  "quota_batch_copy": {
+    "message": "일괄 URL 복사"
+  },
+  "quota_collection": {
+    "message": "컬렉션"
+  },
+  "quota_eagle_export": {
+    "message": "Eagle 내보내기"
+  },
+  "quota_batch_delete": {
+    "message": "일괄 삭제"
+  },
+  "quota_batch_favorite": {
+    "message": "일괄 즐겨찾기"
+  },
+  "quota_unlimited": {
+    "message": "무제한"
+  },
+  "quota_per_month": {
+    "message": "회/월"
+  },
+  "quota_per_batch": {
+    "message": "장/회"
+  },
+  "quota_upgrade_hint": {
+    "message": "무제한 액세스를 위해 Pro로 업그레이드"
+  },
+  "quota_header_feature": {
+    "message": "기능"
+  },
+  "quota_remaining": {
+    "message": "남음"
+  },
+  "quota_used_count": {
+    "message": "{used}/{max} 사용"
+  },
+  "toast_batch_limit": {
+    "message": "Free plan: up to {limit} items per batch. Upgrade to Pro for unlimited!"
+  },
+  "restricted_section_title": {
+    "message": "Image Harvest로 무엇을 할 수 있나요?"
+  },
+  "restricted_feature_ai_tag_title": {
+    "message": "AI 스마트 태깅"
+  },
+  "restricted_feature_ai_tag_desc": {
+    "message": "AI 기반 자동 태깅 — 쉽게 분류하고 검색하세요."
+  },
+  "restricted_feature_eagle_title": {
+    "message": "Eagle 내보내기"
+  },
+  "restricted_feature_eagle_desc": {
+    "message": "원클릭으로 Eagle 앱에 내보내기 — 비주얼 라이브러리를 원활하게 관리하세요."
+  },
+  "restricted_feature_format_title": {
+    "message": "포맷 변환"
+  },
+  "restricted_feature_format_desc": {
+    "message": "다운로드 전에 PNG, JPG, WebP 포맷 간 이미지를 변환하세요."
+  },
+  "restricted_feature_live_title": {
+    "message": "실시간 모니터링"
+  },
+  "restricted_feature_live_desc": {
+    "message": "실시간 페이지 모니터링 — 새 이미지를 자동으로 캡처합니다."
+  },
+  "pro_modal_ai_tag_title": {
+    "message": "AI 스마트 태깅"
+  },
+  "pro_modal_ai_tag_desc": {
+    "message": "AI 기반 자동 태깅 — 쉽게 분류하고 검색하세요."
+  },
+  "pro_modal_eagle_title": {
+    "message": "Eagle 내보내기"
+  },
+  "pro_modal_eagle_desc": {
+    "message": "태그, 폴더, 메타데이터를 유지하며 Eagle로 원클릭 내보내기."
+  },
+  "pro_modal_format_title": {
+    "message": "포맷 변환"
+  },
+  "pro_modal_format_desc": {
+    "message": "다운로드 전에 PNG, JPG, WebP 포맷 간 이미지를 변환하세요."
+  },
+  "pro_modal_live_title": {
+    "message": "실시간 모니터링"
+  },
+  "pro_modal_live_desc": {
+    "message": "실시간 페이지 모니터링 — 새 이미지를 자동으로 캡처합니다."
+  },
+  "pro_modal_batch_title": {
+    "message": "무제한 일괄 다운로드"
+  },
+  "pro_modal_batch_desc": {
+    "message": "무제한 이미지를 한 번에 선택하고 개별 파일 또는 ZIP으로 다운로드하세요."
+  },
+  "pro_modal_dedup_title": {
+    "message": "중복 감지"
+  },
+  "pro_modal_dedup_desc": {
+    "message": "시각적으로 유사하거나 중복된 이미지를 자동으로 찾아 그룹화합니다."
+  },
+  "quota_unit_items": {
+    "message": "개"
+  },
+  "quota_usage_title": {
+    "message": "Your usage this month"
+  },
+  "referral_cta_title": {
+    "message": "Share & Get 3 Days Pro"
+  },
+  "referral_cta_desc": {
+    "message": "Invite a friend — you both get 3 extra days of Pro access"
+  },
+  "referral_cta_button": {
+    "message": "Copy Link"
+  },
+  "referral_link_copied": {
+    "message": "Referral link copied to clipboard!"
+  },
+  "quota_exhausted_monthly": {
+    "message": "Free plan: up to {limit} {feature} per month. Upgrade to Pro for unlimited!"
+  },
+  "feature_multitab": {
+    "message": "Multi-Tab Extract"
+  },
+  "feature_dedup": {
+    "message": "Similar Image Detection"
+  },
+  "feature_format_convert": {
+    "message": "Format Conversion"
+  },
+  "feature_live_monitor": {
+    "message": "Live Monitoring"
+  },
+  "quota_multitab": {
+    "message": "Multi-Tab Extract"
+  },
+  "quota_dedup": {
+    "message": "Duplicate Detection"
+  },
+  "quota_format_convert": {
+    "message": "Format Conversion"
+  },
+  "quota_live_monitor": {
+    "message": "Live Monitor"
+  },
+  "quota_batch_highlight": {
+    "message": "Batch Highlight"
+  },
+  "quota_reverse_search": {
+    "message": "Reverse Search"
+  },
+  "quota_group_core": {
+    "message": "Core Pro"
+  },
+  "quota_group_ai": {
+    "message": "AI"
+  },
+  "quota_group_batch": {
+    "message": "Batch Operations"
+  },
+  "quota_group_storage": {
+    "message": "Storage & Conversion"
+  },
+  "quota_per_day": {
+    "message": "/day"
+  },
+  "quota_engines": {
+    "message": "engines"
+  },
+  "referral_banner_text": {
+    "message": "Share & get 3 days Pro free"
+  },
+  "referral_banner_copy": {
+    "message": "Copy Link"
+  },
+  "referral_match_success": {
+    "message": "Welcome! You earned {days} days of Pro from a friend's invite."
+  },
+  "pro_feature_ai_tag_title": {
+    "message": "AI Smart Tagging"
+  },
+  "pro_feature_ai_tag_desc_pro": {
+    "message": "Auto-tag images with AI descriptions. Search and organize instantly."
+  },
+  "pro_feature_eagle_title": {
+    "message": "Eagle Export"
+  },
+  "pro_feature_eagle_desc_pro": {
+    "message": "Send images directly to Eagle app with tags and metadata preserved."
+  },
+  "pro_feature_format_title": {
+    "message": "Format Conversion"
+  },
+  "pro_feature_format_desc_pro": {
+    "message": "Convert images to PNG, JPG, or WebP before downloading."
+  },
+  "pro_feature_live_monitor_title": {
+    "message": "Live Monitoring"
+  },
+  "pro_feature_live_monitor_desc_pro": {
+    "message": "Auto-detect new images as they load on the page in real time."
+  },
+  "pro_compare_feature": {
+    "message": "Feature"
+  },
+  "pro_compare_free": {
+    "message": "Free"
+  },
+  "pro_compare_pro": {
+    "message": "Pro"
+  },
+  "pro_compare_batch_free": {
+    "message": "20/day"
+  },
+  "pro_compare_batch_pro": {
+    "message": "Unlimited"
+  },
+  "pro_compare_search_free": {
+    "message": "2 engines"
+  },
+  "pro_compare_search_pro": {
+    "message": "All engines"
+  },
+  "pro_compare_ai_free": {
+    "message": "5/day"
+  },
+  "pro_compare_per_month": {
+    "message": "/mo"
+  },
+  "pro_compare_per_day": {
+    "message": "/day"
+  },
+  "pro_compare_unlimited": {
+    "message": "Unlimited"
+  },
+  "pro_compare_all_engines": {
+    "message": "All engines"
+  },
+  "pro_compare_engines": {
+    "message": "engines"
   }
 }

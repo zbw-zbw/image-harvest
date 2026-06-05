@@ -6,14 +6,14 @@
 import { hideDownloadDropdown } from './actions';
 import {
   applyFilters,
-  clearCustomSizeInputs,
   clearFileSizeInputs,
+  FILESIZE_PRESETS,
   syncCustomSizeInputsFromSettings,
 } from './filter';
 import { hideScanOverlay, showScanOverlay } from './scan';
 import { closeAllFilterDropdowns } from './settings';
 import { elements, state } from './state';
-import { throttle } from './utils';
+import { getAspectRatioCategory, throttle } from './utils';
 import { t } from '../shared/i18n';
 
 // ============================================
@@ -290,14 +290,15 @@ export function applyViewMode(mode: 'grid' | 'list'): void {
 // Responsive Width Observer
 // ============================================
 export function getMinCardWidth(): number {
-  // Minimum card width must fit compact tags and action buttons in card-info-bar.
-  // Compact tags: format ~28px + dims ~50px + filesize ~40px + 2 × 4px gap = ~126px
-  // Compact actions: 4 buttons × 22px + 3 × 1px gap = 91px (search, favorite, download, delete)
-  // + 2 PRO badge wrappers extra ~8px
-  // Info-bar padding: left 6px + right 4px = 10px, gap: 2px
-  // Card border + rounding: ~5px
-  // Total ≈ 242px, use 250px for safety.
-  return 250;
+  // Minimum card width for two-column mode. Tags have flex-shrink: 1 +
+  // overflow: hidden so they gracefully truncate when space is tight;
+  // action buttons (flex-shrink: 0) always stay visible. The threshold
+  // only needs to guarantee actions + at least the format tag are readable.
+  // Compact actions: 6 × 24px + 5 × 1px = 149px
+  // Tags (format ~28px + dims ~35px + size ~28px) + gaps ~9px ≈ 100px
+  // info-bar padding ~20px + card border ~5px ≈ 274px minimum
+  // Use 300px — leaves enough headroom to prevent tag/button overlap.
+  return 300;
 }
 
 export function checkNarrowMode(): void {
@@ -327,14 +328,24 @@ export function checkNarrowMode(): void {
 
   const canFitTwoColumns = availableWidth >= minCardWidth * 2 + gridGap;
 
-  // Compact mode: when panel is narrow (can't fit two columns, or each card < 310px)
-  const compactThreshold = 310;
-  const isCompact = !canFitTwoColumns || (availableWidth - gridGap) / 2 < compactThreshold;
+  // 3-tier density based on the ACTUAL card width, not hypothetical.
+  // In two-column grid mode the real card width is half the available
+  // space, so compact must kick in much earlier than in single-column
+  // list view where each card spans the full width.
+  const isTwoColumnGrid = canFitTwoColumns && state.currentViewMode === 'grid';
+  const effectiveCardWidth = isTwoColumnGrid ? (availableWidth - gridGap) / 2 : availableWidth;
+  // Compact: card narrower than 380px — 6 buttons (28px each = 168px) +
+  // 3 tags (~100px) + padding (~28px) = ~296px, so below 380px we start
+  // shrinking to give breathing room.
+  const isCompact = effectiveCardWidth < 380;
+  // Ultra-compact: card narrower than 280px — hide secondary tags entirely.
+  const isUltraCompact = effectiveCardWidth < 280;
 
-  // Toggle compact-mode class on #app for unified compact styles (grid cards)
+  // Toggle density classes on #app for 3-tier responsive styles
   const appElement = document.getElementById('app');
   if (appElement) {
     appElement.classList.toggle('compact-mode', isCompact);
+    appElement.classList.toggle('ultra-compact-mode', isUltraCompact);
   }
 
   // Always sync view toggle button visibility with current width
@@ -855,4 +866,114 @@ export function applyTranslations(): void {
       textEl.textContent = activeOpt.textContent;
     }
   });
+}
+
+// ============================================
+// Filter Dropdown Counts
+// ============================================
+
+/**
+ * Update each filter dropdown option with the count of matching images
+ * from state.allImages. Counts are displayed as <span class="filter-count">(N)</span>.
+ */
+export function updateFilterDropdownCounts(): void {
+  // Guard: skip when running in environments without DOM (e.g. node/SW tests)
+  if (typeof document === 'undefined') return;
+
+  const images = state.allImages;
+  const totalCount = images.length;
+
+  // --- Size counts ---
+  const sizeCounts: Record<string, number> = {
+    all: totalCount,
+    small: 0,
+    medium: 0,
+    large: 0,
+    xl: 0,
+  };
+  for (const img of images) {
+    const w = img.naturalWidth || img.displayWidth || 0;
+    const h = img.naturalHeight || img.displayHeight || 0;
+    const maxDim = Math.max(w, h);
+    if (maxDim < 100) sizeCounts.small++;
+    else if (maxDim < 500) sizeCounts.medium++;
+    else if (maxDim < 1000) sizeCounts.large++;
+    else sizeCounts.xl++;
+  }
+  document.querySelectorAll<HTMLElement>('[data-size-filter]').forEach((el) => {
+    const key = el.getAttribute('data-size-filter') || '';
+    setFilterCount(el, sizeCounts[key] ?? 0);
+  });
+
+  // --- Type counts ---
+  const typeCounts: Record<string, number> = { all: totalCount };
+  for (const img of images) {
+    const format = (img.format || 'unknown').toLowerCase();
+    const key = format === 'unknown' ? 'other' : format;
+    typeCounts[key] = (typeCounts[key] || 0) + 1;
+  }
+  document.querySelectorAll<HTMLElement>('.type-checkbox').forEach((checkbox) => {
+    const value = (checkbox as HTMLInputElement).value;
+    const label = checkbox.closest('label.checkbox-label') as HTMLElement | null;
+    if (label) {
+      const count = value === 'all' ? totalCount : (typeCounts[value] ?? 0);
+      setFilterCount(label, count);
+    }
+  });
+
+  // --- Layout counts ---
+  const layoutCounts: Record<string, number> = {
+    all: totalCount,
+    square: 0,
+    landscape: 0,
+    portrait: 0,
+    panorama: 0,
+  };
+  for (const img of images) {
+    const w = img.naturalWidth || img.displayWidth || 0;
+    const h = img.naturalHeight || img.displayHeight || 0;
+    if (w && h) {
+      const category = getAspectRatioCategory(w, h);
+      if (category && category in layoutCounts) {
+        layoutCounts[category]++;
+      }
+    }
+  }
+  document.querySelectorAll<HTMLElement>('[data-layout-filter]').forEach((el) => {
+    const key = el.getAttribute('data-layout-filter') || '';
+    setFilterCount(el, layoutCounts[key] ?? 0);
+  });
+
+  // --- File Size counts ---
+  const fileSizeCounts: Record<string, number> = {
+    all: totalCount,
+    tiny: 0,
+    small: 0,
+    medium: 0,
+    large: 0,
+    xlarge: 0,
+  };
+  for (const img of images) {
+    const sizeKB = (img.estimatedSize || 0) / 1024;
+    if (sizeKB < FILESIZE_PRESETS.tiny.max) fileSizeCounts.tiny++;
+    else if (sizeKB < FILESIZE_PRESETS.small.max) fileSizeCounts.small++;
+    else if (sizeKB < FILESIZE_PRESETS.medium.max) fileSizeCounts.medium++;
+    else if (sizeKB < FILESIZE_PRESETS.large.max) fileSizeCounts.large++;
+    else fileSizeCounts.xlarge++;
+  }
+  document.querySelectorAll<HTMLElement>('[data-filesize-filter]').forEach((el) => {
+    const key = el.getAttribute('data-filesize-filter') || '';
+    setFilterCount(el, fileSizeCounts[key] ?? 0);
+  });
+}
+
+/** Insert or update a <span class="filter-count"> inside the given element. */
+function setFilterCount(container: HTMLElement, count: number): void {
+  let span = container.querySelector<HTMLElement>('.filter-count');
+  if (!span) {
+    span = document.createElement('span');
+    span.className = 'filter-count';
+    container.appendChild(span);
+  }
+  span.textContent = `(${count})`;
 }
