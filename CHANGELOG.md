@@ -61,7 +61,7 @@ HOW TO ADD A NEW RELEASE ENTRY
 - **Collection Batch Operations**: Select all, batch download, and batch delete for saved collections. Includes a selected/total count indicator and confirmation dialog for destructive actions.
 - **Collection URL Search**: New search-by-URL input in the collection modal for quickly finding specific saved images.
 - **Batch-specific Pro Toast Messages**: Batch favorite, batch AI tag, and batch delete now show feature-specific quota limit messages instead of a generic "batch limit" toast.
-- **AI Tag Quota Pre-check**: Single and batch AI tagging now verify remaining free quota *before* sending API requests, showing the Pro upgrade modal immediately instead of a confusing "tag failed" error.
+- **AI Tag Quota Pre-check**: Single and batch AI tagging now verify remaining free quota _before_ sending API requests, showing the Pro upgrade modal immediately instead of a confusing "tag failed" error.
 - **Remote Config: Partial Sync**: New incremental remote config sync via `fetchPartialRemoteConfig()` — only refreshes stale keys instead of fetching the full config every time, reducing bandwidth and latency.
 
 ### 🔄 Changed

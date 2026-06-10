@@ -744,7 +744,11 @@ export async function batchAiTag(images: ImageItem[]): Promise<void> {
     });
     if (!resp?.success) {
       // Quota / license errors → show Pro upgrade modal instead of generic error
-      if (resp?.error === 'monthly_limit' || resp?.error === 'pro_required' || resp?.error === 'quota_exceeded') {
+      if (
+        resp?.error === 'monthly_limit' ||
+        resp?.error === 'pro_required' ||
+        resp?.error === 'quota_exceeded'
+      ) {
         showToast(
           t('toast_ai_monthly_limit', { max: getFreeLimits().MAX_MONTHLY_AI_TAGS }),
           'warning'
