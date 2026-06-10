@@ -54,7 +54,47 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
-## [Unreleased]
+## [1.0.7] — 2026-06-10
+
+### ✨ Added
+
+- **Collection Batch Operations**: Select all, batch download, and batch delete for saved collections. Includes a selected/total count indicator and confirmation dialog for destructive actions.
+- **Collection URL Search**: New search-by-URL input in the collection modal for quickly finding specific saved images.
+- **Batch-specific Pro Toast Messages**: Batch favorite, batch AI tag, and batch delete now show feature-specific quota limit messages instead of a generic "batch limit" toast.
+- **AI Tag Quota Pre-check**: Single and batch AI tagging now verify remaining free quota *before* sending API requests, showing the Pro upgrade modal immediately instead of a confusing "tag failed" error.
+- **Remote Config: Partial Sync**: New incremental remote config sync via `fetchPartialRemoteConfig()` — only refreshes stale keys instead of fetching the full config every time, reducing bandwidth and latency.
+
+### 🔄 Changed
+
+- **Pro Upgrade Modal Redesign**: Completely overhauled with clearer feature comparison table, reordered feature rows (free-limited features first, Pro-only features last), and better visual hierarchy. "Advanced grouping" moved from Pro-only to limited-free (format grouping free, all modes Pro).
+- **Quota Display Overhaul**: `QuotaDisplay` rewritten to support remote-driven feature copy. Rows, labels, and ordering are now fetched from the server and fall back to a hardcoded layout when offline. "Free" column header now uses i18n (`quota_header_free`) instead of hardcoded English.
+- **Quota Text Unified**: `quota_unlimited` changed from "不限" to "无限制" across all Chinese locales, aligning with `pro_compare_unlimited` and the official website.
+- **Pro Badge Sizing**: `.pro-badge-mini` enlarged from 7px→8px base with better padding and margin. Icon-button badges (`icon-btn-wrapper .pro-badge-mini`) enlarged from 5px→6px with improved positioning.
+- **Format Conversion**: Removed PRO badge from the format conversion dropdown label — the feature uses soft quota (free users get limited monthly conversions), not a hard Pro gate.
+- **Modal Scroll Reset**: All modals (settings, Pro upgrade, collection, multi-tab, dedup) now reset `scrollTop` synchronously on open, with a `requestAnimationFrame` fallback for hidden-element edge cases.
+- **Batch AI Tag Error Handling**: `batchAiTag()` now distinguishes `monthly_limit` / `pro_required` / `quota_exceeded` errors and shows the Pro upgrade modal instead of a generic failure toast.
+- **StatusCounts & Init Flow**: Improved startup sequence and status count rendering for better first-paint experience.
+
+### 🐛 Fixed
+
+- **Modal scroll position**: Opening a modal no longer shows stale scroll position from the previous session — all modals scroll to top on open.
+- **AI tag failure on quota exhaustion**: Free users with exhausted AI tag quota now correctly see the Pro upgrade modal instead of "AI 标签失败，请重试".
+- **Reverse search tab tracking**: Fixed edge cases in tab lifecycle management for reverse image search results.
+- **Highlight overlay clicks**: Improved reliability of highlight dismiss on complex page layouts.
+
+### 🌍 i18n
+
+- **88 new English keys**: Added keys for collection batch ops, batch-specific Pro limits, quota display, color copy, and feature comparison.
+- **Full catalogue sync**: All 15 language files updated. zh_TW received localized translations for batch limit messages; other languages use English fallback.
+
+### 🧹 Housekeeping
+
+- **Debug logs cleaned**: Removed remaining `console.log` from `background/reverse-search.ts` (Baidu upload debug). Previously flagged `background/license.ts` and `background/index.ts` logs were already cleaned in prior commits.
+- **DEV guard confirmed**: `TEST_MATCH_REFERRAL` message handler is properly wrapped in `import.meta.env.DEV` check.
+
+### 🧪 Test Coverage
+
+- **4 test files updated**: Tests synchronized with modal scroll reset changes, collection UI additions, batch ops quota pre-checks, and Pro feature guard updates.
 
 ---
 

@@ -42,7 +42,12 @@ function getFilteredSimilarGroups() {
 function populateDedupBody(): void {
   const modalEl = document.getElementById('dedup-modal');
   const modalBody = modalEl?.querySelector('.modal-body');
-  if (modalBody) modalBody.scrollTop = 0;
+  if (modalBody) {
+    modalBody.scrollTop = 0;
+    requestAnimationFrame(() => {
+      modalBody.scrollTop = 0;
+    });
+  }
 
   const dedupBody = document.getElementById('dedup-body');
   if (!dedupBody) return;
@@ -86,11 +91,11 @@ function populateDedupBody(): void {
 
 export async function removeDuplicates(): Promise<void> {
   if (!state.isProUser) {
-    const { checkFeatureQuota } = await import('../shared/feature-quota');
+    const { checkFeatureQuota, quotaBlockedMessage } = await import('../shared/feature-quota');
     const { allowed, limit } = await checkFeatureQuota('dedup');
     if (!allowed) {
       closeDedupModal();
-      showToast(t('quota_exhausted_monthly', { feature: t('feature_dedup'), limit }), 'warning');
+      showToast(quotaBlockedMessage(t, 'feature_dedup', limit), 'warning');
       showProUpgradeModal();
       return;
     }

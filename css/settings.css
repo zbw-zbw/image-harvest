@@ -313,7 +313,7 @@
 }
 
 .settings-content .setting-inputs label > span:first-child {
-  min-width: 110px;
+  min-width: auto;
   flex-shrink: 0;
 }
 

@@ -53,6 +53,11 @@ vi.mock('../shared/collection', () => ({
   collectionGetAll: vi.fn(() => Promise.resolve([])),
   collectionRemove: vi.fn(() => Promise.resolve()),
 }));
+vi.mock('../shared/feature-quota', () => ({
+  checkFeatureQuota: vi.fn().mockResolvedValue({ allowed: true, limit: 5 }),
+  incrementFeatureUsage: vi.fn().mockResolvedValue(undefined),
+  quotaBlockedMessage: vi.fn().mockReturnValue('quota_exhausted_monthly'),
+}));
 
 import {
   detectSimilarImages,
@@ -519,7 +524,7 @@ describe('addToCollection', () => {
     vi.mocked(collectionMod.collectionAdd).mockRejectedValueOnce(new Error('QuotaExceeded'));
     const uiMod = await import('../sidepanel/ui');
 
-    await expect(addToCollection(makeImg({ id: 'img-4' }))).resolves.toBeUndefined();
+    await expect(addToCollection(makeImg({ id: 'img-4' }))).resolves.toBe(false);
     expect(uiMod.showToast).toHaveBeenCalledWith('Failed to add to collection', 'error');
   });
 });

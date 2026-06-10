@@ -214,29 +214,35 @@ export const VALID_REVERSE_SEARCH_ENGINES = ['google', 'tineye', 'baidu', 'yande
 //   - REVERSE_SEARCH_ENGINES: + 'tineye'  (most useful free engine after Google)
 //   - MAX_COLLECTION_ITEMS: 5  (was: collection fully Pro; now 5 free favorites)
 export const FREE_LIMITS = {
-  MAX_ZIP_IMAGES: 30,
+  MAX_ZIP_IMAGES: 50,
   MAX_BATCH_COPY_URLS: 10,
   MAX_COLLECTION_ITEMS: 10,
-  MAX_MONTHLY_AI_TAGS: 10,
+  MAX_MONTHLY_AI_TAGS: 5,
   MAX_EAGLE_EXPORT_PER_BATCH: 10,
   MAX_BATCH_DELETE: 15,
   MAX_BATCH_FAVORITE: 15,
+  MAX_BATCH_AI_TAGS: 15,
   ALLOWED_GROUP_MODES: ['none', 'format'] as const,
   REVERSE_SEARCH_ENGINES: ['google', 'tineye'] as const,
-  COLOR_EXTRACT_COPY: false,
+  COLOR_EXTRACT_COPY: true,
   COLOR_EXTRACT_FILTER: true,
+  MAX_MONTHLY_COLOR_COPY: 5,
   HIGHLIGHT_BATCH: false,
   LIVE_MONITORING: false,
   IMAGE_DELETE: true,
   FORMAT_CONVERSION: false,
-  CUSTOM_NAMING: true,
-  // Monthly quota for features that were previously fully locked.
-  // These give free users limited access so they can experience the value.
-  MAX_MONTHLY_MULTI_TAB: 3,
-  MAX_MONTHLY_DEDUP: 3,
-  MAX_MONTHLY_FORMAT_CONVERT: 5,
-  MAX_MONTHLY_LIVE_MONITOR: 1,
-  MAX_DAILY_BATCH_HIGHLIGHT: 3,
+  // "Experience paywall" strategy: after 7-day Pro trial, core features
+  // are locked to Pro-only (0 free quota) to maximise loss-aversion and
+  // drive trial→paid conversion. Basic features remain usable.
+  CUSTOM_NAMING: false,
+  MAX_MONTHLY_MULTI_TAB: 0,
+  MAX_MONTHLY_DEDUP: 0,
+  MAX_MONTHLY_FORMAT_CONVERT: 0,
+  MAX_MONTHLY_LIVE_MONITOR: 0,
+  MAX_MONTHLY_BATCH_HIGHLIGHT: 0,
+  MAX_MONTHLY_DELETE: 0,
+  MAX_MONTHLY_CUSTOM_NAMING: 0,
+  MAX_MONTHLY_COLOR_FILTER: 0,
 } as const;
 
 /**
@@ -281,6 +287,9 @@ export function getFreeLimits(): typeof FREE_LIMITS {
       MAX_BATCH_FAVORITE: (typeof remote.maxBatchFavorite === 'number'
         ? remote.maxBatchFavorite
         : FREE_LIMITS.MAX_BATCH_FAVORITE) as typeof FREE_LIMITS.MAX_BATCH_FAVORITE,
+      MAX_BATCH_AI_TAGS: (typeof remote.maxBatchAiTags === 'number'
+        ? remote.maxBatchAiTags
+        : FREE_LIMITS.MAX_BATCH_AI_TAGS) as typeof FREE_LIMITS.MAX_BATCH_AI_TAGS,
       MAX_MONTHLY_MULTI_TAB: (typeof remote.maxMonthlyMultiTab === 'number'
         ? remote.maxMonthlyMultiTab
         : FREE_LIMITS.MAX_MONTHLY_MULTI_TAB) as typeof FREE_LIMITS.MAX_MONTHLY_MULTI_TAB,
@@ -290,18 +299,52 @@ export function getFreeLimits(): typeof FREE_LIMITS {
       MAX_MONTHLY_FORMAT_CONVERT: (typeof remote.maxMonthlyFormatConvert === 'number'
         ? remote.maxMonthlyFormatConvert
         : FREE_LIMITS.MAX_MONTHLY_FORMAT_CONVERT) as typeof FREE_LIMITS.MAX_MONTHLY_FORMAT_CONVERT,
+      MAX_MONTHLY_COLOR_COPY: (typeof remote.maxMonthlyColorCopy === 'number'
+        ? remote.maxMonthlyColorCopy
+        : FREE_LIMITS.MAX_MONTHLY_COLOR_COPY) as typeof FREE_LIMITS.MAX_MONTHLY_COLOR_COPY,
       MAX_MONTHLY_LIVE_MONITOR: (typeof remote.maxMonthlyLiveMonitor === 'number'
         ? remote.maxMonthlyLiveMonitor
         : FREE_LIMITS.MAX_MONTHLY_LIVE_MONITOR) as typeof FREE_LIMITS.MAX_MONTHLY_LIVE_MONITOR,
-      MAX_DAILY_BATCH_HIGHLIGHT: (typeof remote.maxDailyBatchHighlight === 'number'
-        ? remote.maxDailyBatchHighlight
-        : FREE_LIMITS.MAX_DAILY_BATCH_HIGHLIGHT) as typeof FREE_LIMITS.MAX_DAILY_BATCH_HIGHLIGHT,
+      MAX_MONTHLY_BATCH_HIGHLIGHT: (typeof remote.maxMonthlyBatchHighlight === 'number'
+        ? remote.maxMonthlyBatchHighlight
+        : FREE_LIMITS.MAX_MONTHLY_BATCH_HIGHLIGHT) as typeof FREE_LIMITS.MAX_MONTHLY_BATCH_HIGHLIGHT,
+      MAX_MONTHLY_DELETE: (typeof remote.maxMonthlyDelete === 'number'
+        ? remote.maxMonthlyDelete
+        : FREE_LIMITS.MAX_MONTHLY_DELETE) as typeof FREE_LIMITS.MAX_MONTHLY_DELETE,
+      MAX_MONTHLY_CUSTOM_NAMING: (typeof remote.maxMonthlyCustomNaming === 'number'
+        ? remote.maxMonthlyCustomNaming
+        : FREE_LIMITS.MAX_MONTHLY_CUSTOM_NAMING) as typeof FREE_LIMITS.MAX_MONTHLY_CUSTOM_NAMING,
+      MAX_MONTHLY_COLOR_FILTER: (typeof remote.maxMonthlyColorFilter === 'number'
+        ? remote.maxMonthlyColorFilter
+        : FREE_LIMITS.MAX_MONTHLY_COLOR_FILTER) as typeof FREE_LIMITS.MAX_MONTHLY_COLOR_FILTER,
       ALLOWED_GROUP_MODES: Array.isArray(remote.allowedGroupModes)
         ? (remote.allowedGroupModes as unknown as typeof FREE_LIMITS.ALLOWED_GROUP_MODES)
         : FREE_LIMITS.ALLOWED_GROUP_MODES,
       REVERSE_SEARCH_ENGINES: Array.isArray(remote.reverseSearchEngines)
         ? (remote.reverseSearchEngines as unknown as typeof FREE_LIMITS.REVERSE_SEARCH_ENGINES)
         : FREE_LIMITS.REVERSE_SEARCH_ENGINES,
+      // Boolean overrides
+      CUSTOM_NAMING: (typeof remote.customNaming === 'boolean'
+        ? remote.customNaming
+        : FREE_LIMITS.CUSTOM_NAMING) as typeof FREE_LIMITS.CUSTOM_NAMING,
+      HIGHLIGHT_BATCH: (typeof remote.highlightBatchEnabled === 'boolean'
+        ? remote.highlightBatchEnabled
+        : FREE_LIMITS.HIGHLIGHT_BATCH) as typeof FREE_LIMITS.HIGHLIGHT_BATCH,
+      LIVE_MONITORING: (typeof remote.liveMonitorEnabled === 'boolean'
+        ? remote.liveMonitorEnabled
+        : FREE_LIMITS.LIVE_MONITORING) as typeof FREE_LIMITS.LIVE_MONITORING,
+      FORMAT_CONVERSION: (typeof remote.formatConvertEnabled === 'boolean'
+        ? remote.formatConvertEnabled
+        : FREE_LIMITS.FORMAT_CONVERSION) as typeof FREE_LIMITS.FORMAT_CONVERSION,
+      COLOR_EXTRACT_COPY: (typeof remote.colorExtractCopy === 'boolean'
+        ? remote.colorExtractCopy
+        : FREE_LIMITS.COLOR_EXTRACT_COPY) as typeof FREE_LIMITS.COLOR_EXTRACT_COPY,
+      COLOR_EXTRACT_FILTER: (typeof remote.colorExtractFilter === 'boolean'
+        ? remote.colorExtractFilter
+        : FREE_LIMITS.COLOR_EXTRACT_FILTER) as typeof FREE_LIMITS.COLOR_EXTRACT_FILTER,
+      IMAGE_DELETE: (typeof remote.imageDelete === 'boolean'
+        ? remote.imageDelete
+        : FREE_LIMITS.IMAGE_DELETE) as typeof FREE_LIMITS.IMAGE_DELETE,
     };
   } catch {
     return FREE_LIMITS;

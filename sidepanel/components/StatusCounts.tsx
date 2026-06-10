@@ -85,17 +85,14 @@ export function DownloadLabel() {
   const filteredCount = useStoreSelector((s) => s.filteredImages.length);
   // Subscribe to localeTick so a runtime language switch triggers re-render
   useStoreSelector((s) => s.localeTick);
-  // When images are selected, the i18n string already includes the count
-  // (e.g. "下载 (7)"), so we only add a separate count for the unselected
-  // "download all" state where the base label is just "下载".
-  const textLabel =
-    selectedSize > 0
-      ? t('toolbar_download_selected', { count: selectedSize })
-      : t('toolbar_download_all');
-  // Show count in .btn-count only for the "download all" state — when
-  // images are selected, the i18n textLabel already includes the count.
-  // .btn-count remains visible on narrow viewports where .btn-label is hidden.
-  const countLabel = selectedSize > 0 ? '' : filteredCount > 0 ? `(${filteredCount})` : '';
+  // Text label: always use the plain "Download" form so that .btn-label
+  // can be safely hidden on narrow viewports without losing the count.
+  // The count is shown separately via .btn-count (always visible).
+  const textLabel = t('toolbar_download_all');
+  // .btn-count is always visible (even when .btn-label is hidden on narrow
+  // viewports), so we always populate it — selected count takes priority.
+  const countLabel =
+    selectedSize > 0 ? `(${selectedSize})` : filteredCount > 0 ? `(${filteredCount})` : '';
   return (
     <span id="download-label">
       <span class="btn-label">{textLabel}</span>

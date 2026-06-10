@@ -86,6 +86,14 @@
   "toast_download_failed": {
     "message": "Download failed"
   },
+  "toast_download_all_failed": {
+    "message": "Download failed — all images could not be fetched",
+    "description": "Shown when every image in a batch download fails to fetch"
+  },
+  "toast_highlight_not_found": {
+    "message": "Cannot highlight — image may be in a cross-origin iframe or hidden element",
+    "description": "Shown when an image cannot be located on the page for highlighting"
+  },
   "toast_download_cancelled": {
     "message": "Download cancelled"
   },
@@ -146,6 +154,24 @@
   },
   "pro_collection_limit": {
     "message": "Free plan: up to {max} favorites. Upgrade to Pro for unlimited!"
+  },
+  "pro_batch_limit_exceeded": {
+    "message": "Free plan: up to {max} items per batch. Upgrade to Pro for unlimited!"
+  },
+  "pro_batch_favorite_limit": {
+    "message": "Free plan: up to {max} favorites per batch. Upgrade to Pro for unlimited!"
+  },
+  "pro_batch_ai_tag_limit": {
+    "message": "Free plan: up to {max} AI tags per batch. Upgrade to Pro for unlimited!"
+  },
+  "pro_batch_delete_limit": {
+    "message": "Free plan: up to {max} deletions per batch. Upgrade to Pro for unlimited!"
+  },
+  "toast_batch_favorite_partial": {
+    "message": "Added {added} items. Free plan limit: {max} favorites. Upgrade to Pro for unlimited!"
+  },
+  "pro_feature_upgrade_required": {
+    "message": "This feature requires Pro. Upgrade to unlock!"
   },
   "toolbar_sort": {
     "message": "Sort"
@@ -450,6 +476,15 @@
   "collection_search_placeholder": {
     "message": "Search collection..."
   },
+  "collection_search_url_placeholder": {
+    "message": "Search by URL..."
+  },
+  "confirm_delete_title": {
+    "message": "Confirm Delete"
+  },
+  "confirm_delete_collection_message": {
+    "message": "Remove this image from your collection?"
+  },
   "collection_no_match": {
     "message": "No matching images found"
   },
@@ -461,6 +496,31 @@
   },
   "collection_empty_hint": {
     "message": "Click the star icon on any image to add it to your collection"
+  },
+  "collection_select_all": {
+    "message": "Select all"
+  },
+  "collection_batch_download": {
+    "message": "Download selected"
+  },
+  "collection_batch_delete": {
+    "message": "Delete selected"
+  },
+  "collection_count": {
+    "message": "{total} items",
+    "description": "Total count in collection"
+  },
+  "collection_count_selected": {
+    "message": "{selected}/{total} selected",
+    "description": "Selected count in collection"
+  },
+  "collection_batch_delete_confirm": {
+    "message": "Delete {count} selected items from collection?",
+    "description": "Confirmation dialog for batch delete"
+  },
+  "toast_collection_batch_deleted": {
+    "message": "Deleted {count} items from collection",
+    "description": "Success toast after batch delete"
   },
   "common_dismiss": {
     "message": "Dismiss"
@@ -1389,6 +1449,9 @@
   "quota_header_feature": {
     "message": "Feature"
   },
+  "quota_header_free": {
+    "message": "Free"
+  },
   "quota_remaining": {
     "message": "left"
   },
@@ -1476,6 +1539,9 @@
   "feature_live_monitor": {
     "message": "Live Monitoring"
   },
+  "feature_color_copy": {
+    "message": "Color copy"
+  },
   "quota_multitab": {
     "message": "Multi-Tab Extract"
   },
@@ -1490,6 +1556,9 @@
   },
   "quota_batch_highlight": {
     "message": "Batch Highlight"
+  },
+  "quota_color_copy": {
+    "message": "Color Copy"
   },
   "quota_reverse_search": {
     "message": "Reverse Search"
@@ -1527,6 +1596,12 @@
   "pro_feature_ai_tag_desc_pro": {
     "message": "Auto-tag images with AI descriptions. Search and organize instantly."
   },
+  "pro_feature_batch_ops_title": {
+    "message": "Batch Operations"
+  },
+  "pro_feature_batch_ops_desc_pro": {
+    "message": "Batch delete, favorite, AI tag, and Eagle export — all unlimited."
+  },
   "pro_feature_eagle_title": {
     "message": "Eagle Export"
   },
@@ -1555,7 +1630,7 @@
     "message": "Pro"
   },
   "pro_compare_batch_free": {
-    "message": "20/day"
+    "message": "Limited"
   },
   "pro_compare_batch_pro": {
     "message": "Unlimited"
@@ -1567,7 +1642,7 @@
     "message": "All engines"
   },
   "pro_compare_ai_free": {
-    "message": "5/day"
+    "message": "Limited"
   },
   "pro_compare_per_month": {
     "message": "/mo"
@@ -1583,5 +1658,14 @@
   },
   "pro_compare_engines": {
     "message": "engines"
+  },
+  "pro_compare_feature": {
+    "message": "FEATURE"
+  },
+  "pro_compare_per_batch": {
+    "message": "imgs/batch"
+  },
+  "pro_compare_times_per_month": {
+    "message": "times/mo"
   }
 }

@@ -203,7 +203,7 @@ export function handleMessage(message: IncomingMessage): void {
     case MESSAGE_TYPES.CLEAR_SELECTION:
       // User clicked overlay or pressed ESC on the page — clear selection in UI
       state.selectedImages.clear();
-      renderImages();
+      renderImages({ skipScrollReset: true });
       // updateSelectionUI is called via clearSelection downstream; keep parity
       // with original code by directly invoking renderImages + selection sync
       // (see actions.clearSelection).

@@ -69,8 +69,13 @@ export function renderProgressiveImages(): void {
   }
 
   elements.imageGrid.classList.remove('hidden');
-  // Scroll to top so the user always sees images from the beginning
-  elements.imageGrid.scrollTop = 0;
+  // Scroll to top only during an active scan so the user sees newly
+  // discovered images from the beginning. When the panel regains visibility
+  // (e.g. user returns from a new window) the scan is already complete and
+  // we must NOT reset the scroll — otherwise the user loses their position.
+  if (state.scanProgress.visible) {
+    elements.imageGrid.scrollTop = 0;
+  }
 
   checkNarrowMode();
 

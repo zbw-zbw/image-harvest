@@ -88,11 +88,18 @@ export function showSettings(): void {
   // body subtree was moved into the Preact-rendered slot at mount time, so
   // all the getElementById('setting-xxx') calls below continue to work.
   state.settingsModalState = { open: true };
-  // Re-resolve the modal element (cached ref is stale post-mount) and scroll
-  // its body to the top for a fresh entry experience.
+  // Scroll modal body to top for a fresh entry experience.
+  // Set synchronously first (works when DOM is already visible), then
+  // again in rAF as a fallback for when Preact hasn't removed the
+  // `hidden` class yet (scrollTop on hidden elements is a no-op).
   const modalEl = document.getElementById('settings-modal');
   const modalBody = modalEl?.querySelector('.modal-body');
-  if (modalBody) modalBody.scrollTop = 0;
+  if (modalBody) {
+    modalBody.scrollTop = 0;
+    requestAnimationFrame(() => {
+      modalBody.scrollTop = 0;
+    });
+  }
 
   // Render hotkey display
   renderHotkeyDisplay();
@@ -170,6 +177,10 @@ export function showSettings(): void {
 }
 
 export function closeSettings(): void {
+  // Reset scroll position on close so re-opening always starts at the top
+  const modalEl = document.getElementById('settings-modal');
+  const modalBody = modalEl?.querySelector('.modal-body');
+  if (modalBody) modalBody.scrollTop = 0;
   state.settingsModalState = { open: false };
 }
 
@@ -464,8 +475,11 @@ export async function applyProFeatureVisibility(): Promise<void> {
   // Check license status via background
   try {
     const proStatus = await chrome.runtime.sendMessage({ type: MESSAGE_TYPES.VALIDATE_LICENSE });
-    state.isProUser = proStatus?.isPro === true;
     state.inTrialGracePeriod = proStatus?.inGracePeriod === true;
+    // During trial grace period, treat user as free so quota checks apply.
+    // The grace banner still shows (driven by inTrialGracePeriod), but all
+    // feature gates use the free-tier limits instead of bypassing them.
+    state.isProUser = proStatus?.isPro === true && !state.inTrialGracePeriod;
     state.trialGraceDaysRemaining = 0;
     if (state.inTrialGracePeriod && proStatus?.expiresAt) {
       const elapsed = Date.now() - proStatus.expiresAt;
@@ -616,7 +630,12 @@ export function showProUpgradeModal(): void {
   state.proUpgradeModalState = { open: true, errorText: '' };
   const modal = document.getElementById('pro-upgrade-modal');
   const modalBody = modal?.querySelector('.modal-body');
-  if (modalBody) modalBody.scrollTop = 0;
+  if (modalBody) {
+    modalBody.scrollTop = 0;
+    requestAnimationFrame(() => {
+      modalBody.scrollTop = 0;
+    });
+  }
   const input = document.getElementById('pro-modal-key-input') as HTMLInputElement | null;
   if (input) input.focus();
   // Telemetry: this is THE conversion-funnel waypoint — every modal open
@@ -708,17 +727,12 @@ export function bindProGuards(): void {
       async (e) => {
         if (!state.isProUser) {
           e.preventDefault();
-          const { checkFeatureQuota } = await import('../shared/feature-quota');
+          const { checkFeatureQuota, quotaBlockedMessage } =
+            await import('../shared/feature-quota');
           const { allowed, limit } = await checkFeatureQuota('multiTab');
           if (!allowed) {
             state.multitabModalState = { open: false };
-            showToast(
-              t('quota_exhausted_monthly', {
-                feature: t('feature_multitab'),
-                limit: String(limit),
-              }),
-              'warning'
-            );
+            showToast(quotaBlockedMessage(t, 'feature_multitab', limit), 'warning');
             void track(EVENTS.PRO_FEATURE_BLOCKED, { feature: 'multitab_extract' });
             showProUpgradeModal();
           }
@@ -752,18 +766,12 @@ export function bindProGuards(): void {
 
           e.preventDefault();
           e.stopImmediatePropagation();
-          const { checkFeatureQuota, incrementFeatureUsage } =
+          const { checkFeatureQuota, incrementFeatureUsage, quotaBlockedMessage } =
             await import('../shared/feature-quota');
           const { allowed, limit } = await checkFeatureQuota('liveMonitor');
           if (!allowed) {
             closeSettings();
-            showToast(
-              t('quota_exhausted_monthly', {
-                feature: t('feature_live_monitor'),
-                limit: String(limit),
-              }),
-              'warning'
-            );
+            showToast(quotaBlockedMessage(t, 'feature_live_monitor', limit), 'warning');
             void track(EVENTS.PRO_FEATURE_BLOCKED, { feature: 'live_monitor' });
             showProUpgradeModal();
           } else {

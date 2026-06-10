@@ -316,6 +316,33 @@
   gap: 8px;
 }
 
+/* ── Compact dropdown sizing ── */
+.compact-mode .card-search-dropdown,
+.compact-mode .card-dl-dropdown {
+  min-width: 110px;
+  padding: 3px 0;
+}
+
+.compact-mode .card-search-dropdown .dropdown-item,
+.compact-mode .card-dl-dropdown .dropdown-item {
+  padding: 4px 10px;
+  font-size: 11px;
+  gap: 6px;
+}
+
+.ultra-compact-mode .card-search-dropdown,
+.ultra-compact-mode .card-dl-dropdown {
+  min-width: 95px;
+  padding: 2px 0;
+}
+
+.ultra-compact-mode .card-search-dropdown .dropdown-item,
+.ultra-compact-mode .card-dl-dropdown .dropdown-item {
+  padding: 3px 8px;
+  font-size: 10px;
+  gap: 4px;
+}
+
 .card-search-dropdown .dropdown-item:hover {
   background: var(--bg-secondary);
 }
@@ -430,9 +457,13 @@
 }
 
 .compact-mode .card-tag {
-  font-size: 8.5px;
-  padding: 1px 4px;
+  font-size: 8px;
+  padding: 1px 3px;
   border-radius: 2px;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1.2;
+  min-height: 13px;
 }
 
 .compact-mode .card-tag.filesize {
@@ -445,31 +476,37 @@
 }
 
 .compact-mode .card-action-btn {
-  width: 24px;
-  height: 24px;
+  width: 22px;
+  height: 22px;
 }
 
 .compact-mode .card-action-btn svg {
-  width: 13px;
-  height: 13px;
+  width: 12px;
+  height: 12px;
 }
 
 /* ── Tier 2: ultra-compact (~30% shrink) ── */
 .ultra-compact-mode .card-info-bar {
-  padding: 3px 4px;
-  padding-right: 4px;
-  gap: 2px 3px;
-  min-height: 28px;
+  padding: 2px 3px;
+  padding-right: 3px;
+  gap: 1px 2px;
+  min-height: 22px;
+  align-items: center;
 }
 
 .ultra-compact-mode .card-tags {
   gap: 2px;
+  align-items: center;
 }
 
 .ultra-compact-mode .card-tag {
-  font-size: 7.5px;
-  padding: 0px 3px;
+  font-size: 7px;
+  padding: 0px 2.5px;
   border-radius: 2px;
+  line-height: 1.2;
+  display: inline-flex;
+  align-items: center;
+  min-height: 12px;
 }
 
 .ultra-compact-mode .card-tag.filesize {
@@ -482,13 +519,13 @@
 }
 
 .ultra-compact-mode .card-action-btn {
-  width: 22px;
-  height: 22px;
+  width: 18px;
+  height: 18px;
 }
 
 .ultra-compact-mode .card-action-btn svg {
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
 }
 
 .compact-mode .icon-btn-wrapper .pro-badge-mini {
@@ -513,13 +550,18 @@
    selectors above — no separate list-view overrides needed. */
 
 .card-tag {
-  padding: 2px 5px;
+  padding: 1px 5px 2px;
   font-size: 9px;
   font-weight: 600;
   color: white;
   border-radius: 3px;
-  line-height: 1.3;
+  line-height: 1;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  min-height: 16px;
+  box-sizing: border-box;
 }
 
 .card-tag.format {
@@ -917,11 +959,11 @@
 
 /* Pro Badge Mini - for Header buttons, Filter buttons */
 .pro-badge-mini {
-  padding: 0px 3px;
-  font-size: 7px;
+  padding: 1px 4px;
+  font-size: 8px;
   letter-spacing: 0.3px;
-  margin-left: 0;
-  line-height: 1.4;
+  margin-left: 2px;
+  line-height: 1.3;
 }
 
 /* Icon Button Wrapper - for positioning mini badge on icon buttons */
@@ -932,11 +974,11 @@
 
 .icon-btn-wrapper .pro-badge-mini {
   position: absolute;
-  top: -1px;
-  right: -5px;
+  top: -3px;
+  right: -8px;
   pointer-events: none;
-  font-size: 5px;
-  padding: 0px 1.5px;
+  font-size: 6px;
+  padding: 1px 2.5px;
   line-height: 1.2;
 }
 

@@ -30,6 +30,7 @@ vi.mock('../sidepanel/pro-features', () => ({
 }));
 vi.mock('../sidepanel/ui', () => ({
   hideProgress: vi.fn(),
+  showConfirmDialog: vi.fn().mockResolvedValue(true),
   showProgress: vi.fn(),
   showToast: vi.fn(),
   updateProgress: vi.fn(),

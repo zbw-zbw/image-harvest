@@ -297,8 +297,8 @@ export function getMinCardWidth(): number {
   // Compact actions: 6 × 24px + 5 × 1px = 149px
   // Tags (format ~28px + dims ~35px + size ~28px) + gaps ~9px ≈ 100px
   // info-bar padding ~20px + card border ~5px ≈ 274px minimum
-  // Use 300px — leaves enough headroom to prevent tag/button overlap.
-  return 300;
+  // Use 350px — prevents card content from wrapping in two-column grid.
+  return 350;
 }
 
 export function checkNarrowMode(): void {

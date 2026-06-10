@@ -16,7 +16,7 @@
 import { STORAGE_KEYS, getFreeLimits } from './constants';
 
 /** Features tracked on a monthly reset cycle. */
-export type MonthlyFeature = 'multiTab' | 'dedup' | 'formatConvert' | 'liveMonitor';
+export type MonthlyFeature = 'multiTab' | 'dedup' | 'formatConvert' | 'liveMonitor' | 'colorCopy';
 
 /** Features tracked on a daily reset cycle. */
 export type DailyFeature = 'batchHighlight';
@@ -28,7 +28,13 @@ interface QuotaData {
   daily: Record<string, Record<DailyFeature, number>>;
 }
 
-const MONTHLY_FEATURES: MonthlyFeature[] = ['multiTab', 'dedup', 'formatConvert', 'liveMonitor'];
+const MONTHLY_FEATURES: MonthlyFeature[] = [
+  'multiTab',
+  'dedup',
+  'formatConvert',
+  'liveMonitor',
+  'colorCopy',
+];
 const DAILY_FEATURES: DailyFeature[] = ['batchHighlight'];
 
 function currentMonthKey(): string {
@@ -92,8 +98,10 @@ function getLimit(feature: TrackedFeature): number {
       return limits.MAX_MONTHLY_FORMAT_CONVERT;
     case 'liveMonitor':
       return limits.MAX_MONTHLY_LIVE_MONITOR;
+    case 'colorCopy':
+      return limits.MAX_MONTHLY_COLOR_COPY;
     case 'batchHighlight':
-      return limits.MAX_DAILY_BATCH_HIGHLIGHT;
+      return limits.MAX_MONTHLY_BATCH_HIGHLIGHT;
   }
 }
 
@@ -127,7 +135,18 @@ export async function incrementFeatureUsage(feature: TrackedFeature): Promise<nu
   if (isMonthly) {
     const monthKey = currentMonthKey();
     if (!data.monthly[monthKey]) {
-      data.monthly[monthKey] = { multiTab: 0, dedup: 0, formatConvert: 0, liveMonitor: 0 };
+      data.monthly[monthKey] = {
+        multiTab: 0,
+        dedup: 0,
+        formatConvert: 0,
+        liveMonitor: 0,
+        colorCopy: 0,
+      };
+    }
+    // Ensure the field exists — older monthly records may lack fields for
+    // features added after the record was first created (e.g. colorCopy).
+    if (data.monthly[monthKey][feature as MonthlyFeature] == null) {
+      data.monthly[monthKey][feature as MonthlyFeature] = 0;
     }
     data.monthly[monthKey][feature as MonthlyFeature] += 1;
     await saveQuotaData(data);
@@ -165,4 +184,23 @@ export async function getAllFeatureQuotas(): Promise<
   }
 
   return result;
+}
+
+/**
+ * Build the appropriate toast message when a feature quota check fails.
+ * When limit is 0 the feature is Pro-exclusive — use a clean "Pro feature"
+ * message instead of the confusing "0 times per month" wording.
+ */
+export function quotaBlockedMessage(
+  translationFn: (key: string, params?: Record<string, string | number>) => string,
+  featureI18nKey: string,
+  limit: number
+): string {
+  if (limit === 0) {
+    return translationFn('pro_feature_upgrade_required');
+  }
+  return translationFn('quota_exhausted_monthly', {
+    feature: translationFn(featureI18nKey),
+    limit: String(limit),
+  });
 }

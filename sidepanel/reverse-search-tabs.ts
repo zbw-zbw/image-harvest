@@ -15,6 +15,14 @@
 let pendingReverseSearch = false;
 const reverseSearchTabIds = new Set<number>();
 
+// Grace period after closing a reverse-search tab. When Chrome closes
+// a tab it fires onRemoved (which clears the tabId from our set) and
+// then immediately fires onActivated to switch focus back to the
+// original tab. Without this grace period, handleTabChange would treat
+// the focus-restore as a regular tab switch — potentially triggering a
+// full rescan, skeleton flash, or stuck loading state.
+let reverseSearchCloseGraceUntil = 0;
+
 /** Call BEFORE chrome.tabs.create to arm the pending flag. */
 export function armReverseSearchPending(): void {
   pendingReverseSearch = true;
@@ -31,8 +39,18 @@ export function isReverseSearchTab(tabId: number): boolean {
   return pendingReverseSearch || reverseSearchTabIds.has(tabId);
 }
 
+/** True if we are within the grace period after closing a reverse-search tab. */
+export function isWithinReverseSearchCloseGrace(): boolean {
+  return Date.now() < reverseSearchCloseGraceUntil;
+}
+
 export function forgetReverseSearchTab(tabId: number): void {
-  reverseSearchTabIds.delete(tabId);
+  if (reverseSearchTabIds.has(tabId)) {
+    reverseSearchTabIds.delete(tabId);
+    // Allow a short grace period so the subsequent onActivated (focus
+    // returning to the original tab) is also ignored.
+    reverseSearchCloseGraceUntil = Date.now() + 500;
+  }
 }
 
 // Additional set of extension-owned tab IDs (welcome page, etc.) that should

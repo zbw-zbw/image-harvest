@@ -142,13 +142,10 @@ function normalizeImageUrl(url: string): string {
 /** Lazy entry: triggered by the "Dedup" toolbar button. */
 export async function showDedupModal(): Promise<void> {
   if (!state.isProUser) {
-    const { checkFeatureQuota } = await import('../shared/feature-quota');
+    const { checkFeatureQuota, quotaBlockedMessage } = await import('../shared/feature-quota');
     const { allowed, limit } = await checkFeatureQuota('dedup');
     if (!allowed) {
-      showToast(
-        t('quota_exhausted_monthly', { feature: t('feature_dedup'), limit: String(limit) }),
-        'warning'
-      );
+      showToast(quotaBlockedMessage(t, 'feature_dedup', limit), 'warning');
       showProUpgradeModal();
       return;
     }
@@ -205,25 +202,27 @@ export function removeImageById(imageId: string): void {
 // Collection / Favorites — Pro-only feature.
 // Non-Pro users are completely blocked from adding to collection.
 // ============================================
-export async function addToCollection(img: ImageItem): Promise<void> {
+export async function addToCollection(img: ImageItem, silent = false): Promise<boolean> {
   try {
     const all = await collectionGetAll();
 
     if (all.some((c: CollectionItem) => c.url === img.url)) {
-      showToast(t('toast_collection_already_exists'), 'info');
+      if (!silent) showToast(t('toast_collection_already_exists'), 'info');
       void track(EVENTS.COLLECTION_DUPLICATE);
-      return;
+      return false;
     }
 
     if (!state.isProUser) {
       if (all.length >= getFreeLimits().MAX_COLLECTION_ITEMS) {
-        showToast(
-          t('toast_collection_limit', { max: getFreeLimits().MAX_COLLECTION_ITEMS }),
-          'warning'
-        );
+        if (!silent) {
+          showToast(
+            t('toast_collection_limit', { max: getFreeLimits().MAX_COLLECTION_ITEMS }),
+            'warning'
+          );
+          showProUpgradeModal();
+        }
         void track(EVENTS.COLLECTION_FULL);
-        showProUpgradeModal();
-        return;
+        return false;
       }
     }
 
@@ -256,10 +255,12 @@ export async function addToCollection(img: ImageItem): Promise<void> {
       notes: '',
       createdAt: Date.now(),
     } as CollectionItem);
-    showToast(t('toast_collection_added'), 'success');
+    if (!silent) showToast(t('toast_collection_added'), 'success');
     void track(EVENTS.COLLECTION_ADDED);
+    return true;
   } catch {
-    showToast(t('toast_collection_add_failed'), 'error');
+    if (!silent) showToast(t('toast_collection_add_failed'), 'error');
+    return false;
   }
 }
 
@@ -344,13 +345,10 @@ export function closeMultiTabModal(): void {
  */
 export async function showMultiTabModal(): Promise<void> {
   if (!state.isProUser) {
-    const { checkFeatureQuota } = await import('../shared/feature-quota');
+    const { checkFeatureQuota, quotaBlockedMessage } = await import('../shared/feature-quota');
     const { allowed, limit } = await checkFeatureQuota('multiTab');
     if (!allowed) {
-      showToast(
-        t('quota_exhausted_monthly', { feature: t('feature_multitab'), limit: String(limit) }),
-        'warning'
-      );
+      showToast(quotaBlockedMessage(t, 'feature_multitab', limit), 'warning');
       showProUpgradeModal();
       return;
     }

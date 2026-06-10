@@ -34,6 +34,11 @@ import {
 import { showProUpgradeModal } from '../settings';
 import { showConfirmDialog, showToast } from '../ui';
 import { formatBytes } from '../utils';
+import {
+  checkFeatureQuota,
+  incrementFeatureUsage,
+  quotaBlockedMessage,
+} from '../../shared/feature-quota';
 import { useStoreSelector } from './storeHook';
 import { state } from '../state';
 import { applyFilters } from '../filter';
@@ -207,7 +212,9 @@ export function ImageCard({ img, index }: Props) {
   const format = (img.format || 'unknown').toUpperCase();
   const colors = img.colors || [];
 
-  // ── Dropup: auto-flip dropdown direction when near viewport bottom ──
+  // ── Dropup: default to opening upward so the dropdown doesn't cover
+  //    the URL-row actions (copy / open-in-new-tab) below the card.
+  //    Only fall back to downward when there isn't enough room above. ──
   const handleDropdownHover = (e: MouseEvent) => {
     const group = e.currentTarget as HTMLElement;
     // Re-entering the group should clear any leftover "dismissed" state so
@@ -218,10 +225,12 @@ export function ImageCard({ img, index }: Props) {
     ) as HTMLElement | null;
     if (!dropdown) return;
     const rect = group.getBoundingClientRect();
-    const spaceBelow = window.innerHeight - rect.bottom;
-    // Estimate dropdown height; 200px is a safe upper bound for 4-5 items
-    const needsFlip = spaceBelow < 200;
-    dropdown.classList.toggle('dropup', needsFlip);
+    const spaceAbove = rect.top;
+    // Estimate dropdown height; 200px is a safe upper bound for 4-5 items.
+    // Default to dropup (open upward); only open downward when there
+    // isn't enough room above.
+    const shouldDropDown = spaceAbove < 200;
+    dropdown.classList.toggle('dropup', !shouldDropDown);
   };
 
   // ── Dismiss: hide the dropdown immediately after a click ──
@@ -314,11 +323,17 @@ export function ImageCard({ img, index }: Props) {
     openInNewTab(img.url);
   };
 
-  const handleColorClick = (color: string) => (e: MouseEvent) => {
+  const handleColorClick = (color: string) => async (e: MouseEvent) => {
     e.stopPropagation();
     if (!isProUser) {
-      showToast(t('pro_feature_blocked_color_copy'), 'warning');
-      showProUpgradeModal();
+      const { allowed, limit } = await checkFeatureQuota('colorCopy');
+      if (!allowed) {
+        showToast(quotaBlockedMessage(t, 'feature_color_copy', limit), 'warning');
+        showProUpgradeModal();
+        return;
+      }
+      await incrementFeatureUsage('colorCopy');
+      copyColor(color);
       return;
     }
     copyColor(color);

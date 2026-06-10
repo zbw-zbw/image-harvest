@@ -39,7 +39,12 @@ export function showMultiTabModal(): void {
   state.multitabModalState = { open: true };
   const modalEl = document.getElementById('multitab-modal');
   const modalBody = modalEl?.querySelector('.modal-body');
-  if (modalBody) modalBody.scrollTop = 0;
+  if (modalBody) {
+    modalBody.scrollTop = 0;
+    requestAnimationFrame(() => {
+      modalBody.scrollTop = 0;
+    });
+  }
   loadTabList();
 }
 

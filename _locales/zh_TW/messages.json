@@ -1364,6 +1364,9 @@
   "quota_header_feature": {
     "message": "功能"
   },
+  "quota_header_free": {
+    "message": "免費版"
+  },
   "quota_remaining": {
     "message": "剩餘"
   },
@@ -1576,5 +1579,77 @@
   },
   "pro_compare_engines": {
     "message": "引擎"
+  },
+  "pro_batch_favorite_limit": {
+    "message": "免費版：單次最多收藏 {max} 張圖片，升級 Pro 無限使用！"
+  },
+  "pro_batch_ai_tag_limit": {
+    "message": "免費版：單次最多為 {max} 張圖片生成 AI 標籤，升級 Pro 無限使用！"
+  },
+  "pro_batch_delete_limit": {
+    "message": "免費版：單次最多刪除 {max} 張圖片，升級 Pro 無限使用！"
+  },
+  "toast_download_all_failed": {
+    "message": "Download failed — all images could not be fetched"
+  },
+  "toast_highlight_not_found": {
+    "message": "Cannot highlight — image may be in a cross-origin iframe or hidden element"
+  },
+  "pro_batch_limit_exceeded": {
+    "message": "Free plan: up to {max} items per batch. Upgrade to Pro for unlimited!"
+  },
+  "toast_batch_favorite_partial": {
+    "message": "Added {added} items. Free plan limit: {max} favorites. Upgrade to Pro for unlimited!"
+  },
+  "pro_feature_upgrade_required": {
+    "message": "This feature requires Pro. Upgrade to unlock!"
+  },
+  "collection_search_url_placeholder": {
+    "message": "Search by URL..."
+  },
+  "confirm_delete_title": {
+    "message": "Confirm Delete"
+  },
+  "confirm_delete_collection_message": {
+    "message": "Remove this image from your collection?"
+  },
+  "collection_select_all": {
+    "message": "Select all"
+  },
+  "collection_batch_download": {
+    "message": "Download selected"
+  },
+  "collection_batch_delete": {
+    "message": "Delete selected"
+  },
+  "collection_count": {
+    "message": "{total} items"
+  },
+  "collection_count_selected": {
+    "message": "{selected}/{total} selected"
+  },
+  "collection_batch_delete_confirm": {
+    "message": "Delete {count} selected items from collection?"
+  },
+  "toast_collection_batch_deleted": {
+    "message": "Deleted {count} items from collection"
+  },
+  "feature_color_copy": {
+    "message": "Color copy"
+  },
+  "quota_color_copy": {
+    "message": "Color Copy"
+  },
+  "pro_feature_batch_ops_title": {
+    "message": "Batch Operations"
+  },
+  "pro_feature_batch_ops_desc_pro": {
+    "message": "Batch delete, favorite, AI tag, and Eagle export — all unlimited."
+  },
+  "pro_compare_per_batch": {
+    "message": "imgs/batch"
+  },
+  "pro_compare_times_per_month": {
+    "message": "times/mo"
   }
 }

@@ -212,7 +212,7 @@
 
 .quota-header {
   display: grid;
-  grid-template-columns: 1fr 52px 52px;
+  grid-template-columns: 1fr 64px 64px;
   gap: 0;
   padding: 0 12px 6px;
   font-size: 10px;
@@ -264,7 +264,7 @@
 
 .quota-row {
   display: grid;
-  grid-template-columns: 1fr 52px 52px;
+  grid-template-columns: 1fr 64px 64px;
   gap: 0;
   align-items: center;
   padding: 5px 12px;
@@ -507,4 +507,46 @@
 
 .pro-fc-pro.pro-fc-check {
   font-size: 13px;
+}
+
+/* ── Pro compare header (FEATURE / FREE / PRO column titles) ── */
+.pro-fc-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 4px 14px 8px 14px;
+  border-bottom: 1px solid var(--border-color, #e5e7eb);
+  margin-bottom: 4px;
+}
+
+.pro-fc-header-feature {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
+}
+
+.pro-fc-header-badges {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.pro-fc-header-label {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 56px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-align: center;
+}
+
+/* Ensure badges have consistent width for alignment */
+.pro-fc-badge {
+  min-width: 56px;
 }

@@ -83,6 +83,12 @@
   "toast_download_failed": {
     "message": "下载失败"
   },
+  "toast_download_all_failed": {
+    "message": "下载失败 — 所有图片均无法获取"
+  },
+  "toast_highlight_not_found": {
+    "message": "无法高亮 — 图片可能位于跨域 iframe 或隐藏元素中"
+  },
   "toast_download_cancelled": {
     "message": "已取消下载"
   },
@@ -142,6 +148,24 @@
   },
   "pro_collection_limit": {
     "message": "免费版：最多收藏 {max} 张，升级 Pro 无限使用！"
+  },
+  "pro_batch_limit_exceeded": {
+    "message": "免费版：单次最多操作 {max} 项，升级 Pro 无限使用！"
+  },
+  "pro_batch_favorite_limit": {
+    "message": "免费版：单次最多收藏 {max} 张图片，升级 Pro 无限使用！"
+  },
+  "pro_batch_ai_tag_limit": {
+    "message": "免费版：单次最多为 {max} 张图片生成 AI 标签，升级 Pro 无限使用！"
+  },
+  "pro_batch_delete_limit": {
+    "message": "免费版：单次最多删除 {max} 张图片，升级 Pro 无限使用！"
+  },
+  "toast_batch_favorite_partial": {
+    "message": "已添加 {added} 张，免费版最多收藏 {max} 张，升级 Pro 无限使用！"
+  },
+  "pro_feature_upgrade_required": {
+    "message": "此功能需要 Pro 版本，升级即可解锁！"
   },
   "toolbar_sort": {
     "message": "排序"
@@ -439,6 +463,15 @@
   },
   "collection_search_placeholder": {
     "message": "搜索收藏..."
+  },
+  "collection_search_url_placeholder": {
+    "message": "按 URL 搜索..."
+  },
+  "confirm_delete_title": {
+    "message": "确认删除"
+  },
+  "confirm_delete_collection_message": {
+    "message": "确定从收藏中移除此图片？"
   },
   "common_dismiss": {
     "message": "关闭"
@@ -1022,6 +1055,27 @@
   "collection_empty_hint": {
     "message": "点击任意图片上的星标图标即可添加到收藏夹"
   },
+  "collection_select_all": {
+    "message": "全选"
+  },
+  "collection_batch_download": {
+    "message": "下载选中"
+  },
+  "collection_batch_delete": {
+    "message": "删除选中"
+  },
+  "collection_count": {
+    "message": "{total} 项"
+  },
+  "collection_count_selected": {
+    "message": "已选 {selected}/{total}"
+  },
+  "collection_batch_delete_confirm": {
+    "message": "确定从收藏中删除 {count} 个选中项？"
+  },
+  "toast_collection_batch_deleted": {
+    "message": "已从收藏中删除 {count} 项"
+  },
   "restricted_notice": {
     "message": "此页面不允许扩展注入脚本。请导航到常规网页（如文章、图库或搜索结果）以开始提取图片。"
   },
@@ -1350,7 +1404,7 @@
     "message": "批量收藏"
   },
   "quota_unlimited": {
-    "message": "不限"
+    "message": "无限制"
   },
   "quota_per_month": {
     "message": "次/月"
@@ -1381,6 +1435,9 @@
   },
   "quota_header_feature": {
     "message": "功能"
+  },
+  "quota_header_free": {
+    "message": "免费版"
   },
   "quota_remaining": {
     "message": "剩余"
@@ -1469,6 +1526,9 @@
   "feature_live_monitor": {
     "message": "实时监控"
   },
+  "feature_color_copy": {
+    "message": "色值复制"
+  },
   "quota_multitab": {
     "message": "多标签页提取"
   },
@@ -1483,6 +1543,9 @@
   },
   "quota_batch_highlight": {
     "message": "批量高亮"
+  },
+  "quota_color_copy": {
+    "message": "色值复制"
   },
   "quota_reverse_search": {
     "message": "以图搜图"
@@ -1520,6 +1583,12 @@
   "pro_feature_ai_tag_desc_pro": {
     "message": "AI 自动为图片生成描述标签，快速搜索和整理。"
   },
+  "pro_feature_batch_ops_title": {
+    "message": "批量操作"
+  },
+  "pro_feature_batch_ops_desc_pro": {
+    "message": "批量删除、收藏、AI 标签、Eagle 导出 — 不限数量。"
+  },
   "pro_feature_eagle_title": {
     "message": "Eagle 导出"
   },
@@ -1548,7 +1617,7 @@
     "message": "Pro"
   },
   "pro_compare_batch_free": {
-    "message": "20次/天"
+    "message": "有限制"
   },
   "pro_compare_batch_pro": {
     "message": "无限制"
@@ -1560,7 +1629,7 @@
     "message": "全引擎"
   },
   "pro_compare_ai_free": {
-    "message": "5次/天"
+    "message": "有限制"
   },
   "pro_compare_per_month": {
     "message": "/月"
@@ -1576,5 +1645,14 @@
   },
   "pro_compare_engines": {
     "message": "引擎"
+  },
+  "pro_compare_feature": {
+    "message": "功能"
+  },
+  "pro_compare_per_batch": {
+    "message": "张/次"
+  },
+  "pro_compare_times_per_month": {
+    "message": "次/月"
   }
 }

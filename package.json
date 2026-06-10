@@ -1,6 +1,6 @@
 {
   "name": "image-harvest",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "Image Harvest - Download Any Image from Any Webpage (Chrome Extension)",
   "type": "module",
   "scripts": {

@@ -21,25 +21,239 @@ import {
 } from './actions';
 import { removeFromCollection } from './pro-features';
 import { elements, state } from './state';
-import { hideProgress, showProgress, showToast, updateProgress } from './ui';
+import { hideProgress, showConfirmDialog, showProgress, showToast, updateProgress } from './ui';
 import { formatBytes, generateFilename, truncateUrl } from './utils';
 
+// ── Selection state for batch operations ──
+const selectedCollectionItems = new Set<string>();
+let currentCollectionItems: CollectionItem[] = [];
+
+function updateCollectionCount(): void {
+  const countEl = document.getElementById('collection-count');
+  if (!countEl) return;
+  const total = currentCollectionItems.length;
+  const selected = selectedCollectionItems.size;
+  countEl.textContent =
+    selected > 0
+      ? t('collection_count_selected', { selected, total })
+      : total > 0
+        ? t('collection_count', { total })
+        : '';
+}
+
+function updateBatchButtons(): void {
+  const hasSelection = selectedCollectionItems.size > 0;
+  const batchDl = document.getElementById(
+    'btn-collection-batch-download'
+  ) as HTMLButtonElement | null;
+  const batchDel = document.getElementById(
+    'btn-collection-batch-delete'
+  ) as HTMLButtonElement | null;
+  if (batchDl) batchDl.disabled = !hasSelection;
+  if (batchDel) batchDel.disabled = !hasSelection;
+}
+
+function updateSelectAllCheckbox(): void {
+  const btn = document.getElementById('collection-select-all');
+  if (!btn) return;
+  const total = currentCollectionItems.length;
+  const selected = selectedCollectionItems.size;
+  const allChecked = total > 0 && selected === total;
+  const partial = selected > 0 && selected < total;
+  btn.classList.toggle('checked', allChecked);
+  btn.classList.toggle('partial', partial);
+}
+
+const CHECK_SVG =
+  '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>';
+
+function updateCardCheckbox(card: Element, isSelected: boolean): void {
+  card.classList.toggle('selected', isSelected);
+  const cbDiv = card.querySelector('.collection-card-checkbox') as HTMLElement | null;
+  if (!cbDiv) return;
+  cbDiv.classList.toggle('checked', isSelected);
+  const iconSpan = cbDiv.querySelector('.checkbox-icon') as HTMLElement | null;
+  if (iconSpan) iconSpan.innerHTML = isSelected ? CHECK_SVG : '';
+}
+
+function toggleCollectionItemSelection(itemId: string): void {
+  if (selectedCollectionItems.has(itemId)) {
+    selectedCollectionItems.delete(itemId);
+  } else {
+    selectedCollectionItems.add(itemId);
+  }
+  const card = document.querySelector(`.collection-card[data-id="${itemId}"]`);
+  if (card) updateCardCheckbox(card, selectedCollectionItems.has(itemId));
+  updateSelectAllCheckbox();
+  updateBatchButtons();
+  updateCollectionCount();
+}
+
+function toggleCollectionSelectAll(): void {
+  const allSelected = selectedCollectionItems.size === currentCollectionItems.length;
+  if (allSelected) {
+    selectedCollectionItems.clear();
+  } else {
+    for (const item of currentCollectionItems) {
+      selectedCollectionItems.add(item.id);
+    }
+  }
+  // Update all card visuals
+  document.querySelectorAll('.collection-card').forEach((card) => {
+    const id = (card as HTMLElement).dataset.id!;
+    updateCardCheckbox(card, selectedCollectionItems.has(id));
+  });
+  updateSelectAllCheckbox();
+  updateBatchButtons();
+  updateCollectionCount();
+}
+
+async function batchDownloadCollection(): Promise<void> {
+  const selectedItems = currentCollectionItems.filter((item) =>
+    selectedCollectionItems.has(item.id)
+  );
+  if (selectedItems.length === 0) return;
+
+  if (selectedItems.length === 1) {
+    downloadSingle(selectedItems[0] as unknown as ImageItem, null);
+    return;
+  }
+
+  let aborted = false;
+  try {
+    showProgress(t('toast_downloading'), () => {
+      aborted = true;
+      showToast(t('toast_download_cancelled'), 'info');
+    });
+
+    const { default: JSZip } = (await import('jszip')) as { default: typeof JSZipType };
+    const zip = new JSZip();
+    const pageInfo = await getActivePageInfo();
+    const failed: string[] = [];
+
+    for (let i = 0; i < selectedItems.length; i++) {
+      if (aborted) return;
+      updateProgress(i + 1, selectedItems.length, truncateUrl(selectedItems[i].url, 40));
+      try {
+        const resp = await fetch(selectedItems[i].url, { mode: 'cors' });
+        if (resp.ok) {
+          const blob = await resp.blob();
+          zip.file(
+            generateFilename(selectedItems[i] as unknown as ImageItem, i, null, pageInfo),
+            blob
+          );
+        } else {
+          failed.push(selectedItems[i].url);
+        }
+      } catch {
+        failed.push(selectedItems[i].url);
+      }
+    }
+
+    if (aborted) return;
+    if (failed.length > 0) {
+      zip.file('_failed.txt', 'Failed to download:\n' + failed.join('\n'));
+    }
+
+    const content = await zip.generateAsync({ type: 'blob' });
+    const blobUrl = URL.createObjectURL(content);
+    const ts = formatTimestamp(new Date());
+    await chrome.downloads.download({
+      url: blobUrl,
+      filename: `collection-${ts}.zip`,
+      saveAs: false,
+    });
+    URL.revokeObjectURL(blobUrl);
+
+    const successCount = selectedItems.length - failed.length;
+    if (successCount === 0) {
+      showToast(t('toast_download_all_failed'), 'error');
+    } else {
+      showToast(t('toast_download_completed', { count: successCount }), 'success');
+    }
+  } catch (error) {
+    if (!aborted) {
+      showToast(t('toast_download_failed') + ': ' + (error as Error).message, 'error');
+    }
+  } finally {
+    hideProgress();
+  }
+}
+
+async function batchDeleteCollection(): Promise<void> {
+  const count = selectedCollectionItems.size;
+  if (count === 0) return;
+
+  const confirmed = await showConfirmDialog({
+    title: t('collection_batch_delete'),
+    message: t('collection_batch_delete_confirm', { count }),
+    confirmText: t('common_confirm'),
+    cancelText: t('common_cancel'),
+    type: 'warning',
+  });
+  if (!confirmed) return;
+
+  const idsToDelete = [...selectedCollectionItems];
+  for (const id of idsToDelete) {
+    await removeFromCollection(id);
+    // Update favorite button in main grid
+    const mainCard = document.querySelector(`.image-card[data-id="${id}"] .btn-favorite`);
+    if (mainCard) {
+      mainCard.classList.remove('favorited');
+      (mainCard as HTMLElement).title = 'Add to collection';
+    }
+  }
+
+  selectedCollectionItems.clear();
+  showToast(t('toast_collection_batch_deleted', { count }), 'success');
+  loadCollection(
+    (document.getElementById('collection-search') as HTMLInputElement | null)?.value?.trim() || ''
+  );
+}
+
+function bindCollectionToolbarEvents(): void {
+  const selectAllBtn = document.getElementById('collection-select-all');
+  if (selectAllBtn) {
+    selectAllBtn.onclick = () => toggleCollectionSelectAll();
+  }
+  const batchDlBtn = document.getElementById('btn-collection-batch-download');
+  if (batchDlBtn) {
+    batchDlBtn.onclick = () => void batchDownloadCollection();
+  }
+  const batchDelBtn = document.getElementById('btn-collection-batch-delete');
+  if (batchDelBtn) {
+    batchDelBtn.onclick = () => void batchDeleteCollection();
+  }
+}
+
 export function showCollectionModal(): void {
+  // Reset selection state on open
+  selectedCollectionItems.clear();
+
   // Open the Preact-managed shell. cached refs may be stale because Preact
   // owns the modal subtree now — re-resolve via getElementById.
   state.collectionModalState = { open: true };
   const modalEl = document.getElementById('collection-modal');
   const modalBody = modalEl?.querySelector('.modal-body');
-  if (modalBody) modalBody.scrollTop = 0;
+  if (modalBody) {
+    modalBody.scrollTop = 0;
+    requestAnimationFrame(() => {
+      modalBody.scrollTop = 0;
+    });
+  }
   // Bind search input. The input lives inside the Preact subtree; use a
   // fresh lookup so we don't grab a detached reference from cacheElements().
   const searchInput = document.getElementById('collection-search') as HTMLInputElement | null;
   if (searchInput) {
     searchInput.value = '';
     searchInput.oninput = () => {
+      // Clear selection when search changes
+      selectedCollectionItems.clear();
       loadCollection(searchInput.value.trim());
     };
   }
+  // Bind toolbar batch action events
+  bindCollectionToolbarEvents();
   loadCollection();
 }
 
@@ -64,6 +278,16 @@ export async function loadCollection(searchQuery = ''): Promise<void> {
     // Sort by newest first
     items.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
 
+    // Cache items for batch operations
+    currentCollectionItems = items;
+
+    // Remove stale selections (items no longer in filtered list)
+    for (const id of [...selectedCollectionItems]) {
+      if (!items.some((item) => item.id === id)) {
+        selectedCollectionItems.delete(id);
+      }
+    }
+
     if (items.length === 0) {
       elements.collectionBody.innerHTML = `
         <div class="collection-empty">
@@ -82,7 +306,12 @@ export async function loadCollection(searchQuery = ''): Promise<void> {
             const format = ((item.format as string | undefined) || 'unknown').toUpperCase();
             const fileSize = item.fileSize ? formatBytes(item.fileSize as number) : '';
             return `
-          <div class="image-card collection-card" data-id="${item.id}">
+          <div class="image-card collection-card${selectedCollectionItems.has(item.id) ? ' selected' : ''}" data-id="${item.id}">
+            <div class="collection-item-select">
+              <div class="collection-card-checkbox${selectedCollectionItems.has(item.id) ? ' checked' : ''}" data-id="${item.id}">
+                <span class="checkbox-icon">${selectedCollectionItems.has(item.id) ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : ''}</span>
+              </div>
+            </div>
             <div class="card-thumb checkerboard">
               <img src="${item.url}" alt="" loading="lazy">
             </div>
@@ -126,6 +355,14 @@ export async function loadCollection(searchQuery = ''): Promise<void> {
       .forEach((btn) => {
         btn.addEventListener('click', async (e) => {
           e.stopPropagation();
+          const confirmed = await showConfirmDialog({
+            title: t('confirm_delete_title'),
+            message: t('confirm_delete_collection_message'),
+            confirmText: t('common_remove'),
+            cancelText: t('common_cancel'),
+            type: 'danger',
+          });
+          if (!confirmed) return;
           await removeFromCollection(btn.dataset.id!);
           // Also update favorite button state in main grid
           const mainCard = document.querySelector(
@@ -179,6 +416,36 @@ export async function loadCollection(searchQuery = ''): Promise<void> {
           showReverseSearchMenu(btn.dataset.url!, e.currentTarget as HTMLElement);
         });
       });
+
+    // Bind checkbox selection events
+    elements.collectionBody
+      .querySelectorAll<HTMLElement>('.collection-card-checkbox')
+      .forEach((cbDiv) => {
+        cbDiv.addEventListener('click', (e) => {
+          e.stopPropagation();
+          toggleCollectionItemSelection(cbDiv.dataset.id!);
+        });
+      });
+
+    // Click anywhere on card to toggle selection (except action buttons)
+    elements.collectionBody.querySelectorAll<HTMLElement>('.collection-card').forEach((card) => {
+      card.addEventListener('click', (e) => {
+        const target = e.target as HTMLElement;
+        // Don't toggle if clicking on action buttons, checkboxes, or links
+        if (
+          target.closest(
+            '.card-action-btn, .card-actions, .card-url-actions, .collection-card-checkbox, a'
+          )
+        )
+          return;
+        toggleCollectionItemSelection(card.dataset.id!);
+      });
+    });
+
+    // Update toolbar state after render
+    updateSelectAllCheckbox();
+    updateBatchButtons();
+    updateCollectionCount();
 
     // Handle broken images
     elements.collectionBody.querySelectorAll<HTMLImageElement>('.card-thumb img').forEach((img) => {

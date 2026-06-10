@@ -200,7 +200,6 @@ async function uploadToBaidu(
         dt.items.add(file);
         input.files = dt.files;
         input.dispatchEvent(new Event('change', { bubbles: true }));
-        console.log('[ImageSnatcher] Baidu file upload triggered');
       } else {
         console.error('[ImageSnatcher] Baidu: input[type=file] not found');
       }

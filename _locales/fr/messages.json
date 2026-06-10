@@ -1265,6 +1265,9 @@
   "quota_header_feature": {
     "message": "Fonction"
   },
+  "quota_header_free": {
+    "message": "Free"
+  },
   "quota_remaining": {
     "message": "restants"
   },
@@ -1477,5 +1480,14 @@
   },
   "pro_compare_engines": {
     "message": "engines"
+  },
+  "pro_batch_favorite_limit": {
+    "message": "Free plan: up to {max} favorites per batch. Upgrade to Pro for unlimited!"
+  },
+  "pro_batch_ai_tag_limit": {
+    "message": "Free plan: up to {max} AI tags per batch. Upgrade to Pro for unlimited!"
+  },
+  "pro_batch_delete_limit": {
+    "message": "Free plan: up to {max} deletions per batch. Upgrade to Pro for unlimited!"
   }
 }

@@ -101,49 +101,48 @@
     display: none;
   }
   /* Icon-only filter buttons: shrink padding and min-height to match
-     per-card action buttons (28×28) for visual consistency. */
+     the compact icon-only buttons for visual consistency. */
   .filter-btn {
-    padding: 4px 6px;
-    min-height: 28px;
-    gap: 3px;
+    padding: 3px 5px;
+    min-height: 24px;
+    gap: 2px;
   }
   .status-bar {
-    padding: 6px 10px;
+    padding: 4px 8px;
   }
-  /* Icon-only: right-aligned with a comfortable gap. Buttons sized to
-     match the per-card action buttons for visual harmony. */
+  /* Icon-only: right-aligned with a comfortable gap. */
   .status-buttons {
-    gap: 8px;
+    gap: 6px;
     justify-content: flex-end;
   }
-  /* Compact buttons: auto width to fit icon + count, small padding */
+  /* Compact buttons: smaller height and icon for better proportion */
   .status-action-btn {
     width: auto;
-    height: 28px;
-    padding: 0 6px;
-    gap: 3px;
+    height: 24px;
+    padding: 0 5px;
+    gap: 2px;
     justify-content: center;
   }
   .status-action-btn svg {
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
     flex-shrink: 0;
   }
   .btn-small {
     width: auto;
-    height: 28px;
-    padding: 0 6px;
-    gap: 3px;
+    height: 24px;
+    padding: 0 5px;
+    gap: 2px;
     justify-content: center;
   }
   .btn-small svg {
-    width: 14px;
-    height: 14px;
+    width: 12px;
+    height: 12px;
     flex-shrink: 0;
   }
   .status-action-btn .btn-count,
   #download-label > .btn-count {
-    font-size: 10px;
+    font-size: 9px;
     line-height: 1;
   }
 }
@@ -545,7 +544,8 @@
 }
 
 .collection-search-input {
-  flex: 1;
+  flex: 1 1 0;
+  min-width: 80px;
   padding: 6px 12px;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
@@ -560,18 +560,43 @@
   border-color: var(--primary-color);
 }
 
+/* Fixed height so the modal doesn't jump when filtering changes item count */
+.collection-content {
+  height: 85vh;
+}
+
+.collection-content .modal-body {
+  flex: 1;
+  min-height: 0;
+}
+
 .collection-body {
   display: flex;
   flex-direction: column;
   gap: 0;
 }
 
-/* Collection Grid - matches image-grid card layout */
+/* Collection Grid - matches image-grid card layout (max 2 columns) */
 .collection-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
   gap: 10px;
   padding: 4px 0;
+  max-width: 100%;
+}
+
+/* Never exceed 2 columns */
+@media (min-width: 620px) {
+  .collection-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* When panel is too narrow for 2 columns, force single column (list mode) */
+@media (max-width: 559px) {
+  .collection-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
 /* Collection card compact adaptations for narrow panels */
@@ -640,6 +665,161 @@
 .collection-empty p {
   font-size: 13px;
   margin: 0;
+}
+
+/* ── Collection toolbar actions ── */
+.collection-toolbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+/* Collection select-all uses the shared .select-all-btn styles from toolbar.css */
+
+/* Hide check icon when not checked/partial — collection toolbar only */
+.collection-toolbar .select-all-btn:not(.checked):not(.partial) .check-icon {
+  visibility: hidden;
+}
+
+.collection-batch-btn {
+  opacity: 0.4;
+  transition:
+    opacity 0.15s,
+    background 0.15s,
+    color 0.15s;
+  border-radius: var(--radius-sm);
+  padding: 5px;
+}
+
+.collection-batch-btn:not(:disabled) {
+  opacity: 1;
+}
+
+.collection-batch-btn:not(:disabled):hover {
+  background: var(--bg-tertiary);
+}
+
+.collection-batch-delete:not(:disabled) {
+  color: var(--danger-color, #e53e3e);
+}
+
+.collection-batch-delete:not(:disabled):hover {
+  background: var(--bg-tertiary);
+}
+
+.collection-count {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+  padding: 2px 6px;
+  background: var(--bg-secondary);
+  border-radius: var(--radius-sm);
+}
+
+/* ── Collection card checkbox & selection ── */
+.collection-card {
+  position: relative;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1.5px solid var(--card-border, #e5e7eb);
+  border-left: 3px solid var(--card-border, #e5e7eb);
+  border-radius: var(--radius-lg, 10px);
+  background: var(--card-bg, #fff);
+  box-shadow: var(--shadow-sm);
+  overflow: visible;
+}
+
+.collection-card:hover {
+  box-shadow: var(--card-hover-shadow);
+  border-color: var(--primary-color);
+  border-left-color: var(--primary-color);
+}
+
+.collection-card.selected {
+  border-color: var(--selected-border, var(--primary-color));
+  border-left-color: var(--primary-color);
+  box-shadow:
+    0 0 0 1px rgba(96, 181, 87, 0.2),
+    var(--shadow-sm);
+}
+
+.collection-item-select {
+  position: absolute;
+  top: 6px;
+  left: 8px;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.collection-card-checkbox {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  opacity: 0;
+  transition:
+    opacity 0.2s,
+    background 0.15s;
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--border-color);
+  border-radius: 5px;
+  background: var(--bg-color);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(6px);
+  pointer-events: auto;
+}
+
+.collection-card:hover .collection-card-checkbox,
+.collection-card.selected .collection-card-checkbox {
+  opacity: 1;
+}
+
+.collection-card-checkbox:hover {
+  border-color: var(--primary-color);
+  background: var(--bg-secondary);
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
+}
+
+.collection-card-checkbox.checked {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  box-shadow: 0 2px 6px rgba(96, 181, 87, 0.3);
+}
+
+.collection-card-checkbox .checkbox-icon {
+  width: 14px;
+  height: 14px;
+  color: var(--text-tertiary);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.collection-card-checkbox.checked .checkbox-icon {
+  color: white;
+}
+
+/* Collection card proportions: shorter thumb, tighter info rows */
+.collection-grid .card-thumb {
+  height: 90px;
+}
+
+.collection-grid .card-info-bar {
+  padding: 4px 6px;
+  min-height: 28px;
+  gap: 2px;
+}
+
+.collection-grid .card-url-row {
+  min-height: 28px;
+}
+
+.collection-grid .card-url {
+  padding: 4px 8px;
+  font-size: 10px;
 }
 
 /* Dedup Button in Status Bar */

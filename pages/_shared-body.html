@@ -140,6 +140,7 @@ HTML document — it omits the surrounding
                 <line x1="9" y1="21" x2="9" y2="9" />
               </svg>
             </button>
+            <span class="pro-badge pro-badge-mini" data-pro-hide>PRO</span>
           </span>
           <button
             id="btn-settings"
@@ -1584,9 +1585,15 @@ HTML document — it omits the surrounding
                           >
                             None
                           </div>
-                          <div class="setting-select-option" data-value="png">PNG</div>
-                          <div class="setting-select-option" data-value="jpg">JPG</div>
-                          <div class="setting-select-option" data-value="webp">WebP</div>
+                          <div class="setting-select-option" data-value="png">
+                            PNG <span class="pro-badge pro-badge-mini">PRO</span>
+                          </div>
+                          <div class="setting-select-option" data-value="jpg">
+                            JPG <span class="pro-badge pro-badge-mini">PRO</span>
+                          </div>
+                          <div class="setting-select-option" data-value="webp">
+                            WebP <span class="pro-badge pro-badge-mini">PRO</span>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -1614,6 +1621,7 @@ HTML document — it omits the surrounding
                         <polyline points="20 6 9 17 4 12" /></svg
                     ></span>
                     <span data-i18n="settings_live_monitor">Enable Live Monitoring</span>
+                    <span class="pro-badge pro-badge-mini">PRO</span>
                   </label>
                   <p class="setting-desc" data-i18n="settings_live_monitor_desc">
                     Automatically detect new images as the page content changes

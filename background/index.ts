@@ -110,7 +110,7 @@ initTabActivationListener();
 
 chrome.downloads.onChanged.addListener((delta) => {
   if (delta.state?.current === 'complete') {
-    broadcastToPopup({ type: 'DOWNLOAD_COMPLETE', downloadId: delta.id });
+    broadcastToPopup({ type: 'DOWNLOAD_COMPLETE', downloadId: delta.id, count: 1 });
   }
 });
 

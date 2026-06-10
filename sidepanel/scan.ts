@@ -9,7 +9,7 @@ import { getFileFormat } from '../shared/utils';
 import { track } from '../shared/telemetry';
 import { EVENTS } from '../shared/telemetry-events';
 import { updateSelectionUI } from './actions';
-import { applyFilters, renderColorSwatches } from './filter';
+import { applyFilters, refreshVisibility, renderColorSwatches } from './filter';
 import { isWithinTabSwitchGrace } from './tab-lifecycle';
 import { detectSimilarImages } from './pro-features';
 import { saveTabImageCache } from '../shared/storage';
@@ -317,6 +317,14 @@ export async function rescanWithProgress(tabId: number, tabUrl: string): Promise
       );
 
       hideScanOverlay();
+
+      // When "visible only" filter is active, refresh visibility from the
+      // content script BEFORE applying filters — otherwise scan-time snapshot
+      // (where most images have visible=undefined) causes nearly all to be hidden.
+      if (state.activeFilters.showVisibleOnly) {
+        await refreshVisibility();
+      }
+
       applyFilters();
       updateSelectionUI();
       // Use filteredImages count so the toast matches the bottom status bar.
@@ -498,6 +506,12 @@ export async function fetchImages(targetTabId?: number): Promise<void> {
 
       // Hide scan overlay and re-enable toolbar buttons
       hideLoading();
+
+      // When "visible only" filter is active, refresh visibility before
+      // filtering — scan-time snapshot has most images as visible=undefined.
+      if (state.activeFilters.showVisibleOnly) {
+        await refreshVisibility();
+      }
 
       // Render the final complete image list
       applyFilters();

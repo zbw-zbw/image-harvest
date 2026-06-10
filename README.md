@@ -34,7 +34,7 @@
   <img src="https://img.shields.io/badge/Manifest-V3-blue" alt="Manifest V3">
   <img src="https://img.shields.io/badge/Chrome-88%2B-brightgreen?logo=googlechrome&logoColor=white" alt="Chrome 88+">
   <img src="https://img.shields.io/badge/Privacy-First-success" alt="Privacy First">
-  <img src="https://img.shields.io/badge/Telemetry-Anonymous%20%26%20Opt--in-success" alt="Anonymous Opt-in Telemetry">
+  <img src="https://img.shields.io/badge/Privacy-No%20Analytics-success" alt="No Analytics">
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen" alt="PRs welcome">
 </p>
 
@@ -74,7 +74,7 @@
 
 - 🏗️ **[Architecture](./docs/ARCHITECTURE.md)** — Runtime model, IPC protocol, state machines, performance budgets ([中文](./docs/ARCHITECTURE.zh-CN.md))
 - 🔒 **[Security Policy](./SECURITY.md)** — Vulnerability reporting, trust boundaries, permission justifications ([中文](./SECURITY.zh-CN.md))
-- 🛡️ **[Privacy Policy](./docs/PRIVACY.md)** — Data handling, telemetry details, user controls ([中文](./docs/PRIVACY.zh-CN.md))
+- 🛡️ **[Privacy Policy](./docs/PRIVACY.md)** — Data handling, privacy details, user controls ([中文](./docs/PRIVACY.zh-CN.md))
 - 🤝 **[Contributing](./CONTRIBUTING.md)** — Dev setup, coding standards, PR process ([中文](./CONTRIBUTING.zh-CN.md))
 - 📜 **[Code of Conduct](./CODE_OF_CONDUCT.md)** — Community guidelines ([中文](./CODE_OF_CONDUCT.zh-CN.md))
 - 📋 **[Changelog](./CHANGELOG.md)** — Release history
@@ -340,25 +340,30 @@ To install in Chrome: `chrome://extensions/` → Developer mode → **Load unpac
 
 ## 💎 Free vs Pro
 
-| Feature                                | Free               | Pro                        |
-| -------------------------------------- | ------------------ | -------------------------- |
-| Smart image extraction                 | ✅ Full            | ✅ Full                    |
-| Filters (size / format / layout / URL) | ✅ Full            | ✅ Full                    |
-| Sorting & view modes                   | ✅ Full            | ✅ Full                    |
-| Single download                        | ✅ Full            | ✅ Full                    |
-| Side Panel / Popup modes               | ✅ Full            | ✅ Full                    |
-| Batch ZIP download                     | ⚡ Up to 30        | ✅ Unlimited               |
-| Batch URL copy                         | ⚡ Up to 20        | ✅ Unlimited               |
-| Format conversion                      | ❌                 | ✅ PNG / JPG / WebP        |
-| Custom naming templates                | ⚡ Default only    | ✅ Full template variables |
-| Page highlight                         | ⚡ Single only     | ✅ Batch + auto-scroll     |
-| Smart grouping                         | ⚡ None / Format   | ✅ All 5 modes             |
-| Live monitoring                        | ❌                 | ✅ Real-time               |
-| Similar image detection                | ❌                 | ✅ pHash-based             |
-| Image collection                       | ⚡ Up to 5         | ✅ Unlimited               |
-| Multi-tab extraction                   | ❌                 | ✅ Cross-tab               |
-| Reverse image search                   | ⚡ Google + TinEye | ✅ 4 engines               |
-| Interface languages                    | ✅ EN/中/繁/日/Es  | ✅ EN/中/繁/日/Es          |
+| Feature                                | Free              | Pro                        |
+| -------------------------------------- | ----------------- | -------------------------- |
+| Smart image extraction                 | ✅ Full           | ✅ Full                    |
+| Filters (size / format / layout / URL) | ✅ Full           | ✅ Full                    |
+| Sorting & view modes                   | ✅ Full           | ✅ Full                    |
+| Single download                        | ✅ Full           | ✅ Full                    |
+| Side Panel / Popup modes               | ✅ Full           | ✅ Full                    |
+| Batch ZIP download                     | ⚡ 30/batch       | ✅ Unlimited               |
+| Batch URL copy                         | ⚡ 10/batch       | ✅ Unlimited               |
+| Eagle export                           | ⚡ 10/batch       | ✅ Unlimited               |
+| Batch delete                           | ⚡ 15/batch       | ✅ Unlimited               |
+| Batch favorite                         | ⚡ 15/batch       | ✅ Unlimited               |
+| Batch highlight                        | ⚡ 3/day          | ✅ Unlimited               |
+| Format conversion                      | ⚡ 5/mo           | ✅ PNG / JPG / WebP        |
+| Custom naming templates                | ⚡ Default only   | ✅ Full template variables |
+| Page highlight                         | ⚡ Single only    | ✅ Batch + auto-scroll     |
+| Smart grouping                         | ⚡ None / Format  | ✅ All 5 modes             |
+| Live monitoring                        | ⚡ 1/mo           | ✅ Real-time               |
+| Similar image detection                | ⚡ 3/mo           | ✅ pHash-based             |
+| AI Tags                                | ⚡ 10/mo          | ✅ Unlimited               |
+| Image collection                       | ⚡ 10 items       | ✅ Unlimited               |
+| Multi-tab extraction                   | ⚡ 3/mo           | ✅ Cross-tab               |
+| Reverse image search                   | ⚡ 2 engines      | ✅ 4 engines               |
+| Interface languages                    | ✅ EN/中/繁/日/Es | ✅ EN/中/繁/日/Es          |
 
 ---
 
@@ -392,7 +397,7 @@ The Chrome Web Store has dozens of "image downloader" extensions, most released 
 | Multi-tab batch extraction                        | ✅ Pro             | ❌                      | ❌                 | ❌             |
 | Custom naming templates                           | ✅ Pro             | ❌                      | ❌                 | ⚡ Limited     |
 | Reverse image search (Google + TinEye built-in)   | ✅ Free            | ❌                      | ❌                 | ❌             |
-| Anonymous, opt-in telemetry only                  | ✅ One toggle      | n/a (unmaintained)      | ⚠️ Ad network      | ✅ Yes         |
+| Privacy-first (no analytics)                      | ✅ Yes             | n/a (unmaintained)      | ⚠️ Ad network      | ✅ Yes         |
 | Active maintenance (2026)                         | ✅ Yes             | ❌ Abandoned            | ⚠️ Sporadic        | ⚠️ Sporadic    |
 | Free tier                                         | ✅ Permanent       | ✅ Permanent            | ⚡ Ad-supported    | ✅ Permanent   |
 | Pro tier with 7-day trial + 30-day refund         | ✅ Yes             | ❌ No Pro tier          | ⚡ No clear refund | ❌ No Pro tier |
@@ -403,28 +408,26 @@ The Chrome Web Store has dozens of "image downloader" extensions, most released 
 
 ## 🛠️ Tech Stack
 
-| Component          | Technology                          | Rationale                                      |
-| ------------------ | ----------------------------------- | ---------------------------------------------- |
-| Platform           | Chrome Extension Manifest V3        | Latest extension standard                      |
-| UI                 | Vanilla HTML/CSS/JS                 | Zero framework dependency, minimal bundle size |
-| ZIP packaging      | JSZip                               | Mature, supports blob streaming                |
-| Image extraction   | DOM traversal + `getComputedStyle`  | Accurate runtime background image detection    |
-| Perceptual hash    | Canvas API + DCT                    | Pure frontend, no external dependencies        |
-| Color extraction   | Canvas API + Median Cut             | Pure frontend, extracts dominant colors        |
-| Format conversion  | Canvas API (`toDataURL` / `toBlob`) | Supports PNG / JPG / WebP                      |
-| Collection storage | IndexedDB                           | Supports large datasets and Blob storage       |
-| Settings storage   | `chrome.storage.local` / `sync`     | Persists user preferences                      |
+| Component          | Technology                          | Rationale                                       |
+| ------------------ | ----------------------------------- | ----------------------------------------------- |
+| Platform           | Chrome Extension Manifest V3        | Latest extension standard                       |
+| UI                 | Preact + HTML/CSS                   | Lightweight reactive components, minimal bundle |
+| ZIP packaging      | JSZip                               | Mature, supports blob streaming                 |
+| Image extraction   | DOM traversal + `getComputedStyle`  | Accurate runtime background image detection     |
+| Perceptual hash    | Canvas API + DCT                    | Pure frontend, no external dependencies         |
+| Color extraction   | Canvas API + Median Cut             | Pure frontend, extracts dominant colors         |
+| Format conversion  | Canvas API (`toDataURL` / `toBlob`) | Supports PNG / JPG / WebP                       |
+| Collection storage | IndexedDB                           | Supports large datasets and Blob storage        |
+| Settings storage   | `chrome.storage.local` / `sync`     | Persists user preferences                       |
 
 ---
 
 ## 🔒 Privacy & Security
 
 - **All processing is local** — image extraction, hashing, color analysis, and format conversion happen entirely in your browser
-- **Anonymous, opt-in telemetry** — to understand which features matter most we ship a small amount of usage data **only after you click "Sure, help improve" on first launch**. You can change your mind anytime in **Settings → Help Improve (Anonymous Usage Data)**
-  - **Collected**: button clicks, scan/download counts, feature usage events
-  - **Never collected**: URLs, page titles, image URLs, image data, IP addresses, email, license keys, or anything that could identify you
-  - **Anonymity**: every event carries only a 16-char hashed install id (never your raw id) and is sent to our own endpoint — no Google Analytics, no Mixpanel, no third parties
-- **You're always in control** — telemetry is one toggle and your decision is honored across sessions; uninstalling the extension wipes every locally-stored byte
+- **No analytics or tracking** — we do not collect usage analytics, telemetry data, or any form of tracking information
+- **No third-party services** — no Google Analytics, no Mixpanel, no ad networks
+- **You're always in control** — uninstalling the extension wipes every locally-stored byte
 
 ---
 
@@ -447,7 +450,7 @@ The marketing site for Image Harvest (landing page, pricing, FAQ, license activa
 
 See [CHANGELOG.md](./CHANGELOG.md) for the full release history.
 
-**Latest**: `v1.0.2` — 🌍 5-language UI (EN/中/繁/日/Es), 🆓 7-day Pro trial, 📋 batch URL copy, 💳 Creem checkout migration, and the first wave of anonymous opt-in telemetry. See [CHANGELOG.md](./CHANGELOG.md) for the full list.
+**Latest**: `v1.0.7` — 🐛 Bug fixes (download count, highlight, grid threshold), ⭐ Collection batch operations, 📊 Free vs Pro alignment across all surfaces. See [CHANGELOG.md](./CHANGELOG.md) for the full list.
 
 ---
 

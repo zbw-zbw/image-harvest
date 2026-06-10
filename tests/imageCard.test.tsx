@@ -36,12 +36,18 @@ const mocks = vi.hoisted(() => ({
   settings: {
     showProUpgradeModal: vi.fn(),
   },
+  featureQuota: {
+    checkFeatureQuota: vi.fn().mockResolvedValue({ allowed: true, limit: 5 }),
+    incrementFeatureUsage: vi.fn().mockResolvedValue(undefined),
+    quotaBlockedMessage: vi.fn().mockReturnValue('quota_exhausted_monthly'),
+  },
 }));
 
 vi.mock('../sidepanel/actions', () => mocks.actions);
 vi.mock('../sidepanel/pro-features', () => mocks.pro);
 vi.mock('../sidepanel/ui', () => mocks.ui);
 vi.mock('../sidepanel/settings', () => mocks.settings);
+vi.mock('../shared/feature-quota', () => mocks.featureQuota);
 
 // Imports MUST come after vi.mock() calls.
 import { ImageCard } from '../sidepanel/components/ImageCard';
@@ -219,18 +225,29 @@ describe('ImageCard – click handlers', () => {
     expect(mocks.settings.showProUpgradeModal).not.toHaveBeenCalled();
   });
 
-  it('blocks color copy for free users and copies for Pro', () => {
+  it('blocks color copy for free users when quota exhausted and copies when allowed', async () => {
+    // Free user with exhausted quota → blocked
     state.isProUser = false;
+    mocks.featureQuota.checkFeatureQuota.mockResolvedValueOnce({ allowed: false, limit: 5 });
     const { container, rerender } = render(
       <ImageCard img={makeImage({ colors: ['#abcdef'] })} index={0} />
     );
     fireEvent.click(container.querySelector('.card-color-bar')!);
-    expect(mocks.ui.showToast).toHaveBeenCalledWith(
-      'Color copy is a Pro feature. Upgrade to unlock!',
-      'warning'
-    );
+    await waitFor(() => {
+      expect(mocks.settings.showProUpgradeModal).toHaveBeenCalled();
+    });
     expect(mocks.pro.copyColor).not.toHaveBeenCalled();
 
+    // Free user with remaining quota → allowed
+    vi.clearAllMocks();
+    mocks.featureQuota.checkFeatureQuota.mockResolvedValueOnce({ allowed: true, limit: 5 });
+    fireEvent.click(container.querySelector('.card-color-bar')!);
+    await waitFor(() => {
+      expect(mocks.pro.copyColor).toHaveBeenCalledWith('#abcdef');
+    });
+
+    // Pro user → always allowed (no quota check)
+    vi.clearAllMocks();
     state.isProUser = true;
     rerender(<ImageCard img={makeImage({ colors: ['#abcdef'] })} index={0} />);
     fireEvent.click(container.querySelector('.card-color-bar')!);

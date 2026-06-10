@@ -81,7 +81,11 @@ import {
   isWithinTabSwitchGrace,
   loadCurrentTab,
 } from './tab-lifecycle';
-import { forgetReverseSearchTab, forgetIgnoredExtensionTab } from './reverse-search-tabs';
+import {
+  forgetReverseSearchTab,
+  forgetIgnoredExtensionTab,
+  isWithinReverseSearchCloseGrace,
+} from './reverse-search-tabs';
 
 // Flag set by uiPort.onDisconnect — signals that the extension has been
 // reloaded and chrome.* APIs are no longer valid. All event listeners
@@ -356,7 +360,7 @@ async function init(): Promise<void> {
               el.style.pointerEvents = '';
             });
         });
-        if (state.isTabSwitching || isWithinTabSwitchGrace()) {
+        if (state.isTabSwitching || isWithinTabSwitchGrace() || isWithinReverseSearchCloseGrace()) {
           lastHiddenTime = 0;
           return;
         }
@@ -379,34 +383,53 @@ async function init(): Promise<void> {
         // cache or currently displayed), skip the rescan — but force-reload
         // any lazy images that the browser may have evicted while hidden.
         if (state.tabCache.has(state.currentTabId) || state.allImages.length > 0) {
-          // Nudge the browser to re-evaluate lazy images that may have been
+          // Nudge the browser to re-evaluate images that may have been
           // evicted while the sidepanel was hidden (e.g. user opens a new
-          // window and comes back). Instead of removing and re-assigning
-          // src (which causes a visible flash and can leave images stuck),
-          // temporarily switch loading from "lazy" to "eager" so the
-          // browser bypasses IntersectionObserver and fetches immediately,
-          // then restore "lazy" for future scroll-based loading.
-          requestAnimationFrame(() => {
+          // window and comes back). We query ALL card-thumb images — not
+          // just loading="lazy" — because a previous fix attempt may have
+          // switched some to "eager" without them finishing before the
+          // panel was hidden again.
+          // Use a short delay instead of rAF to give the browser time to
+          // fully restore the visible state of the document.
+          setTimeout(() => {
             const staleImages: HTMLImageElement[] = [];
-            document
-              .querySelectorAll<HTMLImageElement>('.card-thumb img[loading="lazy"]')
-              .forEach((img) => {
-                if (!img.complete || img.naturalWidth === 0) {
-                  staleImages.push(img);
-                }
-              });
+            document.querySelectorAll<HTMLImageElement>('.card-thumb img').forEach((img) => {
+              if (!img.complete || img.naturalWidth === 0) {
+                staleImages.push(img);
+              }
+            });
             if (staleImages.length === 0) return;
             for (const img of staleImages) {
-              img.loading = 'eager';
+              const wasLazy = img.loading === 'lazy';
+              if (wasLazy) {
+                // Switch lazy → eager so the browser fetches immediately
+                // without waiting for IntersectionObserver.
+                img.loading = 'eager';
+              } else {
+                // Already eager but still not loaded — force re-fetch by
+                // resetting src. Append a cache-bust fragment so the
+                // browser treats it as a new request.
+                const originalSrc = img.src;
+                img.src = '';
+                img.src = originalSrc;
+              }
+              // Restore lazy individually once loaded (or on error),
+              // so future scroll-based loading still works.
+              const restoreLazy = () => {
+                img.loading = 'lazy';
+                img.removeEventListener('load', restoreLazy);
+                img.removeEventListener('error', restoreLazy);
+              };
+              img.addEventListener('load', restoreLazy, { once: true });
+              img.addEventListener('error', restoreLazy, { once: true });
             }
-            // Restore lazy loading after a short delay so future images
-            // outside the viewport remain lazily loaded.
+            // Fallback: force-restore all after 5s in case some never fire
             setTimeout(() => {
               for (const img of staleImages) {
                 img.loading = 'lazy';
               }
-            }, 500);
-          });
+            }, 5000);
+          }, 50);
           return;
         }
 
@@ -586,16 +609,11 @@ function bindEvents(): void {
         const format = item.dataset.format;
         // Quota check: non-original formats use monthly formatConvert quota
         if (!state.isProUser && format !== 'original') {
-          const { checkFeatureQuota } = await import('../shared/feature-quota');
+          const { checkFeatureQuota, quotaBlockedMessage } =
+            await import('../shared/feature-quota');
           const { allowed, limit } = await checkFeatureQuota('formatConvert');
           if (!allowed) {
-            showToast(
-              t('quota_exhausted_monthly', {
-                feature: t('feature_format_convert'),
-                limit: String(limit),
-              }),
-              'warning'
-            );
+            showToast(quotaBlockedMessage(t, 'feature_format_convert', limit), 'warning');
             showProUpgradeModal();
             return;
           }
@@ -827,9 +845,14 @@ function bindEvents(): void {
       const isOn = saved !== undefined ? Boolean(saved) : DEFAULT_SHOW_VISIBLE_ONLY;
       visibleCheckbox.checked = isOn;
       state.activeFilters.showVisibleOnly = isOn;
-      // Re-apply filters after restoring persisted preference so the image
-      // list reflects the saved visible-only state on first render.
-      applyFilters();
+      if (isOn) {
+        // Must refresh visibility from the content script before filtering,
+        // otherwise we'd use the stale scan-time snapshot where most images
+        // have visible=undefined and get dropped by filterByVisibility.
+        void refreshVisibility().then(() => applyFilters());
+      } else {
+        applyFilters();
+      }
     });
     visibleCheckbox.addEventListener('change', () => {
       state.activeFilters.showVisibleOnly = visibleCheckbox.checked;
@@ -980,18 +1003,13 @@ function bindEvents(): void {
             !state.isProUser &&
             ['png', 'jpg', 'webp'].includes(value)
           ) {
-            const { checkFeatureQuota } = await import('../shared/feature-quota');
+            const { checkFeatureQuota, quotaBlockedMessage } =
+              await import('../shared/feature-quota');
             const { allowed, limit } = await checkFeatureQuota('formatConvert');
             if (!allowed) {
               dropdown.classList.add('hidden');
               closeSettings();
-              showToast(
-                t('quota_exhausted_monthly', {
-                  feature: t('feature_format_convert'),
-                  limit: String(limit),
-                }),
-                'warning'
-              );
+              showToast(quotaBlockedMessage(t, 'feature_format_convert', limit), 'warning');
               showProUpgradeModal();
               return;
             }
@@ -1051,7 +1069,16 @@ function bindEvents(): void {
   if (elements.btnRemoveDuplicates)
     elements.btnRemoveDuplicates.addEventListener('click', removeDuplicates);
   if (elements.btnCollectionExport)
-    elements.btnCollectionExport.addEventListener('click', exportCollection);
+    elements.btnCollectionExport.addEventListener('click', () => {
+      // When items are selected, use batch download for selected items only;
+      // otherwise export the entire collection as ZIP.
+      const batchDlBtn = document.getElementById('btn-collection-batch-download');
+      if (batchDlBtn && !batchDlBtn.hasAttribute('disabled')) {
+        batchDlBtn.click();
+      } else {
+        exportCollection();
+      }
+    });
 
   // Reverse search menu items
   document.querySelectorAll<HTMLElement>('[data-engine]').forEach((item) => {

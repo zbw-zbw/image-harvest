@@ -7,7 +7,7 @@ import { clearTabImageCache, getTabImageCache, saveTabImageCache } from '../shar
 import { loadAiTagsMap } from '../shared/ai-tags-store';
 import { elements, state, store } from './state';
 import { fetchImages, processImageExtras } from './scan';
-import { applyFilters } from './filter';
+import { applyFilters, refreshVisibility } from './filter';
 import { updateSelectionUI } from './actions';
 import { renderImages } from './render';
 import { checkNarrowMode, hideLoading, hideRestricted, showLoading, showRestricted } from './ui';
@@ -19,6 +19,7 @@ import {
   isOwnExtensionUrl,
   isIgnoredExtensionTab,
   markIgnoredExtensionTab,
+  isWithinReverseSearchCloseGrace,
 } from './reverse-search-tabs';
 // Module-level rescan debounce timer
 let tabUpdatedTimer: ReturnType<typeof setTimeout> | null = null;
@@ -85,13 +86,26 @@ export async function loadCurrentTab(forceRescan = false, targetTabId?: number):
   if (!forceRescan && state.tabCache.has(tabId)) {
     const cached = state.tabCache.get(tabId)!;
     if (cached.url === tabUrl) {
+      state.allImages = [...cached.images];
+      state.selectedImages = new Set(cached.selectedImages);
+      hideLoading();
+
+      // When "show visible only" filter is active, cached visibility flags
+      // may be stale (content script context can change between tab
+      // switches). Re-check visibility from the content script and
+      // re-apply filters so images aren't incorrectly hidden.
+      if (state.activeFilters.showVisibleOnly) {
+        void refreshVisibility().then(() => {
+          applyFilters();
+          updateSelectionUI();
+        });
+        return;
+      }
+
       if (cached.filteredImages && cached.filteredImages.length > 0) {
         state.filteredImages = [...cached.filteredImages];
         state.lastRenderedFilteredIds = cached.lastRenderedFilteredIds ?? null;
       }
-      state.allImages = [...cached.images];
-      state.selectedImages = new Set(cached.selectedImages);
-      hideLoading();
       if (!cached.filteredImages || cached.filteredImages.length === 0) {
         applyFilters();
       } else if (!state.isInitialized) {
@@ -176,7 +190,14 @@ export async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Pr
   // synchronous (no await) so it does NOT delay or break the synchronous
   // cache-restore fast path below. Switching to such a tab must not
   // save/clear/rescan the current tab's images.
-  if (isReverseSearchTab(newTabId) || isIgnoredExtensionTab(newTabId)) return;
+  // Also ignore the focus-restore event that fires immediately after
+  // closing a reverse-search tab (grace period protects the original tab).
+  if (
+    isReverseSearchTab(newTabId) ||
+    isIgnoredExtensionTab(newTabId) ||
+    isWithinReverseSearchCloseGrace()
+  )
+    return;
 
   // Remember the previous tabId so we can restore it if the target turns
   // out to be an extension page discovered only after the async check.

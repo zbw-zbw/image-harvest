@@ -36,6 +36,8 @@ import { EVENTS } from '../../shared/telemetry-events';
 import { getProUpsellBucket, type AbBucket } from '../../shared/ab-experiment';
 import { getState as getPaywallState, markResolved } from '../../shared/paywall-state';
 import { PRICING_PAGE_URL, MESSAGE_TYPES, getFreeLimits } from '../../shared/constants';
+import { getFeatureCopySynchronous, interpolateFeatureDesc } from '../../shared/remote-config';
+import { getLocale } from '../../shared/i18n';
 import { showToast } from '../ui';
 import { applyProFeatureVisibility } from '../settings';
 import { startTrial as startTrialFn, isTrialEligible } from '../../shared/trial';
@@ -336,31 +338,154 @@ function FeatureCompareCard({
   );
 }
 
-/** Dynamically builds the feature comparison list from getFreeLimits(). */
+// Icon + gradient mapping for known feature keys (fallback for remote copy)
+const FEATURE_ICONS: Record<string, { icon: string; gradient: string }> = {
+  smartExtract: { icon: '🔍', gradient: 'gradient-green' },
+  zipDownload: { icon: '📦', gradient: 'gradient-blue' },
+  batchCopyUrls: { icon: '📋', gradient: 'gradient-blue' },
+  batchDelete: { icon: '🗑️', gradient: 'gradient-red' },
+  batchFavorite: { icon: '⭐', gradient: 'gradient-amber' },
+  collection: { icon: '📁', gradient: 'gradient-amber' },
+  aiTag: { icon: '🏷️', gradient: 'gradient-cyan' },
+  batchHighlight: { icon: '✨', gradient: 'gradient-yellow' },
+  multiTab: { icon: '🖥️', gradient: 'gradient-purple' },
+  dedup: { icon: '🧹', gradient: 'gradient-orange' },
+  formatConvert: { icon: '🔄', gradient: 'gradient-indigo' },
+  liveMonitor: { icon: '📡', gradient: 'gradient-teal' },
+  reverseSearch: { icon: '🔍', gradient: 'gradient-green' },
+  eagleExport: { icon: '🦅', gradient: 'gradient-amber' },
+  colorCopy: { icon: '🎨', gradient: 'gradient-pink' },
+  customNaming: { icon: '📝', gradient: 'gradient-indigo' },
+  advancedGrouping: { icon: '📊', gradient: 'gradient-purple' },
+};
+
+/** Dynamically builds the feature comparison list from remote copy config,
+ *  falling back to getFreeLimits() when remote copy is unavailable. */
 function ProFeatureCompareList() {
   const limits = getFreeLimits();
-  const perMonth = t('pro_compare_per_month');
-  const perDay = t('pro_compare_per_day');
+  const copy = getFeatureCopySynchronous();
+  const locale = getLocale();
+  const lang = locale.startsWith('zh') ? 'zh' : 'en';
+
+  // Build flat limits record for template interpolation
+  const limitsRecord: Record<string, unknown> = {
+    maxZipImages: limits.MAX_ZIP_IMAGES,
+    maxBatchCopyUrls: limits.MAX_BATCH_COPY_URLS,
+    maxCollectionItems: limits.MAX_COLLECTION_ITEMS,
+    maxMonthlyAiTags: limits.MAX_MONTHLY_AI_TAGS,
+    maxEagleExportPerBatch: limits.MAX_EAGLE_EXPORT_PER_BATCH,
+    maxBatchDelete: limits.MAX_BATCH_DELETE,
+    maxBatchFavorite: limits.MAX_BATCH_FAVORITE,
+    maxMonthlyColorCopy: limits.MAX_MONTHLY_COLOR_COPY,
+    maxMonthlyMultiTab: limits.MAX_MONTHLY_MULTI_TAB,
+    maxMonthlyDedup: limits.MAX_MONTHLY_DEDUP,
+    maxMonthlyFormatConvert: limits.MAX_MONTHLY_FORMAT_CONVERT,
+    maxMonthlyLiveMonitor: limits.MAX_MONTHLY_LIVE_MONITOR,
+    maxMonthlyBatchHighlight: limits.MAX_MONTHLY_BATCH_HIGHLIGHT,
+    proAiMonthlyQuota: (() => {
+      const remote = (globalThis as Record<string, unknown>).__remoteConfig as
+        | Record<string, unknown>
+        | undefined;
+      return typeof remote?.proAiMonthlyQuota === 'number' ? remote.proAiMonthlyQuota : 100;
+    })(),
+  };
+
+  // If remote copy is available, build cards dynamically
+  if (copy) {
+    // Filter out features where both free and pro show "✓" (not interesting for upsell)
+    const upsellFeatures = copy.featureOrder.filter((key) => {
+      const feat = copy.features[key];
+      if (!feat) return false;
+      const freeVal = feat.free[lang] || feat.free['en'] || '';
+      const proVal = feat.pro[lang] || feat.pro['en'] || '';
+      return freeVal !== proVal; // Only show features where Pro offers more
+    });
+
+    return (
+      <div class="pro-features-compare" style={{ marginTop: '14px' }}>
+        <div class="pro-fc-header">
+          <span class="pro-fc-header-feature">{t('pro_compare_feature')}</span>
+          <div class="pro-fc-header-badges">
+            <span class="pro-fc-header-label pro-fc-free">FREE</span>
+            <span class="pro-fc-header-label pro-fc-pro">PRO</span>
+          </div>
+        </div>
+        {upsellFeatures.map((featureKey) => {
+          const feat = copy.features[featureKey]!;
+          const iconInfo = FEATURE_ICONS[featureKey] || { icon: '⚡', gradient: 'gradient-blue' };
+          const label = feat.label[lang] || feat.label['en'] || featureKey;
+          const freeDesc = interpolateFeatureDesc(
+            feat.free[lang] || feat.free['en'] || '',
+            limitsRecord
+          );
+          const proDesc = interpolateFeatureDesc(
+            feat.pro[lang] || feat.pro['en'] || '',
+            limitsRecord
+          );
+
+          return (
+            <FeatureCompareCard
+              key={featureKey}
+              icon={iconInfo.icon}
+              gradient={iconInfo.gradient}
+              title={label}
+              desc=""
+              free={freeDesc}
+              pro={proDesc}
+            />
+          );
+        })}
+      </div>
+    );
+  }
+
+  // Fallback: hardcoded cards
+  const perBatch = t('pro_compare_per_batch');
+  const timesPerMonth = t('pro_compare_times_per_month');
   const unlimited = t('pro_compare_unlimited');
   const allEngines = t('pro_compare_all_engines');
   const engineCount = limits.REVERSE_SEARCH_ENGINES.length;
 
   return (
     <div class="pro-features-compare" style={{ marginTop: '14px' }}>
+      <div class="pro-fc-header">
+        <span class="pro-fc-header-feature">{t('pro_compare_feature')}</span>
+        <div class="pro-fc-header-badges">
+          <span class="pro-fc-header-label pro-fc-free">FREE</span>
+          <span class="pro-fc-header-label pro-fc-pro">PRO</span>
+        </div>
+      </div>
+      {/* — Features with free tier (limited usage) — */}
       <FeatureCompareCard
         icon="📦"
         gradient="gradient-blue"
         title={t('pro_feature_batch_title')}
         desc={t('pro_feature_batch_desc_pro')}
-        free={`${limits.MAX_ZIP_IMAGES} ${perDay}`}
+        free={`${limits.MAX_ZIP_IMAGES} ${perBatch}`}
         pro={unlimited}
       />
       <FeatureCompareCard
-        icon="🖥️"
-        gradient="gradient-purple"
-        title={t('pro_feature_multitab_title')}
-        desc={t('pro_feature_multitab_desc_pro')}
-        free={`${limits.MAX_MONTHLY_MULTI_TAB} ${perMonth}`}
+        icon="⚡"
+        gradient="gradient-amber"
+        title={t('pro_feature_batch_ops_title')}
+        desc={t('pro_feature_batch_ops_desc_pro')}
+        free={`${limits.MAX_BATCH_DELETE} ${perBatch}`}
+        pro={unlimited}
+      />
+      <FeatureCompareCard
+        icon="🏷️"
+        gradient="gradient-cyan"
+        title={t('pro_feature_ai_tag_title')}
+        desc={t('pro_feature_ai_tag_desc_pro')}
+        free={`${limits.MAX_MONTHLY_AI_TAGS} ${timesPerMonth}`}
+        pro={unlimited}
+      />
+      <FeatureCompareCard
+        icon="🎨"
+        gradient="gradient-pink"
+        title={t('pro_feature_color_title')}
+        desc={t('pro_feature_color_desc_pro')}
+        free={`${limits.MAX_MONTHLY_COLOR_COPY} ${timesPerMonth}`}
         pro={unlimited}
       />
       <FeatureCompareCard
@@ -372,19 +497,24 @@ function ProFeatureCompareList() {
         pro={allEngines}
       />
       <FeatureCompareCard
-        icon="🏷️"
-        gradient="gradient-cyan"
-        title={t('pro_feature_ai_tag_title')}
-        desc={t('pro_feature_ai_tag_desc_pro')}
-        free={`${limits.MAX_MONTHLY_AI_TAGS} ${perMonth}`}
-        pro={unlimited}
-      />
-      <FeatureCompareCard
         icon="🦅"
-        gradient="gradient-amber"
+        gradient="gradient-yellow"
         title={t('pro_feature_eagle_title')}
         desc={t('pro_feature_eagle_desc_pro')}
-        free={`${limits.MAX_EAGLE_EXPORT_PER_BATCH} ${perMonth}`}
+        free={`${limits.MAX_EAGLE_EXPORT_PER_BATCH} ${perBatch}`}
+        pro={unlimited}
+      />
+      {/* — Pro-exclusive features (unavailable on free) — */}
+      <FeatureCompareCard
+        icon="🖥️"
+        gradient="gradient-purple"
+        title={t('pro_feature_multitab_title')}
+        desc={t('pro_feature_multitab_desc_pro')}
+        free={
+          limits.MAX_MONTHLY_MULTI_TAB > 0
+            ? `${limits.MAX_MONTHLY_MULTI_TAB} ${timesPerMonth}`
+            : '—'
+        }
         pro={unlimited}
       />
       <FeatureCompareCard
@@ -392,23 +522,19 @@ function ProFeatureCompareList() {
         gradient="gradient-orange"
         title={t('pro_feature_dedup_title')}
         desc={t('pro_feature_dedup_desc_pro')}
-        free={`${limits.MAX_MONTHLY_DEDUP} ${perMonth}`}
+        free={limits.MAX_MONTHLY_DEDUP > 0 ? `${limits.MAX_MONTHLY_DEDUP} ${timesPerMonth}` : '—'}
         pro={unlimited}
-      />
-      <FeatureCompareCard
-        icon="🎨"
-        gradient="gradient-pink"
-        title={t('pro_feature_color_title')}
-        desc={t('pro_feature_color_desc_pro')}
-        free="—"
-        pro="✓"
       />
       <FeatureCompareCard
         icon="🔄"
         gradient="gradient-indigo"
         title={t('pro_feature_format_title')}
         desc={t('pro_feature_format_desc_pro')}
-        free={`${limits.MAX_MONTHLY_FORMAT_CONVERT} ${perMonth}`}
+        free={
+          limits.MAX_MONTHLY_FORMAT_CONVERT > 0
+            ? `${limits.MAX_MONTHLY_FORMAT_CONVERT} ${timesPerMonth}`
+            : '—'
+        }
         pro={unlimited}
       />
       <FeatureCompareCard
@@ -416,7 +542,11 @@ function ProFeatureCompareList() {
         gradient="gradient-teal"
         title={t('pro_feature_live_monitor_title')}
         desc={t('pro_feature_live_monitor_desc_pro')}
-        free={`${limits.MAX_MONTHLY_LIVE_MONITOR} ${perMonth}`}
+        free={
+          limits.MAX_MONTHLY_LIVE_MONITOR > 0
+            ? `${limits.MAX_MONTHLY_LIVE_MONITOR} ${timesPerMonth}`
+            : '—'
+        }
         pro={unlimited}
       />
     </div>

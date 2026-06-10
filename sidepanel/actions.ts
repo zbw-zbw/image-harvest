@@ -16,6 +16,7 @@ import { isRestrictedUrl } from '../shared/utils';
 import { isSafeImageUrl } from '../shared/url-validator';
 import { track } from '../shared/telemetry';
 import { EVENTS } from '../shared/telemetry-events';
+import { getRemainingMonthlyFreeAiTags } from '../shared/ai-free-quota';
 import { recordDownloads } from '../shared/paywall-state';
 import { recordDownloadForRating } from '../shared/rating-prompt-state';
 import { applyFilters } from './filter';
@@ -304,16 +305,10 @@ export async function exportSingleToEagle(img: ImageItem): Promise<void> {
 export async function downloadSingle(img: ImageItem, format: string | null): Promise<void> {
   // Quota check: format conversion uses monthly quota for free users
   if (format && !state.isProUser) {
-    const { checkFeatureQuota } = await import('../shared/feature-quota');
+    const { checkFeatureQuota, quotaBlockedMessage } = await import('../shared/feature-quota');
     const { allowed, limit } = await checkFeatureQuota('formatConvert');
     if (!allowed) {
-      showToast(
-        t('quota_exhausted_monthly', {
-          feature: t('feature_format_convert'),
-          limit: String(limit),
-        }),
-        'warning'
-      );
+      showToast(quotaBlockedMessage(t, 'feature_format_convert', limit), 'warning');
       showProUpgradeModal();
       return;
     }
@@ -373,16 +368,10 @@ export async function downloadSelectedAsZip(
 
   // Quota check: format conversion uses monthly quota for free users
   if (targetFormat && !state.isProUser) {
-    const { checkFeatureQuota } = await import('../shared/feature-quota');
+    const { checkFeatureQuota, quotaBlockedMessage } = await import('../shared/feature-quota');
     const { allowed, limit } = await checkFeatureQuota('formatConvert');
     if (!allowed) {
-      showToast(
-        t('quota_exhausted_monthly', {
-          feature: t('feature_format_convert'),
-          limit: String(limit),
-        }),
-        'warning'
-      );
+      showToast(quotaBlockedMessage(t, 'feature_format_convert', limit), 'warning');
       showProUpgradeModal();
       return;
     }
@@ -478,7 +467,11 @@ export async function downloadSelectedAsZip(
 
     URL.revokeObjectURL(blobUrl);
     const successCount = selected.length - failed.length;
-    showToast(t('toast_download_completed', { count: successCount }), 'success');
+    if (successCount === 0) {
+      showToast(t('toast_download_all_failed'), 'error');
+    } else {
+      showToast(t('toast_download_completed', { count: successCount }), 'success');
+    }
     // Telemetry: count is the SUCCESSFUL count, not selected.length —
     // failures are inferred via (selected.length - count). Funnels care
     // about user-perceived success.
@@ -678,11 +671,49 @@ export function reverseSearch(imageUrl: string, engine: string): void {
 
 export async function batchAddToCollection(images: ImageItem[]): Promise<void> {
   if (images.length === 0) return;
+
+  // Pre-check collection quota before starting batch
+  if (!state.isProUser) {
+    const { collectionGetAll } = await import('../shared/collection');
+    const existing = await collectionGetAll();
+    const maxItems = getFreeLimits().MAX_COLLECTION_ITEMS;
+    const remainingSlots = maxItems - existing.length;
+    if (remainingSlots <= 0) {
+      showToast(t('toast_collection_limit', { max: maxItems }), 'warning');
+      showProUpgradeModal();
+      return;
+    }
+  }
+
   const { addToCollection } = await import('./pro-features');
   let added = 0;
   for (const img of images) {
-    await addToCollection(img);
-    added++;
+    // Re-check quota mid-batch for free users
+    if (!state.isProUser) {
+      const { collectionGetAll } = await import('../shared/collection');
+      const currentAll = await collectionGetAll();
+      if (currentAll.length >= getFreeLimits().MAX_COLLECTION_ITEMS) {
+        if (added > 0) {
+          showToast(
+            t('toast_batch_favorite_partial', {
+              added: String(added),
+              max: String(getFreeLimits().MAX_COLLECTION_ITEMS),
+            }),
+            'warning'
+          );
+        } else {
+          showToast(
+            t('toast_collection_limit', { max: getFreeLimits().MAX_COLLECTION_ITEMS }),
+            'warning'
+          );
+        }
+        showProUpgradeModal();
+        void track(EVENTS.BATCH_FAVORITE, { count: added });
+        return;
+      }
+    }
+    const success = await addToCollection(img, true);
+    if (success) added++;
   }
   showToast(t('toast_batch_favorite_done', { count: String(added) }), 'success');
   void track(EVENTS.BATCH_FAVORITE, { count: added });
@@ -690,6 +721,20 @@ export async function batchAddToCollection(images: ImageItem[]): Promise<void> {
 
 export async function batchAiTag(images: ImageItem[]): Promise<void> {
   if (images.length === 0) return;
+
+  // Pre-check: free users must have remaining AI tag quota
+  if (!state.isProUser) {
+    const freeRemaining = await getRemainingMonthlyFreeAiTags();
+    if (freeRemaining <= 0) {
+      showToast(
+        t('toast_ai_monthly_limit', { max: getFreeLimits().MAX_MONTHLY_AI_TAGS }),
+        'warning'
+      );
+      showProUpgradeModal();
+      return;
+    }
+  }
+
   const urls = images.map((img) => img.url);
   showToast(t('toast_batch_ai_tag_started', { count: String(urls.length) }), 'info');
   try {
@@ -698,7 +743,16 @@ export async function batchAiTag(images: ImageItem[]): Promise<void> {
       imageUrls: urls,
     });
     if (!resp?.success) {
-      showToast(t('toast_ai_tag_failed'), 'error');
+      // Quota / license errors → show Pro upgrade modal instead of generic error
+      if (resp?.error === 'monthly_limit' || resp?.error === 'pro_required' || resp?.error === 'quota_exceeded') {
+        showToast(
+          t('toast_ai_monthly_limit', { max: getFreeLimits().MAX_MONTHLY_AI_TAGS }),
+          'warning'
+        );
+        showProUpgradeModal();
+      } else {
+        showToast(t('toast_ai_tag_failed'), 'error');
+      }
       return;
     }
     const results: Array<{ url: string; tags: string[]; success: boolean }> = resp.results ?? [];
