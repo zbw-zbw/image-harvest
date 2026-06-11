@@ -225,8 +225,6 @@ export function bindLicenseModalEvents(): void {
   ) as HTMLButtonElement | null;
   const proModalInput = document.getElementById('pro-modal-key-input') as HTMLInputElement | null;
   const proModalError = document.getElementById('pro-modal-error');
-  const proModalGetLink = document.getElementById('link-pro-modal-get');
-
   if (proModalActivateBtn && proModalInput) {
     proModalActivateBtn.addEventListener('click', () =>
       activateLicenseFromInput(proModalInput, proModalError, proModalActivateBtn, true)
@@ -237,10 +235,6 @@ export function bindLicenseModalEvents(): void {
     });
   }
 
-  if (proModalGetLink) {
-    proModalGetLink.addEventListener('click', (e) => {
-      e.preventDefault();
-      chrome.tabs.create({ url: PRICING_PAGE_URL });
-    });
-  }
+  // NOTE: #link-pro-modal-get click is handled by ProUpgradeModal.tsx's
+  // onClick={handlePricingClick} — do NOT add a duplicate listener here.
 }

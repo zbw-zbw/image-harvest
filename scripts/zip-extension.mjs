@@ -22,6 +22,34 @@ if (!existsSync(distDir)) {
   process.exit(1);
 }
 
+// ── Safety check: reject builds that accidentally baked in localhost ──
+// This catches the case where a developer runs `npm run zip` with
+// VITE_API_BASE=http://localhost:3000 in .env.local — the resulting
+// extension would send users to localhost instead of the production site.
+import { readdirSync } from 'node:fs';
+
+function scanForLocalhost(dir) {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    const fullPath = resolve(dir, entry.name);
+    if (entry.isDirectory()) {
+      scanForLocalhost(fullPath);
+    } else if (/\.(js|html)$/.test(entry.name)) {
+      const content = readFileSync(fullPath, 'utf8');
+      const match = content.match(/https?:\/\/localhost[:\d]*/);
+      if (match) {
+        console.error(
+          `\n✖ BLOCKED: production build contains "${match[0]}" in ${entry.name}\n` +
+            '  This usually means .env.local has VITE_API_BASE=http://localhost:3000.\n' +
+            '  Remove or comment it out, rebuild, then re-run this script.\n'
+        );
+        process.exit(1);
+      }
+    }
+  }
+}
+
+scanForLocalhost(distDir);
+
 const pkg = JSON.parse(readFileSync(resolve(repoRoot, 'package.json'), 'utf8'));
 const zipName = `image-harvest-v${pkg.version}.zip`;
 const zipPath = resolve(repoRoot, zipName);

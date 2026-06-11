@@ -87,23 +87,20 @@
 
 ---
 
-## 🆕 What's New (v1.0.6)
+## 🆕 What's New (v1.0.8)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
-- **🎁 Referral & Invite System** — share your invite link with friends; both of you earn bonus trial days when they install Image Harvest.
-- **📊 Smart Feature Quotas** — Pro features now use a soft monthly quota instead of hard locks. Free users get meaningful access; Pro removes all limits.
-- **🔧 Remote Feature Configuration** — feature limits are server-controlled with three-tier caching (memory → storage → network), adjustable without releasing a new version.
-- **📈 Quota Display** — new settings panel showing clear Free vs Pro comparison with remaining usage for each feature.
-- **👁️ Visibility Filter** — "Show visible only" toggle filters out hidden/off-screen images using `IntersectionObserver`.
-- **🎨 Color Extraction unlocked** — color palette extraction is now free for all users.
-- **🔍 MIME detection from bytes** — file format detection via magic bytes (PNG/JPEG/GIF/WebP/BMP/ICO/SVG) for reliable identification.
-- **💰 Pricing update** — Monthly $3.99 / Yearly $29.99 / Lifetime $49.99.
-- **🌍 290+ new i18n keys** across all 15 supported languages.
-- **🆓 7-day free trial for Pro** — try every Pro feature with no upfront charge. Cancel during the trial = no bill.
-- **💰 30-day money-back guarantee** — every paid plan refundable for 30 days, no questions asked. See the [Refund Policy](https://image-harvest.kyriewen.cn/refund).
-- **🔍 Reverse image search** — Google + TinEye built into the right-click menu (Free); Baidu + Yandex unlocked with Pro.
-- **📚 Long-form guides** — see the new [Image Harvest Blog](https://image-harvest.kyriewen.cn/blog) for tutorials, comparisons, and the honest "best image extractor for Chrome 2026" review.
+- **📦 Collection Batch Operations** — select all, batch download, and batch delete for saved collections with count indicator and confirmation dialogs.
+- **🔍 Collection URL Search** — quickly find specific saved images by URL in the collection modal.
+- **🤖 AI Tag Quota Pre-check** — AI tagging now checks remaining free quota _before_ sending API requests, showing the Pro upgrade modal immediately instead of a confusing error.
+- **🔄 Remote Config Partial Sync** — incremental remote config sync refreshes only stale keys, reducing bandwidth and latency.
+- **💎 Pro Upgrade Modal Redesign** — clearer feature comparison table with reordered rows (free-limited first, Pro-only last) and better visual hierarchy.
+- **📊 Quota Display Overhaul** — server-driven feature rows, labels, and ordering with offline fallback. "Free" header now uses i18n.
+- **🏷️ Batch-specific Pro Toasts** — batch favorite, AI tag, and delete now show feature-specific quota messages instead of generic limits.
+- **🐛 AI tag failure fixed** — free users with exhausted quota now see the Pro upgrade modal instead of "AI tag failed, please retry".
+- **🧹 Modal scroll reset** — all modals now reset scroll position on open.
+- **🌍 88 new i18n keys** across all 15 supported languages for collection batch ops, quota display, and feature comparison.
 
 ---
 

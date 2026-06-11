@@ -54,6 +54,23 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
+## [1.0.8] — 2026-06-11
+
+### 🐛 Fixed
+
+- **Pro upgrade modal opening two tabs**: Clicking "Get Pro →" in the Pro upgrade modal opened two browser tabs instead of one. Caused by a duplicate click handler in both the Preact component and the legacy `license-ui.ts` event binding.
+- **Settings variable hint alignment**: The "Variables: {domain}, {index}…" hint text below the filename input now aligns with the input field instead of sitting flush-left.
+
+### 🔄 Changed
+
+- **Filename label**: Chinese locale label changed from "文件名" to "文件名称" for better visual alignment with "子文件夹".
+
+### 🧹 Housekeeping
+
+- **Production build localhost guard**: `npm run zip` now scans the built `dist/` folder for any `localhost` URLs before packaging. If found (e.g. from a leftover `.env.local`), the script aborts with a clear error message, preventing accidental deployment of dev-targeted builds.
+
+---
+
 ## [1.0.7] — 2026-06-10
 
 ### ✨ Added
