@@ -175,14 +175,35 @@ jobs:
           path: ${{ steps.package.outputs.zip_name }}
           retention-days: 90
 
+      # Extract the current version's section from CHANGELOG.md to use as
+      # the GitHub Release body. Falls back to auto-generated notes if the
+      # version heading isn't found (e.g. for prereleases).
+      - name: Extract changelog for this version
+        id: changelog
+        run: |
+          VERSION="${{ steps.package.outputs.version }}"
+          # Grab everything between "## [X.Y.Z]" and the next "## [" or "---"
+          BODY=$(awk "/^## \\[${VERSION}\\]/{found=1; next} found && /^(## \\[|---)/{exit} found{print}" CHANGELOG.md)
+          if [ -z "$BODY" ]; then
+            echo "No CHANGELOG entry found for v${VERSION}, falling back to auto-generated notes"
+            echo "found=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "found=true" >> "$GITHUB_OUTPUT"
+            # Use heredoc delimiter to handle multiline output
+            {
+              echo "body<<CHANGELOG_EOF"
+              echo "$BODY"
+              echo "CHANGELOG_EOF"
+            } >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ github.ref_name }}
           name: ${{ github.ref_name }}
-          # Auto-generate release notes from commits between this tag and the
-          # previous one. Maintainers can still edit afterwards.
-          generate_release_notes: true
+          body: ${{ steps.changelog.outputs.found == 'true' && steps.changelog.outputs.body || '' }}
+          generate_release_notes: ${{ steps.changelog.outputs.found != 'true' }}
           # Mark `-alpha` / `-beta` / `-rc` tags as prereleases automatically.
           prerelease: ${{ contains(github.ref_name, '-') }}
           files: ${{ steps.package.outputs.zip_name }}
