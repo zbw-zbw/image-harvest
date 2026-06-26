@@ -23,6 +23,7 @@ import {
   isElementAccessibleWithoutInteraction,
   pickBestSrcsetUrl,
 } from './utils';
+import { addToBatch, flushBatch } from './batch-sender';
 import {
   extractInlineSvgs,
   extractCanvasElements,
@@ -258,7 +259,7 @@ async function extractImgTags(images: Map<string, ImageItem>): Promise<void> {
           timestamp: Date.now(),
         } as ImageItem;
         images.set(dataKey, item);
-        sendDiscoveredImages([item]);
+        addToBatch(item);
         continue;
       }
 
@@ -282,18 +283,37 @@ async function extractImgTags(images: Map<string, ImageItem>): Promise<void> {
       } as ImageItem;
 
       images.set(resolvedUrl, item);
-      sendDiscoveredImages([item]);
+      addToBatch(item);
     } catch (error) {
       console.warn('Failed to extract img:', error);
     }
   }
+  // Flush any remaining buffered images at end of extractImgTags
+  flushBatch();
 }
 
 // Extract background images
 async function extractBackgroundImages(images: Map<string, ImageItem>): Promise<void> {
   // Limit elements to check for performance
   const elements = document.querySelectorAll('body, body *');
-  const maxElements = Math.min(elements.length, 2000);
+  const BG_SCAN_LIMIT = 2000;
+  const maxElements = Math.min(elements.length, BG_SCAN_LIMIT);
+
+  // Notify UI when the page exceeds the scan limit so users are aware
+  if (elements.length > BG_SCAN_LIMIT) {
+    try {
+      chrome.runtime
+        .sendMessage({
+          type: MESSAGE_TYPES.BG_SCAN_LIMIT_EXCEEDED,
+          total: elements.length,
+        })
+        .catch(() => {
+          /* ignore */
+        });
+    } catch {
+      /* ignore */
+    }
+  }
 
   for (let i = 0; i < maxElements; i++) {
     const el = elements[i];
@@ -366,6 +386,7 @@ async function extractBackgroundImages(images: Map<string, ImageItem>): Promise<
         } as ImageItem;
 
         images.set(resolvedUrl, item);
+        addToBatch(item);
       }
     } catch {
       // Skip elements we can't access (cross-origin iframes, etc.)
@@ -394,7 +415,7 @@ async function extractBackgroundImages(images: Map<string, ImageItem>): Promise<
             if (state.seenUrls.has(dataKey)) continue;
             state.seenUrls.add(dataKey);
             const rect = el.getBoundingClientRect();
-            images.set(dataKey, {
+            const dataItem: ImageItem = {
               id: generateId(dataKey),
               url: url,
               displayWidth: Math.round(rect.width),
@@ -404,7 +425,9 @@ async function extractBackgroundImages(images: Map<string, ImageItem>): Promise<
               sourceDomain: window.location.hostname,
               checked: false,
               timestamp: Date.now(),
-            } as ImageItem);
+            } as ImageItem;
+            images.set(dataKey, dataItem);
+            addToBatch(dataItem);
             continue;
           }
 
@@ -412,7 +435,7 @@ async function extractBackgroundImages(images: Map<string, ImageItem>): Promise<
           if (state.seenUrls.has(resolvedUrl)) continue;
           state.seenUrls.add(resolvedUrl);
           const rect = el.getBoundingClientRect();
-          images.set(resolvedUrl, {
+          const contentItem: ImageItem = {
             id: generateId(resolvedUrl),
             url: resolvedUrl,
             displayWidth: Math.round(rect.width),
@@ -422,13 +445,17 @@ async function extractBackgroundImages(images: Map<string, ImageItem>): Promise<
             sourceDomain: getDomain(resolvedUrl),
             checked: false,
             timestamp: Date.now(),
-          } as ImageItem);
+          } as ImageItem;
+          images.set(resolvedUrl, contentItem);
+          addToBatch(contentItem);
         }
       } catch {
         // Skip inaccessible pseudo-elements
       }
     }
   }
+  // Flush any remaining buffered background/CSS-content images
+  flushBatch();
 }
 
 // Extract from <picture> elements — smart merge: for each <picture>, pick

@@ -203,8 +203,21 @@ describe('detectLocale', () => {
     (globalThis as unknown as { chrome?: ChromeStub }).chrome = {
       storage: { local: installChromeStub().storage },
     };
-    const locale = await detectLocale();
-    expect(locale).toBe('en');
+    // Also neutralise navigator.language so the code cannot detect a
+    // system locale and must fall back to the 'en' default.
+    const origLang = Object.getOwnPropertyDescriptor(Navigator.prototype, 'language');
+    Object.defineProperty(Navigator.prototype, 'language', {
+      get: () => undefined,
+      configurable: true,
+    });
+    try {
+      const locale = await detectLocale();
+      expect(locale).toBe('en');
+    } finally {
+      if (origLang) {
+        Object.defineProperty(Navigator.prototype, 'language', origLang);
+      }
+    }
   });
 });
 

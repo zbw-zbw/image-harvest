@@ -94,6 +94,9 @@ beforeEach(async () => {
   __test.setFetch(mockFetch.fn);
   __test.setNow(() => 1_700_000_000_000);
   setEnvelopeMeta({ version: '1.0.1', lang: 'en', plan: 'free' });
+  // Default is now opt-out (GDPR). Set storage key directly to opt-in
+  // without enqueuing the TELEMETRY_OPT_IN event that setOptIn() produces.
+  await mem.set('telemetryOptIn', true);
 });
 
 afterEach(async () => {
@@ -110,8 +113,13 @@ afterEach(async () => {
 // ── opt-in / opt-out ──────────────────────────────────────────────────────
 
 describe('opt-in semantics', () => {
-  test('defaults to opted-in when no choice has been made', async () => {
-    expect(await isOptedIn()).toBe(true);
+  test('defaults to opted-out when no explicit choice has been made (GDPR)', async () => {
+    // Reset to a clean state with no persisted preference.
+    __test.reset();
+    const freshMem = makeMemStorage();
+    __test.setStorage(freshMem);
+    __test.setFetch(mockFetch.fn);
+    expect(await isOptedIn()).toBe(false);
   });
 
   test('persisted false survives the in-memory cache reset', async () => {

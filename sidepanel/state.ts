@@ -63,6 +63,21 @@ export interface TabCacheEntry {
   similarGroups?: SimilarGroup[];
   /** Scroll position of the image grid when this tab was last active. */
   scrollTop?: number;
+  /** Timestamp of last access (for LRU eviction). */
+  lastAccessed: number;
+}
+
+/** Maximum number of tab cache entries to keep in memory. */
+export const MAX_TAB_CACHE = 20;
+
+/** Evict oldest tab cache entries when the cache exceeds MAX_TAB_CACHE. */
+export function evictOldestTabCache(tabCache: Map<number, TabCacheEntry>): void {
+  if (tabCache.size <= MAX_TAB_CACHE) return;
+  const entries = [...tabCache.entries()].sort((a, b) => a[1].lastAccessed - b[1].lastAccessed);
+  while (tabCache.size > MAX_TAB_CACHE) {
+    const oldest = entries.shift();
+    if (oldest) tabCache.delete(oldest[0]);
+  }
 }
 
 // ── Similar-image group ─────────────────────────────────────────────────────

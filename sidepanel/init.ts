@@ -84,7 +84,9 @@ import {
 import {
   forgetReverseSearchTab,
   forgetIgnoredExtensionTab,
+  forgetOpenedTab,
   isWithinReverseSearchCloseGrace,
+  isWithinOpenedTabCloseGrace,
 } from './reverse-search-tabs';
 
 // Flag set by uiPort.onDisconnect — signals that the extension has been
@@ -314,6 +316,7 @@ async function init(): Promise<void> {
       clearTabImageCache(tabId);
       forgetReverseSearchTab(tabId);
       forgetIgnoredExtensionTab(tabId);
+      forgetOpenedTab(tabId);
     });
   }
 
@@ -360,7 +363,12 @@ async function init(): Promise<void> {
               el.style.pointerEvents = '';
             });
         });
-        if (state.isTabSwitching || isWithinTabSwitchGrace() || isWithinReverseSearchCloseGrace()) {
+        if (
+          state.isTabSwitching ||
+          isWithinTabSwitchGrace() ||
+          isWithinReverseSearchCloseGrace() ||
+          isWithinOpenedTabCloseGrace()
+        ) {
           lastHiddenTime = 0;
           return;
         }

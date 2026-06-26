@@ -359,7 +359,7 @@ export function ImageCard({ img, index }: Props) {
       return;
     }
     if (img.format === 'svg' || img.url.endsWith('.svg') || img.url.includes('.svg?')) {
-      showToast('SVG images are not supported for AI tagging', 'warning');
+      showToast(t('toast_ai_tag_svg_unsupported'), 'warning');
       return;
     }
     const imgW = img.naturalWidth || img.displayWidth || 0;
@@ -382,15 +382,25 @@ export function ImageCard({ img, index }: Props) {
         );
         applyFilters();
         void saveAiTags(img.url, resp.tags);
-        if (typeof resp.quotaRemaining === 'number') {
-          state.aiQuotaRemaining = resp.quotaRemaining;
-        }
         if (isProUser && typeof resp.quotaRemaining === 'number') {
-          showToast(`${t('toast_ai_tag_success')} (${resp.quotaRemaining} remaining)`, 'success');
+          state.aiQuotaRemaining = resp.quotaRemaining;
+          // Infer the real monthly limit: remaining + tags just consumed (1).
+          // This corrects the stale fallback (100) on the first API call.
+          const inferredLimit = resp.quotaRemaining + 1;
+          if (inferredLimit > state.aiQuotaLimit) {
+            state.aiQuotaLimit = inferredLimit;
+          }
+          showToast(
+            t('toast_ai_tag_success_remaining', { remaining: resp.quotaRemaining }),
+            'success'
+          );
         } else {
           const freeLeft = await getRemainingMonthlyFreeAiTags();
           showToast(
-            `${t('toast_ai_tag_success')} (${freeLeft}/${getFreeLimits().MAX_MONTHLY_AI_TAGS} remaining)`,
+            t('toast_ai_tag_success_remaining_free', {
+              remaining: freeLeft,
+              max: getFreeLimits().MAX_MONTHLY_AI_TAGS,
+            }),
             'success'
           );
         }

@@ -15,6 +15,22 @@
   align-content: start;
 }
 
+/* Tab-switch fade-in animation: provides a smooth reveal when switching
+   between tabs with cached images. Uses CSS @keyframes so the browser
+   can compositor-accelerate the opacity change. Duration is short enough
+   to feel snappy but long enough to eliminate the abrupt "pop-in" feel. */
+@keyframes tab-switch-fadein {
+  from {
+    opacity: 0.45;
+  }
+  to {
+    opacity: 1;
+  }
+}
+.image-grid.tab-switch-fadein {
+  animation: tab-switch-fadein 120ms ease-out forwards;
+}
+
 .density-compact .image-grid {
   grid-template-columns: repeat(2, 1fr);
   gap: 6px;

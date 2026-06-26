@@ -123,11 +123,23 @@ function sanitizeLicenseResult(data: unknown): LicenseValidationResult {
   }
   const obj = data as Record<string, unknown>;
   const plan = typeof obj.plan === 'string' && VALID_PLANS.includes(obj.plan) ? obj.plan : null;
+
+  // expiresAt: accept number (epoch ms) directly, or parse ISO string as fallback.
+  // The server should return epoch ms, but we handle string defensively in case
+  // an older backend version returns the raw ISO date from PostgreSQL.
+  let expiresAt: number | null = null;
+  if (typeof obj.expiresAt === 'number') {
+    expiresAt = obj.expiresAt;
+  } else if (typeof obj.expiresAt === 'string') {
+    const parsed = new Date(obj.expiresAt).getTime();
+    if (!Number.isNaN(parsed)) expiresAt = parsed;
+  }
+
   return {
     valid: Boolean(obj.valid),
     status: typeof obj.status === 'string' ? obj.status : undefined,
     plan,
-    expiresAt: typeof obj.expiresAt === 'number' ? obj.expiresAt : null,
+    expiresAt,
     error: typeof obj.error === 'string' ? obj.error : undefined,
   };
 }
@@ -175,7 +187,21 @@ export async function activateLicenseRemote(
       throw new Error('API request failed: ' + response.status);
     }
 
-    return (await response.json()) as RemoteActivationResponse;
+    const data = (await response.json()) as Record<string, unknown>;
+    // Sanitize expiresAt — server returns epoch ms, but handle string defensively.
+    let expiresAt: number | null = null;
+    if (typeof data.expiresAt === 'number') {
+      expiresAt = data.expiresAt;
+    } else if (typeof data.expiresAt === 'string') {
+      const parsed = new Date(data.expiresAt).getTime();
+      if (!Number.isNaN(parsed)) expiresAt = parsed;
+    }
+    return {
+      success: Boolean(data.success),
+      plan: typeof data.plan === 'string' ? data.plan : null,
+      expiresAt,
+      error: typeof data.error === 'string' ? data.error : undefined,
+    };
   } catch (error) {
     console.error('Failed to activate license remotely:', error);
     return { success: false, error: 'license_error_network' };

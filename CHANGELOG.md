@@ -54,6 +54,42 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
+## [1.0.9] — 2026-06-26
+
+### ✨ Added
+
+- **Batch Image Discovery Pipeline**: Content script now buffers discovered images and sends them in batches (50 images / 100ms), dramatically reducing IPC message storms on image-heavy pages.
+- **Background Scan Element Limit**: Background image scanning now caps at 2000 DOM elements with a user notification, preventing browser tab freezes on extremely complex pages.
+- **AI Tag Timeout Protection**: Single (15s) and batch (30s) AI tagging requests now have built-in timeout via AbortController, preventing indefinite hangs on network issues.
+- **Concurrent ZIP Downloads**: Batch ZIP download switched from sequential to sliding-window concurrent downloads (3 parallel fetches), significantly improving large batch download speed.
+- **Tab Cache LRU Eviction**: Per-tab image cache now tracks last access time and evicts the oldest entries when exceeding 20 tabs, preventing unbounded memory growth.
+- **Trial License Grace Period**: Trial licenses now include a 3-day grace period after expiration, giving users a smoother transition window before features lock.
+
+### 🔄 Changed
+
+- **Telemetry Default Opt-Out**: Anonymous usage analytics now defaults to disabled (opt-out) for new installs, in compliance with privacy best practices.
+- **AI Quota Fallback Unified**: Pro monthly AI quota fallback aligned to 100 across extension and backend, eliminating quota display inconsistencies.
+- **Atomic Quota Counting**: Backend AI tag endpoint rewritten to use atomic increment-then-check logic, eliminating race conditions under concurrent requests.
+
+### 🐛 Fixed
+
+- **Tab Switch Flicker Eliminated**: Completely reworked tab-switch rendering to use `queueMicrotask` + CSS fade-in animation. No more white screen flash, "No images" ghost UI, or scroll position jumps when switching between tabs.
+- **AI Quota Display Accuracy**: Quota remaining now correctly syncs after each AI tag operation, and the display defensively handles edge cases where remaining exceeds limit.
+- **Scroll Position Restoration**: Fixed scrolling container targeting (`.image-grid` not `.image-grid-wrapper`) and properly saves/restores per-tab scroll position.
+- **New Tab Close Ghost Rescan**: Extension now tracks tabs it opens (reverse search, "open in new tab") and suppresses false rescan triggers when those tabs close.
+- **License ExpiresAt Type Safety**: `expiresAt` field now handles both epoch milliseconds and ISO strings from backend, preventing grace period logic failures.
+- **Opened Tab Pending State Leak**: `pendingOpenedTab` flag now properly clears on double-failure paths, preventing permanent tab-switch blocking.
+
+### 🌍 i18n
+
+- **6 new translation keys**: AI tag success with remaining quota, SVG unsupported notice, background scan limit toast — added across all 15 supported locales.
+
+### 🧪 Test Coverage
+
+- **2 test files updated**: `telemetry.test.ts` adapted for default opt-out behavior; `i18n.test.ts` hardened locale fallback testing.
+
+---
+
 ## [1.0.8] — 2026-06-11
 
 ### 🐛 Fixed

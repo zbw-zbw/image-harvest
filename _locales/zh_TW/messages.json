@@ -1651,5 +1651,17 @@
   },
   "pro_compare_times_per_month": {
     "message": "times/mo"
+  },
+  "toast_ai_tag_svg_unsupported": {
+    "message": "SVG 圖片不支援 AI 標籤"
+  },
+  "toast_ai_tag_success_remaining": {
+    "message": "AI 標籤已新增（剩餘 {remaining} 次）"
+  },
+  "toast_ai_tag_success_remaining_free": {
+    "message": "AI 標籤已新增（剩餘 {remaining}/{max} 次）"
+  },
+  "toast_bg_scan_limit": {
+    "message": "偵測到 {total} 個元素，已掃描前 2000 個"
   }
 }

@@ -131,6 +131,7 @@ export const MESSAGE_TYPES = {
 
   // Visibility re-check (side panel → content script)
   CHECK_VISIBILITY: 'CHECK_VISIBILITY',
+  BG_SCAN_LIMIT_EXCEEDED: 'BG_SCAN_LIMIT_EXCEEDED',
 } as const;
 
 export type MessageType = (typeof MESSAGE_TYPES)[keyof typeof MESSAGE_TYPES];

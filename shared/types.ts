@@ -35,6 +35,16 @@ export interface ImageItem {
   aiTags?: string[];
   /** Whether the image element is visible in the page viewport */
   visible?: boolean;
+
+  // ── Runtime fields (injected by content script / sidepanel) ─────────
+  /** Selection state for batch operations */
+  checked?: boolean;
+  /** Discovery timestamp (ms) for sort-by-time */
+  timestamp?: number;
+  /** Whether the image is currently being downloaded */
+  downloading?: boolean;
+  /** Whether the image is marked as favorite / in collection */
+  favorite?: boolean;
 }
 
 // ── App settings (persisted to chrome.storage.local) ────────────────────────

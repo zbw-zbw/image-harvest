@@ -1667,5 +1667,17 @@
   },
   "pro_compare_times_per_month": {
     "message": "times/mo"
+  },
+  "toast_ai_tag_svg_unsupported": {
+    "message": "SVG images are not supported for AI tagging"
+  },
+  "toast_ai_tag_success_remaining": {
+    "message": "AI tags added ({remaining} remaining)"
+  },
+  "toast_ai_tag_success_remaining_free": {
+    "message": "AI tags added ({remaining}/{max} remaining)"
+  },
+  "toast_bg_scan_limit": {
+    "message": "Detected {total} elements, scanned first 2000"
   }
 }

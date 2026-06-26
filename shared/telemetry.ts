@@ -229,13 +229,14 @@ export async function flushNow(): Promise<void> {
 /**
  * Read the opt-in flag with caching. The first call reads from storage;
  * subsequent calls hit the in-memory cache until setOptIn() invalidates.
- * Defaults to TRUE (opt-in) when the user has never made a choice — see
- * implementation_plan.md "default opt-in but completely off-able".
+ * Defaults to FALSE (opt-out) when the user has never made a choice —
+ * GDPR-compliant: telemetry remains off until the Privacy Opt-In Modal
+ * is explicitly accepted.
  */
 export async function isOptedIn(): Promise<boolean> {
   if (optInCache !== null) return optInCache;
   const v = await storage.get<boolean>(STORAGE_KEY_OPT_IN);
-  optInCache = v === undefined ? true : Boolean(v);
+  optInCache = v === undefined ? false : Boolean(v);
   return optInCache;
 }
 

@@ -78,8 +78,9 @@ function buildQuotaRows(
 
     if (featureKey === 'aiTag') {
       if (isPro) {
-        row.used = aiQuotaLimit - aiQuotaRemaining;
-        row.max = aiQuotaLimit;
+        // Defensive: clamp to ≥0 in case server remaining exceeds local limit
+        row.used = Math.max(0, aiQuotaLimit - aiQuotaRemaining);
+        row.max = Math.max(aiQuotaLimit, aiQuotaRemaining);
       } else {
         row.remaining = limits.MAX_MONTHLY_AI_TAGS - freeAiUsed;
         row.exhausted = freeAiUsed >= limits.MAX_MONTHLY_AI_TAGS;
@@ -116,8 +117,8 @@ function buildFallbackRows(
           label: t('quota_ai_tags'),
           freeLimit: `${limits.MAX_MONTHLY_AI_TAGS}${perMonth}`,
           proLimit: `${aiQuotaLimit}${perMonth}`,
-          used: aiQuotaLimit - aiQuotaRemaining,
-          max: aiQuotaLimit,
+          used: Math.max(0, aiQuotaLimit - aiQuotaRemaining),
+          max: Math.max(aiQuotaLimit, aiQuotaRemaining),
         }
       : {
           label: t('quota_ai_tags'),

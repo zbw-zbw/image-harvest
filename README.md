@@ -87,20 +87,20 @@
 
 ---
 
-## 🆕 What's New (v1.0.8)
+## 🆕 What's New (v1.0.9)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
-- **📦 Collection Batch Operations** — select all, batch download, and batch delete for saved collections with count indicator and confirmation dialogs.
-- **🔍 Collection URL Search** — quickly find specific saved images by URL in the collection modal.
-- **🤖 AI Tag Quota Pre-check** — AI tagging now checks remaining free quota _before_ sending API requests, showing the Pro upgrade modal immediately instead of a confusing error.
-- **🔄 Remote Config Partial Sync** — incremental remote config sync refreshes only stale keys, reducing bandwidth and latency.
-- **💎 Pro Upgrade Modal Redesign** — clearer feature comparison table with reordered rows (free-limited first, Pro-only last) and better visual hierarchy.
-- **📊 Quota Display Overhaul** — server-driven feature rows, labels, and ordering with offline fallback. "Free" header now uses i18n.
-- **🏷️ Batch-specific Pro Toasts** — batch favorite, AI tag, and delete now show feature-specific quota messages instead of generic limits.
-- **🐛 AI tag failure fixed** — free users with exhausted quota now see the Pro upgrade modal instead of "AI tag failed, please retry".
-- **🧹 Modal scroll reset** — all modals now reset scroll position on open.
-- **🌍 88 new i18n keys** across all 15 supported languages for collection batch ops, quota display, and feature comparison.
+- **⚡ Batch Image Discovery** — content script buffers and sends images in batches, eliminating IPC message storms on heavy pages.
+- **🎯 Tab Switch Zero-Flicker** — completely reworked rendering with `queueMicrotask` + CSS fade-in — no more white flashes, ghost "No images" UI, or scroll jumps.
+- **📦 Concurrent ZIP Downloads** — batch downloads now run 3 fetches in parallel via sliding window, dramatically faster for large selections.
+- **🤖 AI Tag Timeout Protection** — requests auto-abort after 15s (single) / 30s (batch), preventing indefinite hangs.
+- **🧠 Tab Cache LRU** — per-tab cache evicts oldest entries beyond 20 tabs, preventing unbounded memory growth.
+- **🔒 Telemetry Default Opt-Out** — new installs default to analytics disabled, respecting user privacy.
+- **⏳ Trial Grace Period** — 3-day grace window after trial expiration for smoother upgrade transitions.
+- **🐛 Quota Sync Fixed** — AI quota remaining correctly updates after each tag operation with defensive display handling.
+- **🐛 New Tab Ghost Rescan Fixed** — closing extension-opened tabs no longer triggers false page rescans.
+- **🌍 6 new i18n keys** — AI tag success/remaining, SVG unsupported, and scan limit notifications across all 15 locales.
 
 ---
 

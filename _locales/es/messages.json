@@ -1654,5 +1654,17 @@
   },
   "pro_compare_times_per_month": {
     "message": "times/mo"
+  },
+  "toast_ai_tag_svg_unsupported": {
+    "message": "Las imágenes SVG no son compatibles con el etiquetado IA"
+  },
+  "toast_ai_tag_success_remaining": {
+    "message": "Etiquetas IA añadidas ({remaining} restantes)"
+  },
+  "toast_ai_tag_success_remaining_free": {
+    "message": "Etiquetas IA añadidas ({remaining}/{max} restantes)"
+  },
+  "toast_bg_scan_limit": {
+    "message": "Detectados {total} elementos, escaneados los primeros 2000"
   }
 }

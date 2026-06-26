@@ -1489,5 +1489,23 @@
   },
   "pro_batch_delete_limit": {
     "message": "Free plan: up to {max} deletions per batch. Upgrade to Pro for unlimited!"
+  },
+  "toast_ai_tag_success_remaining": {
+    "message": "AI tags added ({remaining} remaining)"
+  },
+  "toast_ai_tag_success_remaining_free": {
+    "message": "AI tags added ({remaining}/{max} remaining)"
+  },
+  "toast_ai_tag_svg_unsupported": {
+    "message": "SVG images are not supported for AI tagging"
+  },
+  "toast_bg_scan_limit": {
+    "message": "Detected {total} elements, scanned first 2000"
+  },
+  "trial_grace_message": {
+    "message": "Your trial has expired. Pro features available for {days} more day(s). Upgrade to keep access."
+  },
+  "trial_grace_upgrade_btn": {
+    "message": "Upgrade Now"
   }
 }

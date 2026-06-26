@@ -88,3 +88,47 @@ export function isOwnExtensionUrl(url: string | null | undefined): boolean {
   if (!url || !OWN_EXTENSION_ORIGIN) return false;
   return url.startsWith(OWN_EXTENSION_ORIGIN);
 }
+
+// ── Generic "opened tab" tracking ────────────────────────────────────────────
+// Tracks tabs intentionally opened by the extension (e.g. "open image in new
+// tab") so handleTabChange ignores them — preventing unnecessary cache
+// save/load/rescan cycles and scroll position loss when the user closes the
+// new tab and focus returns to the original page.
+
+let pendingOpenedTab = false;
+const openedTabIds = new Set<number>();
+let openedTabCloseGraceUntil = 0;
+
+/** Call BEFORE chrome.tabs.create to arm the pending flag. */
+export function armOpenedTabPending(): void {
+  pendingOpenedTab = true;
+}
+
+/** Called from chrome.tabs.create().then() to record the actual tabId. */
+export function markOpenedTab(tabId: number): void {
+  openedTabIds.add(tabId);
+  pendingOpenedTab = false;
+}
+
+/** Clear the pending flag without recording any tabId (e.g. when tab creation fails). */
+export function clearOpenedTabPending(): void {
+  pendingOpenedTab = false;
+}
+
+/** Synchronous check: is the given tabId (or a pending create) an opened tab? */
+export function isOpenedTab(tabId: number): boolean {
+  return pendingOpenedTab || openedTabIds.has(tabId);
+}
+
+/** Remove tracking for a closed tab and start a short grace period. */
+export function forgetOpenedTab(tabId: number): void {
+  if (openedTabIds.has(tabId)) {
+    openedTabIds.delete(tabId);
+    openedTabCloseGraceUntil = Date.now() + 500;
+  }
+}
+
+/** True if we are within the grace period after closing an opened tab. */
+export function isWithinOpenedTabCloseGrace(): boolean {
+  return Date.now() < openedTabCloseGraceUntil;
+}

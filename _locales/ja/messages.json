@@ -1651,5 +1651,17 @@
   },
   "pro_compare_times_per_month": {
     "message": "times/mo"
+  },
+  "toast_ai_tag_svg_unsupported": {
+    "message": "SVG画像はAIタグ付けに対応していません"
+  },
+  "toast_ai_tag_success_remaining": {
+    "message": "AIタグを追加しました（残り{remaining}回）"
+  },
+  "toast_ai_tag_success_remaining_free": {
+    "message": "AIタグを追加しました（残り{remaining}/{max}回）"
+  },
+  "toast_bg_scan_limit": {
+    "message": "{total}個の要素を検出、先頭2000個をスキャンしました"
   }
 }

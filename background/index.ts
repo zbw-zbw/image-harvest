@@ -549,36 +549,43 @@ async function handleMessage(
             requestBody.licenseKey = licenseKey;
           }
 
-          const resp = await fetch(AI_TAG_API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(requestBody),
-          });
-          const data = (await resp.json()) as {
-            success: boolean;
-            tags?: string[];
-            quotaRemaining?: number;
-            error?: string;
-          };
-          if (!resp.ok || !data.success) {
+          const aiController = new AbortController();
+          const aiTimeout = setTimeout(() => aiController.abort(), 15000);
+          try {
+            const resp = await fetch(AI_TAG_API_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(requestBody),
+              signal: aiController.signal,
+            });
+            const data = (await resp.json()) as {
+              success: boolean;
+              tags?: string[];
+              quotaRemaining?: number;
+              error?: string;
+            };
+            if (!resp.ok || !data.success) {
+              sendResponse({
+                success: false,
+                error: data.error || 'ai_tag_failed',
+                quotaRemaining: data.quotaRemaining,
+              });
+              break;
+            }
+            if (proInfo.isPro && typeof data.quotaRemaining === 'number') {
+              await setLocalQuotaFromServer(data.quotaRemaining);
+            }
+            if (!proInfo.isPro) {
+              await incrementMonthlyFreeAiTag();
+            }
             sendResponse({
-              success: false,
-              error: data.error || 'ai_tag_failed',
+              success: true,
+              tags: data.tags || [],
               quotaRemaining: data.quotaRemaining,
             });
-            break;
+          } finally {
+            clearTimeout(aiTimeout);
           }
-          if (proInfo.isPro && typeof data.quotaRemaining === 'number') {
-            await setLocalQuotaFromServer(data.quotaRemaining);
-          }
-          if (!proInfo.isPro) {
-            await incrementMonthlyFreeAiTag();
-          }
-          sendResponse({
-            success: true,
-            tags: data.tags || [],
-            quotaRemaining: data.quotaRemaining,
-          });
         } catch (error) {
           sendResponse({ success: false, error: (error as Error).message });
         }
@@ -603,33 +610,40 @@ async function handleMessage(
             sendResponse({ success: false, error: 'no_license' });
             break;
           }
-          const resp = await fetch(AI_TAG_BATCH_API_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-              licenseKey: licenseInfo.licenseKey,
-              instanceId: licenseInfo.instanceId,
-              imageUrls,
-            }),
-          });
-          const data = (await resp.json()) as {
-            success: boolean;
-            results?: Array<{ url: string; tags: string[]; success: boolean }>;
-            quotaRemaining?: number;
-            error?: string;
-          };
-          if (!resp.ok || !data.success) {
-            sendResponse({ success: false, error: data.error || 'batch_tag_failed' });
-            break;
+          const batchController = new AbortController();
+          const batchTimeout = setTimeout(() => batchController.abort(), 30000);
+          try {
+            const resp = await fetch(AI_TAG_BATCH_API_URL, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({
+                licenseKey: licenseInfo.licenseKey,
+                instanceId: licenseInfo.instanceId,
+                imageUrls,
+              }),
+              signal: batchController.signal,
+            });
+            const data = (await resp.json()) as {
+              success: boolean;
+              results?: Array<{ url: string; tags: string[]; success: boolean }>;
+              quotaRemaining?: number;
+              error?: string;
+            };
+            if (!resp.ok || !data.success) {
+              sendResponse({ success: false, error: data.error || 'batch_tag_failed' });
+              break;
+            }
+            if (typeof data.quotaRemaining === 'number') {
+              await setLocalQuotaFromServer(data.quotaRemaining);
+            }
+            sendResponse({
+              success: true,
+              results: data.results || [],
+              quotaRemaining: data.quotaRemaining,
+            });
+          } finally {
+            clearTimeout(batchTimeout);
           }
-          if (typeof data.quotaRemaining === 'number') {
-            await setLocalQuotaFromServer(data.quotaRemaining);
-          }
-          sendResponse({
-            success: true,
-            results: data.results || [],
-            quotaRemaining: data.quotaRemaining,
-          });
         } catch (error) {
           sendResponse({ success: false, error: (error as Error).message });
         }

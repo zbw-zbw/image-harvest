@@ -258,6 +258,10 @@ export function handleMessage(message: IncomingMessage): void {
       hideProgress();
       showToast(t('toast_multitab_failed') + (message.error ? ': ' + message.error : ''), 'error');
       break;
+
+    case MESSAGE_TYPES.BG_SCAN_LIMIT_EXCEEDED:
+      showToast(t('toast_bg_scan_limit', { total: message.total ?? 0 }), 'info');
+      break;
   }
 }
 

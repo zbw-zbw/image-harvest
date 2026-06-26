@@ -5,7 +5,7 @@ import { MESSAGE_TYPES, TIMING } from '../shared/constants';
 import { isRestrictedUrl } from '../shared/utils';
 import { clearTabImageCache, getTabImageCache, saveTabImageCache } from '../shared/storage';
 import { loadAiTagsMap } from '../shared/ai-tags-store';
-import { elements, state, store } from './state';
+import { elements, state, store, evictOldestTabCache } from './state';
 import { fetchImages, processImageExtras } from './scan';
 import { applyFilters, refreshVisibility } from './filter';
 import { updateSelectionUI } from './actions';
@@ -20,6 +20,8 @@ import {
   isIgnoredExtensionTab,
   markIgnoredExtensionTab,
   isWithinReverseSearchCloseGrace,
+  isOpenedTab,
+  isWithinOpenedTabCloseGrace,
 } from './reverse-search-tabs';
 // Module-level rescan debounce timer
 let tabUpdatedTimer: ReturnType<typeof setTimeout> | null = null;
@@ -154,6 +156,7 @@ export async function loadCurrentTab(forceRescan = false, targetTabId?: number):
         selectedImages: new Set(),
         filteredImages: [...state.filteredImages],
         lastRenderedFilteredIds: state.lastRenderedFilteredIds,
+        lastAccessed: Date.now(),
       });
 
       // Re-derive extras (file size, dimensions, colors, pHash) that are
@@ -195,9 +198,15 @@ export async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Pr
   if (
     isReverseSearchTab(newTabId) ||
     isIgnoredExtensionTab(newTabId) ||
-    isWithinReverseSearchCloseGrace()
+    isWithinReverseSearchCloseGrace() ||
+    isOpenedTab(newTabId) ||
+    isWithinOpenedTabCloseGrace()
   )
     return;
+
+  // Re-activating the current tab (e.g. focus returns after closing a new
+  // window) — nothing to do.
+  if (newTabId === state.currentTabId) return;
 
   // Remember the previous tabId so we can restore it if the target turns
   // out to be an extension page discovered only after the async check.
@@ -213,9 +222,10 @@ export async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Pr
       if (oldest !== undefined) state.tabCache.delete(oldest);
     }
 
-    // Save scroll position so we can restore it when switching back
-    const gridWrapper = document.querySelector<HTMLElement>('.image-grid-wrapper');
-    const scrollTop = gridWrapper?.scrollTop ?? 0;
+    // Save scroll position so we can restore it when switching back.
+    // The actual scrollable container is .image-grid (overflow-y: auto),
+    // NOT .image-grid-wrapper (which is a non-scrolling flex parent).
+    const scrollTop = elements.imageGrid?.scrollTop ?? 0;
 
     state.tabCache.set(state.currentTabId, {
       url: cachedUrl,
@@ -225,7 +235,9 @@ export async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Pr
       lastRenderedFilteredIds: state.lastRenderedFilteredIds,
       similarGroups: [...state.similarGroups],
       scrollTop,
+      lastAccessed: Date.now(),
     });
+    evictOldestTabCache(state.tabCache);
     if (cachedUrl) {
       saveTabImageCache(state.currentTabId, cachedUrl, state.allImages);
     }
@@ -285,32 +297,15 @@ export async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Pr
         cached.images[cached.images.length - 1]?.id ===
           state.allImages[state.allImages.length - 1]?.id;
 
-      // If the images in memory are already the same as what we cached,
-      // skip store updates to avoid triggering Preact re-renders that
-      // would rebuild the list DOM and reset the scroll position.
-      if (!currentImagesMatch) {
-        const patch: Record<string, unknown> = {
-          allImages: [...cached.images],
-          selectedImages: new Set(cached.selectedImages),
-          similarGroups: (cached.similarGroups || []).map((g) => [...g]),
-        };
-        if (cached.filteredImages && cached.filteredImages.length > 0) {
-          patch.filteredImages = [...cached.filteredImages];
-          patch.lastRenderedFilteredIds = cachedFilteredIds;
-        }
-        store.setMany(patch as Partial<typeof state>);
-      }
-
-      // Ensure the normal-page UI is visible
-      hideLoading();
+      // ── 1. Prepare DOM containers BEFORE any state mutation ──────────
+      // The grid might be hidden from a previous no-cache tab switch
+      // (which sets display:none on the wrapper). Making containers visible
+      // FIRST ensures Preact renders into a correctly-laid-out parent so
+      // the browser composites everything in a single paint frame.
       const stateScreensMount = document.querySelector<HTMLElement>(
         '[data-preact-mount="state-screens"]'
       );
       if (stateScreensMount) stateScreensMount.style.display = 'none';
-      state.uiScreen = 'images';
-      document.querySelectorAll('.toolbar, .status-bar').forEach((el) => {
-        el.classList.remove('hidden');
-      });
 
       const gridWrapper = document.querySelector<HTMLElement>('.image-grid-wrapper');
       if (gridWrapper) {
@@ -319,9 +314,98 @@ export async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Pr
         gridWrapper.style.visibility = '';
       }
       if (elements.imageGrid) elements.imageGrid.classList.remove('hidden');
+      document.querySelectorAll('.toolbar, .status-bar').forEach((el) => {
+        el.classList.remove('hidden');
+        el.classList.remove('scanning-disabled');
+      });
 
-      if (!currentImagesMatch && (!cached.filteredImages || cached.filteredImages.length === 0)) {
-        applyFilters();
+      // ── 2. Atomic state update (queueMicrotask + CSS fade-in) ────────
+      // Strategy: Do NOT hide the grid (no opacity:0 — avoids white flash).
+      // Instead, let Preact swap DOM in its microtask while old content is
+      // still displayed. Then, in OUR queueMicrotask (guaranteed to fire
+      // after Preact's Promise-based render, and BEFORE any browser paint
+      // per the event-loop spec: all microtasks drain before rendering),
+      // we restore scrollTop and trigger a subtle CSS fade-in animation.
+      // Result: the browser's first paint already shows new content at the
+      // correct scroll position, with a smooth opacity transition.
+      if (!currentImagesMatch) {
+        const patch: Record<string, unknown> = {
+          allImages: [...cached.images],
+          selectedImages: new Set(cached.selectedImages),
+          similarGroups: (cached.similarGroups || []).map((g) => [...g]),
+          uiScreen: 'images',
+          scanSkeletonsToShow: 0,
+          scanProgress: {
+            ...state.scanProgress,
+            visible: false,
+            indeterminate: false,
+            currentUrl: '',
+          },
+        };
+        if (cached.filteredImages && cached.filteredImages.length > 0) {
+          patch.filteredImages = [...cached.filteredImages];
+          patch.lastRenderedFilteredIds = cachedFilteredIds;
+        }
+        store.setMany(patch as Partial<typeof state>);
+
+        if (!cached.filteredImages || cached.filteredImages.length === 0) {
+          applyFilters({ skipScrollReset: true });
+          // Guard: applyFilters→renderImages→showEmpty may hide the grid
+          // and set uiScreen='empty' if filters produce 0 results. Undo
+          // those side effects to prevent "暂无数据" flash during tab switch.
+          if (gridWrapper) {
+            gridWrapper.classList.remove('hidden');
+            gridWrapper.style.removeProperty('display');
+          }
+          if (elements.imageGrid) elements.imageGrid.classList.remove('hidden');
+          if (stateScreensMount) stateScreensMount.style.display = 'none';
+          state.uiScreen = 'images';
+        }
+
+        // Restore scroll + smooth reveal AFTER Preact commits the new DOM.
+        // Preact's render is scheduled via Promise.resolve().then(process),
+        // which is a microtask queued DURING store.setMany(). Our
+        // queueMicrotask() is queued AFTER — FIFO guarantees it fires once
+        // Preact has finished. The browser only paints after the entire
+        // microtask queue drains, so the user never sees an intermediate state.
+        const savedScroll = cached.scrollTop ?? 0;
+        queueMicrotask(() => {
+          if (!elements.imageGrid) return;
+          if (savedScroll) elements.imageGrid.scrollTop = savedScroll;
+          // Trigger a smooth CSS fade-in animation.
+          // Start from low opacity and animate to full.
+          elements.imageGrid.classList.add('tab-switch-fadein');
+          // Remove the animation class after it completes to avoid
+          // interfering with other opacity-related styles.
+          const onEnd = () => {
+            elements.imageGrid?.classList.remove('tab-switch-fadein');
+            elements.imageGrid?.removeEventListener('animationend', onEnd);
+          };
+          elements.imageGrid.addEventListener('animationend', onEnd, { once: true });
+          // Fallback cleanup in case animationend doesn't fire (e.g. tab
+          // switched away mid-animation, or browser throttles animation).
+          setTimeout(() => {
+            if (elements.imageGrid) {
+              elements.imageGrid.classList.remove('tab-switch-fadein');
+            }
+          }, 200);
+        });
+      } else {
+        // Images already match — just ensure UI flags are consistent.
+        state.uiScreen = 'images';
+        state.scanSkeletonsToShow = 0;
+        if (state.scanProgress.visible) {
+          state.scanProgress = {
+            ...state.scanProgress,
+            visible: false,
+            indeterminate: false,
+            currentUrl: '',
+          };
+        }
+        // No DOM change pending — restore scroll directly.
+        if (cached.scrollTop && elements.imageGrid) {
+          elements.imageGrid.scrollTop = cached.scrollTop;
+        }
       }
 
       if (elements.foundCount) {
@@ -329,31 +413,6 @@ export async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Pr
       }
       updateSelectionUI();
       checkNarrowMode();
-
-      // Restore scroll position from cache. We need to wait until Preact
-      // has finished re-rendering the list DOM. Use a MutationObserver on
-      // the grid wrapper — once the children are rebuilt, restore scroll.
-      // Fall back to a timer if no mutation fires (e.g. data was identical).
-      if (cached.scrollTop && gridWrapper) {
-        const savedScroll = cached.scrollTop;
-        let restored = false;
-        const restore = () => {
-          if (restored) return;
-          restored = true;
-          gridWrapper.scrollTop = savedScroll;
-        };
-        const observer = new MutationObserver(() => {
-          observer.disconnect();
-          // Let the browser paint the new DOM, then scroll
-          requestAnimationFrame(restore);
-        });
-        observer.observe(gridWrapper, { childList: true, subtree: true });
-        // Safety fallback: if no mutations within 150ms (data unchanged), restore anyway
-        setTimeout(() => {
-          observer.disconnect();
-          restore();
-        }, 150);
-      }
 
       // Now verify the tab URL asynchronously — roll back if stale
       let newTab: chrome.tabs.Tab | undefined;
