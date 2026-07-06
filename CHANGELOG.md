@@ -54,6 +54,41 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
+## [1.0.10] — 2026-07-06
+
+### 🔒 Security
+
+- **XSS injection prevention**: All user-controlled and web-page-provided data (tab titles, URLs, collection items, dedup image URLs, color hex values) are now HTML-escaped before insertion into `innerHTML` templates. New `escapeHtml()` utility function added to `shared/utils.ts`.
+- **SSRF hardening**: Extended private IP blocklist to cover `0.0.0.0/8`, `127.0.0.0/8`, `100.64.0.0/10` (CGNAT), `198.18.0.0/15` (benchmarking). Added IPv6 checks for `::` (unspecified), expanded IPv4-mapped format, full `fe80::/10` link-local range, and multicast (`ff00::/8`). Blocks non-standard IP representations (decimal/octal/hex integers) and URLs with embedded credentials (`user@host`).
+- **Redirect bypass prevention**: `fetchImageData` and `fetchImageMetaProxy` now re-validate `response.url` after HTTP redirects to prevent DNS rebinding attacks.
+
+### 🐛 Fixed
+
+- **License deactivation slot leak**: `deactivateLicense()` now checks the remote deactivation result and does NOT clear local license data if the server reports failure — prevents permanently leaking activation slots.
+- **AI quota race condition (TOCTOU)**: AI tagging now uses optimistic quota deduction — deducts locally before the API request and rolls back on failure (including abort/timeout). Prevents quota overuse from rapid concurrent clicks.
+- **AI batch quota check**: `AI_TAG_BATCH` now verifies `remaining >= batchSize` instead of just `remaining > 0`, preventing batches larger than the remaining quota.
+- **Live monitor timer leak**: `flushTimer` in `monitor.ts` promoted to module scope and properly cleared in `stopLiveMonitoring()`, preventing stale mutation flushes after monitoring stops.
+- **Batch download flicker eliminated**: Progress modal now uses a 300ms show-delay — fast downloads (< 300ms) never display the modal, eliminating the flash-of-progress-bar that caused the image list to visually flicker on every click.
+- **Download dropdown flicker**: Dropdown closes instantly via `display:none` (no CSS transition) and uses a module-level lock variable to prevent `mouseenter` from re-opening during async download operations.
+- **Rating prompt overlap**: Rating prompt modal now waits until image scanning completes (with a 30s timeout) before checking visibility, preventing overlap with loading skeletons.
+- **Tab cache consistency**: Removed hardcoded `MAX_TAB_CACHE = 10` in `tab-lifecycle.ts`; unified to use `state.ts` exported `MAX_TAB_CACHE = 20` with LRU eviction.
+- **Filter result false-positive skip**: Improved filter fingerprint comparison to reduce incorrect "no change" short-circuits.
+
+### ⚡ Performance
+
+- **CSS content extraction capped**: `extractCssContentImages` now limits DOM traversal to 5,000 elements (was unlimited) and yields the main thread every 500 elements via `setTimeout(0)`.
+- **Visibility check O(n+m)**: `checkImagesVisibility` now builds a single URL→Element index with one DOM traversal pass, then queries it per-URL — down from O(n×m) repeated full-DOM scans.
+- **Base64 encoding 10×faster**: `arrayBufferToBase64` rewritten to use 8KB chunk processing instead of per-byte string concatenation.
+- **Fetch timeouts added**: `fetchImageMetaProxy` (10s) and `fetchImageData` (30s) now use `AbortController` timeouts, preventing indefinite hangs on slow servers.
+- **Progress update throttling**: `updateProgress` now throttles state updates to max once per 150ms, reducing Preact re-render storms from 40+/sec to ~7/sec during batch downloads.
+
+### 🧹 Housekeeping
+
+- **Progress controller refactored**: Consolidated 6 module-level progress variables into a single `progressController` object with `show/hide/update/abort` methods.
+- **Download dropdown lock refactored**: Replaced fragile `dataset.dlLocked` DOM attribute with module-level `dlDropdownLocked` variable + `lockDlDropdown()/unlockDlDropdown()` helpers.
+
+---
+
 ## [1.0.9] — 2026-06-26
 
 ### ✨ Added

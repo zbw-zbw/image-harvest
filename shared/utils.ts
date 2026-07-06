@@ -334,3 +334,16 @@ export function deepMerge<T extends Record<string, any>>(target: T, source: Part
   }
   return output as T;
 }
+
+/**
+ * Escape HTML special characters to prevent XSS injection when inserting
+ * user-controlled or web-page-provided data into innerHTML.
+ */
+export function escapeHtml(str: string): string {
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}

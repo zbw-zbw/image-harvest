@@ -485,34 +485,84 @@ export function showToast(message: string, type?: import('./state').ToastType): 
 // ============================================
 // Progress Modal
 // ============================================
-let progressAbortCallback: (() => void) | null = null;
+
+const progressController = {
+  abortCallback: null as (() => void) | null,
+  showTimer: null as ReturnType<typeof setTimeout> | null,
+  throttleTimer: null as ReturnType<typeof setTimeout> | null,
+  pendingUpdate: null as {
+    current: number;
+    total: number;
+    currentFile: string;
+    imageCount: number | null;
+  } | null,
+  pendingVisible: false,
+
+  SHOW_DELAY_MS: 300,
+  THROTTLE_MS: 150,
+
+  show(title: string, onAbort?: () => void): void {
+    this.abortCallback = onAbort || null;
+    this.pendingVisible = true;
+    if (this.showTimer) clearTimeout(this.showTimer);
+    this.showTimer = setTimeout(() => {
+      this.showTimer = null;
+      if (this.pendingVisible) {
+        state.downloadProgress = {
+          ...state.downloadProgress,
+          visible: true,
+          title: title || t('progress_downloading'),
+        };
+      }
+    }, this.SHOW_DELAY_MS);
+  },
+
+  hide(): void {
+    this.abortCallback = null;
+    this.pendingVisible = false;
+    if (this.showTimer) {
+      clearTimeout(this.showTimer);
+      this.showTimer = null;
+    }
+    if (this.throttleTimer) {
+      clearTimeout(this.throttleTimer);
+      this.throttleTimer = null;
+    }
+    this.pendingUpdate = null;
+    state.downloadProgress = { ...state.downloadProgress, visible: false };
+  },
+
+  update(current: number, total: number, currentFile?: string, imageCount?: number | null): void {
+    const data = { current, total, currentFile: currentFile || '', imageCount: imageCount ?? null };
+    this.pendingUpdate = data;
+    if (!this.throttleTimer) {
+      state.downloadProgress = { ...state.downloadProgress, ...data };
+      this.throttleTimer = setTimeout(() => {
+        this.throttleTimer = null;
+        if (this.pendingUpdate) {
+          state.downloadProgress = { ...state.downloadProgress, ...this.pendingUpdate };
+          this.pendingUpdate = null;
+        }
+      }, this.THROTTLE_MS);
+    }
+  },
+
+  abort(): void {
+    if (this.abortCallback) this.abortCallback();
+    this.hide();
+  },
+};
 
 export function showProgress(title: string, onAbort?: () => void): void {
-  progressAbortCallback = onAbort || null;
-  // Mutating a single field on the .downloadProgress object would not be
-  // observed by the Proxy (it watches top-level state.* assignments only),
-  // so we replace the whole object to trigger the <DownloadProgressModal>
-  // re-render. Same pattern used in updateProgress / hideProgress.
-  state.downloadProgress = {
-    ...state.downloadProgress,
-    visible: true,
-    title: title || t('progress_downloading'),
-  };
+  progressController.show(title, onAbort);
 }
 
 export function hideProgress(): void {
-  progressAbortCallback = null;
-  state.downloadProgress = {
-    ...state.downloadProgress,
-    visible: false,
-  };
+  progressController.hide();
 }
 
 export function handleProgressClose(): void {
-  if (progressAbortCallback) {
-    progressAbortCallback();
-  }
-  hideProgress();
+  progressController.abort();
 }
 
 export function updateProgress(
@@ -521,13 +571,7 @@ export function updateProgress(
   currentFile?: string,
   imageCount?: number | null
 ): void {
-  state.downloadProgress = {
-    ...state.downloadProgress,
-    current,
-    total,
-    currentFile: currentFile || '',
-    imageCount: imageCount ?? null,
-  };
+  progressController.update(current, total, currentFile, imageCount);
 }
 
 // ============================================

@@ -10,6 +10,7 @@
 
 import type JSZipType from 'jszip';
 import { collectionGetAll } from '../shared/collection';
+import { escapeHtml } from '../shared/utils';
 import { t } from '../shared/i18n';
 import type { CollectionItem, ImageItem } from '../shared/types';
 import {
@@ -305,41 +306,49 @@ export async function loadCollection(searchQuery = ''): Promise<void> {
             const dims = item.width && item.height ? `${item.width}×${item.height}` : '';
             const format = ((item.format as string | undefined) || 'unknown').toUpperCase();
             const fileSize = item.fileSize ? formatBytes(item.fileSize as number) : '';
+            const safeUrl = escapeHtml(item.url);
+            const safeId = escapeHtml(item.id);
+            const safeFormat = escapeHtml(format);
+            const selectedClass = selectedCollectionItems.has(item.id) ? ' selected' : '';
+            const checkedClass = selectedCollectionItems.has(item.id) ? ' checked' : '';
+            const checkIcon = selectedCollectionItems.has(item.id)
+              ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>'
+              : '';
             return `
-          <div class="image-card collection-card${selectedCollectionItems.has(item.id) ? ' selected' : ''}" data-id="${item.id}">
+          <div class="image-card collection-card${selectedClass}" data-id="${safeId}">
             <div class="collection-item-select">
-              <div class="collection-card-checkbox${selectedCollectionItems.has(item.id) ? ' checked' : ''}" data-id="${item.id}">
-                <span class="checkbox-icon">${selectedCollectionItems.has(item.id) ? '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>' : ''}</span>
+              <div class="collection-card-checkbox${checkedClass}" data-id="${safeId}">
+                <span class="checkbox-icon">${checkIcon}</span>
               </div>
             </div>
             <div class="card-thumb checkerboard">
-              <img src="${item.url}" alt="" loading="lazy">
+              <img src="${safeUrl}" alt="" loading="lazy">
             </div>
             <div class="card-info-bar">
               <div class="card-tags">
-                <span class="card-tag format">${format}</span>
+                <span class="card-tag format">${safeFormat}</span>
                 ${dims ? `<span class="card-tag dims">${dims}</span>` : ''}
                 ${fileSize ? `<span class="card-tag filesize">${fileSize}</span>` : ''}
               </div>
               <div class="card-actions">
-                <button class="card-action-btn btn-search-collection" title="${t('menu_reverse_search')}" data-url="${item.url}">
+                <button class="card-action-btn btn-search-collection" title="${t('menu_reverse_search')}" data-url="${safeUrl}">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                 </button>
-                <button class="card-action-btn btn-dl-collection" data-url="${item.url}" data-format="${item.format || ''}" title="Download">
+                <button class="card-action-btn btn-dl-collection" data-url="${safeUrl}" data-format="${escapeHtml(String(item.format || ''))}" title="Download">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
                 </button>
-                <button class="card-action-btn btn-remove-collection" data-id="${item.id}" title="${t('card_remove_from_collection')}">
+                <button class="card-action-btn btn-remove-collection" data-id="${safeId}" title="${t('card_remove_from_collection')}">
                   <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                 </button>
               </div>
             </div>
             <div class="card-url-row">
-              <div class="card-url" title="${item.url}">${item.url}</div>
+              <div class="card-url" title="${safeUrl}">${safeUrl}</div>
               <div class="card-url-actions">
-                <button class="card-action-btn btn-copy-collection" data-url="${item.url}" title="${t('card_copy_url')}">
+                <button class="card-action-btn btn-copy-collection" data-url="${safeUrl}" title="${t('card_copy_url')}">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
                 </button>
-                <button class="card-action-btn btn-open-collection" data-url="${item.url}" title="${t('card_open_in_new_tab')}">
+                <button class="card-action-btn btn-open-collection" data-url="${safeUrl}" title="${t('card_open_in_new_tab')}">
                   <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
                 </button>
               </div>

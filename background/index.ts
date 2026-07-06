@@ -462,11 +462,13 @@ async function handleMessage(
       case MESSAGE_TYPES.DEACTIVATE_LICENSE: {
         try {
           const deactivateResult = await deactivateLicense();
-          broadcastToPopup({
-            type: MESSAGE_TYPES.LICENSE_STATUS_CHANGED,
-            isPro: false,
-            status: 'inactive',
-          });
+          if (deactivateResult.success) {
+            broadcastToPopup({
+              type: MESSAGE_TYPES.LICENSE_STATUS_CHANGED,
+              isPro: false,
+              status: 'inactive',
+            });
+          }
           sendResponse(deactivateResult);
         } catch (error) {
           sendResponse({ success: false, error: (error as Error).message });
@@ -517,6 +519,7 @@ async function handleMessage(
 
           let licenseKey = '';
           let instanceId = '';
+          let previousQuota: number | null = null;
 
           if (proInfo.isPro) {
             const remaining = await getRemainingQuota();
@@ -524,8 +527,15 @@ async function handleMessage(
               sendResponse({ success: false, error: 'quota_exceeded', quotaRemaining: 0 });
               break;
             }
+            // Optimistic deduction: deduct 1 before making the request to prevent
+            // TOCTOU race conditions when multiple requests are in flight.
+            previousQuota = remaining;
+            await setLocalQuotaFromServer(remaining - 1);
+
             const licenseInfo = await getLicenseInfo();
             if (!licenseInfo.hasLicense) {
+              // Rollback the optimistic deduction
+              await setLocalQuotaFromServer(previousQuota);
               sendResponse({ success: false, error: 'no_license' });
               break;
             }
@@ -537,6 +547,9 @@ async function handleMessage(
               sendResponse({ success: false, error: 'monthly_limit', quotaRemaining: 0 });
               break;
             }
+            // Optimistic deduction for free tier — increment before sending
+            await incrementMonthlyFreeAiTag();
+
             instanceId = await getOrCreateInstanceId();
           }
 
@@ -551,6 +564,7 @@ async function handleMessage(
 
           const aiController = new AbortController();
           const aiTimeout = setTimeout(() => aiController.abort(), 15000);
+          let aiTagSuccess = false;
           try {
             const resp = await fetch(AI_TAG_API_URL, {
               method: 'POST',
@@ -565,6 +579,10 @@ async function handleMessage(
               error?: string;
             };
             if (!resp.ok || !data.success) {
+              // Request failed — rollback the optimistic deduction
+              if (proInfo.isPro && previousQuota !== null) {
+                await setLocalQuotaFromServer(previousQuota);
+              }
               sendResponse({
                 success: false,
                 error: data.error || 'ai_tag_failed',
@@ -572,12 +590,11 @@ async function handleMessage(
               });
               break;
             }
+            // Success — use server's authoritative quota value to correct local state
             if (proInfo.isPro && typeof data.quotaRemaining === 'number') {
               await setLocalQuotaFromServer(data.quotaRemaining);
             }
-            if (!proInfo.isPro) {
-              await incrementMonthlyFreeAiTag();
-            }
+            aiTagSuccess = true;
             sendResponse({
               success: true,
               tags: data.tags || [],
@@ -585,6 +602,10 @@ async function handleMessage(
             });
           } finally {
             clearTimeout(aiTimeout);
+            // Rollback optimistic deduction on abort/network errors
+            if (!aiTagSuccess && proInfo.isPro && previousQuota !== null) {
+              await setLocalQuotaFromServer(previousQuota);
+            }
           }
         } catch (error) {
           sendResponse({ success: false, error: (error as Error).message });
@@ -600,18 +621,34 @@ async function handleMessage(
             sendResponse({ success: false, error: 'pro_required' });
             break;
           }
-          const remaining = await getRemainingQuota();
-          if (remaining <= 0) {
-            sendResponse({ success: false, error: 'quota_exceeded', quotaRemaining: 0 });
+          const batchSize = Array.isArray(imageUrls) ? imageUrls.length : 0;
+          if (batchSize === 0) {
+            sendResponse({ success: false, error: 'no_images' });
             break;
           }
+          const remaining = await getRemainingQuota();
+          if (remaining < batchSize) {
+            sendResponse({
+              success: false,
+              error: 'quota_exceeded',
+              quotaRemaining: remaining,
+            });
+            break;
+          }
+          const previousQuota = remaining;
+          // Optimistic deduction: deduct the full batch size up front
+          await setLocalQuotaFromServer(remaining - batchSize);
+
           const licenseInfo = await getLicenseInfo();
           if (!licenseInfo.hasLicense) {
+            // Rollback
+            await setLocalQuotaFromServer(previousQuota);
             sendResponse({ success: false, error: 'no_license' });
             break;
           }
           const batchController = new AbortController();
           const batchTimeout = setTimeout(() => batchController.abort(), 30000);
+          let batchSuccess = false;
           try {
             const resp = await fetch(AI_TAG_BATCH_API_URL, {
               method: 'POST',
@@ -630,12 +667,16 @@ async function handleMessage(
               error?: string;
             };
             if (!resp.ok || !data.success) {
+              // Rollback optimistic deduction
+              await setLocalQuotaFromServer(previousQuota);
               sendResponse({ success: false, error: data.error || 'batch_tag_failed' });
               break;
             }
+            // Use server's authoritative quota value
             if (typeof data.quotaRemaining === 'number') {
               await setLocalQuotaFromServer(data.quotaRemaining);
             }
+            batchSuccess = true;
             sendResponse({
               success: true,
               results: data.results || [],
@@ -643,6 +684,10 @@ async function handleMessage(
             });
           } finally {
             clearTimeout(batchTimeout);
+            // Rollback optimistic deduction on abort/network errors
+            if (!batchSuccess) {
+              await setLocalQuotaFromServer(previousQuota);
+            }
           }
         } catch (error) {
           sendResponse({ success: false, error: (error as Error).message });

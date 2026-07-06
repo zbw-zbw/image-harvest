@@ -548,6 +548,20 @@ function cacheElements(): void {
   });
 }
 
+// Download dropdown lock — prevents mouseenter from re-opening the dropdown
+// after a click triggers a download. Released on mouseleave.
+let dlDropdownLocked = false;
+
+function lockDlDropdown(): void {
+  dlDropdownLocked = true;
+  const dlGroup = document.getElementById('download-group');
+  if (dlGroup) dlGroup.classList.remove('dl-dropdown-open');
+}
+
+function unlockDlDropdown(): void {
+  dlDropdownLocked = false;
+}
+
 function bindEvents(): void {
   // Refresh / rescan images
   if (elements.btnRefresh) {
@@ -586,7 +600,10 @@ function bindEvents(): void {
       // Close the dropdown immediately on click — the download starts,
       // user doesn't need the format menu visible anymore.
       const dlGroup = document.getElementById('download-group');
-      if (dlGroup) dlGroup.classList.remove('dl-dropdown-open');
+      if (dlGroup) {
+        dlGroup.classList.remove('dl-dropdown-open');
+      }
+      lockDlDropdown();
       const hasSelection = state.selectedImages.size > 0;
       const imagesToDownload = hasSelection
         ? state.filteredImages.filter((img) => state.selectedImages.has(img.id))
@@ -614,6 +631,8 @@ function bindEvents(): void {
     elements.downloadDropdown.addEventListener('click', async (e) => {
       const item = (e.target as HTMLElement).closest<HTMLElement>('[data-format]');
       if (item) {
+        e.stopPropagation();
+        lockDlDropdown();
         const format = item.dataset.format;
         // Quota check: non-original formats use monthly formatConvert quota
         if (!state.isProUser && format !== 'original') {
@@ -651,31 +670,30 @@ function bindEvents(): void {
   const dlGroup = document.getElementById('download-group');
   if (dlGroup) {
     let dlHideTimer: ReturnType<typeof setTimeout> | null = null;
-    let dlLocked = false; // Lock prevents mouseenter from re-opening after click
-    dlGroup.addEventListener('mouseenter', () => {
-      if (dlLocked) return;
+
+    function openDlDropdown() {
+      if (dlDropdownLocked) return;
       if (dlHideTimer) {
         clearTimeout(dlHideTimer);
         dlHideTimer = null;
       }
-      dlGroup.classList.add('dl-dropdown-open');
-    });
+      dlGroup!.classList.add('dl-dropdown-open');
+    }
+
+    function closeDlDropdown() {
+      dlGroup!.classList.remove('dl-dropdown-open');
+    }
+
+    dlGroup.addEventListener('mouseenter', openDlDropdown);
     dlGroup.addEventListener('mouseleave', () => {
-      dlLocked = false; // Unlock when mouse fully leaves the group
+      unlockDlDropdown();
       if (dlHideTimer) {
         clearTimeout(dlHideTimer);
         dlHideTimer = null;
       }
-      dlHideTimer = setTimeout(() => {
-        dlGroup.classList.remove('dl-dropdown-open');
-      }, 100);
+      dlHideTimer = setTimeout(closeDlDropdown, 100);
     });
-    // When the download button is clicked, lock the dropdown closed until
-    // the user moves the mouse away and back.
-    dlGroup.addEventListener('click', () => {
-      dlLocked = true;
-      dlGroup.classList.remove('dl-dropdown-open');
-    });
+    dlGroup.addEventListener('click', lockDlDropdown);
   }
 
   // View toggle

@@ -1,7 +1,13 @@
 // Content Script Highlight Module
 // Handles image highlighting and locating functionality
 
-import { resolveUrl, isDataUri, generateDataUriKey, extractBackgroundUrls } from '../shared/utils';
+import {
+  resolveUrl,
+  isDataUri,
+  isImageDataUri,
+  generateDataUriKey,
+  extractBackgroundUrls,
+} from '../shared/utils';
 import { parseSrcset, isElementAccessibleWithoutInteraction } from './utils';
 import { collectShadowRoots } from './shadow-iframe';
 
@@ -887,38 +893,149 @@ export function removeAllHighlights(): void {
 }
 
 /**
+ * Build a URL→Element[] index with a single DOM traversal pass.
+ * Returns a Map from image URL to all matching visible DOM elements.
+ * Used by `checkImagesVisibility` to avoid O(n*m) repeated full-DOM scans.
+ */
+function buildImageElementIndex(): Map<string, Element[]> {
+  const index = new Map<string, Element[]>();
+
+  function addToIndex(resolvedUrl: string, element: Element): void {
+    const list = index.get(resolvedUrl);
+    if (list) {
+      list.push(element);
+    } else {
+      index.set(resolvedUrl, [element]);
+    }
+  }
+
+  function addUrl(rawUrl: string, element: Element): void {
+    if (!rawUrl) return;
+    if (isDataUri(rawUrl)) {
+      if (!isImageDataUri(rawUrl)) return;
+      const key = generateDataUriKey(rawUrl);
+      addToIndex(key, element);
+    } else {
+      const resolved = resolveUrl(rawUrl);
+      addToIndex(resolved, element);
+    }
+  }
+
+  // 1. <img> elements
+  const imgs = document.querySelectorAll('img');
+  for (const img of imgs) {
+    addUrl(img.currentSrc || img.src, img);
+    if (img.srcset) {
+      const parsed = parseSrcset(img.srcset);
+      for (const { url } of parsed) addUrl(url, img);
+    }
+    for (const attr of ['data-src', 'data-original', 'data-lazy', 'data-lazy-src']) {
+      addUrl(img.getAttribute(attr) || '', img);
+    }
+  }
+
+  // 2. <picture> > <source>
+  for (const source of document.querySelectorAll('picture source')) {
+    for (const attr of ['srcset', 'data-srcset', 'src', 'data-src']) {
+      const val = source.getAttribute(attr);
+      if (!val) continue;
+      if (attr.includes('srcset')) {
+        for (const { url } of parseSrcset(val)) addUrl(url, source);
+      } else {
+        addUrl(val, source);
+      }
+    }
+  }
+
+  // 3. <video poster>
+  for (const video of document.querySelectorAll<HTMLVideoElement>('video[poster]')) {
+    addUrl(video.poster, video);
+  }
+
+  // 4. <input type="image">
+  for (const input of document.querySelectorAll<HTMLInputElement>('input[type="image"]')) {
+    addUrl(input.src, input);
+  }
+
+  // 5. <object> and <embed>
+  for (const obj of document.querySelectorAll<HTMLObjectElement>('object[data]')) {
+    addUrl(obj.data, obj);
+  }
+  for (const embed of document.querySelectorAll<HTMLEmbedElement>('embed[src]')) {
+    addUrl(embed.src, embed);
+  }
+
+  // 6. Background images on body and descendants (capped at 2000 elements)
+  const bgElements = document.querySelectorAll('body, body *');
+  const bgLimit = Math.min(bgElements.length, 2000);
+  for (let i = 0; i < bgLimit; i++) {
+    const el = bgElements[i];
+    try {
+      const style = window.getComputedStyle(el);
+      const bg = style.backgroundImage;
+      if (bg && bg !== 'none') {
+        for (const u of extractBackgroundUrls(bg)) addUrl(u, el);
+      }
+      for (const pseudo of ['::before', '::after']) {
+        const pStyle = window.getComputedStyle(el, pseudo);
+        const content = pStyle.content;
+        if (content && content !== 'none' && content !== 'normal' && content !== '""') {
+          for (const u of extractBackgroundUrls(content)) addUrl(u, el);
+        }
+      }
+    } catch {
+      /* skip */
+    }
+  }
+
+  // 7. Lazy-load data-* attributes on non-img elements
+  const lazyAttrs = [
+    'data-src',
+    'data-original',
+    'data-bg',
+    'data-bg-src',
+    'data-background',
+    'data-image',
+  ];
+  for (let i = 0; i < bgLimit; i++) {
+    const el = bgElements[i];
+    for (const attr of lazyAttrs) {
+      const val = el.getAttribute(attr);
+      if (!val) continue;
+      const urlMatch = val.match(/url\(['"]?([^'")]+)['"]?\)/);
+      addUrl(urlMatch ? urlMatch[1] : val, el);
+    }
+  }
+
+  return index;
+}
+
+/**
  * Check visibility of multiple images by finding their DOM elements and
  * running `isElementAccessibleWithoutInteraction` in real-time.
- * Returns a map of imageUrl → visible (true/false).
- * This aligns "visible only" filtering with the highlight logic: an image
- * is considered visible iff it can be highlighted (i.e. findImageElement
- * returns a valid candidate via pickBestCandidate).
- *
- * Performance note: findImageElement does heavy DOM traversal for each URL.
- * For large image lists we yield to the main thread periodically to avoid
- * blocking user interaction.
+ * Builds a single URL→Element[] index once, then queries it for each URL
+ * (O(n+m) instead of O(n*m)).
  */
 export function checkImagesVisibility(imageUrls: string[]): Record<string, boolean> {
   const result: Record<string, boolean> = {};
+  const index = buildImageElementIndex();
 
   for (const url of imageUrls) {
-    const element = findImageElement(url);
+    // Look up candidates from the pre-built index
+    const lookupKey = isDataUri(url) ? generateDataUriKey(url) : url;
+    const candidates = index.get(lookupKey) || [];
+    const element = pickBestCandidate(candidates);
+
     if (!element) {
       result[url] = false;
       continue;
     }
 
-    // Apply the same extra checks as addHighlight so "visible only"
-    // filtering matches the highlight behaviour exactly.
-
-    // Metadata elements (<link>, <meta>) exist in <head> — they are
-    // "found" but not visually present on the page, so mark invisible.
     if (isMetadataElement(element)) {
       result[url] = false;
       continue;
     }
 
-    // Zero-size or origin-pinned tiny elements are not truly visible.
     const rect = element.getBoundingClientRect();
     const hasZeroSize = rect.width < 2 || rect.height < 2;
     const isAtOriginSmall =

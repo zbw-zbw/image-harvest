@@ -64,19 +64,30 @@ export async function fetchImageMetaProxy(
   if (!isAllowedFetchUrl(url)) {
     throw new Error('URL not allowed: must be public http/https');
   }
-  const response = await fetch(url, {
-    method: 'HEAD',
-    headers: { Accept: 'image/*' },
-  });
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status}`);
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
+  try {
+    const response = await fetch(url, {
+      method: 'HEAD',
+      headers: { Accept: 'image/*' },
+      signal: controller.signal,
+    });
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+    // Re-validate the final URL after redirects to prevent DNS rebinding bypass
+    if (!isAllowedFetchUrl(response.url)) {
+      throw new Error('Redirected to disallowed URL');
+    }
+    const contentLength = response.headers.get('content-length');
+    const contentType = response.headers.get('content-type') || '';
+    return {
+      size: contentLength ? parseInt(contentLength, 10) : null,
+      contentType,
+    };
+  } finally {
+    clearTimeout(timeout);
   }
-  const contentLength = response.headers.get('content-length');
-  const contentType = response.headers.get('content-type') || '';
-  return {
-    size: contentLength ? parseInt(contentLength, 10) : null,
-    contentType,
-  };
 }
 
 /** Fetch an image and return it as a `data:` URL (used to bypass CORS in UI). */
@@ -84,27 +95,38 @@ export async function fetchImageData(url: string): Promise<string> {
   if (!isAllowedFetchUrl(url)) {
     throw new Error('URL not allowed: must be public http/https');
   }
-  const imageResponse = await fetch(url, {
-    headers: { Accept: 'image/*' },
-  });
-  if (!imageResponse.ok) {
-    throw new Error(`HTTP ${imageResponse.status}`);
-  }
-  const arrayBuffer = await imageResponse.arrayBuffer();
-  let contentType = imageResponse.headers.get('content-type') || '';
-
-  // If content-type is not image/*, try to detect from magic bytes
-  if (!contentType.startsWith('image/')) {
-    const detected = detectImageMimeFromBytes(new Uint8Array(arrayBuffer));
-    if (detected) {
-      contentType = detected;
-    } else {
-      throw new Error('Response is not an image');
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 30000);
+  try {
+    const imageResponse = await fetch(url, {
+      headers: { Accept: 'image/*' },
+      signal: controller.signal,
+    });
+    if (!imageResponse.ok) {
+      throw new Error(`HTTP ${imageResponse.status}`);
     }
-  }
+    // Re-validate the final URL after redirects to prevent DNS rebinding bypass
+    if (!isAllowedFetchUrl(imageResponse.url)) {
+      throw new Error('Redirected to disallowed URL');
+    }
+    const arrayBuffer = await imageResponse.arrayBuffer();
+    let contentType = imageResponse.headers.get('content-type') || '';
 
-  const base64 = arrayBufferToBase64(arrayBuffer);
-  return `data:${contentType};base64,${base64}`;
+    // If content-type is not image/*, try to detect from magic bytes
+    if (!contentType.startsWith('image/')) {
+      const detected = detectImageMimeFromBytes(new Uint8Array(arrayBuffer));
+      if (detected) {
+        contentType = detected;
+      } else {
+        throw new Error('Response is not an image');
+      }
+    }
+
+    const base64 = arrayBufferToBase64(arrayBuffer);
+    return `data:${contentType};base64,${base64}`;
+  } finally {
+    clearTimeout(timeout);
+  }
 }
 
 /** Upload an image to a reverse-search engine (Baidu / Yandex). */

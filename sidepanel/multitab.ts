@@ -16,7 +16,7 @@
 // dismissal. Pulling it here would force every ESC press to await a
 // dynamic import.
 
-import { isRestrictedUrl } from '../shared/utils';
+import { isRestrictedUrl, escapeHtml } from '../shared/utils';
 import { t } from '../shared/i18n';
 import type { ImageItem } from '../shared/types';
 import { clearSelection } from './actions';
@@ -67,6 +67,9 @@ export async function loadTabList(): Promise<void> {
     elements.multitabList.innerHTML = validTabs
       .map((tab) => {
         const faviconUrl = tab.favIconUrl || getFallbackFaviconUrl(tab.url || '');
+        const safeTitle = escapeHtml(tab.title || t('multitab_untitled'));
+        const safeUrl = escapeHtml(truncateUrl(tab.url || '', 50));
+        const safeFaviconUrl = escapeHtml(faviconUrl);
         return `
       <div class="tab-item${tab.active ? ' tab-current' : ''}" data-tab-id="${tab.id}">
         <label class="tab-checkbox" data-tab-id="${tab.id}">
@@ -75,10 +78,10 @@ export async function loadTabList(): Promise<void> {
             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"><polyline points="20 6 9 17 4 12"/></svg>
           </span>
         </label>
-        <img src="${faviconUrl}" alt="" class="tab-favicon">
+        <img src="${safeFaviconUrl}" alt="" class="tab-favicon">
         <div class="tab-info">
-          <div class="tab-title">${tab.title || t('multitab_untitled')}${tab.active ? `<span class="tab-current-badge">${t('multitab_current')}</span>` : ''}</div>
-          <div class="tab-url">${truncateUrl(tab.url || '', 50)}</div>
+          <div class="tab-title">${safeTitle}${tab.active ? `<span class="tab-current-badge">${t('multitab_current')}</span>` : ''}</div>
+          <div class="tab-url">${safeUrl}</div>
         </div>
       </div>
     `;

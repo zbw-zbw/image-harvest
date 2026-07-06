@@ -480,8 +480,18 @@ export async function extractLazyLoadImages(images: Map<string, ImageItem>): Pro
 
 // Extract images from CSS content property (e.g. ::before / ::after pseudo-elements)
 export async function extractCssContentImages(images: Map<string, ImageItem>): Promise<void> {
-  const elements = document.querySelectorAll('*');
-  for (const el of elements) {
+  const MAX_ELEMENTS = 5000;
+  const BATCH_SIZE = 500;
+  const allElements = document.querySelectorAll('*');
+  const limit = Math.min(allElements.length, MAX_ELEMENTS);
+
+  for (let i = 0; i < limit; i++) {
+    // Yield the main thread periodically to avoid blocking the UI
+    if (i > 0 && i % BATCH_SIZE === 0) {
+      await new Promise((resolve) => setTimeout(resolve, 0));
+    }
+
+    const el = allElements[i];
     if (skipElement(el)) continue;
     for (const pseudo of ['::before', '::after'] as const) {
       try {

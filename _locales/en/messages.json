@@ -102,7 +102,7 @@
   },
   "toast_download_completed": {
     "message": "Downloaded {count} images",
-    "description": "{count} = number of images successfully downloaded"
+    "description": "{count} = number of images to download"
   },
   "toast_no_images_selected": {
     "message": "No images selected"

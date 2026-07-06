@@ -10,6 +10,7 @@ import { renderImages } from './render';
 import { closeAllFilterDropdowns } from './settings';
 import { elements, state } from './state';
 import { t } from '../shared/i18n';
+import { escapeHtml } from '../shared/utils';
 import { updateFilterButtonLabels, updateFilterDropdownCounts } from './ui';
 import { getAspectRatioCategory } from './utils';
 
@@ -172,10 +173,10 @@ export function renderColorSwatches(): void {
   const swatchTitle = state.isProUser ? (hex: string) => hex : () => t('title_upgrade_copy_color');
 
   container.innerHTML = sortedColors
-    .map(
-      (hex) =>
-        `<div class="color-swatch${state.activeFilters.color === hex ? ' active' : ''}" style="background:${hex}" data-color-value="${hex}" title="${swatchTitle(hex)}"></div>`
-    )
+    .map((hex) => {
+      const safeHex = /^#[0-9a-fA-F]{6}$/.test(hex) ? hex : '#000000';
+      return `<div class="color-swatch${state.activeFilters.color === hex ? ' active' : ''}" style="background:${safeHex}" data-color-value="${safeHex}" title="${escapeHtml(swatchTitle(hex))}"></div>`;
+    })
     .join('');
 
   // Bind click events

@@ -405,9 +405,17 @@ describe('clearCurrentImages / resetStatusBar / hideAll', () => {
 // ─────────────────────────────────────────────────────────────────────
 
 describe('showProgress / updateProgress / hideProgress / handleProgressClose', () => {
+  beforeEach(() => {
+    vi.useFakeTimers();
+  });
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
   it('showProgress flips visible:true + sets title + stores abort callback', () => {
     const onAbort = vi.fn();
     showProgress('Downloading 5 images', onAbort);
+    vi.advanceTimersByTime(300);
 
     expect(state.downloadProgress.visible).toBe(true);
     expect(state.downloadProgress.title).toBe('Downloading 5 images');
@@ -415,6 +423,7 @@ describe('showProgress / updateProgress / hideProgress / handleProgressClose', (
 
   it('showProgress applies "Downloading..." default when title omitted/empty', () => {
     showProgress('');
+    vi.advanceTimersByTime(300);
     expect(state.downloadProgress.title).toBe('Downloading...');
   });
 
@@ -450,6 +459,7 @@ describe('showProgress / updateProgress / hideProgress / handleProgressClose', (
   it('handleProgressClose invokes the stored abort callback then hides', () => {
     const onAbort = vi.fn();
     showProgress('test', onAbort);
+    vi.advanceTimersByTime(300);
     handleProgressClose();
 
     expect(onAbort).toHaveBeenCalledTimes(1);
@@ -458,6 +468,7 @@ describe('showProgress / updateProgress / hideProgress / handleProgressClose', (
 
   it('handleProgressClose with NO abort callback just hides (no crash)', () => {
     showProgress('test'); // no onAbort
+    vi.advanceTimersByTime(300);
     expect(() => handleProgressClose()).not.toThrow();
     expect(state.downloadProgress.visible).toBe(false);
   });
@@ -465,6 +476,7 @@ describe('showProgress / updateProgress / hideProgress / handleProgressClose', (
   it('hideProgress clears the abort callback so subsequent close is no-op', () => {
     const onAbort = vi.fn();
     showProgress('test', onAbort);
+    vi.advanceTimersByTime(300);
     hideProgress(); // clears progressAbortCallback
     handleProgressClose(); // should NOT call onAbort again
 

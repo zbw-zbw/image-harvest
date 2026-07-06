@@ -34,12 +34,14 @@ function makeResponse(opts: {
   body?: ArrayBuffer | string;
   headers?: Record<string, string>;
   json?: unknown;
+  url?: string;
 }): Response {
   const headers = new Map(Object.entries(opts.headers ?? {}).map(([k, v]) => [k.toLowerCase(), v]));
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return {
     ok: opts.ok ?? true,
     status: opts.status ?? 200,
+    url: opts.url ?? 'https://x.com/a.jpg',
     headers: { get: (k: string) => headers.get(k.toLowerCase()) ?? null },
     arrayBuffer: async () =>
       typeof opts.body === 'string'

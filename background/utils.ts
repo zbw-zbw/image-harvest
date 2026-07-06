@@ -67,9 +67,11 @@ export function broadcastToPopup(message: unknown): void {
 
 export function arrayBufferToBase64(buffer: ArrayBuffer): string {
   const bytes = new Uint8Array(buffer);
-  let binary = '';
-  for (let i = 0; i < bytes.byteLength; i++) {
-    binary += String.fromCharCode(bytes[i]);
+  const CHUNK_SIZE = 8192;
+  const chunks: string[] = [];
+  for (let i = 0; i < bytes.byteLength; i += CHUNK_SIZE) {
+    const chunk = bytes.subarray(i, Math.min(i + CHUNK_SIZE, bytes.byteLength));
+    chunks.push(String.fromCharCode(...chunk));
   }
-  return btoa(binary);
+  return btoa(chunks.join(''));
 }

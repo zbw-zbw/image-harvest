@@ -87,20 +87,20 @@
 
 ---
 
-## 🆕 What's New (v1.0.9)
+## 🆕 What's New (v1.0.10)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
-- **⚡ Batch Image Discovery** — content script buffers and sends images in batches, eliminating IPC message storms on heavy pages.
-- **🎯 Tab Switch Zero-Flicker** — completely reworked rendering with `queueMicrotask` + CSS fade-in — no more white flashes, ghost "No images" UI, or scroll jumps.
-- **📦 Concurrent ZIP Downloads** — batch downloads now run 3 fetches in parallel via sliding window, dramatically faster for large selections.
-- **🤖 AI Tag Timeout Protection** — requests auto-abort after 15s (single) / 30s (batch), preventing indefinite hangs.
-- **🧠 Tab Cache LRU** — per-tab cache evicts oldest entries beyond 20 tabs, preventing unbounded memory growth.
-- **🔒 Telemetry Default Opt-Out** — new installs default to analytics disabled, respecting user privacy.
-- **⏳ Trial Grace Period** — 3-day grace window after trial expiration for smoother upgrade transitions.
-- **🐛 Quota Sync Fixed** — AI quota remaining correctly updates after each tag operation with defensive display handling.
-- **🐛 New Tab Ghost Rescan Fixed** — closing extension-opened tabs no longer triggers false page rescans.
-- **🌍 6 new i18n keys** — AI tag success/remaining, SVG unsupported, and scan limit notifications across all 15 locales.
+- **🔒 XSS Prevention** — all innerHTML-injected external data (tab titles, URLs, collection items) are now HTML-escaped via new `escapeHtml()` utility.
+- **🛡️ SSRF Hardening** — expanded private IP blocklist covering full IPv4/IPv6 ranges, non-standard IP formats, credential URLs, and redirect bypass prevention.
+- **💳 License Deactivation Fix** — remote deactivation failures no longer silently clear local data, preventing activation slot leaks.
+- **⚡ AI Quota Race Fix** — optimistic deduction with rollback on all error paths (including timeout/abort) prevents quota overuse from rapid clicks.
+- **🚀 Visibility Check 10× Faster** — `checkImagesVisibility` now builds a single-pass URL index (O(n+m) vs O(n×m)).
+- **📦 Base64 Encoding 10× Faster** — `arrayBufferToBase64` rewritten with 8KB chunked processing.
+- **🐛 Batch Download Flicker Eliminated** — progress modal uses 300ms show-delay; fast downloads never display it.
+- **🐛 Download Dropdown Instant Close** — dropdown closes via `display:none` with module-level lock, no more re-opening during async operations.
+- **⏱️ Fetch Timeouts Added** — `fetchImageMetaProxy` (10s) and `fetchImageData` (30s) now abort on slow servers.
+- **🧹 Progress Controller Refactored** — 6 loose module variables consolidated into a single `progressController` object.
 
 ---
 

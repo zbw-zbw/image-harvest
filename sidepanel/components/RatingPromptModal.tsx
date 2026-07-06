@@ -13,6 +13,9 @@
 // Visibility decision is made once per mount via shouldShowRatingPrompt().
 // Pro users are NOT exempted (a happy Pro user is exactly who we want
 // reviewing the listing); the gate is purely behavioral.
+//
+// We defer the visibility check until the current scan has finished to
+// avoid overlapping with the loading overlay.
 import { useEffect, useState } from 'preact/hooks';
 import {
   markRatingPromptDismissed,
@@ -21,6 +24,7 @@ import {
   shouldShowRatingPrompt,
 } from '../../shared/rating-prompt-state';
 import { t } from '../../shared/i18n';
+import { state } from '../state';
 
 /**
  * Chrome Web Store reviews URL for our listing. Extracted as a constant
@@ -38,6 +42,17 @@ export function RatingPromptModal() {
   useEffect(() => {
     let cancelled = false;
     void (async () => {
+      // Wait until the current scan is complete to avoid overlapping
+      // with the loading overlay (skeleton cards, scan progress bar).
+      // Poll state.isScanning and state.isFetching with a short delay.
+      // Give up after 30s to avoid infinite polling if scan gets stuck.
+      let waitMs = 0;
+      while (!cancelled && (state.isScanning || state.isFetching) && waitMs < 30000) {
+        await new Promise((r) => setTimeout(r, 300));
+        waitMs += 300;
+      }
+      if (cancelled) return;
+
       const ok = await shouldShowRatingPrompt();
       if (cancelled || !ok) return;
       await markRatingPromptShown();

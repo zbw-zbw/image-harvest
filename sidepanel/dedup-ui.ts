@@ -9,6 +9,7 @@
 //   - detectSimilarImages (called from scan.ts + settings.ts)
 
 import { t } from '../shared/i18n';
+import { escapeHtml } from '../shared/utils';
 import { applyFilters } from './filter';
 import { closeDedupModal, detectSimilarImages } from './pro-features';
 import { showProUpgradeModal } from './settings';
@@ -67,9 +68,9 @@ function populateDedupBody(): void {
           ${group
             .map(
               (img, ii) => `
-            <div class="dedup-image" data-group="${gi}" data-index="${ii}" data-img-id="${img.id}">
+            <div class="dedup-image" data-group="${gi}" data-index="${ii}" data-img-id="${escapeHtml(img.id)}">
               <div class="dedup-image-thumb">
-                <img src="${img.url}" alt="">
+                <img src="${escapeHtml(img.url)}" alt="">
               </div>
             </div>
           `

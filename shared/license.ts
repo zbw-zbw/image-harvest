@@ -297,7 +297,7 @@ export async function activateLicense(licenseKey: string): Promise<LicenseActiva
   };
 }
 
-export async function deactivateLicense(): Promise<{ success: true }> {
+export async function deactivateLicense(): Promise<{ success: boolean; error?: string }> {
   const licenseData = await getLicenseData();
   if (!licenseData) return { success: true };
 
@@ -308,7 +308,13 @@ export async function deactivateLicense(): Promise<{ success: true }> {
   // call — the local sentinel in shared/trial.ts already prevents
   // re-redemption, and the trial expires server-side regardless.
   if (licenseData.plan !== 'trial') {
-    await deactivateLicenseRemote(licenseData.licenseKey, licenseData.instanceId);
+    const result = await deactivateLicenseRemote(licenseData.licenseKey, licenseData.instanceId);
+    if (!result.success) {
+      // Remote deactivation failed — do NOT clear local data to prevent
+      // permanently leaking an activation slot on the server. The user
+      // can retry later.
+      return { success: false, error: result.error || 'license_error_deactivation_failed' };
+    }
   }
   await clearLicenseData();
 

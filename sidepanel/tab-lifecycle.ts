@@ -216,12 +216,6 @@ export async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Pr
   if (state.currentTabId != null && state.currentTabId !== newTabId) {
     const cachedUrl = state.tabCache.get(state.currentTabId)?.url || '';
 
-    const MAX_TAB_CACHE = 10;
-    if (state.tabCache.size >= MAX_TAB_CACHE && !state.tabCache.has(state.currentTabId)) {
-      const oldest = state.tabCache.keys().next().value;
-      if (oldest !== undefined) state.tabCache.delete(oldest);
-    }
-
     // Save scroll position so we can restore it when switching back.
     // The actual scrollable container is .image-grid (overflow-y: auto),
     // NOT .image-grid-wrapper (which is a non-scrolling flex parent).

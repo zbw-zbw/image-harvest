@@ -501,17 +501,9 @@ export async function downloadSelectedAsZip(
     } else {
       showToast(t('toast_download_completed', { count: successCount }), 'success');
     }
-    // Telemetry: count is the SUCCESSFUL count, not selected.length —
-    // failures are inferred via (selected.length - count). Funnels care
-    // about user-perceived success.
     void track(EVENTS.DOWNLOAD_BATCH, { count: successCount });
-    // Soft paywall: a 30-image batch counts as 30 toward the threshold.
-    // Same intent as DOWNLOAD_SINGLE above — see comment there.
     if (successCount > 0) void recordDownloads(successCount);
-    // Rating prompt — same batch contribution rule (success count, not
-    // selected count). See DOWNLOAD_SINGLE call above for rationale.
     if (successCount > 0) void recordDownloadForRating(successCount);
-    // Increment format conversion quota after successful zip download
     if (targetFormat && !state.isProUser) {
       import('../shared/feature-quota').then(({ incrementFeatureUsage }) =>
         incrementFeatureUsage('formatConvert')

@@ -23,6 +23,8 @@ interface LiveMonitorConfig {
 }
 
 let lazyLoadController: AbortController | null = null;
+let flushTimer: ReturnType<typeof setTimeout> | null = null;
+let pendingMutations: MutationRecord[] = [];
 
 // Live monitoring with MutationObserver
 export function startLiveMonitoring(config: LiveMonitorConfig = {}): void {
@@ -34,10 +36,8 @@ export function startLiveMonitoring(config: LiveMonitorConfig = {}): void {
   const debounceMs = config.debounceMs || 500;
   lazyLoadController = new AbortController();
 
-  // Accumulating buffer: collect all mutations during the debounce window
-  // so none are lost (unlike a plain debounce which discards earlier calls).
-  let pendingMutations: MutationRecord[] = [];
-  let flushTimer: ReturnType<typeof setTimeout> | null = null;
+  // Reset accumulated mutations from previous monitoring session
+  pendingMutations = [];
 
   function flushMutations(): void {
     flushTimer = null;
@@ -144,6 +144,11 @@ function handleLazyImageLoad(event: Event): void {
 }
 
 export function stopLiveMonitoring(): void {
+  if (flushTimer) {
+    clearTimeout(flushTimer);
+    flushTimer = null;
+  }
+  pendingMutations = [];
   if (lazyLoadController) {
     lazyLoadController.abort();
     lazyLoadController = null;
