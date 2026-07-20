@@ -81,9 +81,9 @@ function getConfigApiUrl(): string {
     const base =
       (typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_API_BASE) ||
       'https://image-harvest.kyriewen.cn';
-    return `${base}/api/config/limits`;
+    return `${base}/api/v1/config/limits`;
   } catch {
-    return 'https://image-harvest.kyriewen.cn/api/config/limits';
+    return 'https://image-harvest.kyriewen.cn/api/v1/config/limits';
   }
 }
 

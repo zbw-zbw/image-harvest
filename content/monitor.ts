@@ -14,7 +14,7 @@ import {
 } from '../shared/utils';
 import { TIMING } from '../shared/constants';
 import type { ImageItem } from '../shared/types';
-import { state, isExtensionContextValid } from './state';
+import { state, isExtensionContextValid, evictOldestSeenUrls } from './state';
 import { parseSrcset, sendDiscoveredImages } from './utils';
 import { extractInlineSvg, extractCanvasImage } from './extract-advanced';
 
@@ -46,9 +46,11 @@ export function startLiveMonitoring(config: LiveMonitorConfig = {}): void {
       return;
     }
 
-    // Prevent unbounded growth on long-lived SPA pages
+    // Prevent unbounded growth on long-lived SPA pages. Evict the oldest
+    // entries (approximate LRU) instead of clearing the whole set, so we keep
+    // recent dedup memory and avoid re-discovery churn.
     if (state.seenUrls.size > TIMING.SEEN_URLS_MAX_SIZE) {
-      state.seenUrls.clear();
+      evictOldestSeenUrls(TIMING.SEEN_URLS_MAX_SIZE);
     }
 
     const mutations = pendingMutations;

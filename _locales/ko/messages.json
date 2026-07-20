@@ -236,6 +236,24 @@
   "license_error_activation_failed": {
     "message": "활성화에 실패했습니다. 다시 시도해 주세요."
   },
+  "license_error_max_instances": {
+    "message": "이 라이선스는 이미 다른 기기에서 사용 중입니다."
+  },
+  "license_error_reset_cooldown": {
+    "message": "최근에 기기 연결을 해제했습니다. 며칠 후 다시 시도해 주세요."
+  },
+  "license_error_reset_failed": {
+    "message": "다른 기기 해제에 실패했습니다. 다시 시도해 주세요."
+  },
+  "license_unbind_confirm_title": {
+    "message": "이 기기에서 활성화하시겠습니까?"
+  },
+  "license_unbind_confirm_message": {
+    "message": "이 라이선스는 이미 다른 기기에서 사용 중입니다. 해제하고 이 기기에서 활성화하시겠습니까? 다른 기기의 Pro는 로그아웃됩니다."
+  },
+  "license_unbind_confirm_button": {
+    "message": "해제 후 여기서 활성화"
+  },
   "license_error_invalid_key": {
     "message": "유효하지 않은 라이선스 키입니다."
   },

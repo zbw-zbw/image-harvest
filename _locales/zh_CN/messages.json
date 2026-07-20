@@ -1157,6 +1157,24 @@
   "license_error_activation_failed": {
     "message": "激活失败，请重试。"
   },
+  "license_error_max_instances": {
+    "message": "该许可证已在另一台设备上使用。"
+  },
+  "license_error_reset_cooldown": {
+    "message": "最近已解绑过设备，请过几天再试。"
+  },
+  "license_error_reset_failed": {
+    "message": "解绑其他设备失败，请重试。"
+  },
+  "license_unbind_confirm_title": {
+    "message": "在此设备上激活？"
+  },
+  "license_unbind_confirm_message": {
+    "message": "该许可证已在另一台设备上使用。是否解绑并改为在此设备激活？另一台设备的 Pro 将被注销。"
+  },
+  "license_unbind_confirm_button": {
+    "message": "解绑并在此激活"
+  },
   "pro_feature_blocked_dedup": {
     "message": "免费版：每月最多 {max} 次去重检测，升级 Pro 无限使用！"
   },

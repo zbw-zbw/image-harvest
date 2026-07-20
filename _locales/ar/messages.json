@@ -236,6 +236,24 @@
   "license_error_activation_failed": {
     "message": "فشل التفعيل. يرجى المحاولة مرة أخرى."
   },
+  "license_error_max_instances": {
+    "message": "هذا الترخيص مفعّل بالفعل على جهاز آخر."
+  },
+  "license_error_reset_cooldown": {
+    "message": "تم تحرير الأجهزة مؤخرًا. يرجى المحاولة مرة أخرى بعد بضعة أيام."
+  },
+  "license_error_reset_failed": {
+    "message": "تعذّر تحرير الجهاز الآخر. يرجى المحاولة مرة أخرى."
+  },
+  "license_unbind_confirm_title": {
+    "message": "التفعيل على هذا الجهاز؟"
+  },
+  "license_unbind_confirm_message": {
+    "message": "هذا الترخيص مفعّل بالفعل على جهاز آخر. هل تريد تحريره وتفعيله هنا؟ سيتم تسجيل خروج Pro من الجهاز الآخر."
+  },
+  "license_unbind_confirm_button": {
+    "message": "تحرير وتفعيل هنا"
+  },
   "license_error_invalid_key": {
     "message": "مفتاح ترخيص غير صالح."
   },

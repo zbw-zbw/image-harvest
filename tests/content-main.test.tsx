@@ -532,13 +532,21 @@ describe('extractImages — main pipeline', () => {
     expect(callOrder.indexOf('shadow')).toBeLessThan(callOrder.indexOf('iframes'));
   });
 
-  it('finally block restores state.isExtracting=false even when an extractor throws', async () => {
+  it('isolates a throwing extractor stage: scan still resolves and isExtracting is restored', async () => {
+    const warnSpy = vi.spyOn(console, 'warn').mockImplementation(() => {});
     const ea = await import('../content/extract-advanced');
     vi.mocked(ea.extractInlineSvgs).mockRejectedValue(new Error('boom'));
 
     const extractImages = await getExtractImages();
-    await expect(extractImages()).rejects.toThrow('boom');
+    // P1-6: a throw in one stage is logged and skipped, not propagated —
+    // the whole scan completes rather than aborting and hanging the caller.
+    await expect(extractImages()).resolves.toBeInstanceOf(Array);
     expect(state.isExtracting).toBe(false);
+    expect(warnSpy).toHaveBeenCalledWith(
+      expect.stringContaining('stage "inline-svg" failed'),
+      expect.any(Error)
+    );
+    warnSpy.mockRestore();
   });
 });
 

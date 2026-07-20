@@ -1,6 +1,7 @@
 // Background Service Worker for Image Harvest.
 // Main entry — initializes subsystems and routes runtime messages.
 import { MESSAGE_TYPES, ERROR_CODES } from '../shared/constants';
+import { validateIncomingMessage } from '../shared/messaging';
 import {
   getFilterConfig,
   getDownloadHistory,
@@ -12,6 +13,7 @@ import {
 import {
   activateLicense,
   deactivateLicense,
+  resetAndActivateLicense,
   isProUser,
   getLicenseInfo,
   getOrCreateInstanceId,
@@ -127,6 +129,13 @@ interface ExtensionError extends Error {
 }
 
 chrome.runtime.onMessage.addListener((message: RuntimeMessage, sender, sendResponse) => {
+  // Drop unknown / malformed / version-mismatched messages before dispatch.
+  const valid = validateIncomingMessage(message);
+  if (!valid) {
+    sendResponse({ success: false, error: 'Unknown or malformed message' });
+    return false;
+  }
+
   let channelOpen = true;
   const safeSendResponse = (response: unknown): void => {
     if (!channelOpen) return;
@@ -138,7 +147,7 @@ chrome.runtime.onMessage.addListener((message: RuntimeMessage, sender, sendRespo
     channelOpen = false;
   };
 
-  handleMessage(message, sender, safeSendResponse).catch((unhandledError: Error) => {
+  handleMessage(valid, sender, safeSendResponse).catch((unhandledError: Error) => {
     console.error('[Background] Unhandled error in handleMessage:', unhandledError);
     safeSendResponse({ success: false, error: unhandledError?.message || 'Internal error' });
   });
@@ -470,6 +479,24 @@ async function handleMessage(
             });
           }
           sendResponse(deactivateResult);
+        } catch (error) {
+          sendResponse({ success: false, error: (error as Error).message });
+        }
+        break;
+      }
+
+      case MESSAGE_TYPES.RESET_LICENSE_INSTANCES: {
+        try {
+          const resetResult = await resetAndActivateLicense(message.licenseKey as string);
+          if (resetResult.success) {
+            broadcastToPopup({
+              type: MESSAGE_TYPES.LICENSE_STATUS_CHANGED,
+              isPro: true,
+              plan: resetResult.plan,
+              status: 'active',
+            });
+          }
+          sendResponse(resetResult);
         } catch (error) {
           sendResponse({ success: false, error: (error as Error).message });
         }

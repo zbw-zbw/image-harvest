@@ -236,6 +236,24 @@
   "license_error_activation_failed": {
     "message": "Activering mislukt. Probeer het opnieuw."
   },
+  "license_error_max_instances": {
+    "message": "Deze licentie is al actief op een ander apparaat."
+  },
+  "license_error_reset_cooldown": {
+    "message": "Apparaten zijn onlangs vrijgegeven. Probeer het over een paar dagen opnieuw."
+  },
+  "license_error_reset_failed": {
+    "message": "Kan het andere apparaat niet vrijgeven. Probeer het opnieuw."
+  },
+  "license_unbind_confirm_title": {
+    "message": "Activeren op dit apparaat?"
+  },
+  "license_unbind_confirm_message": {
+    "message": "Deze licentie is al actief op een ander apparaat. Vrijgeven en hier activeren? Het andere apparaat wordt afgemeld bij Pro."
+  },
+  "license_unbind_confirm_button": {
+    "message": "Vrijgeven en hier activeren"
+  },
   "license_error_invalid_key": {
     "message": "Ongeldige licentiesleutel."
   },

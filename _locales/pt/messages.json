@@ -236,6 +236,24 @@
   "license_error_activation_failed": {
     "message": "Falha na ativação. Tente novamente."
   },
+  "license_error_max_instances": {
+    "message": "Esta licença já está ativa em outro dispositivo."
+  },
+  "license_error_reset_cooldown": {
+    "message": "Os dispositivos foram liberados recentemente. Tente novamente em alguns dias."
+  },
+  "license_error_reset_failed": {
+    "message": "Não foi possível liberar o outro dispositivo. Tente novamente."
+  },
+  "license_unbind_confirm_title": {
+    "message": "Ativar neste dispositivo?"
+  },
+  "license_unbind_confirm_message": {
+    "message": "Esta licença já está ativa em outro dispositivo. Liberá-la e ativar aqui? O outro dispositivo perderá o acesso Pro."
+  },
+  "license_unbind_confirm_button": {
+    "message": "Liberar e ativar aqui"
+  },
   "license_error_invalid_key": {
     "message": "Chave de licença inválida."
   },

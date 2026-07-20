@@ -236,6 +236,24 @@
   "license_error_activation_failed": {
     "message": "सक्रियण विफल। कृपया पुनः प्रयास करें।"
   },
+  "license_error_max_instances": {
+    "message": "यह लाइसेंस पहले से ही किसी अन्य डिवाइस पर सक्रिय है।"
+  },
+  "license_error_reset_cooldown": {
+    "message": "डिवाइस हाल ही में रिलीज़ किए गए थे। कृपया कुछ दिनों बाद पुनः प्रयास करें।"
+  },
+  "license_error_reset_failed": {
+    "message": "दूसरे डिवाइस को रिलीज़ नहीं किया जा सका। कृपया पुनः प्रयास करें।"
+  },
+  "license_unbind_confirm_title": {
+    "message": "इस डिवाइस पर सक्रिय करें?"
+  },
+  "license_unbind_confirm_message": {
+    "message": "यह लाइसेंस पहले से ही किसी अन्य डिवाइस पर सक्रिय है। इसे रिलीज़ करके यहां सक्रिय करें? दूसरे डिवाइस का Pro साइन आउट हो जाएगा।"
+  },
+  "license_unbind_confirm_button": {
+    "message": "रिलीज़ करें और यहां सक्रिय करें"
+  },
   "license_error_invalid_key": {
     "message": "अमान्य लाइसेंस कुंजी।"
   },

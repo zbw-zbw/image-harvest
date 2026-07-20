@@ -564,6 +564,15 @@ interface StoreApi {
    * every assignment is applied; the all-changes subscribers fire once.
    */
   setMany(patch: Partial<SidepanelState>): void;
+  /**
+   * Run `fn`, batching every `store.set` / `state.x =` mutation it performs
+   * into a single notification pass. Field subscribers fire once per changed
+   * key (with the pre-transaction value as `prev`); selector subscribers fire
+   * once at the end. Nested transactions join the outer batch. Use when a
+   * logical update touches several fields and intermediate renders would be
+   * wasteful or visually inconsistent.
+   */
+  transaction(fn: () => void): void;
   /** Subscribe to a single field's changes. Returns an unsubscribe fn. */
   subscribe<K extends keyof SidepanelState>(
     key: K,
@@ -599,8 +608,10 @@ function createStore(): StoreApi {
   // outside code can only reach it through the Proxy.
   const raw = createInitialState();
 
-  // Suppress notifications during setMany so we batch.
-  let batching = false;
+  // Non-null while inside a transaction/setMany: records the pre-batch value
+  // of every key touched (first write wins) so notifications fire once at the
+  // end with the correct `prev`.
+  let batchChanges: Map<keyof SidepanelState, unknown> | null = null;
 
   function notifyField<K extends keyof SidepanelState>(
     key: K,
@@ -623,9 +634,13 @@ function createStore(): StoreApi {
       const key = prop as keyof SidepanelState;
       const prev = target[key];
       const ok = Reflect.set(target, prop, value, receiver);
-      if (ok && !batching) {
-        notifyField(key, value as SidepanelState[typeof key], prev);
-        notifySelectors();
+      if (ok) {
+        if (batchChanges) {
+          if (!batchChanges.has(key)) batchChanges.set(key, prev);
+        } else {
+          notifyField(key, value as SidepanelState[typeof key], prev);
+          notifySelectors();
+        }
       }
       return ok;
     },
@@ -683,24 +698,34 @@ function createStore(): StoreApi {
     proxy[key] = value;
   }
 
-  function setMany(patch: Partial<SidepanelState>): void {
-    batching = true;
-    const prevValues = new Map<keyof SidepanelState, unknown>();
+  function transaction(fn: () => void): void {
+    // Nested transaction → join the outer batch; the outermost flushes.
+    if (batchChanges) {
+      fn();
+      return;
+    }
+    const changes = new Map<keyof SidepanelState, unknown>();
+    batchChanges = changes;
     try {
+      fn();
+    } finally {
+      batchChanges = null;
+    }
+    // Fire all field-level notifications now that every value is in place.
+    for (const [k, prev] of changes) {
+      notifyField(k, proxy[k] as never, prev as never);
+    }
+    if (changes.size > 0) notifySelectors();
+  }
+
+  function setMany(patch: Partial<SidepanelState>): void {
+    transaction(() => {
       for (const k of Object.keys(patch) as (keyof SidepanelState)[]) {
-        prevValues.set(k, proxy[k]);
         // Cast through unknown: TS can't see through Partial<> per-key narrow,
         // and Proxy mutations always go via the same trap regardless of type.
         (proxy as unknown as Record<string, unknown>)[k as string] = patch[k];
       }
-    } finally {
-      batching = false;
-    }
-    // Fire all field-level notifications now that every value is in place.
-    for (const [k, prev] of prevValues) {
-      notifyField(k, proxy[k] as never, prev as never);
-    }
-    notifySelectors();
+    });
   }
 
   function reset(): void {
@@ -712,6 +737,7 @@ function createStore(): StoreApi {
     get,
     set: setField,
     setMany,
+    transaction,
     subscribe,
     subscribeSelector,
     subscribeAll,

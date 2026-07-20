@@ -272,6 +272,24 @@
   "license_error_activation_failed": {
     "message": "啟用失敗，請重試。"
   },
+  "license_error_max_instances": {
+    "message": "此授權已在另一台裝置上使用。"
+  },
+  "license_error_reset_cooldown": {
+    "message": "最近已解除綁定過裝置，請過幾天再試。"
+  },
+  "license_error_reset_failed": {
+    "message": "解除其他裝置綁定失敗，請重試。"
+  },
+  "license_unbind_confirm_title": {
+    "message": "在此裝置上啟用？"
+  },
+  "license_unbind_confirm_message": {
+    "message": "此授權已在另一台裝置上使用。是否解除綁定並改為在此裝置啟用？另一台裝置的 Pro 將被登出。"
+  },
+  "license_unbind_confirm_button": {
+    "message": "解除綁定並在此啟用"
+  },
   "license_error_invalid_key": {
     "message": "無效的授權金鑰。"
   },

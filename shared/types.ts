@@ -94,6 +94,10 @@ export interface LicenseData {
   expiresAt?: number | null;
   lastVerified?: number;
   instanceId: string;
+  /** Base64 ECDSA-P256 signature from the server (tamper-evidence). */
+  signature?: string;
+  /** epoch ms the server signed at; part of the signed payload. */
+  signedAt?: number;
 }
 
 export interface LicenseValidationResult {
@@ -102,6 +106,9 @@ export interface LicenseValidationResult {
   plan?: string | null;
   expiresAt?: number | null;
   error?: string;
+  /** Base64 ECDSA-P256 signature (present when the server has a signing key). */
+  signature?: string;
+  signedAt?: number;
 }
 
 export interface LicenseActivationResult {

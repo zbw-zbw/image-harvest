@@ -11,6 +11,7 @@ import type {
   LicenseValidationResult,
   ProUserInfo,
 } from './types';
+import { verifyLicenseSignature } from './license-verify';
 
 /** 3-day grace period after trial expiry (mirrors trial.ts constant). */
 const TRIAL_EXPIRY_GRACE_MS = 3 * 24 * 60 * 60 * 1000;
@@ -141,6 +142,8 @@ function sanitizeLicenseResult(data: unknown): LicenseValidationResult {
     plan,
     expiresAt,
     error: typeof obj.error === 'string' ? obj.error : undefined,
+    signature: typeof obj.signature === 'string' ? obj.signature : undefined,
+    signedAt: typeof obj.signedAt === 'number' ? obj.signedAt : undefined,
   };
 }
 
@@ -163,6 +166,8 @@ interface RemoteActivationResponse {
   plan?: string | null;
   expiresAt?: number | null;
   error?: string;
+  signature?: string;
+  signedAt?: number;
 }
 
 export async function activateLicenseRemote(
@@ -201,6 +206,8 @@ export async function activateLicenseRemote(
       plan: typeof data.plan === 'string' ? data.plan : null,
       expiresAt,
       error: typeof data.error === 'string' ? data.error : undefined,
+      signature: typeof data.signature === 'string' ? data.signature : undefined,
+      signedAt: typeof data.signedAt === 'number' ? data.signedAt : undefined,
     };
   } catch (error) {
     console.error('Failed to activate license remotely:', error);
@@ -273,6 +280,9 @@ export async function activateLicense(licenseKey: string): Promise<LicenseActiva
     expiresAt: activation.expiresAt ?? validation.expiresAt ?? null,
     lastVerified: Date.now(),
     instanceId,
+    // Prefer the activation signature; fall back to the verify signature.
+    signature: activation.signature ?? validation.signature,
+    signedAt: activation.signedAt ?? validation.signedAt,
   };
 
   await saveLicenseData(licenseData);
@@ -295,6 +305,58 @@ export async function activateLicense(licenseKey: string): Promise<LicenseActiva
     plan: licenseData.plan,
     expiresAt: licenseData.expiresAt,
   };
+}
+
+/**
+ * Self-serve unbind (P2-3): release ALL devices bound to this license key on the
+ * server. Used when the user hits the max-instances limit on a NEW device and
+ * no longer has the old device to deactivate from. Never needs an instanceId.
+ */
+export async function resetLicenseInstancesRemote(
+  licenseKey: string
+): Promise<{ success: boolean; error?: string }> {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
+  try {
+    const response = await fetch(LICENSE_API_URL + '/activate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        licenseKey: licenseKey.trim().toUpperCase(),
+        action: 'reset',
+      }),
+      signal: controller.signal,
+    });
+
+    // The reset endpoint returns 400 (not ok) with a coded error body on
+    // expected failures (e.g. cooldown); parse those. Only treat other
+    // non-2xx as transport failures.
+    if (!response.ok && response.status !== 400) {
+      throw new Error('API request failed: ' + response.status);
+    }
+
+    return (await response.json()) as { success: boolean; error?: string };
+  } catch (error) {
+    console.error('Failed to reset license instances remotely:', error);
+    return { success: false, error: 'license_error_network' };
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
+/**
+ * Self-serve unbind + re-activate on THIS device in one step: release all bound
+ * devices server-side, then run the normal activation flow. Surfaces the reset
+ * error (e.g. cooldown) if the release fails.
+ */
+export async function resetAndActivateLicense(
+  licenseKey: string
+): Promise<LicenseActivationResult> {
+  const reset = await resetLicenseInstancesRemote(licenseKey);
+  if (!reset.success) {
+    return { success: false, error: reset.error || 'license_error_reset_failed' };
+  }
+  return activateLicense(licenseKey);
 }
 
 export async function deactivateLicense(): Promise<{ success: boolean; error?: string }> {
@@ -336,12 +398,19 @@ export async function isProUser(): Promise<ProUserInfo> {
   const isCacheFresh = timeSinceLastCheck < LICENSE_CHECK_INTERVAL;
 
   if (isCacheFresh && licenseData.status === LICENSE_STATUS.ACTIVE) {
-    return {
-      isPro: true,
-      plan: licenseData.plan,
-      expiresAt: licenseData.expiresAt,
-      status: LICENSE_STATUS.ACTIVE,
-    };
+    // Trust the cache unless the signature is present but INVALID (tampering).
+    // 'unsigned' (legacy/trial or no signing key) still trusts the cache, so
+    // existing users and trials are unaffected.
+    const sig = await verifyLicenseSignature(licenseData);
+    if (sig !== 'invalid') {
+      return {
+        isPro: true,
+        plan: licenseData.plan,
+        expiresAt: licenseData.expiresAt,
+        status: LICENSE_STATUS.ACTIVE,
+      };
+    }
+    console.warn('License signature invalid — forcing remote verification.');
   }
 
   // Remote verify path. We deliberately let `validateLicenseRemote` throw on
@@ -357,6 +426,9 @@ export async function isProUser(): Promise<ProUserInfo> {
       licenseData.expiresAt =
         validation.expiresAt !== undefined ? validation.expiresAt : licenseData.expiresAt;
       licenseData.lastVerified = Date.now();
+      // Refresh the tamper-evidence signature from the authoritative response.
+      licenseData.signature = validation.signature;
+      licenseData.signedAt = validation.signedAt;
       await saveLicenseData(licenseData);
 
       return {
@@ -406,12 +478,18 @@ export async function isProUser(): Promise<ProUserInfo> {
     if (licenseData.status === LICENSE_STATUS.ACTIVE) {
       const isWithinGracePeriod = timeSinceLastCheck < LICENSE_GRACE_PERIOD;
       if (isWithinGracePeriod) {
-        return {
-          isPro: true,
-          plan: licenseData.plan,
-          expiresAt: licenseData.expiresAt,
-          status: LICENSE_STATUS.ACTIVE,
-        };
+        // Don't extend the grace period to a tampered record: a present-but-
+        // invalid signature means the cached fields were edited offline.
+        const sig = await verifyLicenseSignature(licenseData);
+        if (sig !== 'invalid') {
+          return {
+            isPro: true,
+            plan: licenseData.plan,
+            expiresAt: licenseData.expiresAt,
+            status: LICENSE_STATUS.ACTIVE,
+          };
+        }
+        console.warn('License signature invalid during offline grace — denying Pro.');
       }
     }
 

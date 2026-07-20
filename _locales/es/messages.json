@@ -273,6 +273,24 @@
   "license_error_activation_failed": {
     "message": "Error de activación. Inténtalo de nuevo."
   },
+  "license_error_max_instances": {
+    "message": "Esta licencia ya está activa en otro dispositivo."
+  },
+  "license_error_reset_cooldown": {
+    "message": "Los dispositivos se liberaron recientemente. Inténtalo de nuevo en unos días."
+  },
+  "license_error_reset_failed": {
+    "message": "No se pudo liberar el otro dispositivo. Inténtalo de nuevo."
+  },
+  "license_unbind_confirm_title": {
+    "message": "¿Activar en este dispositivo?"
+  },
+  "license_unbind_confirm_message": {
+    "message": "Esta licencia ya está activa en otro dispositivo. ¿Liberarla y activarla aquí? El otro dispositivo perderá el acceso a Pro."
+  },
+  "license_unbind_confirm_button": {
+    "message": "Liberar y activar aquí"
+  },
   "license_error_invalid_key": {
     "message": "Clave de licencia no válida."
   },

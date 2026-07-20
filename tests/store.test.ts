@@ -222,3 +222,62 @@ describe('removeImageById — Proxy notification (regression)', () => {
     expect(sizeSpy).not.toHaveBeenCalled();
   });
 });
+
+describe('store.transaction', () => {
+  it('batches writes: each field subscriber fires once with the pre-transaction value', () => {
+    const scanSpy = vi.fn();
+    const fetchSpy = vi.fn();
+    store.subscribe('isScanning', scanSpy);
+    store.subscribe('isFetching', fetchSpy);
+
+    store.transaction(() => {
+      state.isScanning = true;
+      state.isFetching = true;
+    });
+
+    expect(scanSpy).toHaveBeenCalledTimes(1);
+    expect(scanSpy).toHaveBeenCalledWith(true, false);
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+    expect(fetchSpy).toHaveBeenCalledWith(true, false);
+  });
+
+  it('fires selector subscribers once for the whole transaction', () => {
+    const selSpy = vi.fn();
+    store.subscribeSelector((s) => `${s.isScanning}|${s.isFetching}`, selSpy);
+    store.transaction(() => {
+      state.isScanning = true;
+      state.isFetching = true;
+    });
+    expect(selSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('joins nested transactions into the outer batch (outermost flushes)', () => {
+    const spy = vi.fn();
+    store.subscribe('isScanning', spy);
+    store.transaction(() => {
+      state.isScanning = true;
+      store.transaction(() => {
+        state.isFetching = true;
+      });
+      // Still inside the outer transaction → nothing has flushed yet.
+      expect(spy).not.toHaveBeenCalled();
+    });
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
+
+  it('restores immediate notifications after the transaction (even when it throws)', () => {
+    const spy = vi.fn();
+    store.subscribe('isScanning', spy);
+    expect(() =>
+      store.transaction(() => {
+        state.isScanning = true;
+        throw new Error('boom');
+      })
+    ).toThrow('boom');
+
+    // The finally block reset the batch flag → subsequent writes notify now.
+    spy.mockClear();
+    state.isScanning = false;
+    expect(spy).toHaveBeenCalledTimes(1);
+  });
+});

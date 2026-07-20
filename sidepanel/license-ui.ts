@@ -123,6 +123,35 @@ export async function activateLicenseFromInput(
       if (closeModalOnSuccess) closeProUpgradeModal();
       await applyProFeatureVisibility();
       showToast(t('toast_pro_activated'), 'success');
+    } else if (result?.error === 'license_error_max_instances') {
+      // Self-serve unbind (P2-3): the key is bound to another device and the
+      // user can't deactivate from there. Offer to release all devices and
+      // activate here, guarded by a confirm dialog.
+      if (errorEl) errorEl.classList.add('hidden');
+      const confirmed = await showConfirmDialog({
+        title: t('license_unbind_confirm_title'),
+        message: t('license_unbind_confirm_message'),
+        confirmText: t('license_unbind_confirm_button'),
+        cancelText: t('common_cancel'),
+        type: 'warning',
+      });
+      if (!confirmed) return;
+
+      buttonEl.disabled = true;
+      buttonEl.textContent = t('license_activating');
+      const resetResult = await chrome.runtime.sendMessage({
+        type: MESSAGE_TYPES.RESET_LICENSE_INSTANCES,
+        licenseKey: key,
+      });
+      if (resetResult?.success) {
+        inputEl.value = '';
+        if (closeModalOnSuccess) closeProUpgradeModal();
+        await applyProFeatureVisibility();
+        showToast(t('toast_pro_activated'), 'success');
+      } else if (errorEl) {
+        errorEl.textContent = t(resetResult?.error || 'license_error_reset_failed');
+        errorEl.classList.remove('hidden');
+      }
     } else {
       if (errorEl) {
         errorEl.textContent = t(result?.error || 'license_activation_failed');

@@ -19,6 +19,25 @@ export const state: ContentState = {
 };
 
 /**
+ * Bound the dedup set to `max` entries using approximate-LRU eviction.
+ * A `Set` preserves insertion order, so the oldest URLs are dropped first.
+ * This keeps recent-discovery memory intact — unlike a blanket `.clear()`,
+ * which wipes everything and forces re-discovery of every image on
+ * long-lived SPA pages. Evicts down to half of `max` to amortise the cost.
+ */
+export function evictOldestSeenUrls(max: number): void {
+  const size = state.seenUrls.size;
+  if (size <= max) return;
+  const evictCount = size - Math.floor(max / 2);
+  const iter = state.seenUrls.values();
+  for (let i = 0; i < evictCount; i++) {
+    const oldest = iter.next().value;
+    if (oldest === undefined) break;
+    state.seenUrls.delete(oldest);
+  }
+}
+
+/**
  * Check whether the extension context is still valid. After an extension
  * reload / update the old content script stays alive but `chrome.runtime`
  * becomes unusable — any property access throws "Extension context invalidated".

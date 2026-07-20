@@ -236,6 +236,24 @@
   "license_error_activation_failed": {
     "message": "Échec de l'activation. Veuillez réessayer."
   },
+  "license_error_max_instances": {
+    "message": "Cette licence est déjà active sur un autre appareil."
+  },
+  "license_error_reset_cooldown": {
+    "message": "Les appareils ont été libérés récemment. Veuillez réessayer dans quelques jours."
+  },
+  "license_error_reset_failed": {
+    "message": "Impossible de libérer l'autre appareil. Veuillez réessayer."
+  },
+  "license_unbind_confirm_title": {
+    "message": "Activer sur cet appareil ?"
+  },
+  "license_unbind_confirm_message": {
+    "message": "Cette licence est déjà active sur un autre appareil. La libérer et l'activer ici ? L'autre appareil sera déconnecté de Pro."
+  },
+  "license_unbind_confirm_button": {
+    "message": "Libérer et activer ici"
+  },
   "license_error_invalid_key": {
     "message": "Clé de licence invalide."
   },

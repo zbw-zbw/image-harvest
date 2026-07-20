@@ -21,6 +21,8 @@ import { EVENTS } from './telemetry-events';
 const STORAGE_KEY_REFERRAL_COUNT = '_referral_claimed_count';
 const REFERRAL_BONUS_DAYS = 3;
 const API_BASE = PRICING_PAGE_URL.replace(/\/pricing$/, '');
+/** Versioned API prefix (P2-1) — mirrors shared/constants.ts. */
+const API_V1_BASE = `${API_BASE}/api/v1`;
 
 export interface ReferralStatus {
   /** Number of successful referrals this user has made. */
@@ -116,7 +118,7 @@ export async function claimReferralBonus(
   }
 
   try {
-    const resp = await fetch(`${API_BASE}/api/referral/claim`, {
+    const resp = await fetch(`${API_V1_BASE}/referral/claim`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
@@ -186,7 +188,7 @@ export async function matchReferral(): Promise<{ bonusDays: number } | null> {
       generateFingerprint(),
     ]);
 
-    const resp = await fetch(`${API_BASE}/api/referral/match`, {
+    const resp = await fetch(`${API_V1_BASE}/referral/match`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

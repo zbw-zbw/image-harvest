@@ -7,7 +7,7 @@
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 
-import { isExtensionContextValid, state } from '../content/state';
+import { evictOldestSeenUrls, isExtensionContextValid, state } from '../content/state';
 
 // Preserve the original singleton across tests so mutations inside one
 // case never leak into another.
@@ -102,5 +102,30 @@ describe('isExtensionContextValid', () => {
       }
     );
     expect(isExtensionContextValid()).toBe(false);
+  });
+});
+
+// ──────────────────────────────────────────────────────────────
+// evictOldestSeenUrls — approximate-LRU bound on the dedup set
+// ──────────────────────────────────────────────────────────────
+
+describe('evictOldestSeenUrls', () => {
+  it('is a no-op when size <= max', () => {
+    state.seenUrls.add('a');
+    state.seenUrls.add('b');
+    evictOldestSeenUrls(10);
+    expect(state.seenUrls.size).toBe(2);
+    expect(state.seenUrls.has('a')).toBe(true);
+  });
+
+  it('evicts oldest first, keeping the newest ~half, when size exceeds max', () => {
+    // Set preserves insertion order, so url-0 is the oldest.
+    for (let i = 0; i < 12; i++) state.seenUrls.add(`url-${i}`);
+    evictOldestSeenUrls(10); // 12 > 10 → evict down to floor(10/2)=5 newest
+    expect(state.seenUrls.size).toBe(5);
+    expect(state.seenUrls.has('url-0')).toBe(false); // oldest evicted
+    expect(state.seenUrls.has('url-6')).toBe(false); // boundary evicted
+    expect(state.seenUrls.has('url-7')).toBe(true); // boundary kept
+    expect(state.seenUrls.has('url-11')).toBe(true); // newest kept
   });
 });

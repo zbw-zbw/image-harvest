@@ -6,7 +6,7 @@
 // We replace rather than augment because the legacy markup may carry
 // imperative class toggles (`hidden`, etc.) that would conflict with
 // Preact's reconciliation.
-import { render, type ComponentType } from 'preact';
+import { render, type ComponentType, type VNode } from 'preact';
 import { LiveIndicator } from './LiveIndicator';
 import { DownloadLabel, FoundActionCount, SimilarInline } from './StatusCounts';
 import { StateScreens } from './StateScreens';
@@ -30,6 +30,15 @@ import { ReferralBanner } from './ReferralBanner';
 import { SettingsModal } from './SettingsModal';
 import { ImageGrid } from './ImageGrid';
 import { QuotaDisplay } from './QuotaDisplay';
+import { ErrorBoundary } from './ErrorBoundary';
+
+/**
+ * render() a node wrapped in an <ErrorBoundary> so a render-time crash in one
+ * subtree can't blank the whole panel. `label` tags any console output.
+ */
+function renderSafe(node: VNode, container: Element, label: string): void {
+  render(<ErrorBoundary label={label}>{node}</ErrorBoundary>, container);
+}
 
 /**
  * Replace a legacy DOM element with an empty `<tag>` mount point.
@@ -53,7 +62,7 @@ function replaceWithMountPoint(legacyId: string, tag: 'span' | 'div' = 'span'): 
 function mountAt(legacyId: string, Component: ComponentType, tag: 'span' | 'div' = 'span'): void {
   const mount = replaceWithMountPoint(legacyId, tag);
   if (!mount) return;
-  render(<Component />, mount);
+  renderSafe(<Component />, mount, legacyId);
 }
 
 /**
@@ -81,7 +90,7 @@ function mountSettingsModal(): void {
   const mount = document.createElement('div');
   mount.dataset.preactMount = 'settings-modal';
   legacy.replaceWith(mount);
-  render(<SettingsModal />, mount);
+  renderSafe(<SettingsModal />, mount, 'settings-modal');
 
   // Synchronously plant the legacy body and footer into the Preact-rendered
   // slot containers AFTER render() returns. This guarantees the subtrees
@@ -109,7 +118,7 @@ function mountImageGrid(): void {
   // Clear any pre-existing static children (none in current HTML, but
   // defensive in case of future markup changes).
   grid.innerHTML = '';
-  render(<ImageGrid />, grid);
+  renderSafe(<ImageGrid />, grid, 'image-grid');
 }
 
 /**
@@ -137,7 +146,7 @@ function mountStateScreens(): void {
   mount.style.flex = '1 1 auto';
   mount.style.minHeight = '0';
   empty.replaceWith(mount);
-  render(<StateScreens />, mount);
+  renderSafe(<StateScreens />, mount, 'state-screens');
 }
 
 /**
@@ -161,7 +170,7 @@ export function mountPreactComponents(): void {
     const proMount = replaceWithMountPoint('pro-status-area', 'div');
     if (proMount) {
       proMount.style.marginRight = 'auto';
-      render(<ProStatusBadge />, proMount);
+      renderSafe(<ProStatusBadge />, proMount, 'pro-status-area');
     }
   }
   mountAt('toast-container', ToastContainer, 'div');
@@ -202,14 +211,14 @@ export function mountPreactComponents(): void {
     const batchMount = replaceWithMountPoint('batch-ops-mount');
     if (batchMount) {
       batchMount.style.display = 'contents';
-      render(<BatchOpsButton />, batchMount);
+      renderSafe(<BatchOpsButton />, batchMount, 'batch-ops-mount');
     }
   }
   {
     const deleteMount = replaceWithMountPoint('batch-delete-mount');
     if (deleteMount) {
       deleteMount.style.display = 'contents';
-      render(<BatchDeleteButton />, deleteMount);
+      renderSafe(<BatchDeleteButton />, deleteMount, 'batch-delete-mount');
     }
   }
 
@@ -230,7 +239,7 @@ export function mountPreactComponents(): void {
 function mountSoftPaywallBanner(): void {
   const slot = document.getElementById('soft-paywall-banner-mount');
   if (slot) {
-    render(<SoftPaywallBanner />, slot);
+    renderSafe(<SoftPaywallBanner />, slot, 'soft-paywall-banner-mount');
     return;
   }
   // Fallback: no slot in this HTML variant. Stitch one onto the top of
@@ -241,13 +250,13 @@ function mountSoftPaywallBanner(): void {
   mount.id = 'soft-paywall-banner-mount';
   mount.dataset.preactMount = 'soft-paywall-banner-mount';
   app.insertBefore(mount, app.firstChild);
-  render(<SoftPaywallBanner />, mount);
+  renderSafe(<SoftPaywallBanner />, mount, 'soft-paywall-banner-mount');
 }
 
 function mountTrialGraceBanner(): void {
   const slot = document.getElementById('trial-grace-banner-mount');
   if (slot) {
-    render(<TrialGraceBanner />, slot);
+    renderSafe(<TrialGraceBanner />, slot, 'trial-grace-banner-mount');
     return;
   }
   const app = document.getElementById('app');
@@ -256,13 +265,13 @@ function mountTrialGraceBanner(): void {
   mount.id = 'trial-grace-banner-mount';
   mount.dataset.preactMount = 'trial-grace-banner-mount';
   app.insertBefore(mount, app.firstChild);
-  render(<TrialGraceBanner />, mount);
+  renderSafe(<TrialGraceBanner />, mount, 'trial-grace-banner-mount');
 }
 
 function mountReferralBanner(): void {
   const slot = document.getElementById('referral-banner-mount');
   if (slot) {
-    render(<ReferralBanner />, slot);
+    renderSafe(<ReferralBanner />, slot, 'referral-banner-mount');
     return;
   }
   const app = document.getElementById('app');
@@ -271,7 +280,7 @@ function mountReferralBanner(): void {
   mount.id = 'referral-banner-mount';
   mount.dataset.preactMount = 'referral-banner-mount';
   app.insertBefore(mount, app.firstChild);
-  render(<ReferralBanner />, mount);
+  renderSafe(<ReferralBanner />, mount, 'referral-banner-mount');
 }
 
 /**
@@ -287,5 +296,5 @@ function mountFreshComponent(mountId: string, Component: ComponentType): void {
     mount.dataset.preactMount = mountId;
     document.body.appendChild(mount);
   }
-  render(<Component />, mount);
+  renderSafe(<Component />, mount, mountId);
 }

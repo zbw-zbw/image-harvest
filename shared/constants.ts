@@ -118,6 +118,7 @@ export const MESSAGE_TYPES = {
   // License
   ACTIVATE_LICENSE: 'ACTIVATE_LICENSE',
   DEACTIVATE_LICENSE: 'DEACTIVATE_LICENSE',
+  RESET_LICENSE_INSTANCES: 'RESET_LICENSE_INSTANCES',
   VALIDATE_LICENSE: 'VALIDATE_LICENSE',
   GET_LICENSE_STATUS: 'GET_LICENSE_STATUS',
   LICENSE_STATUS_CHANGED: 'LICENSE_STATUS_CHANGED',
@@ -383,8 +384,14 @@ export const NAMING_VARIABLES = [
 // Backend base URL — override via VITE_API_BASE in .env.local for local dev.
 const API_BASE = import.meta.env.VITE_API_BASE || 'https://image-harvest.kyriewen.cn';
 
+// Versioned API surface (P2-1). All extension↔backend calls go through the
+// `/api/v1` prefix so the contract can evolve without breaking older installs.
+// The backend serves `/api/v1/*` via a rewrite onto the same handlers as the
+// legacy `/api/*` paths, so this is fully backward compatible on the wire.
+const API_V1_BASE = `${API_BASE}/api/v1`;
+
 // License & Payment
-export const LICENSE_API_URL = `${API_BASE}/api/license`;
+export const LICENSE_API_URL = `${API_V1_BASE}/license`;
 export const PRICING_PAGE_URL = `${API_BASE}/pricing`;
 export const INVITE_PAGE_URL = `${API_BASE}/invite`;
 
@@ -396,7 +403,7 @@ export const INVITE_PAGE_URL = `${API_BASE}/invite`;
 //     ~64KB Chrome cap on unload-time fetches.
 //   - MAX_QUEUE: hard cap on persisted retry events. Prevents a long server
 //     outage from filling chrome.storage.local indefinitely.
-export const TELEMETRY_API_URL = `${API_BASE}/api/telemetry`;
+export const TELEMETRY_API_URL = `${API_V1_BASE}/telemetry`;
 export const TELEMETRY_FLUSH_INTERVAL_MS = 5_000;
 export const TELEMETRY_BATCH_SIZE = 20;
 export const TELEMETRY_MAX_QUEUE = 100;
@@ -414,13 +421,23 @@ export const LICENSE_CHECK_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours
 export const LICENSE_GRACE_PERIOD = 7 * 24 * 60 * 60 * 1000; // 7 days offline grace
 export const MAX_LICENSE_INSTANCES = 1;
 
+// Public key (base64 SPKI DER, ECDSA P-256) used to verify server-signed
+// license responses offline. Generate the matching keypair on the backend with
+// `npm run keys:generate` and paste the printed public key here; put the
+// private key in the backend's LICENSE_SIGNING_PRIVATE_KEY env var.
+//
+// Empty string = signing not yet provisioned. In that case the extension
+// treats every license as "unsigned/legacy" and trusts the cache exactly as
+// before (fully backward compatible) — no user is locked out.
+export const LICENSE_PUBLIC_KEY = '';
+
 // Eagle export (Phase 5) — local API provided by Eagle app.
 export const EAGLE_API_BASE = 'http://localhost:41595';
 export const EAGLE_BATCH_SIZE = 10;
 
 // AI tagging (Phase 4) — backend API + quota.
-export const AI_TAG_API_URL = `${API_BASE}/api/ai/tag`;
-export const AI_TAG_BATCH_API_URL = `${API_BASE}/api/ai/tag-batch`;
+export const AI_TAG_API_URL = `${API_V1_BASE}/ai/tag`;
+export const AI_TAG_BATCH_API_URL = `${API_V1_BASE}/ai/tag-batch`;
 /** Fallback Pro AI quota when remote config is unavailable. Must match backend default. */
 export const AI_QUOTA_LIMIT_FALLBACK = 100;
 

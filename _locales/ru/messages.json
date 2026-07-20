@@ -236,6 +236,24 @@
   "license_error_activation_failed": {
     "message": "Ошибка активации. Пожалуйста, попробуйте снова."
   },
+  "license_error_max_instances": {
+    "message": "Эта лицензия уже активирована на другом устройстве."
+  },
+  "license_error_reset_cooldown": {
+    "message": "Устройства недавно были отвязаны. Пожалуйста, попробуйте через несколько дней."
+  },
+  "license_error_reset_failed": {
+    "message": "Не удалось отвязать другое устройство. Пожалуйста, попробуйте снова."
+  },
+  "license_unbind_confirm_title": {
+    "message": "Активировать на этом устройстве?"
+  },
+  "license_unbind_confirm_message": {
+    "message": "Эта лицензия уже активирована на другом устройстве. Отвязать её и активировать здесь? На другом устройстве Pro будет отключён."
+  },
+  "license_unbind_confirm_button": {
+    "message": "Отвязать и активировать здесь"
+  },
   "license_error_invalid_key": {
     "message": "Недействительный лицензионный ключ."
   },

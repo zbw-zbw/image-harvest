@@ -10,6 +10,8 @@ import {
   getLicenseInfo,
   getOrCreateInstanceId,
   isProUser,
+  resetAndActivateLicense,
+  resetLicenseInstancesRemote,
 } from '../shared/license';
 import { LICENSE_CHECK_INTERVAL, LICENSE_GRACE_PERIOD, LICENSE_STATUS } from '../shared/constants';
 import type { LicenseData } from '../shared/types';
@@ -303,5 +305,68 @@ describe('isProUser', () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const stored = await (globalThis as any).chrome.storage.local.get('licenseData');
     expect((stored.licenseData as LicenseData).lastVerified).toBe(lastVerifiedAt);
+  });
+});
+
+describe('resetLicenseInstancesRemote (self-serve unbind)', () => {
+  it('posts action=reset with an upper-cased key and no instanceId', async () => {
+    installFetchMock((call) => {
+      if (call.url.endsWith('/activate')) return { success: true };
+      return { success: false };
+    });
+    const result = await resetLicenseInstancesRemote('aaaa-bbbb-cccc-dddd');
+    expect(result.success).toBe(true);
+    expect(fetchCalls).toHaveLength(1);
+    expect(fetchCalls[0].url).toContain('/activate');
+    expect(fetchCalls[0].body.action).toBe('reset');
+    expect(fetchCalls[0].body.licenseKey).toBe('AAAA-BBBB-CCCC-DDDD');
+    expect(fetchCalls[0].body.instanceId).toBeUndefined();
+  });
+
+  it('surfaces a coded error body (e.g. cooldown) as a failed result', async () => {
+    installFetchMock(() => ({ success: false, error: 'license_error_reset_cooldown' }));
+    const result = await resetLicenseInstancesRemote('aaaa-bbbb-cccc-dddd');
+    expect(result.success).toBe(false);
+    expect(result.error).toBe('license_error_reset_cooldown');
+  });
+
+  it('returns a network error result when the request throws', async () => {
+    installFetchMock(() => undefined); // responder undefined → mock throws
+    const result = await resetLicenseInstancesRemote('aaaa-bbbb-cccc-dddd');
+    expect(result.success).toBe(false);
+    expect(result.error).toBe('license_error_network');
+  });
+});
+
+describe('resetAndActivateLicense', () => {
+  it('short-circuits and returns the reset error when unbind fails', async () => {
+    installFetchMock(() => ({ success: false, error: 'license_error_reset_cooldown' }));
+    const result = await resetAndActivateLicense('aaaa-bbbb-cccc-dddd');
+    expect(result.success).toBe(false);
+    expect(result.error).toBe('license_error_reset_cooldown');
+    // Only the reset call happened — activation was never attempted.
+    expect(fetchCalls).toHaveLength(1);
+    expect(fetchCalls[0].body.action).toBe('reset');
+  });
+
+  it('proceeds to full activation after a successful unbind', async () => {
+    installFetchMock((call) => {
+      if (call.body.action === 'reset') return { success: true };
+      if (call.url.includes('/verify')) return { valid: true, plan: 'yearly' };
+      if (call.url.endsWith('/activate')) return { success: true, plan: 'yearly' };
+      return { success: false };
+    });
+    const result = await resetAndActivateLicense('aaaa-bbbb-cccc-dddd');
+    expect(result.success).toBe(true);
+    expect(result.plan).toBe('yearly');
+    // reset → verify → activate
+    const actions = fetchCalls.map((c) => c.body.action);
+    expect(actions).toContain('reset');
+    expect(actions).toContain('activate');
+    expect(fetchCalls.some((c) => c.url.includes('/verify'))).toBe(true);
+
+    // Local license data was persisted by the activation step.
+    const info = await getLicenseInfo();
+    expect(info.hasLicense).toBe(true);
   });
 });

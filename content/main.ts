@@ -2,6 +2,7 @@
 // Handles message processing and core image extraction functions
 
 import { MESSAGE_TYPES, LIMITS } from '../shared/constants';
+import { validateIncomingMessage } from '../shared/messaging';
 import {
   generateId,
   resolveUrl,
@@ -58,7 +59,9 @@ interface MessageBase {
 try {
   chrome.runtime.onMessage.addListener((message: MessageBase, _sender, sendResponse) => {
     if (!isExtensionContextValid()) return;
-    handleMessage(message, sendResponse);
+    const valid = validateIncomingMessage(message);
+    if (!valid) return; // drop unknown / malformed / version-mismatched messages
+    handleMessage(valid, sendResponse);
     return true;
   });
 } catch {
@@ -130,6 +133,37 @@ async function handleMessage(
 }
 
 // Main extraction function
+//
+// The scan is expressed as an ordered pipeline of independent stages. Each
+// stage populates the shared `images` map in place. Add / remove / reorder a
+// stage by editing EXTRACTION_STAGES below — no other code changes needed.
+interface ExtractionStage {
+  /** Short name used in diagnostics. */
+  name: string;
+  /** Populate `images` in place. */
+  run: (images: Map<string, ImageItem>) => Promise<void>;
+  /** When present and it returns false, the stage is skipped. */
+  when?: (options: ExtractOptions) => boolean;
+}
+
+const EXTRACTION_STAGES: ExtractionStage[] = [
+  { name: 'img-tags', run: extractImgTags },
+  { name: 'background-images', run: extractBackgroundImages },
+  { name: 'picture-sources', run: extractPictureSources },
+  // (removed: extractFromStylesheets was a no-op — per-element
+  //  getComputedStyle already catches applied background images)
+  { name: 'inline-svg', run: extractInlineSvgs },
+  { name: 'canvas', run: extractCanvasElements },
+  { name: 'video-poster', run: extractVideoPosterImages },
+  { name: 'input-image', run: extractInputImages },
+  { name: 'object-embed', run: extractObjectEmbedImages },
+  { name: 'meta-link', run: extractMetaAndLinkImages },
+  { name: 'css-content', run: extractCssContentImages },
+  { name: 'lazy-load', run: extractLazyLoadImages },
+  { name: 'shadow-dom', run: extractFromShadowDom },
+  { name: 'iframes', run: extractFromIframes, when: (o) => !o.skipIframes },
+];
+
 export async function extractImages(options: ExtractOptions = {}): Promise<ImageItem[]> {
   if (state.isExtracting) {
     return [];
@@ -140,48 +174,16 @@ export async function extractImages(options: ExtractOptions = {}): Promise<Image
   try {
     const images = new Map<string, ImageItem>();
 
-    // 1. Extract <img> tags
-    await extractImgTags(images);
-
-    // 2. Extract background images
-    await extractBackgroundImages(images);
-
-    // 3. Extract picture sources
-    await extractPictureSources(images);
-
-    // 4. (removed: extractFromStylesheets was a no-op — per-element
-    //    getComputedStyle already catches applied background images)
-
-    // 5. Extract inline <svg> elements
-    await extractInlineSvgs(images);
-
-    // 6. Extract <canvas> elements
-    await extractCanvasElements(images);
-
-    // 7. Extract <video> poster images
-    await extractVideoPosterImages(images);
-
-    // 8. Extract <input type="image"> elements
-    await extractInputImages(images);
-
-    // 9. Extract <object>/<embed> images
-    await extractObjectEmbedImages(images);
-
-    // 10. Extract <link> icons and <meta> og:image
-    await extractMetaAndLinkImages(images);
-
-    // 11. Extract images from CSS content property
-    await extractCssContentImages(images);
-
-    // 12. Extract lazy-loaded images (data-src, data-srcset, etc.)
-    await extractLazyLoadImages(images);
-
-    // 13. Extract images from Shadow DOM trees
-    await extractFromShadowDom(images);
-
-    // 14. Extract from iframes (V2.0)
-    if (!options.skipIframes) {
-      await extractFromIframes(images);
+    // Run each pipeline stage in order. Stages are isolated: a throw in one
+    // (e.g. a hostile canvas or a cross-origin iframe) is logged and skipped
+    // rather than aborting the whole scan and hanging the caller.
+    for (const stage of EXTRACTION_STAGES) {
+      if (stage.when && !stage.when(options)) continue;
+      try {
+        await stage.run(images);
+      } catch (error) {
+        console.warn(`[extract] stage "${stage.name}" failed:`, error);
+      }
     }
 
     const imageArray = Array.from(images.values());

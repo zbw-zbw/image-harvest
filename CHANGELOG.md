@@ -54,6 +54,43 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
+## [Unreleased]
+
+---
+
+## [1.0.11] — 2026-07-20
+
+### 🔒 Security
+
+- **Tamper-evident Pro licenses**: activation and verification responses can now be cryptographically signed (ECDSA P-256) and verified offline by the extension, so a cached Pro license can no longer be forged by editing local storage.
+- **Safer license delivery**: after payment your license key is no longer exposed in the redirect URL — it's delivered through a single-use, short-lived token that the success page exchanges securely.
+- **Hardened license endpoints**: activation and device-reset requests are now rate-limited to deter abuse.
+
+### ✨ Added
+
+- **Self-serve device unbind**: hit the device limit on a new computer? You can now release all previously bound devices using just your license key — no need to still have access to the old device.
+- **Multilingual checkout**: purchasing in your language now returns you to a success page in that same language.
+
+### 🔄 Changed
+
+- **Versioned backend API**: the extension now talks to the backend over a versioned `/api/v1` endpoint so future backend changes won't break existing installs.
+- **More resilient side panel**: the UI is wrapped in an error boundary that recovers gracefully from unexpected errors instead of leaving a blank panel.
+
+### 🐛 Fixed
+
+- **Payment page stuck on "Processing"**: fixed cases where switching language or reloading could leave the success page loading forever; the redeemed key is now cached and language switches preserve your session.
+- **Reliable payment callbacks**: corrected the payment redirect signature check so completed purchases consistently reach the success page.
+
+### 🌍 i18n
+
+- Refreshed all 15 language catalogues with strings for the new self-serve unbind and license flows.
+
+### 🧪 Test Coverage
+
+- Added tests for the typed messaging layer and license reset helpers; the extension suite now runs 1467 tests.
+
+---
+
 ## [1.0.10] — 2026-07-06
 
 ### 🔒 Security

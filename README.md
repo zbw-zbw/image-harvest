@@ -87,20 +87,19 @@
 
 ---
 
-## 🆕 What's New (v1.0.10)
+## 🆕 What's New (v1.0.11)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
-- **🔒 XSS Prevention** — all innerHTML-injected external data (tab titles, URLs, collection items) are now HTML-escaped via new `escapeHtml()` utility.
-- **🛡️ SSRF Hardening** — expanded private IP blocklist covering full IPv4/IPv6 ranges, non-standard IP formats, credential URLs, and redirect bypass prevention.
-- **💳 License Deactivation Fix** — remote deactivation failures no longer silently clear local data, preventing activation slot leaks.
-- **⚡ AI Quota Race Fix** — optimistic deduction with rollback on all error paths (including timeout/abort) prevents quota overuse from rapid clicks.
-- **🚀 Visibility Check 10× Faster** — `checkImagesVisibility` now builds a single-pass URL index (O(n+m) vs O(n×m)).
-- **📦 Base64 Encoding 10× Faster** — `arrayBufferToBase64` rewritten with 8KB chunked processing.
-- **🐛 Batch Download Flicker Eliminated** — progress modal uses 300ms show-delay; fast downloads never display it.
-- **🐛 Download Dropdown Instant Close** — dropdown closes via `display:none` with module-level lock, no more re-opening during async operations.
-- **⏱️ Fetch Timeouts Added** — `fetchImageMetaProxy` (10s) and `fetchImageData` (30s) now abort on slow servers.
-- **🧹 Progress Controller Refactored** — 6 loose module variables consolidated into a single `progressController` object.
+- **🔐 Tamper-Evident Pro Licenses** — activation/verify responses can be ECDSA-signed and verified offline, so a cached Pro license can't be forged by editing local storage.
+- **🎟️ Safer License Delivery** — your key is no longer exposed in the redirect URL; it's handed over through a single-use, short-lived token.
+- **🔓 Self-Serve Device Unbind** — hit the device limit on a new machine? Release all previously bound devices with just your license key.
+- **🌍 Multilingual Checkout** — purchasing in your language now returns you to a success page in that same language.
+- **🧩 Versioned Backend API** — the extension now talks to the backend over `/api/v1` so future changes won't break existing installs.
+- **🛡️ Rate-Limited License Endpoints** — activation and device-reset requests are throttled to deter abuse.
+- **🧱 Resilient Side Panel** — wrapped in an error boundary that recovers gracefully instead of showing a blank panel.
+- **🐛 No More Stuck "Processing" Page** — switching language or reloading no longer leaves the payment success page loading forever.
+- **✅ Reliable Payment Callbacks** — corrected the redirect signature check so completed purchases consistently reach the success page.
 
 ---
 
