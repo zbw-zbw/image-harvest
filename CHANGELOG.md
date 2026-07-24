@@ -266,6 +266,8 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ### ⚠️ Known Issues
 
+> ✅ **Both resolved in [1.0.7]** — see that release's 🧹 Housekeeping (debug logs cleaned, `TEST_MATCH_REFERRAL` confirmed `import.meta.env.DEV`-guarded). Kept here for historical accuracy.
+
 - **4 debug `console.log` statements** remain in `background/license.ts:19`, `background/reverse-search.ts:245,252`, `background/index.ts:204` — should be cleaned before final submission.
 - **`TEST_MATCH_REFERRAL` message handler** in `background/index.ts` lacks a production environment guard — consider wrapping in `__DEV__` check.
 
