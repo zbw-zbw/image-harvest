@@ -20,7 +20,7 @@
 //     functions above)
 //
 // Called from settings.ts > showSettings() via dynamic import.
-import { MESSAGE_TYPES, PRICING_PAGE_URL } from '../shared/constants';
+import { MESSAGE_TYPES, pricingPageUrl } from '../shared/constants';
 import { t } from '../shared/i18n';
 import { applyProFeatureVisibility, closeProUpgradeModal } from './settings';
 import { showConfirmDialog, showToast } from './ui';
@@ -244,7 +244,7 @@ export function bindLicenseModalEvents(): void {
   if (getProLink) {
     getProLink.addEventListener('click', (e) => {
       e.preventDefault();
-      chrome.tabs.create({ url: PRICING_PAGE_URL });
+      chrome.tabs.create({ url: pricingPageUrl('license_ui') });
     });
   }
 

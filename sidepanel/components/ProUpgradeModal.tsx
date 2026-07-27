@@ -35,7 +35,7 @@ import { track, flushNow } from '../../shared/telemetry';
 import { EVENTS } from '../../shared/telemetry-events';
 import { getProUpsellBucket, type AbBucket } from '../../shared/ab-experiment';
 import { getState as getPaywallState, markResolved } from '../../shared/paywall-state';
-import { PRICING_PAGE_URL, MESSAGE_TYPES, getFreeLimits } from '../../shared/constants';
+import { pricingPageUrl, MESSAGE_TYPES, getFreeLimits } from '../../shared/constants';
 import { getFeatureCopySynchronous, interpolateFeatureDesc } from '../../shared/remote-config';
 import { getLocale } from '../../shared/i18n';
 import { showToast } from '../ui';
@@ -106,7 +106,10 @@ async function handleStartTrial(
 function handlePricingClick(e: MouseEvent): void {
   e.preventDefault();
   void track(EVENTS.PRO_UPSELL_CTA_CLICKED, { trigger: 'modal', cta: 'pricing' });
-  chrome.tabs.create({ url: PRICING_PAGE_URL });
+  // Attribution: 'modal' tells the website funnel WHICH touchpoint sent
+  // this visit (vs. the settings get-Pro link) — mirrors the trigger prop
+  // on the telemetry event above.
+  chrome.tabs.create({ url: pricingPageUrl('modal') });
 }
 
 export function ProUpgradeModal() {

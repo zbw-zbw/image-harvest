@@ -393,6 +393,17 @@ const API_V1_BASE = `${API_BASE}/api/v1`;
 // License & Payment
 export const LICENSE_API_URL = `${API_V1_BASE}/license`;
 export const PRICING_PAGE_URL = `${API_BASE}/pricing`;
+
+/**
+ * Pricing-page URL with attribution params. The website's
+ * PricingPageTracker reads `utm_source` / `trigger` so the funnel can
+ * join "which extension touchpoint sent this visit" instead of guessing
+ * from the (unreliable) document.referrer.
+ */
+export function pricingPageUrl(trigger: string): string {
+  return `${PRICING_PAGE_URL}?utm_source=extension&trigger=${encodeURIComponent(trigger)}`;
+}
+
 export const INVITE_PAGE_URL = `${API_BASE}/invite`;
 
 // Telemetry (anonymous, opt-in). See shared/telemetry.ts.
