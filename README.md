@@ -87,19 +87,15 @@
 
 ---
 
-## 🆕 What's New (v1.0.11)
+## 🆕 What's New (v1.0.12)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
-- **🔐 Tamper-Evident Pro Licenses** — activation/verify responses can be ECDSA-signed and verified offline, so a cached Pro license can't be forged by editing local storage.
-- **🎟️ Safer License Delivery** — your key is no longer exposed in the redirect URL; it's handed over through a single-use, short-lived token.
-- **🔓 Self-Serve Device Unbind** — hit the device limit on a new machine? Release all previously bound devices with just your license key.
-- **🌍 Multilingual Checkout** — purchasing in your language now returns you to a success page in that same language.
-- **🧩 Versioned Backend API** — the extension now talks to the backend over `/api/v1` so future changes won't break existing installs.
-- **🛡️ Rate-Limited License Endpoints** — activation and device-reset requests are throttled to deter abuse.
-- **🧱 Resilient Side Panel** — wrapped in an error boundary that recovers gracefully instead of showing a blank panel.
-- **🐛 No More Stuck "Processing" Page** — switching language or reloading no longer leaves the payment success page loading forever.
-- **✅ Reliable Payment Callbacks** — corrected the redirect signature check so completed purchases consistently reach the success page.
+- **📊 Complete Analytics Data** — fixed 14 anonymous product events being silently dropped by the backend, so improvements are driven by real usage data.
+- **🎯 Honest Upgrade Attribution** — the pricing page now knows which in-extension touchpoint sent you, without collecting any extra personal data.
+- **✅ Accurate Payment Funnel** — an anonymous "payment confirmed" signal replaces indirect estimates on the success page.
+- **🧪 51 New Extension Tests** — offline license-signature verification (tamper evidence), referral flows and remote-config caching are now fully regression-tested (1518 tests total).
+- **🛡️ Backend Test Suite + CI** — the backend gained its first automated suite (61 tests: payment signatures, license signing, SSRF guards, rate limits), enforced by GitHub Actions on every push.
 
 ---
 

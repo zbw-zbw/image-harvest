@@ -58,6 +58,24 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
+## [1.0.12] — 2026-07-28
+
+### 🐛 Fixed
+
+- **Analytics events silently dropped**: 14 extension events (soft-paywall clicks, auto-trial starts, referral shares, Eagle exports, AI tagging and more) were rejected by the backend's event whitelist and never recorded — they now land correctly, so product decisions are based on complete data.
+
+### 🔄 Changed
+
+- **Smarter upgrade-page attribution**: opening the pricing page from the extension now tells the website which touchpoint sent you (upgrade dialog vs. settings link), so we can learn which prompts are genuinely useful — no extra personal data is collected.
+- **Payment funnel accuracy**: the website now records an anonymous "payment confirmed" step when your license key is delivered, replacing an indirect estimate.
+
+### 🧪 Test Coverage
+
+- **51 new extension tests** (suite now 1518): offline license-signature verification (tamper-evidence contract), referral flows, and the remote-config cache.
+- **Backend gains its first automated test suite**: 61 Vitest cases covering payment signature verification, license signing, SSRF guards and rate limiting, now enforced by a new GitHub Actions CI on every push.
+
+---
+
 ## [1.0.11] — 2026-07-20
 
 ### 🔒 Security
