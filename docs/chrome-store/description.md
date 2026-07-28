@@ -2,13 +2,16 @@
 
 > 用于 Chrome Web Store 商品详情页的完整描述文案。
 > 注意：CWS 不支持 Markdown，以下为纯文本格式（emoji 可正常显示）。
-> 最后更新：v1.0.6 (2026-06-05)
+> 最后更新：v1.0.12 (2026-07-28) —— 新增开篇总览段（官方 best-listing 要求「总览段 + 功能列表」结构），修复标题粘连。
 
 ---
 
-## English🔍 Smart Image Extraction
+## English
 
 ```text
+Image Harvest is a smart image downloader that finds and batch-saves every image on any webpage — including the CSS backgrounds, lazy-loaded and Shadow-DOM images most tools miss. Filter by size or format, download everything as one ZIP, extract from multiple tabs at once, detect near-duplicates, and organize with AI tags and collections. Built for designers, researchers, e-commerce sellers and content curators. Free to use — no sign-up required.
+
+🔍 Smart Image Extraction
 
 Automatically finds every image on any webpage — including standard images, CSS backgrounds, responsive images, and high-resolution variants. Scans deep into Shadow DOM and iframes for complete coverage. Live monitoring detects new images as you scroll (Pro).
 
@@ -74,9 +77,12 @@ Ctrl+Shift+S (Cmd+Shift+S on Mac): Toggle Image Harvest
 
 ---
 
-## 简体中文🔍 智能图片提取
+## 简体中文
 
 ```text
+Image Harvest 是一款智能图片下载器：自动找出网页上的每一张图片 —— 包括其他工具经常漏掉的 CSS 背景图、懒加载图和 Shadow DOM 图片，并一键打包为 ZIP 批量下载。支持按尺寸/格式筛选、多标签页同时提取、相似图去重、AI 智能标注与收藏管理。为设计师、研究者、电商卖家和内容创作者打造。免费使用，无需注册。
+
+🔍 智能图片提取
 
 自动识别网页上的所有图片 —— 包括标准图片、CSS 背景图、响应式图片和高清变体。深入扫描 Shadow DOM 和 iframe，确保不遗漏任何一张图。Pro 用户还可开启实时监控，滚动页面时自动发现新加载的图片。
 

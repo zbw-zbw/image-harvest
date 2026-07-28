@@ -1,6 +1,7 @@
 # Chrome Web Store — Short Summary
 
 > 用于 Chrome Web Store 商品详情页 "Summary" 字段（短描述，**严格限制 132 字符**）。
+> ⚠️ Summary 由 manifest.config.ts 的 `description` 字段自动填充，无法在 dashboard 单独修改 —— 换文案必须随新版本发布。
 
 ---
 
@@ -11,6 +12,16 @@ Batch download images. Multi-tab extract, AI tagging, Eagle export, similar dete
 ```
 
 字符数：**131 / 132** ✅
+
+---
+
+## ⭐ 推荐新稿（随 v1.0.13 更新 manifest description）
+
+```
+Image downloader that finds every image on a page. Batch save as ZIP, multi-tab extract, AI tags, duplicate detection and more.
+```
+
+理由：当前版是纯功能名词堆砸，缺主搜索词「image downloader」（title 里只有动词形式 Download）；新稿首句 = 品类词 + 核心差异化（finds every image），后句保留高价值功能词。符合官方「首句含核心动词、突出主用例」要求。
 
 ---
 
