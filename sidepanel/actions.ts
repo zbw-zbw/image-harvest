@@ -355,6 +355,9 @@ export async function downloadSingle(img: ImageItem, format: string | null): Pro
     // short-circuit on render.
     void recordDownloads(1);
     void recordDownloadForRating(1);
+    // Nudge the rating prompt to re-check its gate now that the user just
+    // received a file — the best moment to ask for a review.
+    state.ratingCheckTick += 1;
     // Increment format conversion quota after successful download
     if (format && !state.isProUser) {
       import('../shared/feature-quota').then(({ incrementFeatureUsage }) =>
@@ -504,6 +507,9 @@ export async function downloadSelectedAsZip(
     void track(EVENTS.DOWNLOAD_BATCH, { count: successCount });
     if (successCount > 0) void recordDownloads(successCount);
     if (successCount > 0) void recordDownloadForRating(successCount);
+    // Batch completion is the strongest "moment of delight" — re-check the
+    // rating gate immediately instead of waiting for the next panel open.
+    if (successCount > 0) state.ratingCheckTick += 1;
     if (targetFormat && !state.isProUser) {
       import('../shared/feature-quota').then(({ incrementFeatureUsage }) =>
         incrementFeatureUsage('formatConvert')

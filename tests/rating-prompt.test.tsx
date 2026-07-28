@@ -173,6 +173,17 @@ import {
   CHROME_STORE_REVIEW_URL,
 } from '../sidepanel/components/RatingPromptModal';
 import * as ratingState from '../shared/rating-prompt-state';
+import { state } from '../sidepanel/state';
+import { track } from '../shared/telemetry';
+
+// Hoisted: the component now emits rating_prompt_shown / rating_prompt_cta.
+// Mocking transport keeps these tests network-silent and lets us assert
+// the exact event payloads.
+vi.mock('../shared/telemetry', () => ({
+  track: vi.fn().mockResolvedValue(undefined),
+  flushNow: vi.fn().mockResolvedValue(undefined),
+}));
+const mockTrack = vi.mocked(track);
 
 describe('<RatingPromptModal/>', () => {
   // Typed as MockInstance without generics so the narrower window.open
@@ -191,6 +202,10 @@ describe('<RatingPromptModal/>', () => {
       i18n: { getUILanguage: () => 'en' },
     };
     openSpy = vi.spyOn(window, 'open').mockReturnValue(null);
+    // Reset the delight-moment counter so trigger assertions ('mount' vs
+    // 'download') are deterministic regardless of test order.
+    state.ratingCheckTick = 0;
+    mockTrack.mockClear();
   });
 
   afterEach(() => {
@@ -255,5 +270,47 @@ describe('<RatingPromptModal/>', () => {
     fireEvent.click(btn);
     expect(markResolved).toHaveBeenCalledTimes(1);
     expect(openSpy).not.toHaveBeenCalled();
+  });
+
+  // ── Telemetry + delight-moment re-check (growth B2) ──────────────────
+
+  it('emits rating_prompt_shown with trigger=mount for the panel-open check', async () => {
+    vi.spyOn(ratingState, 'shouldShowRatingPrompt').mockResolvedValue(true);
+    vi.spyOn(ratingState, 'markRatingPromptShown').mockResolvedValue();
+    const { findByText } = render(<RatingPromptModal />);
+    await findByText('Enjoying Image Harvest?');
+    expect(mockTrack).toHaveBeenCalledWith('rating_prompt_shown', { trigger: 'mount' });
+  });
+
+  it('re-evaluates the gate when ratingCheckTick bumps (download completed)', async () => {
+    // Gate closed at mount — below threshold.
+    const gate = vi.spyOn(ratingState, 'shouldShowRatingPrompt').mockResolvedValue(false);
+    vi.spyOn(ratingState, 'markRatingPromptShown').mockResolvedValue();
+    const { container, findByText } = render(<RatingPromptModal />);
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(container.querySelector('#rating-prompt-modal')).toBeNull();
+
+    // A successful download crosses the threshold mid-session: actions.ts
+    // bumps the tick, and the modal must re-check WITHOUT a remount.
+    gate.mockResolvedValue(true);
+    state.ratingCheckTick += 1;
+
+    await findByText('Enjoying Image Harvest?');
+    expect(mockTrack).toHaveBeenCalledWith('rating_prompt_shown', { trigger: 'download' });
+  });
+
+  it.each([
+    ['⭐ Rate on Chrome Store', 'rate'],
+    ['Maybe later', 'later'],
+    ["Don't ask again", 'never'],
+  ])('emits rating_prompt_cta action=%s', async (label, action) => {
+    vi.spyOn(ratingState, 'shouldShowRatingPrompt').mockResolvedValue(true);
+    vi.spyOn(ratingState, 'markRatingPromptShown').mockResolvedValue();
+    vi.spyOn(ratingState, 'markRatingPromptResolved').mockResolvedValue();
+    vi.spyOn(ratingState, 'markRatingPromptDismissed').mockResolvedValue();
+    const { findByText } = render(<RatingPromptModal />);
+    fireEvent.click(await findByText(label as string));
+    expect(mockTrack).toHaveBeenCalledWith('rating_prompt_cta', { action });
   });
 });

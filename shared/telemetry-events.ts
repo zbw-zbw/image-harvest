@@ -76,6 +76,12 @@ export const EVENTS = {
   SOFT_PAYWALL_DISMISSED: 'soft_paywall_dismissed',
   SOFT_PAYWALL_CTA_CLICKED: 'soft_paywall_cta_clicked',
 
+  // Rating prompt — store-listing social proof funnel. `trigger` tells us
+  // whether the "moment of delight" re-check (download) converts better
+  // than the legacy mount-time check.
+  RATING_PROMPT_SHOWN: 'rating_prompt_shown', // props: { trigger: 'mount' | 'download' }
+  RATING_PROMPT_CTA: 'rating_prompt_cta', // props: { action: 'rate' | 'later' | 'never' }
+
   // Batch operations (Round 2)
   BATCH_FAVORITE: 'batch_favorite',
   BATCH_AI_TAG: 'batch_ai_tag',
@@ -172,6 +178,9 @@ export const EVENT_PROP_SCHEMAS: Record<TelemetryEventName, readonly string[]> =
   [EVENTS.SOFT_PAYWALL_SHOWN]: ['triggerCount', 'abBucket'], // download count threshold
   [EVENTS.SOFT_PAYWALL_DISMISSED]: ['action', 'abBucket'], // action: "later" | "close"
   [EVENTS.SOFT_PAYWALL_CTA_CLICKED]: ['action', 'abBucket'], // action: "trial" | "pricing"
+
+  [EVENTS.RATING_PROMPT_SHOWN]: ['trigger'], // trigger: "mount" | "download"
+  [EVENTS.RATING_PROMPT_CTA]: ['action'], // action: "rate" | "later" | "never"
 
   [EVENTS.BATCH_FAVORITE]: ['count'],
   [EVENTS.BATCH_AI_TAG]: ['count'],

@@ -427,6 +427,14 @@ export interface SidepanelState {
    * without needing a panel reload.
    */
   localeTick: number;
+
+  /**
+   * Bumped after a successful download so <RatingPromptModal/> re-evaluates
+   * its visibility gate at the "moment of delight" (user just received
+   * files) instead of only once at panel mount — crossing the threshold
+   * mid-session no longer waits for the NEXT panel open to prompt.
+   */
+  ratingCheckTick: number;
 }
 
 // ── Initial state value ─────────────────────────────────────────────────────
@@ -527,6 +535,7 @@ function createInitialState(): SidepanelState {
     settingsModalState: { open: false },
     privacyOptInModalState: { open: false },
     localeTick: 0,
+    ratingCheckTick: 0,
   };
 }
 

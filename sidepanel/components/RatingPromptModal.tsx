@@ -10,7 +10,8 @@
 //     ask again" (resolved). Both "Rate now" and "Don't ask again"
 //     mark resolved=true; "Maybe later" only starts the cooldown.
 //
-// Visibility decision is made once per mount via shouldShowRatingPrompt().
+// Visibility decision runs at mount AND again whenever state.ratingCheckTick
+// bumps (a successful download just completed — the "moment of delight").
 // Pro users are NOT exempted (a happy Pro user is exactly who we want
 // reviewing the listing); the gate is purely behavioral.
 //
@@ -24,7 +25,10 @@ import {
   shouldShowRatingPrompt,
 } from '../../shared/rating-prompt-state';
 import { t } from '../../shared/i18n';
+import { track } from '../../shared/telemetry';
+import { EVENTS } from '../../shared/telemetry-events';
 import { state } from '../state';
+import { useStoreSelector } from './storeHook';
 
 /**
  * Chrome Web Store reviews URL for our listing. Extracted as a constant
@@ -38,6 +42,8 @@ export const CHROME_STORE_REVIEW_URL =
 
 export function RatingPromptModal() {
   const [visible, setVisible] = useState(false);
+  // Re-run the gate check when a download completes (see actions.ts).
+  const ratingCheckTick = useStoreSelector((s) => s.ratingCheckTick);
 
   useEffect(() => {
     let cancelled = false;
@@ -56,12 +62,18 @@ export function RatingPromptModal() {
       const ok = await shouldShowRatingPrompt();
       if (cancelled || !ok) return;
       await markRatingPromptShown();
+      // trigger distinguishes the "moment of delight" re-check (download)
+      // from the legacy panel-open check so the funnel can compare their
+      // CTA conversion rates.
+      void track(EVENTS.RATING_PROMPT_SHOWN, {
+        trigger: ratingCheckTick > 0 ? 'download' : 'mount',
+      });
       setVisible(true);
     })();
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [ratingCheckTick]);
 
   function handleRateNow(): void {
     // Open in a new tab. We use window.open rather than chrome.tabs.create
@@ -70,17 +82,20 @@ export function RatingPromptModal() {
     // listing's reviews tab; we mark resolved synchronously so a fast
     // re-open won't show the modal again.
     void markRatingPromptResolved();
+    void track(EVENTS.RATING_PROMPT_CTA, { action: 'rate' });
     window.open(CHROME_STORE_REVIEW_URL, '_blank', 'noopener,noreferrer');
     setVisible(false);
   }
 
   function handleLater(): void {
     void markRatingPromptDismissed();
+    void track(EVENTS.RATING_PROMPT_CTA, { action: 'later' });
     setVisible(false);
   }
 
   function handleNever(): void {
     void markRatingPromptResolved();
+    void track(EVENTS.RATING_PROMPT_CTA, { action: 'never' });
     setVisible(false);
   }
 
