@@ -19,10 +19,12 @@ import pkg from './package.json' with { type: 'json' };
 
 export default defineManifest({
   manifest_version: 3,
-  name: 'Image Harvest - Download Any Image from Any Webpage',
+  // Localized via _locales/<locale>/messages.json (extName / extDesc) so the
+  // Chrome Web Store shows a translated listing title + summary in all 15
+  // supported languages. en is the default_locale fallback.
+  name: '__MSG_extName__',
   version: pkg.version,
-  description:
-    'Batch download images. Multi-tab extract, AI tagging, Eagle export, similar detection, reverse search, collections, color extract.',
+  description: '__MSG_extDesc__',
   default_locale: 'en',
 
   permissions: [

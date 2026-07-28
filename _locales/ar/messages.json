@@ -1525,5 +1525,13 @@
   },
   "trial_grace_upgrade_btn": {
     "message": "Upgrade Now"
+  },
+  "extName": {
+    "message": "Image Harvest - تنزيل جميع الصور من أي صفحة ويب",
+    "description": "Extension name shown in the Chrome Web Store and browser UI."
+  },
+  "extDesc": {
+    "message": "أداة تنزيل صور تعثر على كل صورة في الصفحة. حفظ دفعي ZIP، استخراج من عدة تبويبات، وسوم AI، كشف الصور المكررة والمزيد.",
+    "description": "Store summary max 132 chars. Fed into manifest description."
   }
 }

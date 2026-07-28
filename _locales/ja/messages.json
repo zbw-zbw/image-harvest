@@ -1681,5 +1681,13 @@
   },
   "toast_bg_scan_limit": {
     "message": "{total}個の要素を検出、先頭2000個をスキャンしました"
+  },
+  "extName": {
+    "message": "Image Harvest - ウェブページの画像を一括ダウンロード",
+    "description": "Extension name shown in the Chrome Web Store and browser UI."
+  },
+  "extDesc": {
+    "message": "ページ上のすべての画像を検出する画像ダウンローダー。ZIP一括保存、マルチタブ抽出、AIタグ、重複検出など。",
+    "description": "Store summary max 132 chars. Fed into manifest description."
   }
 }

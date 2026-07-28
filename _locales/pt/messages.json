@@ -1525,5 +1525,13 @@
   },
   "trial_grace_upgrade_btn": {
     "message": "Upgrade Now"
+  },
+  "extName": {
+    "message": "Image Harvest - Baixe todas as imagens de qualquer página",
+    "description": "Extension name shown in the Chrome Web Store and browser UI."
+  },
+  "extDesc": {
+    "message": "Baixador de imagens que encontra cada imagem de uma página. ZIP em lote, extração multiabas, tags de IA, detecção de duplicatas.",
+    "description": "Store summary max 132 chars. Fed into manifest description."
   }
 }

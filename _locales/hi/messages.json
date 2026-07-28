@@ -1525,5 +1525,13 @@
   },
   "trial_grace_upgrade_btn": {
     "message": "Upgrade Now"
+  },
+  "extName": {
+    "message": "Image Harvest - किसी भी वेबपेज से सभी इमेज डाउनलोड करें",
+    "description": "Extension name shown in the Chrome Web Store and browser UI."
+  },
+  "extDesc": {
+    "message": "इमेज डाउनलोडर जो पेज की हर इमेज खोजता है। ZIP में बैच सेव, मल्टी-टैब एक्सट्रैक्ट, AI टैग, डुप्लीकेट डिटेक्शन और बहुत कुछ।",
+    "description": "Store summary max 132 chars. Fed into manifest description."
   }
 }

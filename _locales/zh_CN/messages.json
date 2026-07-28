@@ -1664,9 +1664,6 @@
   "pro_compare_engines": {
     "message": "引擎"
   },
-  "pro_compare_feature": {
-    "message": "功能"
-  },
   "pro_compare_per_batch": {
     "message": "张/次"
   },
@@ -1684,5 +1681,13 @@
   },
   "toast_bg_scan_limit": {
     "message": "检测到 {total} 个元素，已扫描前 2000 个"
+  },
+  "extName": {
+    "message": "Image Harvest - 批量下载网页图片",
+    "description": "Extension name shown in the Chrome Web Store and browser UI."
+  },
+  "extDesc": {
+    "message": "智能图片下载器：自动找出网页上的每一张图片，一键打包 ZIP 批量下载。支持多标签页提取、AI 标注、相似图去重等。",
+    "description": "Store summary max 132 chars. Fed into manifest description."
   }
 }

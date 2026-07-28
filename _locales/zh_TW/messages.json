@@ -1681,5 +1681,13 @@
   },
   "toast_bg_scan_limit": {
     "message": "偵測到 {total} 個元素，已掃描前 2000 個"
+  },
+  "extName": {
+    "message": "Image Harvest - 批次下載網頁圖片",
+    "description": "Extension name shown in the Chrome Web Store and browser UI."
+  },
+  "extDesc": {
+    "message": "智慧圖片下載器：自動找出網頁上的每一張圖片，一鍵打包 ZIP 批次下載。支援多分頁擷取、AI 標註、相似圖去重等。",
+    "description": "Store summary max 132 chars. Fed into manifest description."
   }
 }

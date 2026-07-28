@@ -1525,5 +1525,13 @@
   },
   "trial_grace_upgrade_btn": {
     "message": "Upgrade Now"
+  },
+  "extName": {
+    "message": "Image Harvest - 웹페이지 이미지 일괄 다운로드",
+    "description": "Extension name shown in the Chrome Web Store and browser UI."
+  },
+  "extDesc": {
+    "message": "페이지의 모든 이미지를 찾아내는 이미지 다운로더. ZIP 일괄 저장, 멀티탭 추출, AI 태그, 중복 감지 등 지원.",
+    "description": "Store summary max 132 chars. Fed into manifest description."
   }
 }

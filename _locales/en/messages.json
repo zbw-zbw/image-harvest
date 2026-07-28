@@ -1639,7 +1639,7 @@
     "message": "Auto-detect new images as they load on the page in real time."
   },
   "pro_compare_feature": {
-    "message": "Feature"
+    "message": "FEATURE"
   },
   "pro_compare_free": {
     "message": "Free"
@@ -1677,9 +1677,6 @@
   "pro_compare_engines": {
     "message": "engines"
   },
-  "pro_compare_feature": {
-    "message": "FEATURE"
-  },
   "pro_compare_per_batch": {
     "message": "imgs/batch"
   },
@@ -1697,5 +1694,13 @@
   },
   "toast_bg_scan_limit": {
     "message": "Detected {total} elements, scanned first 2000"
+  },
+  "extName": {
+    "message": "Image Harvest - Download Any Image from Any Webpage",
+    "description": "Extension name shown in the Chrome Web Store and browser UI."
+  },
+  "extDesc": {
+    "message": "Image downloader that finds every image on a page. Batch save as ZIP, multi-tab extract, AI tags, duplicate detection and more.",
+    "description": "Store summary max 132 chars. Fed into manifest description."
   }
 }

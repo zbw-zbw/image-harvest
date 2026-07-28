@@ -1525,5 +1525,13 @@
   },
   "trial_grace_upgrade_btn": {
     "message": "Upgrade Now"
+  },
+  "extName": {
+    "message": "Image Harvest - Скачивайте все изображения с любой страницы",
+    "description": "Extension name shown in the Chrome Web Store and browser UI."
+  },
+  "extDesc": {
+    "message": "Загрузчик изображений: находит все картинки на странице. Пакетный ZIP, мультивкладки, ИИ-теги, поиск дубликатов и другое.",
+    "description": "Store summary max 132 chars. Fed into manifest description."
   }
 }

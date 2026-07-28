@@ -1525,5 +1525,13 @@
   },
   "trial_grace_upgrade_btn": {
     "message": "Upgrade Now"
+  },
+  "extName": {
+    "message": "Image Harvest - ดาวน์โหลดทุกรูปจากทุกเว็บเพจ",
+    "description": "Extension name shown in the Chrome Web Store and browser UI."
+  },
+  "extDesc": {
+    "message": "ตัวดาวน์โหลดรูปที่ค้นหาทุกรูปบนหน้าเว็บ บันทึก ZIP แบบกลุ่ม ดึงจากหลายแท็บ แท็ก AI และตรวจจับรูปซ้ำ",
+    "description": "Store summary max 132 chars. Fed into manifest description."
   }
 }

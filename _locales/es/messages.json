@@ -1684,5 +1684,13 @@
   },
   "toast_bg_scan_limit": {
     "message": "Detectados {total} elementos, escaneados los primeros 2000"
+  },
+  "extName": {
+    "message": "Image Harvest - Descarga todas las imágenes de cualquier página",
+    "description": "Extension name shown in the Chrome Web Store and browser UI."
+  },
+  "extDesc": {
+    "message": "Descargador de imágenes que encuentra cada imagen de una página. ZIP por lotes, extracción multipestaña, etiquetas IA y más.",
+    "description": "Store summary max 132 chars. Fed into manifest description."
   }
 }
