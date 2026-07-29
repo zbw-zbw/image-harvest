@@ -413,6 +413,34 @@ export async function isProUser(): Promise<ProUserInfo> {
     console.warn('License signature invalid — forcing remote verification.');
   }
 
+  // EXPIRED is just as cacheable as ACTIVE. Without this branch every user
+  // whose trial/license lapsed re-hit /license/verify on EVERY isProUser()
+  // call — and the MV3 service worker calls it on every cold start — which
+  // hammered the backend (~97% of all function invocations). A renewal is
+  // picked up at the next 24h re-check, or instantly via manual activation
+  // (activateLicense always verifies remotely).
+  if (isCacheFresh && licenseData.status === LICENSE_STATUS.EXPIRED) {
+    // Reproduce the trial grace decision from cached fields — no network
+    // needed; the elapsed check keeps the 3-day window exact regardless.
+    if (licenseData.plan === 'trial' && licenseData.expiresAt) {
+      const elapsed = Date.now() - licenseData.expiresAt;
+      if (elapsed >= 0 && elapsed <= TRIAL_EXPIRY_GRACE_MS) {
+        return {
+          isPro: true,
+          plan: licenseData.plan,
+          expiresAt: licenseData.expiresAt,
+          status: LICENSE_STATUS.EXPIRED,
+          inGracePeriod: true,
+        };
+      }
+    }
+    return {
+      isPro: false,
+      plan: licenseData.plan,
+      status: LICENSE_STATUS.EXPIRED,
+    };
+  }
+
   // Remote verify path. We deliberately let `validateLicenseRemote` throw on
   // transport-level failures (offline / 5xx / malformed JSON) so the catch
   // block below can engage the offline grace period instead of treating an

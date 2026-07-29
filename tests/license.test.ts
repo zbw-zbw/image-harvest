@@ -306,6 +306,86 @@ describe('isProUser', () => {
     const stored = await (globalThis as any).chrome.storage.local.get('licenseData');
     expect((stored.licenseData as LicenseData).lastVerified).toBe(lastVerifiedAt);
   });
+
+  // ── EXPIRED cache ─────────────────────────────────────────────────
+  // Regression: EXPIRED must honor the same 24h freshness window as ACTIVE.
+  // Before the fix every expired-trial install re-hit /license/verify on
+  // EVERY isProUser() call (= every MV3 SW cold start), which accounted for
+  // ~97% of all backend function invocations.
+  it('serves a fresh EXPIRED cache without hitting the network', async () => {
+    const data: LicenseData = {
+      licenseKey: 'XXXX',
+      status: LICENSE_STATUS.EXPIRED,
+      plan: 'monthly',
+      expiresAt: null,
+      lastVerified: Date.now() - 1000,
+      instanceId: 'inst_test',
+    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (globalThis as any).chrome.storage.local.set({ licenseData: data });
+
+    const info = await isProUser();
+    expect(info.isPro).toBe(false);
+    expect(info.status).toBe(LICENSE_STATUS.EXPIRED);
+    expect(fetchCalls).toHaveLength(0);
+  });
+
+  it('re-verifies an EXPIRED license once the 24h cache goes stale', async () => {
+    const data: LicenseData = {
+      licenseKey: 'XXXX',
+      status: LICENSE_STATUS.EXPIRED,
+      plan: 'monthly',
+      expiresAt: null,
+      lastVerified: Date.now() - LICENSE_CHECK_INTERVAL - 1000,
+      instanceId: 'inst_test',
+    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (globalThis as any).chrome.storage.local.set({ licenseData: data });
+
+    // Renewal happened server-side — the stale-cache re-check picks it up.
+    installFetchMock(() => ({ valid: true, plan: 'monthly' }));
+    const info = await isProUser();
+    expect(fetchCalls).toHaveLength(1);
+    expect(fetchCalls[0].url).toContain('/verify');
+    expect(info.isPro).toBe(true);
+    expect(info.status).toBe(LICENSE_STATUS.ACTIVE);
+  });
+
+  it('serves trial grace from a fresh EXPIRED cache without network', async () => {
+    const data: LicenseData = {
+      licenseKey: 'XXXX',
+      status: LICENSE_STATUS.EXPIRED,
+      plan: 'trial',
+      expiresAt: Date.now() - 24 * 60 * 60 * 1000, // expired 1 day ago → in 3-day grace
+      lastVerified: Date.now() - 1000,
+      instanceId: 'inst_test',
+    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (globalThis as any).chrome.storage.local.set({ licenseData: data });
+
+    const info = await isProUser();
+    expect(info.isPro).toBe(true);
+    expect(info.inGracePeriod).toBe(true);
+    expect(info.status).toBe(LICENSE_STATUS.EXPIRED);
+    expect(fetchCalls).toHaveLength(0);
+  });
+
+  it('returns non-Pro from a fresh EXPIRED cache once trial grace has passed', async () => {
+    const data: LicenseData = {
+      licenseKey: 'XXXX',
+      status: LICENSE_STATUS.EXPIRED,
+      plan: 'trial',
+      expiresAt: Date.now() - 4 * 24 * 60 * 60 * 1000, // 4 days ago → grace over
+      lastVerified: Date.now() - 1000,
+      instanceId: 'inst_test',
+    };
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    await (globalThis as any).chrome.storage.local.set({ licenseData: data });
+
+    const info = await isProUser();
+    expect(info.isPro).toBe(false);
+    expect(fetchCalls).toHaveLength(0);
+  });
 });
 
 describe('resetLicenseInstancesRemote (self-serve unbind)', () => {
