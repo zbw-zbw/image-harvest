@@ -30,7 +30,9 @@ import {
   bucketFor,
   getCachedBucket,
   getProUpsellBucket,
+  getExperimentBucket,
   EXPERIMENT_PRO_UPSELL_COPY,
+  EXPERIMENTS,
   __test,
 } from '../shared/ab-experiment';
 import { getOrCreateInstanceId } from '../shared/license';
@@ -186,6 +188,58 @@ describe('__test hooks', () => {
     expect(getCachedBucket()).not.toBeNull();
 
     __test.reset();
+    expect(getCachedBucket()).toBeNull();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// Multi-experiment registry (Phase-2 groundwork)
+// ─────────────────────────────────────────────────────────────────────
+
+describe('multi-experiment registry', () => {
+  it('PINS the live pro_upsell assignment — these values must NEVER change', () => {
+    // Computed with the production formula (fnv1a32('pro_upsell_copy_v1:' + id)
+    // % 2) BEFORE the registry refactor. If any of these flip, the refactor
+    // reshuffled live users mid-experiment and invalidated the funnel data.
+    expect(bucketFor('inst_alpha')).toBe('b');
+    expect(bucketFor('inst_beta')).toBe('b');
+    expect(bucketFor('inst_gamma')).toBe('a');
+    expect(bucketFor('inst_delta')).toBe('b');
+  });
+
+  it('assigns buckets independently per experiment id (salt isolation)', () => {
+    // Across a realistic sample, a hypothetical second experiment must not
+    // mirror the first one's assignment — at least one id must differ.
+    // (Identical vectors across 200 ids ≈ 2^-200 by chance.)
+    let differs = 0;
+    for (let i = 0; i < 200; i++) {
+      const id = `uuid-${i}-${i * 31 + 7}`;
+      if (bucketFor(id, 'pro_upsell_copy_v1') !== bucketFor(id, 'paywall_copy_v1')) {
+        differs++;
+      }
+    }
+    expect(differs).toBeGreaterThan(0);
+  });
+
+  it('getExperimentBucket caches per experiment with ONE storage round-trip total', async () => {
+    vi.mocked(getOrCreateInstanceId).mockResolvedValue('install-multi');
+
+    const upsell = await getExperimentBucket(EXPERIMENTS.PRO_UPSELL_COPY);
+    const upsellAgain = await getExperimentBucket(EXPERIMENTS.PRO_UPSELL_COPY);
+
+    expect(upsell).toBe(bucketFor('install-multi', EXPERIMENTS.PRO_UPSELL_COPY));
+    expect(upsellAgain).toBe(upsell);
+    // Second call for the SAME experiment hits the cache.
+    expect(getOrCreateInstanceId).toHaveBeenCalledTimes(1);
+  });
+
+  it('__test.setBucket scopes to the given experiment id', () => {
+    __test.setBucket('b', EXPERIMENTS.PRO_UPSELL_COPY);
+    expect(getCachedBucket(EXPERIMENTS.PRO_UPSELL_COPY)).toBe('b');
+    // Default-arg accessor reads the same (pro upsell) slot.
+    expect(getCachedBucket()).toBe('b');
+
+    __test.setBucket(null, EXPERIMENTS.PRO_UPSELL_COPY);
     expect(getCachedBucket()).toBeNull();
   });
 });

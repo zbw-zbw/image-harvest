@@ -1,10 +1,12 @@
-// A/B experiment bucketing — Sprint 2.4.
+// A/B experiment bucketing — Sprint 2.4, generalized to a multi-experiment
+// registry ahead of conversion-optimization Phase 2.
 //
 // Decides which variant of a user-facing experiment a given install belongs
-// to. Buckets are STABLE per install: hashing the persisted instance id
-// means the same user always sees the same variant, no matter how many
-// times they reopen the panel or which surface (sidepanel vs popup) they
-// open from.
+// to. Buckets are STABLE per install AND per experiment: hashing the
+// persisted instance id salted with the experiment id means the same user
+// always sees the same variant of a given test, while two experiments
+// assign their buckets independently (no correlated assignment biasing
+// results).
 //
 // Why not chrome.storage random-coin-flip on first open?
 //   1. Determinism makes debugging trivially reproducible — given an
@@ -14,6 +16,11 @@
 //      where two simultaneous reads can both think they're the first.
 //   3. The hash is one-way; we never expose the raw instanceId, only its
 //      mod-N output.
+//
+// ⚠️ ASSIGNMENT STABILITY CONTRACT: the salt format `${experimentId}:${id}`
+// and the FNV-1a hash MUST never change for a live experiment — reshuffling
+// buckets mid-flight invalidates its funnel data. tests/ab-experiment.test.ts
+// pins known id→bucket pairs to enforce this.
 //
 // Privacy note: the underlying instanceId is the SAME identifier
 // shared/license.ts uses (getOrCreateInstanceId), but the *output* of
@@ -31,18 +38,30 @@ import { getOrCreateInstanceId } from './license';
 export type AbBucket = 'a' | 'b';
 
 /**
- * The single experiment slot for Sprint 2. We deliberately don't introduce
- * a per-experiment registry yet — only one in-flight test at a time keeps
- * the funnel math interpretable. When a second experiment lands, replace
- * this with `{ experimentId: string; bucket: AbBucket }` and migrate
- * callers.
+ * Experiment registry — the single place new experiments are declared.
+ *
+ * To launch a new experiment:
+ *   1. Add an entry here with a unique, versioned id (e.g. 'paywall_copy_v1').
+ *      The id is the hash salt — NEVER reuse or rename a live id.
+ *   2. Read the bucket at the surface via getExperimentBucket(EXPERIMENTS.X).
+ *   3. Ship the bucket explicitly in that surface's telemetry props (the
+ *      envelope-level `abBucket` stays reserved for PRO_UPSELL_COPY for
+ *      backward compatibility with the existing funnel).
+ *   4. Retire by deleting the entry once the experiment concludes.
  */
-export const EXPERIMENT_PRO_UPSELL_COPY = 'pro_upsell_copy_v1';
+export const EXPERIMENTS = {
+  PRO_UPSELL_COPY: 'pro_upsell_copy_v1',
+} as const;
+export type ExperimentId = (typeof EXPERIMENTS)[keyof typeof EXPERIMENTS];
 
-// In-memory cache so `getProUpsellBucket()` is synchronous after the first
-// resolution. The first caller does the chrome.storage.local round-trip
-// once at startup; everything after that hits this cache.
-let cachedBucket: AbBucket | null = null;
+/** Back-compat alias — pre-registry callers/tests import this name. */
+export const EXPERIMENT_PRO_UPSELL_COPY = EXPERIMENTS.PRO_UPSELL_COPY;
+
+// In-memory cache keyed by experiment id so `getCachedBucket()` is
+// synchronous after the first resolution. The first caller does the
+// chrome.storage.local round-trip once at startup; everything after that
+// hits this cache.
+const cachedBuckets = new Map<string, AbBucket>();
 
 /**
  * Cheap, deterministic 32-bit hash of a UTF-8 string. We use FNV-1a
@@ -67,55 +86,78 @@ function fnv1a32(str: string): number {
 }
 
 /**
- * Map an instanceId to a stable bucket. Exported for tests; production
- * callers should use `getProUpsellBucket()` which adds caching.
+ * Map an instanceId to a stable bucket for a given experiment. Exported for
+ * tests; production callers should use `getExperimentBucket()` which adds
+ * caching. Defaults to the Pro-upsell experiment for pre-registry callers.
+ *
+ * Salting with the experiment id means every experiment assigns its buckets
+ * *independently* — a user can be in A for the copy test and B for some
+ * later pricing test without correlated assignment biasing the results.
  */
-export function bucketFor(instanceId: string): AbBucket {
-  // Salting with the experiment name means a future second experiment
-  // assigns its buckets *independently* — a user can be in A for the
-  // copy test and B for some later pricing test without correlated
-  // assignment biasing the results.
-  return fnv1a32(EXPERIMENT_PRO_UPSELL_COPY + ':' + instanceId) % 2 === 0 ? 'a' : 'b';
+export function bucketFor(
+  instanceId: string,
+  experimentId: string = EXPERIMENTS.PRO_UPSELL_COPY
+): AbBucket {
+  return fnv1a32(experimentId + ':' + instanceId) % 2 === 0 ? 'a' : 'b';
 }
 
 /**
- * Resolve the current install's bucket for the Pro upsell copy
- * experiment. Async because the underlying instanceId may not have been
- * created yet; subsequent calls hit the in-memory cache.
+ * Resolve the current install's bucket for an experiment. Async because the
+ * underlying instanceId may not have been created yet; subsequent calls hit
+ * the in-memory cache.
  */
-export async function getProUpsellBucket(): Promise<AbBucket> {
-  if (cachedBucket !== null) return cachedBucket;
+export async function getExperimentBucket(experimentId: ExperimentId): Promise<AbBucket> {
+  const cached = cachedBuckets.get(experimentId);
+  if (cached) return cached;
+  let bucket: AbBucket;
   try {
     const id = await getOrCreateInstanceId();
-    cachedBucket = bucketFor(id);
+    bucket = bucketFor(id, experimentId);
   } catch {
     // Falling back to 'a' on storage failure means a degraded user gets
-    // the control variant. Better than crashing the upsell modal render.
-    cachedBucket = 'a';
+    // the control variant. Better than crashing the surface's render.
+    bucket = 'a';
   }
-  return cachedBucket;
+  cachedBuckets.set(experimentId, bucket);
+  return bucket;
+}
+
+/** Back-compat wrapper for the original single-experiment API. */
+export async function getProUpsellBucket(): Promise<AbBucket> {
+  return getExperimentBucket(EXPERIMENTS.PRO_UPSELL_COPY);
 }
 
 /**
  * Synchronous accessor returning the previously-cached bucket. Returns
- * null if `getProUpsellBucket()` hasn't been awaited yet. Used by the
+ * null if the experiment's bucket hasn't been awaited yet. Used by the
  * telemetry envelope injector which can't await on every track() call
  * — the bucket is seeded once at startup, then read synchronously per
- * event.
+ * event. Defaults to the Pro-upsell experiment (the envelope-level
+ * `abBucket` prop) for backward compatibility.
  */
-export function getCachedBucket(): AbBucket | null {
-  return cachedBucket;
+export function getCachedBucket(
+  experimentId: ExperimentId = EXPERIMENTS.PRO_UPSELL_COPY
+): AbBucket | null {
+  return cachedBuckets.get(experimentId) ?? null;
 }
 
 // ── Test hooks ──────────────────────────────────────────────────────────────
 
 export const __test = {
   reset(): void {
-    cachedBucket = null;
+    cachedBuckets.clear();
   },
-  /** Force the cached bucket (bypasses storage). Used by component tests
-   * that need to render a specific variant without touching license.ts. */
-  setBucket(bucket: AbBucket | null): void {
-    cachedBucket = bucket;
+  /** Force a cached bucket (bypasses storage). Used by component tests
+   * that need to render a specific variant without touching license.ts.
+   * Passing null clears that experiment's cache entry. */
+  setBucket(
+    bucket: AbBucket | null,
+    experimentId: ExperimentId = EXPERIMENTS.PRO_UPSELL_COPY
+  ): void {
+    if (bucket === null) {
+      cachedBuckets.delete(experimentId);
+    } else {
+      cachedBuckets.set(experimentId, bucket);
+    }
   },
 };

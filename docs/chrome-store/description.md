@@ -61,7 +61,7 @@ Select multiple images and perform actions in bulk: batch favorite (add to colle
 
 🌍 15 Languages Supported
 
-Fully translated into 15 languages: English, 简体中文, 繁體中文, 日本語, Español, 한국어, Português, Français, Deutsch, Italiano, Русский, Nederlands, Polski, العربية, ไทย. Auto-detects your browser language — no manual setup needed.
+Fully translated into 15 languages: English, 简体中文, 繁體中文, 日本語, Español, 한국어, Português, Français, Deutsch, Italiano, Русский, Nederlands, हिन्दी, العربية, ไทย. Auto-detects your browser language — no manual setup needed.
 
 🔒 Privacy First
 
@@ -132,7 +132,7 @@ Image Harvest 是一款智能图片下载器：自动找出网页上的每一张
 
 🌍 支持 15 种语言
 
-完整翻译为 15 种语言：English、简体中文、繁體中文、日本語、Español、한국어、Português、Français、Deutsch、Italiano、Русский、Nederlands、Polski、العربية、ไทย。自动检测浏览器语言，无需手动设置。
+完整翻译为 15 种语言：English、简体中文、繁體中文、日本語、Español、한국어、Português、Français、Deutsch、Italiano、Русский、Nederlands、हिन्दी、العربية、ไทย。自动检测浏览器语言，无需手动设置。
 
 🔒 隐私优先
 
