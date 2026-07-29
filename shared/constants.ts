@@ -406,6 +406,14 @@ export function pricingPageUrl(trigger: string): string {
 
 export const INVITE_PAGE_URL = `${API_BASE}/invite`;
 
+/**
+ * Shown by Chrome after the user removes the extension (see
+ * chrome.runtime.setUninstallURL in background/index.ts). Churn reasons are
+ * the blind half of the conversion funnel — the page collects an anonymous,
+ * optional reason with no identifiers attached.
+ */
+export const UNINSTALL_FEEDBACK_URL = `${API_BASE}/uninstall`;
+
 // Telemetry (anonymous, opt-in). See shared/telemetry.ts.
 //   - FLUSH_INTERVAL_MS: max time a single event waits in the queue before
 //     being shipped. 5s balances battery drain vs. dashboard freshness.

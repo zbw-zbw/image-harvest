@@ -1,6 +1,6 @@
 // Background Service Worker for Image Harvest.
 // Main entry — initializes subsystems and routes runtime messages.
-import { MESSAGE_TYPES, ERROR_CODES } from '../shared/constants';
+import { MESSAGE_TYPES, ERROR_CODES, UNINSTALL_FEEDBACK_URL } from '../shared/constants';
 import { validateIncomingMessage } from '../shared/messaging';
 import {
   getFilterConfig,
@@ -70,6 +70,18 @@ function initTelemetry(): void {
 }
 
 initTelemetry();
+
+// Chrome opens this URL in a new tab after the user removes the extension.
+// It's the only churn signal we can collect — the page asks for an optional,
+// anonymous reason (no identifiers, no license key, no telemetry id). Safe to
+// call unconditionally on every SW start; Chrome just stores the value.
+try {
+  chrome.runtime.setUninstallURL(
+    `${UNINSTALL_FEEDBACK_URL}?v=${encodeURIComponent(chrome.runtime.getManifest().version || '')}`
+  );
+} catch {
+  /* non-fatal — older Chrome or restricted context */
+}
 
 // onInstalled fires exactly once per install/update event. We use it to
 // distinguish brand-new installs (the most valuable signal in the funnel)
