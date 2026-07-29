@@ -440,7 +440,11 @@ export const MAX_LICENSE_INSTANCES = 1;
 // Empty string = signing not yet provisioned. In that case the extension
 // treats every license as "unsigned/legacy" and trusts the cache exactly as
 // before (fully backward compatible) — no user is locked out.
-export const LICENSE_PUBLIC_KEY = '';
+//
+// Provisioned 2026-07 — pairs with the production LICENSE_SIGNING_PRIVATE_KEY.
+// Rotating the pair only forces a one-time remote re-verify (no lockout).
+export const LICENSE_PUBLIC_KEY =
+  'MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAEwYfPTT87ZvtWJeEtOgMXMKE7T2/MyhX1ezQ/m8JX2RPSxMKnyjNXNESQda8B/vwswOD+bvIiuZu9fVN5R9kjhg==';
 
 // Eagle export (Phase 5) — local API provided by Eagle app.
 export const EAGLE_API_BASE = 'http://localhost:41595';
