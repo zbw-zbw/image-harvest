@@ -87,15 +87,14 @@
 
 ---
 
-## 🆕 What's New (v1.0.12)
+## 🆕 What's New (v1.0.13)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
-- **📊 Complete Analytics Data** — fixed 14 anonymous product events being silently dropped by the backend, so improvements are driven by real usage data.
-- **🎯 Honest Upgrade Attribution** — the pricing page now knows which in-extension touchpoint sent you, without collecting any extra personal data.
-- **✅ Accurate Payment Funnel** — an anonymous "payment confirmed" signal replaces indirect estimates on the success page.
-- **🧪 51 New Extension Tests** — offline license-signature verification (tamper evidence), referral flows and remote-config caching are now fully regression-tested (1518 tests total).
-- **🛡️ Backend Test Suite + CI** — the backend gained its first automated suite (61 tests: payment signatures, license signing, SSRF guards, rate limits), enforced by GitHub Actions on every push.
+- **🔋 Far Fewer Background Checks** — expired trials/licenses were re-verifying with the server on every browser event; now everything respects the once-a-day cadence (same 3-day trial grace, less network and battery).
+- **🌐 Localized Store Listing** — the Chrome Web Store title and summary now appear in all 15 supported languages, not just English.
+- **⭐ Better-Timed Review Prompt** — the rating dialog now shows up right after a successful download instead of interrupting you at panel open.
+- **🧪 1527 Tests** — new regression nets for the license cache and the review-prompt funnel.
 
 ---
 

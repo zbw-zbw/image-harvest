@@ -58,6 +58,27 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
+## [1.0.13] — 2026-07-29
+
+### 🐛 Fixed
+
+- **Excessive background license checks**: installs with an expired trial or license were re-contacting the server on every browser event instead of once a day — wasted network, battery, and backend load. The 24-hour check cadence now applies to every license state; the 3-day trial grace window behaves exactly as before.
+
+### 🔄 Changed
+
+- **Store listing in your language**: the extension's Chrome Web Store title and summary are now localized in all 15 supported languages instead of English-only.
+- **Better-timed review prompt**: the "Enjoying Image Harvest?" dialog now appears right after a successful download (when it's least disruptive) instead of interrupting you at panel open.
+
+### 🌍 i18n
+
+- **2 new keys × 15 languages**: localized store-listing name and summary (`extName` / `extDesc`) added to every language catalogue.
+
+### 🧪 Test Coverage
+
+- **9 new tests** (suite now 1527): license-cache regression net (EXPIRED honors the 24h window, trial grace without network) and rating-prompt telemetry + re-check timing.
+
+---
+
 ## [1.0.12] — 2026-07-28
 
 ### 🐛 Fixed
