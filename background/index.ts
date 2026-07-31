@@ -237,6 +237,29 @@ async function handleMessage(
         });
         break;
 
+      // Onboarding (Phase 2a): the welcome page's "Try it now" CTA opens the
+      // side panel on its own tab. sendMessage preserves the user-gesture
+      // context (Chrome 116+), which chrome.sidePanel.open() requires.
+      case MESSAGE_TYPES.OPEN_SIDE_PANEL: {
+        try {
+          const tabId = sender.tab?.id;
+          if (!tabId) {
+            sendResponse({ success: false, error: 'no_tab' });
+            break;
+          }
+          await chrome.sidePanel.setOptions({
+            tabId,
+            path: 'pages/sidepanel.html',
+            enabled: true,
+          });
+          await chrome.sidePanel.open({ tabId });
+          sendResponse({ success: true });
+        } catch (error) {
+          sendResponse({ success: false, error: (error as Error).message });
+        }
+        break;
+      }
+
       case MESSAGE_TYPES.HIGHLIGHT_IMAGE: {
         try {
           const tabId = await getAccessibleTabId(message.tabId as number | undefined);

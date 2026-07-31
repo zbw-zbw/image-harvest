@@ -1689,5 +1689,32 @@
   "extDesc": {
     "message": "智能图片下载器：自动找出网页上的每一张图片，一键打包 ZIP 批量下载。支持多标签页提取、AI 标注、相似图去重等。",
     "description": "Store summary max 132 chars. Fed into manifest description."
+  },
+  "welcome_demo_title": {
+    "message": "就在这里试一试"
+  },
+  "welcome_demo_desc": {
+    "message": "这些图片就在本页上。打开侧边栏，Image Harvest 会立刻找到它们 —— 勾选几张，下载你的第一个 ZIP。"
+  },
+  "welcome_demo_cta": {
+    "message": "打开面板并扫描本页"
+  },
+  "welcome_demo_hint": {
+    "message": "面板已在右侧打开 —— 跟着提示完成第一次下载。"
+  },
+  "onboarding_step_counter": {
+    "message": "第 {n} / 3 步"
+  },
+  "onboarding_tip_scan": {
+    "message": "正在扫描本页…… 找到的图片马上会显示在上方。"
+  },
+  "onboarding_tip_select": {
+    "message": "很好，已找到图片！勾选几张缩略图试试。"
+  },
+  "onboarding_tip_download": {
+    "message": "最后一步：点击下载按钮，打包成 ZIP 保存。🎉"
+  },
+  "onboarding_dismiss": {
+    "message": "关闭提示"
   }
 }

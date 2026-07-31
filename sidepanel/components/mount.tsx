@@ -227,6 +227,18 @@ export function mountPreactComponents(): void {
   // shouldShowRatingPrompt() at mount time and short-circuits to null
   // for users below the threshold or in the cooldown window.
   mountFreshComponent('rating-prompt-modal-mount', RatingPromptModal);
+
+  // Onboarding coach marks (Phase 2a). LAZY-LOADED on purpose: only a
+  // freshly-installed user in bucket b of onboarding_flow_v1 ever sees this,
+  // so shipping it in the main chunk would cost every user ~1 kB gzip (and
+  // pushed the sidepanel bundle over its budget). We check the cheap storage
+  // flag first and only then pull in the component.
+  void (async () => {
+    const { isOnboardingActive } = await import('../../shared/onboarding-state');
+    if (!(await isOnboardingActive())) return;
+    const { OnboardingCoach } = await import('./OnboardingCoach');
+    mountFreshComponent('onboarding-coach-mount', OnboardingCoach);
+  })();
 }
 
 /**

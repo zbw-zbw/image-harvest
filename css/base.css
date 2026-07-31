@@ -604,6 +604,78 @@
   color: var(--amber-light);
 }
 
+/* ============================================
+   Onboarding Coach Marks (Phase 2a activation)
+   Fixed to the panel bottom so it never fights the toolbar or the image
+   grid's scroll position, and stays visible while the user selects images.
+   ============================================ */
+.onboarding-coach {
+  position: fixed;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  z-index: 60;
+  padding: 10px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--primary, #60b557);
+  background: var(--bg-elevated, #fff);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+  font-size: 12px;
+}
+
+.onboarding-coach-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.onboarding-coach-step {
+  font-weight: 600;
+  color: var(--primary, #60b557);
+  font-size: 11px;
+  letter-spacing: 0.02em;
+}
+
+.onboarding-coach-close {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.onboarding-coach-text {
+  margin: 4px 0 0;
+  line-height: 1.5;
+  color: var(--text-primary);
+}
+
+.onboarding-coach-dots {
+  display: flex;
+  gap: 5px;
+  margin-top: 8px;
+}
+
+.onboarding-coach-dot {
+  width: 18px;
+  height: 3px;
+  border-radius: 2px;
+  background: var(--border, #d0d0d0);
+}
+
+.onboarding-coach-dot.is-active {
+  background: var(--primary, #60b557);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .onboarding-coach {
+    background: #1e1f22;
+  }
+}
+
+:root[data-theme='dark'] .onboarding-coach {
+  background: #1e1f22;
+}
+
 /* Toolbar responsive — shrink for narrow panels */
 @media (max-width: 500px) {
   .toolbar-actions .icon-btn {

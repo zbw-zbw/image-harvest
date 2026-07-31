@@ -1689,5 +1689,32 @@
   "extDesc": {
     "message": "智慧圖片下載器：自動找出網頁上的每一張圖片，一鍵打包 ZIP 批次下載。支援多分頁擷取、AI 標註、相似圖去重等。",
     "description": "Store summary max 132 chars. Fed into manifest description."
+  },
+  "welcome_demo_title": {
+    "message": "就在這裡試一試"
+  },
+  "welcome_demo_desc": {
+    "message": "這些圖片就在本頁上。開啟側邊欄，Image Harvest 會立刻找到它們 —— 勾選幾張，下載你的第一個 ZIP。"
+  },
+  "welcome_demo_cta": {
+    "message": "開啟面板並掃描本頁"
+  },
+  "welcome_demo_hint": {
+    "message": "面板已在右側開啟 —— 跟著提示完成第一次下載。"
+  },
+  "onboarding_step_counter": {
+    "message": "第 {n} / 3 步"
+  },
+  "onboarding_tip_scan": {
+    "message": "正在掃描本頁…… 找到的圖片馬上會顯示在上方。"
+  },
+  "onboarding_tip_select": {
+    "message": "很好，已找到圖片！勾選幾張縮圖試試。"
+  },
+  "onboarding_tip_download": {
+    "message": "最後一步：點擊下載按鈕，打包成 ZIP 儲存。🎉"
+  },
+  "onboarding_dismiss": {
+    "message": "關閉提示"
   }
 }

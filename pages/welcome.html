@@ -749,6 +749,53 @@
       /* ============================================
          Footer
          ============================================ */
+      /* ===== Demo gallery (guided onboarding, bucket b) ===== */
+      .demo-section {
+        margin-top: 40px;
+      }
+      .demo-inner {
+        text-align: center;
+        padding: 32px 24px;
+        border-radius: 20px;
+        border: 1px solid rgba(96, 181, 87, 0.28);
+        background:
+          radial-gradient(circle at 50% 0%, rgba(96, 181, 87, 0.12), transparent 70%),
+          rgba(255, 255, 255, 0.02);
+      }
+      .demo-inner h2 {
+        font-size: 24px;
+        font-weight: 700;
+        margin: 0 0 8px;
+      }
+      .demo-inner > .demo-inner p,
+      .demo-inner p {
+        margin: 0 auto 20px;
+        max-width: 480px;
+        font-size: 14px;
+        line-height: 1.6;
+        opacity: 0.75;
+      }
+      .demo-grid {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        margin-bottom: 24px;
+        padding: 20px;
+        border-radius: 14px;
+        background: rgba(0, 0, 0, 0.25);
+      }
+      .demo-grid img {
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.04);
+      }
+      .demo-hint {
+        margin-top: 16px !important;
+        font-size: 13px;
+        color: #60b557;
+      }
+
       .footer {
         text-align: center;
         margin-top: 32px;
@@ -1036,6 +1083,70 @@
           </button>
         </div>
       </div>
+
+      <!--
+        ===================== DEMO GALLERY (onboarding bucket b) =====================
+        Hidden by default; welcome.ts unhides it for the guided-onboarding
+        variant. Practising on THIS page means the very first scan can never
+        fail (no network, no CSP, no lazy-loading) — the images are the
+        extension's own bundled assets.
+      -->
+      <section id="demo-section" class="demo-section" hidden>
+        <div class="demo-inner">
+          <h2 data-i18n="welcome_demo_title">Try it right here</h2>
+          <p data-i18n="welcome_demo_desc">
+            These images live on this page. Open the side panel and Image Harvest will find them
+            instantly — pick a few and download your first ZIP.
+          </p>
+          <div class="demo-grid" role="list">
+            <!--
+              Only manifest-referenced icons are guaranteed to exist in dist/
+              (vite.config.ts has publicDir:false and copies just _locales;
+              crxjs emits the manifest's icon set). Using them keeps the demo
+              gallery 404-proof. Sizes vary on purpose so the size filter has
+              something meaningful to show.
+            -->
+            <img
+              src="/icons/icon128.png"
+              alt="Demo image 1"
+              width="128"
+              height="128"
+              role="listitem"
+            />
+            <img
+              src="/icons/icon48.png"
+              alt="Demo image 2"
+              width="48"
+              height="48"
+              role="listitem"
+            />
+            <img
+              src="/icons/icon32.png"
+              alt="Demo image 3"
+              width="32"
+              height="32"
+              role="listitem"
+            />
+            <img
+              src="/icons/icon16.png"
+              alt="Demo image 4"
+              width="16"
+              height="16"
+              role="listitem"
+            />
+          </div>
+          <button class="btn-primary" id="btn-try-now" type="button">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M5 12h14" />
+              <path d="M12 5l7 7-7 7" />
+            </svg>
+            <span data-i18n="welcome_demo_cta">Open the panel &amp; scan this page</span>
+          </button>
+          <p id="demo-hint" class="demo-hint" hidden data-i18n="welcome_demo_hint">
+            The panel is open on the right — follow the tips to download your first images.
+          </p>
+        </div>
+      </section>
 
       <!-- ===================== FOOTER ===================== -->
       <footer class="footer animate">

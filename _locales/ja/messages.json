@@ -1689,5 +1689,32 @@
   "extDesc": {
     "message": "ページ上のすべての画像を検出する画像ダウンローダー。ZIP一括保存、マルチタブ抽出、AIタグ、重複検出など。",
     "description": "Store summary max 132 chars. Fed into manifest description."
+  },
+  "welcome_demo_title": {
+    "message": "ここで試してみましょう"
+  },
+  "welcome_demo_desc": {
+    "message": "これらの画像はこのページ上にあります。サイドパネルを開けば Image Harvest がすぐに検出します — いくつか選んで最初の ZIP をダウンロードしてみてください。"
+  },
+  "welcome_demo_cta": {
+    "message": "パネルを開いてこのページをスキャン"
+  },
+  "welcome_demo_hint": {
+    "message": "右側にパネルが開きました — ヒントに従って最初のダウンロードを完了しましょう。"
+  },
+  "onboarding_step_counter": {
+    "message": "ステップ {n} / 3"
+  },
+  "onboarding_tip_scan": {
+    "message": "このページをスキャン中… 見つかった画像がすぐ上に表示されます。"
+  },
+  "onboarding_tip_select": {
+    "message": "画像が見つかりました！サムネイルをいくつか選択してください。"
+  },
+  "onboarding_tip_download": {
+    "message": "最後のステップ：ダウンロードボタンを押して ZIP で保存します。🎉"
+  },
+  "onboarding_dismiss": {
+    "message": "ヒントを閉じる"
   }
 }

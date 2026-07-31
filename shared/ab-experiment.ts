@@ -51,6 +51,14 @@ export type AbBucket = 'a' | 'b';
  */
 export const EXPERIMENTS = {
   PRO_UPSELL_COPY: 'pro_upsell_copy_v1',
+  /**
+   * Phase-2a activation experiment. a = legacy welcome (CTA closes the
+   * tab), b = guided onboarding (CTA opens the side panel on the welcome
+   * page's demo gallery + coach marks until the first download).
+   * Primary metric: share of installs completing a first download within
+   * 7 days (onboarding_download_done vs download_* baseline).
+   */
+  ONBOARDING_FLOW: 'onboarding_flow_v1',
 } as const;
 export type ExperimentId = (typeof EXPERIMENTS)[keyof typeof EXPERIMENTS];
 

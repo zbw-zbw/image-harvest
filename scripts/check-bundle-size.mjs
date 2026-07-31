@@ -41,7 +41,12 @@ const BUDGETS = {
   // Bumped 95 → 115 kB for v1.0.6: referral system, feature-quota soft limits,
   // remote-config, QuotaDisplay, ReferralBanner, visibility filter pushed init
   // to ~106 kB gzip; growth accepted — new user-facing features, ~9 kB headroom.
-  'init.js': { gzipKb: 115, label: 'sidepanel main' },
+  // Bumped 115 → 118 kB for the Phase-2a onboarding flow: the multi-experiment
+  // A/B registry, the onboarding telemetry events and the onboarding-state
+  // gate add ~1.6 kB to init (the coach-mark component itself is lazy-loaded
+  // behind that gate, so it stays out of this chunk). Justified by the funnel
+  // data driving it: only ~2.6% of installs ever completed a first download.
+  'init.js': { gzipKb: 118, label: 'sidepanel main' },
   // Background service worker entry. Currently ~5.6 kB gzip.
   'index.ts.js': { gzipKb: 12, label: 'background SW' },
   // Content script entry. Currently ~7.7 kB gzip.

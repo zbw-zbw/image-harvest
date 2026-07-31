@@ -94,6 +94,9 @@ export const MESSAGE_TYPES = {
   REMOVE_HIGHLIGHT: 'REMOVE_HIGHLIGHT',
   CLEAR_SELECTION: 'CLEAR_SELECTION',
   TOGGLE_SIDEBAR: 'TOGGLE_SIDEBAR',
+  // Onboarding: welcome page asks the SW to open the side panel on its own
+  // tab (user-gesture context is preserved through sendMessage, Chrome 116+).
+  OPEN_SIDE_PANEL: 'OPEN_SIDE_PANEL',
   TOGGLE_FAB: 'TOGGLE_FAB',
   SET_DISPLAY_MODE: 'SET_DISPLAY_MODE',
   MULTI_TAB_EXTRACT: 'MULTI_TAB_EXTRACT',

@@ -56,6 +56,13 @@ export const EVENTS = {
   WELCOME_PAGE_VIEWED: 'welcome_page_viewed', // props: { source: string }
   WELCOME_CTA_CLICKED: 'welcome_cta_clicked', // props: { action: string }
 
+  // Onboarding activation funnel (Phase 2a). `bucket` is the
+  // onboarding_flow_v1 variant — shipped explicitly because the envelope
+  // abBucket is reserved for the pro-upsell experiment.
+  ONBOARDING_STARTED: 'onboarding_started', // welcome "Try it" clicked
+  ONBOARDING_SCAN_DONE: 'onboarding_scan_done', // first scan produced images
+  ONBOARDING_DOWNLOAD_DONE: 'onboarding_download_done', // first download completed
+
   // Eagle export (Phase 5)
   EXPORT_EAGLE_STARTED: 'export_eagle_started', // props: { count: number }
   EXPORT_EAGLE_COMPLETED: 'export_eagle_completed', // props: { count, durationMs }
@@ -162,6 +169,10 @@ export const EVENT_PROP_SCHEMAS: Record<TelemetryEventName, readonly string[]> =
 
   [EVENTS.WELCOME_PAGE_VIEWED]: ['source'],
   [EVENTS.WELCOME_CTA_CLICKED]: ['action'],
+
+  [EVENTS.ONBOARDING_STARTED]: ['bucket'],
+  [EVENTS.ONBOARDING_SCAN_DONE]: ['bucket'],
+  [EVENTS.ONBOARDING_DOWNLOAD_DONE]: ['bucket'],
 
   [EVENTS.EXPORT_EAGLE_STARTED]: ['count'],
   [EVENTS.EXPORT_EAGLE_COMPLETED]: ['count', 'durationMs'],

@@ -1533,5 +1533,32 @@
   "extDesc": {
     "message": "Baixador de imagens que encontra cada imagem de uma página. ZIP em lote, extração multiabas, tags de IA, detecção de duplicatas.",
     "description": "Store summary max 132 chars. Fed into manifest description."
+  },
+  "welcome_demo_title": {
+    "message": "Try it right here"
+  },
+  "welcome_demo_desc": {
+    "message": "These images live on this page. Open the side panel and Image Harvest will find them instantly — pick a few and download your first ZIP."
+  },
+  "welcome_demo_cta": {
+    "message": "Open the panel & scan this page"
+  },
+  "welcome_demo_hint": {
+    "message": "The panel is open on the right — follow the tips to download your first images."
+  },
+  "onboarding_step_counter": {
+    "message": "Step {n} of 3"
+  },
+  "onboarding_tip_scan": {
+    "message": "Scanning this page… the images found here will appear above in a moment."
+  },
+  "onboarding_tip_select": {
+    "message": "Nice — images found! Tick a few thumbnails to select them."
+  },
+  "onboarding_tip_download": {
+    "message": "Last step: hit the download button to save them as a ZIP. 🎉"
+  },
+  "onboarding_dismiss": {
+    "message": "Dismiss tips"
   }
 }
