@@ -58,6 +58,26 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
+## [1.0.14] — 2026-07-31
+
+### 🔒 Security
+
+- **License tamper-protection is now live**: cached Pro licenses are cryptographically signed by the server and verified offline — editing the local license record (plan, expiry, status) invalidates it and forces a fresh server check. Legacy and trial licenses are unaffected.
+
+### ✨ Added
+
+- **Optional uninstall feedback**: removing the extension now opens a short, fully anonymous one-click survey — helping us learn why people leave. No account, no identifiers, answering is optional.
+
+### 🔄 Changed
+
+- **A/B testing groundwork**: the experiment framework now supports multiple concurrent experiments with independent, stable assignments — existing participants keep their variant.
+
+### 🧪 Test Coverage
+
+- **4 new tests** (suite now 1531): multi-experiment bucket isolation and pinned assignment stability for live experiment participants.
+
+---
+
 ## [1.0.13] — 2026-07-29
 
 ### 🐛 Fixed

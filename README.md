@@ -87,14 +87,13 @@
 
 ---
 
-## 🆕 What's New (v1.0.13)
+## 🆕 What's New (v1.0.14)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
-- **🔋 Far Fewer Background Checks** — expired trials/licenses were re-verifying with the server on every browser event; now everything respects the once-a-day cadence (same 3-day trial grace, less network and battery).
-- **🌐 Localized Store Listing** — the Chrome Web Store title and summary now appear in all 15 supported languages, not just English.
-- **⭐ Better-Timed Review Prompt** — the rating dialog now shows up right after a successful download instead of interrupting you at panel open.
-- **🧪 1527 Tests** — new regression nets for the license cache and the review-prompt funnel.
+- **🔒 Tamper-Proof Licenses Live** — cached Pro licenses are now server-signed and verified offline; editing the local record invalidates it. Legacy and trial users are unaffected.
+- **💬 Anonymous Uninstall Feedback** — an optional one-click survey after removal tells us why people leave, with zero identifiers collected.
+- **🧪 Multi-Experiment A/B Framework** — supports concurrent experiments with independent, stable assignments (1531 tests total).
 
 ---
 
