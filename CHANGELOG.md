@@ -58,6 +58,18 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
+## [1.0.15] — 2026-08-03
+
+### ✨ Added
+
+- **Guided first-run onboarding (A/B test)**: new installs in the treatment bucket now see a demo gallery on the welcome page and the side panel opens on that same page, with three lightweight coach marks that advance from the user's real actions (scan → select → download) instead of a tour. Control bucket keeps the legacy welcome. Why: only ~2.6% of installs ever completed a first download over the prior 90 days — the welcome page told people to "click the toolbar icon" and closed itself.
+
+### 🧪 Test Coverage
+
+- **6 new tests** (suite now 1537): the onboarding-state gate's arming, stickiness-after-resolution, and persisted-state hydration.
+
+---
+
 ## [1.0.14] — 2026-07-31
 
 ### 🔒 Security

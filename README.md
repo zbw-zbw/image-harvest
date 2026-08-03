@@ -87,13 +87,12 @@
 
 ---
 
-## 🆕 What's New (v1.0.14)
+## 🆕 What's New (v1.0.15)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
-- **🔒 Tamper-Proof Licenses Live** — cached Pro licenses are now server-signed and verified offline; editing the local record invalidates it. Legacy and trial users are unaffected.
-- **💬 Anonymous Uninstall Feedback** — an optional one-click survey after removal tells us why people leave, with zero identifiers collected.
-- **🧪 Multi-Experiment A/B Framework** — supports concurrent experiments with independent, stable assignments (1531 tests total).
+- **✨ Guided First-Run Onboarding (A/B)** — new installs in the test bucket see a demo gallery on the welcome page; the side panel opens right there with three coach marks that follow your real actions (scan → select → download). Why: only ~2.6% of installs ever finished a first download.
+- **🧪 1537 Tests** — the onboarding gate's arming, stickiness-after-resolution, and persisted-state hydration are now pinned.
 
 ---
 
