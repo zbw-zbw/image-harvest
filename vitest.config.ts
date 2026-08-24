@@ -36,7 +36,13 @@ export default defineConfig({
     // setupFiles are loaded for every test file but the imports inside are
     // jsdom-safe (jest-dom + cleanup) — no-op under the node environment
     // because @testing-library/preact never runs there.
-    setupFiles: ['tests/_helpers/preact-setup.ts'],
+    //
+    // block-prod-api.ts MUST stay first: it wraps globalThis.fetch before
+    // any module under test binds `fetch` at import time (shared/telemetry.ts
+    // does exactly that). Without it, non-telemetry tests that trigger
+    // track()+flushNow() race worker teardown and can write REAL events to
+    // the production telemetry table (2026-08-24 incident).
+    setupFiles: ['tests/_helpers/block-prod-api.ts', 'tests/_helpers/preact-setup.ts'],
     globals: false,
     reporters: ['default'],
     coverage: {
