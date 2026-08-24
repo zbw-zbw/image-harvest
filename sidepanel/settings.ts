@@ -6,7 +6,7 @@ import { applyFilters, renderColorSwatches, syncCustomSizeInputsFromSettings } f
 import { detectSimilarImages } from './pro-features';
 import { fetchImages, processImageExtras } from './scan';
 import { state } from './state';
-import { track, isOptedIn, setOptIn } from '../shared/telemetry';
+import { track } from '../shared/telemetry';
 import { EVENTS } from '../shared/telemetry-events';
 import { getLocale, t } from '../shared/i18n';
 import { checkNarrowMode, showConfirmDialog, showToast, updateFilterButtonLabels } from './ui';
@@ -150,16 +150,8 @@ export function showSettings(): void {
   setToggle('setting-no-warning', !!state.appSettings.noManyFilesWarning);
   // Language: source of truth is `getLocale()` (resolved by detectLocale()
   // at init time), not appSettings — i18n state lives in its own
-  // chrome.storage key managed by shared/i18n.ts. This mirrors the
-  // setting-telemetry pattern below: a single SDK owns the value, the
-  // toggle is just a one-way mirror of current state at modal-open time.
+  // chrome.storage key managed by shared/i18n.ts.
   setSelect('setting-language', getLocale());
-  // Telemetry opt-in lives in its OWN chrome.storage key (managed by the
-  // SDK), not in appSettings. This avoids two sources of truth and lets
-  // the SDK be reused outside the sidepanel context (background SW).
-  // The toggle reflects current SDK state at modal-open time; it is not
-  // re-synced on background changes (none expected in normal use).
-  void isOptedIn().then((enabled) => setToggle('setting-telemetry', enabled));
 
   // Sync setting-inputs sub-panel visibility
   const togglePanelPairs: Array<[string, string]> = [
@@ -230,13 +222,12 @@ export async function saveSettings(): Promise<void> {
     ? DEFAULT_APP_SETTINGS.maxHeight
     : parsedMaxHeight;
   state.appSettings.noManyFilesWarning = getToggle('setting-no-warning');
-  // Telemetry opt-in is intentionally NOT a member of appSettings (see
-  // loadSettings comment). Forward the toggle's current value to the SDK,
-  // which persists it under its own storage key. Failure here must not
-  // prevent the rest of the settings from being saved.
-  void setOptIn(getToggle('setting-telemetry')).catch(() => {
-    /* best-effort */
-  });
+  // Telemetry: silent by design (zero-PII anonymous events, disclosed in
+  // the Chrome Web Store listing). There is no in-product toggle anymore —
+  // the old #setting-telemetry checkbox was removed with the v1.0.10 UI
+  // revamp, and v1.0.16 made that removal deliberate: no settings write
+  // path touches telemetryOptIn, so saving unrelated settings can never
+  // silently mute an install again (the v1.0.6–v1.0.15 bug).
   // Language: now applied immediately on dropdown selection (in init.ts).
   // No need to re-apply here — setLocale() was already called when the
   // user picked a language from the dropdown.

@@ -412,13 +412,6 @@ export interface SidepanelState {
    * settings.ts continue to work unchanged.
    */
   settingsModalState: ModalState;
-  /**
-   * Privacy opt-in modal — shown exactly once per install on first
-   * sidepanel open. Drives the user's choice into telemetry.setOptIn().
-   * The "decided" flag lives in chrome.storage.local; this state field
-   * only controls in-memory visibility for the current session.
-   */
-  privacyOptInModalState: ModalState;
 
   /**
    * Monotonically-increasing counter bumped every time the runtime locale
@@ -533,7 +526,6 @@ function createInitialState(): SidepanelState {
     multitabModalState: { open: false },
     proUpgradeModalState: { open: false, errorText: '' },
     settingsModalState: { open: false },
-    privacyOptInModalState: { open: false },
     localeTick: 0,
     ratingCheckTick: 0,
   };

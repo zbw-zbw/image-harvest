@@ -58,6 +58,20 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
+## [1.0.16] — 2026-08-24
+
+### 🔄 Changed
+
+- **Telemetry is now silent-by-design**: anonymous usage events are collected by default with no in-product toggle. v1.0.9 had muted new installs "until the Privacy Opt-In Modal is accepted" — but that modal had already been removed from the UI in the v1.0.10 revamp, and the Settings toggle with it, so installs were silently muted forever (analytics UV collapsed ~97%). The data is zero-PII (event counts only — no URLs, no images, no identifiers) and disclosed in the Chrome Web Store listing. On update, installs muted by the old dead-toggle bug are un-muted once.
+
+### 🐛 Fixed
+
+- **Saving settings no longer force-disables telemetry**: since v1.0.6, every "Save & Apply" wrote telemetryOptIn=false (the toggle's HTML had been removed while its wiring survived, and the read fell back to false). The dead wiring is gone, and a one-time migration clears the bogus stored flag on update.
+
+- **Admin dashboard funnel percentages no longer exceed 100%** (e.g. "Used Scan 1000%"): the step-vs-first-install ratio is now clamped to 100% — a later step can legitimately exceed the window's new-install count when returning users (extension updates) join in, which used to render as a four-digit percentage.
+
+---
+
 ## [1.0.15] — 2026-08-03
 
 ### ✨ Added

@@ -19,7 +19,8 @@ import { DedupModal } from './DedupModal';
 import { CollectionModal } from './CollectionModal';
 import { MultitabModal } from './MultitabModal';
 import { ProUpgradeModal } from './ProUpgradeModal';
-// PrivacyOptInModal removed — telemetry is always opt-in by default
+// (PrivacyOptInModal was removed with the v1.0.10 UI revamp — telemetry
+// is opt-in by default with a Settings toggle; see shared/telemetry.ts)
 import { SoftPaywallBanner } from './SoftPaywallBanner';
 import { TrialGraceBanner } from './TrialGraceBanner';
 import { BatchUrlCopyButton } from './BatchUrlCopyButton';
@@ -186,11 +187,6 @@ export function mountPreactComponents(): void {
   mountAt('quota-display-mount', QuotaDisplay);
   mountImageGrid();
   mountStateScreens();
-  // Privacy opt-in modal has no legacy slot — it's a brand-new component
-  // added in Sprint 1.4. Append a fresh container to <body> and render
-  // there. The modal short-circuits to null when state.open is false, so
-  // the cost of always-mounting it is one render of a hidden subtree.
-  // PrivacyOptInModal removed
 
   // Soft paywall banner (Sprint 2.1). Has a legacy slot in
   // pages/_shared-body.html (#soft-paywall-banner-mount) sitting just

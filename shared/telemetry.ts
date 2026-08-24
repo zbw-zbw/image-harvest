@@ -229,14 +229,25 @@ export async function flushNow(): Promise<void> {
 /**
  * Read the opt-in flag with caching. The first call reads from storage;
  * subsequent calls hit the in-memory cache until setOptIn() invalidates.
- * Defaults to FALSE (opt-out) when the user has never made a choice —
- * GDPR-compliant: telemetry remains off until the Privacy Opt-In Modal
- * is explicitly accepted.
+ * Defaults to TRUE (opt-in) when the user has never made a choice.
+ *
+ * Product stance (v1.0.16): SILENT anonymous telemetry. The payload is
+ * zero-PII (see the contract at the top of this file) and disclosed in the
+ * Chrome Web Store listing; there is deliberately NO in-product opt-out
+ * toggle. setOptIn() remains exported purely as SDK surface for tests —
+ * production code no longer calls it, so the persisted flag stays absent
+ * and every install reports by default.
+ *
+ * History: v1.0.9 flipped this default to FALSE "until the Privacy Opt-In
+ * Modal is explicitly accepted" — but that modal had already been removed
+ * from the UI in the v1.0.10 revamp, so new installs were silently muted
+ * with no path to ever opt in (analytics UV collapsed ~97%). Restoring the
+ * default restores the pre-v1.0.9 behaviour for the no-choice case.
  */
 export async function isOptedIn(): Promise<boolean> {
   if (optInCache !== null) return optInCache;
   const v = await storage.get<boolean>(STORAGE_KEY_OPT_IN);
-  optInCache = v === undefined ? false : Boolean(v);
+  optInCache = v === undefined ? true : Boolean(v);
   return optInCache;
 }
 

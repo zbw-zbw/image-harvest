@@ -207,30 +207,6 @@ async function init(): Promise<void> {
         await flushNow();
       }
     })();
-
-    // First-run privacy opt-in. Show the modal only when the user has
-    // never made a choice before; otherwise honor their stored decision.
-    // We deliberately delay by one tick so mountPreactComponents() can
-    // attach the modal mount point before we flip the visibility flag.
-    void (async () => {
-      // E2E tests set this synchronous flag via addInitScript to bypass
-      // the privacy modal without a chrome.storage race condition.
-      if (
-        (window as unknown as { __IH_SKIP_PRIVACY_MODAL__?: boolean }).__IH_SKIP_PRIVACY_MODAL__
-      ) {
-        return;
-      }
-      const { _telemetry_opt_in_decided } = await chrome.storage.local.get(
-        '_telemetry_opt_in_decided'
-      );
-      if (!_telemetry_opt_in_decided) {
-        // setTimeout puts the state mutation after the current task so
-        // Preact has finished its initial mount pass.
-        setTimeout(() => {
-          state.privacyOptInModalState = { open: true };
-        }, 50);
-      }
-    })();
   } catch {
     /* telemetry must never break init */
   }

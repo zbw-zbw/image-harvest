@@ -106,6 +106,28 @@ chrome.runtime.onInstalled.addListener((details) => {
       toVersion: chrome.runtime.getManifest().version || 'unknown',
     });
     void autoStartTrial('update');
+    // One-time migration (v1.0.16): drop any persisted telemetryOptIn value.
+    // Between v1.0.6 and v1.0.15 a dead-settings bug force-wrote
+    // telemetryOptIn=false on every "Save & Apply" (the toggle's HTML had
+    // been removed while its wiring survived, and the read fell back to
+    // false) — and with the toggle gone there was NO user path that could
+    // ever write true. Every stored value from that era is bug noise, not
+    // a user choice. Telemetry is silent-by-design anonymous events now
+    // (disclosed in the store listing), so a clean slate restores the
+    // intended default-on state for all survivors of that window.
+    void (async () => {
+      try {
+        const { _telemetry_opt_in_reset_v1016: done } = await chrome.storage.local.get(
+          '_telemetry_opt_in_reset_v1016'
+        );
+        if (!done) {
+          await chrome.storage.local.remove('telemetryOptIn');
+          await chrome.storage.local.set({ _telemetry_opt_in_reset_v1016: true });
+        }
+      } catch {
+        /* non-fatal — migration retries on next update */
+      }
+    })();
   }
   // SW may go dormant before the 5s flush window — ship immediately.
   void flushNow();

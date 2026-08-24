@@ -34,7 +34,7 @@
   <img src="https://img.shields.io/badge/Manifest-V3-blue" alt="Manifest V3">
   <img src="https://img.shields.io/badge/Chrome-88%2B-brightgreen?logo=googlechrome&logoColor=white" alt="Chrome 88+">
   <img src="https://img.shields.io/badge/Privacy-First-success" alt="Privacy First">
-  <img src="https://img.shields.io/badge/Privacy-No%20Analytics-success" alt="No Analytics">
+  <img src="https://img.shields.io/badge/Privacy-Zero%20PII-success" alt="Zero PII">
   <img src="https://img.shields.io/badge/PRs-welcome-brightgreen" alt="PRs welcome">
 </p>
 
@@ -87,12 +87,13 @@
 
 ---
 
-## 🆕 What's New (v1.0.15)
+## 🆕 What's New (v1.0.16)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
-- **✨ Guided First-Run Onboarding (A/B)** — new installs in the test bucket see a demo gallery on the welcome page; the side panel opens right there with three coach marks that follow your real actions (scan → select → download). Why: only ~2.6% of installs ever finished a first download.
-- **🧪 1537 Tests** — the onboarding gate's arming, stickiness-after-resolution, and persisted-state hydration are now pinned.
+- **🔄 Silent Anonymous Telemetry** — anonymous usage events (feature counts only — no URLs, no images, no identifiers) are now collected by default and disclosed in the store listing. A v1.0.9–v1.0.15 bug had silently muted analytics for almost every install; affected installs are un-muted once on update.
+- **🐛 Settings No Longer Mute Analytics** — the dead wiring that force-disabled telemetry on every "Save & Apply" is gone.
+- **🐛 Dashboard Funnel Fix** — admin funnel percentages no longer exceed 100%.
 
 ---
 
@@ -414,8 +415,8 @@ The Chrome Web Store has dozens of "image downloader" extensions, most released 
 ## 🔒 Privacy & Security
 
 - **All processing is local** — image extraction, hashing, color analysis, and format conversion happen entirely in your browser
-- **No analytics or tracking** — we do not collect usage analytics, telemetry data, or any form of tracking information
-- **No third-party services** — no Google Analytics, no Mixpanel, no ad networks
+- **Anonymous usage statistics only** — we collect anonymous feature-usage event counts (no URLs, no images, no personal data) to improve the product; images, page content, and personal data never leave your device
+- **No third-party trackers** — no Google Analytics, no Mixpanel, no ad networks; telemetry goes only to our own endpoint
 - **You're always in control** — uninstalling the extension wipes every locally-stored byte
 
 ---

@@ -206,14 +206,6 @@ export async function openSidepanelWithImages(
     ({ stub, tabs }: { stub: boolean; tabs: boolean }) => {
       (window as unknown as { __IH_E2E__?: boolean }).__IH_E2E__ = true;
 
-      // Suppress the first-run privacy opt-in modal via a synchronous flag.
-      // We previously used chrome.storage.local.set() here, but addInitScript
-      // callbacks are synchronous — the async set() races with init.ts's
-      // get() and loses on fast startups (CI). A synchronous window flag has
-      // no race condition; init.ts checks it before showing the modal.
-      (window as unknown as { __IH_SKIP_PRIVACY_MODAL__?: boolean }).__IH_SKIP_PRIVACY_MODAL__ =
-        true;
-
       if (tabs) {
         // Wrap chrome.tabs.create so test cases can assert that the app
         // tried to open a new tab without actually opening one (which
