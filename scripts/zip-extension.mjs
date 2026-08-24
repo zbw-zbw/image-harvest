@@ -28,6 +28,11 @@ if (!existsSync(distDir)) {
 // extension would send users to localhost instead of the production site.
 import { readdirSync } from 'node:fs';
 
+// Eagle's desktop app exposes its local API at a fixed localhost port
+// (http://localhost:41595) — that's part of the Eagle protocol, not a
+// leaked dev URL, so it is the single whitelisted exception to this scan.
+const EAGLE_LOCAL_API = 'http://localhost:41595';
+
 function scanForLocalhost(dir) {
   for (const entry of readdirSync(dir, { withFileTypes: true })) {
     const fullPath = resolve(dir, entry.name);
@@ -35,11 +40,15 @@ function scanForLocalhost(dir) {
       scanForLocalhost(fullPath);
     } else if (/\.(js|html)$/.test(entry.name)) {
       const content = readFileSync(fullPath, 'utf8');
-      const match = content.match(/https?:\/\/localhost[:\d]*/);
-      if (match) {
+      // Collect ALL matches (not just the first) so an Eagle URL earlier in
+      // the bundle can't mask a genuinely leaked localhost URL after it.
+      const matches = content.match(/https?:\/\/localhost[:\d]*/g) ?? [];
+      const offender = matches.find((m) => m !== EAGLE_LOCAL_API);
+      if (offender) {
         console.error(
-          `\n✖ BLOCKED: production build contains "${match[0]}" in ${entry.name}\n` +
+          `\n✖ BLOCKED: production build contains "${offender}" in ${entry.name}\n` +
             '  This usually means .env.local has VITE_API_BASE=http://localhost:3000.\n' +
+            '  (http://localhost:41595 — the Eagle desktop app API — is whitelisted.)\n' +
             '  Remove or comment it out, rebuild, then re-run this script.\n'
         );
         process.exit(1);
