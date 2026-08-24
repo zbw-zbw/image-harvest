@@ -13,7 +13,7 @@
 //
 // See `manifest.config.ts` for the typed MV3 manifest used by crxjs.
 
-import { cpSync } from 'node:fs';
+import { cpSync, writeFileSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { defineConfig, type Plugin } from 'vite';
 import { crx } from '@crxjs/vite-plugin';
@@ -37,6 +37,31 @@ function copyStaticAssetsPlugin(): Plugin {
   };
 }
 
+// E2E builds (`npm run build:e2e` = VITE_E2E=1 vite build) produce a
+// byte-equivalent production bundle EXCEPT that shared/telemetry.ts and
+// shared/trial.ts compile-time gates shut off real network writes — see
+// the define block below. Without this, every Playwright run (each test
+// case = a fresh Chrome profile = a fresh install) writes real
+// ext_installed events and /api/trial/start rows to the production DB;
+// CI runs e2e on every push, which polluted ~76% of the trials table and
+// ~88% of telemetry instances before this gate existed (2026-08-24).
+const e2eBuild = process.env.VITE_E2E === '1';
+
+/** Drop a marker file so tooling can prove dist/ is e2e-safe. */
+function e2eMarkerPlugin(): Plugin {
+  return {
+    name: 'e2e-build-marker',
+    closeBundle() {
+      if (e2eBuild) {
+        writeFileSync(
+          resolve(__dirname, 'dist', '.e2e-build'),
+          'e2e build: telemetry + trial network writes disabled at compile time\n'
+        );
+      }
+    },
+  };
+}
+
 // Toggle bundle-size analysis with `ANALYZE=1 npm run build`. The visualizer
 // emits dist/stats.html (treemap) — useful for spotting which deps dominate
 // the largest chunks. Off by default so production builds stay clean.
@@ -46,8 +71,12 @@ export default defineConfig(({ mode }) => ({
   // Compile-time constants injected into the bundle. `__DEV__` is used by
   // shared/telemetry.ts to completely disable telemetry in dev builds so
   // local development does not pollute the production analytics database.
+  // `__E2E__` (set by VITE_E2E=1, independent of mode so e2e bundles stay
+  // byte-identical to production otherwise) additionally hard-blocks the
+  // trial RPC — see shared/trial.ts for why dev builds need it too.
   define: {
     __DEV__: JSON.stringify(mode !== 'production'),
+    __E2E__: JSON.stringify(e2eBuild),
   },
   // Preact JSX automatic runtime — matches the tsconfig "jsxImportSource":
   // "preact" setting so `.tsx` files compile without an explicit `h` import.
@@ -75,6 +104,8 @@ export default defineConfig(({ mode }) => ({
     crx({ manifest }),
     // Copy _locales and other static dirs that crxjs doesn't handle.
     copyStaticAssetsPlugin(),
+    // Write dist/.e2e-build when building with VITE_E2E=1 (see above).
+    e2eMarkerPlugin(),
     ...(analyze
       ? [
           // Treemap for human eyeballing.

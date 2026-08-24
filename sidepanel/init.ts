@@ -176,9 +176,16 @@ async function init(): Promise<void> {
   // Background SW seeds {version, plan} but lives in a different runtime,
   // so the sidepanel must re-seed for its own SDK instance. lang is
   // sidepanel-only because chrome.i18n returns the UI locale here.
+  // version must ALSO be re-seeded: it comes from the manifest at runtime
+  // (not an import), and the SDK instance in THIS context otherwise keeps
+  // the '0.0.0' default forever — before this line existed, 87% of all
+  // telemetry events shipped with version='0.0.0' because the sidepanel
+  // is where most user-facing events originate (scan_triggered,
+  // images_shown, …), poisoning any version-based dashboard analysis.
   try {
     const lang = chrome.i18n?.getUILanguage?.() || 'unknown';
-    setEnvelopeMeta({ lang });
+    const version = chrome.runtime?.getManifest?.().version || '0.0.0';
+    setEnvelopeMeta({ lang, version });
     isProUser()
       .then((info) => setEnvelopeMeta({ plan: info.isPro ? info.plan || 'pro' : 'free' }))
       .catch(() => {

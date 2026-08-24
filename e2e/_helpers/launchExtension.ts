@@ -39,6 +39,22 @@ export async function launchExtension(): Promise<LaunchedExtension> {
     );
   }
 
+  // Guard: the loaded bundle must be an E2E build (`npm run build:e2e`),
+  // proven by the dist/.e2e-build marker written by vite.config.ts. A
+  // regular production dist/ here means every test case (fresh Chrome
+  // profile = fresh install) writes real ext_installed events and trial
+  // rows to the production DB — this exact mistake polluted ~76% of the
+  // trials table and ~88% of telemetry instances before the marker existed
+  // (2026-08-24). Fail fast with the fix in the message.
+  if (!existsSync(join(extensionPath, '.e2e-build'))) {
+    throw new Error(
+      `dist/ at ${extensionPath} is NOT an e2e build (missing dist/.e2e-build marker). ` +
+        `Running e2e against a production build writes real telemetry and trial rows ` +
+        `to the production database. Run \`npm run build:e2e\` (not \`npm run build\`) ` +
+        `before \`npm run test:e2e\`.`
+    );
+  }
+
   const userDataDir = mkdtempSync(join(tmpdir(), 'image-harvest-e2e-'));
 
   const context = await chromium.launchPersistentContext(userDataDir, {

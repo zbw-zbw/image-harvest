@@ -141,8 +141,15 @@ export async function track(
   props?: TelemetryProps
 ): Promise<void> {
   // Completely silence telemetry in dev builds so local development
-  // does not pollute the production analytics database.
+  // does not pollute the production analytics database. __E2E__ covers the
+  // separate case where a PRODUCTION bundle is loaded by Playwright — the
+  // bundle is byte-identical to the store build (so e2e tests the real
+  // code), but every track() must be a no-op or each e2e run (fresh Chrome
+  // profile per test = fresh install) writes real events to the production
+  // DB. Before this gate, release-day e2e bursts polluted ~88% of telemetry
+  // instances (2026-08-24).
   if (typeof __DEV__ !== 'undefined' && __DEV__) return;
+  if (typeof __E2E__ !== 'undefined' && __E2E__) return;
 
   const opted = await isOptedIn();
   if (!opted) return;

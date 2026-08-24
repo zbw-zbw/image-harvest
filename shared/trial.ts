@@ -89,6 +89,22 @@ export async function isTrialEligible(): Promise<boolean> {
  * error so the UI never double-charges the server.
  */
 export async function startTrial(): Promise<TrialStartResult> {
+  // E2E builds load the production bundle in Playwright with a fresh
+  // Chrome profile per test case — without this gate each run writes a
+  // real row to the production trials table via /api/trial/start (server
+  // rows persist the moment the request lands, even if the test browser
+  // dies before reading the response). Release-day e2e bursts made up 76%
+  // of the table before this gate existed (2026-08-24). Dev builds need the
+  // same guard: VITE_API_BASE defaults to the PRODUCTION backend when unset
+  // (see shared/constants.ts), so `npm run dev` + the auto-trial onInstalled
+  // hook also wrote real trial rows.
+  if (typeof __E2E__ !== 'undefined' && __E2E__) {
+    return { success: false, error: 'trial_error_disabled_in_e2e' };
+  }
+  if (typeof __DEV__ !== 'undefined' && __DEV__) {
+    return { success: false, error: 'trial_error_disabled_in_dev' };
+  }
+
   if (!(await isTrialEligible())) {
     return {
       success: false,

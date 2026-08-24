@@ -58,6 +58,14 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
+## [1.0.17] — 2026-08-24
+
+### 🐛 Fixed
+
+- **Anonymous telemetry no longer ships wrong versions**: side-panel events (the majority of all usage events — scan triggered, images shown, downloads completed) carried version `0.0.0` because the side panel never re-seeded the extension version into its own telemetry client instance. Version-based analysis (e.g. adoption of a new release) was effectively blind; the side panel now reads the version from the manifest at runtime.
+
+---
+
 ## [1.0.16] — 2026-08-24
 
 ### 🔄 Changed

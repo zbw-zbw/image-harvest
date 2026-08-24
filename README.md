@@ -87,13 +87,11 @@
 
 ---
 
-## 🆕 What's New (v1.0.16)
+## 🆕 What's New (v1.0.17)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
-- **🔄 Silent Anonymous Telemetry** — anonymous usage events (feature counts only — no URLs, no images, no identifiers) are now collected by default and disclosed in the store listing. A v1.0.9–v1.0.15 bug had silently muted analytics for almost every install; affected installs are un-muted once on update.
-- **🐛 Settings No Longer Mute Analytics** — the dead wiring that force-disabled telemetry on every "Save & Apply" is gone.
-- **🐛 Dashboard Funnel Fix** — admin funnel percentages no longer exceed 100%.
+- **🐛 Telemetry Version Fix** — side-panel events (the majority of all usage events) previously shipped with version `0.0.0`, making version-based analysis blind. The side panel now reads the extension version from the manifest at runtime.
 
 ---
 

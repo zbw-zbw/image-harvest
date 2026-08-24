@@ -146,7 +146,15 @@ jobs:
       - run: npm ci --legacy-peer-deps
       # Re-run the build inside this job so dist/ is local. Cheaper than
       # downloading the artifact from the build job and unpacking it.
-      - run: npm run build
+      # MUST be build:e2e (VITE_E2E=1): it compiles telemetry + trial RPC
+      # network-writes out of the bundle. A plain production build here
+      # would make every Playwright run (fresh Chrome profile per test =
+      # fresh install) write real ext_installed events and trial rows to
+      # the production DB — CI runs on every push, which polluted ~76% of
+      # the trials table before this gate existed (2026-08-24).
+      # e2e/_helpers/launchExtension.ts also refuses to run without the
+      # dist/.e2e-build marker as a second line of defense.
+      - run: npm run build:e2e
       # `playwright install --with-deps` pulls Chromium + the system libs
       # (libnss3, libatk, etc) needed for headed mode. xvfb is not part of
       # --with-deps, so we install it explicitly.
