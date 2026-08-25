@@ -623,6 +623,10 @@ function bindEvents(): void {
             await import('../shared/feature-quota');
           const { allowed, limit } = await checkFeatureQuota('formatConvert');
           if (!allowed) {
+            // Close the dropdown before the modal — same contract as the
+            // normal item-click branch below (lockDlDropdown), so the menu
+            // doesn't linger open behind the upgrade modal after ESC.
+            lockDlDropdown();
             showToast(quotaBlockedMessage(t, 'feature_format_convert', limit), 'warning');
             showProUpgradeModal();
             return;
@@ -1212,6 +1216,15 @@ declare global {
        * link is disabled (similarGroups=[]).
        */
       showDedupModal: () => Promise<void>;
+      /**
+       * Clear the tab-switch grace window + isTabSwitching flag so e2e
+       * tests can dispatch synthetic IMAGES_DISCOVERED frames immediately
+       * after panel open. The fixture's bringToFront() fires a real
+       * chrome.tabs.onActivated → handleTabChange, which would otherwise
+       * suppress discoveries for TAB_SWITCH_GRACE_MS (see
+       * tab-lifecycle.ts resetTabSwitchGraceForTest).
+       */
+      resetDiscoveryGuards: () => void;
     };
   }
 }
@@ -1225,7 +1238,8 @@ if (typeof window !== 'undefined' && window.__IH_E2E__) {
     import('./filter'),
     import('./settings'),
     import('./message'),
-  ]).then(([stateMod, filterMod, settingsMod, messageMod]) => {
+    import('./tab-lifecycle'),
+  ]).then(([stateMod, filterMod, settingsMod, messageMod, tabLifecycleMod]) => {
     window.__IH__ = {
       store: stateMod.store,
       applyFilters: filterMod.applyFilters,
@@ -1236,6 +1250,7 @@ if (typeof window !== 'undefined' && window.__IH_E2E__) {
         const { showDedupModal } = await import('./dedup-ui');
         showDedupModal();
       },
+      resetDiscoveryGuards: tabLifecycleMod.resetTabSwitchGraceForTest,
     };
   });
 }

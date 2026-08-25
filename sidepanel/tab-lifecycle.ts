@@ -36,6 +36,19 @@ export function isWithinTabSwitchGrace(): boolean {
   return Date.now() - lastTabSwitchTime < TIMING.TAB_SWITCH_GRACE_MS;
 }
 
+/** E2E-only escape hatch (exposed via window.__IH__.resetDiscoveryGuards):
+ * clear the tab-switch grace window and the switching flag so tests can
+ * dispatch synthetic IMAGES_DISCOVERED frames immediately after panel open.
+ * The fixture's bringToFront() fires a real chrome.tabs.onActivated →
+ * handleTabChange, which would otherwise suppress discoveries for
+ * TAB_SWITCH_GRACE_MS — a delay the production code deliberately keeps
+ * (it prevents stale discoveries from the previous tab) but which only
+ * adds flaky sleeps to tests. */
+export function resetTabSwitchGraceForTest(): void {
+  lastTabSwitchTime = 0;
+  state.isTabSwitching = false;
+}
+
 export async function loadCurrentTab(forceRescan = false, targetTabId?: number): Promise<void> {
   let activeTab: chrome.tabs.Tab | undefined;
   try {
@@ -216,24 +229,33 @@ export async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Pr
   if (state.currentTabId != null && state.currentTabId !== newTabId) {
     const cachedUrl = state.tabCache.get(state.currentTabId)?.url || '';
 
-    // Save scroll position so we can restore it when switching back.
-    // The actual scrollable container is .image-grid (overflow-y: auto),
-    // NOT .image-grid-wrapper (which is a non-scrolling flex parent).
-    const scrollTop = elements.imageGrid?.scrollTop ?? 0;
+    // Skip saving an empty snapshot for a tab we never actually scanned
+    // (e.g. the sidepanel's own chrome-extension:// tab that briefly owns
+    // currentTabId while the panel is booting). An empty entry would
+    // otherwise linger in the Map and be misread as a restricted-tab
+    // marker by the get-then-delete branch in handleTabChange below —
+    // and it is never persisted anyway (saveTabImageCache is already
+    // guarded by `if (cachedUrl)`).
+    if (cachedUrl || state.allImages.length > 0) {
+      // Save scroll position so we can restore it when switching back.
+      // The actual scrollable container is .image-grid (overflow-y: auto),
+      // NOT .image-grid-wrapper (which is a non-scrolling flex parent).
+      const scrollTop = elements.imageGrid?.scrollTop ?? 0;
 
-    state.tabCache.set(state.currentTabId, {
-      url: cachedUrl,
-      images: [...state.allImages],
-      selectedImages: new Set(state.selectedImages),
-      filteredImages: [...state.filteredImages],
-      lastRenderedFilteredIds: state.lastRenderedFilteredIds,
-      similarGroups: [...state.similarGroups],
-      scrollTop,
-      lastAccessed: Date.now(),
-    });
-    evictOldestTabCache(state.tabCache);
-    if (cachedUrl) {
-      saveTabImageCache(state.currentTabId, cachedUrl, state.allImages);
+      state.tabCache.set(state.currentTabId, {
+        url: cachedUrl,
+        images: [...state.allImages],
+        selectedImages: new Set(state.selectedImages),
+        filteredImages: [...state.filteredImages],
+        lastRenderedFilteredIds: state.lastRenderedFilteredIds,
+        similarGroups: [...state.similarGroups],
+        scrollTop,
+        lastAccessed: Date.now(),
+      });
+      evictOldestTabCache(state.tabCache);
+      if (cachedUrl) {
+        saveTabImageCache(state.currentTabId, cachedUrl, state.allImages);
+      }
     }
   }
 

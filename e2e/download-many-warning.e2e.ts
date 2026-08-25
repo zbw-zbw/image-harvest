@@ -65,6 +65,12 @@ async function seedManyAndClickDownload(
       displayHeight: number;
       estimatedSize: number;
       format: string;
+      // Required: the default filter state has showVisibleOnly enabled, and
+      // filterByVisibility drops images without an explicit visible===true
+      // flag — without it filteredImages stays empty, the btn-download
+      // handler's `imagesToDownload.length === 0` guard returns early, and
+      // the warning dialog under test never opens.
+      visible: boolean;
     }
     interface IH {
       store: {
@@ -84,6 +90,7 @@ async function seedManyAndClickDownload(
       displayHeight: 200,
       estimatedSize: 1024,
       format: 'png',
+      visible: true,
     }));
 
     // Make sure the warning isn't suppressed by a stale setting from
@@ -97,9 +104,19 @@ async function seedManyAndClickDownload(
     w.__IH__.store.set('selectedImages', new Set(synthetic.map((i) => i.id)));
   });
 
-  // Trigger the download. The Download button hits downloadSelectedAsZip
-  // when the selection has 2+ images.
+  // Trigger the download. Re-assert isProUser in the SAME synchronous
+  // block as the click: a LICENSE_STATUS_CHANGED broadcast from the
+  // background (trial/license check) can land between the seeding
+  // evaluate and this one and flip isProUser back to false via
+  // applyProFeatureVisibility — which would divert the 150 images into
+  // the free-tier zip guard (MAX_ZIP_IMAGES=50) instead of the >100
+  // warning dialog under test. The click handler reads state.isProUser
+  // synchronously, so setting it right before the click is race-free.
   await sidepanel.evaluate(() => {
+    const w = window as unknown as {
+      __IH__: { store: { set: (k: string, v: unknown) => void } };
+    };
+    w.__IH__.store.set('isProUser', true);
     document.getElementById('btn-download')?.click();
   });
 

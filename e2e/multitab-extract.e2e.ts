@@ -17,8 +17,10 @@
 // sidepanel's other internal messaging keeps working. This pins
 // every consumer-side contract of startMultiTabExtract:
 //   1. progress modal opens (#progress-modal becomes visible)
-//   2. response.images get merged into state.allImages, dedup'd
-//      by url against existing entries
+//   2. response.images REPLACE state.allImages (multitab.ts: "Replace
+//      allImages with only the multi-tab results. The user explicitly
+//      chose which tabs to extract from; showing images from tabs they
+//      did NOT select would be confusing.")
 //   3. grouping mode auto-flips to 'tab'
 //   4. multitab modal closes
 //   5. 'Extracted N images from M tabs' toast surfaces
@@ -177,16 +179,19 @@ test('Pro user selects all tabs + Start Extraction → MULTI_TAB_EXTRACT respons
   expect(calls[0].type).toBe('MULTI_TAB_EXTRACT');
   expect(calls[0].tabIds!.length).toBe(tabItemCount);
 
-  // allImages grew by exactly tabItemCount * 2 (two synth images per
-  // tab in the stub). The merge dedup'd by url, but every stub url
-  // is unique so all of them land.
+  // allImages is REPLACED with only the multi-tab results (two synth
+  // images per tab in the stub) — the pre-existing fixture images are
+  // intentionally dropped so the grid shows exactly what was extracted.
   const afterCount = await sidepanel.evaluate(() => {
     interface IH {
       store: { get: (k: 'allImages') => unknown[] };
     }
     return (window as unknown as { __IH__: IH }).__IH__.store.get('allImages').length;
   });
-  expect(afterCount).toBe(beforeCount + tabItemCount * 2);
+  expect(afterCount).toBe(tabItemCount * 2);
+
+  // The pre-extraction snapshot is gone (replace, not append).
+  expect(afterCount).not.toBe(beforeCount + tabItemCount * 2);
 
   // Grouping mode auto-flipped to 'tab' (multitab.ts L325).
   const groupMode = await sidepanel.evaluate(() => {

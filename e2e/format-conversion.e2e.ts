@@ -1,13 +1,20 @@
 // e2e: download-format dropdown (#download-dropdown) gates non-original
-// formats behind Pro and routes Pro users into downloadSelectedAsZip
-// with the chosen format string.
+// formats behind the monthly formatConvert quota and routes into
+// downloadSelectedAsZip with the chosen format string.
 //
-// Flow (init.ts L599-643):
-//   1. Click #btn-download-toggle → toggleDownloadDropdown removes
-//      .hidden from #download-dropdown.
+// NOTE on dropdown mechanics (v1.0.x redesign): #btn-download-toggle no
+// longer exists in the DOM and toggleDownloadDropdown/hideDownloadDropdown
+// are retired no-ops. The dropdown is a JS-controlled hover menu —
+// visibility is driven by the .dl-dropdown-open class on #download-group
+// (mouseenter opens, mouseleave/lockDlDropdown closes, see init.ts
+// bindEvents). Tests open it by adding the class directly.
+//
+// Flow (init.ts downloadDropdown click handler):
+//   1. Open the dropdown (add .dl-dropdown-open to #download-group).
 //   2. Click a .dropdown-item with [data-format="png|jpg|webp"]:
-//        - free user → showToast 'Format conversion is a Pro feature'
-//          + showProUpgradeModal + hideDownloadDropdown, no download.
+//        - free user with quota exhausted (MAX_MONTHLY_FORMAT_CONVERT=0
+//          in e2e builds — remote config is gated) → lockDlDropdown +
+//          toast + showProUpgradeModal, no download.
 //        - Pro user → set the format as the active dropdown item,
 //          route through downloadSingle/downloadSelectedAsZip with
 //          convertFormat = the chosen string. With ≥2 selected images
@@ -46,26 +53,28 @@ test('free user picking PNG from the format dropdown opens the upgrade modal (no
 
   await expect(sidepanel.locator('#pro-upgrade-modal')).toHaveClass(/hidden/);
 
-  // Open the dropdown.
+  // Open the dropdown — .dl-dropdown-open on #download-group is the
+  // JS-hover mechanism (mouseenter normally adds it).
   await sidepanel.evaluate(() => {
-    document.getElementById('btn-download-toggle')?.click();
+    document.getElementById('download-group')?.classList.add('dl-dropdown-open');
   });
-  await expect(sidepanel.locator('#download-dropdown')).not.toHaveClass(/hidden/, {
-    timeout: 3_000,
-  });
+  await expect(sidepanel.locator('#download-group')).toHaveClass(/dl-dropdown-open/);
 
-  // Pick PNG (Pro-gated for free users).
+  // Pick PNG (quota-gated for free users).
   await sidepanel.evaluate(() => {
     document
       .querySelector<HTMLElement>('#download-dropdown .dropdown-item[data-format="png"]')
       ?.click();
   });
 
-  // Pro upgrade modal opens, dropdown auto-hides, no download fired.
+  // Pro upgrade modal opens, dropdown closes (lockDlDropdown), no
+  // download fired.
   await expect(sidepanel.locator('#pro-upgrade-modal')).not.toHaveClass(/hidden/, {
     timeout: 3_000,
   });
-  await expect(sidepanel.locator('#download-dropdown')).toHaveClass(/hidden/);
+  await expect(sidepanel.locator('#download-group')).not.toHaveClass(/dl-dropdown-open/, {
+    timeout: 3_000,
+  });
   await sidepanel.waitForTimeout(300);
   expect(await readDownloadCalls(sidepanel)).toHaveLength(0);
 });
@@ -97,9 +106,9 @@ test('Pro user picking JPG from the format dropdown triggers a single .zip downl
   });
 
   await sidepanel.evaluate(() => {
-    document.getElementById('btn-download-toggle')?.click();
+    document.getElementById('download-group')?.classList.add('dl-dropdown-open');
   });
-  await expect(sidepanel.locator('#download-dropdown')).not.toHaveClass(/hidden/);
+  await expect(sidepanel.locator('#download-group')).toHaveClass(/dl-dropdown-open/);
 
   await sidepanel.evaluate(() => {
     document

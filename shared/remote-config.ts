@@ -89,6 +89,17 @@ function getConfigApiUrl(): string {
 
 /** Fetch config from backend, write to storage + memory. Returns true on success. */
 export async function syncRemoteConfig(): Promise<boolean> {
+  // Never fetch remote config in e2e builds. E2E launches the production
+  // bundle against the REAL backend, so without this gate every test run
+  // pulls the live admin-managed feature_limits snapshot into
+  // globalThis.__remoteConfig — and free-tier guard thresholds
+  // (maxZipImages, maxMonthlyMultiTab, ...) silently drift with whatever
+  // an admin changed in the dashboard that day. Tests were written against
+  // the hardcoded FREE_LIMITS defaults and must stay deterministic.
+  // Same gate pattern as shared/telemetry.ts track() and shared/trial.ts
+  // startTrial() (see 2026-08-24 e2e isolation work).
+  if (typeof __E2E__ !== 'undefined' && __E2E__) return false;
+
   try {
     const response = await fetch(getConfigApiUrl(), {
       signal: AbortSignal.timeout(8000),
@@ -121,6 +132,11 @@ export async function syncRemoteConfig(): Promise<boolean> {
 
 /** Get the cached remote config. Returns null if never synced. */
 export async function getRemoteConfig(): Promise<RemoteLimitsConfig | null> {
+  // E2e builds must never see remote overrides (see syncRemoteConfig gate).
+  // Even a stale chrome.storage.local entry would re-expose drifting limits,
+  // so short-circuit to null before touching memory/storage caches.
+  if (typeof __E2E__ !== 'undefined' && __E2E__) return null;
+
   // 1. Memory cache (fastest)
   if (isMemoryCacheValid()) return memoryConfig;
 

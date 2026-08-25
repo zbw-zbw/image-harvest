@@ -16,9 +16,9 @@
 //   1. Error screen: errorInfo {code, message, workaround} → all
 //      three render with the right text; .hidden goes away.
 //   2. Empty 'no results' (filtered to nothing): button label flips
-//      to 'Reset Filters', description is the filter-tuned copy.
+//      to 'Reset filters', description is the filter-tuned copy.
 //   3. Empty 'no images at all': button label flips to 'Rescan
-//      Images', description is the page-tuned copy.
+//      images', description is the page-tuned copy.
 //   4. Recovery: setting uiScreen back to 'images' re-hides every
 //      screen.
 import { test, expect } from '@playwright/test';
@@ -105,7 +105,7 @@ test('empty screen — isNoResults=true → "Reset Filters" + filter-tuned copy'
   });
   await expect(sidepanel.locator('.empty-state-title')).toHaveText('No images found');
   await expect(sidepanel.locator('.empty-state-desc')).toContainText('adjusting your filter');
-  await expect(sidepanel.locator('#btn-reset-filters span')).toHaveText('Reset Filters');
+  await expect(sidepanel.locator('#btn-reset-filters span')).toHaveText('Reset filters');
 });
 
 test('empty screen — isNoResults=false → "Rescan Images" + page-tuned copy', async () => {
@@ -123,8 +123,10 @@ test('empty screen — isNoResults=false → "Rescan Images" + page-tuned copy',
   await expect(sidepanel.locator('#empty-state')).not.toHaveClass(/hidden/, {
     timeout: 2_000,
   });
-  await expect(sidepanel.locator('.empty-state-desc')).toContainText('No images were detected');
-  await expect(sidepanel.locator('#btn-reset-filters span')).toHaveText('Rescan Images');
+  await expect(sidepanel.locator('.empty-state-desc')).toContainText(
+    'Try scrolling the page or click Rescan'
+  );
+  await expect(sidepanel.locator('#btn-reset-filters span')).toHaveText('Rescan images');
 });
 
 test('restricted screen: uiScreen=restricted → #restricted-state visible; recovery shows it again', async () => {

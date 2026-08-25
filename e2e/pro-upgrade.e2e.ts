@@ -1,22 +1,19 @@
 // e2e: Pro feature click guard regression coverage.
 //
-// settings.ts > bindProGuards attaches a CAPTURE-PHASE click listener to
-// #btn-collection and #btn-multitab that:
-//   1. Calls e.stopImmediatePropagation() — preventing the lazy
-//      showCollectionModal / showMultiTabModal handlers from running
-//   2. Calls showProUpgradeModal() — which sets
-//      state.proUpgradeModalState = { open: true, errorText: '' }
-//      so the <ProUpgradeModal> Preact shell un-hides the
-//      #pro-upgrade-modal container.
-//   3. Surfaces a toast warning ("Collection is a Pro feature ...")
+// Sprint 3.5 "first wow" strategy changed the free-tier surface:
+//   - Collection: fully free to open (limit enforced on SAVES inside
+//     addToCollection, covered by unit tests) — free users get the
+//     modal directly, no interception.
+//   - Multi-Tab: the modal button reaches showMultiTabModal, whose
+//     internal quota gate (MAX_MONTHLY_MULTI_TAB = 0 = Pro-exclusive)
+//     redirects free users to the upgrade modal + toast
+//     (pro_feature_upgrade_required). The old capture-phase
+//     proLockedButtons interceptor in settings.ts is now an EMPTY array
+//     — these tests pin the NEW contract so a future refactor can't
+//     silently re-lock or break either path.
 //
-// This is critical product logic: we burned a debug session believing it
-// was a button-binding bug. These tests pin the contract so future
-// refactors of the bindProGuards / Pro detection path can't silently
-// remove the upsell path.
-//
-// We deliberately DO NOT pass enablePro:true — the whole point is to
-// observe the free-user upsell flow.
+// We deliberately DO NOT pass enablePro:true for the free-tier tests —
+// the whole point is to observe the free-user flow.
 import { test, expect } from '@playwright/test';
 import {
   launchExtension,
@@ -49,7 +46,7 @@ async function readProUpgradeOpen(sidepanel: import('@playwright/test').Page): P
   });
 }
 
-test('free user clicking #btn-collection opens the Pro upgrade modal (does NOT open Collection)', async () => {
+test('free user clicking #btn-collection opens the Collection modal directly (free-tier allowance, no interception)', async () => {
   const { sidepanel } = await openSidepanelWithImages(ext.context, fixtureServer, ext.extensionId);
 
   // Wait for __IH__ to land so we can read store state.
@@ -62,30 +59,22 @@ test('free user clicking #btn-collection opens the Pro upgrade modal (does NOT o
   await expect(sidepanel.locator('#collection-modal')).toHaveClass(/hidden/);
   expect(await readProUpgradeOpen(sidepanel)).toBe(false);
 
-  // Real DOM click — exercises the production path through the
-  // capture-phase guard.
+  // Real DOM click — free user opens the lazy showCollectionModal path.
   await sidepanel.evaluate(() => {
     document.getElementById('btn-collection')?.click();
   });
 
-  // Pro upgrade modal opens (capture-phase listener wins, then triggers
-  // showProUpgradeModal → store mutation → Preact removes .hidden).
-  await expect(sidepanel.locator('#pro-upgrade-modal')).not.toHaveClass(/hidden/, {
-    timeout: 3_000,
+  // Collection modal opens directly — the save-count limit is enforced
+  // inside addToCollection, not at the button.
+  await expect(sidepanel.locator('#collection-modal')).not.toHaveClass(/hidden/, {
+    timeout: 5_000,
   });
-  expect(await readProUpgradeOpen(sidepanel)).toBe(true);
-
-  // Collection modal stays hidden — stopImmediatePropagation killed the
-  // showCollectionModal handler before it could run.
-  await expect(sidepanel.locator('#collection-modal')).toHaveClass(/hidden/);
-
-  // Toast warning surfaces with the feature name.
-  await expect(
-    sidepanel.locator('#toast-container .toast').filter({ hasText: /Collection.*Pro feature/i })
-  ).toBeVisible({ timeout: 3_000 });
+  // Pro upgrade modal stays hidden — no interception.
+  await expect(sidepanel.locator('#pro-upgrade-modal')).toHaveClass(/hidden/);
+  expect(await readProUpgradeOpen(sidepanel)).toBe(false);
 });
 
-test('free user clicking #btn-multitab opens the Pro upgrade modal (does NOT open Multi-Tab)', async () => {
+test('free user clicking #btn-multitab hits the quota gate → Pro upgrade modal (Multi-Tab modal stays closed)', async () => {
   const { sidepanel } = await openSidepanelWithImages(ext.context, fixtureServer, ext.extensionId);
 
   await sidepanel.waitForFunction(() =>
@@ -99,19 +88,26 @@ test('free user clicking #btn-multitab opens the Pro upgrade modal (does NOT ope
     document.getElementById('btn-multitab')?.click();
   });
 
+  // MAX_MONTHLY_MULTI_TAB = 0 (Pro-exclusive) → showMultiTabModal's
+  // internal quota gate redirects free users to the upgrade modal.
   await expect(sidepanel.locator('#pro-upgrade-modal')).not.toHaveClass(/hidden/, {
     timeout: 3_000,
   });
   expect(await readProUpgradeOpen(sidepanel)).toBe(true);
 
   // The Multi-Tab modal must NOT open — that's the entire purpose of
-  // the guard. Use a short timeout: if it ever opens, it does so
+  // the gate. Use a short timeout: if it ever opens, it does so
   // synchronously after the click handler runs.
   await sidepanel.waitForTimeout(500);
   await expect(sidepanel.locator('#multitab-modal')).toHaveClass(/hidden/);
 
+  // limit = 0 → quotaBlockedMessage uses pro_feature_upgrade_required
+  // ("This feature requires Pro. Upgrade to unlock!") instead of the
+  // confusing "0 per month" wording.
   await expect(
-    sidepanel.locator('#toast-container .toast').filter({ hasText: /Multi-Tab.*Pro feature/i })
+    sidepanel.locator('#toast-container .toast').filter({
+      hasText: /requires Pro/i,
+    })
   ).toBeVisible({ timeout: 3_000 });
 });
 

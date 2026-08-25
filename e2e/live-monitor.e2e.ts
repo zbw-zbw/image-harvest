@@ -71,6 +71,11 @@ interface ImagePayload {
   sourceDomain: string;
   checked: boolean;
   timestamp: number;
+  // Required: the default filter state has showVisibleOnly enabled, and
+  // filterByVisibility drops images without an explicit visible===true flag —
+  // merged images would land in allImages but never survive applyFilters, so
+  // the grid-count assertion below would stall at beforeCardCount.
+  visible: boolean;
 }
 
 /**
@@ -90,6 +95,7 @@ function makeDiscoveredImages(urls: string[]): ImagePayload[] {
     sourceDomain: 'live.example.com',
     checked: false,
     timestamp: Date.now(),
+    visible: true,
   }));
 }
 
@@ -122,7 +128,13 @@ test('happy path: IMAGES_DISCOVERED with matching fromTabId merges new urls into
   ];
   await sidepanel.evaluate(
     ({ urls, tabId, payload }) => {
-      const w = window as unknown as { __IH__: IH };
+      const w = window as unknown as { __IH__: IH & { resetDiscoveryGuards: () => void } };
+      // The fixture's bringToFront() (launchExtension.ts) fires a real
+      // chrome.tabs.onActivated → handleTabChange, which arms the 2s
+      // tab-switch grace window. That guard exists to protect real users
+      // from stale discoveries after a tab switch — for this test we clear
+      // it so the live-monitor branch is reachable deterministically.
+      w.__IH__.resetDiscoveryGuards();
       w.__IH__.handleMessage({
         type: 'IMAGES_DISCOVERED',
         fromTabId: tabId,

@@ -133,12 +133,14 @@ test('selecting a subset and clicking "Copy URLs" copies only the selected URLs'
   expect(firstUrl).toBeTruthy();
 
   // Wait for the label to reflect the count → guarantees the store
-  // subscription has flushed before we click.
+  // subscription has flushed before we click. The count lives in a
+  // separate .btn-count span (mirroring DownloadLabel's two-span
+  // structure), so assert on the whole button's textContent.
   await expect
     .poll(
       () =>
         sidepanel.evaluate(() => {
-          const label = document.querySelector('#btn-batch-copy-urls .btn-label');
+          const label = document.querySelector('#btn-batch-copy-urls');
           return label?.textContent || '';
         }),
       { timeout: 3_000 }

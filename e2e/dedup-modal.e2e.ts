@@ -65,6 +65,7 @@ async function seedSimilarGroups(
       estimatedSize: number;
       format: string;
       phash: string | null;
+      visible: boolean;
     }
     interface IH {
       store: { set: (k: string, v: unknown) => void };
@@ -82,6 +83,11 @@ async function seedSimilarGroups(
       estimatedSize: 1024,
       format: 'png',
       phash,
+      // Required: the default filter state has showVisibleOnly enabled, and
+      // filterByVisibility drops images without an explicit visible===true
+      // flag — which would leave filteredImages empty, SimilarInline count
+      // at 0, and the dedup entry link disabled.
+      visible: true,
     });
 
     const groupA = [make('a1', 'aaaa'), make('a2', 'aaaa'), make('a3', 'aaaa')];
@@ -99,30 +105,16 @@ async function seedSimilarGroups(
   });
 }
 
-test('free user opens Dedup modal, clicks Remove Duplicates → ProUpgradeModal opens, allImages unchanged', async () => {
+test('free user clicking the Similar link → ProUpgradeModal opens, dedup modal stays closed, allImages unchanged', async () => {
   const { sidepanel } = await openSidepanelWithImages(ext.context, fixtureServer, ext.extensionId);
 
   await seedSimilarGroups(sidepanel);
 
-  // Open the dedup modal via the SimilarInline link (replaces old #btn-dedup).
+  // The SimilarInline link is enabled (both seeded groups are visible
+  // in filteredImages, so the ≥2-members count is 2).
   await expect(sidepanel.locator('.similar-inline-link:not(.disabled)')).toBeVisible({
     timeout: 3_000,
   });
-  await sidepanel.locator('.similar-inline-link').click();
-  await expect(sidepanel.locator('#dedup-modal')).not.toHaveClass(/hidden/, {
-    timeout: 3_000,
-  });
-
-  // Two groups rendered with the right per-group sizes.
-  await expect(sidepanel.locator('#dedup-modal .dedup-group')).toHaveCount(2, {
-    timeout: 2_000,
-  });
-  await expect(
-    sidepanel.locator('#dedup-modal .dedup-group').nth(0).locator('.dedup-image')
-  ).toHaveCount(3);
-  await expect(
-    sidepanel.locator('#dedup-modal .dedup-group').nth(1).locator('.dedup-image')
-  ).toHaveCount(2);
 
   // Snapshot allImages length so we can assert it doesn't change.
   const beforeCount = await sidepanel.evaluate(() => {
@@ -134,15 +126,16 @@ test('free user opens Dedup modal, clicks Remove Duplicates → ProUpgradeModal 
   });
   expect(beforeCount).toBe(5);
 
-  // Click Remove Duplicates → free guard fires.
-  await sidepanel.evaluate(() => {
-    document.getElementById('btn-remove-duplicates')?.click();
-  });
+  // Click the link. Dedup is a Pro feature: pro-features.ts >
+  // showDedupModal's free-tier gate fires BEFORE the modal opens —
+  // warning toast + ProUpgradeModal, and the dedup modal itself never
+  // opens for a free user.
+  await sidepanel.locator('.similar-inline-link').click();
 
   await expect(sidepanel.locator('#pro-upgrade-modal')).not.toHaveClass(/hidden/, {
     timeout: 3_000,
   });
-  // Dedup modal auto-closes from the free-user guard (dedup-ui.ts L71).
+  // Dedup modal stays closed.
   await expect(sidepanel.locator('#dedup-modal')).toHaveClass(/hidden/);
 
   // No removal happened.

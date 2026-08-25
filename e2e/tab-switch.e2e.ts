@@ -72,37 +72,40 @@ interface IH {
 test('tabCache.set/get round-trips images + selectedImages + url by value', async () => {
   const { sidepanel } = await openSidepanelWithImages(ext.context, fixtureServer, ext.extensionId);
 
-  // The initial scan populated tabCache for the current tab — pin
-  // the size grew from 0 to (>=) 1 once the sidepanel boot finished.
-  const cacheSnapshot = await sidepanel.evaluate(() => {
+  // The initial scan populated tabCache for the current tab — pin that
+  // the CURRENT tab's entry exists with a non-empty image list. Locate
+  // it by currentTabId: the Map may also hold entries for other tabs
+  // (e.g. a stale snapshot for a tab we switched away from), so
+  // asserting on insertion order ([0]) is fragile.
+  const initialEntry = await sidepanel.evaluate(() => {
     interface ImageItem {
       id: string;
       url: string;
     }
+    interface CacheEntry {
+      url: string;
+      images: ImageItem[];
+      selectedImages: Set<string>;
+    }
     const w = window as unknown as { __IH__: IH };
-    const cache = w.__IH__.store.get<
-      Map<
-        number,
-        {
-          url: string;
-          images: ImageItem[];
-          selectedImages: Set<string>;
-        }
-      >
-    >('tabCache');
-    const entries = Array.from(cache.entries());
-    return entries.map(([tabId, entry]) => ({
-      tabId,
+    const currentTabId = w.__IH__.store.get<number | null>('currentTabId');
+    const cache = w.__IH__.store.get<Map<number, CacheEntry>>('tabCache');
+    const entry = currentTabId != null ? cache.get(currentTabId) : undefined;
+    if (!entry) return null;
+    return {
+      currentTabId,
       url: entry.url,
       imageCount: entry.images.length,
       selectedCount: entry.selectedImages.size,
-    }));
+    };
   });
-  expect(cacheSnapshot.length).toBeGreaterThanOrEqual(1);
-  const initialEntry = cacheSnapshot[0];
-  expect(initialEntry.imageCount).toBeGreaterThan(0);
+  expect(initialEntry).not.toBeNull();
+  // The cache entry for the scanned tab carries the fixture page's url
+  // (the field handleTabChange's URL-invalidation gate compares against).
+  expect(initialEntry!.url).toContain('page-with-images.html');
+  expect(initialEntry!.imageCount).toBeGreaterThan(0);
   // Initial selection is empty — the user hasn't checked anything yet.
-  expect(initialEntry.selectedCount).toBe(0);
+  expect(initialEntry!.selectedCount).toBe(0);
 
   // Now fake the pre-switch save that handleTabChange runs at
   // init.ts L274-281: spread allImages + new Set(selectedImages)
@@ -178,6 +181,9 @@ test('restore round-trip: writing cached snapshot back into store + applyFilters
   expect(beforeCardCount).toBeGreaterThan(0);
 
   // Build a synthetic "previous tab snapshot" — 2 images with 1 selected.
+  // `visible: true` is required: the default filter state has
+  // showVisibleOnly enabled, and filterByVisibility drops any image
+  // without an explicit visible===true flag.
   await sidepanel.evaluate(() => {
     interface ImageItem {
       id: string;
@@ -188,6 +194,7 @@ test('restore round-trip: writing cached snapshot back into store + applyFilters
       displayHeight: number;
       estimatedSize: number;
       format: string;
+      visible: boolean;
     }
     const make = (id: string): ImageItem => ({
       id,
@@ -198,6 +205,7 @@ test('restore round-trip: writing cached snapshot back into store + applyFilters
       displayHeight: 100,
       estimatedSize: 512,
       format: 'png',
+      visible: true,
     });
     const cachedImages = [make('snap-1'), make('snap-2')];
     const cachedSelected = new Set(['snap-1']);

@@ -47,32 +47,34 @@ async function waitForIHHook(sidepanel: import('@playwright/test').Page): Promis
 }
 
 test('dedup modal renders one group per SimilarGroup with correct image counts', async () => {
-  const { sidepanel } = await openSidepanelWithImages(ext.context, fixtureServer, ext.extensionId);
+  // Dedup is a Pro feature: pro-features.ts > showDedupModal gates FREE
+  // users behind checkFeatureQuota('dedup') (toast + ProUpgradeModal,
+  // modal never opens). This test pins the modal's RENDERING contract, so
+  // open it through the real Pro path (link click) with enablePro.
+  const { sidepanel } = await openSidepanelWithImages(ext.context, fixtureServer, ext.extensionId, {
+    enablePro: true,
+  });
   await waitForIHHook(sidepanel);
 
-  // Seed two similar-image groups (3 + 2 images). The Similar button is
-  // now always visible in the status bar (no hidden wrapper), so we only
-  // need to populate the store — no manual class toggling required.
+  // Seed two similar-image groups (3 + 2 images). SimilarInline's count
+  // only credits groups where ≥2 member images are present in the
+  // current filteredImages (StatusCounts.tsx) — so the groups must
+  // reference REAL card ids, not synthetic ones, or the link stays
+  // disabled and the click never opens the modal.
   await sidepanel.evaluate(() => {
     interface ImageItem {
       id: string;
       url: string;
     }
     interface IH {
-      store: { set: (key: 'similarGroups', value: ImageItem[][]) => void };
+      store: {
+        get: (k: 'filteredImages') => ImageItem[];
+        set: (key: 'similarGroups', value: ImageItem[][]) => void;
+      };
     }
     const w = window as unknown as { __IH__: IH };
-    w.__IH__.store.set('similarGroups', [
-      [
-        { id: 'sim-a-1', url: 'https://example.com/a1.png' },
-        { id: 'sim-a-2', url: 'https://example.com/a2.png' },
-        { id: 'sim-a-3', url: 'https://example.com/a3.png' },
-      ],
-      [
-        { id: 'sim-b-1', url: 'https://example.com/b1.png' },
-        { id: 'sim-b-2', url: 'https://example.com/b2.png' },
-      ],
-    ]);
+    const filtered = w.__IH__.store.get('filteredImages');
+    w.__IH__.store.set('similarGroups', [filtered.slice(0, 3), filtered.slice(3, 5)]);
   });
 
   // Wait for the SimilarInline component to reflect the seeded count,

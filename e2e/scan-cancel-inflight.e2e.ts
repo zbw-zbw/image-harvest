@@ -50,6 +50,7 @@ interface IH {
     set: (k: string, v: unknown) => void;
   };
   handleMessage: (msg: unknown) => void;
+  resetDiscoveryGuards: () => void;
 }
 
 interface ScanProgress {
@@ -104,9 +105,12 @@ test('scanning branch: in-flight IMAGES_DISCOVERED merges + drives scanProgress.
     return w.__IH__.store.get<number>('currentTabId');
   });
 
-  // Dispatch a scanning-mode IMAGES_DISCOVERED frame.
+  // Dispatch a scanning-mode IMAGES_DISCOVERED frame. Clear the
+  // tab-switch grace window first — the fixture's bringToFront() fires a
+  // real chrome.tabs.onActivated, which would otherwise drop the frame.
   await sidepanel.evaluate((t) => {
     const w = window as unknown as { __IH__: IH };
+    w.__IH__.resetDiscoveryGuards();
     w.__IH__.handleMessage({
       type: 'IMAGES_DISCOVERED',
       fromTabId: t,
@@ -179,11 +183,13 @@ test('scanning branch: in-flight IMAGES_DISCOVERED merges + drives scanProgress.
 test('cancel with images: btn-scan-cancel sets all three flags + hides overlay + toasts the count', async () => {
   const { sidepanel } = await openSidepanelWithImages(ext.context, fixtureServer, ext.extensionId);
 
-  const total = await sidepanel.evaluate(() => {
+  // handleScanCancel toasts the FILTERED count (status-bar parity via
+  // status_found_images = "Found {count} images"), not allImages.length.
+  const filteredTotal = await sidepanel.evaluate(() => {
     const w = window as unknown as { __IH__: IH };
-    return w.__IH__.store.get<unknown[]>('allImages').length;
+    return w.__IH__.store.get<unknown[]>('filteredImages').length;
   });
-  expect(total).toBeGreaterThan(0);
+  expect(filteredTotal).toBeGreaterThan(0);
 
   await startSyntheticScan(sidepanel);
 
@@ -217,9 +223,9 @@ test('cancel with images: btn-scan-cancel sets all three flags + hides overlay +
     timeout: 2_000,
   });
 
-  // Toast surfaces with the existing count (scan.ts L33-34).
+  // Toast surfaces with the filtered count (scan.ts L39-43).
   await expect(sidepanel.locator('.toast').last()).toContainText(
-    `Scan cancelled · ${total} images found`,
+    `Scan cancelled · Found ${filteredTotal} images`,
     { timeout: 2_000 }
   );
 });
@@ -295,9 +301,11 @@ test('cancel-then-late-discovery: post-cancel IMAGES_DISCOVERED falls through to
 
   // Now dispatch a late IMAGES_DISCOVERED — simulates a content
   // script frame that the background SW had buffered before the
-  // cancel landed.
+  // cancel landed. Clear the grace window so the frame isn't dropped
+  // by the tab-switch suppression.
   await sidepanel.evaluate((t) => {
     const w = window as unknown as { __IH__: IH };
+    w.__IH__.resetDiscoveryGuards();
     w.__IH__.handleMessage({
       type: 'IMAGES_DISCOVERED',
       fromTabId: t,

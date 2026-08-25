@@ -69,7 +69,49 @@ async function mutateStore(patch: Record<string, unknown>): Promise<void> {
 }
 
 test('changing sort mode reorders the rendered image cards', async () => {
-  // Baseline order under default sort (size-desc, set in createInitialState).
+  // The fixture images all share the same dimensions, so size-desc and
+  // size-asc both fall through to the deterministic id tiebreaker
+  // (filter.ts sortImagesArray) and produce the SAME order — the reverse
+  // assertion below would never hold. Give each image a distinct size so
+  // the two modes become strict inverses.
+  await opened.sidepanel.evaluate(() => {
+    const ih = (
+      window as unknown as {
+        __IH__: {
+          store: {
+            get: <T>(k: string) => T;
+            set: (k: string, v: unknown) => void;
+          };
+          applyFilters: () => void;
+        };
+      }
+    ).__IH__;
+    interface Img {
+      naturalWidth: number;
+      naturalHeight: number;
+      displayWidth: number;
+      displayHeight: number;
+    }
+    const imgs = ih.store.get<Img[]>('allImages');
+    imgs.forEach((img, i) => {
+      img.naturalWidth = (i + 1) * 100;
+      img.naturalHeight = 100;
+      img.displayWidth = (i + 1) * 100;
+      img.displayHeight = 100;
+    });
+    ih.store.set('allImages', [...imgs]);
+    ih.applyFilters();
+  });
+  await opened.sidepanel.evaluate(
+    () => new Promise<void>((resolve) => requestAnimationFrame(() => resolve()))
+  );
+
+  // Baseline order under explicit size-desc. The store's default
+  // currentSortMode is 'natural' (DOM order = allImages order), which
+  // would make the asc flip below a no-op since the synthetic sizes are
+  // already ascending by index — pin size-desc explicitly so the two
+  // modes are strict inverses regardless of the default.
+  await mutateStore({ currentSortMode: 'size-desc' });
   const initialIds = await collectCardIds();
   expect(initialIds.length).toBeGreaterThan(1);
 
@@ -90,6 +132,8 @@ test('filtering by a non-matching format hides all cards', async () => {
   expect(before.length).toBeGreaterThan(0);
 
   // Fixtures are SVG data URLs — filtering to 'gif' guarantees zero matches.
+  // aiTagFilter must be present: filterByAiTag reads it unconditionally and
+  // a partial activeFilters object would crash applyFilters.
   await mutateStore({
     activeFilters: {
       size: 'all',
@@ -99,6 +143,7 @@ test('filtering by a non-matching format hides all cards', async () => {
       layout: 'all',
       urlKeyword: '',
       color: null,
+      aiTagFilter: [],
     },
   });
 
@@ -118,6 +163,7 @@ test('filtering by a non-matching format hides all cards', async () => {
       layout: 'all',
       urlKeyword: '',
       color: null,
+      aiTagFilter: [],
     },
   });
   await expect

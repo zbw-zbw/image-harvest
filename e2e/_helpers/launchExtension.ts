@@ -141,17 +141,19 @@ export interface OpenSidepanelOptions {
    */
   stubDownloads?: boolean;
   /**
-   * If true, sets `state.isProUser=true` after init by writing through
-   * `__IH__.store.set('isProUser', true)`. Without this flag the Pro
-   * feature click guard in settings.ts (a capture-phase listener that
-   * calls `stopImmediatePropagation`) intercepts clicks on
-   * `#btn-collection` and `#btn-multitab` and surfaces the upgrade modal
-   * instead of opening the underlying feature — which is correct
-   * production behavior, but breaks tests that want to drive those
-   * features end-to-end.
+   * If true, makes the sidepanel behave as a licensed Pro user:
+   *   1. Stubs chrome.runtime.sendMessage so every VALIDATE_LICENSE
+   *      request resolves {isPro:true} — this covers applyProFeatureVisibility
+   *      re-runs triggered by LICENSE_STATUS_CHANGED broadcasts, which would
+   *      otherwise flip state.isProUser back to false mid-test (the real
+   *      background license check always says "free" in e2e fresh profiles).
+   *   2. Sets `state.isProUser=true` immediately for code paths that read
+   *      the flag synchronously before any license check runs.
    *
-   * Tests that exercise the upgrade-modal path itself should leave this
-   * unset (default false).
+   * Without this flag free-tier guards intercept Pro features (upgrade
+   * modal + toast) — correct production behavior, but it breaks tests that
+   * want to drive those features end-to-end. Tests that exercise the
+   * upgrade-modal path itself should leave this unset (default false).
    */
   enablePro?: boolean;
   /**
@@ -326,6 +328,23 @@ export async function openSidepanelWithImages(
     )
     .toBeGreaterThan(0);
 
+  // Wait for the full init pipeline to settle. The first .image-card
+  // renders as soon as loadCurrentTab's response lands, but init.ts only
+  // flips isInitialized AFTER loadCurrentTab + proVisibilityPromise +
+  // quotaPromise all resolve (init.ts "await proVisibilityPromise" block).
+  // Tests that snapshot init-dependent state or dispatch messages guarded
+  // by isInitialized otherwise race init and fail intermittently.
+  await sidepanel.waitForFunction(
+    () => {
+      const w = window as unknown as {
+        __IH__?: { store: { get: (k: string) => unknown } };
+      };
+      return w.__IH__?.store.get('isInitialized') === true;
+    },
+    undefined,
+    { timeout: 15_000 }
+  );
+
   if (options.enablePro) {
     // __IH__ is wired up asynchronously inside init.ts behind a
     // Promise.all([import('./state'), import('./filter')]).then(...) so
@@ -337,6 +356,32 @@ export async function openSidepanelWithImages(
       { timeout: 5_000 }
     );
     await sidepanel.evaluate(() => {
+      // Stub the license check at its source. applyProFeatureVisibility
+      // (settings.ts) sends VALIDATE_LICENSE on panel init AND on every
+      // LICENSE_STATUS_CHANGED broadcast — the real background always
+      // answers {isPro:false} for a fresh e2e profile, which races the
+      // tests' store.set('isProUser', true) and silently reverts it.
+      // Answering {isPro:true} from the stub keeps every re-check Pro.
+      interface ChromeRuntime {
+        runtime?: {
+          sendMessage?: (...args: unknown[]) => Promise<unknown>;
+        };
+      }
+      interface LicenseRequest {
+        type?: string;
+      }
+      const c = (window as unknown as { chrome: ChromeRuntime }).chrome;
+      if (c.runtime?.sendMessage) {
+        const original = c.runtime.sendMessage.bind(c.runtime);
+        c.runtime.sendMessage = ((req: unknown, ...rest: unknown[]) => {
+          const r = req as LicenseRequest;
+          if (r && r.type === 'VALIDATE_LICENSE') {
+            return Promise.resolve({ isPro: true, expiresAt: null });
+          }
+          return original(req, ...rest);
+        }) as typeof c.runtime.sendMessage;
+      }
+
       interface IH {
         store: { set: (k: string, v: unknown) => void };
       }

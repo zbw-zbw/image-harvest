@@ -84,6 +84,12 @@ test('clicking #btn-progress-close mid-download closes the modal, fires the abor
       displayHeight: number;
       estimatedSize: number;
       format: string;
+      // Required: the default filter state has showVisibleOnly enabled, and
+      // filterByVisibility drops images without an explicit visible===true
+      // flag — without it filteredImages stays empty, the btn-download
+      // handler's `imagesToDownload.length === 0` guard returns early, and
+      // the zip pipeline + progress modal under test never start.
+      visible: boolean;
     }
     interface IH {
       store: { set: (k: string, v: unknown) => void };
@@ -99,6 +105,7 @@ test('clicking #btn-progress-close mid-download closes the modal, fires the abor
       displayHeight: 200,
       estimatedSize: 1024,
       format: 'png',
+      visible: true,
     }));
     w.__IH__.store.set('isProUser', true);
     w.__IH__.store.set('allImages', synthetic);
@@ -106,8 +113,18 @@ test('clicking #btn-progress-close mid-download closes the modal, fires the abor
     w.__IH__.store.set('selectedImages', new Set(synthetic.map((i) => i.id)));
   });
 
-  // Trigger the zip download.
+  // Trigger the zip download. Re-assert isProUser in the SAME synchronous
+  // block as the click — a LICENSE_STATUS_CHANGED broadcast from the
+  // background can land after the seeding evaluate and flip isProUser
+  // back to false via applyProFeatureVisibility, which would divert the
+  // 50 images into the free-tier zip guard instead of the pipeline under
+  // test. The click handler reads state.isProUser synchronously, so this
+  // is race-free.
   await sidepanel.evaluate(() => {
+    const w = window as unknown as {
+      __IH__: { store: { set: (k: string, v: unknown) => void } };
+    };
+    w.__IH__.store.set('isProUser', true);
     document.getElementById('btn-download')?.click();
   });
 

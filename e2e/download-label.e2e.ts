@@ -70,8 +70,9 @@ test('deleting a selected image updates #download-label from "Download (N)" to "
   });
   expect(firstId).toBeTruthy();
 
-  // Initial label reflects the seeded selection.
-  await expect(sidepanel.locator('#download-label')).toHaveText('Download (3)', {
+  // Initial label reflects the seeded selection. (No space: btn-label and
+  // btn-count are adjacent spans, so textContent is "Download(3)".)
+  await expect(sidepanel.locator('#download-label')).toHaveText('Download(3)', {
     timeout: 3_000,
   });
 
@@ -96,7 +97,7 @@ test('deleting a selected image updates #download-label from "Download (N)" to "
   await expect(sidepanel.locator(`.image-card[data-id="${firstId}"]`)).toHaveCount(0, {
     timeout: 3_000,
   });
-  await expect(sidepanel.locator('#download-label')).toHaveText('Download (2)', {
+  await expect(sidepanel.locator('#download-label')).toHaveText('Download(2)', {
     timeout: 3_000,
   });
 });
@@ -127,7 +128,7 @@ test('deleting an UN-selected image leaves #download-label unchanged', async () 
     return filtered[0].id;
   });
 
-  await expect(sidepanel.locator('#download-label')).toHaveText('Download (2)', {
+  await expect(sidepanel.locator('#download-label')).toHaveText('Download(2)', {
     timeout: 3_000,
   });
 
@@ -144,6 +145,7 @@ test('deleting an UN-selected image leaves #download-label unchanged', async () 
   await expect(sidepanel.locator(`.image-card[data-id="${targetId}"]`)).toHaveCount(0, {
     timeout: 3_000,
   });
-  // Label unchanged — selection size still 2.
-  await expect(sidepanel.locator('#download-label')).toHaveText('Download (2)');
+  // Label unchanged — selection size still 2. (No space: btn-label and
+  // btn-count are adjacent spans — same as the test above.)
+  await expect(sidepanel.locator('#download-label')).toHaveText('Download(2)');
 });

@@ -67,17 +67,18 @@ test('clicking #btn-refresh clears the grid and re-populates it via the full sca
   });
   expect(tabCacheBefore?.hasEntry).toBe(true);
 
-  // Click refresh.
-  await sidepanel.evaluate(() => {
-    document.getElementById('btn-refresh')?.click();
-  });
-
-  // Cache is invalidated synchronously by the click handler (see
-  // init.ts L538-552: tabCache.delete + clearTabImageCache run before
-  // showLoading()). This is the one signal that's both deterministic
-  // AND survives until the test reads it (unlike scanProgress which
-  // may flicker away on a tiny fixture before we sample it).
+  // Click refresh AND sample the cache in the SAME synchronous JS task.
+  // The click handler deletes the entry synchronously (init.ts L551-563),
+  // but the rescan pipeline (loadCurrentTab → EXTRACT round-trip →
+  // fetchImages → tabCache.set) can finish BEFORE a separate evaluate
+  // lands — the Playwright RPC round-trip is slower than the in-process
+  // extension message round-trip on a tiny fixture, so by the time a
+  // second evaluate reaches the page the entry may already be back.
+  // Sampling right after click() inside one task is race-free: loadCurrentTab's
+  // first await (chrome.tabs.query) hasn't resolved, so the entry is
+  // guaranteed gone.
   const cacheClearedImmediately = await sidepanel.evaluate((tabId: number) => {
+    document.getElementById('btn-refresh')?.click();
     interface IH {
       store: { get: (k: 'tabCache') => Map<number, unknown> };
     }

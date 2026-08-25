@@ -279,7 +279,10 @@ export async function refreshVisibility(): Promise<void> {
 
 export function filterByAiTag(img: ImageItem): boolean {
   const tags = state.activeFilters.aiTagFilter;
-  if (tags.length === 0) return true;
+  // Defensive: activeFilters may come from a stale cache or a test fixture
+  // that predates the aiTagFilter field — treat a missing filter as "no
+  // filter" rather than crashing on undefined.length.
+  if (!tags || tags.length === 0) return true;
   if (!img.aiTags || img.aiTags.length === 0) return false;
   return tags.some((t) => img.aiTags!.includes(t));
 }

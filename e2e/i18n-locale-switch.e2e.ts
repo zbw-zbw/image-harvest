@@ -9,7 +9,7 @@
 //   3. Click the "Language" select dropdown → click the zh-CN option.
 //   4. Click "Save & Apply" → Settings closes, setLocale('zh-CN') runs.
 //   5. Trigger copyImageUrl on a card → the Toast text should now match
-//      the zh-CN catalogue ("URL 已复制!") rather than the English one.
+//      the zh-CN catalogue ("链接已复制!") rather than the English one.
 //   6. Reload the sidepanel → detectLocale() reads the persisted preference
 //      and zh-CN sticks.
 //
@@ -126,5 +126,5 @@ test('switching the language persists and flips toast wording', async () => {
         }),
       { timeout: 5_000 }
     )
-    .toContain('URL 已复制');
+    .toContain('链接已复制');
 });

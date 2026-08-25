@@ -143,10 +143,14 @@ test('free-tier guard: clicking PRO engine surfaces upgrade modal + no chrome.ta
   });
 
   // Toast (warning) + Pro upgrade modal both surface; chrome.tabs.create
-  // never fires.
-  await expect(sidepanel.locator('.toast').last()).toContainText(/Yandex search requires Pro/i, {
-    timeout: 3_000,
-  });
+  // never fires. (Wording = pro_feature_blocked_reverse_search:
+  // "{engine} reverse search is a Pro feature. Upgrade to unlock!")
+  await expect(sidepanel.locator('.toast').last()).toContainText(
+    /Yandex reverse search is a Pro feature/i,
+    {
+      timeout: 3_000,
+    }
+  );
   await expect(sidepanel.locator('#pro-upgrade-modal')).not.toHaveClass(/hidden/, {
     timeout: 3_000,
   });

@@ -75,16 +75,14 @@ test('pressing Escape with the collection modal open closes it', async () => {
   });
 });
 
-test('pressing Escape with no modal open clears the current selection', async () => {
+test('pressing Escape with no modal open PRESERVES the selection (only exits highlight view)', async () => {
   const { sidepanel } = await openSidepanelWithImages(ext.context, fixtureServer, ext.extensionId);
 
   await sidepanel.waitForFunction(() =>
     Boolean((window as unknown as { __IH__?: unknown }).__IH__)
   );
 
-  // Seed a non-empty selection via the store. handleKeyDown's tail
-  // branch only runs when no modal is open AND state.selectedImages
-  // .size > 0 → calls clearSelection.
+  // Seed a non-empty selection via the store.
   await sidepanel.evaluate(() => {
     interface ImageItem {
       id: string;
@@ -105,9 +103,13 @@ test('pressing Escape with no modal open clears the current selection', async ()
 
   await sidepanel.keyboard.press('Escape');
 
-  // clearSelection wipes state.selectedImages → Preact re-renders the
-  // grid without .selected on any card.
-  await expect(sidepanel.locator('#image-grid .image-card.selected')).toHaveCount(0, {
-    timeout: 3_000,
-  });
+  // handleKeyDown's no-modal branch intentionally PRESERVES the
+  // selection — ESC now only removes page highlights and closes
+  // dropdowns (message.ts: "Only remove page highlights — preserve
+  // selection state and scroll position. ESC is just exiting the page
+  // highlight view, not deselecting images in the list.").
+  // Give the (potential) deselection a tick to misfire, then pin that
+  // it didn't.
+  await sidepanel.waitForTimeout(500);
+  await expect(sidepanel.locator('#image-grid .image-card.selected')).toHaveCount(2);
 });

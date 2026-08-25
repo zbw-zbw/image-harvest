@@ -143,12 +143,19 @@ test('Pro user opens collection modal — renders one collection-card per row + 
     sidepanel.locator('#collection-modal .collection-card .btn-remove-collection')
   ).toHaveCount(1);
 
-  // Click remove-button. The handler awaits collectionRemove + syncs
-  // the main grid's favorite class + re-runs loadCollection().
+  // Click remove-button. The handler first opens a confirm dialog
+  // (showConfirmDialog) and only runs removeFromCollection after the
+  // user confirms — mirror that click here.
   await sidepanel.evaluate(() => {
     document
       .querySelector<HTMLElement>('#collection-modal .collection-card .btn-remove-collection')
       ?.click();
+  });
+  await expect(sidepanel.locator('#confirm-dialog')).not.toHaveClass(/hidden/, {
+    timeout: 3_000,
+  });
+  await sidepanel.evaluate(() => {
+    document.getElementById('confirm-dialog-confirm')?.click();
   });
 
   // IndexedDB row deleted.
