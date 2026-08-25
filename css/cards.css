@@ -584,6 +584,17 @@
   background: var(--tag-format-bg);
 }
 
+/* Link penetration type badges (v1.1.0): green "original" for direct image
+   links, purple for deep-resolved og:image results — distinguishes them
+   from page-embedded images at a glance. */
+.card-tag.type-badge.link-image-badge {
+  background: var(--primary-color, #60b557);
+}
+
+.card-tag.type-badge.link-resolved-badge {
+  background: #8b5cf6;
+}
+
 .card-tag.dims {
   background: var(--tag-info-bg);
   opacity: 0.85;

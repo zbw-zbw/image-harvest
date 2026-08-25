@@ -7,10 +7,18 @@ import { injectContentScript } from './injector';
 interface ExtractOptions {
   searchAllFrames?: boolean;
   liveMonitoring?: boolean;
+  /**
+   * Receives the gallery-link candidates (thumb → detail page) collected by
+   * the content script's link-image stage. Optional so existing callers /
+   * tests that don't care about link penetration are unaffected.
+   */
+  onGalleryLinks?: (links: string[]) => void;
 }
 
 interface ExtractResponse {
   images?: ImageItem[];
+  /** Gallery-link candidates from the link-image stage (v1.1.0). */
+  galleryLinks?: string[];
 }
 
 interface InjectionError extends Error {
@@ -21,7 +29,32 @@ interface InjectionError extends Error {
 // Per-tab dedup: if multiple callers request images from the same tab
 // concurrently (e.g. sidepanel retry loop), reuse the in-flight promise
 // instead of bombarding the content script with parallel EXTRACT_IMAGES.
-const pendingExtractions = new Map<number, Promise<ImageItem[]>>();
+// The map value carries the gallery-link candidates too: the promise alone
+// only resolves with images, so a caller that hits the in-flight entry
+// would otherwise never receive its onGalleryLinks callback.
+interface InFlightExtraction {
+  promise: Promise<ImageItem[]>;
+  /** Set once the main-frame response arrives; late dedup callers get it immediately. */
+  galleryLinks?: string[];
+  /** One entry per caller still waiting for the gallery links (cleared after each emit). */
+  listeners: Array<(links: string[]) => void>;
+}
+const pendingExtractions = new Map<number, InFlightExtraction>();
+
+/** Deliver gallery links to every registered caller of an in-flight extraction. */
+function emitGalleryLinks(tabId: number, links: string[]): void {
+  const entry = pendingExtractions.get(tabId);
+  if (!entry) return;
+  entry.galleryLinks = links;
+  for (const fn of entry.listeners) {
+    try {
+      fn(links);
+    } catch {
+      // A listener error must never break the extraction pipeline.
+    }
+  }
+  entry.listeners.length = 0;
+}
 
 /** Get all images from a tab; injects the content script as needed. */
 export async function getImagesFromTab(
@@ -40,18 +73,33 @@ export async function getImagesFromTab(
     throw new Error('No active tab found');
   }
 
-  // If there's already an in-flight extraction for this tab, reuse it
-  const existing = pendingExtractions.get(tabId);
-  if (existing) {
-    return existing;
+  // Register this caller's gallery-links interest BEFORE any early return,
+  // so a dedup hit never silently swallows the callback.
+  let entry = pendingExtractions.get(tabId);
+  if (entry) {
+    if (options.onGalleryLinks) {
+      if (entry.galleryLinks) options.onGalleryLinks(entry.galleryLinks);
+      else entry.listeners.push(options.onGalleryLinks);
+    }
+    return entry.promise;
   }
 
-  const promise = doGetImagesFromTab(tabId, options);
-  pendingExtractions.set(tabId, promise);
+  entry = {
+    promise: null as unknown as Promise<ImageItem[]>,
+    galleryLinks: undefined,
+    listeners: [],
+  };
+  if (options.onGalleryLinks) entry.listeners.push(options.onGalleryLinks);
+  // Safe ordering: doGetImagesFromTab's first statement awaits chrome.tabs.get,
+  // so emitGalleryLinks (further in) always runs after the set() below.
+  entry.promise = doGetImagesFromTab(tabId, options);
+  pendingExtractions.set(tabId, entry);
   try {
-    return await promise;
+    return await entry.promise;
   } finally {
-    pendingExtractions.delete(tabId);
+    if (pendingExtractions.get(tabId) === entry) {
+      pendingExtractions.delete(tabId);
+    }
   }
 }
 
@@ -86,6 +134,14 @@ async function doGetImagesFromTab(tabId: number, options: ExtractOptions): Promi
     { frameId: 0 }
   );
   let allImages: ImageItem[] = response?.images || [];
+
+  // Hand the link-penetration gallery candidates to every caller waiting on
+  // this extraction (sidepanel's GET_IMAGES handler forwards them to the
+  // resolve-originals bar). Only the main frame's candidates are
+  // meaningful — sub-frame links stay in-frame.
+  if (Array.isArray(response?.galleryLinks)) {
+    emitGalleryLinks(tabId, response.galleryLinks);
+  }
 
   if (searchAllFrames) {
     try {

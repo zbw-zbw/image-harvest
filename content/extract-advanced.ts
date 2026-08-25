@@ -9,6 +9,7 @@ import {
   isDataUri,
   isImageDataUri,
   generateDataUriKey,
+  isDirectImageUrl,
 } from '../shared/utils';
 import type { ImageItem } from '../shared/types';
 import { state } from './state';
@@ -538,6 +539,112 @@ export async function extractCssContentImages(images: Map<string, ImageItem>): P
         }
       } catch {
         // Swallow getComputedStyle exceptions for inaccessible pseudo-elements
+      }
+    }
+  }
+}
+
+// ============================================
+// Link penetration (v1.1.0)
+// ============================================
+
+/** Cap on <a href> elements examined per scan — protects link-farm pages. */
+const MAX_LINK_ELEMENTS = 500;
+/** Cap on gallery-link candidates surfaced to the side panel per scan. */
+export const MAX_GALLERY_LINKS = 30;
+
+/** True when the <img> inside an <a> is actually rendered on the page. */
+function isInnerImgVisible(img: HTMLImageElement): boolean {
+  try {
+    const rect = img.getBoundingClientRect();
+    if (rect.width < 2 && rect.height < 2) return false;
+    const style = window.getComputedStyle(img);
+    return style.display !== 'none' && style.visibility !== 'hidden';
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Link penetration stage (pipeline stage 14):
+ *
+ *  1. Direct image links — `<a href="photo-full.jpg"><img src="thumb.jpg">`
+ *     is the classic thumbnail → original pattern. The href becomes its own
+ *     ImageItem (type 'link-image') so the user gets BOTH the thumbnail and
+ *     the full-size file. Visibility is inherited from the inner <img> (a
+ *     visible thumbnail means the original is "visible" too, which matters
+ *     because the default filter chain drops items without visible=true).
+ *     Plain-text image links (no inner img) are added with visible:false,
+ *     matching the existing link-icon stage's semantics.
+ *
+ *  2. Gallery-link candidates — thumbnails wrapped in NON-image links are
+ *     likely detail pages (Reddit posts, imgur galleries, product zoom).
+ *     Collected (max 30) into state.pendingGalleryLinks for the sidepanel's
+ *     Pro "resolve originals" bar; the background fetches each page and pulls
+ *     its og:image.
+ */
+export async function extractLinkedImages(images: Map<string, ImageItem>): Promise<void> {
+  state.pendingGalleryLinks = [];
+
+  const anchors = document.querySelectorAll<HTMLAnchorElement>('a[href]');
+  let processed = 0;
+
+  for (const a of anchors) {
+    if (processed >= MAX_LINK_ELEMENTS) break;
+    // a.href is the browser-resolved absolute URL (never the raw attribute).
+    const href = a.href;
+    if (!href) continue;
+    processed++;
+
+    // Cheap pre-filter: skip non-http(s) and same-document anchors early.
+    if (!/^https?:/i.test(href)) continue;
+
+    const innerImg = a.querySelector('img');
+
+    if (isDirectImageUrl(href)) {
+      // If the link just wraps an <img> whose src IS the href, the img-tags
+      // stage already captured it — nothing new to add.
+      if (innerImg && (innerImg.src === href || innerImg.currentSrc === href)) continue;
+      if (state.seenUrls.has(href)) continue;
+      state.seenUrls.add(href);
+
+      let visible = false;
+      let width = 0;
+      let height = 0;
+      if (innerImg) {
+        visible = isInnerImgVisible(innerImg);
+        try {
+          const rect = innerImg.getBoundingClientRect();
+          width = Math.round(rect.width);
+          height = Math.round(rect.height);
+        } catch {
+          /* keep zeros */
+        }
+      }
+      let alt = innerImg?.alt?.trim() || '';
+      if (!alt) {
+        alt = (a.textContent || '').trim().slice(0, 120);
+      }
+
+      images.set(href, {
+        id: generateId(href),
+        url: href,
+        displayWidth: width,
+        displayHeight: height,
+        type: 'link-image',
+        format: getFileFormat(href),
+        sourceDomain: getDomain(href),
+        alt: alt || undefined,
+        checked: false,
+        timestamp: Date.now(),
+        visible,
+      } as ImageItem);
+    } else if (innerImg && state.pendingGalleryLinks.length < MAX_GALLERY_LINKS) {
+      // Gallery candidate: thumbnail wrapped in a non-image link. Don't add
+      // to seenUrls — a later lazy-load/background stage may still legitimately
+      // discover the same URL as a real image.
+      if (!state.pendingGalleryLinks.includes(href)) {
+        state.pendingGalleryLinks.push(href);
       }
     }
   }

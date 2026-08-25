@@ -1716,5 +1716,59 @@
   },
   "onboarding_dismiss": {
     "message": "ヒントを閉じる"
+  },
+  "contextExtractImage": {
+    "message": "Image Harvest で画像を抽出"
+  },
+  "contextExtractLinked": {
+    "message": "リンク先の画像を抽出"
+  },
+  "badge_link_image": {
+    "message": "リンク先の原画"
+  },
+  "badge_link_resolved": {
+    "message": "リンクから取得"
+  },
+  "gallery_resolve_bar_title": {
+    "message": "{count} 個のギャラリーリンクを検出"
+  },
+  "gallery_resolve_action": {
+    "message": "オリジナルを取得"
+  },
+  "gallery_resolve_progress": {
+    "message": "オリジナル画像を取得中…"
+  },
+  "toast_gallery_resolved": {
+    "message": "{images} 枚のオリジナル画像を追加しました"
+  },
+  "toast_gallery_resolve_failed": {
+    "message": "このリンクの画像を取得できませんでした"
+  },
+  "toast_context_item_added": {
+    "message": "画像を結果に追加しました"
+  },
+  "feature_link_resolve": {
+    "message": "ディープリンク解決"
+  },
+  "gallery_resolve_bar_hint": {
+    "message": "これらのサムネイルは詳細ページへリンクしています。解析すると各ページのメイン画像を結果に追加します。"
+  },
+  "gallery_resolve_toggle_title": {
+    "message": "ギャラリーリンクの表示 / 非表示"
+  },
+  "gallery_resolve_links_more": {
+    "message": "…ほか{count}件"
+  },
+  "toast_not_on_page": {
+    "message": "この画像はリンクから取得したもので、ページ上には表示されていません"
+  },
+  "badge_link_image_title": {
+    "message": "このサムネイルのリンク先がこの大きな画像を直接指しています"
+  },
+  "badge_link_resolved_title": {
+    "message": "リンク先ページの解析によって追加されました（ページ上には表示されていません）"
+  },
+  "toast_context_item_duplicate": {
+    "message": "すでに結果に含まれているため、重複追加はしません"
   }
 }

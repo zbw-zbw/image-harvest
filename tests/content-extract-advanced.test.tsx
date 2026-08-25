@@ -22,6 +22,9 @@ vi.mock('../content/state', () => ({
     get seenUrls() {
       return seenUrls;
     },
+    // v1.1.0 link-penetration side-channel — extractLinkedImages resets
+    // and repopulates it per scan; tests read it off the mock object.
+    pendingGalleryLinks: [] as string[],
     liveObserver: null,
   },
   isExtensionContextValid: vi.fn(() => true),
@@ -61,6 +64,19 @@ vi.mock('../shared/utils', () => ({
   }),
   isDataUri: vi.fn((u: string) => u.startsWith('data:')),
   isImageDataUri: vi.fn((u: string) => u.startsWith('data:image/')),
+  // Simplified mirror of the real heuristic — pathname extension only
+  // (the full query-param matrix lives in tests/utils.test.ts against
+  // the real implementation).
+  isDirectImageUrl: vi.fn((u: string) => {
+    if (!u || u.startsWith('data:')) return false;
+    try {
+      const parsed = new URL(u);
+      if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return false;
+      return /[.](jpg|jpeg|png|webp|gif|avif|svg|bmp|ico|jfif)$/i.test(parsed.pathname);
+    } catch {
+      return false;
+    }
+  }),
   // Real-ish url() parser so background-image / css-content / data-bg
   // url() syntax all work end-to-end.
   extractBackgroundUrls: vi.fn((value: string) => {
@@ -321,6 +337,7 @@ import {
   extractMetaAndLinkImages,
   extractLazyLoadImages,
   extractCssContentImages,
+  extractLinkedImages,
 } from '../content/extract-advanced';
 
 // Helper — stub getBoundingClientRect (jsdom returns 0).
@@ -1039,5 +1056,208 @@ describe('extractCssContentImages', () => {
     const images = new Map();
     await extractCssContentImages(images);
     expect(images.size).toBe(0);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// extractLinkedImages — v1.1.0 link-penetration stage
+// ─────────────────────────────────────────────────────────────────────
+
+describe('extractLinkedImages', () => {
+  // jsdom resolves relative hrefs against http://localhost — absolute
+  // URLs keep the fixtures readable, so use them throughout.
+  function makeAnchor(href: string): HTMLAnchorElement {
+    const a = document.createElement('a');
+    a.href = href;
+    document.body.appendChild(a);
+    return a;
+  }
+
+  function makeInnerImg(anchor: HTMLAnchorElement, src: string, w = 100, h = 50): HTMLImageElement {
+    const img = document.createElement('img');
+    img.src = src;
+    img.alt = 'thumbnail alt';
+    anchor.appendChild(img);
+    stubElementRect(img, w, h);
+    return img;
+  }
+
+  beforeEach(() => {
+    // The mock state object is module-scoped; extractLinkedImages resets
+    // pendingGalleryLinks itself, but a stale seenUrls from an earlier
+    // describe block in this file would leak — clear defensively.
+    seenUrls.clear();
+  });
+
+  it('extracts thumbnail→original links: href becomes a link-image item inheriting visibility + rect from the inner <img>', async () => {
+    const a = makeAnchor('https://cdn.example.com/full.jpg');
+    makeInnerImg(a, 'https://cdn.example.com/thumb.jpg', 120, 60);
+
+    const images = new Map();
+    await extractLinkedImages(images);
+
+    expect(images.size).toBe(1);
+    const [item] = Array.from(images.values());
+    expect(item.type).toBe('link-image');
+    expect(item.url).toBe('https://cdn.example.com/full.jpg');
+    // visible + display dimensions are INHERITED from the thumbnail.
+    expect(item.visible).toBe(true);
+    expect(item.displayWidth).toBe(120);
+    expect(item.displayHeight).toBe(60);
+    expect(item.format).toBe('jpg');
+    expect(item.sourceDomain).toBe('cdn.example.com');
+    // alt prefers the inner <img>'s alt attribute.
+    expect(item.alt).toBe('thumbnail alt');
+  });
+
+  it('pure-text image links produce visible:false items with 0×0 dimensions', async () => {
+    makeAnchor('https://example.com/plain-text.png');
+
+    const images = new Map();
+    await extractLinkedImages(images);
+
+    expect(images.size).toBe(1);
+    const [item] = Array.from(images.values());
+    expect(item.type).toBe('link-image');
+    expect(item.visible).toBe(false);
+    expect(item.displayWidth).toBe(0);
+    expect(item.displayHeight).toBe(0);
+  });
+
+  it('uses the anchor text as alt when the inner <img> has no alt', async () => {
+    const a = makeAnchor('https://example.com/no-alt.jpg');
+    const img = makeInnerImg(a, 'https://example.com/thumb.jpg');
+    img.alt = '';
+    a.textContent = 'View the original photo';
+
+    const images = new Map();
+    await extractLinkedImages(images);
+
+    const [item] = Array.from(images.values());
+    expect(item.alt).toBe('View the original photo');
+  });
+
+  it('skips when href === inner img.src (img-tags stage already captured it)', async () => {
+    // The classic lightbox trap: <a href="photo.jpg"><img src="photo.jpg">.
+    const a = makeAnchor('https://example.com/same.jpg');
+    makeInnerImg(a, 'https://example.com/same.jpg');
+
+    const images = new Map();
+    await extractLinkedImages(images);
+    expect(images.size).toBe(0);
+  });
+
+  it('skips when href === inner img.currentSrc (srcset-resolved duplicate)', async () => {
+    const a = makeAnchor('https://example.com/resolved.webp');
+    const img = makeInnerImg(a, 'https://example.com/placeholder.jpg');
+    // Browsers expose the picked candidate via currentSrc; jsdom doesn't
+    // resolve srcset, so stub it directly.
+    Object.defineProperty(img, 'currentSrc', {
+      value: 'https://example.com/resolved.webp',
+      configurable: true,
+    });
+
+    const images = new Map();
+    await extractLinkedImages(images);
+    expect(images.size).toBe(0);
+  });
+
+  it('skips non-image hrefs entirely (no item, not even with inner img text-only)', async () => {
+    // A text-only link to an HTML page is neither an image item nor a
+    // gallery candidate (gallery requires an inner <img>).
+    makeAnchor('https://example.com/gallery/album-1');
+
+    const images = new Map();
+    await extractLinkedImages(images);
+    expect(images.size).toBe(0);
+  });
+
+  it('skips non-http(s) hrefs (mailto / javascript / #fragment)', async () => {
+    makeAnchor('mailto:someone@example.com');
+    makeAnchor('javascript:void(0)');
+    makeAnchor('https://example.com/page#section'); // http, but not an image URL
+
+    const images = new Map();
+    await extractLinkedImages(images);
+    expect(images.size).toBe(0);
+  });
+
+  it('dedups identical hrefs across multiple anchors via seenUrls', async () => {
+    makeAnchor('https://example.com/dup.png');
+    makeAnchor('https://example.com/dup.png');
+    makeAnchor('https://example.com/dup.png');
+
+    const images = new Map();
+    await extractLinkedImages(images);
+    expect(images.size).toBe(1);
+    // The URL was also registered in seenUrls so later stages
+    // (lazy-load, bg) don't re-emit it.
+    expect(seenUrls.has('https://example.com/dup.png')).toBe(true);
+  });
+
+  it('caps processed links at 500 (link-farm protection)', async () => {
+    for (let i = 0; i < 520; i++) {
+      makeAnchor(`https://example.com/farm-${i}.jpg`);
+    }
+
+    const images = new Map();
+    await extractLinkedImages(images);
+    // The 501st+ anchors are never examined — pin the hard cap.
+    expect(images.size).toBe(500);
+    expect(images.has('https://example.com/farm-499.jpg')).toBe(true);
+    expect(images.has('https://example.com/farm-500.jpg')).toBe(false);
+  });
+
+  // ── Gallery-link side channel ──
+
+  it('collects non-image hrefs wrapping an <img> into state.pendingGalleryLinks', async () => {
+    const a = makeAnchor('https://example.com/gallery/item-1');
+    makeInnerImg(a, 'https://example.com/thumb-1.jpg');
+
+    const images = new Map();
+    await extractLinkedImages(images);
+
+    // Not an image item — it's a candidate for the deep-resolve bar.
+    expect(images.size).toBe(0);
+    const { state } = await import('../content/state');
+    expect(state.pendingGalleryLinks).toEqual(['https://example.com/gallery/item-1']);
+  });
+
+  it('gallery candidates are NOT added to seenUrls (other stages may still emit that URL)', async () => {
+    const a = makeAnchor('https://example.com/gallery/item-2');
+    makeInnerImg(a, 'https://example.com/thumb-2.jpg');
+
+    await extractLinkedImages(new Map());
+    expect(seenUrls.has('https://example.com/gallery/item-2')).toBe(false);
+  });
+
+  it('gallery links dedup identical hrefs', async () => {
+    for (let i = 0; i < 3; i++) {
+      const a = makeAnchor('https://example.com/gallery/dup');
+      makeInnerImg(a, 'https://example.com/dup-thumb.jpg');
+    }
+
+    await extractLinkedImages(new Map());
+    const { state } = await import('../content/state');
+    expect(state.pendingGalleryLinks).toEqual(['https://example.com/gallery/dup']);
+  });
+
+  it('caps gallery candidates at 30 per scan', async () => {
+    for (let i = 0; i < 35; i++) {
+      const a = makeAnchor(`https://example.com/gallery/capped-${i}`);
+      makeInnerImg(a, `https://example.com/thumb-capped-${i}.jpg`);
+    }
+
+    await extractLinkedImages(new Map());
+    const { state } = await import('../content/state');
+    expect(state.pendingGalleryLinks).toHaveLength(30);
+  });
+
+  it('resets pendingGalleryLinks at the start of each run (no stale candidates)', async () => {
+    const { state } = await import('../content/state');
+    state.pendingGalleryLinks = ['https://stale.example.com/old'];
+
+    await extractLinkedImages(new Map());
+    expect(state.pendingGalleryLinks).toEqual([]);
   });
 });

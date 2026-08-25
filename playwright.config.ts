@@ -1,9 +1,9 @@
 // Playwright config for Image Harvest e2e smoke tests.
 //
 // Loads the unpacked extension from dist/ via launchPersistentContext (the
-// only way Chromium accepts MV3 extensions). Tests run in headed mode
-// because MV3 service workers don't initialize reliably in headless shell —
-// CI uses xvfb-run to provide a virtual display.
+// only way Chromium accepts MV3 extensions). Runs in the new headless mode
+// by default (no window steals focus locally; no xvfb needed in CI) — see
+// e2e/_helpers/launchExtension.ts for the E2E_HEADED=1 debug escape hatch.
 //
 // See e2e/_helpers/launchExtension.ts for the actual context launch logic;
 // this file only configures the Playwright runner.

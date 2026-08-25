@@ -45,6 +45,13 @@ export interface ImageItem {
   downloading?: boolean;
   /** Whether the image is marked as favorite / in collection */
   favorite?: boolean;
+  /**
+   * True for images the user explicitly injected (right-click extract,
+   * resolve-originals results). They are not part of the page DOM, so no
+   * scan will ever rediscover them — scans must preserve them and the
+   * sidepanel persists them per-tab so a panel reload doesn't drop them.
+   */
+  userInjected?: boolean;
 }
 
 // ── App settings (persisted to chrome.storage.local) ────────────────────────

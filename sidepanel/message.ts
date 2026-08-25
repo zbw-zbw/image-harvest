@@ -10,6 +10,7 @@ import {
   selectAll,
 } from './actions';
 import { applyFilters } from './filter';
+import { mergeContextItem, PENDING_CONTEXT_ITEMS_KEY } from './injected-items';
 import { isWithinTabSwitchGrace } from './tab-lifecycle';
 import { processImageExtras, updateScanProgress } from './scan';
 import { renderImages } from './render';
@@ -63,6 +64,8 @@ interface IncomingMessage {
   error?: string;
   success?: boolean;
   tabCount?: number;
+  /** Context-menu injected item (v1.1.0 CONTEXT_ITEM_INJECTED). */
+  item?: ImageItem;
 }
 
 // ============================================
@@ -262,6 +265,28 @@ export function handleMessage(message: IncomingMessage): void {
     case MESSAGE_TYPES.BG_SCAN_LIMIT_EXCEEDED:
       showToast(t('toast_bg_scan_limit', { total: message.total ?? 0 }), 'info');
       break;
+
+    // Right-click "extract image/linked image" (v1.1.0). Delivered live over
+    // the UI port; the storage.session copy is cleared here because this
+    // message is authoritative for anything queued earlier.
+    case MESSAGE_TYPES.CONTEXT_ITEM_INJECTED: {
+      void chrome.storage.session.remove(PENDING_CONTEXT_ITEMS_KEY).catch(() => {});
+      if (message.error) {
+        showToast(t('toast_gallery_resolve_failed'), 'error');
+        break;
+      }
+      if (message.item) {
+        if (mergeContextItem(message.item)) {
+          showToast(t('toast_context_item_added'), 'success');
+        } else {
+          // URL-dedup hit: the image is already in the results. Staying
+          // silent made the explicit right-click look like a no-op ("did
+          // it work? nothing happened") — say so instead.
+          showToast(t('toast_context_item_duplicate'), 'info');
+        }
+      }
+      break;
+    }
   }
 }
 

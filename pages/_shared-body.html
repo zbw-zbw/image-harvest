@@ -633,6 +633,12 @@ HTML document — it omits the surrounding
           </div>
         </div>
 
+        <!-- Gallery resolve bar mount (v1.1.0). Permanent layout slot below
+             the filter toolbar; the Preact component short-circuits to null
+             until a scan finds gallery-link candidates, so the slot is a
+             no-op height-zero div in the common case. -->
+        <div id="gallery-resolve-bar-mount" data-preact-mount="gallery-resolve-bar-mount"></div>
+
         <!-- Image Grid Container (with scan overlay) -->
         <div class="image-grid-wrapper hidden">
           <div id="image-grid" class="image-grid list-view">

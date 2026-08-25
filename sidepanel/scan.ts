@@ -94,6 +94,34 @@ export function updateScanProgress(current: number, total: number, currentUrl = 
 // ============================================
 
 /**
+ * Link penetration (v1.1.0): report how many direct image links the
+ * link-image stage surfaced for this scan. One event per scan (not per
+ * image) to keep volume bounded on link-farm pages.
+ */
+function trackLinkExtractFound(images: ImageItem[]): void {
+  const count = images.reduce((n, img) => (img.type === 'link-image' ? n + 1 : n), 0);
+  if (count > 0) {
+    void track(EVENTS.LINK_EXTRACT_FOUND, { count });
+  }
+}
+
+/**
+ * Re-attach user-injected items (right-click extract, resolve-originals
+ * results) that an authoritative scan replace would otherwise wipe — they
+ * are not part of the page, so no scan can ever rediscover them. Only
+ * items owned by this tab are preserved (no cross-tab leakage when a scan
+ * races a tab switch).
+ */
+function preserveInjectedItems(fresh: ImageItem[], tabId: number | null): ImageItem[] {
+  const freshUrls = new Set(fresh.map((img) => img.url));
+  const injected = state.allImages.filter(
+    (img) =>
+      img.userInjected && (img.tabId == null || img.tabId === tabId) && !freshUrls.has(img.url)
+  );
+  return injected.length > 0 ? [...fresh, ...injected] : fresh;
+}
+
+/**
  * Silently rescan the current tab in the background without showing
  * loading UI. Used after restoring from session cache so the user sees
  * cached images instantly while we check for updates.
@@ -137,6 +165,8 @@ export async function silentRescan(tabId: number, tabUrl: string): Promise<void>
     }
 
     if (response && response.success && response.images) {
+      // Link penetration (v1.1.0): refresh gallery candidates from the scan.
+      state.galleryLinks = Array.isArray(response.galleryLinks) ? response.galleryLinks : [];
       const freshImages: ImageItem[] = response.images.map((img: ImageItem) => ({
         ...img,
         id: img.id || generateId(img.url),
@@ -146,6 +176,7 @@ export async function silentRescan(tabId: number, tabUrl: string): Promise<void>
         colors: undefined,
         phash: null,
       }));
+      trackLinkExtractFound(freshImages);
 
       // Compare against the pre-rescan snapshot
       const preRescanUrls = new Set(preRescanImages.map((img) => img.url));
@@ -163,8 +194,9 @@ export async function silentRescan(tabId: number, tabUrl: string): Promise<void>
       }
 
       // Always replace allImages with the authoritative fresh result
+      // (preserving user-injected items — see preserveInjectedItems).
       const previousSelection = new Set(state.selectedImages);
-      state.allImages = freshImages;
+      state.allImages = preserveInjectedItems(freshImages, tabId);
 
       // Restore persisted AI tags into fresh images
       const silentTagMap = await loadAiTagsMap();
@@ -175,7 +207,7 @@ export async function silentRescan(tabId: number, tabUrl: string): Promise<void>
       }
 
       state.selectedImages = new Set(
-        [...previousSelection].filter((id) => freshImages.some((img) => img.id === id))
+        [...previousSelection].filter((id) => state.allImages.some((img) => img.id === id))
       );
       applyFilters();
       updateSelectionUI();
@@ -276,6 +308,8 @@ export async function rescanWithProgress(tabId: number, tabUrl: string): Promise
     }
 
     if (response && response.success && response.images) {
+      // Link penetration (v1.1.0): refresh gallery candidates from the scan.
+      state.galleryLinks = Array.isArray(response.galleryLinks) ? response.galleryLinks : [];
       const freshImages: ImageItem[] = response.images.map((img: ImageItem) => ({
         ...img,
         id: img.id || generateId(img.url),
@@ -301,9 +335,10 @@ export async function rescanWithProgress(tabId: number, tabUrl: string): Promise
           phash: null,
         }));
       const mergedImages = [...freshImages, ...extraDiscovered];
+      trackLinkExtractFound(mergedImages);
 
       const previousSelection = new Set(state.selectedImages);
-      state.allImages = mergedImages;
+      state.allImages = preserveInjectedItems(mergedImages, tabId);
 
       // Restore persisted AI tags into rescanned images
       const rescanTagMap = await loadAiTagsMap();
@@ -469,6 +504,8 @@ export async function fetchImages(targetTabId?: number): Promise<void> {
     }
 
     if (response && response.success && response.images) {
+      // Link penetration (v1.1.0): refresh gallery candidates from the scan.
+      state.galleryLinks = Array.isArray(response.galleryLinks) ? response.galleryLinks : [];
       // Use the final complete result from GET_IMAGES as the authoritative list
       const responseImages: ImageItem[] = response.images.map((img: ImageItem) => ({
         ...img,
@@ -496,7 +533,8 @@ export async function fetchImages(targetTabId?: number): Promise<void> {
           colors: undefined,
           phash: null,
         }));
-      state.allImages = [...responseImages, ...extraDiscovered];
+      state.allImages = preserveInjectedItems([...responseImages, ...extraDiscovered], scanTabId);
+      trackLinkExtractFound(state.allImages);
 
       // Restore persisted AI tags from previous sessions
       const tagMap = await loadAiTagsMap();

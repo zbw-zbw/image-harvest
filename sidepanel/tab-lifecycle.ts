@@ -12,6 +12,7 @@ import { updateSelectionUI } from './actions';
 import { renderImages } from './render';
 import { checkNarrowMode, hideLoading, hideRestricted, showLoading, showRestricted } from './ui';
 import { cancelDiscoveredToast } from './message';
+import { restoreInjectedItems } from './injected-items';
 import { generateId } from './utils';
 import {
   isReverseSearchTab,
@@ -82,6 +83,10 @@ export async function loadCurrentTab(forceRescan = false, targetTabId?: number):
 
   state.currentTabId = tabId;
 
+  // Link penetration (v1.1.0): gallery candidates are tab-scoped and not
+  // carried in the tab cache — reset on every load; the next scan refills.
+  state.galleryLinks = [];
+
   // Notify background that the side panel is open on this tab
   if (!state.isPopupMode) {
     chrome.runtime
@@ -104,6 +109,9 @@ export async function loadCurrentTab(forceRescan = false, targetTabId?: number):
       state.allImages = [...cached.images];
       state.selectedImages = new Set(cached.selectedImages);
       hideLoading();
+      // Cached scans never contain user-injected items — re-merge the ones
+      // persisted for this tab (idempotent, URL-deduped).
+      void restoreInjectedItems(tabId);
 
       // When "show visible only" filter is active, cached visibility flags
       // may be stale (content script context can change between tab
@@ -160,6 +168,10 @@ export async function loadCurrentTab(forceRescan = false, targetTabId?: number):
       hideLoading();
       applyFilters();
       updateSelectionUI();
+
+      // User-injected items are not part of the cached scan — re-merge them
+      // (idempotent) so switching tabs back and forth never drops them.
+      void restoreInjectedItems(tabId);
 
       // Write into the in-memory tabCache (including filteredImages) so
       // subsequent tab switches hit the fast path and skip applyFilters().

@@ -1560,5 +1560,61 @@
   },
   "onboarding_dismiss": {
     "message": "Dismiss tips"
+  },
+  "contextExtractImage": {
+    "message": "Extract image with Image Harvest",
+    "description": "Context menu item shown when right-clicking an image."
+  },
+  "contextExtractLinked": {
+    "message": "Extract linked image",
+    "description": "Context menu item shown when right-clicking a link."
+  },
+  "badge_link_image": {
+    "message": "الأصل المرتبط"
+  },
+  "badge_link_resolved": {
+    "message": "من رابط"
+  },
+  "gallery_resolve_bar_title": {
+    "message": "Found {count} gallery links"
+  },
+  "gallery_resolve_action": {
+    "message": "Resolve originals"
+  },
+  "gallery_resolve_progress": {
+    "message": "Resolving original images..."
+  },
+  "toast_gallery_resolved": {
+    "message": "Added {images} original images"
+  },
+  "toast_gallery_resolve_failed": {
+    "message": "Could not resolve images from this link"
+  },
+  "toast_context_item_added": {
+    "message": "Image added to results"
+  },
+  "feature_link_resolve": {
+    "message": "Deep Link Resolve"
+  },
+  "gallery_resolve_bar_hint": {
+    "message": "تربط هذه الصور المصغّرة بصفحات تفاصيل؛ يقوم التحليل بفتح كل صفحة وإضافة صورتها الرئيسية إلى النتائج."
+  },
+  "gallery_resolve_toggle_title": {
+    "message": "إظهار / إخفاء روابط المعرض"
+  },
+  "gallery_resolve_links_more": {
+    "message": "…و{count} أخرى"
+  },
+  "toast_not_on_page": {
+    "message": "هذه الصورة مأخوذة من رابط ولا تظهر في الصفحة نفسها"
+  },
+  "badge_link_image_title": {
+    "message": "الرابط خلف هذه الصورة المصغّرة يشير مباشرة إلى هذه الصورة الأكبر"
+  },
+  "badge_link_resolved_title": {
+    "message": "أُضيفت عن طريق تحليل الصفحة المرتبطة (لا تظهر في الصفحة نفسها)"
+  },
+  "toast_context_item_duplicate": {
+    "message": "الصورة موجودة بالفعل في النتائج — لم تتم إضافتها مرة أخرى"
   }
 }

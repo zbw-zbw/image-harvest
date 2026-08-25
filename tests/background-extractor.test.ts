@@ -609,3 +609,112 @@ describe('getImagesFromTab — EXTRACT_IMAGES response handling', () => {
     expect(result).toEqual([]);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────
+// getImagesFromTab — concurrent dedup gallery-links fan-out (v1.1.0).
+// Two sidepanel scans can race on the same tab; the in-flight dedup must
+// still deliver gallery links to EVERY caller, not just the first one —
+// otherwise the second panel's resolve-originals bar never renders.
+// ─────────────────────────────────────────────────────────────────────
+
+/** Install a single-tab chrome stub whose EXTRACT_IMAGES payload is controllable. */
+function installGalleryLinksStub(): {
+  sendMessage: ReturnType<typeof vi.fn>;
+  resolveExtract: (images: Array<{ url: string }>, galleryLinks: string[]) => void;
+  releaseMonitor: () => void;
+} {
+  let resolveExtract!: (v: { images: Array<{ url: string }>; galleryLinks: string[] }) => void;
+  const extractGate = new Promise<{ images: Array<{ url: string }>; galleryLinks: string[] }>(
+    (r) => {
+      resolveExtract = r;
+    }
+  );
+  let releaseMonitor!: () => void;
+  // START_LIVE_MONITOR gate lets a test hold the extraction promise open
+  // AFTER the gallery links were already emitted (late-arrival window).
+  const monitorGate = new Promise<void>((r) => {
+    releaseMonitor = r;
+  });
+
+  const sendMessage = vi.fn(async (tabId: number, message: { type: string }) => {
+    if (message.type === MESSAGE_TYPES.PING) return { pong: true };
+    if (message.type === MESSAGE_TYPES.EXTRACT_IMAGES) return await extractGate;
+    if (message.type === MESSAGE_TYPES.START_LIVE_MONITOR) return await monitorGate;
+    return undefined;
+  });
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  (globalThis as any).chrome = {
+    tabs: {
+      query: vi.fn(async () => [{ id: tabIdForGalleryStub }]),
+      get: vi.fn(async () => ({
+        id: tabIdForGalleryStub,
+        title: 'Gallery',
+        url: 'https://gallery.com',
+        index: 0,
+        status: 'complete',
+      })),
+      sendMessage,
+    },
+    scripting: { executeScript: vi.fn() },
+    runtime: { getManifest: vi.fn(() => ({ content_scripts: [{ js: ['x.js'] }] })) },
+    webNavigation: { getAllFrames: vi.fn(async () => []) },
+  };
+  return {
+    sendMessage,
+    resolveExtract: (images, galleryLinks) => resolveExtract({ images, galleryLinks }),
+    releaseMonitor,
+  };
+}
+
+const tabIdForGalleryStub = 77;
+
+describe('getImagesFromTab — concurrent gallery-links fan-out', () => {
+  it('second caller hitting the in-flight dedup still receives galleryLinks (and EXTRACT_IMAGES runs once)', async () => {
+    const { sendMessage, resolveExtract, releaseMonitor } = installGalleryLinksStub();
+
+    const received: string[][] = [];
+    const onLinks = (links: string[]) => received.push(links);
+    const p1 = getImagesFromTab(tabIdForGalleryStub, { onGalleryLinks: onLinks });
+    // Same tab, still in flight → dedup hit; without the listener fan-out
+    // this callback would silently never fire and the second sidepanel's
+    // resolve bar would stay hidden (the v1.1.0 gallery bug).
+    const p2 = getImagesFromTab(tabIdForGalleryStub, { onGalleryLinks: onLinks });
+
+    resolveExtract([{ url: 'img1' }], ['https://gallery.com/detail/1']);
+    releaseMonitor();
+    const [r1, r2] = await Promise.all([p1, p2]);
+
+    expect(received).toEqual([['https://gallery.com/detail/1'], ['https://gallery.com/detail/1']]);
+    expect(r1).toHaveLength(1);
+    expect(r2).toHaveLength(1);
+    const extractCalls = sendMessage.mock.calls.filter(
+      (c) => (c[1] as { type: string }).type === MESSAGE_TYPES.EXTRACT_IMAGES
+    );
+    expect(extractCalls).toHaveLength(1);
+  });
+
+  it('caller arriving after the emit but before settle gets the cached galleryLinks immediately', async () => {
+    const { releaseMonitor, resolveExtract } = installGalleryLinksStub();
+
+    const first: string[][] = [];
+    const p1 = getImagesFromTab(tabIdForGalleryStub, {
+      onGalleryLinks: (l) => first.push(l),
+    });
+    // Advance the extraction past EXTRACT_IMAGES (emit fires) and park it
+    // on the START_LIVE_MONITOR gate — entry still in flight, links cached.
+    resolveExtract([{ url: 'img1' }], ['https://gallery.com/detail/late']);
+    await vi.waitFor(() => expect(first).toEqual([['https://gallery.com/detail/late']]));
+
+    const late: string[][] = [];
+    const p2 = getImagesFromTab(tabIdForGalleryStub, {
+      onGalleryLinks: (l) => late.push(l),
+    });
+    // Synchronously served from the in-flight entry's cached links — the
+    // late caller must not depend on a second emit that will never come.
+    expect(late).toEqual([['https://gallery.com/detail/late']]);
+
+    releaseMonitor();
+    await Promise.all([p1, p2]);
+  });
+});

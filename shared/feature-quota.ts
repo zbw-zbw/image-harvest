@@ -16,7 +16,13 @@
 import { STORAGE_KEYS, getFreeLimits } from './constants';
 
 /** Features tracked on a monthly reset cycle. */
-export type MonthlyFeature = 'multiTab' | 'dedup' | 'formatConvert' | 'liveMonitor' | 'colorCopy';
+export type MonthlyFeature =
+  | 'multiTab'
+  | 'dedup'
+  | 'formatConvert'
+  | 'liveMonitor'
+  | 'colorCopy'
+  | 'linkResolve';
 
 /** Features tracked on a daily reset cycle. */
 export type DailyFeature = 'batchHighlight';
@@ -34,6 +40,7 @@ const MONTHLY_FEATURES: MonthlyFeature[] = [
   'formatConvert',
   'liveMonitor',
   'colorCopy',
+  'linkResolve',
 ];
 const DAILY_FEATURES: DailyFeature[] = ['batchHighlight'];
 
@@ -100,6 +107,8 @@ function getLimit(feature: TrackedFeature): number {
       return limits.MAX_MONTHLY_LIVE_MONITOR;
     case 'colorCopy':
       return limits.MAX_MONTHLY_COLOR_COPY;
+    case 'linkResolve':
+      return limits.MAX_MONTHLY_LINK_RESOLVE;
     case 'batchHighlight':
       return limits.MAX_MONTHLY_BATCH_HIGHLIGHT;
   }
@@ -141,6 +150,7 @@ export async function incrementFeatureUsage(feature: TrackedFeature): Promise<nu
         formatConvert: 0,
         liveMonitor: 0,
         colorCopy: 0,
+        linkResolve: 0,
       };
     }
     // Ensure the field exists — older monthly records may lack fields for

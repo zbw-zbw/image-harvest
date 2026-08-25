@@ -1,0 +1,154 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Image Harvest link-penetration fixture</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        margin: 24px;
+        background: #fafafa;
+      }
+      h1 {
+        font-size: 18px;
+      }
+      .grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 12px;
+        margin-top: 16px;
+      }
+      .grid > * {
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        padding: 8px;
+        text-align: center;
+      }
+      a {
+        color: #1a5fb4;
+      }
+      .thumb img {
+        width: 80px;
+        height: 80px;
+      }
+      .gallery img {
+        width: 70px;
+        height: 70px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Image Harvest link-penetration fixture</h1>
+    <p>
+      Covers the v1.1.0 link-image pipeline stage: direct image links (thumbnail→original and
+      plain-text), plus gallery-link candidates (thumbnail→detail page).
+    </p>
+
+    <!--
+      Extraction expectations (content → sidepanel):
+
+        img-tags / data-URI items (all visible under the default
+        visible-only filter): 3 baseline squares + 1 thumbnail inside the
+        first link + 2 gallery thumbs = 6 items.
+
+        link-image stage:
+          - linked-full-1.jpg  → ImageItem type 'link-image', visible:true
+            (inherited from the visible inner thumbnail) → shown by default.
+          - linked-plain-1.png → type 'link-image', visible:false (no inner
+            img) → hidden under visible-only, shown once the filter is off.
+
+        galleryLinks (non-image links wrapping an img): gallery-detail-1.html
+        and gallery-detail-2.html → exactly 2 candidates for the
+        GalleryResolveBar.
+
+        hrefs are RELATIVE on purpose — the fixture server binds a random
+        port, and the content script reads the browser-resolved absolute
+        a.href.
+    -->
+
+    <div class="grid">
+      <!-- Baseline 1: red square (60) -->
+      <div>
+        <img
+          alt="baseline red"
+          width="60"
+          height="60"
+          src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2260%22%20height%3D%2260%22%3E%3Crect%20width%3D%2260%22%20height%3D%2260%22%20fill%3D%22%23e74c3c%22%2F%3E%3C%2Fsvg%3E"
+        />
+        <div>baseline img (60)</div>
+      </div>
+
+      <!-- Baseline 2: blue square (90) -->
+      <div>
+        <img
+          alt="baseline blue"
+          width="90"
+          height="90"
+          src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2290%22%20height%3D%2290%22%3E%3Crect%20width%3D%2290%22%20height%3D%2290%22%20fill%3D%22%233498db%22%2F%3E%3C%2Fsvg%3E"
+        />
+        <div>baseline img (90)</div>
+      </div>
+
+      <!-- Baseline 3: green square (120) -->
+      <div>
+        <img
+          alt="baseline green"
+          width="120"
+          height="120"
+          src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22120%22%20height%3D%22120%22%3E%3Crect%20width%3D%22120%22%20height%3D%22120%22%20fill%3D%22%2327ae60%22%2F%3E%3C%2Fsvg%3E"
+        />
+        <div>baseline img (120)</div>
+      </div>
+
+      <!-- Thumbnail → original: href is a direct image URL (extension match)
+           and the inner img is a different (data-URI) thumbnail. Produces the
+           linked-full-1.jpg 'link-image' item with visible inherited from the
+           visible inner thumbnail. -->
+      <div class="thumb">
+        <a href="linked-full-1.jpg" title="thumbnail one">
+          <img
+            alt="thumb one"
+            width="80"
+            height="80"
+            src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2280%22%20height%3D%2280%22%3E%3Crect%20width%3D%2280%22%20height%3D%2280%22%20fill%3D%22%239b59b6%22%2F%3E%3C%2Fsvg%3E"
+          />
+        </a>
+        <div>thumbnail → original link</div>
+      </div>
+
+      <!-- Plain-text image link: direct image URL with no inner img. Produces
+           the linked-plain-1.png 'link-image' item with visible:false — only
+           surfaced once the visible-only filter is turned off. -->
+      <div>
+        <a href="linked-plain-1.png">plain text image link</a>
+        <div>plain-text image link</div>
+      </div>
+
+      <!-- Gallery candidates 1+2: visible thumbnails wrapped in NON-image
+           links (detail pages). Not images themselves — collected into
+           galleryLinks for the deep-resolve bar. -->
+      <div class="gallery">
+        <a href="gallery-detail-1.html">
+          <img
+            alt="gallery thumb one"
+            width="70"
+            height="70"
+            src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2270%22%20height%3D%2270%22%3E%3Crect%20width%3D%2270%22%20height%3D%2270%22%20fill%3D%22%231abc9c%22%2F%3E%3C%2Fsvg%3E"
+          />
+        </a>
+        <div>gallery candidate 1</div>
+      </div>
+      <div class="gallery">
+        <a href="gallery-detail-2.html">
+          <img
+            alt="gallery thumb two"
+            width="70"
+            height="70"
+            src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2270%22%20height%3D%2270%22%3E%3Crect%20width%3D%2270%22%20height%3D%2270%22%20fill%3D%22%233465a4%22%2F%3E%3C%2Fsvg%3E"
+          />
+        </a>
+        <div>gallery candidate 2</div>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1560,5 +1560,61 @@
   },
   "onboarding_dismiss": {
     "message": "Dismiss tips"
+  },
+  "contextExtractImage": {
+    "message": "Extract image with Image Harvest",
+    "description": "Context menu item shown when right-clicking an image."
+  },
+  "contextExtractLinked": {
+    "message": "Extract linked image",
+    "description": "Context menu item shown when right-clicking a link."
+  },
+  "badge_link_image": {
+    "message": "링크 원본"
+  },
+  "badge_link_resolved": {
+    "message": "링크에서 가져옴"
+  },
+  "gallery_resolve_bar_title": {
+    "message": "Found {count} gallery links"
+  },
+  "gallery_resolve_action": {
+    "message": "Resolve originals"
+  },
+  "gallery_resolve_progress": {
+    "message": "Resolving original images..."
+  },
+  "toast_gallery_resolved": {
+    "message": "Added {images} original images"
+  },
+  "toast_gallery_resolve_failed": {
+    "message": "Could not resolve images from this link"
+  },
+  "toast_context_item_added": {
+    "message": "Image added to results"
+  },
+  "feature_link_resolve": {
+    "message": "Deep Link Resolve"
+  },
+  "gallery_resolve_bar_hint": {
+    "message": "이 섬네일은 상세 페이지로 연결됩니다. 해석을 실행하면 각 페이지의 대표 이미지를 결과에 추가합니다."
+  },
+  "gallery_resolve_toggle_title": {
+    "message": "갤러리 링크 표시 / 숨기기"
+  },
+  "gallery_resolve_links_more": {
+    "message": "…외 {count}개"
+  },
+  "toast_not_on_page": {
+    "message": "이 이미지는 링크에서 가져온 것으로 페이지에 표시되어 있지 않습니다"
+  },
+  "badge_link_image_title": {
+    "message": "이 섬네일의 링크가 이 큰 이미지를 직접 가리킵니다"
+  },
+  "badge_link_resolved_title": {
+    "message": "링크된 페이지를 해석하여 추가되었습니다 (페이지에는 표시되지 않음)"
+  },
+  "toast_context_item_duplicate": {
+    "message": "이미 결과에 있어 중복 추가하지 않았습니다"
   }
 }

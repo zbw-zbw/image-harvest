@@ -363,6 +363,16 @@ export interface SidepanelState {
   isMultiTabExtracting: boolean;
   isEagleExporting: boolean;
 
+  // Link penetration (v1.1.0)
+  /**
+   * Gallery-link candidates (visible thumbnail → non-image detail page)
+   * found by the last scan of the current tab. Drives the
+   * <GalleryResolveBar> "resolve originals" hint.
+   */
+  galleryLinks: string[];
+  /** Deep link-resolution in flight (GalleryResolveBar busy state). */
+  isResolvingGallery: boolean;
+
   // License
   isProUser: boolean;
   inTrialGracePeriod: boolean;
@@ -491,6 +501,9 @@ function createInitialState(): SidepanelState {
 
     isMultiTabExtracting: false,
     isEagleExporting: false,
+
+    galleryLinks: [],
+    isResolvingGallery: false,
 
     isProUser: false,
     inTrialGracePeriod: false,

@@ -47,12 +47,25 @@ export async function toggleSelection(imageId: string): Promise<void> {
   } else {
     state.selectedImages.add(imageId);
     // Free tier: only one image highlighted at a time
+    let highlighted = true;
     if (!state.isProUser && img) {
       // Remove all existing highlights first, then highlight only this one
       removeAllHighlightsOnPage();
-      await highlightImageOnPage(img.url);
+      highlighted = await highlightImageOnPage(img.url);
     } else if (img) {
-      await highlightImageOnPage(img.url);
+      highlighted = await highlightImageOnPage(img.url);
+    }
+    // Link-penetrated items (right-click extract, resolve originals, link
+    // targets) have no DOM element on the page — highlighting them is a
+    // guaranteed no-op. Say so instead of failing silently; otherwise users
+    // tick the card, see nothing light up on the page, and wonder if the
+    // feature is broken.
+    if (
+      img &&
+      !highlighted &&
+      (img.userInjected || img.type === 'link-image' || img.type === 'link-resolved')
+    ) {
+      showToast(t('toast_not_on_page'), 'info');
     }
   }
 

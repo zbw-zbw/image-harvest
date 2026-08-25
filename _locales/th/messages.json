@@ -1560,5 +1560,61 @@
   },
   "onboarding_dismiss": {
     "message": "Dismiss tips"
+  },
+  "contextExtractImage": {
+    "message": "Extract image with Image Harvest",
+    "description": "Context menu item shown when right-clicking an image."
+  },
+  "contextExtractLinked": {
+    "message": "Extract linked image",
+    "description": "Context menu item shown when right-clicking a link."
+  },
+  "badge_link_image": {
+    "message": "ต้นฉบับจากลิงก์"
+  },
+  "badge_link_resolved": {
+    "message": "จากลิงก์"
+  },
+  "gallery_resolve_bar_title": {
+    "message": "Found {count} gallery links"
+  },
+  "gallery_resolve_action": {
+    "message": "Resolve originals"
+  },
+  "gallery_resolve_progress": {
+    "message": "Resolving original images..."
+  },
+  "toast_gallery_resolved": {
+    "message": "Added {images} original images"
+  },
+  "toast_gallery_resolve_failed": {
+    "message": "Could not resolve images from this link"
+  },
+  "toast_context_item_added": {
+    "message": "Image added to results"
+  },
+  "feature_link_resolve": {
+    "message": "Deep Link Resolve"
+  },
+  "gallery_resolve_bar_hint": {
+    "message": "รูปขนาดย่อเหล่านี้ลิงก์ไปยังหน้ารายละเอียด การแก้ไขจะเปิดแต่ละหน้าและเพิ่มรูปหลักลงในผลลัพธ์"
+  },
+  "gallery_resolve_toggle_title": {
+    "message": "แสดง / ซ่อนลิงก์แกลเลอรี"
+  },
+  "gallery_resolve_links_more": {
+    "message": "…และอีก {count} รายการ"
+  },
+  "toast_not_on_page": {
+    "message": "รูปนี้มาจากลิงก์และไม่ได้แสดงบนหน้าเว็บ"
+  },
+  "badge_link_image_title": {
+    "message": "ลิงก์ที่อยู่หลังรูปขนาดย่อนี้ชี้ตรงไปยังรูปขนาดใหญ่นี้"
+  },
+  "badge_link_resolved_title": {
+    "message": "เพิ่มโดยแก้ไขหน้าที่ลิงก์ไว้ (ไม่ได้แสดงบนหน้าเว็บ)"
+  },
+  "toast_context_item_duplicate": {
+    "message": "มีในผลลัพธ์อยู่แล้ว — ไม่ได้เพิ่มซ้ำ"
   }
 }

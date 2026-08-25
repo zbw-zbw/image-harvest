@@ -6,6 +6,7 @@ import { EVENTS } from '../shared/telemetry-events';
 import { hammingDistance } from '../shared/phash';
 import type { CollectionItem, ImageItem } from '../shared/types';
 import { applyFilters } from './filter';
+import { persistInjectedItems } from './injected-items';
 import { showProUpgradeModal } from './settings';
 import { state } from './state';
 import { showToast } from './ui';
@@ -187,6 +188,7 @@ export function closeDedupModal(): void {
  * left untouched.
  */
 export function removeImageById(imageId: string): void {
+  const removed = state.allImages.find((img) => img.id === imageId);
   state.allImages = state.allImages.filter((img) => img.id !== imageId);
   if (state.selectedImages.has(imageId)) {
     const next = new Set(state.selectedImages);
@@ -196,6 +198,9 @@ export function removeImageById(imageId: string): void {
   applyFilters({ skipScrollReset: true });
   detectSimilarImages();
   showToast(t('toast_image_removed'), 'success');
+  // Deleting a user-injected item must also drop it from the per-tab
+  // persistence, or the next panel boot would resurrect it.
+  if (removed?.userInjected) void persistInjectedItems();
 }
 
 // ============================================

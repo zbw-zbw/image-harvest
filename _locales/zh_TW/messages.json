@@ -1716,5 +1716,59 @@
   },
   "onboarding_dismiss": {
     "message": "關閉提示"
+  },
+  "contextExtractImage": {
+    "message": "用 Image Harvest 擷取圖片"
+  },
+  "contextExtractLinked": {
+    "message": "擷取連結中的圖片"
+  },
+  "badge_link_image": {
+    "message": "連結原圖"
+  },
+  "badge_link_resolved": {
+    "message": "來自連結"
+  },
+  "gallery_resolve_bar_title": {
+    "message": "發現 {count} 個圖庫連結"
+  },
+  "gallery_resolve_action": {
+    "message": "解析原圖"
+  },
+  "gallery_resolve_progress": {
+    "message": "正在解析原圖…"
+  },
+  "toast_gallery_resolved": {
+    "message": "已新增 {images} 張原圖"
+  },
+  "toast_gallery_resolve_failed": {
+    "message": "無法解析該連結的圖片"
+  },
+  "toast_context_item_added": {
+    "message": "圖片已加入結果"
+  },
+  "feature_link_resolve": {
+    "message": "深度連結解析"
+  },
+  "gallery_resolve_bar_hint": {
+    "message": "這些縮圖指向詳細頁——點擊解析會逐頁取得其中的原圖並加入結果。"
+  },
+  "gallery_resolve_toggle_title": {
+    "message": "展開 / 收合圖庫連結"
+  },
+  "gallery_resolve_links_more": {
+    "message": "…還有 {count} 個"
+  },
+  "toast_not_on_page": {
+    "message": "該圖片來自連結解析，不在頁面中顯示"
+  },
+  "badge_link_image_title": {
+    "message": "該縮圖的連結直接指向這張大圖"
+  },
+  "badge_link_resolved_title": {
+    "message": "透過解析連結頁面新增，不在目前頁面中顯示"
+  },
+  "toast_context_item_duplicate": {
+    "message": "圖片已在結果中，未重複新增"
   }
 }

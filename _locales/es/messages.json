@@ -1719,5 +1719,59 @@
   },
   "onboarding_dismiss": {
     "message": "Cerrar consejos"
+  },
+  "contextExtractImage": {
+    "message": "Extraer imagen con Image Harvest"
+  },
+  "contextExtractLinked": {
+    "message": "Extraer imagen enlazada"
+  },
+  "badge_link_image": {
+    "message": "Original enlazado"
+  },
+  "badge_link_resolved": {
+    "message": "Del enlace"
+  },
+  "gallery_resolve_bar_title": {
+    "message": "Se encontraron {count} enlaces de galería"
+  },
+  "gallery_resolve_action": {
+    "message": "Resolver originales"
+  },
+  "gallery_resolve_progress": {
+    "message": "Resolviendo imágenes originales..."
+  },
+  "toast_gallery_resolved": {
+    "message": "{images} imágenes originales añadidas"
+  },
+  "toast_gallery_resolve_failed": {
+    "message": "No se pudo resolver la imagen del enlace"
+  },
+  "toast_context_item_added": {
+    "message": "Imagen añadida a los resultados"
+  },
+  "feature_link_resolve": {
+    "message": "Resolución de enlaces profundos"
+  },
+  "gallery_resolve_bar_hint": {
+    "message": "Estas miniaturas enlazan a páginas de detalle; resolver abre cada página y añade su imagen principal a los resultados."
+  },
+  "gallery_resolve_toggle_title": {
+    "message": "Mostrar / ocultar enlaces de galería"
+  },
+  "gallery_resolve_links_more": {
+    "message": "…y {count} más"
+  },
+  "toast_not_on_page": {
+    "message": "Esta imagen proviene de un enlace y no se muestra en la propia página"
+  },
+  "badge_link_image_title": {
+    "message": "El enlace detrás de esta miniatura apunta directamente a esta imagen más grande"
+  },
+  "badge_link_resolved_title": {
+    "message": "Añadido al resolver la página enlazada (no se muestra en la propia página)"
+  },
+  "toast_context_item_duplicate": {
+    "message": "Ya está en los resultados; no se añade otra vez"
   }
 }

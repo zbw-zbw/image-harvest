@@ -1560,5 +1560,61 @@
   },
   "onboarding_dismiss": {
     "message": "Dismiss tips"
+  },
+  "contextExtractImage": {
+    "message": "Extract image with Image Harvest",
+    "description": "Context menu item shown when right-clicking an image."
+  },
+  "contextExtractLinked": {
+    "message": "Extract linked image",
+    "description": "Context menu item shown when right-clicking a link."
+  },
+  "badge_link_image": {
+    "message": "Original vinculado"
+  },
+  "badge_link_resolved": {
+    "message": "Do link"
+  },
+  "gallery_resolve_bar_title": {
+    "message": "Found {count} gallery links"
+  },
+  "gallery_resolve_action": {
+    "message": "Resolve originals"
+  },
+  "gallery_resolve_progress": {
+    "message": "Resolving original images..."
+  },
+  "toast_gallery_resolved": {
+    "message": "Added {images} original images"
+  },
+  "toast_gallery_resolve_failed": {
+    "message": "Could not resolve images from this link"
+  },
+  "toast_context_item_added": {
+    "message": "Image added to results"
+  },
+  "feature_link_resolve": {
+    "message": "Deep Link Resolve"
+  },
+  "gallery_resolve_bar_hint": {
+    "message": "Estas miniaturas apontam para páginas de detalhe; resolver abre cada página e adiciona a sua imagem principal aos resultados."
+  },
+  "gallery_resolve_toggle_title": {
+    "message": "Mostrar / ocultar links da galeria"
+  },
+  "gallery_resolve_links_more": {
+    "message": "…e mais {count}"
+  },
+  "toast_not_on_page": {
+    "message": "Esta imagem veio de um link e não é exibida na própria página"
+  },
+  "badge_link_image_title": {
+    "message": "O link atrás desta miniatura aponta diretmente para esta imagem maior"
+  },
+  "badge_link_resolved_title": {
+    "message": "Adicionado ao resolver a página vinculada (não exibido na própria página)"
+  },
+  "toast_context_item_duplicate": {
+    "message": "Já está nos resultados — não adicionado novamente"
   }
 }

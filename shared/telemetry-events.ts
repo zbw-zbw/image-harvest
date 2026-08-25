@@ -109,6 +109,12 @@ export const EVENTS = {
   // Similar detection
   SIMILAR_DETECTION_COMPLETED: 'similar_detection_completed',
 
+  // Link penetration (v1.1.0) — how often links→original extraction finds
+  // anything and how well the deep gallery resolve converts.
+  LINK_EXTRACT_FOUND: 'link_extract_found', // props: { count: number } (per scan, only when > 0)
+  GALLERY_RESOLVE_STARTED: 'gallery_resolve_started', // props: { linkCount: number }
+  GALLERY_RESOLVE_COMPLETED: 'gallery_resolve_completed', // props: { resolved: number, failed: number }
+
   // Referral / Share-to-Earn
   REFERRAL_LINK_COPIED: 'referral_link_copied',
   REFERRAL_LINK_SHARED: 'referral_link_shared', // props: { method: string }
@@ -203,6 +209,9 @@ export const EVENT_PROP_SCHEMAS: Record<TelemetryEventName, readonly string[]> =
   [EVENTS.AI_TAG_FILTER_APPLIED]: ['tag'],
   [EVENTS.VISIBLE_FILTER_TOGGLED]: ['enabled'],
   [EVENTS.SIMILAR_DETECTION_COMPLETED]: ['groupCount', 'totalImages'],
+  [EVENTS.LINK_EXTRACT_FOUND]: ['count'],
+  [EVENTS.GALLERY_RESOLVE_STARTED]: ['linkCount'],
+  [EVENTS.GALLERY_RESOLVE_COMPLETED]: ['resolved', 'failed'],
   [EVENTS.REFERRAL_LINK_COPIED]: [],
   [EVENTS.REFERRAL_LINK_SHARED]: ['method'],
   [EVENTS.REFERRAL_CLAIMED]: ['bonusDays'],

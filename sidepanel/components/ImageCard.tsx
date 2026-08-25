@@ -493,6 +493,19 @@ export function ImageCard({ img, index }: Props) {
       <ColorBar colors={colors} isProUser={isProUser} onSwatchClick={handleColorClick} />
       <div class="card-info-bar">
         <div class="card-tags">
+          {img.type === 'link-image' && (
+            <span class="card-tag type-badge link-image-badge" title={t('badge_link_image_title')}>
+              {t('badge_link_image')}
+            </span>
+          )}
+          {img.type === 'link-resolved' && (
+            <span
+              class="card-tag type-badge link-resolved-badge"
+              title={t('badge_link_resolved_title')}
+            >
+              {t('badge_link_resolved')}
+            </span>
+          )}
           <span class="card-tag format">{format}</span>
           {dims && <span class="card-tag dims">{dims}</span>}
           {size && <span class="card-tag filesize">{size}</span>}

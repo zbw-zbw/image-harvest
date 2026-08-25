@@ -23,6 +23,7 @@ import { ProUpgradeModal } from './ProUpgradeModal';
 // is opt-in by default with a Settings toggle; see shared/telemetry.ts)
 import { SoftPaywallBanner } from './SoftPaywallBanner';
 import { TrialGraceBanner } from './TrialGraceBanner';
+import { GalleryResolveBar } from './GalleryResolveBar';
 import { BatchUrlCopyButton } from './BatchUrlCopyButton';
 import { EagleExportButton } from './EagleExportButton';
 import { BatchOpsButton, BatchDeleteButton } from './BatchOpsButton';
@@ -196,6 +197,8 @@ export function mountPreactComponents(): void {
   mountSoftPaywallBanner();
   mountTrialGraceBanner();
   mountReferralBanner();
+  // Link penetration (v1.1.0): gallery-link hint bar below the filters.
+  mountGalleryResolveBar();
 
   // Batch URL copy button (Sprint 3.4). Renders into the
   // `#batch-url-copy-mount` slot in toolbar row 2. The slot is a
@@ -289,6 +292,17 @@ function mountReferralBanner(): void {
   mount.dataset.preactMount = 'referral-banner-mount';
   app.insertBefore(mount, app.firstChild);
   renderSafe(<ReferralBanner />, mount, 'referral-banner-mount');
+}
+
+/**
+ * Gallery resolve bar mount (v1.1.0). Slot sits between the filter toolbar
+ * and the image grid. Render directly into the slot (permanent layout
+ * anchor); the component renders null until candidates exist.
+ */
+function mountGalleryResolveBar(): void {
+  const slot = document.getElementById('gallery-resolve-bar-mount');
+  if (!slot) return;
+  renderSafe(<GalleryResolveBar />, slot, 'gallery-resolve-bar-mount');
 }
 
 /**

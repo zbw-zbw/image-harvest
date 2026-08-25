@@ -36,6 +36,7 @@ export default defineManifest({
     'sidePanel',
     'webNavigation',
     'alarms',
+    'contextMenus',
   ],
 
   host_permissions: ['<all_urls>'],

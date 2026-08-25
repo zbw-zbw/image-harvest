@@ -37,6 +37,7 @@ import {
 } from './filter';
 import { mountPreactComponents } from './components/mount';
 import { handleKeyDown, handleMessage } from './message';
+import { drainPendingContextItems, restoreInjectedItems } from './injected-items';
 import {
   exportCollection,
   removeDuplicates,
@@ -435,6 +436,16 @@ async function init(): Promise<void> {
   // SPA navigation, dynamic content). A full rescan ensures the user always
   // sees up-to-date images.
   await loadCurrentTab(true);
+
+  // Link penetration (v1.1.0): merge any context-menu items the background
+  // queued while the panel was closed (right-click extract → panel opens).
+  // Fire-and-forget — must not block the init tail.
+  void drainPendingContextItems();
+
+  // Re-merge user-injected items persisted for this tab — they live in the
+  // page nowhere, so the fresh scan above can't rediscover them and a
+  // reload must not silently drop what the user explicitly extracted.
+  void restoreInjectedItems(state.currentTabId);
 
   // Ensure the Pro visibility promise settles before marking init done,
   // so state.isProUser is resolved and UI badges are correct.

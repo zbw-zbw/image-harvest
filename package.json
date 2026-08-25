@@ -26,6 +26,7 @@
     "release:minor": "npm version minor && git push --follow-tags",
     "release:major": "npm version major && git push --follow-tags",
     "test:e2e": "playwright test",
+    "test:e2e:headed": "E2E_HEADED=1 playwright test",
     "test:e2e:ui": "playwright test --ui"
   },
   "lint-staged": {

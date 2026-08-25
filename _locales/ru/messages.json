@@ -1560,5 +1560,61 @@
   },
   "onboarding_dismiss": {
     "message": "Dismiss tips"
+  },
+  "contextExtractImage": {
+    "message": "Extract image with Image Harvest",
+    "description": "Context menu item shown when right-clicking an image."
+  },
+  "contextExtractLinked": {
+    "message": "Extract linked image",
+    "description": "Context menu item shown when right-clicking a link."
+  },
+  "badge_link_image": {
+    "message": "Оригинал по ссылке"
+  },
+  "badge_link_resolved": {
+    "message": "Из ссылки"
+  },
+  "gallery_resolve_bar_title": {
+    "message": "Found {count} gallery links"
+  },
+  "gallery_resolve_action": {
+    "message": "Resolve originals"
+  },
+  "gallery_resolve_progress": {
+    "message": "Resolving original images..."
+  },
+  "toast_gallery_resolved": {
+    "message": "Added {images} original images"
+  },
+  "toast_gallery_resolve_failed": {
+    "message": "Could not resolve images from this link"
+  },
+  "toast_context_item_added": {
+    "message": "Image added to results"
+  },
+  "feature_link_resolve": {
+    "message": "Deep Link Resolve"
+  },
+  "gallery_resolve_bar_hint": {
+    "message": "Эти миниатюры ведут на страницы-детали; разрешение открывает каждую страницу и добавляет её главное изображение в результаты."
+  },
+  "gallery_resolve_toggle_title": {
+    "message": "Показать / скрыть ссылки галереи"
+  },
+  "gallery_resolve_links_more": {
+    "message": "…ещё {count}"
+  },
+  "toast_not_on_page": {
+    "message": "Это изображение получено из ссылки и не отображается на самой странице"
+  },
+  "badge_link_image_title": {
+    "message": "Ссылка позади этой миниатюры ведёт напрямую на это увеличенное изображение"
+  },
+  "badge_link_resolved_title": {
+    "message": "Добавлено при разрешении связанной страницы (не отображается на самой странице)"
+  },
+  "toast_context_item_duplicate": {
+    "message": "Уже есть в результатах — повторно не добавлено"
   }
 }

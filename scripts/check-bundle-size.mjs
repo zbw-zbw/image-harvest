@@ -46,7 +46,11 @@ const BUDGETS = {
   // gate add ~1.6 kB to init (the coach-mark component itself is lazy-loaded
   // behind that gate, so it stays out of this chunk). Justified by the funnel
   // data driving it: only ~2.6% of installs ever completed a first download.
-  'init.js': { gzipKb: 118, label: 'sidepanel main' },
+  // Bumped 118 → 122 kB for v1.1.0 link penetration: GalleryResolveBar (hint
+  // copy + expandable candidate-link list), injected-items persistence module,
+  // the userInjected filter exemption, and badge tooltips push init to
+  // ~119.7 kB gzip. New user-facing feature growth, accepted intentionally.
+  'init.js': { gzipKb: 122, label: 'sidepanel main' },
   // Background service worker entry. Currently ~5.6 kB gzip.
   'index.ts.js': { gzipKb: 12, label: 'background SW' },
   // Content script entry. Currently ~7.7 kB gzip.

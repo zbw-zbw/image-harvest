@@ -55,6 +55,14 @@ vi.mock('../sidepanel/message', () => ({
   handleMessage: vi.fn(),
 }));
 
+vi.mock('../sidepanel/injected-items', () => ({
+  // v1.1.0: drains right-click-injected items queued in storage.session
+  // while the panel was closed, then restores persisted injected items.
+  // Mock-resolved so init() never blocks.
+  drainPendingContextItems: vi.fn().mockResolvedValue(undefined),
+  restoreInjectedItems: vi.fn().mockResolvedValue(undefined),
+}));
+
 vi.mock('../sidepanel/pro-features', () => ({
   exportCollection: vi.fn(),
   removeDuplicates: vi.fn(),

@@ -46,6 +46,7 @@ export interface RemoteLimitsConfig {
   maxMonthlyDelete?: number;
   maxMonthlyCustomNaming?: number;
   maxMonthlyColorFilter?: number;
+  maxMonthlyLinkResolve?: number;
   customNaming?: boolean;
   highlightBatchEnabled?: boolean;
   multiTabEnabled?: boolean;

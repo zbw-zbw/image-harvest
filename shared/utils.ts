@@ -115,6 +115,46 @@ export function getDomain(url: string): string {
   }
 }
 
+/**
+ * Heuristically determine whether a URL points *directly* at an image file.
+ * Used by the link-penetration extraction stage (v1.1.0) to catch `<a href>`
+ * targets like "photo-full.jpg" or "https://cdn.example.com/img?format=png".
+ *
+ * Accepts either:
+ *   - a pathname ending in an image extension (query/hash ignored), or
+ *   - a query parameter that carries the format (WordPress / image-CDN
+ *     style: ?format=jpg, &type=png, f=webp).
+ *
+ * Returns false for data: URIs (handled by their own pipeline stages) and
+ * non-http(s) schemes (mailto:, javascript:, tel:, same-document #anchors).
+ */
+export function isDirectImageUrl(url: string): boolean {
+  const trimmed = url.trim();
+  if (!trimmed || isDataUri(trimmed)) return false;
+
+  let urlObj: URL;
+  try {
+    urlObj = new URL(trimmed);
+  } catch {
+    return false;
+  }
+  // Only http(s) targets are fetchable / downloadable.
+  if (urlObj.protocol !== 'http:' && urlObj.protocol !== 'https:') return false;
+
+  const extPattern = buildExtensionPattern();
+  // Pathname check: /path/to/photo.jpg — case-insensitive, query excluded.
+  if (new RegExp(`[.](${extPattern})$`, 'i').test(urlObj.pathname)) return true;
+
+  // Query check: the extension lives in a well-known param instead of the
+  // pathname (e.g. WordPress ?format=jpg, S3/CDN ?f=webp).
+  const queryFormatParams = ['format', 'type', 'f', 'fmt', 'output'];
+  for (const key of queryFormatParams) {
+    const value = urlObj.searchParams.get(key);
+    if (value && new RegExp(`^(${extPattern})$`, 'i').test(value)) return true;
+  }
+  return false;
+}
+
 export function formatBytes(bytes: number, decimals: number = 1): string {
   if (bytes === 0) return '0 B';
   const k = 1024;

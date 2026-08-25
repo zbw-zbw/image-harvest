@@ -1716,5 +1716,59 @@
   },
   "onboarding_dismiss": {
     "message": "关闭提示"
+  },
+  "contextExtractImage": {
+    "message": "用 Image Harvest 提取图片"
+  },
+  "contextExtractLinked": {
+    "message": "提取链接中的图片"
+  },
+  "badge_link_image": {
+    "message": "链接原图"
+  },
+  "badge_link_resolved": {
+    "message": "来自链接"
+  },
+  "gallery_resolve_bar_title": {
+    "message": "发现 {count} 个图库链接"
+  },
+  "gallery_resolve_action": {
+    "message": "解析原图"
+  },
+  "gallery_resolve_progress": {
+    "message": "正在解析原图…"
+  },
+  "toast_gallery_resolved": {
+    "message": "已添加 {images} 张原图"
+  },
+  "toast_gallery_resolve_failed": {
+    "message": "无法解析该链接的图片"
+  },
+  "toast_context_item_added": {
+    "message": "图片已加入结果"
+  },
+  "feature_link_resolve": {
+    "message": "深度链接解析"
+  },
+  "gallery_resolve_bar_hint": {
+    "message": "这些缩略图指向详情页——点击解析会逐页获取其中的原图并加入结果。"
+  },
+  "gallery_resolve_toggle_title": {
+    "message": "展开 / 收起图库链接"
+  },
+  "gallery_resolve_links_more": {
+    "message": "…还有 {count} 个"
+  },
+  "toast_not_on_page": {
+    "message": "该图片来自链接解析，不在页面中显示"
+  },
+  "badge_link_image_title": {
+    "message": "该缩略图的链接直接指向这张大图"
+  },
+  "badge_link_resolved_title": {
+    "message": "通过解析链接页面添加，不在当前页面中显示"
+  },
+  "toast_context_item_duplicate": {
+    "message": "图片已在结果中，未重复添加"
   }
 }

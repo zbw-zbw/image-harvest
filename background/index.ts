@@ -25,6 +25,9 @@ import { uiPorts, sidePanelOpenedTabs, getAccessibleTabId, broadcastToPopup } fr
 import { initLicenseAlarm } from './license';
 import { initDisplayMode, initTabActivationListener } from './display-mode';
 import { getImagesFromTab, processMultiTabExtract } from './extractor';
+import { resolveLinkImages } from './link-resolver';
+import { generateId, getDomain, getFileFormat, isDirectImageUrl } from '../shared/utils';
+import type { ImageItem } from '../shared/types';
 import { fetchImageData, fetchImageMetaProxy, reverseSearchUpload } from './reverse-search';
 import { isAllowedFetchUrl } from '../shared/url-validator';
 import { autoStartTrial, initAutoTrialAlarm } from './auto-trial';
@@ -86,7 +89,128 @@ try {
 // onInstalled fires exactly once per install/update event. We use it to
 // distinguish brand-new installs (the most valuable signal in the funnel)
 // from version updates of existing installs.
+
+// ── Context menus (v1.1.0) ──────────────────────────────────────────────────
+// Right-click → "Extract image" (on images) / "Extract linked image" (on
+// links). Menu titles resolve via chrome.i18n.getMessage() instead of the
+// `__MSG_*__` manifest substitution: on some setups the substitution silently
+// fails and the raw placeholder leaks into the menu (seen in manual smoke
+// testing), while getMessage() shares the same locale-resolution path and
+// returns "" for a missing key — which we hard-fallback to English.
+const CONTEXT_MENU_EXTRACT_IMAGE = 'ih-context-extract-image';
+const CONTEXT_MENU_EXTRACT_LINKED = 'ih-context-extract-linked';
+
+/** storage.session queue for context items injected while the panel is closed. */
+const PENDING_CONTEXT_ITEMS_KEY = 'pendingContextItems';
+
+interface ContextItemPayload {
+  item?: ImageItem;
+  error?: string;
+}
+
+/** Build a single-image item for a URL the user right-clicked. */
+function buildContextImageItem(url: string, type: 'context-image' | 'link-image'): ImageItem {
+  return {
+    id: generateId(url),
+    url,
+    displayWidth: 0,
+    displayHeight: 0,
+    type,
+    format: getFileFormat(url),
+    sourceDomain: getDomain(url),
+    checked: false,
+    timestamp: Date.now(),
+    // Explicit user action — must survive the visible-only filter.
+    visible: true,
+    // …and must survive rescans: not part of the page DOM, so the sidepanel
+    // persists it per-tab instead of relying on the next scan to find it.
+    userInjected: true,
+  } as ImageItem;
+}
+
+/**
+ * Deliver a context-menu item to the sidepanel over two channels:
+ *   1. storage.session queue — survives a closed/busy panel; the sidepanel
+ *      drains it on boot and clears it once consumed.
+ *   2. broadcastToPopup — picked up live over the UI port when the panel is
+ *      already open (same channel as DOWNLOAD_PROGRESS et al.).
+ */
+async function injectContextItem(payload: ContextItemPayload): Promise<void> {
+  try {
+    const stored = await chrome.storage.session.get(PENDING_CONTEXT_ITEMS_KEY);
+    const existing = stored[PENDING_CONTEXT_ITEMS_KEY];
+    const queue: ContextItemPayload[] = Array.isArray(existing) ? existing : [];
+    queue.push(payload);
+    await chrome.storage.session.set({ [PENDING_CONTEXT_ITEMS_KEY]: queue });
+  } catch {
+    /* storage unavailable — the live broadcast below still covers an open panel */
+  }
+  broadcastToPopup({
+    type: MESSAGE_TYPES.CONTEXT_ITEM_INJECTED,
+    ...payload,
+  });
+}
+
+chrome.contextMenus.onClicked.addListener((info, tab) => {
+  void handleContextMenuClick(info, tab);
+});
+
+async function handleContextMenuClick(
+  info: chrome.contextMenus.OnClickData,
+  tab: chrome.tabs.Tab | undefined
+): Promise<void> {
+  const tabId = tab?.id;
+  if (tabId === undefined) return;
+
+  // Open the panel FIRST, while the user-gesture context is still fresh —
+  // chrome.sidePanel.open() must run inside a gesture handler. Resolution
+  // work happens after, so the panel is already booting to receive the item.
+  try {
+    await chrome.sidePanel.setOptions({ tabId, path: 'pages/sidepanel.html', enabled: true });
+    await chrome.sidePanel.open({ tabId });
+  } catch {
+    /* restricted page etc. — still queue the item via storage.session */
+  }
+
+  if (info.menuItemId === CONTEXT_MENU_EXTRACT_IMAGE) {
+    if (info.srcUrl) {
+      await injectContextItem({ item: buildContextImageItem(info.srcUrl, 'context-image') });
+    }
+    return;
+  }
+
+  if (info.menuItemId === CONTEXT_MENU_EXTRACT_LINKED) {
+    if (!info.linkUrl) return;
+    if (isDirectImageUrl(info.linkUrl)) {
+      await injectContextItem({ item: buildContextImageItem(info.linkUrl, 'link-image') });
+      return;
+    }
+    // Non-image link — try to pull its og:image original via deep resolution.
+    const { images } = await resolveLinkImages([info.linkUrl]);
+    if (images.length > 0) {
+      await injectContextItem({ item: images[0] });
+    } else {
+      await injectContextItem({ error: 'resolve_failed' });
+    }
+  }
+}
+
 chrome.runtime.onInstalled.addListener((details) => {
+  // (Re-)register context menus on every install/update — Chrome wipes an
+  // extension's menus when it updates, so this must run for both reasons.
+  chrome.contextMenus.removeAll(() => {
+    chrome.contextMenus.create({
+      id: CONTEXT_MENU_EXTRACT_IMAGE,
+      title: chrome.i18n.getMessage('contextExtractImage') || 'Extract image with Image Harvest',
+      contexts: ['image'],
+    });
+    chrome.contextMenus.create({
+      id: CONTEXT_MENU_EXTRACT_LINKED,
+      title: chrome.i18n.getMessage('contextExtractLinked') || 'Extract linked image',
+      contexts: ['link'],
+    });
+  });
+
   if (details.reason === 'install') {
     void track(EVENTS.EXTENSION_INSTALLED);
     void autoStartTrial('install');
@@ -196,11 +320,17 @@ async function handleMessage(
   try {
     switch (message.type) {
       case MESSAGE_TYPES.GET_IMAGES: {
+        // Gallery-link candidates (v1.1.0) ride along on the same response —
+        // the sidepanel's resolve-originals bar reads `galleryLinks`.
+        let galleryLinks: string[] = [];
         const images = await getImagesFromTab(message.tabId as number | undefined, {
           searchAllFrames: (message.searchAllFrames as boolean) || false,
           liveMonitoring: message.liveMonitoring !== false,
+          onGalleryLinks: (links: string[]) => {
+            galleryLinks = links;
+          },
         });
-        sendResponse({ success: true, images });
+        sendResponse({ success: true, images, galleryLinks });
         const tabId = message.tabId as number | undefined;
         if (tabId && images.length > 0) {
           const text = images.length > 999 ? '999+' : String(images.length);
@@ -785,6 +915,18 @@ async function handleMessage(
           sendResponse(multiTabResult);
         } catch (multiTabError) {
           sendResponse({ success: false, error: (multiTabError as Error).message });
+        }
+        break;
+      }
+
+      // Deep link-resolution (v1.1.0): fetch detail pages, pull og:image.
+      // Quota gating / telemetry live in the sidepanel — this route is pure.
+      case MESSAGE_TYPES.RESOLVE_LINK_IMAGES: {
+        try {
+          const result = await resolveLinkImages((message.urls as string[]) || []);
+          sendResponse({ success: true, ...result });
+        } catch (resolveError) {
+          sendResponse({ success: false, error: (resolveError as Error).message });
         }
         break;
       }

@@ -103,6 +103,12 @@ export const MESSAGE_TYPES = {
   MULTI_TAB_EXTRACT_COMPLETE: 'MULTI_TAB_EXTRACT_COMPLETE',
   MULTI_TAB_EXTRACT_ERROR: 'MULTI_TAB_EXTRACT_ERROR',
 
+  // Link penetration (v1.1.0)
+  /** Sidepanel → background: resolve gallery/detail links to og:image originals. */
+  RESOLVE_LINK_IMAGES: 'RESOLVE_LINK_IMAGES',
+  /** Background → sidepanel: items added via the right-click context menu. */
+  CONTEXT_ITEM_INJECTED: 'CONTEXT_ITEM_INJECTED',
+
   // Image data proxy (bypass CORS)
   FETCH_IMAGE_DATA: 'FETCH_IMAGE_DATA',
   FETCH_IMAGE_META: 'FETCH_IMAGE_META',
@@ -248,6 +254,9 @@ export const FREE_LIMITS = {
   MAX_MONTHLY_DELETE: 0,
   MAX_MONTHLY_CUSTOM_NAMING: 0,
   MAX_MONTHLY_COLOR_FILTER: 0,
+  // Link penetration: free users get a taste of gallery-link resolving each
+  // month ("first wow" strategy) — Pro is unlimited.
+  MAX_MONTHLY_LINK_RESOLVE: 3,
 } as const;
 
 /**
@@ -322,6 +331,9 @@ export function getFreeLimits(): typeof FREE_LIMITS {
       MAX_MONTHLY_COLOR_FILTER: (typeof remote.maxMonthlyColorFilter === 'number'
         ? remote.maxMonthlyColorFilter
         : FREE_LIMITS.MAX_MONTHLY_COLOR_FILTER) as typeof FREE_LIMITS.MAX_MONTHLY_COLOR_FILTER,
+      MAX_MONTHLY_LINK_RESOLVE: (typeof remote.maxMonthlyLinkResolve === 'number'
+        ? remote.maxMonthlyLinkResolve
+        : FREE_LIMITS.MAX_MONTHLY_LINK_RESOLVE) as typeof FREE_LIMITS.MAX_MONTHLY_LINK_RESOLVE,
       ALLOWED_GROUP_MODES: Array.isArray(remote.allowedGroupModes)
         ? (remote.allowedGroupModes as unknown as typeof FREE_LIMITS.ALLOWED_GROUP_MODES)
         : FREE_LIMITS.ALLOWED_GROUP_MODES,

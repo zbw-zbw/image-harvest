@@ -93,6 +93,13 @@ let onMessageListener:
   | null = null;
 let onConnectListener: ((port: chrome.runtime.Port) => void) | null = null;
 let onDownloadChanged: ((delta: chrome.downloads.DownloadDelta) => void) | null = null;
+// v1.1.0: captured at module import — clearAllMocks() wipes mock call
+// records between cases, so listener REFERENCES are the only stable way
+// to re-invoke bootstrap-time registrations.
+let onInstalledListener: ((details: chrome.runtime.InstalledDetails) => void) | null = null;
+let onContextMenuClick:
+  | ((info: chrome.contextMenus.OnClickData, tab?: chrome.tabs.Tab) => void)
+  | null = null;
 
 beforeAll(async () => {
   (globalThis as unknown as { chrome: unknown }).chrome = {
@@ -108,7 +115,9 @@ beforeAll(async () => {
         }),
       },
       onInstalled: {
-        addListener: vi.fn(),
+        addListener: vi.fn((fn) => {
+          onInstalledListener = fn;
+        }),
       },
       // initTelemetry() reads version from here at module init time.
       getManifest: vi.fn(() => ({ version: '1.0.1' })),
@@ -119,6 +128,23 @@ beforeAll(async () => {
           onDownloadChanged = fn;
         }),
       },
+    },
+    // v1.1.0 context menus — registered at module top-level
+    // (onClicked listener) and inside onInstalled (removeAll + create).
+    // Menu titles resolve via chrome.i18n.getMessage() (NOT manifest
+    // __MSG__ substitution — that silently fails on some setups), so the
+    // mock returns a distinctive marker the registration test pins.
+    i18n: {
+      getMessage: vi.fn((key: string) => `[i18n:${key}]`),
+    },
+    contextMenus: {
+      onClicked: {
+        addListener: vi.fn((fn) => {
+          onContextMenuClick = fn;
+        }),
+      },
+      removeAll: vi.fn((callback?: () => void) => callback?.()),
+      create: vi.fn(),
     },
     tabs: {
       sendMessage: vi.fn(),
@@ -238,7 +264,7 @@ describe('module bootstrap', () => {
 // ─────────────────────────────────────────────────────────────────────
 
 describe('handleMessage — storage routes', () => {
-  it('GET_IMAGES → calls getImagesFromTab + responds with success+images', async () => {
+  it('GET_IMAGES → calls getImagesFromTab + responds with success+images+galleryLinks', async () => {
     vi.mocked(bgExtractor.getImagesFromTab).mockResolvedValue([
       { url: 'a.jpg' },
     ] as unknown as Awaited<ReturnType<typeof bgExtractor.getImagesFromTab>>);
@@ -246,8 +272,12 @@ describe('handleMessage — storage routes', () => {
     expect(bgExtractor.getImagesFromTab).toHaveBeenCalledWith(42, {
       searchAllFrames: false,
       liveMonitoring: true,
+      onGalleryLinks: expect.any(Function),
     });
-    expect(result).toEqual({ success: true, images: [{ url: 'a.jpg' }] });
+    // Pin: galleryLinks always present (empty array when the page has no
+    // gallery candidates) — the sidepanel's resolve-bar treats absence
+    // and [] identically, but a stable shape keeps consumers simple.
+    expect(result).toEqual({ success: true, images: [{ url: 'a.jpg' }], galleryLinks: [] });
   });
 
   it('GET_IMAGES forwards searchAllFrames + liveMonitoring=false flags', async () => {
@@ -263,6 +293,26 @@ describe('handleMessage — storage routes', () => {
     expect(bgExtractor.getImagesFromTab).toHaveBeenCalledWith(1, {
       searchAllFrames: true,
       liveMonitoring: false,
+      onGalleryLinks: expect.any(Function),
+    });
+  });
+
+  it('GET_IMAGES → onGalleryLinks callback feeds galleryLinks into the response', async () => {
+    // Pin: the extractor invokes the callback with the content script's
+    // gallery-link candidates; background MUST forward them verbatim so
+    // the sidepanel resolve-bar can offer deep resolution.
+    vi.mocked(bgExtractor.getImagesFromTab).mockImplementation((async (
+      _tabId: number,
+      options?: { onGalleryLinks?: (links: string[]) => void }
+    ) => {
+      options?.onGalleryLinks?.(['https://example.com/gallery/1', 'https://example.com/gallery/2']);
+      return [];
+    }) as unknown as typeof bgExtractor.getImagesFromTab);
+    const result = await dispatch({ type: MESSAGE_TYPES.GET_IMAGES, tabId: 7 });
+    expect(result).toEqual({
+      success: true,
+      images: [],
+      galleryLinks: ['https://example.com/gallery/1', 'https://example.com/gallery/2'],
     });
   });
 
@@ -847,6 +897,153 @@ describe('handleMessage — multi-tab extract', () => {
       tabIds: [1, 2, 3],
     });
     expect(result).toEqual({ success: false, error: 'all tabs are restricted' });
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// Link resolve (v1.1.0 deep penetration)
+// ─────────────────────────────────────────────────────────────────────
+
+describe('handleMessage — RESOLVE_LINK_IMAGES', () => {
+  it('forwards urls to resolveLinkImages and responds with success + result', async () => {
+    const linkResolver = await import('../background/link-resolver');
+    const spy = vi.spyOn(linkResolver, 'resolveLinkImages').mockResolvedValue({
+      images: [{ url: 'https://example.com/og.jpg' }] as never,
+      resolved: 1,
+      failed: 0,
+    });
+
+    const result = await dispatch({
+      type: MESSAGE_TYPES.RESOLVE_LINK_IMAGES,
+      urls: ['https://example.com/gallery/1'],
+    });
+
+    expect(spy).toHaveBeenCalledWith(['https://example.com/gallery/1']);
+    expect(result).toEqual({
+      success: true,
+      images: [{ url: 'https://example.com/og.jpg' }],
+      resolved: 1,
+      failed: 0,
+    });
+    spy.mockRestore();
+  });
+
+  it('missing urls → defaults to [] (empty batch resolves nothing)', async () => {
+    const linkResolver = await import('../background/link-resolver');
+    const spy = vi
+      .spyOn(linkResolver, 'resolveLinkImages')
+      .mockResolvedValue({ images: [], resolved: 0, failed: 0 });
+
+    await dispatch({ type: MESSAGE_TYPES.RESOLVE_LINK_IMAGES });
+    expect(spy).toHaveBeenCalledWith([]);
+
+    spy.mockRestore();
+  });
+
+  it('resolveLinkImages rejection → local try/catch returns {success:false, error}', async () => {
+    const linkResolver = await import('../background/link-resolver');
+    const spy = vi
+      .spyOn(linkResolver, 'resolveLinkImages')
+      .mockRejectedValue(new Error('network unreachable'));
+
+    const result = await dispatch({
+      type: MESSAGE_TYPES.RESOLVE_LINK_IMAGES,
+      urls: ['https://example.com/x'],
+    });
+
+    // Pin: the RESOLVE_LINK_IMAGES route owns its error shape. Without
+    // the local try/catch the failure would bubble to the outer
+    // handleMessage catch and surface as INJECTION_FAILED — misleading
+    // for a network-level resolution problem.
+    expect(result).toEqual({ success: false, error: 'network unreachable' });
+    spy.mockRestore();
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// Context menus (v1.1.0) — bootstrap registration
+// ─────────────────────────────────────────────────────────────────────
+
+describe('context menus bootstrap', () => {
+  it('chrome.contextMenus.onClicked listener registered at module top-level', () => {
+    // The listener reference was captured during the beforeAll module
+    // import — mock call records are wiped by clearAllMocks, so we pin
+    // the reference itself.
+    expect(onContextMenuClick).toBeTypeOf('function');
+  });
+
+  it('onInstalled registers both menus with chrome.i18n titles (removeAll first)', () => {
+    expect(onInstalledListener).toBeTypeOf('function');
+
+    const chromeMock = (globalThis as unknown as { chrome: typeof chrome }).chrome as unknown as {
+      contextMenus: {
+        removeAll: ReturnType<typeof vi.fn>;
+        create: ReturnType<typeof vi.fn>;
+      };
+      i18n: {
+        getMessage: ReturnType<typeof vi.fn>;
+      };
+    };
+
+    chromeMock.contextMenus.removeAll.mockClear();
+    chromeMock.contextMenus.create.mockClear();
+    chromeMock.i18n.getMessage.mockClear();
+    onInstalledListener!({ reason: 'update' } as chrome.runtime.InstalledDetails);
+
+    // Pin: menus are re-created on EVERY install/update (Chrome wipes
+    // them on update) — removeAll runs first so IDs never collide.
+    expect(chromeMock.contextMenus.removeAll).toHaveBeenCalled();
+    // Pin: titles come from chrome.i18n.getMessage() per-key, not the
+    // `__MSG_*__` manifest substitution — on some setups Chrome never
+    // substitutes and the raw placeholder leaks into the menu (seen in
+    // manual smoke testing). getMessage() shares Chrome's locale
+    // resolution and returns "" for a missing key.
+    expect(chromeMock.i18n.getMessage).toHaveBeenCalledWith('contextExtractImage');
+    expect(chromeMock.i18n.getMessage).toHaveBeenCalledWith('contextExtractLinked');
+    const createCalls = chromeMock.contextMenus.create.mock.calls.map((c) => c[0]);
+    expect(createCalls).toContainEqual(
+      expect.objectContaining({
+        id: 'ih-context-extract-image',
+        title: '[i18n:contextExtractImage]',
+        contexts: ['image'],
+      })
+    );
+    expect(createCalls).toContainEqual(
+      expect.objectContaining({
+        id: 'ih-context-extract-linked',
+        title: '[i18n:contextExtractLinked]',
+        contexts: ['link'],
+      })
+    );
+  });
+
+  it('missing i18n key (getMessage → "") falls back to hardcoded English titles', () => {
+    const chromeMock = (globalThis as unknown as { chrome: typeof chrome }).chrome as unknown as {
+      contextMenus: {
+        removeAll: ReturnType<typeof vi.fn>;
+        create: ReturnType<typeof vi.fn>;
+      };
+      i18n: {
+        getMessage: ReturnType<typeof vi.fn>;
+      };
+    };
+
+    // getMessage returns "" for a missing key — registration must not
+    // create a menu with an empty title. ('update' reason keeps this on
+    // the pure re-registration path — 'install' also opens the welcome
+    // page, which the mock chrome has no runtime.getURL for.)
+    chromeMock.i18n.getMessage.mockReturnValueOnce('');
+    chromeMock.contextMenus.removeAll.mockClear();
+    chromeMock.contextMenus.create.mockClear();
+    onInstalledListener!({ reason: 'update' } as chrome.runtime.InstalledDetails);
+
+    const titles = chromeMock.contextMenus.create.mock.calls.map(
+      (c) => (c[0] as { title?: string }).title
+    );
+    // First registration with the "" return falls back to English; the
+    // second (contextExtractLinked) gets the normal marker again.
+    expect(titles[0]).toBe('Extract image with Image Harvest');
+    expect(titles).toContain('[i18n:contextExtractLinked]');
   });
 });
 

@@ -83,6 +83,7 @@ vi.mock('../content/extract-advanced', () => ({
   extractMetaAndLinkImages: vi.fn(() => Promise.resolve()),
   extractCssContentImages: vi.fn(() => Promise.resolve()),
   extractLazyLoadImages: vi.fn(() => Promise.resolve()),
+  extractLinkedImages: vi.fn(() => Promise.resolve()),
 }));
 
 vi.mock('../content/shadow-iframe', () => ({
@@ -446,7 +447,7 @@ describe('extractImages — main pipeline', () => {
     expect(seenUrls.has('stale-from-previous-scan')).toBe(false);
   });
 
-  it('runs all 14 advanced extractors + shadow + iframes when skipIframes is false', async () => {
+  it('runs all 9 advanced extractors + shadow + iframes when skipIframes is false', async () => {
     const ea = await import('../content/extract-advanced');
     const si = await import('../content/shadow-iframe');
 
@@ -462,6 +463,8 @@ describe('extractImages — main pipeline', () => {
     expect(ea.extractMetaAndLinkImages).toHaveBeenCalled();
     expect(ea.extractCssContentImages).toHaveBeenCalled();
     expect(ea.extractLazyLoadImages).toHaveBeenCalled();
+    // v1.1.0 link-image stage — 14th pipeline stage, must always run.
+    expect(ea.extractLinkedImages).toHaveBeenCalled();
     expect(si.extractFromShadowDom).toHaveBeenCalled();
     expect(si.extractFromIframes).toHaveBeenCalled();
   });
@@ -513,6 +516,12 @@ describe('extractImages — main pipeline', () => {
     vi.mocked(ea.extractCanvasElements).mockImplementation(async () => {
       callOrder.push('canvas');
     });
+    vi.mocked(ea.extractLazyLoadImages).mockImplementation(async () => {
+      callOrder.push('lazy-load');
+    });
+    vi.mocked(ea.extractLinkedImages).mockImplementation(async () => {
+      callOrder.push('link-image');
+    });
     vi.mocked(si.extractFromShadowDom).mockImplementation(async () => {
       callOrder.push('shadow');
     });
@@ -524,11 +533,14 @@ describe('extractImages — main pipeline', () => {
       await getExtractImages()
     )();
 
-    // svgs (step 5) runs before canvas (step 6); shadow (step 13)
-    // before iframes (step 14). Pin SEQUENTIAL await order — a refactor
-    // to Promise.all would break consumer assumptions about state.seenUrls
-    // dedup happening in a deterministic order.
+    // svgs (step 5) runs before canvas (step 6); link-image (step 12)
+    // runs after lazy-load (step 11) and before shadow (step 13), which
+    // runs before iframes (step 14). Pin SEQUENTIAL await order — a
+    // refactor to Promise.all would break consumer assumptions about
+    // state.seenUrls dedup happening in a deterministic order.
     expect(callOrder.indexOf('svgs')).toBeLessThan(callOrder.indexOf('canvas'));
+    expect(callOrder.indexOf('lazy-load')).toBeLessThan(callOrder.indexOf('link-image'));
+    expect(callOrder.indexOf('link-image')).toBeLessThan(callOrder.indexOf('shadow'));
     expect(callOrder.indexOf('shadow')).toBeLessThan(callOrder.indexOf('iframes'));
   });
 

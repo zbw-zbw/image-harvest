@@ -25,6 +25,7 @@ import {
   EventEmitter,
   isRestrictedUrl,
   deepMerge,
+  isDirectImageUrl,
 } from '../shared/utils';
 
 describe('generateId', () => {
@@ -479,5 +480,109 @@ describe('extractBackgroundUrls — quote and whitespace variants', () => {
   it('coexists with linear-gradient — extracts only the url() portion', () => {
     const css = 'linear-gradient(red, blue), url("hero.png")';
     expect(extractBackgroundUrls(css)).toEqual(['hero.png']);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// isDirectImageUrl — link-penetration URL heuristic (v1.1.0)
+// ─────────────────────────────────────────────────────────────────────
+
+describe('isDirectImageUrl', () => {
+  // ── Pathname extension (primary signal) ──
+  it('accepts http(s) URLs whose pathname ends in an image extension', () => {
+    expect(isDirectImageUrl('https://example.com/photo.jpg')).toBe(true);
+    expect(isDirectImageUrl('https://example.com/path/to/pic.png')).toBe(true);
+    expect(isDirectImageUrl('http://cdn.example.com/img.webp')).toBe(true);
+    expect(isDirectImageUrl('https://example.com/anim.gif')).toBe(true);
+    expect(isDirectImageUrl('https://example.com/icon.ico')).toBe(true);
+    expect(isDirectImageUrl('https://example.com/photo.avif')).toBe(true);
+    expect(isDirectImageUrl('https://example.com/photo.jfif')).toBe(true);
+    expect(isDirectImageUrl('https://example.com/vector.svg')).toBe(true);
+    expect(isDirectImageUrl('https://example.com/legacy.bmp')).toBe(true);
+  });
+
+  it('ignores query strings and fragments when checking the pathname', () => {
+    // The classic CDN cache-buster pattern — extension still ends the path.
+    expect(isDirectImageUrl('https://example.com/photo.jpg?v=123&size=large')).toBe(true);
+    expect(isDirectImageUrl('https://example.com/photo.jpg#frag')).toBe(true);
+  });
+
+  it('is case-insensitive on the extension', () => {
+    expect(isDirectImageUrl('https://example.com/PHOTO.JPG')).toBe(true);
+    expect(isDirectImageUrl('https://example.com/Photo.JpEg')).toBe(true);
+    expect(isDirectImageUrl('https://example.com/WeirdCase.PNG')).toBe(true);
+  });
+
+  it('handles URL-encoded pathnames (browsers keep %20 in pathname)', () => {
+    expect(isDirectImageUrl('https://example.com/my%20photo.png')).toBe(true);
+    expect(isDirectImageUrl('https://example.com/a%2Fb%20c.jpeg')).toBe(true);
+  });
+
+  // ── Query-parameter format (WordPress / image-CDN pattern) ──
+  it('accepts when the format lives in a well-known query param', () => {
+    expect(isDirectImageUrl('https://example.com/media?id=42&format=jpg')).toBe(true);
+    expect(isDirectImageUrl('https://example.com/img?type=png')).toBe(true);
+    expect(isDirectImageUrl('https://cdn.example.com/file?f=webp')).toBe(true);
+    expect(isDirectImageUrl('https://example.com/img?fmt=gif')).toBe(true);
+    expect(isDirectImageUrl('https://example.com/render?output=avif')).toBe(true);
+  });
+
+  it('is case-insensitive on query param VALUES (param names are exact per URLSearchParams)', () => {
+    expect(isDirectImageUrl('https://example.com/img?format=PNG')).toBe(true);
+    // URLSearchParams.get('format') matches parameter names exactly —
+    // a capitalized param name is a DIFFERENT key and must not match.
+    // Pin this so a future "helpful" lowercase-everything refactor
+    // surfaces here instead of silently changing behavior.
+    expect(isDirectImageUrl('https://example.com/img?FORMAT=JPG')).toBe(false);
+  });
+
+  it('rejects query params whose value is NOT an image format', () => {
+    expect(isDirectImageUrl('https://example.com/img?format=webp2')).toBe(false);
+    expect(isDirectImageUrl('https://example.com/page?type=article')).toBe(false);
+    expect(isDirectImageUrl('https://example.com/api?output=json')).toBe(false);
+    // "format" embedded in an unrelated param name must not match.
+    expect(isDirectImageUrl('https://example.com/img?reformat=jpg')).toBe(false);
+  });
+
+  // ── Negatives: scheme / URI shape ──
+  it('rejects data: URIs (own pipeline stages handle them)', () => {
+    expect(isDirectImageUrl('data:image/png;base64,iVBORw0KGgo=')).toBe(false);
+    expect(isDirectImageUrl('data:image/jpeg;base64,AAAA')).toBe(false);
+  });
+
+  it('rejects non-http(s) schemes', () => {
+    expect(isDirectImageUrl('mailto:someone@example.com')).toBe(false);
+    expect(isDirectImageUrl('javascript:void(0)')).toBe(false);
+    expect(isDirectImageUrl('tel:+15551234567')).toBe(false);
+    expect(isDirectImageUrl('ftp://example.com/photo.jpg')).toBe(false);
+    expect(isDirectImageUrl('chrome://settings')).toBe(false);
+    expect(isDirectImageUrl('blob:https://example.com/abc-123')).toBe(false);
+  });
+
+  it('rejects non-image pathname extensions', () => {
+    expect(isDirectImageUrl('https://example.com/page.html')).toBe(false);
+    expect(isDirectImageUrl('https://example.com/doc.pdf')).toBe(false);
+    expect(isDirectImageUrl('https://example.com/gallery/12345')).toBe(false);
+    expect(isDirectImageUrl('https://example.com/')).toBe(false);
+  });
+
+  it('rejects relative / unparseable inputs', () => {
+    // Relative paths can't be validated (no scheme) — the content stage
+    // always passes browser-resolved absolute URLs, so this is defense
+    // in depth for other callers.
+    expect(isDirectImageUrl('/relative/photo.jpg')).toBe(false);
+    expect(isDirectImageUrl('not a url')).toBe(false);
+    expect(isDirectImageUrl('')).toBe(false);
+  });
+
+  it('rejects a same-document #anchor href', () => {
+    // href="#" resolves to "<page>#", which fails the http(s) check via
+    // the URL parse — pin that trailing-anchor links never match.
+    expect(isDirectImageUrl('https://example.com/page#')).toBe(false);
+  });
+
+  it('does not match the extension mid-path (must END the pathname)', () => {
+    expect(isDirectImageUrl('https://example.com/photo.jpg.html')).toBe(false);
+    expect(isDirectImageUrl('https://example.com/jpg-folder/index')).toBe(false);
   });
 });

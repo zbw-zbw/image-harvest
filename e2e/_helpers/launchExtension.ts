@@ -1,8 +1,13 @@
 // e2e helpers for loading the Image Harvest unpacked extension under
 // Playwright. Chromium only accepts MV3 extensions through
-// launchPersistentContext + the --load-extension flag, and the service
-// worker won't initialize in headless-shell — we use the full headed
-// chromium that `npx playwright install chromium` provides.
+// launchPersistentContext + the --load-extension flag.
+//
+// Headless: with Playwright ≥1.49, `channel: 'chromium'` + `headless: true`
+// runs the FULL Chromium in the new headless mode — extensions, MV3 service
+// workers and chrome.* APIs all work (unlike the old headless-shell binary,
+// which silently never loaded extensions). No window ever appears, so local
+// runs no longer steal focus / spawn a browser on the active display.
+// Set E2E_HEADED=1 to force a visible window when debugging a test.
 //
 // Note about fixtures: content_scripts in manifest.config.ts only match
 // http(s) — file:// pages would never get the extractor injected. We
@@ -58,9 +63,12 @@ export async function launchExtension(): Promise<LaunchedExtension> {
   const userDataDir = mkdtempSync(join(tmpdir(), 'image-harvest-e2e-'));
 
   const context = await chromium.launchPersistentContext(userDataDir, {
-    // Headed mode is mandatory for MV3 service workers under Chromium.
-    // CI uses xvfb-run to provide a virtual display.
-    headless: false,
+    // New headless (full Chromium via channel:'chromium', Playwright ≥1.49)
+    // loads MV3 extensions and boots their service workers fine — and never
+    // shows a window. E2E_HEADED=1 opts back into a visible window for
+    // debugging (also needed for `npm run test:e2e:ui`, which expects to
+    // watch the browser).
+    headless: process.env.E2E_HEADED !== '1',
     channel: 'chromium',
     args: [
       `--disable-extensions-except=${extensionPath}`,

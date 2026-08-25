@@ -16,6 +16,13 @@ import { getAspectRatioCategory } from './utils';
 
 export function applyFilters(options?: { skipScrollReset?: boolean }): void {
   state.filteredImages = state.allImages.filter((img) => {
+    // User-injected items (right-click extract, resolve-originals results)
+    // bypass every content filter. They arrive with unknown size/format
+    // metadata (0×0, format 'unknown' until fetchImageMeta lands), so size /
+    // format filters would silently hide them right after the "added to
+    // results" toast — the explicit user request outranks the filters, same
+    // principle as the visible-only exemption for link-penetrated items.
+    if (img.userInjected) return true;
     return (
       filterByVisibility(img) &&
       filterBySize(img) &&
@@ -251,7 +258,19 @@ export async function refreshVisibility(): Promise<void> {
   }
 
   // Only check non-data-URI images to avoid message size issues.
-  const checkableImages = state.allImages.filter((img) => img.url && !img.url.startsWith('data:'));
+  // Link-penetration items (v1.1.0) are exempt: a link-image original has
+  // no DOM element of its own (its visible flag was inherited from the
+  // inner thumbnail at extract time), and a link-resolved original lives
+  // on a different page entirely. Re-checking either here would find no
+  // local element and wrongly flip visible → false, hiding originals the
+  // link-image stage explicitly surfaced.
+  const checkableImages = state.allImages.filter(
+    (img) =>
+      img.url &&
+      !img.url.startsWith('data:') &&
+      img.type !== 'link-image' &&
+      img.type !== 'link-resolved'
+  );
   if (checkableImages.length === 0) return;
 
   const imageUrls = checkableImages.map((img) => img.url);

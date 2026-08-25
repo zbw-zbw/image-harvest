@@ -10,12 +10,20 @@ export interface ContentState {
   liveObserver: MutationObserver | null;
   /** De-dup set populated during a single extraction pass */
   seenUrls: Set<string>;
+  /**
+   * Gallery-link candidates (thumbnail → detail page) collected by the
+   * link-image stage. Reset at the start of every scan; consumed by the
+   * background's EXTRACT_IMAGES response so the sidepanel can offer the
+   * deep-resolve (og:image) upgrade.
+   */
+  pendingGalleryLinks: string[];
 }
 
 export const state: ContentState = {
   isExtracting: false,
   liveObserver: null,
   seenUrls: new Set<string>(),
+  pendingGalleryLinks: [],
 };
 
 /**

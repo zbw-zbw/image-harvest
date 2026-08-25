@@ -34,6 +34,7 @@ import {
   extractMetaAndLinkImages,
   extractCssContentImages,
   extractLazyLoadImages,
+  extractLinkedImages,
 } from './extract-advanced';
 import { extractFromShadowDom, extractFromIframes } from './shadow-iframe';
 import {
@@ -81,7 +82,10 @@ async function handleMessage(
       const images = await extractImages({
         skipIframes: message.skipIframes as boolean | undefined,
       });
-      sendResponse({ success: true, images });
+      // Gallery-link candidates (thumb → detail page) collected by the
+      // link-image stage ride along on the response so the background /
+      // sidepanel can offer the deep-resolve upgrade without a second scan.
+      sendResponse({ success: true, images, galleryLinks: state.pendingGalleryLinks });
       break;
     }
 
@@ -160,6 +164,7 @@ const EXTRACTION_STAGES: ExtractionStage[] = [
   { name: 'meta-link', run: extractMetaAndLinkImages },
   { name: 'css-content', run: extractCssContentImages },
   { name: 'lazy-load', run: extractLazyLoadImages },
+  { name: 'link-image', run: extractLinkedImages },
   { name: 'shadow-dom', run: extractFromShadowDom },
   { name: 'iframes', run: extractFromIframes, when: (o) => !o.skipIframes },
 ];
@@ -170,6 +175,7 @@ export async function extractImages(options: ExtractOptions = {}): Promise<Image
   }
   state.isExtracting = true;
   state.seenUrls.clear();
+  state.pendingGalleryLinks = [];
 
   try {
     const images = new Map<string, ImageItem>();
