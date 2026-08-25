@@ -58,6 +58,22 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
+## [1.0.18] — 2026-08-25
+
+### 🐛 Fixed
+
+- **Collection export is back**: the "Export as ZIP" button in the Collections modal had silently vanished during a UI-framework migration — clicking Export did nothing. The button (and the batch-download shortcut when rows are selected) is restored.
+
+- **No more false "restricted page" flashes when switching tabs**: the panel briefly cached an empty snapshot of its own tab while booting, which could be mistaken for a restricted-site marker and surface the wrong state when switching back. Empty snapshots are no longer saved.
+
+- **Minor**: the AI-tag filter no longer breaks on cached state that predates the feature; the format-conversion dropdown now closes before the upgrade dialog opens (the menu no longer lingers behind it).
+
+### 🧪 Test Coverage
+
+- **End-to-end suite fully repaired**: all 30 accumulated e2e failures (stale copy expectations, missing visibility flags in test seeds, race conditions, two real product bugs) are fixed — the suite now runs 119/119 green locally and in CI, so regressions actually get caught again.
+
+---
+
 ## [1.0.17] — 2026-08-24
 
 ### 🐛 Fixed
