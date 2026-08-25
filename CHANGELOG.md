@@ -54,7 +54,35 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
-## [Unreleased]
+## [1.1.0] — 2026-08-25
+
+### ✨ Added
+
+- **Link penetration — get the image the link actually points to**: pages full of "thumbnail → full-size" links (the classic Reddit / gallery pattern) no longer stop at the thumbnail. Three layers:
+  - **Direct image links are extracted automatically** (free): `<a href="…jpg">` targets become their own image cards, badged "Linked original", alongside the thumbnail itself — part of every scan, no toggle needed. A visible thumbnail makes its original visible too, so originals survive the default "Visible only" filter.
+  - **Right-click any image or image link** to send it straight to the panel (free): new context-menu items "Extract image" / "Extract linked image" inject the item directly — no full-page scan. If the panel is closed, the item waits and appears on next open.
+  - **Deep resolve for gallery pages** (Pro): when a scan finds thumbnails linking to detail pages, a "Found N gallery links · Resolve originals" bar offers to fetch every detail page and pull its `og:image` original in one click. Click the count to expand the full list of candidate links before resolving. Free tier gets 3 resolves per month (server-adjustable); originals arrive badged "From link".
+
+### 🐛 Fixed
+
+- **Resolved/link-image originals no longer disappear under "Visible only"**: the post-scan visibility re-check looked for each image's DOM element — link targets have none (the URL lives in an `href`, not an `img src`), so freshly extracted originals were wrongly flagged hidden. Link-penetrated items now keep the visibility they inherited from their thumbnail.
+
+- **Right-clicked and resolved images survive panel reloads and rescans**: items injected via the context menu (or pulled in by "Resolve originals") lived only in the panel's memory — reloading the panel, or any background rescan, silently dropped what the user explicitly extracted (and, for resolves, what the monthly quota paid for). Injected items are now flagged, persisted per-tab, and re-merged after every scan or cache restore; deleting one from the grid also removes it for good.
+
+- **"Resolve originals" bar reappears when two scans race the same tab**: when a second scan request arrived while the first was still running, the background's per-tab dedup reused the in-flight result but dropped the second caller's gallery-links callback — the resolve bar never showed on the second panel. Gallery links are now delivered to every concurrent caller.
+
+- **Total resolve failure no longer shows a success toast or burns quota**: when every gallery link failed (anti-bot 4xx, timeout, security guard), the panel reported "Added 0 original images" as success and still counted the attempt against the free monthly quota. A total failure now shows the error toast and doesn't consume the quota.
+
+- **Context-menu titles no longer leak raw `__MSG_…__` placeholders**: menu items were registered with the manifest `__MSG_*__` substitution, which Chrome silently fails to perform on some setups — leaving literal `__MSG_contextExtractLinked__` in the right-click menu. Titles are now resolved through `chrome.i18n.getMessage()` at registration time, with an English fallback for missing keys.
+
+- **Right-clicked images are no longer invisible ghosts under active filters**: injected items arrive with unknown metadata (0×0 size, "unknown" format) until their real dimensions load — any active size/format filter silently swallowed them right after the "added" toast, so the count never moved. Explicitly injected items now bypass content filters (the user's explicit request outranks filtering), and re-right-clicking an image that's already in the results says "Already in the results" instead of silence.
+
+- **Link-sourced images explain themselves**: the "Resolved" badge told users nothing about where an image came from — renamed to "From link" (direct-link originals: "Linked original"), both with tooltips spelling out the source. Ticking such a card now shows "This image came from a link and isn't displayed on the page itself" instead of failing to highlight with no explanation. The gallery-links bar shows what it will actually do, and the found count expands to the candidate link list.
+
+### 🧪 Test Coverage
+
+- **70 new tests** (unit suite now 1620): `isDirectImageUrl` URL matrix, the link-image extraction stage (visibility inheritance, dedup, gallery-candidate collection), the background og:image resolver (meta ladder, security guards, timeouts), the linkResolve monthly quota, injected-item persistence/restore lifecycle, concurrent-scan gallery-links fan-out, and i18n-driven context-menu registration incl. the missing-key fallback. Three new e2e specs (link-image grid behavior, gallery-resolve bar incl. link-list expansion and the failure path, context-menu injection live + queue fallback) bring the browser suite to 124.
+- **e2e now runs headless**: the suite used to open a visible Chromium window per test (stealing focus on every test start); it now uses the new headless mode (full Chromium kernel, Playwright ≥1.49), which supports MV3 extensions and service workers — CI no longer needs xvfb, and the full run is ~2× faster (7.7m vs 16m). `npm run test:e2e:headed` brings the window back when debugging.
 
 ---
 
