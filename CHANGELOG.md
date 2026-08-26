@@ -54,6 +54,42 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
+## [Unreleased]
+
+---
+
+## [1.1.1] — 2026-08-26
+
+### 🐛 Fixed
+
+- **Right-click "Extract image" / "Extract linked image" now open the side panel**: with the panel closed, both context-menu items looked completely dead. The panel-opening call must run while the click's user gesture is still active, but the handler awaited another Chrome API first — the gesture expired, the open call threw, and the error was swallowed. Images actually landed in a silent queue, so they only appeared the next time you opened the panel manually. The open call now fires first (same fix applied to the welcome page's "Try it now" button and the settings' display-mode switch), restoring the intended behavior: right-click → panel pops open with the image already in it.
+
+- **Resolved / right-click images now group with their tab**: images added by "resolve originals" or the right-click extractor carried no tab identity, so the "group by tab" view split one tab into two groups — the page's scanned images under the tab title, and every injected image under a stray untranslated "Current Tab" group. Injected images now carry the owning tab's title and index, legacy persisted ones pick it up on restore, and the last-resort fallback group name is localized ("Unknown tab") instead of hardcoded English.
+
+- **The "found N gallery links" bar no longer disappears after switching tabs**: the candidate list was cleared on every tab load but never cached, so switching to another tab and back left the banner gone until a rescan. Gallery-link candidates are now saved and restored with the tab's image cache, so the bar (and its per-link status dots) survives the round trip.
+
+- **Ticking an off-page image no longer toasts "this image came from a link…"**: selecting a resolved / right-clicked image fired an informational toast every time, because those images have nothing on the page to highlight. Selection is now silent — the card's "from link" badge already explains where the image came from. The duplicate right-click toast was also shortened from "Already in the results — not added again" to "Image already exists".
+
+### 🔄 Changed
+
+- **Gallery-links bar: smoother expand/collapse**: the candidate list now glides open/closed (height + opacity animation) instead of popping in and out, the expander got a rotating chevron matching the group headers, and the "Found N gallery links" title is now visually stronger (hover highlights it instead of underlining).
+
+- **"Resolve originals" now works behind logins**: the deep resolve fetched detail pages without the browser's session cookie (the extension's service worker is a cross-site origin, so the default fetch mode never sent one) — on intranet or login-walled sites every fetch landed on an auth redirect and the whole batch failed. Page fetches now carry the session cookie for links on the site you're browsing (see the Security note below for the scoping), and pages that render client-side get a fourth extraction rung (schema.org JSON-LD `image`) after og:image / twitter:image / image_src.
+
+- **Per-link resolve feedback in the gallery-links bar**: "Resolve failed" was one aggregate toast with no hint of which link failed or why. Each candidate link now shows a status dot after resolving — green (extracted), red (failed, hover shows the reason: unreachable / needs login / no image declared / network timeout) — and the list itself was restyled: links render full-width with a real ellipsis at the edge (the old fixed 72-character cut left the right half of the bar empty), entries are real clickable links, and URLs use a monospace font.
+
+- **Icon-heavy pages no longer look broken in the results list**: pages full of 16×16 base64 SVG glyphs (intrachrome toolbars, sprite sheets) rendered as mostly-empty thumbnail strips that read as broken cards. Small images (≤64px) now get a compact thumbnail, and data-URI images show `data:image/svg+xml;… (size)` in the URL row instead of a wall of base64 (the full value is still on hover / in copy).
+
+### 🔒 Security
+
+- **"Resolve originals" no longer attaches your login cookie to arbitrary links**: the candidate links come from page content, so blanket `credentials: 'include'` would let a hostile page fire credentialed requests at any site you're signed into (CSRF-style, including cookie-guarded intranet GET endpoints). The session cookie is now only attached to links on the same site as the page you're browsing — same-site estates on one domain root (e.g. `*.company.com` intranets, the case this feature was built for) keep working unchanged; everything else resolves anonymously. A whitespace-only image declaration is also rejected instead of injecting the page itself as a bogus "original".
+
+### 🌍 i18n
+
+- 7 new translation keys across all 15 languages for the per-link resolve status tooltips.
+
+---
+
 ## [1.1.0] — 2026-08-25
 
 ### ✨ Added
