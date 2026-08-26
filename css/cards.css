@@ -876,6 +876,18 @@
   box-sizing: border-box;
 }
 
+/* Small icons (≤64px): compact thumb instead of the full-height strip — a
+   16×16 glyph floating in 120–160px of empty checkerboard reads as a broken
+   placeholder. Specificity (.image-card .card-thumb.thumb-small) intentionally
+   outranks both .card-thumb and .list-view .card-thumb. */
+.image-card .card-thumb.thumb-small {
+  height: 64px;
+}
+
+.image-card .card-thumb.thumb-small img {
+  max-height: 56px;
+}
+
 .list-view .card-colors {
   display: flex;
   height: 7px;

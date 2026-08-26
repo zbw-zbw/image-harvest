@@ -212,6 +212,18 @@ export function ImageCard({ img, index }: Props) {
   const format = (img.format || 'unknown').toUpperCase();
   const colors = img.colors || [];
 
+  // Small icons (≤64px: page-chrome glyphs, base64 SVG sprites) get a compact
+  // thumb — a 16×16 glyph centered in a 120/160px strip reads as a broken
+  // placeholder (v1.1.1 smoke on Aone: 108 images, most 16×16 icons).
+  const isSmallIcon = w > 0 && h > 0 && Math.max(w, h) <= 64;
+  // Data URIs carry no readable "URL" — the base64 wall is pure noise in the
+  // URL row. Show the mime prefix + size instead; the full value stays in the
+  // title tooltip and the copy/open actions.
+  const isDataUri = img.url.startsWith('data:');
+  const urlText = isDataUri
+    ? `${img.url.slice(0, img.url.indexOf(';') > 0 ? img.url.indexOf(';') + 1 : 16)}…${size ? ` (${size})` : ''}`
+    : img.url;
+
   // ── Dropup: default to opening upward so the dropdown doesn't cover
   //    the URL-row actions (copy / open-in-new-tab) below the card.
   //    Only fall back to downward when there isn't enough room above. ──
@@ -470,7 +482,7 @@ export function ImageCard({ img, index }: Props) {
       </div>
       <div
         ref={thumbRef as preact.RefObject<HTMLDivElement>}
-        class={`card-thumb checkerboard${isNotScanning ? ' loaded' : ''}`}
+        class={`card-thumb checkerboard${isNotScanning ? ' loaded' : ''}${isSmallIcon ? ' thumb-small' : ''}`}
       >
         <img
           src={img.url}
@@ -666,7 +678,7 @@ export function ImageCard({ img, index }: Props) {
       </div>
       <div class="card-url-row">
         <div class="card-url" title={img.url}>
-          {img.url}
+          {urlText}
         </div>
         <div class="card-url-actions">
           <button

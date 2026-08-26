@@ -90,8 +90,8 @@ test('live CONTEXT_ITEM_INJECTED merge: new item joins the grid with toast; dupl
 
   // Same URL again (user right-clicks an image already in the grid):
   // mergeContextItem dedupes — no growth, and an explicit info toast says
-  // the image is already in the results (silence made the click look
-  // like a failed no-op in smoke testing).
+  // the image already exists (silence made the click look like a failed
+  // no-op in smoke testing; v1.1.1 shortened the wording).
   await sidepanel.evaluate((item: Record<string, unknown>) => {
     const w = window as unknown as {
       __IH__?: { handleMessage: (msg: Record<string, unknown>) => void };
@@ -101,7 +101,7 @@ test('live CONTEXT_ITEM_INJECTED merge: new item joins the grid with toast; dupl
 
   await sidepanel.waitForTimeout(500);
   expect(await sidepanel.locator('#image-grid .image-card').count()).toBe(8);
-  await expect(sidepanel.locator('.toast').last()).toContainText('Already in the results');
+  await expect(sidepanel.locator('.toast').last()).toContainText('Image already exists');
 });
 
 test('closed-panel fallback: pendingContextItems queued in storage.session drain into the grid on boot', async () => {

@@ -65,13 +65,17 @@ test('gallery bar shows the candidate count; resolve click merges originals into
   await expect(bar.locator('.gallery-resolve-bar-toggle')).toContainText('2');
 
   // Expanding the toggle reveals the candidate link list (capped at 20):
-  // fixture has 2 gallery links, both rendered with their (truncated) URL.
+  // fixture has 2 gallery links, rendered as FULL urls inside real anchors
+  // (v1.1.0 round-3: the fixed 72-char cut left the right half empty and
+  // the entries were dead text).
   await bar.locator('.gallery-resolve-bar-toggle').click();
   await expect(bar.locator('.gallery-resolve-links li')).toHaveCount(2);
-  await expect(bar.locator('.gallery-resolve-links li').first()).toContainText('gallery-detail');
-  // Collapse again — the list must not linger.
+  await expect(bar.locator('.gallery-resolve-links li a').first()).toContainText('gallery-detail');
+  // Collapse again — v1.1.1 keeps the list mounted inside a CSS-animated
+  // collapse wrapper (height + opacity glide), so "collapsed" means
+  // "not visible", not "not rendered".
   await bar.locator('.gallery-resolve-bar-toggle').click();
-  await expect(bar.locator('.gallery-resolve-links')).toHaveCount(0);
+  await expect(bar.locator('.gallery-resolve-links')).toBeHidden();
 
   // Intercept RESOLVE_LINK_IMAGES before clicking. The stub records the
   // forwarded URL payload (pins that the bar sends the gallery links, not
@@ -123,6 +127,9 @@ test('gallery bar shows the candidate count; resolve click merges originals into
           images,
           resolved: images.length,
           failed: 0,
+          // Per-link outcomes (v1.1.0 round-3): each entry must light up
+          // its status dot in the expanded candidate list.
+          results: r.urls.map((u: string) => ({ url: u, status: 'resolved' })),
         });
       }
       return original(req, ...rest);
@@ -138,6 +145,13 @@ test('gallery bar shows the candidate count; resolve click merges originals into
     .poll(async () => sidepanel.locator('#image-grid .image-card').count(), { timeout: 15_000 })
     .toBe(9);
   await expect(sidepanel.locator('.link-resolved-badge')).toHaveCount(2);
+
+  // Re-expand the list: every candidate now shows its per-link status dot
+  // (green = resolved).
+  await sidepanel.locator('.gallery-resolve-bar-toggle').click();
+  await expect(sidepanel.locator('.gallery-resolve-dot.is-resolved')).toHaveCount(2);
+  await expect(sidepanel.locator('.gallery-resolve-dot.is-failed')).toHaveCount(0);
+  await sidepanel.locator('.gallery-resolve-bar-toggle').click();
 
   // The bar forwarded exactly the two gallery-detail links from the scan,
   // in DOM order.
@@ -173,6 +187,7 @@ test('total resolve failure → error toast, grid unchanged (no "Added 0" succes
     }
     interface ResolveRequest {
       type?: string;
+      urls?: string[];
     }
     const c = (window as unknown as { chrome: ChromeRuntime }).chrome;
     if (!c.runtime?.sendMessage) return;
@@ -180,7 +195,17 @@ test('total resolve failure → error toast, grid unchanged (no "Added 0" succes
     c.runtime.sendMessage = ((req: unknown, ...rest: unknown[]) => {
       const r = req as ResolveRequest;
       if (r && r.type === 'RESOLVE_LINK_IMAGES') {
-        return Promise.resolve({ success: true, images: [], resolved: 0, failed: 2 });
+        return Promise.resolve({
+          success: true,
+          images: [],
+          resolved: 0,
+          failed: 2,
+          results: (r.urls || []).map((u: string) => ({
+            url: u,
+            status: 'failed',
+            reason: 'no-meta-image',
+          })),
+        });
       }
       return original(req, ...rest);
     }) as typeof c.runtime.sendMessage;
@@ -197,4 +222,14 @@ test('total resolve failure → error toast, grid unchanged (no "Added 0" succes
     .poll(async () => sidepanel.locator('#image-grid .image-card').count(), { timeout: 5_000 })
     .toBe(7);
   await expect(sidepanel.locator('.link-resolved-badge')).toHaveCount(0);
+
+  // Per-link feedback (v1.1.0 round-3): expanding the list shows WHY the
+  // batch failed — red dots with the reason in each dot's title tooltip.
+  await sidepanel.locator('.gallery-resolve-bar-toggle').click();
+  await expect(sidepanel.locator('.gallery-resolve-dot.is-failed')).toHaveCount(2);
+  await expect(sidepanel.locator('.gallery-resolve-dot').first()).toHaveAttribute(
+    'title',
+    /advertises no extractable original/i
+  );
+  await expect(sidepanel.locator('.gallery-resolve-dot.is-resolved')).toHaveCount(0);
 });

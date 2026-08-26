@@ -163,7 +163,7 @@ beforeAll(async () => {
 
   // Import target after chrome global is in place — module top-level
   // runs initialization (initLicenseAlarm + onConnect/onMessage register).
-  await import('../background/index');
+  bgIndex = await import('../background/index');
 });
 
 import { MESSAGE_TYPES, ERROR_CODES } from '../shared/constants';
@@ -174,6 +174,11 @@ import * as bgLicense from '../background/license';
 import * as bgDisplayMode from '../background/display-mode';
 import * as bgExtractor from '../background/extractor';
 import * as bgReverseSearch from '../background/reverse-search';
+// NOTE: background/index is imported dynamically in beforeAll (after the
+// chrome global is installed) — a static import would evaluate its module
+// top-level too early and crash on `chrome is not defined`. Bind exports we
+// need through the same dynamic import.
+let bgIndex: typeof import('../background/index') | null = null;
 
 // Helper: invoke the registered onMessage listener and capture sendResponse.
 async function dispatch(
@@ -911,19 +916,26 @@ describe('handleMessage — RESOLVE_LINK_IMAGES', () => {
       images: [{ url: 'https://example.com/og.jpg' }] as never,
       resolved: 1,
       failed: 0,
+      results: [{ url: 'https://example.com/gallery/1', status: 'resolved' }],
     });
 
     const result = await dispatch({
       type: MESSAGE_TYPES.RESOLVE_LINK_IMAGES,
       urls: ['https://example.com/gallery/1'],
+      sourceUrl: 'https://www.example.com/source',
     });
 
-    expect(spy).toHaveBeenCalledWith(['https://example.com/gallery/1']);
+    // sourceUrl rides along so the resolver can scope the session cookie.
+    expect(spy).toHaveBeenCalledWith(
+      ['https://example.com/gallery/1'],
+      'https://www.example.com/source'
+    );
     expect(result).toEqual({
       success: true,
       images: [{ url: 'https://example.com/og.jpg' }],
       resolved: 1,
       failed: 0,
+      results: [{ url: 'https://example.com/gallery/1', status: 'resolved' }],
     });
     spy.mockRestore();
   });
@@ -932,10 +944,11 @@ describe('handleMessage — RESOLVE_LINK_IMAGES', () => {
     const linkResolver = await import('../background/link-resolver');
     const spy = vi
       .spyOn(linkResolver, 'resolveLinkImages')
-      .mockResolvedValue({ images: [], resolved: 0, failed: 0 });
+      .mockResolvedValue({ images: [], resolved: 0, failed: 0, results: [] });
 
     await dispatch({ type: MESSAGE_TYPES.RESOLVE_LINK_IMAGES });
-    expect(spy).toHaveBeenCalledWith([]);
+    // No sourceUrl in the message → undefined (conservative cookie-less path).
+    expect(spy).toHaveBeenCalledWith([], undefined);
 
     spy.mockRestore();
   });
@@ -1044,6 +1057,128 @@ describe('context menus bootstrap', () => {
     // second (contextExtractLinked) gets the normal marker again.
     expect(titles[0]).toBe('Extract image with Image Harvest');
     expect(titles).toContain('[i18n:contextExtractLinked]');
+  });
+});
+
+describe('buildContextImageItem — tab-metadata stamping (v1.1.1)', () => {
+  // v1.1.1: right-click injected items must carry the owning tab's title /
+  // index so the sidepanel's 'tab' group mode buckets them WITH the tab's
+  // scanned images instead of a hardcoded "Current Tab" fallback group.
+  it('stamps tabTitle + tabIndex + isCurrentTab from the clicked tab', () => {
+    const item = bgIndex!.buildContextImageItem('https://a.com/img.png', 'context-image', {
+      id: 7,
+      title: 'My Gallery — Detail',
+      index: 3,
+    } as chrome.tabs.Tab);
+    expect(item).toMatchObject({
+      tabTitle: 'My Gallery — Detail',
+      tabIndex: 3,
+      isCurrentTab: true,
+      userInjected: true,
+      visible: true,
+    });
+  });
+
+  it('without a tab (title-less edge) leaves tabTitle undefined — group fallback stays localized', () => {
+    const item = bgIndex!.buildContextImageItem('https://a.com/img.png', 'link-image');
+    expect(item.tabTitle).toBeUndefined();
+    expect(item.tabIndex).toBeUndefined();
+    expect(item.isCurrentTab).toBe(true);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// sidePanel.open() user-gesture timing (v1.1.1)
+// ─────────────────────────────────────────────────────────────────────
+
+describe('sidePanel.open() sync-first timing (v1.1.1)', () => {
+  // Chrome's transient user activation does NOT survive an await: if the
+  // handler awaits setOptions (or anything else) before calling open(),
+  // the gesture expires, open() throws "may only be called with a user
+  // gesture", and the right-click menu items / welcome CTA look completely
+  // dead whenever the panel is closed. These tests pin open() to the
+  // SYNCHRONOUS phase of each handler.
+
+  const sidePanelMocks = () => {
+    const c = (globalThis as unknown as { chrome: typeof chrome }).chrome as unknown as {
+      sidePanel: {
+        open: ReturnType<typeof vi.fn>;
+        setOptions: ReturnType<typeof vi.fn>;
+      };
+    };
+    c.sidePanel.open.mockClear();
+    c.sidePanel.setOptions.mockClear();
+    return c;
+  };
+
+  it('context-menu click → open() fires synchronously; setOptions follows async', async () => {
+    const c = sidePanelMocks();
+
+    // Do NOT await the listener — the first assertion must observe the
+    // synchronous phase, before any microtask can run.
+    onContextMenuClick!(
+      {
+        menuItemId: 'ih-context-extract-image',
+        srcUrl: 'https://a.com/pic.png',
+      } as chrome.contextMenus.OnClickData,
+      { id: 7, title: 'Smoke page', index: 0 } as chrome.tabs.Tab
+    );
+
+    // Synchronous phase: open() already invoked — this is exactly what the
+    // old `await setOptions` → `await open` ordering broke.
+    expect(c.sidePanel.open).toHaveBeenCalledWith({ tabId: 7 });
+
+    // Async tail settles: per-tab options are still refreshed afterwards.
+    await new Promise((r) => setTimeout(r, 0));
+    expect(c.sidePanel.setOptions).toHaveBeenCalledWith({
+      tabId: 7,
+      path: 'pages/sidepanel.html',
+      enabled: true,
+    });
+  });
+
+  it('context-menu click with open() rejected → no crash, options still written (queue path delivers)', async () => {
+    const c = sidePanelMocks();
+    c.sidePanel.open.mockRejectedValueOnce(new Error('may only be called with a user gesture'));
+
+    // Direct-image link → no network resolution involved in this path.
+    onContextMenuClick!(
+      {
+        menuItemId: 'ih-context-extract-linked',
+        linkUrl: 'https://a.com/img.png',
+      } as chrome.contextMenus.OnClickData,
+      { id: 9, title: 'Link page', index: 1 } as chrome.tabs.Tab
+    );
+
+    await new Promise((r) => setTimeout(r, 0));
+    // open() failure (restricted page etc.) must not break the handler —
+    // the item still lands via the storage.session queue path.
+    expect(c.sidePanel.setOptions).toHaveBeenCalledWith({
+      tabId: 9,
+      path: 'pages/sidepanel.html',
+      enabled: true,
+    });
+  });
+
+  it('OPEN_SIDE_PANEL (welcome CTA) → open() fires synchronously in the handler prologue', async () => {
+    const c = sidePanelMocks();
+
+    const p = dispatch(
+      { type: MESSAGE_TYPES.OPEN_SIDE_PANEL },
+      { tab: { id: 42 } as chrome.tabs.Tab }
+    );
+
+    // Synchronous phase of the onMessage listener: open() already fired —
+    // awaiting setOptions first would let the gesture expire.
+    expect(c.sidePanel.open).toHaveBeenCalledWith({ tabId: 42 });
+
+    const result = (await p) as { success: boolean };
+    expect(result.success).toBe(true);
+    expect(c.sidePanel.setOptions).toHaveBeenCalledWith({
+      tabId: 42,
+      path: 'pages/sidepanel.html',
+      enabled: true,
+    });
   });
 });
 

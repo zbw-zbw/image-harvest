@@ -1759,9 +1759,6 @@
   "gallery_resolve_links_more": {
     "message": "…ほか{count}件"
   },
-  "toast_not_on_page": {
-    "message": "この画像はリンクから取得したもので、ページ上には表示されていません"
-  },
   "badge_link_image_title": {
     "message": "このサムネイルのリンク先がこの大きな画像を直接指しています"
   },
@@ -1769,6 +1766,30 @@
     "message": "リンク先ページの解析によって追加されました（ページ上には表示されていません）"
   },
   "toast_context_item_duplicate": {
-    "message": "すでに結果に含まれているため、重複追加はしません"
+    "message": "画像は既に存在します"
+  },
+  "gallery_resolve_link_pending": {
+    "message": "未解決です——「オリジナルを解決」をクリックして試してください。"
+  },
+  "gallery_resolve_link_resolved": {
+    "message": "このページからオリジナル画像を抽出しました。"
+  },
+  "gallery_resolve_link_failed_blocked": {
+    "message": "セキュリティポリシーによりリンクをスキップしました（プライベートまたは安全でないアドレス）。"
+  },
+  "gallery_resolve_link_failed_http_error": {
+    "message": "ページにアクセスできません——ログインが必要か、期限切れの可能性があります。"
+  },
+  "gallery_resolve_link_failed_non_html": {
+    "message": "リンク先はウェブページではないため、解決できるものがありません。"
+  },
+  "gallery_resolve_link_failed_no_meta_image": {
+    "message": "ページは読み込まれましたが、抽出可能なオリジナル画像が宣言されていません。"
+  },
+  "gallery_resolve_link_failed_network_error": {
+    "message": "ページの取得中にネットワークエラーまたはタイムアウトが発生しました。"
+  },
+  "group_unknown_tab": {
+    "message": "不明なタブ"
   }
 }

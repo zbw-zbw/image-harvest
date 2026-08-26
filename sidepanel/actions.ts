@@ -47,26 +47,18 @@ export async function toggleSelection(imageId: string): Promise<void> {
   } else {
     state.selectedImages.add(imageId);
     // Free tier: only one image highlighted at a time
-    let highlighted = true;
     if (!state.isProUser && img) {
       // Remove all existing highlights first, then highlight only this one
       removeAllHighlightsOnPage();
-      highlighted = await highlightImageOnPage(img.url);
+      await highlightImageOnPage(img.url);
     } else if (img) {
-      highlighted = await highlightImageOnPage(img.url);
+      await highlightImageOnPage(img.url);
     }
     // Link-penetrated items (right-click extract, resolve originals, link
     // targets) have no DOM element on the page — highlighting them is a
-    // guaranteed no-op. Say so instead of failing silently; otherwise users
-    // tick the card, see nothing light up on the page, and wonder if the
-    // feature is broken.
-    if (
-      img &&
-      !highlighted &&
-      (img.userInjected || img.type === 'link-image' || img.type === 'link-resolved')
-    ) {
-      showToast(t('toast_not_on_page'), 'info');
-    }
+    // guaranteed no-op. Stay silent about it (v1.1.1 feedback: the "not on
+    // the page" toast fired on every tick of such cards and read as noise);
+    // the card badge already explains where these images come from.
   }
 
   // Trigger Proxy set trap so Preact components re-render with updated size

@@ -128,6 +128,26 @@ describe('mergeContextItem', () => {
     // was user-injected, so no per-tab key is written at all.
     expect(sessionStore.has('ih:injected:3')).toBe(false);
   });
+
+  it('stamps tab-grouping metadata — item without tabTitle falls back to the current tab title', () => {
+    // v1.1.1: injected items must land in the OWNING tab's group under the
+    // 'tab' group mode. Live injectors pass tabTitle themselves; legacy
+    // persisted items (pre-v1.1.1) arrive bare and pick up the current
+    // tab's title so they stop bucketing into a "Current Tab" fallback.
+    state.currentTabId = 5;
+    state.currentTabTitle = 'My Gallery Page';
+    state.allImages = [];
+
+    expect(mergeContextItem(injectedItem('https://a.com/legacy.png'))).toBe(true);
+    expect(state.allImages[0]).toMatchObject({
+      tabTitle: 'My Gallery Page',
+      isCurrentTab: true,
+    });
+
+    // An explicit tabTitle (new-style injectors) always wins.
+    mergeContextItem(injectedItem('https://a.com/new.png', { tabTitle: 'Detail page' }));
+    expect(state.allImages[1]).toMatchObject({ tabTitle: 'Detail page', isCurrentTab: true });
+  });
 });
 
 // ─────────────────────────────────────────────────────────────────────

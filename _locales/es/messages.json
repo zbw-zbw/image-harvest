@@ -1762,9 +1762,6 @@
   "gallery_resolve_links_more": {
     "message": "…y {count} más"
   },
-  "toast_not_on_page": {
-    "message": "Esta imagen proviene de un enlace y no se muestra en la propia página"
-  },
   "badge_link_image_title": {
     "message": "El enlace detrás de esta miniatura apunta directamente a esta imagen más grande"
   },
@@ -1772,6 +1769,30 @@
     "message": "Añadido al resolver la página enlazada (no se muestra en la propia página)"
   },
   "toast_context_item_duplicate": {
-    "message": "Ya está en los resultados; no se añade otra vez"
+    "message": "La imagen ya existe"
+  },
+  "gallery_resolve_link_pending": {
+    "message": "Aún sin resolver: pulsa «Resolver originales» para intentarlo."
+  },
+  "gallery_resolve_link_resolved": {
+    "message": "Imagen original extraída de esta página."
+  },
+  "gallery_resolve_link_failed_blocked": {
+    "message": "Enlace omitido por la política de seguridad (dirección privada o no segura)."
+  },
+  "gallery_resolve_link_failed_http_error": {
+    "message": "No se puede acceder a la página: puede requerir inicio de sesión o haber caducado."
+  },
+  "gallery_resolve_link_failed_non_html": {
+    "message": "El destino del enlace no es una página web: no hay nada que resolver."
+  },
+  "gallery_resolve_link_failed_no_meta_image": {
+    "message": "La página cargó, pero no declara ninguna imagen original extraíble."
+  },
+  "gallery_resolve_link_failed_network_error": {
+    "message": "Error de red o tiempo de espera agotado al obtener la página."
+  },
+  "group_unknown_tab": {
+    "message": "Pestaña desconocida"
   }
 }

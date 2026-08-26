@@ -1605,9 +1605,6 @@
   "gallery_resolve_links_more": {
     "message": "…ещё {count}"
   },
-  "toast_not_on_page": {
-    "message": "Это изображение получено из ссылки и не отображается на самой странице"
-  },
   "badge_link_image_title": {
     "message": "Ссылка позади этой миниатюры ведёт напрямую на это увеличенное изображение"
   },
@@ -1615,6 +1612,30 @@
     "message": "Добавлено при разрешении связанной страницы (не отображается на самой странице)"
   },
   "toast_context_item_duplicate": {
-    "message": "Уже есть в результатах — повторно не добавлено"
+    "message": "Изображение уже существует"
+  },
+  "gallery_resolve_link_pending": {
+    "message": "Ещё не разрешено — нажмите «Разрешить оригиналы», чтобы попробовать."
+  },
+  "gallery_resolve_link_resolved": {
+    "message": "Оригинальное изображение извлечено с этой страницы."
+  },
+  "gallery_resolve_link_failed_blocked": {
+    "message": "Ссылка пропущена политикой безопасности (приватный или небезопасный адрес)."
+  },
+  "gallery_resolve_link_failed_http_error": {
+    "message": "Страница недоступна — может требовать входа или уже не существует."
+  },
+  "gallery_resolve_link_failed_non_html": {
+    "message": "Цель ссылки — не веб-страница, разрешать нечего."
+  },
+  "gallery_resolve_link_failed_no_meta_image": {
+    "message": "Страница загрузилась, но не объявляет извлекаемое оригинальное изображение."
+  },
+  "gallery_resolve_link_failed_network_error": {
+    "message": "Сетевая ошибка или тайм-аут при загрузке страницы."
+  },
+  "group_unknown_tab": {
+    "message": "Неизвестная вкладка"
   }
 }

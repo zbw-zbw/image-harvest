@@ -1774,9 +1774,6 @@
   "gallery_resolve_links_more": {
     "message": "…and {count} more"
   },
-  "toast_not_on_page": {
-    "message": "This image came from a link and isn't displayed on the page itself"
-  },
   "badge_link_image_title": {
     "message": "The link behind this thumbnail points directly to this larger image"
   },
@@ -1784,6 +1781,30 @@
     "message": "Added by resolving the linked page (not displayed on the page itself)"
   },
   "toast_context_item_duplicate": {
-    "message": "Already in the results — not added again"
+    "message": "Image already exists"
+  },
+  "gallery_resolve_link_pending": {
+    "message": "Not resolved yet — click \"Resolve originals\" to try."
+  },
+  "gallery_resolve_link_resolved": {
+    "message": "Original image extracted from this page."
+  },
+  "gallery_resolve_link_failed_blocked": {
+    "message": "Link skipped by the security policy (private or unsafe address)."
+  },
+  "gallery_resolve_link_failed_http_error": {
+    "message": "Page unreachable — it may require login or has expired."
+  },
+  "gallery_resolve_link_failed_non_html": {
+    "message": "Link target is not a web page, nothing to resolve."
+  },
+  "gallery_resolve_link_failed_no_meta_image": {
+    "message": "Page loaded, but it advertises no extractable original image."
+  },
+  "gallery_resolve_link_failed_network_error": {
+    "message": "Network error or timeout while fetching the page."
+  },
+  "group_unknown_tab": {
+    "message": "Unknown tab"
   }
 }

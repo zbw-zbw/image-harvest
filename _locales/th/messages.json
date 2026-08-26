@@ -1605,9 +1605,6 @@
   "gallery_resolve_links_more": {
     "message": "…และอีก {count} รายการ"
   },
-  "toast_not_on_page": {
-    "message": "รูปนี้มาจากลิงก์และไม่ได้แสดงบนหน้าเว็บ"
-  },
   "badge_link_image_title": {
     "message": "ลิงก์ที่อยู่หลังรูปขนาดย่อนี้ชี้ตรงไปยังรูปขนาดใหญ่นี้"
   },
@@ -1615,6 +1612,30 @@
     "message": "เพิ่มโดยแก้ไขหน้าที่ลิงก์ไว้ (ไม่ได้แสดงบนหน้าเว็บ)"
   },
   "toast_context_item_duplicate": {
-    "message": "มีในผลลัพธ์อยู่แล้ว — ไม่ได้เพิ่มซ้ำ"
+    "message": "มีรูปภาพนี้อยู่แล้ว"
+  },
+  "gallery_resolve_link_pending": {
+    "message": "ยังไม่ได้แก้ไข — คลิก \"แก้ไขรูปต้นฉบับ\" เพื่อลอง"
+  },
+  "gallery_resolve_link_resolved": {
+    "message": "ดึงรูปต้นฉบับจากหน้านี้แล้ว"
+  },
+  "gallery_resolve_link_failed_blocked": {
+    "message": "ข้ามลิงก์ตามนโยบายความปลอดภัย (ที่อยู่ส่วนตัวหรือไม่ปลอดภัย)"
+  },
+  "gallery_resolve_link_failed_http_error": {
+    "message": "เข้าถึงหน้านี้ไม่ได้ — อาจต้องเข้าสู่ระบบหรือหมดอายุแล้ว"
+  },
+  "gallery_resolve_link_failed_non_html": {
+    "message": "เป้าหมายของลิงก์ไม่ใช่หน้าเว็บ จึงแก้ไขไม่ได้"
+  },
+  "gallery_resolve_link_failed_no_meta_image": {
+    "message": "หน้าโหลดแล้ว แต่ไม่มีรูปต้นฉบับที่ดึงได้ระบุไว้"
+  },
+  "gallery_resolve_link_failed_network_error": {
+    "message": "เกิดข้อผิดพลาดของเครือข่ายหรือหมดเวลาระหว่างดึงหน้าเว็บ"
+  },
+  "group_unknown_tab": {
+    "message": "แท็บที่ไม่รู้จัก"
   }
 }

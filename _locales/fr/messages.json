@@ -1605,9 +1605,6 @@
   "gallery_resolve_links_more": {
     "message": "…et {count} autres"
   },
-  "toast_not_on_page": {
-    "message": "Cette image provient d'un lien et n'est pas affichée sur la page elle-même"
-  },
   "badge_link_image_title": {
     "message": "Le lien derrière cette vignette pointe directement vers cette image plus grande"
   },
@@ -1615,6 +1612,30 @@
     "message": "Ajouté en résolvant la page liée (non affiché sur la page elle-même)"
   },
   "toast_context_item_duplicate": {
-    "message": "Déjà dans les résultats — pas ajouté à nouveau"
+    "message": "L'image existe déjà"
+  },
+  "gallery_resolve_link_pending": {
+    "message": "Pas encore résolu — cliquez sur « Résoudre les originaux »."
+  },
+  "gallery_resolve_link_resolved": {
+    "message": "Image originale extraite de cette page."
+  },
+  "gallery_resolve_link_failed_blocked": {
+    "message": "Lien ignoré par la politique de sécurité (adresse privée ou non fiable)."
+  },
+  "gallery_resolve_link_failed_http_error": {
+    "message": "Page inaccessible — connexion requise ou lien expiré."
+  },
+  "gallery_resolve_link_failed_non_html": {
+    "message": "La cible du lien n'est pas une page web : rien à résoudre."
+  },
+  "gallery_resolve_link_failed_no_meta_image": {
+    "message": "Page chargée, mais aucune image originale extractible n'y est déclarée."
+  },
+  "gallery_resolve_link_failed_network_error": {
+    "message": "Erreur réseau ou délai dépassé lors de la récupération de la page."
+  },
+  "group_unknown_tab": {
+    "message": "Onglet inconnu"
   }
 }

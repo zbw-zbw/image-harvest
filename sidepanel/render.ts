@@ -4,6 +4,7 @@
 // 渲染模块：提供图片卡片渲染、分组渲染等功能
 
 import type { ImageItem } from '../shared/types';
+import { t } from '../shared/i18n';
 import { updateSelectionUI } from './actions';
 import {
   filterByColor,
@@ -197,7 +198,9 @@ export function groupImages(images: ImageItem[], mode: string): ImageGroup[] {
         key =
           img.tabTitle ||
           (img as ImageItem & { sourceTabTitle?: string }).sourceTabTitle ||
-          'Current Tab';
+          // Tab metadata missing (title-less tab) — localized fallback so the
+          // group header never leaks a hardcoded English "Current Tab".
+          t('group_unknown_tab');
         break;
     }
     if (!groups.has(key)) {

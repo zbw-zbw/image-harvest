@@ -35,6 +35,13 @@ export function mergeContextItem(item: ImageItem): boolean {
     // Tag the owning tab so scans never preserve an injected item into
     // another tab's result after a fast tab switch.
     tabId: item.tabId ?? state.currentTabId ?? undefined,
+    // Owning-tab grouping metadata: the 'tab' group mode must bucket
+    // injected items with the tab they belong to, never a nameless
+    // fallback group. New items carry it from the injector; legacy
+    // persisted items (pre-v1.1.1) fall back to the current tab's title.
+    tabTitle: item.tabTitle || state.currentTabTitle || undefined,
+    tabIndex: item.tabIndex,
+    isCurrentTab: item.isCurrentTab ?? true,
     colors: undefined,
     phash: null,
   };

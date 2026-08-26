@@ -108,8 +108,13 @@ interface ContextItemPayload {
   error?: string;
 }
 
-/** Build a single-image item for a URL the user right-clicked. */
-function buildContextImageItem(url: string, type: 'context-image' | 'link-image'): ImageItem {
+/** Build a single-image item for a URL the user right-clicked.
+ * Exported for unit tests (tab-metadata stamping contract). */
+export function buildContextImageItem(
+  url: string,
+  type: 'context-image' | 'link-image',
+  tab?: chrome.tabs.Tab
+): ImageItem {
   return {
     id: generateId(url),
     url,
@@ -125,6 +130,11 @@ function buildContextImageItem(url: string, type: 'context-image' | 'link-image'
     // …and must survive rescans: not part of the page DOM, so the sidepanel
     // persists it per-tab instead of relying on the next scan to find it.
     userInjected: true,
+    // Owning-tab metadata: the 'tab' group mode must show injected items in
+    // the tab they were extracted from, not a nameless fallback bucket.
+    tabTitle: tab?.title || undefined,
+    tabIndex: tab?.index,
+    isCurrentTab: true,
   } as ImageItem;
 }
 
@@ -162,19 +172,25 @@ async function handleContextMenuClick(
   const tabId = tab?.id;
   if (tabId === undefined) return;
 
-  // Open the panel FIRST, while the user-gesture context is still fresh —
-  // chrome.sidePanel.open() must run inside a gesture handler. Resolution
-  // work happens after, so the panel is already booting to receive the item.
+  // Open the panel while the click's user gesture is still valid. Chrome's
+  // transient activation does NOT survive an await — the previous
+  // `await setOptions` → `await open` ordering expired the gesture, made
+  // open() throw "may only be called with a user gesture", and the context
+  // menu items looked dead whenever the panel was closed (v1.1.1 bug).
+  // open() resolves its path from the manifest's side_panel.default_path,
+  // so it fires synchronously first; per-tab options are refreshed after.
   try {
+    void chrome.sidePanel.open({ tabId }).catch(() => {
+      /* restricted page etc. — item still lands via the session queue */
+    });
     await chrome.sidePanel.setOptions({ tabId, path: 'pages/sidepanel.html', enabled: true });
-    await chrome.sidePanel.open({ tabId });
   } catch {
-    /* restricted page etc. — still queue the item via storage.session */
+    /* options write may fail on restricted tabs — the queue path still delivers */
   }
 
   if (info.menuItemId === CONTEXT_MENU_EXTRACT_IMAGE) {
     if (info.srcUrl) {
-      await injectContextItem({ item: buildContextImageItem(info.srcUrl, 'context-image') });
+      await injectContextItem({ item: buildContextImageItem(info.srcUrl, 'context-image', tab) });
     }
     return;
   }
@@ -182,13 +198,20 @@ async function handleContextMenuClick(
   if (info.menuItemId === CONTEXT_MENU_EXTRACT_LINKED) {
     if (!info.linkUrl) return;
     if (isDirectImageUrl(info.linkUrl)) {
-      await injectContextItem({ item: buildContextImageItem(info.linkUrl, 'link-image') });
+      await injectContextItem({ item: buildContextImageItem(info.linkUrl, 'link-image', tab) });
       return;
     }
     // Non-image link — try to pull its og:image original via deep resolution.
     const { images } = await resolveLinkImages([info.linkUrl]);
     if (images.length > 0) {
-      await injectContextItem({ item: images[0] });
+      await injectContextItem({
+        item: {
+          ...images[0],
+          tabTitle: tab?.title || undefined,
+          tabIndex: tab?.index,
+          isCurrentTab: true,
+        },
+      });
     } else {
       await injectContextItem({ error: 'resolve_failed' });
     }
@@ -393,18 +416,21 @@ async function handleMessage(
       // side panel on its own tab. sendMessage preserves the user-gesture
       // context (Chrome 116+), which chrome.sidePanel.open() requires.
       case MESSAGE_TYPES.OPEN_SIDE_PANEL: {
+        const tabId = sender.tab?.id;
+        if (!tabId) {
+          sendResponse({ success: false, error: 'no_tab' });
+          break;
+        }
+        // Sync-first open (v1.1.1): the gesture carried by sendMessage only
+        // survives the synchronous call stack — awaiting setOptions first
+        // let it expire, so open() threw and the CTA silently did nothing.
+        void chrome.sidePanel.open({ tabId }).catch(() => {});
         try {
-          const tabId = sender.tab?.id;
-          if (!tabId) {
-            sendResponse({ success: false, error: 'no_tab' });
-            break;
-          }
           await chrome.sidePanel.setOptions({
             tabId,
             path: 'pages/sidepanel.html',
             enabled: true,
           });
-          await chrome.sidePanel.open({ tabId });
           sendResponse({ success: true });
         } catch (error) {
           sendResponse({ success: false, error: (error as Error).message });
@@ -499,6 +525,19 @@ async function handleMessage(
         break;
 
       case MESSAGE_TYPES.SET_DISPLAY_MODE: {
+        // v1.1.1: fire sidePanel.open() in the synchronous phase of this
+        // handler while the settings-page click's user gesture is still
+        // valid — every await below (settings read/write, popup/behavior
+        // flips) would expire it and open() would throw "no user gesture",
+        // leaving the mode switched but the panel never shown.
+        const openPanelPromise =
+          message.useSidePanel === true && message.openSidePanel === true && message.tabId != null
+            ? chrome.sidePanel.open({ tabId: message.tabId as number }).catch(() => {
+                // Expected when the gesture chain was broken upstream
+                // (e.g. toggled programmatically) — harmless, the mode
+                // switch itself still completes below.
+              })
+            : null;
         try {
           const useSidePanel = message.useSidePanel as boolean;
           const currentSettings = await getAppSettings();
@@ -520,7 +559,7 @@ async function handleMessage(
                   path: 'pages/sidepanel.html',
                   enabled: true,
                 });
-                await chrome.sidePanel.open({ tabId: message.tabId as number });
+                await openPanelPromise;
               } catch {
                 // sidePanel.open may fail if no user gesture.
               }
@@ -921,9 +960,14 @@ async function handleMessage(
 
       // Deep link-resolution (v1.1.0): fetch detail pages, pull og:image.
       // Quota gating / telemetry live in the sidepanel — this route is pure.
+      // message.sourceUrl (the browsed page) scopes which links may carry
+      // the session cookie; absent → cross-site fallback (no cookies).
       case MESSAGE_TYPES.RESOLVE_LINK_IMAGES: {
         try {
-          const result = await resolveLinkImages((message.urls as string[]) || []);
+          const result = await resolveLinkImages(
+            (message.urls as string[]) || [],
+            typeof message.sourceUrl === 'string' ? message.sourceUrl : undefined
+          );
           sendResponse({ success: true, ...result });
         } catch (resolveError) {
           sendResponse({ success: false, error: (resolveError as Error).message });

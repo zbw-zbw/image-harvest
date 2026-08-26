@@ -7,7 +7,7 @@
 //     * 'domain' : URL hostname; data:/blob:/parse-fail → 'Other'
 //     * 'format' : (img.format || 'unknown').toUpperCase()
 //     * 'size'   : delegates to getSizeCategory(w, h)
-//     * 'tab'    : img.tabTitle || sourceTabTitle || 'Current Tab'
+//     * 'tab'    : img.tabTitle || sourceTabTitle || t('group_unknown_tab')
 //     * unknown mode (anything else) → all images bucketed as 'Other'
 //   - groupImages — sort contract
 //     * mode === 'tab'  → ascending by tabIndex
@@ -225,7 +225,7 @@ describe("groupImages — mode='tab'", () => {
     expect(groups.map((g) => g.name)).toEqual(['Page A', 'Page B']);
   });
 
-  it('falls back to sourceTabTitle, then to "Current Tab"', () => {
+  it('falls back to sourceTabTitle, then to the localized unknown-tab name', () => {
     const groups = groupImages(
       [
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -235,7 +235,9 @@ describe("groupImages — mode='tab'", () => {
       'tab'
     );
     const names = groups.map((g) => g.name).sort();
-    expect(names).toEqual(['Current Tab', 'From source']);
+    // t() defaults to the en catalogue in tests — 'Unknown tab' pins that
+    // the fallback is localized, not the old hardcoded 'Current Tab'.
+    expect(names).toEqual(['From source', 'Unknown tab']);
   });
 
   it("sorts by tabIndex ascending (NOT by image count) — preserves the user's tab order", () => {

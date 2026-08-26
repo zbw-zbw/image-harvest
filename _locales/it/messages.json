@@ -1605,9 +1605,6 @@
   "gallery_resolve_links_more": {
     "message": "…e altri {count}"
   },
-  "toast_not_on_page": {
-    "message": "Questa immagine proviene da un link e non è mostrata nella pagina stessa"
-  },
   "badge_link_image_title": {
     "message": "Il collegamento dietro questa miniatura punta direttamente a questa immagine più grande"
   },
@@ -1615,6 +1612,30 @@
     "message": "Aggiunto risolvendo la pagina collegata (non mostrato nella pagina stessa)"
   },
   "toast_context_item_duplicate": {
-    "message": "Già presente nei risultati — non aggiunto di nuovo"
+    "message": "L'immagine esiste già"
+  },
+  "gallery_resolve_link_pending": {
+    "message": "Non ancora risolto: premi «Risolvi originali» per provare."
+  },
+  "gallery_resolve_link_resolved": {
+    "message": "Immagine originale estratta da questa pagina."
+  },
+  "gallery_resolve_link_failed_blocked": {
+    "message": "Link saltato dai criteri di sicurezza (indirizzo privato o non sicuro)."
+  },
+  "gallery_resolve_link_failed_http_error": {
+    "message": "Pagina non raggiungibile: potrebbe richiedere l'accesso o essere scaduta."
+  },
+  "gallery_resolve_link_failed_non_html": {
+    "message": "La destinazione del link non è una pagina web: niente da risolvere."
+  },
+  "gallery_resolve_link_failed_no_meta_image": {
+    "message": "Pagina caricata, ma non dichiara alcuna immagine originale estraibile."
+  },
+  "gallery_resolve_link_failed_network_error": {
+    "message": "Errore di rete o timeout durante il recupero della pagina."
+  },
+  "group_unknown_tab": {
+    "message": "Scheda sconosciuta"
   }
 }

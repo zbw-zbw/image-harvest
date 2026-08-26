@@ -87,11 +87,19 @@
 
 ---
 
-## 🆕 What's New (v1.0.17)
+## 🆕 What's New (v1.1.1)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
-- **🐛 Telemetry Version Fix** — side-panel events (the majority of all usage events) previously shipped with version `0.0.0`, making version-based analysis blind. The side panel now reads the extension version from the manifest at runtime.
+- **🐛 Right-click extraction now pops the panel open** — with the side panel closed, "Extract image" / "Extract linked image" looked completely dead. They now open the panel with the image already in it (same fix for the welcome page's "Try it now" button).
+- **🐛 Injected images group with their tab** — "group by tab" no longer splits one tab into two groups with a stray untranslated "Current Tab" bucket; resolved / right-clicked images carry their tab's identity.
+- **🐛 Gallery-links bar survives tab switches** — the "Found N gallery links" banner no longer disappears when you switch to another tab and back.
+- **🐛 Quieter selection** — ticking an off-page image no longer fires an informational toast every time; the duplicate-extract toast is now simply "Image already exists".
+- **🔄 "Resolve originals" works behind logins** — detail pages are now fetched with your session cookie (scoped to the site you're browsing) and client-rendered pages get a JSON-LD extraction rung, so intranet / login-walled galleries resolve instead of failing wholesale.
+- **🔄 Per-link resolve feedback** — every candidate link shows a status dot after resolving: green (extracted) or red (failed — hover for the reason). The link list itself was restyled with full-width ellipsized, clickable, monospace entries.
+- **🔄 Smoother gallery-links expand/collapse** — the candidate list glides open/closed with a rotating chevron instead of popping in and out.
+- **🔄 Icon-heavy pages look right** — tiny glyphs (≤64px) get a compact thumbnail and data-URI images show a short `data:image/svg+xml;… (size)` label instead of a wall of base64.
+- **🔒 Cookie safety** — the session cookie is only attached to links on the same site as the page you're browsing; everything else resolves anonymously (blocks hostile pages from firing credentialed requests at sites you're signed into).
 
 ---
 

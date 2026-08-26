@@ -1605,9 +1605,6 @@
   "gallery_resolve_links_more": {
     "message": "…e mais {count}"
   },
-  "toast_not_on_page": {
-    "message": "Esta imagem veio de um link e não é exibida na própria página"
-  },
   "badge_link_image_title": {
     "message": "O link atrás desta miniatura aponta diretmente para esta imagem maior"
   },
@@ -1615,6 +1612,30 @@
     "message": "Adicionado ao resolver a página vinculada (não exibido na própria página)"
   },
   "toast_context_item_duplicate": {
-    "message": "Já está nos resultados — não adicionado novamente"
+    "message": "A imagem já existe"
+  },
+  "gallery_resolve_link_pending": {
+    "message": "Ainda não resolvido — clique em \"Resolver originais\" para tentar."
+  },
+  "gallery_resolve_link_resolved": {
+    "message": "Imagem original extraída desta página."
+  },
+  "gallery_resolve_link_failed_blocked": {
+    "message": "Link ignorado pela política de segurança (endereço privado ou não seguro)."
+  },
+  "gallery_resolve_link_failed_http_error": {
+    "message": "Página inacessível — pode exigir login ou ter expirado."
+  },
+  "gallery_resolve_link_failed_non_html": {
+    "message": "O destino do link não é uma página web: nada a resolver."
+  },
+  "gallery_resolve_link_failed_no_meta_image": {
+    "message": "A página carregou, mas não declara nenhuma imagem original extraível."
+  },
+  "gallery_resolve_link_failed_network_error": {
+    "message": "Erro de rede ou tempo limite ao buscar a página."
+  },
+  "group_unknown_tab": {
+    "message": "Aba desconhecida"
   }
 }

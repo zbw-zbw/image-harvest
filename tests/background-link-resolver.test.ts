@@ -309,7 +309,7 @@ describe('resolveLinkImages — batch semantics', () => {
   it('empty input → zeroed result', async () => {
     stubFetch([]);
     const result = await resolveLinkImages([]);
-    expect(result).toEqual({ images: [], resolved: 0, failed: 0 });
+    expect(result).toEqual({ images: [], resolved: 0, failed: 0, results: [] });
   });
 
   it('dedups identical og:image URLs across different detail pages', async () => {
@@ -376,7 +376,43 @@ describe('resolveLinkImages — batch semantics', () => {
     ]);
   });
 
-  it('sends an Accept: text/html header on every fetch', async () => {
+  it('sends Accept: text/html and credentials: include for same-site links (session cookie)', async () => {
+    const fetchMock = stubFetch([
+      [
+        'https://example.com/page',
+        makeResponse('<meta property="og:image" content="https://cdn.example.com/og.jpg">'),
+      ],
+    ]);
+
+    // Same approximate registrable domain (www.example.com ↔ example.com),
+    // mirroring the intranet estate case: *.alibaba-inc.com ↔ *.alibaba-inc.com.
+    await resolveLinkImages(['https://example.com/page'], 'https://www.example.com/browse');
+    const init = fetchMock.mock.calls[0][1] as RequestInit | undefined;
+    expect((init?.headers as Record<string, string>)['Accept']).toContain('text/html');
+    // credentials: 'include' — intranet/auth-walled pages need the session
+    // cookie; the default 'same-origin' never sends it cross-site from the
+    // chrome-extension:// service-worker origin (v1.1.0 smoke: Aone resolve
+    // always failed because every fetch landed on an auth redirect).
+    expect(init?.credentials).toBe('include');
+  });
+
+  it('sends credentials: same-origin for cross-site links (cookie-scoping)', async () => {
+    // A hostile page can plant third-party/intranet links among the
+    // candidates — those must NOT ride the user's session cookie
+    // (CSRF-style credentialed-GET surface, security review M-1).
+    const fetchMock = stubFetch([
+      [
+        'https://internal.company.com/export',
+        makeResponse('<meta property="og:image" content="https://cdn.company.com/og.jpg">'),
+      ],
+    ]);
+
+    await resolveLinkImages(['https://internal.company.com/export'], 'https://evil.com/bait');
+    const init = fetchMock.mock.calls[0][1] as RequestInit | undefined;
+    expect(init?.credentials).toBe('same-origin');
+  });
+
+  it('sends credentials: same-origin when no sourceUrl is given (conservative fallback)', async () => {
     const fetchMock = stubFetch([
       [
         'https://example.com/page',
@@ -386,6 +422,212 @@ describe('resolveLinkImages — batch semantics', () => {
 
     await resolveLinkImages(['https://example.com/page']);
     const init = fetchMock.mock.calls[0][1] as RequestInit | undefined;
-    expect((init?.headers as Record<string, string>)['Accept']).toContain('text/html');
+    expect(init?.credentials).toBe('same-origin');
+  });
+
+  it('treats multi-label public suffixes as separate sites (a.co.uk vs b.co.uk)', async () => {
+    const fetchMock = stubFetch([
+      [
+        'https://shop.a.co.uk/item',
+        makeResponse('<meta property="og:image" content="https://cdn.co.uk/og.jpg">'),
+      ],
+    ]);
+
+    await resolveLinkImages(['https://shop.a.co.uk/item'], 'https://evil.b.co.uk/bait');
+    const init = fetchMock.mock.calls[0][1] as RequestInit | undefined;
+    expect(init?.credentials).toBe('same-origin');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// JSON-LD fallback: 4th rung after og:image → twitter:image → image_src
+// (SPA pages ship no og:image in server HTML but often embed ld+json)
+// ─────────────────────────────────────────────────────────────────────
+
+describe('resolveLinkImages — JSON-LD image fallback', () => {
+  it('falls back to ld+json image (string form) when no meta tags exist', async () => {
+    stubFetch([
+      [
+        'https://example.com/spa',
+        makeResponse(
+          '<html><head><script type="application/ld+json">{"@type":"ImageObject","image":"https://cdn.example.com/jsonld.jpg"}</script></head></html>'
+        ),
+      ],
+    ]);
+
+    const result = await resolveLinkImages(['https://example.com/spa']);
+    expect(result.resolved).toBe(1);
+    expect(result.images[0].url).toBe('https://cdn.example.com/jsonld.jpg');
+  });
+
+  it('handles the ImageObject form { image: { url } }', async () => {
+    stubFetch([
+      [
+        'https://example.com/spa',
+        makeResponse(
+          '<script type="application/ld+json">{"image":{"url":"https://cdn.example.com/object.jpg"}}</script>'
+        ),
+      ],
+    ]);
+
+    const result = await resolveLinkImages(['https://example.com/spa']);
+    expect(result.resolved).toBe(1);
+    expect(result.images[0].url).toBe('https://cdn.example.com/object.jpg');
+  });
+
+  it('handles @graph arrays and image arrays (first usable entry wins)', async () => {
+    stubFetch([
+      [
+        'https://example.com/spa',
+        makeResponse(
+          '<script type="application/ld+json">{"@graph":[{"@type":"WebSite"},{"image":[{"url":"https://cdn.example.com/graph-1.jpg"},{"url":"https://cdn.example.com/graph-2.jpg"}]}]}</script>'
+        ),
+      ],
+    ]);
+
+    const result = await resolveLinkImages(['https://example.com/spa']);
+    expect(result.resolved).toBe(1);
+    expect(result.images[0].url).toBe('https://cdn.example.com/graph-1.jpg');
+  });
+
+  it('skips malformed ld+json blocks and still finds a later valid one', async () => {
+    stubFetch([
+      [
+        'https://example.com/spa',
+        makeResponse(
+          '<script type="application/ld+json">{broken json}</script>' +
+            '<script type="application/ld+json">{"image":"https://cdn.example.com/valid.jpg"}</script>'
+        ),
+      ],
+    ]);
+
+    const result = await resolveLinkImages(['https://example.com/spa']);
+    expect(result.resolved).toBe(1);
+    expect(result.images[0].url).toBe('https://cdn.example.com/valid.jpg');
+  });
+
+  it('og:image still wins over ld+json (priority order unchanged)', async () => {
+    stubFetch([
+      [
+        'https://example.com/spa',
+        makeResponse(
+          '<meta property="og:image" content="https://cdn.example.com/og.jpg">' +
+            '<script type="application/ld+json">{"image":"https://cdn.example.com/jsonld.jpg"}</script>'
+        ),
+      ],
+    ]);
+
+    const result = await resolveLinkImages(['https://example.com/spa']);
+    expect(result.images[0].url).toBe('https://cdn.example.com/og.jpg');
+  });
+
+  it('ld+json without an image field → no-meta-image failure', async () => {
+    stubFetch([
+      [
+        'https://example.com/spa',
+        makeResponse(
+          '<script type="application/ld+json">{"@type":"WebPage","name":"Home"}</script>'
+        ),
+      ],
+    ]);
+
+    const result = await resolveLinkImages(['https://example.com/spa']);
+    expect(result.resolved).toBe(0);
+    expect(result.failed).toBe(1);
+    expect(result.results[0].reason).toBe('no-meta-image');
+  });
+
+  it('rejects a whitespace-only og:image instead of resolving the page itself', async () => {
+    // `new URL(' ', pageUrl)` parses to the PAGE (WHATWG strips the space),
+    // which would inject a fake "original" pointing at the HTML document.
+    stubFetch([
+      ['https://example.com/page', makeResponse('<meta property="og:image" content=" ">')],
+    ]);
+
+    const result = await resolveLinkImages(['https://example.com/page']);
+    expect(result.resolved).toBe(0);
+    expect(result.failed).toBe(1);
+    expect(result.results[0].reason).toBe('no-meta-image');
+    expect(result.images).toHaveLength(0);
+  });
+
+  it('rejects a whitespace-only JSON-LD image instead of resolving the page itself', async () => {
+    stubFetch([
+      [
+        'https://example.com/spa',
+        makeResponse(
+          '<script type="application/ld+json">{"@type":"ImageObject","image":" "}</script>'
+        ),
+      ],
+    ]);
+
+    const result = await resolveLinkImages(['https://example.com/spa']);
+    expect(result.resolved).toBe(0);
+    expect(result.failed).toBe(1);
+    expect(result.results[0].reason).toBe('no-meta-image');
+    expect(result.images).toHaveLength(0);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// Per-link outcome reporting (v1.1.0 smoke: "resolve failed" must say
+// WHICH link failed and WHY — not one aggregate number)
+// ─────────────────────────────────────────────────────────────────────
+
+describe('resolveLinkImages — per-link results', () => {
+  it('reports status + reason per link across a mixed batch', async () => {
+    stubFetch([
+      [
+        'https://example.com/ok',
+        makeResponse('<meta property="og:image" content="https://cdn.example.com/ok.jpg">'),
+      ],
+      ['https://example.com/none', makeResponse('<p>no meta anywhere</p>')],
+      ['https://example.com/err', makeResponse('nope', { status: 502 })],
+    ]);
+
+    const result = await resolveLinkImages([
+      'https://example.com/ok',
+      'https://example.com/none',
+      'https://example.com/err',
+    ]);
+
+    expect(result.results).toHaveLength(3);
+    expect(result.results[0]).toMatchObject({ url: 'https://example.com/ok', status: 'resolved' });
+    expect(result.results[1]).toMatchObject({
+      url: 'https://example.com/none',
+      status: 'failed',
+      reason: 'no-meta-image',
+    });
+    expect(result.results[2]).toMatchObject({
+      url: 'https://example.com/err',
+      status: 'failed',
+      reason: 'http-error',
+    });
+  });
+
+  it('network errors surface as reason: network-error', async () => {
+    const fetchMock = vi.fn(async () => {
+      throw new TypeError('Failed to fetch');
+    });
+    vi.stubGlobal('fetch', fetchMock);
+
+    const result = await resolveLinkImages(['https://example.com/down']);
+    expect(result.failed).toBe(1);
+    expect(result.results[0]).toMatchObject({
+      url: 'https://example.com/down',
+      status: 'failed',
+      reason: 'network-error',
+    });
+  });
+
+  it('SSRF-guard rejections surface as reason: blocked', async () => {
+    // No fetch stub needed — the URL is rejected before any network call.
+    const result = await resolveLinkImages(['http://127.0.0.1:8080/admin']);
+    expect(result.failed).toBe(1);
+    expect(result.results[0]).toMatchObject({
+      url: 'http://127.0.0.1:8080/admin',
+      status: 'failed',
+      reason: 'blocked',
+    });
   });
 });

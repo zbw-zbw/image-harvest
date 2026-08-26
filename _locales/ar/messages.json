@@ -1605,9 +1605,6 @@
   "gallery_resolve_links_more": {
     "message": "…و{count} أخرى"
   },
-  "toast_not_on_page": {
-    "message": "هذه الصورة مأخوذة من رابط ولا تظهر في الصفحة نفسها"
-  },
   "badge_link_image_title": {
     "message": "الرابط خلف هذه الصورة المصغّرة يشير مباشرة إلى هذه الصورة الأكبر"
   },
@@ -1615,6 +1612,30 @@
     "message": "أُضيفت عن طريق تحليل الصفحة المرتبطة (لا تظهر في الصفحة نفسها)"
   },
   "toast_context_item_duplicate": {
-    "message": "الصورة موجودة بالفعل في النتائج — لم تتم إضافتها مرة أخرى"
+    "message": "الصورة موجودة بالفعل"
+  },
+  "gallery_resolve_link_pending": {
+    "message": "لم يتم التحليل بعد — انقر على \"استخراج الصور الأصلية\" للمحاولة."
+  },
+  "gallery_resolve_link_resolved": {
+    "message": "تم استخراج الصورة الأصلية من هذه الصفحة."
+  },
+  "gallery_resolve_link_failed_blocked": {
+    "message": "تم تخطي الرابط بواسطة سياسة الأمان (عنوان خاص أو غير موثوق)."
+  },
+  "gallery_resolve_link_failed_http_error": {
+    "message": "تعذر الوصول إلى الصفحة — قد تتطلب تسجيل الدخول أو انتهت صلاحيتها."
+  },
+  "gallery_resolve_link_failed_non_html": {
+    "message": "هدف الرابط ليس صفحة ويب، فلا يمكن تحليله."
+  },
+  "gallery_resolve_link_failed_no_meta_image": {
+    "message": "تم تحميل الصفحة، لكنها لا تعلن عن صورة أصلية قابلة للاستخراج."
+  },
+  "gallery_resolve_link_failed_network_error": {
+    "message": "حدث خطأ في الشبكة أو انتهت المهلة أثناء جلب الصفحة."
+  },
+  "group_unknown_tab": {
+    "message": "علامة تبويب غير معروفة"
   }
 }

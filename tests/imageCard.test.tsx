@@ -90,6 +90,41 @@ describe('ImageCard – rendering', () => {
     expect(thumb!.getAttribute('src')).toBe('https://x.test/y.png');
   });
 
+  it('shows a compact thumb for small icons (≤64px) instead of the full-height strip', () => {
+    // Aone smoke: pages full of 16×16 base64 SVG glyphs rendered as mostly
+    // empty 120/160px strips — visually indistinguishable from broken cards.
+    const small = makeImage({
+      url: 'https://x.test/icon.svg',
+      naturalWidth: 16,
+      naturalHeight: 16,
+    });
+    const { container } = render(<ImageCard img={small} index={0} />);
+    expect(container.querySelector('.card-thumb.thumb-small')).toBeInTheDocument();
+
+    const normal = makeImage({
+      url: 'https://x.test/photo.jpg',
+      naturalWidth: 800,
+      naturalHeight: 600,
+    });
+    const { container: c2 } = render(<ImageCard img={normal} index={0} />);
+    expect(c2.querySelector('.card-thumb.thumb-small')).toBeNull();
+  });
+
+  it('renders data-URI urls as mime prefix + size, keeping the full value in title', () => {
+    const img = makeImage({
+      url: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciLz4=',
+      format: 'svg',
+      estimatedSize: 457,
+      naturalWidth: 16,
+      naturalHeight: 16,
+    });
+    const { container } = render(<ImageCard img={img} index={0} />);
+    const urlEl = container.querySelector('.card-url')!;
+    expect(urlEl.textContent).toBe('data:image/svg+xml;… (457 B)');
+    // Full value stays one hover away (tooltip) for copy/inspection.
+    expect(urlEl.getAttribute('title')).toBe(img.url);
+  });
+
   it('renders color swatches when colors are present', () => {
     const img = makeImage({ colors: ['#ff0000', '#00ff00', '#0000ff'] });
     const { container } = render(<ImageCard img={img} index={0} />);

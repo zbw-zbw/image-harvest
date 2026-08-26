@@ -1605,9 +1605,6 @@
   "gallery_resolve_links_more": {
     "message": "…en nog {count}"
   },
-  "toast_not_on_page": {
-    "message": "Deze afbeelding komt uit een link en wordt niet op de pagina zelf weergegeven"
-  },
   "badge_link_image_title": {
     "message": "De link achter deze miniatuur wijst direct naar deze grotere afbeelding"
   },
@@ -1615,6 +1612,30 @@
     "message": "Toegevoegd door de gelinkte pagina op te lossen (niet zichtbaar op de pagina zelf)"
   },
   "toast_context_item_duplicate": {
-    "message": "Staat al in de resultaten — niet opnieuw toegevoegd"
+    "message": "Afbeelding bestaat al"
+  },
+  "gallery_resolve_link_pending": {
+    "message": "Nog niet opgelost — klik op \"Originelen ophalen\" om het te proberen."
+  },
+  "gallery_resolve_link_resolved": {
+    "message": "Originele afbeelding uit deze pagina gehaald."
+  },
+  "gallery_resolve_link_failed_blocked": {
+    "message": "Link overgeslagen door het beveiligingsbeleid (privé of onveilig adres)."
+  },
+  "gallery_resolve_link_failed_http_error": {
+    "message": "Pagina niet bereikbaar — mogelijk aanmelding vereist of verlopen."
+  },
+  "gallery_resolve_link_failed_non_html": {
+    "message": "Het linkdoel is geen webpagina — niets op te lossen."
+  },
+  "gallery_resolve_link_failed_no_meta_image": {
+    "message": "Pagina geladen, maar meldt geen extraheerbaar origineel afbeelding."
+  },
+  "gallery_resolve_link_failed_network_error": {
+    "message": "Netwerkfout of time-out bij het ophalen van de pagina."
+  },
+  "group_unknown_tab": {
+    "message": "Onbekend tabblad"
   }
 }

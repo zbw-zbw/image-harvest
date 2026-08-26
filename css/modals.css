@@ -1513,12 +1513,13 @@
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 5px;
+  gap: 6px;
   padding: 0;
   border: none;
   background: none;
-  color: var(--text-secondary);
+  color: var(--text-primary);
   font-size: inherit;
+  font-weight: 500;
   font-family: inherit;
   line-height: 1.35;
   text-align: left;
@@ -1526,13 +1527,39 @@
 }
 
 .gallery-resolve-bar-toggle:hover {
-  color: var(--text-primary);
-  text-decoration: underline;
+  color: var(--primary-color);
 }
 
+.gallery-resolve-bar-toggle:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Chevron (v1.1.1): an inline SVG that rotates 90° with a smooth
+   transition — same affordance as the image-group headers, replacing the
+   glyph-swapped ▸/▾ text that read as a stray character. */
 .gallery-resolve-caret {
-  font-size: 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  width: 16px;
+  height: 16px;
   color: var(--text-tertiary, var(--text-secondary));
+  transition:
+    transform 0.2s ease,
+    color 0.2s ease;
+}
+
+.gallery-resolve-caret svg {
+  width: 11px;
+  height: 11px;
+}
+
+.gallery-resolve-caret.open {
+  transform: rotate(90deg);
+  color: var(--primary-color);
 }
 
 .gallery-resolve-hint {
@@ -1542,31 +1569,99 @@
   line-height: 1.4;
 }
 
+/* Expand/collapse animation (v1.1.1): the link list stays mounted inside
+   this wrapper; grid-template-rows 0fr↔1fr animates its height without JS
+   measuring, opacity fades in sync, and visibility only flips AFTER the
+   collapse finishes (delayed transition) so the animation is never cut. */
+.gallery-resolve-collapse {
+  display: grid;
+  grid-template-rows: 0fr;
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    grid-template-rows 0.25s ease,
+    opacity 0.25s ease,
+    visibility 0s linear 0.25s;
+}
+
+.gallery-resolve-collapse.open {
+  grid-template-rows: 1fr;
+  opacity: 1;
+  visibility: visible;
+  transition:
+    grid-template-rows 0.25s ease,
+    opacity 0.25s ease,
+    visibility 0s;
+}
+
+/* Candidate link list (v1.1.0 smoke round 3 restyle): sits in a soft inset
+   panel, entries are status-dot + real anchor, and URLs clip with an
+   ellipsis at the ACTUAL right edge — the old fixed 72-char cut left the
+   right half of the bar empty. min-height:0 lets the 0fr wrapper clip it. */
 .gallery-resolve-links {
   margin: 2px 0 0;
-  padding: 0 0 0 16px;
+  padding: 6px 8px;
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 2px;
-  max-height: 120px;
+  gap: 3px;
+  max-height: 140px;
   overflow-y: auto;
+  min-height: 0;
+  background: color-mix(in srgb, var(--bg-color) 55%, transparent);
+  border-radius: 6px;
 }
 
 .gallery-resolve-links li {
-  color: var(--text-secondary);
-  font-size: 11px;
-  line-height: 1.4;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 0;
   direction: ltr;
   text-align: left;
 }
 
 .gallery-resolve-links li.gallery-resolve-links-more {
   color: var(--text-tertiary, var(--text-secondary));
+  font-size: 11px;
   font-style: italic;
+  line-height: 1.4;
+}
+
+/* Per-link resolve status: grey = not resolved yet, green = original
+   extracted, red = failed (hover the dot for the reason). */
+.gallery-resolve-dot {
+  flex-shrink: 0;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--border-color);
+}
+
+.gallery-resolve-dot.is-resolved {
+  background: var(--success-color);
+}
+
+.gallery-resolve-dot.is-failed {
+  background: var(--danger-color);
+}
+
+.gallery-resolve-links a {
+  min-width: 0;
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  color: var(--text-secondary);
+  font-family: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, monospace;
+  font-size: 10.5px;
+  line-height: 1.5;
+  text-decoration: none;
+}
+
+.gallery-resolve-links a:hover,
+.gallery-resolve-links a:focus-visible {
+  color: var(--text-primary);
+  text-decoration: underline;
 }
 
 .gallery-resolve-bar .btn {

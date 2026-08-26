@@ -82,10 +82,18 @@ export async function loadCurrentTab(forceRescan = false, targetTabId?: number):
   if (targetTabId != null && state.currentTabId !== targetTabId) return;
 
   state.currentTabId = tabId;
+  state.currentTabTitle = activeTab.title || '';
 
-  // Link penetration (v1.1.0): gallery candidates are tab-scoped and not
-  // carried in the tab cache — reset on every load; the next scan refills.
-  state.galleryLinks = [];
+  // Link penetration (v1.1.0): gallery candidates are tab-scoped. Restore
+  // them from the in-memory tab cache when the URL still matches (a
+  // navigation invalidates the candidates) — otherwise reset; the next scan
+  // refills. Without the restore, switching tabs away and back made the
+  // <GalleryResolveBar> banner vanish (the cache-hit path never rescans).
+  const cachedGallery = state.tabCache.get(tabId);
+  state.galleryLinks =
+    cachedGallery && cachedGallery.url === tabUrl && Array.isArray(cachedGallery.galleryLinks)
+      ? [...cachedGallery.galleryLinks]
+      : [];
 
   // Notify background that the side panel is open on this tab
   if (!state.isPopupMode) {
@@ -262,6 +270,7 @@ export async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Pr
         lastRenderedFilteredIds: state.lastRenderedFilteredIds,
         similarGroups: [...state.similarGroups],
         scrollTop,
+        galleryLinks: [...state.galleryLinks],
         lastAccessed: Date.now(),
       });
       evictOldestTabCache(state.tabCache);
@@ -312,6 +321,11 @@ export async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Pr
     try {
       // Restore cached state immediately (no await yet) to eliminate flash
       const cachedFilteredIds = cached.lastRenderedFilteredIds ?? null;
+
+      // Gallery-link candidates are per-tab — restore alongside the images
+      // so the <GalleryResolveBar> banner survives switching back (this
+      // fast path never rescans, so nothing else would refill them).
+      state.galleryLinks = cached.galleryLinks ? [...cached.galleryLinks] : [];
 
       // Determine if this is a no-op restore: same images already rendered.
       // Compare by cached ID string (stable per dataset) against what was
@@ -450,6 +464,10 @@ export async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Pr
         // Tab may have been closed
       }
       if (state.currentTabId !== newTabId) return;
+
+      // Keep the injected-items tab-grouping fallback in sync with the tab
+      // we just switched to.
+      state.currentTabTitle = newTab?.title || '';
 
       if (!newTab || isRestrictedUrl(newTab.url)) {
         // Roll back: tab is restricted

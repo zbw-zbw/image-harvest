@@ -1759,9 +1759,6 @@
   "gallery_resolve_links_more": {
     "message": "…還有 {count} 個"
   },
-  "toast_not_on_page": {
-    "message": "該圖片來自連結解析，不在頁面中顯示"
-  },
   "badge_link_image_title": {
     "message": "該縮圖的連結直接指向這張大圖"
   },
@@ -1769,6 +1766,30 @@
     "message": "透過解析連結頁面新增，不在目前頁面中顯示"
   },
   "toast_context_item_duplicate": {
-    "message": "圖片已在結果中，未重複新增"
+    "message": "圖片已存在"
+  },
+  "gallery_resolve_link_pending": {
+    "message": "尚未解析——點擊「解析原圖」試試。"
+  },
+  "gallery_resolve_link_resolved": {
+    "message": "已解析出該頁面的原圖。"
+  },
+  "gallery_resolve_link_failed_blocked": {
+    "message": "連結被安全策略攔截（私有或不受信位址），未解析。"
+  },
+  "gallery_resolve_link_failed_http_error": {
+    "message": "頁面無法存取——可能需要登入或已失效。"
+  },
+  "gallery_resolve_link_failed_non_html": {
+    "message": "連結目標不是網頁，無法解析。"
+  },
+  "gallery_resolve_link_failed_no_meta_image": {
+    "message": "頁面已載入，但未宣告可擷取的原圖。"
+  },
+  "gallery_resolve_link_failed_network_error": {
+    "message": "取得頁面時發生網路錯誤或逾時。"
+  },
+  "group_unknown_tab": {
+    "message": "未知分頁"
   }
 }

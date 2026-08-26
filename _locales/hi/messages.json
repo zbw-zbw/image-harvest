@@ -1605,9 +1605,6 @@
   "gallery_resolve_links_more": {
     "message": "…और {count} अन्य"
   },
-  "toast_not_on_page": {
-    "message": "यह छवि किसी लिंक से ली गई है और पृष्ठ पर स्वयं दिखाई नहीं देती"
-  },
   "badge_link_image_title": {
     "message": "इस थंबनेल के पीछे का लिंक सीधे इस बड़ी छवि पर जाता है"
   },
@@ -1615,6 +1612,30 @@
     "message": "लिंक किए पृष्ठ को रिज़ॉल्व करके जोड़ा गया (पृष्ठ पर स्वयं प्रदर्शित नहीं)"
   },
   "toast_context_item_duplicate": {
-    "message": "परिणामों में पहले से मौजूद है — दोबारा नहीं जोड़ा गया"
+    "message": "छवि पहले से मौजूद है"
+  },
+  "gallery_resolve_link_pending": {
+    "message": "अभी तक हल नहीं हुआ — कोशिश करने के लिए \"ओरिजिनल रिज़ॉल्व करें\" पर क्लिक करें।"
+  },
+  "gallery_resolve_link_resolved": {
+    "message": "इस पेज से मूल चित्र निकाला गया।"
+  },
+  "gallery_resolve_link_failed_blocked": {
+    "message": "सुरक्षा नीति द्वारा लिंक छोड़ा गया (निजी या असुरक्षित पता)।"
+  },
+  "gallery_resolve_link_failed_http_error": {
+    "message": "पेज उपलब्ध नहीं है — इसमें लॉगिन की आवश्यकता हो सकती है या समाप्त हो चुका है।"
+  },
+  "gallery_resolve_link_failed_non_html": {
+    "message": "लिंक लक्ष्य वेब पेज नहीं है, कुछ भी हल नहीं करने को है।"
+  },
+  "gallery_resolve_link_failed_no_meta_image": {
+    "message": "पेज लोड हो गया, लेकिन इसमें कोई निकालने योग्य मूल चित्र घोषित नहीं है।"
+  },
+  "gallery_resolve_link_failed_network_error": {
+    "message": "पेज लाते समय नेटवर्क त्रुटि या टाइमआउट हुआ।"
+  },
+  "group_unknown_tab": {
+    "message": "अज्ञात टैब"
   }
 }

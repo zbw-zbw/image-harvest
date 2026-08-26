@@ -63,6 +63,12 @@ export interface TabCacheEntry {
   similarGroups?: SimilarGroup[];
   /** Scroll position of the image grid when this tab was last active. */
   scrollTop?: number;
+  /**
+   * Gallery-link candidates found by this tab's last scan — cached so the
+   * <GalleryResolveBar> banner survives switching away and back (the scan
+   * that would refill it never runs on the cache-hit fast path).
+   */
+  galleryLinks?: string[];
   /** Timestamp of last access (for LRU eviction). */
   lastAccessed: number;
 }
@@ -372,6 +378,12 @@ export interface SidepanelState {
   galleryLinks: string[];
   /** Deep link-resolution in flight (GalleryResolveBar busy state). */
   isResolvingGallery: boolean;
+  /**
+   * Title of the current tab (set on tab load/switch). Injected items pick
+   * it up so the 'tab' group mode buckets them with the owning tab instead
+   * of a nameless fallback group.
+   */
+  currentTabTitle: string;
 
   // License
   isProUser: boolean;
@@ -504,6 +516,7 @@ function createInitialState(): SidepanelState {
 
     galleryLinks: [],
     isResolvingGallery: false,
+    currentTabTitle: '',
 
     isProUser: false,
     inTrialGracePeriod: false,

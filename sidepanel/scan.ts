@@ -149,7 +149,7 @@ export async function silentRescan(tabId: number, tabUrl: string): Promise<void>
       return;
     }
 
-    const currentTabTitle = targetTab.title || 'Current Tab';
+    const currentTabTitle = targetTab.title || t('group_unknown_tab');
     const currentTabIndex = targetTab.index ?? 0;
 
     const response = await chrome.runtime.sendMessage({
@@ -284,7 +284,7 @@ export async function rescanWithProgress(tabId: number, tabUrl: string): Promise
       return;
     }
 
-    const currentTabTitle = targetTab.title || 'Current Tab';
+    const currentTabTitle = targetTab.title || t('group_unknown_tab');
     const currentTabIndex = targetTab.index ?? 0;
 
     const response = await chrome.runtime.sendMessage({
@@ -447,7 +447,7 @@ export async function fetchImages(targetTabId?: number): Promise<void> {
       showEmpty();
       return;
     }
-    const currentTabTitle = tabInfo.title || 'Current Tab';
+    const currentTabTitle = tabInfo.title || t('group_unknown_tab');
     const currentTabIndex = tabInfo.index ?? 0;
     const resolvedTabId = tabInfo.id ?? scanTabId;
 

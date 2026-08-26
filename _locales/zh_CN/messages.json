@@ -1759,9 +1759,6 @@
   "gallery_resolve_links_more": {
     "message": "…还有 {count} 个"
   },
-  "toast_not_on_page": {
-    "message": "该图片来自链接解析，不在页面中显示"
-  },
   "badge_link_image_title": {
     "message": "该缩略图的链接直接指向这张大图"
   },
@@ -1769,6 +1766,30 @@
     "message": "通过解析链接页面添加，不在当前页面中显示"
   },
   "toast_context_item_duplicate": {
-    "message": "图片已在结果中，未重复添加"
+    "message": "图片已存在"
+  },
+  "gallery_resolve_link_pending": {
+    "message": "尚未解析——点击\"解析原图\"试试。"
+  },
+  "gallery_resolve_link_resolved": {
+    "message": "已解析出该页面的原图。"
+  },
+  "gallery_resolve_link_failed_blocked": {
+    "message": "链接被安全策略拦截（私有或不受信地址），未解析。"
+  },
+  "gallery_resolve_link_failed_http_error": {
+    "message": "页面无法访问——可能需要登录或已失效。"
+  },
+  "gallery_resolve_link_failed_non_html": {
+    "message": "链接目标不是网页，无法解析。"
+  },
+  "gallery_resolve_link_failed_no_meta_image": {
+    "message": "页面已加载，但未声明可提取的原图。"
+  },
+  "gallery_resolve_link_failed_network_error": {
+    "message": "获取页面时发生网络错误或超时。"
+  },
+  "group_unknown_tab": {
+    "message": "未知标签页"
   }
 }

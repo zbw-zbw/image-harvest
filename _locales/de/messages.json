@@ -1605,9 +1605,6 @@
   "gallery_resolve_links_more": {
     "message": "…und {count} weitere"
   },
-  "toast_not_on_page": {
-    "message": "Dieses Bild stammt aus einem Link und wird nicht auf der Seite selbst angezeigt"
-  },
   "badge_link_image_title": {
     "message": "Der Link hinter dieser Miniatur zeigt direkt auf dieses größere Bild"
   },
@@ -1615,6 +1612,30 @@
     "message": "Durch Auflösen der verlinkten Seite hinzugefügt (nicht auf der Seite selbst sichtbar)"
   },
   "toast_context_item_duplicate": {
-    "message": "Bereits in den Ergebnissen – nicht erneut hinzugefügt"
+    "message": "Bild ist bereits vorhanden"
+  },
+  "gallery_resolve_link_pending": {
+    "message": "Noch nicht aufgelöst — klicke auf „Originalbilder auflösen“."
+  },
+  "gallery_resolve_link_resolved": {
+    "message": "Originalbild von dieser Seite extrahiert."
+  },
+  "gallery_resolve_link_failed_blocked": {
+    "message": "Link wurde aus Sicherheitsgründen übersprungen (private oder unsichere Adresse)."
+  },
+  "gallery_resolve_link_failed_http_error": {
+    "message": "Seite nicht erreichbar — eventuell Anmeldung erforderlich oder abgelaufen."
+  },
+  "gallery_resolve_link_failed_non_html": {
+    "message": "Das Linkziel ist keine Webseite — nichts aufzulösen."
+  },
+  "gallery_resolve_link_failed_no_meta_image": {
+    "message": "Seite geladen, aber sie enthält kein extrahierbares Originalbild."
+  },
+  "gallery_resolve_link_failed_network_error": {
+    "message": "Netzwerkfehler oder Zeitüberschreitung beim Laden der Seite."
+  },
+  "group_unknown_tab": {
+    "message": "Unbekannter Tab"
   }
 }
