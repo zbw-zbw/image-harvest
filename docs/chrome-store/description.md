@@ -2,7 +2,7 @@
 
 > 用于 Chrome Web Store 商品详情页的完整描述文案。
 > 注意：CWS 不支持 Markdown，以下为纯文本格式（emoji 可正常显示）。
-> 最后更新：v1.0.12 (2026-07-28) —— 新增开篇总览段（官方 best-listing 要求「总览段 + 功能列表」结构），修复标题粘连。
+> 最后更新：v1.1.1 (2026-08-26) —— 新增「链接穿透」功能区块（v1.1.0 功能，随 v1.1.1 提审更新 listing）。15 语言版本见文末对照章节。
 
 ---
 
@@ -14,6 +14,10 @@ Image Harvest is a smart image downloader that finds and batch-saves every image
 🔍 Smart Image Extraction
 
 Automatically finds every image on any webpage — including standard images, CSS backgrounds, responsive images, and high-resolution variants. Scans deep into Shadow DOM and iframes for complete coverage. Live monitoring detects new images as you scroll (Pro).
+
+🔗 Get the Original Behind the Link
+
+Thumbnail-to-detail pages (Reddit-style galleries, product grids) hide the full-size image behind every click. Image Harvest follows those links for you: direct image links are extracted automatically on every scan, right-click any image or link to send it straight to the panel, and Pro users can resolve all gallery links in one click to pull each detail page's original image.
 
 🎛️ Powerful Filtering & Sorting
 
@@ -86,6 +90,10 @@ Image Harvest 是一款智能图片下载器：自动找出网页上的每一张
 
 自动识别网页上的所有图片 —— 包括标准图片、CSS 背景图、响应式图片和高清变体。深入扫描 Shadow DOM 和 iframe，确保不遗漏任何一张图。Pro 用户还可开启实时监控，滚动页面时自动发现新加载的图片。
 
+🔗 提取链接背后的原图
+
+缩略图跳详情页的网站（Reddit 式画廊、商品列表页）把高清图藏在每一次点击后面。Image Harvest 会替你跟进这些链接：直链图片每次扫描自动提取；右键任意图片或链接，直接送入结果面板；Pro 用户更可一键解析全部画廊链接，批量抓取每个详情页声明的原图。
+
 🎛️ 强大的筛选与排序
 
 按尺寸（小/中/大/超大/自定义）、格式（JPG/PNG/WebP/SVG/GIF）、比例（方形/横图/竖图/全景）或 URL 关键词灵活筛选。智能分组支持按域名、格式、尺寸范围或标签页分类（Pro）。可按大小、格式或原始顺序排序。开启「仅显示可见」可聚焦当前屏幕上的图片。
@@ -144,4 +152,117 @@ Ctrl+Shift+S（Mac 上为 Cmd+Shift+S）：打开/关闭 Image Harvest
 
 🌐 官网：https://image-harvest.kyriewen.cn
 📧 技术支持：support@kyriewen.cn
+```
+
+---
+
+## 链接穿透功能区块 — 15 语言对照
+
+> v1.1.1 随版本提审更新 listing 用。英文 / 简体中文已并入上方全文；
+> 其余 13 种语言到 CWS 后台对应语言的 description 中，插入到
+> 「Smart Image Extraction」同位置（第二个功能区块之前）。
+> 注意：CWS 后台每个语言的 description 是独立全文，插入时保留原有内容。
+
+### 繁體中文
+
+```text
+🔗 擷取連結背後的原始圖片
+
+縮圖跳轉詳情頁的網站（Reddit 式畫廊、商品列表頁）把高清圖藏在每一次點擊後面。Image Harvest 會替你跟進這些連結：直連圖片每次掃描自動擷取；右鍵任意圖片或連結，直接送入結果面板；Pro 使用者更可一鍵解析全部畫廊連結，批次擷取每個詳情頁宣告的原始圖片。
+```
+
+### 日本語
+
+```text
+🔗 リンクの先にあるオリジナル画像を取得
+
+サムネイルから詳細ページへ遷移するサイト（Reddit 型ギャラリー、商品一覧）では、高画質画像が毎回のクリックの奥に隠れています。Image Harvest がそのリンクを代わりにたどります：画像への直リンクは毎回のスキャンで自動抽出、任意の画像やリンクを右クリックすればそのままパネルへ送信、Pro ユーザーはギャラリーリンクを一括解析して各詳細ページのオリジナル画像を取得できます。
+```
+
+### Español
+
+```text
+🔗 Obtén la imagen original detrás del enlace
+
+Las páginas de miniaturas con enlaces a detalles (galerías estilo Reddit, listados de productos) esconden la imagen en alta resolución detrás de cada clic. Image Harvest sigue esos enlaces por ti: los enlaces directos a imágenes se extraen automáticamente en cada escaneo, haz clic derecho en cualquier imagen o enlace para enviarla directamente al panel, y los usuarios Pro pueden resolver todos los enlaces de la galería de una sola vez para obtener la imagen original de cada página de detalle.
+```
+
+### 한국어
+
+```text
+🔗 링크 뒤의 원본 이미지 가져오기
+
+썸네일이 상세 페이지로 연결되는 사이트(Reddit 스타일 갤러리, 상품 목록)는 고화질 이미지를 클릭 너머에 숨겨둡니다. Image Harvest가 그 링크를 대신 따라갑니다: 이미지 직접 링크는 매 스캔마다 자동으로 추출되고, 이미지나 링크를 우클릭하면 패널로 바로 전송되며, Pro 사용자는 갤러리 링크 전체를 한 번에 분석해 각 상세 페이지의 원본 이미지를 가져올 수 있습니다.
+```
+
+### Português
+
+```text
+🔗 Obtenha a imagem original por trás do link
+
+Páginas de miniaturas com links para detalhes (galerias estilo Reddit, listagens de produtos) escondem a imagem em alta resolução atrás de cada clique. O Image Harvest segue esses links por você: links diretos para imagens são extraídos automaticamente em cada varredura, clique com o botão direito em qualquer imagem ou link para enviá-la direto ao painel, e usuários Pro podem resolver todos os links da galeria de uma vez para obter a imagem original de cada página de detalhe.
+```
+
+### Français
+
+```text
+🔗 Récupérez l'image originale derrière le lien
+
+Les pages à vignettes pointant vers des pages détaillées (galeries façon Reddit, grilles de produits) cachent l'image en pleine résolution derrière chaque clic. Image Harvest suit ces liens pour vous : les liens directs vers des images sont extraits automatiquement à chaque analyse, faites un clic droit sur n'importe quelle image ou lien pour l'envoyer directement au panneau, et les utilisateurs Pro peuvent résoudre tous les liens de la galerie en un clic pour récupérer l'image originale de chaque page de détail.
+```
+
+### Deutsch
+
+```text
+🔗 Hol das Original hinter dem Link
+
+Thumbnail-zu-Detail-Seiten (Galerien im Reddit-Stil, Produktraster) verstecken das Bild in voller Größe hinter jedem Klick. Image Harvest folgt diesen Links für dich: Direkte Bild-Links werden bei jedem Scan automatisch extrahiert, per Rechtsklick sendest du jedes Bild oder jeden Link direkt ins Panel, und Pro-Nutzer können alle Galerie-Links mit einem Klick auflösen, um das Originalbild jeder Detailseite zu holen.
+```
+
+### Italiano
+
+```text
+🔗 Ottieni l'immagine originale dietro il link
+
+Le pagine con miniature che rimandano ai dettagli (gallerie in stile Reddit, griglie di prodotti) nascondono l'immagine in alta risoluzione dietro ogni clic. Image Harvest segue quei link per te: i link diretti alle immagini vengono estratti automaticamente a ogni scansione, fai clic con il tasto destro su qualsiasi immagine o link per inviarla direttamente al pannello, e gli utenti Pro possono risolvere tutti i link della galleria con un clic per ottenere l'immagine originale di ogni pagina di dettaglio.
+```
+
+### Русский
+
+```text
+🔗 Получите оригинал изображения по ссылке
+
+Страницы с миниатюрами и ссылками на детали (галереи в стиле Reddit, каталоги товаров) прячут полноразмерное изображение за каждым кликом. Image Harvest сам проходит по этим ссылкам: прямые ссылки на изображения извлекаются автоматически при каждом сканировании, правый клик по любому изображению или ссылке отправляет его прямо в панель, а пользователи Pro могут одним нажатием обработать все ссылки галереи и получить оригинальное изображение с каждой страницы.
+```
+
+### Nederlands
+
+```text
+🔗 Haal de originele afbeelding achter de link op
+
+Pagina's met thumbnails die naar detailpagina's linken (galerijen in Reddit-stijl, productrasters) verbergen de afbeelding in volledige resolutie achter elke klik. Image Harvest volgt die links voor je: directe afbeeldingslinks worden bij elke scan automatisch geëxtraheerd, klik met de rechtermuisknop op een afbeelding of link om deze direct naar het paneel te sturen, en Pro-gebruikers kunnen alle galerijlinks in één keer verwerken om de originele afbeelding van elke detailpagina op te halen.
+```
+
+### हिन्दी
+
+```text
+🔗 लिंक के पीछे छिपी ओरिजिनल इमेज पाएं
+
+थंबनेल से डिटेल पेज वाली साइटें (Reddit-शैली की गैलरी, प्रोडक्ट लिस्टिंग) हर क्लिक के पीछे फुल-साइज़ इमेज छिपाती हैं। Image Harvest आपके लिए वे लिंक खुद फॉलो करता है: डायरेक्ट इमेज लिंक हर स्कैन पर अपने आप निकाले जाते हैं, किसी भी इमेज या लिंक पर राइट-क्लिक करें और वह सीधे पैनल में चला जाता है, और Pro यूज़र एक क्लिक में सभी गैलरी लिंक रिज़ॉल्व करके हर डिटेल पेज की ओरिजिनल इमेज पा सकते हैं।
+```
+
+### العربية
+
+```text
+🔗 احصل على الصورة الأصلية خلف الرابط
+
+الصفحات التي تعرض صورًا مصغرة تؤدي إلى صفحات التفاصيل (معارض بأسلوب Reddit، وقوائم المنتجات) تخفي الصورة بالدقة الكاملة خلف كل نقرة. يقوم Image Harvest بمتابعة هذه الروابط نيابةً عنك: تُستخرج روابط الصور المباشرة تلقائيًا في كل فحص، انقر بزر الفأرة الأيمن على أي صورة أو رابط لإرسالها مباشرة إلى اللوحة، ويمكن لمستخدمي Pro تحليل جميع روابط المعرض بنقرة واحدة للحصول على الصورة الأصلية من كل صفحة تفاصيل.
+```
+
+### ไทย
+
+```text
+🔗 ดึงภาพต้นฉบับที่ซ่อนอยู่หลังลิงก์
+
+หน้าเว็บแบบภาพย่อที่ลิงก์ไปหน้ารายละเอียด (แกลเลอรีสไตล์ Reddit, หน้ารายการสินค้า) ซ่อนภาพความละเอียดสูงไว้หลังทุกคลิก Image Harvest ตามลิงก์เหล่านั้นให้คุณ: ลิงก์รูปภาพโดยตรงจะถูกดึงออกมาอัตโนมัติทุกครั้งที่สแกน คลิกขวาที่รูปภาพหรือลิงก์ใดก็ได้เพื่อส่งเข้าแผงทันที และผู้ใช้ Pro สามารถวิเคราะห์ลิงก์ทั้งหมดในคลิกเดียวเพื่อดึงภาพต้นฉบับจากทุกหน้ารายละเอียด
 ```
