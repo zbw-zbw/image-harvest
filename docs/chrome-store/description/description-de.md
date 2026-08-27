@@ -1,6 +1,3 @@
-# Deutsch
-
-```text
 Image Harvest ist ein smarter Bild-Downloader, der jedes Bild auf einer beliebigen Webseite findet und als Sammel-Download speichert — einschließlich CSS-Hintergründe, verzögert geladene und Shadow-DOM-Bilder, die die meisten Tools übersehen. Filtere nach Größe oder Format, lade alles als eine ZIP-Datei herunter, extrahiere mehrere Tabs gleichzeitig, erkenne Fast-Duplikate und organisiere mit KI-Tags und Sammlungen. Gemacht für Designer, Researcher, E-Commerce-Verkäufer und Content-Kuratoren. Kostenlos nutzbar — keine Registrierung.
 
 🔍 Smarte Bildextraktion
@@ -69,4 +66,3 @@ Ctrl+Shift+S (Cmd+Shift+S auf dem Mac): Image Harvest ein-/ausblenden
 
 🌐 Webseite: https://image-harvest.kyriewen.cn
 📧 Support: support@kyriewen.cn
-```

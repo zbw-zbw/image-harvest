@@ -1,6 +1,3 @@
-# 繁體中文
-
-```text
 Image Harvest 是一款智慧型圖片下載器：自動找出網頁上的每一張圖片 —— 包括其他工具經常漏掉的 CSS 背景圖、懶加載圖和 Shadow DOM 圖片，並一鍵打包為 ZIP 批次下載。支援按尺寸/格式篩選、多分頁同時擷取、相似圖去重、AI 智慧標記與收藏管理。為設計師、研究者、電商賣家和內容創作者打造。免費使用，無需註冊。
 
 🔍 智慧圖片擷取
@@ -69,4 +66,3 @@ Ctrl+Shift+S（Mac 上為 Cmd+Shift+S）：開啟/關閉 Image Harvest
 
 🌐 官網：https://image-harvest.kyriewen.cn
 📧 技術支援：support@kyriewen.cn
-```

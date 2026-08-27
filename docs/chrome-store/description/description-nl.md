@@ -1,6 +1,3 @@
-# Nederlands
-
-```text
 Image Harvest is een slimme afbeeldingsdownloader die elke afbeelding op elke webpagina vindt en in bulk opslaat — inclusief CSS-achtergronden, lazy-loaded en Shadow-DOM-afbeeldingen die de meeste tools missen. Filter op grootte of formaat, download alles als één ZIP, haal uit meerdere tabs tegelijk, detecteer near-duplicates en organiseer met AI-tags en collecties. Gebouwd voor designers, researchers, e-commerceverkopers en contentcuratoren. Gratis te gebruiken — geen registratie nodig.
 
 🔍 Slimme Afbeeldingsextractie
@@ -69,4 +66,3 @@ Ctrl+Shift+S (Cmd+Shift+S op Mac): Image Harvest tonen/verbergen
 
 🌐 Website: https://image-harvest.kyriewen.cn
 📧 Support: support@kyriewen.cn
-```

@@ -1,7 +1,7 @@
 # Chrome Web Store — Full Description（15 语言版）
 
 > 每个受支持语言一个独立文件，内容为 CWS 商品详情页 Description 字段的**完整纯文本**。
-> 打开文件后直接复制 ```text 代码块全文，粘贴到 CWS 开发者后台对应语言的 description 即可。
+> 文件里没有任何代码块或标题包裹 —— 打开文件后 Cmd+A 全选、Cmd+C 复制，整份直接粘贴到 CWS 开发者后台对应语言的 description 即可。语言靠文件名区分。
 > CWS 不支持 Markdown，粘贴的是纯文本（emoji 正常显示）。
 
 ## 文件清单与 CWS 后台对照

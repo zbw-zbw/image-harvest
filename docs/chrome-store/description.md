@@ -5,7 +5,7 @@
 
 ## 快速指引
 
-- **想复制某语言的描述**：打开 `description/description-<locale>.md`，一键复制其中的 `text` 代码块全文，粘贴到 CWS 后台对应语言的 Description 输入框。
+- **想复制某语言的描述**：打开 `description/description-<locale>.md`，全选复制整个文件内容（就是纯文本本身），粘贴到 CWS 后台对应语言的 Description 输入框。
 - **加新功能 / 改权益口径时**：按 README「同步维护约定」执行 —— 先改 `description-en.md`（唯一真源），再同步其余 14 个语言文件，最后随下一个版本提审时逐个粘贴到 CWS 后台（后台各语言 description 相互独立，不联动，漏贴 = 该语言停留在旧版）。
 - **短摘要 Summary（≤132 字符）**：不在本目录管理，见 [summary.md](./summary.md)（随 manifest 发布，无法在 dashboard 单独改）。
 

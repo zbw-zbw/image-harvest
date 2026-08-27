@@ -1,6 +1,3 @@
-# English
-
-```text
 Image Harvest is a smart image downloader that finds and batch-saves every image on any webpage — including the CSS backgrounds, lazy-loaded and Shadow-DOM images most tools miss. Filter by size or format, download everything as one ZIP, extract from multiple tabs at once, detect near-duplicates, and organize with AI tags and collections. Built for designers, researchers, e-commerce sellers and content curators. Free to use — no sign-up required.
 
 🔍 Smart Image Extraction
@@ -69,4 +66,3 @@ Ctrl+Shift+S (Cmd+Shift+S on Mac): Toggle Image Harvest
 
 🌐 Website: https://image-harvest.kyriewen.cn
 📧 Support: support@kyriewen.cn
-```

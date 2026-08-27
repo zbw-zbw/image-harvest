@@ -1,6 +1,3 @@
-# Français
-
-```text
 Image Harvest est un téléchargeur d'images intelligent qui détecte et enregistre par lots chaque image de n'importe quelle page web — y compris les fonds CSS, les images à chargement différé et les images Shadow DOM que la plupart des outils ignorent. Filtrez par taille ou format, téléchargez tout en un seul ZIP, extrayez plusieurs onglets à la fois, détectez les quasi-doublons et organisez avec des balises IA et des collections. Conçu pour les designers, chercheurs, vendeurs e-commerce et curateurs de contenu. Gratuit, sans inscription.
 
 🔍 Extraction Intelligente d'Images
@@ -69,4 +66,3 @@ Ctrl+Shift+S (Cmd+Shift+S sur Mac) : afficher/masquer Image Harvest
 
 🌐 Site web : https://image-harvest.kyriewen.cn
 📧 Assistance : support@kyriewen.cn
-```
