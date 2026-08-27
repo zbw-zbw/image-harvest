@@ -1637,5 +1637,14 @@
   },
   "group_unknown_tab": {
     "message": "अज्ञात टैब"
+  },
+  "quota_link_resolve": {
+    "message": "लिंक रिज़ॉल्व"
+  },
+  "toast_gallery_resolved_remaining": {
+    "message": "{images} मूल चित्र जोड़े गए · इस माह {remaining} लिंक रिज़ॉल्व शेष"
+  },
+  "toast_gallery_resolved_last": {
+    "message": "{images} मूल चित्र जोड़े गए · इस माह का लिंक रिज़ॉल्व कोटा समाप्त — Pro असीमित है"
   }
 }

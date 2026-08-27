@@ -1637,5 +1637,14 @@
   },
   "group_unknown_tab": {
     "message": "Scheda sconosciuta"
+  },
+  "quota_link_resolve": {
+    "message": "Risoluzione link"
+  },
+  "toast_gallery_resolved_remaining": {
+    "message": "Aggiunte {images} immagini originali · restano {remaining} risoluzioni questo mese"
+  },
+  "toast_gallery_resolved_last": {
+    "message": "Aggiunte {images} immagini originali · quota mensile di risoluzione esaurita — Pro è illimitato"
   }
 }

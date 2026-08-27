@@ -1637,5 +1637,14 @@
   },
   "group_unknown_tab": {
     "message": "Onbekend tabblad"
+  },
+  "quota_link_resolve": {
+    "message": "Link-resolutie"
+  },
+  "toast_gallery_resolved_remaining": {
+    "message": "{images} originele afbeeldingen toegevoegd · nog {remaining} link-resoluties deze maand"
+  },
+  "toast_gallery_resolved_last": {
+    "message": "{images} originele afbeeldingen toegevoegd · maandelijks quotum voor link-resolutie op — Pro is onbeperkt"
   }
 }

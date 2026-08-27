@@ -1791,5 +1791,14 @@
   },
   "group_unknown_tab": {
     "message": "未知标签页"
+  },
+  "quota_link_resolve": {
+    "message": "链接解析"
+  },
+  "toast_gallery_resolved_remaining": {
+    "message": "已添加 {images} 张原图 · 本月还剩 {remaining} 次链接解析"
+  },
+  "toast_gallery_resolved_last": {
+    "message": "已添加 {images} 张原图 · 本月链接解析次数已用完，升级 Pro 无限解析"
   }
 }

@@ -1637,5 +1637,14 @@
   },
   "group_unknown_tab": {
     "message": "Onglet inconnu"
+  },
+  "quota_link_resolve": {
+    "message": "Résolution de liens"
+  },
+  "toast_gallery_resolved_remaining": {
+    "message": "{images} images originales ajoutées · {remaining} résolutions restantes ce mois-ci"
+  },
+  "toast_gallery_resolved_last": {
+    "message": "{images} images originales ajoutées · quota mensuel de résolution épuisé — Pro est illimité"
   }
 }

@@ -62,8 +62,8 @@ function buildQuotaRows(
   const rows: QuotaRow[] = [];
 
   // Settings page only shows features with monthly/daily usage quotas
-  // that the user actively consumes (AI tags, color copy).
-  const SETTINGS_QUOTA_FEATURES = new Set(['aiTag', 'colorCopy']);
+  // that the user actively consumes (AI tags, color copy, link resolve).
+  const SETTINGS_QUOTA_FEATURES = new Set(['aiTag', 'colorCopy', 'linkResolve']);
 
   for (const featureKey of copy.featureOrder) {
     const feat = copy.features[featureKey];
@@ -135,6 +135,14 @@ function buildFallbackRows(
       remaining: featureRemaining('colorCopy'),
       exhausted: featureExhausted('colorCopy'),
     },
+    // Link resolve (original image from gallery links)
+    {
+      label: t('quota_link_resolve'),
+      freeLimit: `${limits.MAX_MONTHLY_LINK_RESOLVE}${perMonth}`,
+      proLimit: t('quota_unlimited'),
+      remaining: featureRemaining('linkResolve'),
+      exhausted: featureExhausted('linkResolve'),
+    },
   ];
 }
 
@@ -188,6 +196,7 @@ export function QuotaDisplay() {
     batchHighlight: 'batchHighlight',
     formatConvert: 'formatConvert',
     colorCopy: 'colorCopy',
+    linkResolve: 'linkResolve',
   };
 
   // Build the flat limits record for template interpolation
@@ -205,6 +214,7 @@ export function QuotaDisplay() {
     maxMonthlyFormatConvert: limits.MAX_MONTHLY_FORMAT_CONVERT,
     maxMonthlyLiveMonitor: limits.MAX_MONTHLY_LIVE_MONITOR,
     maxMonthlyBatchHighlight: limits.MAX_MONTHLY_BATCH_HIGHLIGHT,
+    maxMonthlyLinkResolve: limits.MAX_MONTHLY_LINK_RESOLVE,
     proAiMonthlyQuota: aiQuotaLimit,
   };
 

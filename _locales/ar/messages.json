@@ -1637,5 +1637,14 @@
   },
   "group_unknown_tab": {
     "message": "علامة تبويب غير معروفة"
+  },
+  "quota_link_resolve": {
+    "message": "تحليل الروابط"
+  },
+  "toast_gallery_resolved_remaining": {
+    "message": "تمت إضافة {images} صورة أصلية · متبقٍ {remaining} تحليل روابط هذا الشهر"
+  },
+  "toast_gallery_resolved_last": {
+    "message": "تمت إضافة {images} صورة أصلية · نفدت حصة تحليل الروابط لهذا الشهر — Pro بلا حدود"
   }
 }

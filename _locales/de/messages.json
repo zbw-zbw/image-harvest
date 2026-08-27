@@ -1637,5 +1637,14 @@
   },
   "group_unknown_tab": {
     "message": "Unbekannter Tab"
+  },
+  "quota_link_resolve": {
+    "message": "Link-Auflösung"
+  },
+  "toast_gallery_resolved_remaining": {
+    "message": "{images} Originalbilder hinzugefügt · noch {remaining} Link-Auflösungen diesen Monat"
+  },
+  "toast_gallery_resolved_last": {
+    "message": "{images} Originalbilder hinzugefügt · Monatskontingent für Link-Auflösung aufgebraucht — Pro ist unbegrenzt"
   }
 }

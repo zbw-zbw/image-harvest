@@ -158,13 +158,24 @@ export function GalleryResolveBar() {
           resolved: response.resolved ?? 0,
           failed: response.failed ?? 0,
         });
-        showToast(t('toast_gallery_resolved', { images: toAdd.length }), 'success');
 
         // Increment quota usage only after a successful resolve (free users).
+        // The returned remaining count turns the success toast into a soft
+        // upsell touchpoint: free users watch the monthly budget tick down,
+        // and the last resolve says outright that Pro removes the cap.
         if (!state.isProUser) {
           void import('../../shared/feature-quota').then(({ incrementFeatureUsage }) =>
-            incrementFeatureUsage('linkResolve')
+            incrementFeatureUsage('linkResolve').then((remaining) => {
+              showToast(
+                remaining > 0
+                  ? t('toast_gallery_resolved_remaining', { images: toAdd.length, remaining })
+                  : t('toast_gallery_resolved_last', { images: toAdd.length }),
+                'success'
+              );
+            })
           );
+        } else {
+          showToast(t('toast_gallery_resolved', { images: toAdd.length }), 'success');
         }
       } else {
         void track(EVENTS.GALLERY_RESOLVE_COMPLETED, {

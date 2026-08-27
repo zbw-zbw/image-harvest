@@ -1806,5 +1806,14 @@
   },
   "group_unknown_tab": {
     "message": "Unknown tab"
+  },
+  "quota_link_resolve": {
+    "message": "Link Resolve"
+  },
+  "toast_gallery_resolved_remaining": {
+    "message": "Added {images} original images · {remaining} link resolves left this month"
+  },
+  "toast_gallery_resolved_last": {
+    "message": "Added {images} original images · monthly link-resolve quota used up — Pro is unlimited"
   }
 }

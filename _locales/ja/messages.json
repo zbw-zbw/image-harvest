@@ -1791,5 +1791,14 @@
   },
   "group_unknown_tab": {
     "message": "不明なタブ"
+  },
+  "quota_link_resolve": {
+    "message": "リンク解決"
+  },
+  "toast_gallery_resolved_remaining": {
+    "message": "元画像 {images} 枚を追加 · 今月のリンク解決はあと {remaining} 回"
+  },
+  "toast_gallery_resolved_last": {
+    "message": "元画像 {images} 枚を追加 · 今月のリンク解決回数を使い切りました。Pro なら無制限です"
   }
 }

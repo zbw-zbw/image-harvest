@@ -1791,5 +1791,14 @@
   },
   "group_unknown_tab": {
     "message": "未知分頁"
+  },
+  "quota_link_resolve": {
+    "message": "連結解析"
+  },
+  "toast_gallery_resolved_remaining": {
+    "message": "已新增 {images} 張原圖 · 本月還剩 {remaining} 次連結解析"
+  },
+  "toast_gallery_resolved_last": {
+    "message": "已新增 {images} 張原圖 · 本月連結解析次數已用完，升級 Pro 可無限解析"
   }
 }

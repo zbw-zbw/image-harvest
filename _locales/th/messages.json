@@ -1637,5 +1637,14 @@
   },
   "group_unknown_tab": {
     "message": "แท็บที่ไม่รู้จัก"
+  },
+  "quota_link_resolve": {
+    "message": "แก้ไขลิงก์"
+  },
+  "toast_gallery_resolved_remaining": {
+    "message": "เพิ่มภาพต้นฉบับ {images} ภาพ · เหลือการแก้ไขลิงก์อีก {remaining} ครั้งในเดือนนี้"
+  },
+  "toast_gallery_resolved_last": {
+    "message": "เพิ่มภาพต้นฉบับ {images} ภาพ · ใช้โควต้าแก้ไขลิงก์ประจำเดือนหมดแล้ว — Pro ไม่จำกัด"
   }
 }

@@ -1794,5 +1794,14 @@
   },
   "group_unknown_tab": {
     "message": "Pestaña desconocida"
+  },
+  "quota_link_resolve": {
+    "message": "Resolución de enlaces"
+  },
+  "toast_gallery_resolved_remaining": {
+    "message": "Se añadieron {images} imágenes originales · quedan {remaining} resoluciones este mes"
+  },
+  "toast_gallery_resolved_last": {
+    "message": "Se añadieron {images} imágenes originales · cuota mensual de resolución agotada — Pro es ilimitado"
   }
 }

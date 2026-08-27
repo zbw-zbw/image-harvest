@@ -1637,5 +1637,14 @@
   },
   "group_unknown_tab": {
     "message": "Неизвестная вкладка"
+  },
+  "quota_link_resolve": {
+    "message": "Разбор ссылок"
+  },
+  "toast_gallery_resolved_remaining": {
+    "message": "Добавлено оригиналов: {images} · осталось разборов ссылок в этом месяце: {remaining}"
+  },
+  "toast_gallery_resolved_last": {
+    "message": "Добавлено оригиналов: {images} · месячный лимит разбора ссылок исчерпан — в Pro без ограничений"
   }
 }
