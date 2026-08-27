@@ -38,7 +38,7 @@ Enregistrez vos images favorites dans une collection locale avec étiquettes et 
 
 🎨 Extraction de Couleurs
 
-Extrayez automatiquement les 5 couleurs dominantes de chaque image. Consultez les palettes directement dans le panneau. Copiez les codes HEX pour le travail de design, l'analyse de marque ou les projets créatifs.
+Extrayez automatiquement les 5 couleurs dominantes de chaque image. Consultez les palettes directement dans le panneau. Copiez les codes HEX pour le travail de design, l'analyse de marque ou les projets créatifs. Les utilisateurs gratuits disposent d'un quota mensuel de copies ; les utilisateurs Pro sont illimités.
 
 🤖 Étiquetage par IA
 

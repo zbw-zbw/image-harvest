@@ -38,7 +38,7 @@ Salve suas imagens favoritas em uma coleção local com tags e anotações perso
 
 🎨 Extração de Cores
 
-Extraia automaticamente as 5 cores dominantes de cada imagem. Veja as paletas direto no painel. Copie códigos HEX para trabalhos de design, análise de marca ou projetos criativos.
+Extraia automaticamente as 5 cores dominantes de cada imagem. Veja as paletas direto no painel. Copie códigos HEX para trabalhos de design, análise de marca ou projetos criativos. Usuários gratuitos têm uma cota mensal de cópias; usuários Pro são ilimitados.
 
 🤖 Marcação com IA
 

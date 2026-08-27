@@ -38,7 +38,7 @@ Save your favorite images to a local collection with custom tags and notes. Brow
 
 🎨 Color Extract
 
-Automatically extract the top 5 dominant colors from each image. View color palettes directly in the panel. Copy HEX color codes for design work, branding analysis, or creative projects.
+Automatically extract the top 5 dominant colors from each image. View color palettes directly in the panel. Copy HEX color codes for design work, branding analysis, or creative projects. Free users can copy a limited number of colors per month; Pro users enjoy unlimited color copying.
 
 🤖 AI Image Tagging
 

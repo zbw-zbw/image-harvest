@@ -38,7 +38,7 @@ Speichere Lieblingsbilder mit eigenen Tags und Notizen in einer lokalen Sammlung
 
 🎨 Farbextraktion
 
-Extrahiert automatisch die 5 dominanten Farben pro Bild. Betrachte die Paletten direkt im Panel. Kopiere HEX-Codes für Designarbeit, Markenanalyse oder kreative Projekte.
+Extrahiert automatisch die 5 dominanten Farben pro Bild. Betrachte die Paletten direkt im Panel. Kopiere HEX-Codes für Designarbeit, Markenanalyse oder kreative Projekte. Kostenlose Nutzer erhalten ein monatliches Kopierkontingent; Pro-Nutzer kopieren unbegrenzt.
 
 🤖 KI-Bildtagging
 

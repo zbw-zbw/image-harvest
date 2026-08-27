@@ -38,7 +38,7 @@ Bewaar favoriete afbeeldingen in een lokale collectie met eigen tags en notities
 
 🎨 Kleurextractie
 
-Extraheer automatisch de 5 dominante kleuren per afbeelding. Bekijk paletten direct in het paneel. Kopieer HEX-codes voor designwerk, merkanalyse of creatieve projecten.
+Extraheer automatisch de 5 dominante kleuren per afbeelding. Bekijk paletten direct in het paneel. Kopieer HEX-codes voor designwerk, merkanalyse of creatieve projecten. Gratis gebruikers kunnen per maand een beperkt aantal kleuren kopiëren; Pro-gebruikers onbeperkt.
 
 🤖 AI-Afbeeldingstagging
 

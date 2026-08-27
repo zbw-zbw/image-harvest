@@ -38,7 +38,7 @@ Salva le tue immagini preferite in una collezione locale con tag e note personal
 
 🎨 Estrazione dei Colori
 
-Estrae automaticamente i 5 colori dominanti di ciascuna immagine. Visualizza le palette direttamente nel pannello. Copia i codici HEX per lavori di design, analisi di brand o progetti creativi.
+Estrae automaticamente i 5 colori dominanti di ciascuna immagine. Visualizza le palette direttamente nel pannello. Copia i codici HEX per lavori di design, analisi di brand o progetti creativi. Gli utenti gratuiti hanno una quota mensile di copie; gli utenti Pro sono illimitati.
 
 🤖 Tagging con IA
 
