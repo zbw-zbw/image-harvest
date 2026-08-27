@@ -56,13 +56,19 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ## [Unreleased]
 
+---
+
+## [1.1.2] — 2026-08-27
+
 ### ✨ Added
 
-- Settings → usage quotas now lists the link-resolve monthly quota (free tier:
-  3/month) alongside AI tags and color copy, with a live remaining counter.
-- After a successful "Resolve originals" run, free users see how many
-  link-resolve attempts remain this month; the last one says plainly that Pro
-  removes the cap (soft upsell, no interruption).
+- **Link-resolve quota in Settings → usage quotas**: the settings page now lists the free-tier monthly quota (3/month) alongside AI tags and color copy, with a live remaining counter that grays out when exhausted.
+
+- **"Resolve originals" toasts show remaining quota**: each successful run tells free users how many link resolves are left this month; the final one says plainly that Pro removes the cap — a soft upsell that never interrupts the flow.
+
+### 🌍 i18n
+
+- New quota-row and toast strings translated across all 15 supported languages.
 
 ---
 
