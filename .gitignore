@@ -61,3 +61,7 @@ dist/
 # sync cloud
 sync-code.mjs
 dist.zip
+
+# ai-coding-metrics local metadata (contains conversation excerpts — never commit)
+.specs/ai-coding-log.jsonl
+.specs/archive/

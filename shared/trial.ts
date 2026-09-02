@@ -38,6 +38,7 @@ import { EVENTS } from './telemetry-events';
 
 const STORAGE_KEY_TRIAL_REDEEMED = '_trial_redeemed_at';
 const STORAGE_KEY_TRIAL_EXPIRED_REPORTED = '_trial_expired_reported';
+const STORAGE_KEY_GRACE_BANNER_DAY = '_trial_grace_banner_day';
 
 /** 7 days in milliseconds — kept as a literal to avoid an extra constants import. */
 export const TRIAL_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
@@ -230,6 +231,27 @@ export async function reportTrialExpiryIfNeeded(): Promise<boolean> {
   }
 
   await track(EVENTS.TRIAL_EXPIRED);
+  return true;
+}
+
+/**
+ * Track a trial-grace banner impression at most once per day per install.
+ *
+ * The banner is persistent UI — it re-renders on every panel open for the
+ * whole 3-day grace window, so an unthrottled track() would measure panel
+ * opens, not reach. Keyed by UTC date: granularity matters, timezone
+ * correctness doesn't. Returns true when the event actually fired.
+ */
+export async function maybeReportTrialGraceBanner(daysRemaining: number): Promise<boolean> {
+  const today = new Date().toISOString().slice(0, 10);
+  try {
+    const data = await chrome.storage.local.get(STORAGE_KEY_GRACE_BANNER_DAY);
+    if (data[STORAGE_KEY_GRACE_BANNER_DAY] === today) return false;
+    await chrome.storage.local.set({ [STORAGE_KEY_GRACE_BANNER_DAY]: today });
+  } catch {
+    return false;
+  }
+  await track(EVENTS.TRIAL_GRACE_BANNER_SHOWN, { daysRemaining });
   return true;
 }
 

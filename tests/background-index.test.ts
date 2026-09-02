@@ -82,6 +82,13 @@ vi.mock('../background/auto-trial', () => ({
   initAutoTrialAlarm: vi.fn(),
 }));
 
+// VALIDATE_LICENSE fires the idempotent trial_expired funnel report via
+// shared/trial — mocked here so the router test asserts the hand-off only.
+// The sentinel/storage logic itself is covered by tests/trial.test.ts.
+vi.mock('../shared/trial', () => ({
+  reportTrialExpiryIfNeeded: vi.fn(() => Promise.resolve(false)),
+}));
+
 // ── chrome global mock ──────────────────────────────────────────────
 // Capture the onMessage listener so tests can invoke it directly.
 let onMessageListener:
@@ -169,6 +176,7 @@ beforeAll(async () => {
 import { MESSAGE_TYPES, ERROR_CODES } from '../shared/constants';
 import * as storage from '../shared/storage';
 import * as license from '../shared/license';
+import * as trialShared from '../shared/trial';
 import * as bgUtils from '../background/utils';
 import * as bgLicense from '../background/license';
 import * as bgDisplayMode from '../background/display-mode';
@@ -837,6 +845,15 @@ describe('handleMessage — license', () => {
     } as never);
     const result = await dispatch({ type: MESSAGE_TYPES.VALIDATE_LICENSE });
     expect(result).toEqual({ isPro: true, plan: 'pro-monthly' });
+  });
+
+  it('VALIDATE_LICENSE → fires reportTrialExpiryIfNeeded (fire-and-forget trial_expired funnel)', async () => {
+    // Pin the impl explicitly: clearAllMocks() only wipes call history, so a
+    // mockResolvedValue leaked from a sibling case would otherwise stick.
+    vi.mocked(license.isProUser).mockResolvedValue({ isPro: false, plan: 'free' } as never);
+    const result = await dispatch({ type: MESSAGE_TYPES.VALIDATE_LICENSE });
+    expect(result).toEqual({ isPro: false, plan: 'free' });
+    expect(trialShared.reportTrialExpiryIfNeeded).toHaveBeenCalledTimes(1);
   });
 
   it('VALIDATE_LICENSE on rejection → returns isPro:false (graceful degrade)', async () => {

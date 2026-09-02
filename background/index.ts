@@ -31,6 +31,7 @@ import type { ImageItem } from '../shared/types';
 import { fetchImageData, fetchImageMetaProxy, reverseSearchUpload } from './reverse-search';
 import { isAllowedFetchUrl } from '../shared/url-validator';
 import { autoStartTrial, initAutoTrialAlarm } from './auto-trial';
+import { reportTrialExpiryIfNeeded } from '../shared/trial';
 import { detectEagle, exportToEagle } from '../shared/export-eagle';
 import type { EagleItem } from '../shared/export-eagle';
 import { AI_TAG_API_URL, AI_TAG_BATCH_API_URL } from '../shared/constants';
@@ -732,6 +733,9 @@ async function handleMessage(
       case MESSAGE_TYPES.VALIDATE_LICENSE: {
         try {
           const proStatus = await isProUser();
+          // Fire-and-forget: idempotent trial_expired reporting (sentinel
+          // inside). Must not block the response the sidepanel waits on.
+          void reportTrialExpiryIfNeeded();
           sendResponse(proStatus);
         } catch (error) {
           sendResponse({ isPro: false, error: (error as Error).message });

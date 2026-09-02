@@ -51,6 +51,11 @@ export const EVENTS = {
   TRIAL_STARTED: 'trial_started',
   TRIAL_AUTO_STARTED: 'trial_auto_started', // props: { source: 'install' | 'update' }
   TRIAL_EXPIRED: 'trial_expired',
+  // Trial grace-period banner (3-day post-expiry window) — the only
+  // conversion touchpoint for expired trials. `shown` is throttled to
+  // once/day/install (shared/trial.ts) since the banner is persistent UI.
+  TRIAL_GRACE_BANNER_SHOWN: 'trial_grace_banner_shown', // props: { daysRemaining: number }
+  TRIAL_GRACE_CTA_CLICKED: 'trial_grace_cta_clicked',
 
   // Welcome page (Phase 2)
   WELCOME_PAGE_VIEWED: 'welcome_page_viewed', // props: { source: string }
@@ -172,6 +177,8 @@ export const EVENT_PROP_SCHEMAS: Record<TelemetryEventName, readonly string[]> =
   [EVENTS.TRIAL_STARTED]: ['abBucket'],
   [EVENTS.TRIAL_AUTO_STARTED]: ['source', 'abBucket'],
   [EVENTS.TRIAL_EXPIRED]: ['abBucket'],
+  [EVENTS.TRIAL_GRACE_BANNER_SHOWN]: ['daysRemaining', 'abBucket'],
+  [EVENTS.TRIAL_GRACE_CTA_CLICKED]: ['abBucket'],
 
   [EVENTS.WELCOME_PAGE_VIEWED]: ['source'],
   [EVENTS.WELCOME_CTA_CLICKED]: ['action'],

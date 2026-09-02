@@ -482,6 +482,40 @@ describe('reportTrialExpiryIfNeeded', () => {
   });
 });
 
+// ────────────────────────────────────────────────────────────────────────────
+// maybeReportTrialGraceBanner
+// ────────────────────────────────────────────────────────────────────────────
+
+describe('maybeReportTrialGraceBanner', () => {
+  it('first impression of the day → fires TRIAL_GRACE_BANNER_SHOWN with daysRemaining + sets sentinel', async () => {
+    const { maybeReportTrialGraceBanner } = await import('../shared/trial');
+    expect(await maybeReportTrialGraceBanner(2)).toBe(true);
+    expect(mockTrack).toHaveBeenCalledWith('trial_grace_banner_shown', { daysRemaining: 2 });
+    expect(storage.get('_trial_grace_banner_day')).toBe(new Date().toISOString().slice(0, 10));
+  });
+
+  it('same-day second call → throttled, no duplicate event', async () => {
+    storage.set('_trial_grace_banner_day', new Date().toISOString().slice(0, 10));
+    const { maybeReportTrialGraceBanner } = await import('../shared/trial');
+    expect(await maybeReportTrialGraceBanner(1)).toBe(false);
+    expect(mockTrack).not.toHaveBeenCalled();
+  });
+
+  it('next day → fires again (daily granularity)', async () => {
+    storage.set('_trial_grace_banner_day', '2000-01-01');
+    const { maybeReportTrialGraceBanner } = await import('../shared/trial');
+    expect(await maybeReportTrialGraceBanner(3)).toBe(true);
+    expect(mockTrack).toHaveBeenCalledWith('trial_grace_banner_shown', { daysRemaining: 3 });
+  });
+
+  it('storage failure → returns false without tracking', async () => {
+    chromeStub.storage.local.get.mockRejectedValueOnce(new Error('storage down'));
+    const { maybeReportTrialGraceBanner } = await import('../shared/trial');
+    expect(await maybeReportTrialGraceBanner(2)).toBe(false);
+    expect(mockTrack).not.toHaveBeenCalled();
+  });
+});
+
 describe('isInTrialGracePeriod', () => {
   it('returns inGrace=false when no license data', async () => {
     mockGetLicenseData.mockResolvedValue(null);

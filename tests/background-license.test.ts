@@ -23,6 +23,12 @@ vi.mock('../shared/license', () => ({
   periodicLicenseCheck: vi.fn(),
 }));
 
+// trial.ts is imported for the trial_expired funnel report — mock it so
+// the real module never touches chrome.storage or telemetry.
+vi.mock('../shared/trial', () => ({
+  reportTrialExpiryIfNeeded: vi.fn(() => Promise.resolve(false)),
+}));
+
 interface AlarmsStub {
   get: ReturnType<typeof vi.fn>;
   create: ReturnType<typeof vi.fn>;
@@ -52,6 +58,7 @@ function installChromeStub(existingAlarm: chrome.alarms.Alarm | null): ChromeStu
 const { initLicenseAlarm } = await import('../background/license');
 const { uiPorts } = await import('../background/utils');
 const sharedLicense = await import('../shared/license');
+const sharedTrial = await import('../shared/trial');
 
 interface BroadcastCapture {
   type: string;
@@ -139,6 +146,25 @@ describe('initLicenseAlarm — onAlarm callback', () => {
     });
 
     expect(sharedLicense.periodicLicenseCheck).not.toHaveBeenCalled();
+  });
+
+  it('fires reportTrialExpiryIfNeeded after the periodic check (trial_expired funnel)', async () => {
+    chromeStub = installChromeStub(null);
+    vi.mocked(sharedLicense.periodicLicenseCheck).mockResolvedValue({
+      isPro: false,
+    } as Awaited<ReturnType<typeof sharedLicense.periodicLicenseCheck>>);
+    // Other onAlarm cases in this file also trigger the call — clear the
+    // shared mock record so this assertion is about THIS alarm fire only.
+    vi.mocked(sharedTrial.reportTrialExpiryIfNeeded).mockClear();
+
+    initLicenseAlarm();
+    const onAlarm = chromeStub.alarms.onAlarm.addListener.mock.calls[0][0] as (
+      alarm: chrome.alarms.Alarm
+    ) => Promise<void>;
+
+    await onAlarm({ name: 'license-periodic-check', scheduledTime: Date.now() });
+
+    expect(sharedTrial.reportTrialExpiryIfNeeded).toHaveBeenCalledTimes(1);
   });
 
   it('broadcasts full ProUserInfo (plan + status) when the check returns a pro user', async () => {

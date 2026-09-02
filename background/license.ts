@@ -1,6 +1,7 @@
 // License periodic verification via chrome.alarms.
 import { MESSAGE_TYPES, LICENSE_CHECK_INTERVAL } from '../shared/constants';
 import { periodicLicenseCheck } from '../shared/license';
+import { reportTrialExpiryIfNeeded } from '../shared/trial';
 import { broadcastToPopup } from './utils';
 
 const LICENSE_ALARM_NAME = 'license-periodic-check';
@@ -17,6 +18,11 @@ export function initLicenseAlarm(): void {
   chrome.alarms.onAlarm.addListener(async (alarm) => {
     if (alarm.name !== LICENSE_ALARM_NAME) return;
     const result = await periodicLicenseCheck();
+    // Funnel telemetry: fire trial_expired exactly once when the 7-day
+    // window lapses (idempotent sentinel inside). Also fires from the
+    // VALIDATE_LICENSE handler so the event lands on expiry day even when
+    // the 24h alarm is still hours away.
+    await reportTrialExpiryIfNeeded();
     // `periodicLicenseCheck` may return either { isPro: false } or full ProUserInfo.
     // Forward whatever fields exist; `plan`/`status` may be undefined for the
     // never-licensed case, which is fine for the broadcast payload.
