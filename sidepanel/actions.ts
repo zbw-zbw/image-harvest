@@ -21,6 +21,7 @@ import { isRestrictedUrl } from '../shared/utils';
 import { isSafeImageUrl } from '../shared/url-validator';
 import { track } from '../shared/telemetry';
 import { EVENTS } from '../shared/telemetry-events';
+import { EXPERIMENTS, getCachedBucket } from '../shared/ab-experiment';
 import { getRemainingMonthlyFreeAiTags } from '../shared/ai-free-quota';
 import { recordDownloads } from '../shared/paywall-state';
 import { recordDownloadForRating } from '../shared/rating-prompt-state';
@@ -398,6 +399,15 @@ export async function downloadSelectedAsZip(
 
   // Free tier: per-batch image count limit
   if (!state.isProUser && selected.length > getFreeLimits().MAX_ZIP_IMAGES) {
+    // Report the block with the quota experiment's surface-level bucket —
+    // this used to fire no telemetry at all, so zip-wall hits (the primary
+    // signal for quota_tighten_v1) were invisible in funnels. The key is
+    // omitted when the experiment hasn't resolved yet (bucket === null).
+    const quotaBucket = getCachedBucket(EXPERIMENTS.QUOTA_TIGHTEN_V1);
+    void track(EVENTS.PRO_FEATURE_BLOCKED, {
+      feature: 'batch_zip',
+      ...(quotaBucket ? { bucket: quotaBucket } : {}),
+    });
     showToast(t('pro_zip_limit', { max: String(getFreeLimits().MAX_ZIP_IMAGES) }), 'warning');
     showProUpgradeModal();
     return;

@@ -50,7 +50,12 @@ const BUDGETS = {
   // copy + expandable candidate-link list), injected-items persistence module,
   // the userInjected filter exemption, and badge tooltips push init to
   // ~119.7 kB gzip. New user-facing feature growth, accepted intentionally.
-  'init.js': { gzipKb: 122, label: 'sidepanel main' },
+  // Bumped 122 → 123 kB for v1.1.3+v1.1.4 telemetry: trial-grace banner wiring
+  // and the QUOTA_TIGHTEN_V1 experiment (zip-guard blocked reporting + startup
+  // bucket seed + globalThis mirror read in getFreeLimits) push init to
+  // ~122.05 kB gzip. Conversion-diagnosis instrumentation, accepted —
+  // 0.95 kB headroom left.
+  'init.js': { gzipKb: 123, label: 'sidepanel main' },
   // Background service worker entry. Currently ~5.6 kB gzip.
   'index.ts.js': { gzipKb: 12, label: 'background SW' },
   // Content script entry. Currently ~7.7 kB gzip.

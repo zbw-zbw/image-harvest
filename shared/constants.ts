@@ -226,6 +226,10 @@ export const VALID_REVERSE_SEARCH_ENGINES = ['google', 'tineye', 'baidu', 'yande
 //   - MAX_COLLECTION_ITEMS: 5  (was: collection fully Pro; now 5 free favorites)
 export const FREE_LIMITS = {
   MAX_ZIP_IMAGES: 50,
+  // QUOTA_TIGHTEN_V1 treatment value — a fixed, explainable number so the
+  // experiment survives later remote-config changes to the control limit.
+  // Exported for tests and for the blocked-event reporting in actions.ts.
+  QUOTA_TIGHTEN_B_MAX_ZIP_IMAGES: 10,
   MAX_BATCH_COPY_URLS: 10,
   MAX_COLLECTION_ITEMS: 10,
   MAX_MONTHLY_AI_TAGS: 5,
@@ -270,102 +274,126 @@ export const FREE_LIMITS = {
 export function getFreeLimits(): typeof FREE_LIMITS {
   // Lazy import to avoid circular dependency at module load time
   // eslint-disable-next-line @typescript-eslint/no-require-imports
+  let limits: typeof FREE_LIMITS = FREE_LIMITS;
   try {
     // Dynamic import won't work synchronously, so we use a global cache
     // that remote-config.ts populates on sync.
     const remote = (globalThis as Record<string, unknown>).__remoteConfig as
       | Record<string, unknown>
       | undefined;
-    if (!remote) return FREE_LIMITS;
-
-    return {
-      ...FREE_LIMITS,
-      MAX_ZIP_IMAGES: (typeof remote.maxZipImages === 'number'
-        ? remote.maxZipImages
-        : FREE_LIMITS.MAX_ZIP_IMAGES) as typeof FREE_LIMITS.MAX_ZIP_IMAGES,
-      MAX_BATCH_COPY_URLS: (typeof remote.maxBatchCopyUrls === 'number'
-        ? remote.maxBatchCopyUrls
-        : FREE_LIMITS.MAX_BATCH_COPY_URLS) as typeof FREE_LIMITS.MAX_BATCH_COPY_URLS,
-      MAX_COLLECTION_ITEMS: (typeof remote.maxCollectionItems === 'number'
-        ? remote.maxCollectionItems
-        : FREE_LIMITS.MAX_COLLECTION_ITEMS) as typeof FREE_LIMITS.MAX_COLLECTION_ITEMS,
-      MAX_MONTHLY_AI_TAGS: (typeof remote.maxMonthlyAiTags === 'number'
-        ? remote.maxMonthlyAiTags
-        : FREE_LIMITS.MAX_MONTHLY_AI_TAGS) as typeof FREE_LIMITS.MAX_MONTHLY_AI_TAGS,
-      MAX_EAGLE_EXPORT_PER_BATCH: (typeof remote.maxEagleExportPerBatch === 'number'
-        ? remote.maxEagleExportPerBatch
-        : FREE_LIMITS.MAX_EAGLE_EXPORT_PER_BATCH) as typeof FREE_LIMITS.MAX_EAGLE_EXPORT_PER_BATCH,
-      MAX_BATCH_DELETE: (typeof remote.maxBatchDelete === 'number'
-        ? remote.maxBatchDelete
-        : FREE_LIMITS.MAX_BATCH_DELETE) as typeof FREE_LIMITS.MAX_BATCH_DELETE,
-      MAX_BATCH_FAVORITE: (typeof remote.maxBatchFavorite === 'number'
-        ? remote.maxBatchFavorite
-        : FREE_LIMITS.MAX_BATCH_FAVORITE) as typeof FREE_LIMITS.MAX_BATCH_FAVORITE,
-      MAX_BATCH_AI_TAGS: (typeof remote.maxBatchAiTags === 'number'
-        ? remote.maxBatchAiTags
-        : FREE_LIMITS.MAX_BATCH_AI_TAGS) as typeof FREE_LIMITS.MAX_BATCH_AI_TAGS,
-      MAX_MONTHLY_MULTI_TAB: (typeof remote.maxMonthlyMultiTab === 'number'
-        ? remote.maxMonthlyMultiTab
-        : FREE_LIMITS.MAX_MONTHLY_MULTI_TAB) as typeof FREE_LIMITS.MAX_MONTHLY_MULTI_TAB,
-      MAX_MONTHLY_DEDUP: (typeof remote.maxMonthlyDedup === 'number'
-        ? remote.maxMonthlyDedup
-        : FREE_LIMITS.MAX_MONTHLY_DEDUP) as typeof FREE_LIMITS.MAX_MONTHLY_DEDUP,
-      MAX_MONTHLY_FORMAT_CONVERT: (typeof remote.maxMonthlyFormatConvert === 'number'
-        ? remote.maxMonthlyFormatConvert
-        : FREE_LIMITS.MAX_MONTHLY_FORMAT_CONVERT) as typeof FREE_LIMITS.MAX_MONTHLY_FORMAT_CONVERT,
-      MAX_MONTHLY_COLOR_COPY: (typeof remote.maxMonthlyColorCopy === 'number'
-        ? remote.maxMonthlyColorCopy
-        : FREE_LIMITS.MAX_MONTHLY_COLOR_COPY) as typeof FREE_LIMITS.MAX_MONTHLY_COLOR_COPY,
-      MAX_MONTHLY_LIVE_MONITOR: (typeof remote.maxMonthlyLiveMonitor === 'number'
-        ? remote.maxMonthlyLiveMonitor
-        : FREE_LIMITS.MAX_MONTHLY_LIVE_MONITOR) as typeof FREE_LIMITS.MAX_MONTHLY_LIVE_MONITOR,
-      MAX_MONTHLY_BATCH_HIGHLIGHT: (typeof remote.maxMonthlyBatchHighlight === 'number'
-        ? remote.maxMonthlyBatchHighlight
-        : FREE_LIMITS.MAX_MONTHLY_BATCH_HIGHLIGHT) as typeof FREE_LIMITS.MAX_MONTHLY_BATCH_HIGHLIGHT,
-      MAX_MONTHLY_DELETE: (typeof remote.maxMonthlyDelete === 'number'
-        ? remote.maxMonthlyDelete
-        : FREE_LIMITS.MAX_MONTHLY_DELETE) as typeof FREE_LIMITS.MAX_MONTHLY_DELETE,
-      MAX_MONTHLY_CUSTOM_NAMING: (typeof remote.maxMonthlyCustomNaming === 'number'
-        ? remote.maxMonthlyCustomNaming
-        : FREE_LIMITS.MAX_MONTHLY_CUSTOM_NAMING) as typeof FREE_LIMITS.MAX_MONTHLY_CUSTOM_NAMING,
-      MAX_MONTHLY_COLOR_FILTER: (typeof remote.maxMonthlyColorFilter === 'number'
-        ? remote.maxMonthlyColorFilter
-        : FREE_LIMITS.MAX_MONTHLY_COLOR_FILTER) as typeof FREE_LIMITS.MAX_MONTHLY_COLOR_FILTER,
-      MAX_MONTHLY_LINK_RESOLVE: (typeof remote.maxMonthlyLinkResolve === 'number'
-        ? remote.maxMonthlyLinkResolve
-        : FREE_LIMITS.MAX_MONTHLY_LINK_RESOLVE) as typeof FREE_LIMITS.MAX_MONTHLY_LINK_RESOLVE,
-      ALLOWED_GROUP_MODES: Array.isArray(remote.allowedGroupModes)
-        ? (remote.allowedGroupModes as unknown as typeof FREE_LIMITS.ALLOWED_GROUP_MODES)
-        : FREE_LIMITS.ALLOWED_GROUP_MODES,
-      REVERSE_SEARCH_ENGINES: Array.isArray(remote.reverseSearchEngines)
-        ? (remote.reverseSearchEngines as unknown as typeof FREE_LIMITS.REVERSE_SEARCH_ENGINES)
-        : FREE_LIMITS.REVERSE_SEARCH_ENGINES,
-      // Boolean overrides
-      CUSTOM_NAMING: (typeof remote.customNaming === 'boolean'
-        ? remote.customNaming
-        : FREE_LIMITS.CUSTOM_NAMING) as typeof FREE_LIMITS.CUSTOM_NAMING,
-      HIGHLIGHT_BATCH: (typeof remote.highlightBatchEnabled === 'boolean'
-        ? remote.highlightBatchEnabled
-        : FREE_LIMITS.HIGHLIGHT_BATCH) as typeof FREE_LIMITS.HIGHLIGHT_BATCH,
-      LIVE_MONITORING: (typeof remote.liveMonitorEnabled === 'boolean'
-        ? remote.liveMonitorEnabled
-        : FREE_LIMITS.LIVE_MONITORING) as typeof FREE_LIMITS.LIVE_MONITORING,
-      FORMAT_CONVERSION: (typeof remote.formatConvertEnabled === 'boolean'
-        ? remote.formatConvertEnabled
-        : FREE_LIMITS.FORMAT_CONVERSION) as typeof FREE_LIMITS.FORMAT_CONVERSION,
-      COLOR_EXTRACT_COPY: (typeof remote.colorExtractCopy === 'boolean'
-        ? remote.colorExtractCopy
-        : FREE_LIMITS.COLOR_EXTRACT_COPY) as typeof FREE_LIMITS.COLOR_EXTRACT_COPY,
-      COLOR_EXTRACT_FILTER: (typeof remote.colorExtractFilter === 'boolean'
-        ? remote.colorExtractFilter
-        : FREE_LIMITS.COLOR_EXTRACT_FILTER) as typeof FREE_LIMITS.COLOR_EXTRACT_FILTER,
-      IMAGE_DELETE: (typeof remote.imageDelete === 'boolean'
-        ? remote.imageDelete
-        : FREE_LIMITS.IMAGE_DELETE) as typeof FREE_LIMITS.IMAGE_DELETE,
-    };
+    if (remote) {
+      limits = {
+        ...FREE_LIMITS,
+        MAX_ZIP_IMAGES: (typeof remote.maxZipImages === 'number'
+          ? remote.maxZipImages
+          : FREE_LIMITS.MAX_ZIP_IMAGES) as typeof FREE_LIMITS.MAX_ZIP_IMAGES,
+        MAX_BATCH_COPY_URLS: (typeof remote.maxBatchCopyUrls === 'number'
+          ? remote.maxBatchCopyUrls
+          : FREE_LIMITS.MAX_BATCH_COPY_URLS) as typeof FREE_LIMITS.MAX_BATCH_COPY_URLS,
+        MAX_COLLECTION_ITEMS: (typeof remote.maxCollectionItems === 'number'
+          ? remote.maxCollectionItems
+          : FREE_LIMITS.MAX_COLLECTION_ITEMS) as typeof FREE_LIMITS.MAX_COLLECTION_ITEMS,
+        MAX_MONTHLY_AI_TAGS: (typeof remote.maxMonthlyAiTags === 'number'
+          ? remote.maxMonthlyAiTags
+          : FREE_LIMITS.MAX_MONTHLY_AI_TAGS) as typeof FREE_LIMITS.MAX_MONTHLY_AI_TAGS,
+        MAX_EAGLE_EXPORT_PER_BATCH: (typeof remote.maxEagleExportPerBatch === 'number'
+          ? remote.maxEagleExportPerBatch
+          : FREE_LIMITS.MAX_EAGLE_EXPORT_PER_BATCH) as typeof FREE_LIMITS.MAX_EAGLE_EXPORT_PER_BATCH,
+        MAX_BATCH_DELETE: (typeof remote.maxBatchDelete === 'number'
+          ? remote.maxBatchDelete
+          : FREE_LIMITS.MAX_BATCH_DELETE) as typeof FREE_LIMITS.MAX_BATCH_DELETE,
+        MAX_BATCH_FAVORITE: (typeof remote.maxBatchFavorite === 'number'
+          ? remote.maxBatchFavorite
+          : FREE_LIMITS.MAX_BATCH_FAVORITE) as typeof FREE_LIMITS.MAX_BATCH_FAVORITE,
+        MAX_BATCH_AI_TAGS: (typeof remote.maxBatchAiTags === 'number'
+          ? remote.maxBatchAiTags
+          : FREE_LIMITS.MAX_BATCH_AI_TAGS) as typeof FREE_LIMITS.MAX_BATCH_AI_TAGS,
+        MAX_MONTHLY_MULTI_TAB: (typeof remote.maxMonthlyMultiTab === 'number'
+          ? remote.maxMonthlyMultiTab
+          : FREE_LIMITS.MAX_MONTHLY_MULTI_TAB) as typeof FREE_LIMITS.MAX_MONTHLY_MULTI_TAB,
+        MAX_MONTHLY_DEDUP: (typeof remote.maxMonthlyDedup === 'number'
+          ? remote.maxMonthlyDedup
+          : FREE_LIMITS.MAX_MONTHLY_DEDUP) as typeof FREE_LIMITS.MAX_MONTHLY_DEDUP,
+        MAX_MONTHLY_FORMAT_CONVERT: (typeof remote.maxMonthlyFormatConvert === 'number'
+          ? remote.maxMonthlyFormatConvert
+          : FREE_LIMITS.MAX_MONTHLY_FORMAT_CONVERT) as typeof FREE_LIMITS.MAX_MONTHLY_FORMAT_CONVERT,
+        MAX_MONTHLY_COLOR_COPY: (typeof remote.maxMonthlyColorCopy === 'number'
+          ? remote.maxMonthlyColorCopy
+          : FREE_LIMITS.MAX_MONTHLY_COLOR_COPY) as typeof FREE_LIMITS.MAX_MONTHLY_COLOR_COPY,
+        MAX_MONTHLY_LIVE_MONITOR: (typeof remote.maxMonthlyLiveMonitor === 'number'
+          ? remote.maxMonthlyLiveMonitor
+          : FREE_LIMITS.MAX_MONTHLY_LIVE_MONITOR) as typeof FREE_LIMITS.MAX_MONTHLY_LIVE_MONITOR,
+        MAX_MONTHLY_BATCH_HIGHLIGHT: (typeof remote.maxMonthlyBatchHighlight === 'number'
+          ? remote.maxMonthlyBatchHighlight
+          : FREE_LIMITS.MAX_MONTHLY_BATCH_HIGHLIGHT) as typeof FREE_LIMITS.MAX_MONTHLY_BATCH_HIGHLIGHT,
+        MAX_MONTHLY_DELETE: (typeof remote.maxMonthlyDelete === 'number'
+          ? remote.maxMonthlyDelete
+          : FREE_LIMITS.MAX_MONTHLY_DELETE) as typeof FREE_LIMITS.MAX_MONTHLY_DELETE,
+        MAX_MONTHLY_CUSTOM_NAMING: (typeof remote.maxMonthlyCustomNaming === 'number'
+          ? remote.maxMonthlyCustomNaming
+          : FREE_LIMITS.MAX_MONTHLY_CUSTOM_NAMING) as typeof FREE_LIMITS.MAX_MONTHLY_CUSTOM_NAMING,
+        MAX_MONTHLY_COLOR_FILTER: (typeof remote.maxMonthlyColorFilter === 'number'
+          ? remote.maxMonthlyColorFilter
+          : FREE_LIMITS.MAX_MONTHLY_COLOR_FILTER) as typeof FREE_LIMITS.MAX_MONTHLY_COLOR_FILTER,
+        MAX_MONTHLY_LINK_RESOLVE: (typeof remote.maxMonthlyLinkResolve === 'number'
+          ? remote.maxMonthlyLinkResolve
+          : FREE_LIMITS.MAX_MONTHLY_LINK_RESOLVE) as typeof FREE_LIMITS.MAX_MONTHLY_LINK_RESOLVE,
+        ALLOWED_GROUP_MODES: Array.isArray(remote.allowedGroupModes)
+          ? (remote.allowedGroupModes as unknown as typeof FREE_LIMITS.ALLOWED_GROUP_MODES)
+          : FREE_LIMITS.ALLOWED_GROUP_MODES,
+        REVERSE_SEARCH_ENGINES: Array.isArray(remote.reverseSearchEngines)
+          ? (remote.reverseSearchEngines as unknown as typeof FREE_LIMITS.REVERSE_SEARCH_ENGINES)
+          : FREE_LIMITS.REVERSE_SEARCH_ENGINES,
+        // Boolean overrides
+        CUSTOM_NAMING: (typeof remote.customNaming === 'boolean'
+          ? remote.customNaming
+          : FREE_LIMITS.CUSTOM_NAMING) as typeof FREE_LIMITS.CUSTOM_NAMING,
+        HIGHLIGHT_BATCH: (typeof remote.highlightBatchEnabled === 'boolean'
+          ? remote.highlightBatchEnabled
+          : FREE_LIMITS.HIGHLIGHT_BATCH) as typeof FREE_LIMITS.HIGHLIGHT_BATCH,
+        LIVE_MONITORING: (typeof remote.liveMonitorEnabled === 'boolean'
+          ? remote.liveMonitorEnabled
+          : FREE_LIMITS.LIVE_MONITORING) as typeof FREE_LIMITS.LIVE_MONITORING,
+        FORMAT_CONVERSION: (typeof remote.formatConvertEnabled === 'boolean'
+          ? remote.formatConvertEnabled
+          : FREE_LIMITS.FORMAT_CONVERSION) as typeof FREE_LIMITS.FORMAT_CONVERSION,
+        COLOR_EXTRACT_COPY: (typeof remote.colorExtractCopy === 'boolean'
+          ? remote.colorExtractCopy
+          : FREE_LIMITS.COLOR_EXTRACT_COPY) as typeof FREE_LIMITS.COLOR_EXTRACT_COPY,
+        COLOR_EXTRACT_FILTER: (typeof remote.colorExtractFilter === 'boolean'
+          ? remote.colorExtractFilter
+          : FREE_LIMITS.COLOR_EXTRACT_FILTER) as typeof FREE_LIMITS.COLOR_EXTRACT_FILTER,
+        IMAGE_DELETE: (typeof remote.imageDelete === 'boolean'
+          ? remote.imageDelete
+          : FREE_LIMITS.IMAGE_DELETE) as typeof FREE_LIMITS.IMAGE_DELETE,
+      };
+    }
   } catch {
-    return FREE_LIMITS;
+    /* fall through to defaults */
   }
+
+  // QUOTA_TIGHTEN_V1 overlay — applied LAST so it wins over both the default
+  // and remote config. Single variable: bucket b tightens the per-batch zip
+  // quota; bucket a (and not-yet-resolved) keeps the merged value. The bucket
+  // is read from the globalThis mirror (NOT a static import of ab-experiment —
+  // constants is the most-imported module in the repo, and that edge would
+  // drag license.ts into every consumer's loading graph, breaking vi.mock
+  // hoisting in test files that mock shared/telemetry). ab-experiment mirrors
+  // every resolved bucket there; sidepanel init seeds it at startup. Before
+  // it resolves we conservatively serve control behavior. Returns a copy —
+  // never mutate the FREE_LIMITS constant. The cast is the same lie the
+  // remote-merge above already tells: the literal type is 50 but runtime is
+  // dynamic.
+  const abBuckets = (globalThis as Record<string, unknown>).__abBuckets as
+    | Record<string, string>
+    | undefined;
+  if (abBuckets?.['quota_tighten_v1'] === 'b') {
+    return {
+      ...limits,
+      MAX_ZIP_IMAGES: FREE_LIMITS.QUOTA_TIGHTEN_B_MAX_ZIP_IMAGES,
+    } as unknown as typeof FREE_LIMITS;
+  }
+  return limits;
 }
 
 // Default filter setting for visible-only images

@@ -13,7 +13,7 @@ import {
 import { setEnvelopeMeta, track, flushNow } from '../shared/telemetry';
 import { EVENTS } from '../shared/telemetry-events';
 import { isProUser } from '../shared/license';
-import { getProUpsellBucket } from '../shared/ab-experiment';
+import { EXPERIMENTS, getExperimentBucket, getProUpsellBucket } from '../shared/ab-experiment';
 import { detectLocale, onLocaleChange, setLocale, t, type Locale } from '../shared/i18n';
 import {
   clearSelection,
@@ -201,6 +201,13 @@ async function init(): Promise<void> {
       .catch(() => {
         /* fall back to no bucket — the funnel collapses A+B for that user */
       });
+
+    // Seed the quota experiment's bucket into ab-experiment's sync cache —
+    // getFreeLimits() reads it synchronously on every zip guard / QuotaDisplay
+    // render, so the bucket must be resolved before the first user click.
+    void getExperimentBucket(EXPERIMENTS.QUOTA_TIGHTEN_V1).catch(() => {
+      /* unresolved → control behavior, which is the conservative default */
+    });
 
     // Fire EXTENSION_FIRST_OPEN exactly once per install, gated by a
     // storage flag so subsequent opens stay silent. We deliberately do

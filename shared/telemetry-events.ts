@@ -196,7 +196,9 @@ export const EVENT_PROP_SCHEMAS: Record<TelemetryEventName, readonly string[]> =
   [EVENTS.AI_TAG_FAILED]: ['reason'],
   [EVENTS.AI_QUOTA_EXHAUSTED]: [],
 
-  [EVENTS.PRO_FEATURE_BLOCKED]: ['feature', 'abBucket'],
+  // `bucket` = surface-level experiment variant (e.g. quota_tighten_v1),
+  // distinct from the envelope-level `abBucket` reserved for PRO_UPSELL_COPY.
+  [EVENTS.PRO_FEATURE_BLOCKED]: ['feature', 'abBucket', 'bucket'],
   [EVENTS.PRO_FEATURE_USED]: ['feature'],
 
   [EVENTS.SOFT_PAYWALL_SHOWN]: ['triggerCount', 'abBucket'], // download count threshold

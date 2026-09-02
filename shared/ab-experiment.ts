@@ -59,6 +59,17 @@ export const EXPERIMENTS = {
    * 7 days (onboarding_download_done vs download_* baseline).
    */
   ONBOARDING_FLOW: 'onboarding_flow_v1',
+  /**
+   * Conversion diagnosis experiment (2026-09). Usage data shows free users
+   * never reach the zip quota wall, so no purchase pressure ever forms.
+   * a = control (current limits: remote config or FREE_LIMITS default),
+   * b = treatment: per-batch zip quota tightened to a fixed 10 (single
+   * variable — see getFreeLimits overlay). Primary signal: does
+   * pro_feature_blocked(feature=batch_zip) fire, and does anyone flow to
+   * soft_paywall_* → checkout. Sample is small (~350 installs): read
+   * direction only, no significance testing.
+   */
+  QUOTA_TIGHTEN_V1: 'quota_tighten_v1',
 } as const;
 export type ExperimentId = (typeof EXPERIMENTS)[keyof typeof EXPERIMENTS];
 
@@ -117,6 +128,14 @@ export function bucketFor(
 export async function getExperimentBucket(experimentId: ExperimentId): Promise<AbBucket> {
   const cached = cachedBuckets.get(experimentId);
   if (cached) return cached;
+  // E2E builds pin quota experiments to the control bucket: suites like
+  // download-many-warning.e2e.ts assert behavior against FREE_LIMITS
+  // defaults, and a persistent context that happens to hash into 'b' would
+  // change enforced limits mid-suite. Not cached so production behavior
+  // is untouched by this branch.
+  if (typeof __E2E__ !== 'undefined' && __E2E__ && experimentId === EXPERIMENTS.QUOTA_TIGHTEN_V1) {
+    return 'a';
+  }
   let bucket: AbBucket;
   try {
     const id = await getOrCreateInstanceId();
@@ -127,7 +146,20 @@ export async function getExperimentBucket(experimentId: ExperimentId): Promise<A
     bucket = 'a';
   }
   cachedBuckets.set(experimentId, bucket);
+  mirrorBucketsToGlobalThis();
   return bucket;
+}
+
+/**
+ * Mirror every resolved bucket onto globalThis so synchronous consumers
+ * that must NOT import this module (constants.ts > getFreeLimits — a static
+ * import there would drag license.ts into the whole repo's loading graph and
+ * break vi.mock hoisting in test files) can read experiment state.
+ * Keyed by experiment id; written on every resolution.
+ */
+function mirrorBucketsToGlobalThis(): void {
+  const holder = globalThis as Record<string, unknown>;
+  holder.__abBuckets = Object.fromEntries(cachedBuckets);
 }
 
 /** Back-compat wrapper for the original single-experiment API. */
@@ -154,6 +186,7 @@ export function getCachedBucket(
 export const __test = {
   reset(): void {
     cachedBuckets.clear();
+    mirrorBucketsToGlobalThis();
   },
   /** Force a cached bucket (bypasses storage). Used by component tests
    * that need to render a specific variant without touching license.ts.
@@ -167,5 +200,6 @@ export const __test = {
     } else {
       cachedBuckets.set(experimentId, bucket);
     }
+    mirrorBucketsToGlobalThis();
   },
 };
