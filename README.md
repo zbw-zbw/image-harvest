@@ -87,11 +87,11 @@
 
 ---
 
-## 🆕 What's New (v1.1.3)
+## 🆕 What's New (v1.1.4)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
-- **📡 Trial-expiry telemetry repair** — the `trial_expired` event existed but never fired; it now reports once when a trial lapses, and the grace-period upgrade banner tracks impressions (once per day) and clicks. No visible behavior changes — it makes the post-trial journey measurable so that experience can be improved.
+- **📡 Analytics blind-spot fix** — encounters with the free-tier batch download limit now report usage events (previously missing entirely), and internal telemetry carries richer context. No visible behavior changes — this makes real feature demand measurable so the product can be tuned with data instead of guesses.
 
 ---
 

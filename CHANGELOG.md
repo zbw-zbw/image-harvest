@@ -58,6 +58,18 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
+## [1.1.4] — 2026-09-02
+
+### 🐛 Fixed
+
+- **Batch-download limit analytics**: hitting the free-tier batch download cap now reports a usage event — these encounters were previously a blind spot in analytics, making it impossible to tell how often the limit actually matters.
+
+### 🧹 Housekeeping
+
+- **Telemetry context**: internal usage events now carry richer context, so feature-demand patterns can be analyzed more reliably.
+
+---
+
 ## [1.1.3] — 2026-09-02
 
 ### 🐛 Fixed
