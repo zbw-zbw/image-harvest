@@ -58,6 +58,18 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
+## [1.1.3] — 2026-09-02
+
+### 🐛 Fixed
+
+- **Trial-expiry funnel events**: the `trial_expired` event was defined but never wired up — expiring trials silently vanished from analytics. It now fires exactly once when a trial lapses, from both the periodic license check and license validation.
+
+### ✨ Added
+
+- **Grace-period banner analytics**: the upgrade banner shown during the 3-day post-trial grace window now reports when it is shown (throttled to once per day) and when its upgrade button is clicked.
+
+---
+
 ## [1.1.2] — 2026-08-27
 
 ### ✨ Added

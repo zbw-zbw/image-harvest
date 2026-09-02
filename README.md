@@ -87,13 +87,11 @@
 
 ---
 
-## 🆕 What's New (v1.1.2)
+## 🆕 What's New (v1.1.3)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
-- **📊 Link-resolve quota in Settings** — the usage-quota panel now lists your monthly "resolve originals" allowance (3/month on the free tier) alongside AI tags and color copy, with a live remaining counter that grays out at zero.
-- **🔔 Resolve toasts show what's left** — after a successful run, free users see how many link resolves remain this month; the final one says plainly that Pro removes the cap — a soft upsell that never interrupts the flow.
-- **🌍 All 15 languages updated** — the new quota row and toast strings are translated across every supported locale.
+- **📡 Trial-expiry telemetry repair** — the `trial_expired` event existed but never fired; it now reports once when a trial lapses, and the grace-period upgrade banner tracks impressions (once per day) and clicks. No visible behavior changes — it makes the post-trial journey measurable so that experience can be improved.
 
 ---
 
