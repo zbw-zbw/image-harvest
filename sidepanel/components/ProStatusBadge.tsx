@@ -14,9 +14,13 @@
 //
 // Click handlers (Upgrade / Deactivate) keep their original DOM ids so the
 // existing event bindings in init.ts continue to work unchanged.
+import { useEffect } from 'preact/hooks';
 import { useStoreSelector } from './storeHook';
 import { state } from '../state';
 import { t } from '../../shared/i18n';
+import { track } from '../../shared/telemetry';
+import { EVENTS } from '../../shared/telemetry-events';
+import { maybeReportTrialExpiryWarning, TRIAL_EXPIRY_WARNING_DAYS } from '../../shared/trial';
 
 /**
  * Plan + expiry payload pushed by settings.ts after a license check.
@@ -80,6 +84,27 @@ export function ProStatusBadge() {
   const planLabel = info?.plan ? PLAN_LABELS[info.plan]?.() || info.plan : '';
   const isTrial = info?.plan === 'trial';
   const daysLeft = isTrial ? trialDaysRemaining(info?.expiresAt) : null;
+  // Pre-expiry warning: the trial's final days get an amber banner with an
+  // upgrade CTA — the pre-expiry conversion touchpoint (post-expiry is the
+  // TrialGraceBanner). 0 < daysLeft <= TRIAL_EXPIRY_WARNING_DAYS.
+  const trialExpiringSoon =
+    isTrial && daysLeft != null && daysLeft > 0 && daysLeft <= TRIAL_EXPIRY_WARNING_DAYS;
+
+  // Impression telemetry, throttled to once/day/install inside
+  // maybeReportTrialExpiryWarning — the warning is persistent UI for the
+  // whole window, so an unthrottled track() would measure panel opens.
+  useEffect(() => {
+    if (!trialExpiringSoon || daysLeft == null) return;
+    void maybeReportTrialExpiryWarning(daysLeft);
+  }, [trialExpiringSoon, daysLeft]);
+
+  const handleExpiryUpgrade = () => {
+    if (daysLeft != null) {
+      void track(EVENTS.TRIAL_EXPIRY_CTA_CLICKED, { daysRemaining: daysLeft });
+    }
+    state.proUpgradeModalState = { open: true, errorText: '' };
+  };
+
   let expiryLabel = '';
   if (info?.plan !== 'lifetime' && info?.expiresAt && !isTrial) {
     expiryLabel = t('plan_expires_date', { date: formatDateYMD(info.expiresAt) });
@@ -150,6 +175,19 @@ export function ProStatusBadge() {
           </svg>
         </button>
       </div>
+
+      {/* Pre-expiry amber warning — shown only during the trial's final
+          days; the post-expiry counterpart is the TrialGraceBanner. */}
+      {trialExpiringSoon && daysLeft != null && (
+        <div class="trial-expiry-warning">
+          <span class="trial-expiry-text">
+            {t('trial_expiry_warning', { days: String(daysLeft) })}
+          </span>
+          <button class="btn btn-small btn-primary trial-expiry-btn" onClick={handleExpiryUpgrade}>
+            {t('trial_grace_upgrade_btn')}
+          </button>
+        </div>
+      )}
     </div>
   );
 }

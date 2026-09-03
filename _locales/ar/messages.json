@@ -1526,6 +1526,9 @@
   "trial_grace_upgrade_btn": {
     "message": "Upgrade Now"
   },
+  "trial_expiry_warning": {
+    "message": "Your free Pro trial ends in {days} day(s). Upgrade now to keep Pro features."
+  },
   "extName": {
     "message": "Image Harvest - تنزيل جميع الصور من أي صفحة ويب",
     "description": "Extension name shown in the Chrome Web Store and browser UI."

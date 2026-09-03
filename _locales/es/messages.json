@@ -1097,6 +1097,9 @@
   "trial_grace_upgrade_btn": {
     "message": "Actualizar ahora"
   },
+  "trial_expiry_warning": {
+    "message": "Su prueba termina en {days} día(s). Actualice ahora para conservar las funciones Pro."
+  },
   "view_grid": {
     "message": "Cuadrícula"
   },

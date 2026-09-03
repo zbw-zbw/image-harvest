@@ -1094,6 +1094,9 @@
   "trial_grace_upgrade_btn": {
     "message": "立即升級"
   },
+  "trial_expiry_warning": {
+    "message": "試用即將結束：{days} 天後 Pro 功能將暫停。立即升級以保留全部功能。"
+  },
   "view_grid": {
     "message": "網格"
   },

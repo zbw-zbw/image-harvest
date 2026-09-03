@@ -39,6 +39,10 @@ import { EVENTS } from './telemetry-events';
 const STORAGE_KEY_TRIAL_REDEEMED = '_trial_redeemed_at';
 const STORAGE_KEY_TRIAL_EXPIRED_REPORTED = '_trial_expired_reported';
 const STORAGE_KEY_GRACE_BANNER_DAY = '_trial_grace_banner_day';
+const STORAGE_KEY_EXPIRY_WARNING_DAY = '_trial_expiry_warning_day';
+
+/** The trial shows an amber "expiring soon" warning during these final days. */
+export const TRIAL_EXPIRY_WARNING_DAYS = 3;
 
 /** 7 days in milliseconds — kept as a literal to avoid an extra constants import. */
 export const TRIAL_DURATION_MS = 7 * 24 * 60 * 60 * 1000;
@@ -252,6 +256,25 @@ export async function maybeReportTrialGraceBanner(daysRemaining: number): Promis
     return false;
   }
   await track(EVENTS.TRIAL_GRACE_BANNER_SHOWN, { daysRemaining });
+  return true;
+}
+
+/**
+ * Track the pre-expiry "expiring soon" warning at most once per day per
+ * install — same throttle pattern as the grace banner (the warning is
+ * persistent UI for the whole final-3-days window, so it would otherwise
+ * measure panel opens, not reach).
+ */
+export async function maybeReportTrialExpiryWarning(daysRemaining: number): Promise<boolean> {
+  const today = new Date().toISOString().slice(0, 10);
+  try {
+    const data = await chrome.storage.local.get(STORAGE_KEY_EXPIRY_WARNING_DAY);
+    if (data[STORAGE_KEY_EXPIRY_WARNING_DAY] === today) return false;
+    await chrome.storage.local.set({ [STORAGE_KEY_EXPIRY_WARNING_DAY]: today });
+  } catch {
+    return false;
+  }
+  await track(EVENTS.TRIAL_EXPIRY_WARNING_SHOWN, { daysRemaining });
   return true;
 }
 

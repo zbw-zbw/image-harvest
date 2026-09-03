@@ -584,7 +584,57 @@
   padding: 4px 10px;
 }
 
-/* Dark mode */
+/* ============================================
+   Trial Expiry Warning (final 3 days BEFORE expiry)
+   Same amber language as the grace banner so the two stages read as one
+   continuous urgency ramp: warning (pre) → grace (post).
+   ============================================ */
+.trial-expiry-warning {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #fff3cd, #ffeeba);
+  border-bottom: 1px solid #ffc107;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.trial-expiry-text {
+  color: var(--amber-muted);
+  font-weight: 500;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.trial-expiry-btn {
+  flex-shrink: 0;
+  font-size: 11px;
+  padding: 4px 10px;
+}
+
+/* Dark mode — warning */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .trial-expiry-warning {
+    background: linear-gradient(135deg, #332b00, #3d3200);
+    border-bottom-color: var(--amber-text-dark);
+  }
+  :root:not([data-theme]) .trial-expiry-text {
+    color: var(--amber-light);
+  }
+}
+
+:root[data-theme='dark'] .trial-expiry-warning {
+  background: linear-gradient(135deg, #332b00, #3d3200);
+  border-bottom-color: var(--amber-text-dark);
+}
+
+:root[data-theme='dark'] .trial-expiry-text {
+  color: var(--amber-light);
+}
+
+/* Dark mode (grace banner) */
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) .trial-grace-banner {
     background: linear-gradient(135deg, #332b00, #3d3200);

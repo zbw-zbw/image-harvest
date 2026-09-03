@@ -752,6 +752,9 @@
   "trial_grace_upgrade_btn": {
     "message": "立即升级"
   },
+  "trial_expiry_warning": {
+    "message": "试用即将结束：{days} 天后 Pro 功能将暂停。立即升级以保留全部功能。"
+  },
   "welcome_title": {
     "message": "欢迎使用 Image Harvest Pro"
   },

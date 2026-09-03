@@ -807,6 +807,9 @@
   "trial_grace_upgrade_btn": {
     "message": "Upgrade Now"
   },
+  "trial_expiry_warning": {
+    "message": "Your free Pro trial ends in {days} day(s). Upgrade now to keep Pro features."
+  },
   "welcome_title": {
     "message": "Welcome to Image Harvest Pro"
   },

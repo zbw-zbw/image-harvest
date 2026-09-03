@@ -1094,6 +1094,9 @@
   "trial_grace_upgrade_btn": {
     "message": "今すぐアップグレード"
   },
+  "trial_expiry_warning": {
+    "message": "無料トライアルはあと {days} 日で終了します。Pro 機能を維持するには今すぐアップグレードしてください。"
+  },
   "view_grid": {
     "message": "グリッド"
   },
