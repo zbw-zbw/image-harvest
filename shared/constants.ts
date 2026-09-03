@@ -226,8 +226,9 @@ export const VALID_REVERSE_SEARCH_ENGINES = ['google', 'tineye', 'baidu', 'yande
 //   - MAX_COLLECTION_ITEMS: 5  (was: collection fully Pro; now 5 free favorites)
 export const FREE_LIMITS = {
   MAX_ZIP_IMAGES: 50,
-  // QUOTA_TIGHTEN_V1 treatment value — a fixed, explainable number so the
-  // experiment survives later remote-config changes to the control limit.
+  // QUOTA_TIGHTEN_V1 treatment fallback — remote-configurable via
+  // system.quota_tighten_b_zip_images (remote.quotaTightenBZipImages);
+  // used only when the remote override is missing or invalid.
   // Exported for tests and for the blocked-event reporting in actions.ts.
   QUOTA_TIGHTEN_B_MAX_ZIP_IMAGES: 10,
   MAX_BATCH_COPY_URLS: 10,
@@ -384,13 +385,27 @@ export function getFreeLimits(): typeof FREE_LIMITS {
   // never mutate the FREE_LIMITS constant. The cast is the same lie the
   // remote-merge above already tells: the literal type is 50 but runtime is
   // dynamic.
+  // The treatment value is remote-configurable (system.quota_tighten_b_zip_images,
+  // mapped to remote.quotaTightenBZipImages) so ops can retune it without a
+  // release; the constant below stays as the fallback default. Changing it
+  // mid-experiment makes pre/post wall-hit counts incomparable — the admin
+  // limits page labels it accordingly.
   const abBuckets = (globalThis as Record<string, unknown>).__abBuckets as
     | Record<string, string>
     | undefined;
   if (abBuckets?.['quota_tighten_v1'] === 'b') {
+    // `remote` above is scoped to the try/catch merge; re-read the mirror
+    // here (same pattern the merge uses).
+    const remoteCfg = (globalThis as Record<string, unknown>).__remoteConfig as
+      | Record<string, unknown>
+      | undefined;
+    const remoteB = remoteCfg?.quotaTightenBZipImages;
     return {
       ...limits,
-      MAX_ZIP_IMAGES: FREE_LIMITS.QUOTA_TIGHTEN_B_MAX_ZIP_IMAGES,
+      MAX_ZIP_IMAGES:
+        typeof remoteB === 'number' && remoteB > 0
+          ? remoteB
+          : FREE_LIMITS.QUOTA_TIGHTEN_B_MAX_ZIP_IMAGES,
     } as unknown as typeof FREE_LIMITS;
   }
   return limits;
