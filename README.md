@@ -87,11 +87,11 @@
 
 ---
 
-## 🆕 What's New (v1.1.4)
+## 🆕 What's New (v1.1.5)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
-- **📡 Analytics blind-spot fix** — encounters with the free-tier batch download limit now report usage events (previously missing entirely), and internal telemetry carries richer context. No visible behavior changes — this makes real feature demand measurable so the product can be tuned with data instead of guesses.
+- **⏰ Trial expiry reminder** — during the last 3 days of the free trial, an amber banner appears in the panel with a one-click upgrade entry, so the trial never expires by surprise.
 
 ---
 

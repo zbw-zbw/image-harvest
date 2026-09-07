@@ -58,6 +58,14 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
+## [1.1.5] — 2026-09-04
+
+### ✨ Added
+
+- **Trial expiry reminder**: during the final 3 days of the 7-day free trial, an amber banner appears in the extension panel with a one-click upgrade entry — the trial no longer expires by surprise.
+
+---
+
 ## [1.1.4] — 2026-09-02
 
 ### 🐛 Fixed
