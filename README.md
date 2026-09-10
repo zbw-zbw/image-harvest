@@ -87,11 +87,19 @@
 
 ---
 
-## 🆕 What's New (v1.1.5)
+## 🆕 What's New (v1.1.6)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
-- **⏰ Trial expiry reminder** — during the last 3 days of the free trial, an amber banner appears in the panel with a one-click upgrade entry, so the trial never expires by surprise.
+- 🔒 **Injection-proof error pages** — reverse-search errors now render as plain text, closing a content-injection vector from the searched page.
+- 🔒 **Tamper-evident license cache** — a locally edited license record now fails signature validation and falls back to a server check.
+- 💳 **Paid subscriptions are update-proof** — installing an update no longer overwrites an active monthly/yearly license with a 7-day trial.
+- 🎁 **Referral bonuses finally work** — the invite-page fingerprint silently never matched the extension's (it read a property the service worker doesn't expose); both ends now compute the same hash.
+- 🤖 **Failed AI tags no longer burn the free quota** — the 5 free monthly tags now only count real results.
+- 🔗 **Gallery "resolve originals" bar stays live** — the button disables while resolving, and the candidate list refreshes on tab switches.
+- 🖼️ **No duplicate cards across tabs** — multi-tab extraction now dedupes the same URL found in several tabs.
+- ⚡ **Faster on huge pages** — image highlighting caps its style scan and duplicate checks use constant-time lookups, so image-heavy pages stop stuttering.
+- 🗓️ **Quota resets align with the server** — monthly quota boundaries use UTC everywhere, matching the backend exactly when counts reset.
 
 ---
 

@@ -58,6 +58,44 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
+## [1.1.6] — 2026-09-10
+
+### 🔒 Security
+
+- **Reverse-search error pages are injection-proof**: error text could carry content supplied by the page an image was searched from; it is now rendered as plain text only, closing the injection vector in this extension-origin tab.
+
+- **License cache is tamper-evident**: cache freshness no longer trusts a locally editable field — an edited record now fails signature validation and falls back to a server check, closing a local "permanent Pro" loophole.
+
+### 🐛 Fixed
+
+- **Installing an update no longer downgrades a paid subscription to a trial**: the auto-started 7-day trial could overwrite an active monthly/yearly license; paid users are now exempt from the auto-trial.
+
+- **Referral bonuses now actually match**: the invite-page fingerprint relied on a property that doesn't exist in the extension's service worker, so every referral match silently failed since launch — both ends now compute the identical fingerprint.
+
+- **Failed AI tags no longer burn the free monthly quota**: when an AI tagging request fails, the free-tier deduction is rolled back, so the monthly 5 free tags only count real results.
+
+- **The gallery "resolve originals" bar stays live**: the resolve button now correctly disables while running, and the candidate list refreshes even when you switch back to a tab with the same number of links.
+
+- **Cancelled zip downloads no longer leak memory**: the temporary blob behind a page/collection zip is now released even when the download call itself fails.
+
+- **Reverse-search tab tracking no longer gets stuck**: a single failed attempt to open the reverse-search page used to make the panel ignore every future tab switch; failures now disarm cleanly.
+
+- **Multi-tab extraction no longer duplicates images across tabs**: the same URL found in several tabs rendered one card per tab; results are now deduplicated across the whole batch.
+
+- **Highlighting no longer freezes huge pages**: the background-image scan now caps its forced style computation, so image-heavy pages stop stuttering on every highlight.
+
+- **Month boundaries no longer drift from the server**: monthly quota keys use UTC everywhere now, so cached counts agree with the backend exactly when quotas reset.
+
+### 🧹 Housekeeping
+
+- **Faster grid updates on image-heavy pages**: duplicate checks for incoming images now use constant-time lookups instead of re-scanning the whole grid per image.
+
+### 🧪 Test Coverage Expansion
+
+- Fingerprint tests updated to the new referral inputs, with a regression guard that the service-worker-unavailable `screen` fields stay excluded.
+
+---
+
 ## [1.1.5] — 2026-09-04
 
 ### ✨ Added

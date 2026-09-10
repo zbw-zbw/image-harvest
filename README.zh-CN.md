@@ -342,7 +342,7 @@ Image Harvest 的官方营销站（着陆页、定价、常见问题、License �
 
 完整发布历史详见 [CHANGELOG.md](./CHANGELOG.md)。
 
-**最新版本**：`v1.1.5` —— ⏰ 试用临期提醒：免费试用最后 3 天，面板会出现琥珀色警示条并附一键升级入口——试用到期不再毫无预警。完整列表见 [CHANGELOG.md](./CHANGELOG.md)。
+**最新版本**：`v1.1.6` —— 🔒 安全与稳定性修复批：反向搜索错误页防注入、license 缓存防篡改、付费订阅不再被自动试用覆盖、referral 奖励自上线以来首次真正生效。完整列表见 [CHANGELOG.md](./CHANGELOG.md)。
 
 ---
 
