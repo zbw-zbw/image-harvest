@@ -123,7 +123,11 @@ export function handleMessage(message: IncomingMessage): void {
         );
 
         const prevCount = state.allImages.length;
-        const toAdd = newImgs.filter((ni) => !state.allImages.find((img) => img.url === ni.url));
+        // O(existing + incoming) dedup — the old filter+find pair walked the
+        // whole grid once per discovered image, which compounded badly on
+        // image-heavy pages (batch arrival × growing allImages).
+        const existingUrls = new Set(state.allImages.map((img) => img.url));
+        const toAdd = newImgs.filter((ni) => !existingUrls.has(ni.url));
         if (toAdd.length > 0) {
           state.allImages = [...state.allImages, ...toAdd];
         }
@@ -174,7 +178,9 @@ export function handleMessage(message: IncomingMessage): void {
               phash: null,
             }) as ImageItem
         );
-        const toAdd = newImgs.filter((ni) => !state.allImages.find((img) => img.url === ni.url));
+        // Same Set-based dedup as the scan-discovery path above.
+        const existingUrls = new Set(state.allImages.map((img) => img.url));
+        const toAdd = newImgs.filter((ni) => !existingUrls.has(ni.url));
         const addedCount = toAdd.length;
         if (addedCount > 0) {
           state.allImages = [...state.allImages, ...toAdd];
@@ -230,9 +236,10 @@ export function handleMessage(message: IncomingMessage): void {
             }) as ImageItem
         );
 
-        const toAdd = newImages.filter(
-          (newImg) => !state.allImages.find((img) => img.url === newImg.url)
-        );
+        // Multi-tab results merge hundreds of images into a possibly
+        // already-large grid — Set lookup keeps this linear.
+        const existingUrls = new Set(state.allImages.map((img) => img.url));
+        const toAdd = newImages.filter((newImg) => !existingUrls.has(newImg.url));
         if (toAdd.length > 0) {
           state.allImages = [...state.allImages, ...toAdd];
         }

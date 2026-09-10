@@ -159,12 +159,17 @@ async function batchDownloadCollection(): Promise<void> {
     const content = await zip.generateAsync({ type: 'blob' });
     const blobUrl = URL.createObjectURL(content);
     const ts = formatTimestamp(new Date());
-    await chrome.downloads.download({
-      url: blobUrl,
-      filename: `collection-${ts}.zip`,
-      saveAs: false,
-    });
-    URL.revokeObjectURL(blobUrl);
+    try {
+      await chrome.downloads.download({
+        url: blobUrl,
+        filename: `collection-${ts}.zip`,
+        saveAs: false,
+      });
+    } finally {
+      // Revoke even when the download call throws — the blob backing a
+      // large zip must not leak.
+      URL.revokeObjectURL(blobUrl);
+    }
 
     const successCount = selectedItems.length - failed.length;
     if (successCount === 0) {
@@ -519,12 +524,17 @@ export async function exportCollection(): Promise<void> {
     const content = await zip.generateAsync({ type: 'blob' });
     const blobUrl = URL.createObjectURL(content);
     const ts = formatTimestamp(new Date());
-    await chrome.downloads.download({
-      url: blobUrl,
-      filename: `collection-${ts}.zip`,
-      saveAs: false,
-    });
-    URL.revokeObjectURL(blobUrl);
+    try {
+      await chrome.downloads.download({
+        url: blobUrl,
+        filename: `collection-${ts}.zip`,
+        saveAs: false,
+      });
+    } finally {
+      // Revoke even when the download call throws — the blob backing a
+      // large zip must not leak.
+      URL.revokeObjectURL(blobUrl);
+    }
     showToast(t('toast_collection_exported'), 'success');
   } catch {
     if (!aborted) showToast(t('toast_collection_export_failed'), 'error');

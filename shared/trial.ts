@@ -85,6 +85,19 @@ export async function isTrialEligible(): Promise<boolean> {
   if (license?.plan === 'trial' || license?.plan === 'lifetime') {
     return false;
   }
+  // An ACTIVE monthly/yearly subscription must never be eligible: the
+  // onInstalled(update) hook auto-starts trials, and startTrial() overwrites
+  // the persisted license — a paying customer would be silently downgraded
+  // to a 7-day trial that then expires (while their subscription keeps
+  // billing server-side). Expired paid licenses stay eligible: those users
+  // may legitimately redeem a never-used trial.
+  if (
+    (license?.plan === 'monthly' || license?.plan === 'yearly') &&
+    license?.status === LICENSE_STATUS.ACTIVE &&
+    (!license?.expiresAt || license.expiresAt > Date.now())
+  ) {
+    return false;
+  }
   return true;
 }
 

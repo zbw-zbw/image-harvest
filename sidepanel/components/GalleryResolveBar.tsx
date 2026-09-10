@@ -44,9 +44,17 @@ const FAILURE_TITLE_KEY: Record<string, string> = {
 };
 
 export function GalleryResolveBar() {
-  const galleryCount = useStoreSelector((s) => s.galleryLinks.length);
+  // Subscribe to the array REFERENCE, not just `.length`: restoring a
+  // cached list on tab switch assigns a fresh array whose length may be
+  // identical, and a stale list must not survive the switch.
+  const galleryLinks = useStoreSelector((s) => s.galleryLinks);
+  const galleryCount = galleryLinks.length;
   // Re-render on locale switch so t() picks up the new language.
   useStoreSelector((s) => s.localeTick);
+  // Busy flag must be reactive as well — `disabled={state.isResolvingGallery}`
+  // on an unsubscribed field never re-renders, so the button stayed enabled
+  // (visually clickable) for the entire resolve.
+  const isResolving = useStoreSelector((s) => s.isResolvingGallery);
   const [expanded, setExpanded] = useState(false);
   /** Per-link outcomes from the LAST resolve click, keyed by link URL. */
   const [linkOutcomes, setLinkOutcomes] = useState<Record<string, LinkOutcome>>({});
@@ -196,7 +204,7 @@ export function GalleryResolveBar() {
   // Cap the rendered list: link-farm pages can collect hundreds of
   // candidates; the full set is still resolved, we just render the head.
   const MAX_LINKS_SHOWN = 20;
-  const shownLinks = state.galleryLinks.slice(0, MAX_LINKS_SHOWN);
+  const shownLinks = galleryLinks.slice(0, MAX_LINKS_SHOWN);
   const hiddenCount = galleryCount - shownLinks.length;
 
   return (
@@ -229,7 +237,7 @@ export function GalleryResolveBar() {
           id="btn-gallery-resolve"
           type="button"
           class="btn btn-primary btn-sm"
-          disabled={state.isResolvingGallery}
+          disabled={isResolving}
           onClick={() => void handleResolveClick()}
         >
           {t('gallery_resolve_action')}

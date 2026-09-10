@@ -18,8 +18,32 @@ interface FetchImageDataResult {
   if (!statusEl) return;
 
   function showError(message: string): void {
-    statusEl!.innerHTML = `<div class="error"><p>❌ ${message}</p><p><a href="#" id="close-tab">Close this tab</a></p></div>`;
-    document.getElementById('close-tab')?.addEventListener('click', (e) => {
+    // Build via DOM APIs, not innerHTML: `message` can carry attacker-controlled
+    // data (e.g. an unvalidated ?engine= param, or a fetch error echoing the
+    // image URL from the page that triggered the search). MV3 CSP blocks
+    // inline handlers, but HTML injection could still phish/deface this
+    // extension-origin tab.
+    const status = statusEl!;
+    status.textContent = '';
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'error';
+
+    const msgP = document.createElement('p');
+    msgP.textContent = `❌ ${message}`;
+    wrapper.appendChild(msgP);
+
+    const closeP = document.createElement('p');
+    const closeLink = document.createElement('a');
+    closeLink.href = '#';
+    closeLink.id = 'close-tab';
+    closeLink.textContent = 'Close this tab';
+    closeP.appendChild(closeLink);
+    wrapper.appendChild(closeP);
+
+    status.appendChild(wrapper);
+
+    closeLink.addEventListener('click', (e) => {
       e.preventDefault();
       window.close();
     });

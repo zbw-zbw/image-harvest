@@ -34,6 +34,16 @@ export function markReverseSearchTab(tabId: number): void {
   pendingReverseSearch = false;
 }
 
+/**
+ * Clear the pending flag without recording any tabId (e.g. when tab
+ * creation fails). Without this, a rejected create leaves the flag armed
+ * forever — isReverseSearchTab() then returns true for EVERY tab and
+ * handleTabChange permanently ignores all tab switches.
+ */
+export function clearReverseSearchPending(): void {
+  pendingReverseSearch = false;
+}
+
 /** Synchronous check: is the given tabId (or a pending create) a reverse-search tab? */
 export function isReverseSearchTab(tabId: number): boolean {
   return pendingReverseSearch || reverseSearchTabIds.has(tabId);

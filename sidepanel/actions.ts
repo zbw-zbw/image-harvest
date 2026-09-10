@@ -34,6 +34,7 @@ import { generateFilename, truncateUrl } from './utils';
 import {
   armReverseSearchPending,
   markReverseSearchTab,
+  clearReverseSearchPending,
   armOpenedTabPending,
   markOpenedTab,
   clearOpenedTabPending,
@@ -505,14 +506,17 @@ export async function downloadSelectedAsZip(
 
     const content = await zip.generateAsync({ type: 'blob' });
     const blobUrl = URL.createObjectURL(content);
-
-    await chrome.downloads.download({
-      url: blobUrl,
-      filename: `${pageInfo.domain}-${ts}.zip`,
-      saveAs: false,
-    });
-
-    URL.revokeObjectURL(blobUrl);
+    try {
+      await chrome.downloads.download({
+        url: blobUrl,
+        filename: `${pageInfo.domain}-${ts}.zip`,
+        saveAs: false,
+      });
+    } finally {
+      // Revoke even when the download call throws (disk full / cancelled
+      // save dialog) — the blob backing a large zip must not leak.
+      URL.revokeObjectURL(blobUrl);
+    }
     const successCount = selected.length - failed.length;
     if (successCount === 0) {
       showToast(t('toast_download_all_failed'), 'error');
@@ -711,9 +715,17 @@ export function reverseSearch(imageUrl: string, engine: string): void {
   // the create promise resolves, so handleTabChange needs a synchronous
   // signal that the next activated tab is our reverse-search page.
   armReverseSearchPending();
-  chrome.tabs.create({ url: searchPageUrl, active: true }).then((tab) => {
-    if (tab.id != null) markReverseSearchTab(tab.id);
-  });
+  chrome.tabs
+    .create({ url: searchPageUrl, active: true })
+    .then((tab) => {
+      if (tab.id != null) markReverseSearchTab(tab.id);
+    })
+    .catch(() => {
+      // A failed create must disarm the pending flag, otherwise every
+      // subsequent tab switch looks like a reverse-search tab and
+      // handleTabChange ignores it forever (panel stops tracking tabs).
+      clearReverseSearchPending();
+    });
 }
 
 // ============================================

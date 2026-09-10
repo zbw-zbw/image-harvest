@@ -394,7 +394,15 @@ export async function isProUser(): Promise<ProUserInfo> {
     return { isPro: false, status: LICENSE_STATUS.INACTIVE };
   }
 
-  const timeSinceLastCheck = Date.now() - (licenseData.lastVerified || 0);
+  // Cache-freshness anchor: signedAt (part of the signed payload) when
+  // present, else legacy lastVerified. lastVerified alone is NOT covered by
+  // the signature — editing it in chrome.storage.local kept an expired
+  // license "fresh" forever without ever re-verifying (permanent Pro). With
+  // signedAt as the anchor, bumping it invalidates the signature (forcing
+  // the remote path in isProUser), so no locally-editable field can extend
+  // the cache window of a signed record.
+  const cacheAnchor = licenseData.signedAt ?? licenseData.lastVerified ?? 0;
+  const timeSinceLastCheck = Date.now() - cacheAnchor;
   const isCacheFresh = timeSinceLastCheck < LICENSE_CHECK_INTERVAL;
 
   if (isCacheFresh && licenseData.status === LICENSE_STATUS.ACTIVE) {
@@ -475,6 +483,10 @@ export async function isProUser(): Promise<ProUserInfo> {
       if (elapsed >= 0 && elapsed <= TRIAL_EXPIRY_GRACE_MS) {
         licenseData.status = LICENSE_STATUS.EXPIRED;
         licenseData.lastVerified = Date.now();
+        // Bump the freshness anchor alongside lastVerified — a stale anchor
+        // would re-hit /verify on every isProUser() call (the ~97%-of-backend-
+        // invocations regression this cache exists to prevent).
+        licenseData.signedAt = Date.now();
         await saveLicenseData(licenseData);
         return {
           isPro: true,
@@ -489,6 +501,12 @@ export async function isProUser(): Promise<ProUserInfo> {
     // Persist so we don't keep re-asking the network on every check.
     licenseData.status = LICENSE_STATUS.EXPIRED;
     licenseData.lastVerified = Date.now();
+    // Same anchor bump as the trial-grace branch above: the server doesn't
+    // re-sign an "invalid" answer, so the anchor must be advanced locally
+    // or the EXPIRED cache never goes fresh and hammers /verify. Flipping
+    // status back to ACTIVE locally is still caught: the old signature
+    // only validates the ORIGINAL signedAt, whose anchor is now stale.
+    licenseData.signedAt = Date.now();
     await saveLicenseData(licenseData);
 
     return {

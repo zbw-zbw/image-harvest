@@ -159,11 +159,16 @@ export async function incrementReferralCount(): Promise<void> {
  * Generate a lightweight browser fingerprint for referral matching.
  * Must produce the same hash as the invite landing page's fingerprint
  * so the backend can match the two.
+ *
+ * No `screen` fields: this runs in the MV3 service worker (onInstalled →
+ * matchReferral), where `screen` is not defined — referencing it threw a
+ * ReferenceError that matchReferral's catch swallowed, so fingerprint
+ * matching silently never worked. The invite landing page
+ * (website/src/components/invite-page-client.tsx) must stay in sync.
  */
 export async function generateFingerprint(): Promise<string> {
   const parts = [
     navigator.userAgent,
-    `${screen.width}x${screen.height}x${screen.colorDepth}`,
     navigator.language,
     Intl.DateTimeFormat().resolvedOptions().timeZone,
     navigator.hardwareConcurrency?.toString() ?? '',

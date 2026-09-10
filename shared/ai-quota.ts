@@ -6,9 +6,13 @@ interface AiQuotaData {
 }
 
 function currentMonth(): string {
+  // UTC, matching the backend's currentMonth() and the other local quota
+  // trackers (ai-free-quota, feature-quota). A local-timezone key drifted
+  // from the server's for hours around month boundaries, so the cached
+  // Pro count disagreed with the authoritative one right when quotas reset.
   const d = new Date();
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const y = d.getUTCFullYear();
+  const m = String(d.getUTCMonth() + 1).padStart(2, '0');
   return `${y}-${m}`;
 }
 

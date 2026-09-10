@@ -221,8 +221,17 @@ describe('generateFingerprint', () => {
 
   it('changes when an input dimension changes (backend matches on equality)', async () => {
     const before = await generateFingerprint();
-    vi.stubGlobal('screen', { width: 800, height: 600, colorDepth: 24 });
+    stubNavigator({ hardwareConcurrency: 16 });
     expect(await generateFingerprint()).not.toBe(before);
+  });
+
+  it('ignores screen fields (MV3 service worker has no screen global)', async () => {
+    // Regression: the SW's fingerprint used to reference `screen`, which
+    // threw a ReferenceError that matchReferral swallowed — so fingerprint
+    // matching silently never worked. Screen must stay OUT of the inputs.
+    const before = await generateFingerprint();
+    vi.stubGlobal('screen', { width: 800, height: 600, colorDepth: 8 });
+    expect(await generateFingerprint()).toBe(before);
   });
 });
 

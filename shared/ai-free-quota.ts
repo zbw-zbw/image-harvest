@@ -33,3 +33,13 @@ export async function incrementMonthlyFreeAiTag(): Promise<number> {
   await chrome.storage.local.set({ [STORAGE_KEYS.AI_FREE_MONTHLY]: data });
   return Math.max(0, getFreeLimits().MAX_MONTHLY_AI_TAGS - data.count);
 }
+
+/**
+ * Refund one optimistic free-tag deduction (AI_TAG_IMAGE failure rollback).
+ * Clamps at zero so a stray call after a month rollover can't go negative.
+ */
+export async function decrementMonthlyFreeAiTag(): Promise<void> {
+  const data = await getData();
+  data.count = Math.max(0, data.count - 1);
+  await chrome.storage.local.set({ [STORAGE_KEYS.AI_FREE_MONTHLY]: data });
+}

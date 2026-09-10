@@ -399,21 +399,30 @@ function findImageElement(url: string): Element | null {
     }
   }
 
-  // 8. Check background images (including data URI backgrounds)
+  // 8. Check background images (including data URI backgrounds).
+  // Capped like buildImageElementIndex's background pass (2000 elements):
+  // getComputedStyle forces style computation on every element it touches,
+  // and an uncapped sweep over a multi-thousand-element page visibly jankied
+  // the main thread every time a highlight was requested.
   const allElements = document.querySelectorAll('body, body *');
-  for (const el of allElements) {
+  const bgScanLimit = Math.min(allElements.length, 2000);
+  for (let i = 0; i < bgScanLimit; i++) {
+    const el = allElements[i];
     try {
       const computedStyle = window.getComputedStyle(el);
       const bg = computedStyle.backgroundImage;
+      let matched = false;
       if (bg && bg !== 'none') {
         const bgUrls = extractBackgroundUrls(bg);
         for (const u of bgUrls) {
           if (urlMatches(u)) {
             candidates.push(el);
+            matched = true;
             break;
           }
         }
       }
+      if (matched) continue; // already collected — skip the pseudo probes
 
       // Also check CSS content property on pseudo-elements
       for (const pseudo of ['::before', '::after']) {

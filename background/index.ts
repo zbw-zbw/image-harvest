@@ -36,7 +36,11 @@ import { detectEagle, exportToEagle } from '../shared/export-eagle';
 import type { EagleItem } from '../shared/export-eagle';
 import { AI_TAG_API_URL, AI_TAG_BATCH_API_URL } from '../shared/constants';
 import { getRemainingQuota, setLocalQuotaFromServer } from '../shared/ai-quota';
-import { getRemainingMonthlyFreeAiTags, incrementMonthlyFreeAiTag } from '../shared/ai-free-quota';
+import {
+  getRemainingMonthlyFreeAiTags,
+  incrementMonthlyFreeAiTag,
+  decrementMonthlyFreeAiTag,
+} from '../shared/ai-free-quota';
 import { syncRemoteConfig, getRemoteConfig } from '../shared/remote-config';
 
 // ── Initialization ──────────────────────────────────────────────────────────
@@ -239,14 +243,18 @@ chrome.runtime.onInstalled.addListener((details) => {
     void track(EVENTS.EXTENSION_INSTALLED);
     void autoStartTrial('install');
     // Attempt to match a pending referral (from the invite landing page).
-    // Runs async in background — non-blocking, best-effort.
-    void import('../shared/referral').then(({ matchReferral }) =>
-      matchReferral().then((result) => {
-        if (result) {
-          void track(EVENTS.REFERRAL_CLAIMED, { bonusDays: result.bonusDays });
-        }
-      })
-    );
+    // Runs async in background — non-blocking, best-effort. The .catch keeps
+    // a failed module load from surfacing as an unhandled rejection in the
+    // service worker's error reporting.
+    void import('../shared/referral')
+      .then(({ matchReferral }) =>
+        matchReferral().then((result) => {
+          if (result) {
+            void track(EVENTS.REFERRAL_CLAIMED, { bonusDays: result.bonusDays });
+          }
+        })
+      )
+      .catch((err) => console.warn('Referral match failed:', err));
     chrome.tabs.create({ url: chrome.runtime.getURL('pages/welcome.html') });
   } else if (details.reason === 'update') {
     void track(EVENTS.EXTENSION_UPDATED, {
@@ -777,6 +785,7 @@ async function handleMessage(
           let licenseKey = '';
           let instanceId = '';
           let previousQuota: number | null = null;
+          let freeTierDeducted = false;
 
           if (proInfo.isPro) {
             const remaining = await getRemainingQuota();
@@ -804,10 +813,14 @@ async function handleMessage(
               sendResponse({ success: false, error: 'monthly_limit', quotaRemaining: 0 });
               break;
             }
+            // Resolve the instanceId BEFORE the optimistic increment — a
+            // throw here must not burn the free monthly budget, and every
+            // failure path after the increment is covered by the rollbacks
+            // below (HTTP failure + finally).
+            instanceId = await getOrCreateInstanceId();
             // Optimistic deduction for free tier — increment before sending
             await incrementMonthlyFreeAiTag();
-
-            instanceId = await getOrCreateInstanceId();
+            freeTierDeducted = true;
           }
 
           const requestBody: Record<string, unknown> = {
@@ -836,9 +849,17 @@ async function handleMessage(
               error?: string;
             };
             if (!resp.ok || !data.success) {
-              // Request failed — rollback the optimistic deduction
+              // Request failed — rollback the optimistic deduction. Pro rolls
+              // back to the server-synced quota; free rolls back the local
+              // monthly counter (previously free failures silently burned
+              // budget: tags never arrived yet the count ticked up). Clear
+              // the flag so the finally below doesn't refund a second time
+              // (the Pro write is idempotent, the free decrement is not).
               if (proInfo.isPro && previousQuota !== null) {
                 await setLocalQuotaFromServer(previousQuota);
+              } else if (freeTierDeducted) {
+                await decrementMonthlyFreeAiTag();
+                freeTierDeducted = false;
               }
               sendResponse({
                 success: false,
@@ -859,9 +880,14 @@ async function handleMessage(
             });
           } finally {
             clearTimeout(aiTimeout);
-            // Rollback optimistic deduction on abort/network errors
-            if (!aiTagSuccess && proInfo.isPro && previousQuota !== null) {
-              await setLocalQuotaFromServer(previousQuota);
+            // Rollback optimistic deduction on abort/network errors (both
+            // tiers — see the failure branch above for why free counts too).
+            if (!aiTagSuccess) {
+              if (proInfo.isPro && previousQuota !== null) {
+                await setLocalQuotaFromServer(previousQuota);
+              } else if (freeTierDeducted) {
+                await decrementMonthlyFreeAiTag();
+              }
             }
           }
         } catch (error) {

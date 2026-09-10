@@ -220,6 +220,10 @@ interface SingleTabExtractResult {
 /** Extract images from many tabs sequentially, broadcasting progress. */
 export async function processMultiTabExtract(tabIds: number[]): Promise<MultiTabResult> {
   const allTabImages: ImageItem[] = [];
+  // Cross-tab dedup: the same URL can appear in several tabs (shared banner,
+  // same site opened twice, multi-frame duplicates). Without this the grid
+  // rendered one card per tab instead of per image.
+  const seenUrls = new Set<string>();
   const perTabTimeoutMs = 30000;
 
   let currentTabId: number | null = null;
@@ -241,7 +245,11 @@ export async function processMultiTabExtract(tabIds: number[]): Promise<MultiTab
         ),
       ]);
       tabTitle = tabImages.tabTitle || tabTitle;
-      allTabImages.push(...tabImages.images);
+      for (const img of tabImages.images) {
+        if (seenUrls.has(img.url)) continue;
+        seenUrls.add(img.url);
+        allTabImages.push(img);
+      }
     } catch (tabError) {
       console.warn(`[multi-tab] Tab ${tid} skipped:`, (tabError as Error).message);
     }
