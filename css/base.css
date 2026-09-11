@@ -38,13 +38,10 @@
   border-radius: 10px;
   cursor: pointer;
   white-space: nowrap;
-  transition:
-    box-shadow 0.2s,
-    filter 0.2s;
+  transition: filter 0.2s;
 }
 
 .btn-upgrade-pro:hover {
-  box-shadow: 0 2px 8px rgba(255, 184, 0, 0.45);
   filter: brightness(1.06);
 }
 
@@ -619,11 +616,11 @@
     gap: 4px;
   }
   .select-all-btn {
-    font-size: 11px;
+    font-size: var(--font-aux);
     padding: 3px 6px;
   }
   .filter-btn {
-    font-size: 10px;
+    font-size: var(--font-caption);
     padding: 3px 6px;
   }
 }

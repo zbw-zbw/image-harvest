@@ -139,7 +139,6 @@
 
 .rescan-btn-lg:hover {
   transform: translateY(-1px);
-  box-shadow: var(--shadow-md);
 }
 
 .download-group {
@@ -161,11 +160,11 @@
 
 /* Download button enabled state - more prominent */
 .download-group .btn-primary:not(:disabled) {
-  box-shadow: 0 1px 4px rgba(96, 181, 87, 0.3);
+  box-shadow: var(--cta-shadow);
 }
 
 .download-group .btn-primary:not(:disabled):hover {
-  box-shadow: 0 2px 8px rgba(96, 181, 87, 0.4);
+  box-shadow: var(--cta-shadow);
 }
 
 .btn:disabled {

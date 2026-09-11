@@ -75,7 +75,7 @@
 @container panel (max-width: 600px) {
   .status-action-btn {
     padding: 3px 5px;
-    font-size: 10px;
+    font-size: var(--font-caption);
     gap: 2px;
   }
   .status-buttons {
@@ -83,11 +83,11 @@
   }
   .btn-small {
     padding: 3px 6px;
-    font-size: 10px;
+    font-size: var(--font-caption);
   }
   #download-label,
   .status-action-btn .btn-label {
-    font-size: 10px;
+    font-size: var(--font-caption);
   }
 }
 
@@ -142,7 +142,7 @@
   }
   .status-action-btn .btn-count,
   #download-label > .btn-count {
-    font-size: 9px;
+    font-size: var(--font-caption);
     line-height: 1;
   }
 }
@@ -401,7 +401,7 @@
   border-radius: 10px;
   position: relative;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: background var(--duration-base);
 }
 
 .toggle-switch.active {
@@ -417,8 +417,7 @@
   border-radius: 50%;
   top: 2px;
   left: 2px;
-  transition: transform 0.3s;
-  box-shadow: var(--shadow-sm);
+  transition: transform var(--duration-base);
 }
 
 .toggle-switch.active::after {
@@ -504,7 +503,7 @@
 }
 
 .template-vars {
-  font-size: 10px;
+  font-size: var(--font-caption);
   color: var(--text-tertiary);
   background: var(--bg-secondary);
   padding: 8px;
@@ -641,7 +640,7 @@
 }
 
 .compact-mode .collection-grid .card-url {
-  font-size: 10px;
+  font-size: var(--font-caption);
   padding: 6px 6px;
 }
 
@@ -727,12 +726,10 @@
   border-left: 3px solid var(--card-border, #e5e7eb);
   border-radius: var(--radius-lg, 10px);
   background: var(--card-bg, #fff);
-  box-shadow: var(--shadow-sm);
   overflow: visible;
 }
 
 .collection-card:hover {
-  box-shadow: var(--card-hover-shadow);
   border-color: var(--primary-color);
   border-left-color: var(--primary-color);
 }
@@ -740,9 +737,7 @@
 .collection-card.selected {
   border-color: var(--selected-border, var(--primary-color));
   border-left-color: var(--primary-color);
-  box-shadow:
-    0 0 0 1px rgba(96, 181, 87, 0.2),
-    var(--shadow-sm);
+  box-shadow: 0 0 0 1px rgba(96, 181, 87, 0.2);
 }
 
 .collection-item-select {
@@ -767,7 +762,6 @@
   border: 2px solid var(--border-color);
   border-radius: 5px;
   background: var(--bg-color);
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
   backdrop-filter: blur(6px);
   pointer-events: auto;
 }
@@ -780,13 +774,11 @@
 .collection-card-checkbox:hover {
   border-color: var(--primary-color);
   background: var(--bg-secondary);
-  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
 .collection-card-checkbox.checked {
   background: var(--primary-color);
   border-color: var(--primary-color);
-  box-shadow: 0 2px 6px rgba(96, 181, 87, 0.3);
 }
 
 .collection-card-checkbox .checkbox-icon {
@@ -819,7 +811,7 @@
 
 .collection-grid .card-url {
   padding: 4px 8px;
-  font-size: 10px;
+  font-size: var(--font-caption);
 }
 
 /* Dedup Button in Status Bar */
@@ -911,12 +903,10 @@
   overflow: hidden;
   border: 1.5px solid var(--card-border);
   background: var(--card-bg);
-  box-shadow: var(--shadow-sm);
   transition: all 0.2s;
 }
 
 .dedup-image:hover {
-  box-shadow: var(--card-hover-shadow);
   border-color: var(--primary-color);
 }
 
@@ -1019,7 +1009,6 @@
 .tab-checkbox.checked {
   background: var(--primary-color);
   border-color: var(--primary-color);
-  box-shadow: 0 2px 6px rgba(96, 181, 87, 0.3);
 }
 
 .tab-checkbox.checked .checkbox-icon {
@@ -1047,7 +1036,7 @@
 }
 
 .tab-url {
-  font-size: 10px;
+  font-size: var(--font-caption);
   color: var(--text-tertiary);
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1058,7 +1047,7 @@
 .tab-current-badge {
   display: inline-block;
   padding: 1px 5px;
-  font-size: 9px;
+  font-size: var(--font-caption);
   font-weight: 600;
   color: var(--primary-color);
   background: color-mix(in srgb, var(--primary-color) 12%, transparent);
@@ -1146,12 +1135,10 @@
   cursor: pointer;
   border: 2px solid transparent;
   transition: all 0.15s;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.15);
 }
 
 .color-swatch:hover {
   transform: scale(1.2);
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.25);
 }
 
 .color-swatch.active {
@@ -1234,7 +1221,7 @@
 .progress-fill {
   height: 100%;
   background: var(--primary-color);
-  transition: width 0.3s;
+  transition: width var(--duration-base);
 }
 
 /* Progress Spinner */

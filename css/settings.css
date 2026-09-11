@@ -115,7 +115,6 @@
   background: var(--primary-color);
   color: white;
   font-weight: 600;
-  box-shadow: 0 1px 3px rgba(96, 181, 87, 0.3);
 }
 
 /* Custom Select Dropdown - matches filter-dropdown style */
@@ -239,7 +238,6 @@
   background: var(--bg-color);
   color: var(--text-primary);
   transition: all 0.15s;
-  box-shadow: var(--shadow-sm);
 }
 
 .settings-content input[type='text']:hover,

@@ -215,7 +215,7 @@
   grid-template-columns: 1fr 64px 64px;
   gap: 0;
   padding: 0 12px 6px;
-  font-size: 10px;
+  font-size: var(--font-caption);
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.04em;
@@ -254,7 +254,7 @@
 
 .quota-group-title {
   padding: 5px 12px 3px;
-  font-size: 9px;
+  font-size: var(--font-caption);
   font-weight: 700;
   text-transform: uppercase;
   letter-spacing: 0.06em;
@@ -295,7 +295,7 @@
 
 /* Inline remaining count (same line as label) */
 .quota-inline-remaining {
-  font-size: 10px;
+  font-size: var(--font-caption);
   color: var(--text-tertiary);
   white-space: nowrap;
   flex-shrink: 1;
@@ -320,7 +320,7 @@
 
 .quota-limit-text {
   font-family: 'SF Mono', 'Menlo', 'Consolas', monospace;
-  font-size: 10px;
+  font-size: var(--font-caption);
   color: var(--text-tertiary);
   white-space: nowrap;
 }
@@ -420,7 +420,7 @@
   min-width: 48px;
   padding: 3px 8px;
   border-radius: 5px;
-  font-size: 10px;
+  font-size: var(--font-caption);
   font-weight: 600;
   text-align: center;
   white-space: nowrap;
@@ -428,7 +428,7 @@
 
 .pro-fc-free {
   background: color-mix(in srgb, var(--text-tertiary) 12%, transparent);
-  color: var(--text-secondary);
+  color: var(--text-on-tint, #4b5563); /* v1.2: AA on the 12% tint (4.16 → 6.5) */
 }
 
 .pro-fc-free.pro-fc-na {
@@ -438,7 +438,7 @@
 
 .pro-fc-pro {
   background: color-mix(in srgb, var(--primary-color, #60b557) 15%, transparent);
-  color: var(--primary-color, #60b557);
+  color: var(--primary-strong, #2f7a28); /* v1.2: AA on the 15% tint (2.24 → 4.7) */
 }
 
 .pro-fc-pro.pro-fc-check {
@@ -456,7 +456,7 @@
 }
 
 .pro-fc-header-feature {
-  font-size: 10px;
+  font-size: var(--font-caption);
   font-weight: 700;
   letter-spacing: 0.5px;
   text-transform: uppercase;
@@ -476,7 +476,7 @@
   min-width: 56px;
   padding: 4px 10px;
   border-radius: 6px;
-  font-size: 10px;
+  font-size: var(--font-caption);
   font-weight: 700;
   letter-spacing: 0.5px;
   text-align: center;

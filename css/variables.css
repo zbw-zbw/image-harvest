@@ -68,6 +68,11 @@ html {
   --duration-base: 200ms;
   /* The ONLY elevated surface in the redesign: the Pro CTA */
   --cta-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+  /* AA-safe text colors for tinted badge surfaces (WCAG 4.5:1+ on their
+     own tints; --primary-color/#60b557 is only 2.2:1 on a 15% primary tint,
+     --text-secondary/#6b7280 only 4.16:1 on a 12% tertiary tint) */
+  --primary-strong: #2f7a28;
+  --text-on-tint: #4b5563;
 }
 
 /* Dark Theme - Manual override via data-theme attribute */
@@ -102,6 +107,10 @@ html {
   --tag-format-bg: #6bc963;
   --tag-info-bg: #6b7280;
   --pro-badge-bg: linear-gradient(135deg, #7cc975, #60b557);
+  /* Theme-dependent AA text tokens (light values don't hold on dark tints):
+     dark primary is already 5.7:1 on its tint, dark text-secondary 4.8:1 */
+  --primary-strong: #7cc975;
+  --text-on-tint: #a0a0a0;
   /* v1.2 spacing/typography/motion tokens are theme-independent — defined
      once in :root above and inherited here. */
 }
@@ -139,6 +148,9 @@ html {
     --tag-format-bg: #6bc963;
     --tag-info-bg: #6b7280;
     --pro-badge-bg: linear-gradient(135deg, #7cc975, #60b557);
+    /* Theme-dependent AA text tokens — same as manual dark above */
+    --primary-strong: #7cc975;
+    --text-on-tint: #a0a0a0;
     /* v1.2 spacing/typography/motion tokens are theme-independent — inherited from :root. */
   }
 }
