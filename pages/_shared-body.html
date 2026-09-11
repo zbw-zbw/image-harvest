@@ -16,12 +16,10 @@ HTML document — it omits the surrounding
       wrapper because each entry brings its own. -->
 
       <div id="app">
-        <!-- Soft paywall banner mount (Sprint 2.1).
-             Permanent layout slot above the toolbar; the Preact component
-             short-circuits to null when not eligible, so the slot is a no-op
-             height-zero div in the common case. -->
-        <div id="referral-banner-mount" data-preact-mount="referral-banner-mount"></div>
-        <div id="soft-paywall-banner-mount" data-preact-mount="soft-paywall-banner-mount"></div>
+        <!-- Notice strip (v1.2): the single 26px hint row consolidating
+             trial-grace / soft-paywall / referral banners. The Preact
+             component short-circuits to null when nothing is eligible. -->
+        <div id="notice-strip-mount" data-preact-mount="notice-strip-mount"></div>
         <!-- Toolbar Row 1: Pro status (left) + Live + PRO actions + Settings (right) -->
         <div class="toolbar toolbar-actions">
           <!-- Pro Status Area (left side) -->

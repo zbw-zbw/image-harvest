@@ -86,7 +86,7 @@ export function ProStatusBadge() {
   const daysLeft = isTrial ? trialDaysRemaining(info?.expiresAt) : null;
   // Pre-expiry warning: the trial's final days get an amber banner with an
   // upgrade CTA — the pre-expiry conversion touchpoint (post-expiry is the
-  // TrialGraceBanner). 0 < daysLeft <= TRIAL_EXPIRY_WARNING_DAYS.
+  // notice strip's trial-grace notice). 0 < daysLeft <= TRIAL_EXPIRY_WARNING_DAYS.
   const trialExpiringSoon =
     isTrial && daysLeft != null && daysLeft > 0 && daysLeft <= TRIAL_EXPIRY_WARNING_DAYS;
 
@@ -177,7 +177,8 @@ export function ProStatusBadge() {
       </div>
 
       {/* Pre-expiry amber warning — shown only during the trial's final
-          days; the post-expiry counterpart is the TrialGraceBanner. */}
+          days; the post-expiry counterpart is the notice strip's trial-grace
+          notice. */}
       {trialExpiringSoon && daysLeft != null && (
         <div class="trial-expiry-warning">
           <span class="trial-expiry-text">

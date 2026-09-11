@@ -2,8 +2,8 @@
 //
 // A small overlay modal that asks the user to leave a 5-star review on
 // the Chrome Web Store after they've accumulated enough successful
-// downloads (RATING_PROMPT_THRESHOLD). Counterpart of SoftPaywallBanner
-// but with stricter framing:
+// downloads (RATING_PROMPT_THRESHOLD). Counterpart of the notice strip's
+// soft-paywall notice but with stricter framing:
 //   - Modal (not banner) because the click-through to the store is the
 //     entire point — we want explicit attention, not peripheral nudging.
 //   - 3 CTAs: "Rate now" (primary), "Maybe later" (cooldown), "Don't

@@ -21,14 +21,12 @@ import { MultitabModal } from './MultitabModal';
 import { ProUpgradeModal } from './ProUpgradeModal';
 // (PrivacyOptInModal was removed with the v1.0.10 UI revamp — telemetry
 // is opt-in by default with a Settings toggle; see shared/telemetry.ts)
-import { SoftPaywallBanner } from './SoftPaywallBanner';
-import { TrialGraceBanner } from './TrialGraceBanner';
+import { NoticeStrip } from './NoticeStrip';
 import { GalleryResolveBar } from './GalleryResolveBar';
 import { BatchUrlCopyButton } from './BatchUrlCopyButton';
 import { EagleExportButton } from './EagleExportButton';
 import { BatchOpsButton, BatchDeleteButton } from './BatchOpsButton';
 import { RatingPromptModal } from './RatingPromptModal';
-import { ReferralBanner } from './ReferralBanner';
 import { SettingsModal } from './SettingsModal';
 import { ImageGrid } from './ImageGrid';
 import { QuotaDisplay } from './QuotaDisplay';
@@ -189,14 +187,10 @@ export function mountPreactComponents(): void {
   mountImageGrid();
   mountStateScreens();
 
-  // Soft paywall banner (Sprint 2.1). Has a legacy slot in
-  // pages/_shared-body.html (#soft-paywall-banner-mount) sitting just
-  // above the toolbar so the banner renders ABOVE the action row when
-  // it pops in, not below it. Falls back to a body append if the slot
-  // is missing (popup variant or hot-reload race).
-  mountSoftPaywallBanner();
-  mountTrialGraceBanner();
-  mountReferralBanner();
+  // Notice strip (v1.2): the single 26px hint row that consolidates the
+  // three legacy banners (trial-grace / soft-paywall / referral). The
+  // component itself decides which notice — if any — owns the row.
+  mountNoticeStrip();
   // Link penetration (v1.1.0): gallery-link hint bar below the filters.
   mountGalleryResolveBar();
 
@@ -241,57 +235,25 @@ export function mountPreactComponents(): void {
 }
 
 /**
- * Soft paywall banner mount. The legacy slot is an empty `<div>` because
- * the banner needs block layout (its own row), not the inline span the
- * generic mountAt() helper provides. Renders the component into the slot
- * directly without replacing it — the slot is a permanent layout anchor
- * even when the banner short-circuits to null.
+ * Notice strip mount (v1.2). The slot (#notice-strip-mount) sits at the top
+ * of #app in pages/_shared-body.html. Render directly into the slot
+ * (permanent layout anchor); the component renders null when nothing is
+ * eligible. Falls back to stitching a slot onto the top of #app if this
+ * HTML variant lacks one (popup or hot-reload race).
  */
-function mountSoftPaywallBanner(): void {
-  const slot = document.getElementById('soft-paywall-banner-mount');
+function mountNoticeStrip(): void {
+  const slot = document.getElementById('notice-strip-mount');
   if (slot) {
-    renderSafe(<SoftPaywallBanner />, slot, 'soft-paywall-banner-mount');
-    return;
-  }
-  // Fallback: no slot in this HTML variant. Stitch one onto the top of
-  // #app so the banner still appears above the toolbar.
-  const app = document.getElementById('app');
-  if (!app) return;
-  const mount = document.createElement('div');
-  mount.id = 'soft-paywall-banner-mount';
-  mount.dataset.preactMount = 'soft-paywall-banner-mount';
-  app.insertBefore(mount, app.firstChild);
-  renderSafe(<SoftPaywallBanner />, mount, 'soft-paywall-banner-mount');
-}
-
-function mountTrialGraceBanner(): void {
-  const slot = document.getElementById('trial-grace-banner-mount');
-  if (slot) {
-    renderSafe(<TrialGraceBanner />, slot, 'trial-grace-banner-mount');
+    renderSafe(<NoticeStrip />, slot, 'notice-strip-mount');
     return;
   }
   const app = document.getElementById('app');
   if (!app) return;
   const mount = document.createElement('div');
-  mount.id = 'trial-grace-banner-mount';
-  mount.dataset.preactMount = 'trial-grace-banner-mount';
+  mount.id = 'notice-strip-mount';
+  mount.dataset.preactMount = 'notice-strip-mount';
   app.insertBefore(mount, app.firstChild);
-  renderSafe(<TrialGraceBanner />, mount, 'trial-grace-banner-mount');
-}
-
-function mountReferralBanner(): void {
-  const slot = document.getElementById('referral-banner-mount');
-  if (slot) {
-    renderSafe(<ReferralBanner />, slot, 'referral-banner-mount');
-    return;
-  }
-  const app = document.getElementById('app');
-  if (!app) return;
-  const mount = document.createElement('div');
-  mount.id = 'referral-banner-mount';
-  mount.dataset.preactMount = 'referral-banner-mount';
-  app.insertBefore(mount, app.firstChild);
-  renderSafe(<ReferralBanner />, mount, 'referral-banner-mount');
+  renderSafe(<NoticeStrip />, mount, 'notice-strip-mount');
 }
 
 /**

@@ -1,0 +1,71 @@
+/* ============================================
+   Command bar & notice strip (v1.2 redesign)
+   — one 38px action row + one 26px hint row
+   ============================================ */
+
+/* Notice strip: 26px, single line, subtle background differentiation */
+.notice-strip {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  min-height: 26px;
+  padding: 0 var(--space-3, 12px);
+  font-size: var(--font-aux, 11px);
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+  border-bottom: 1px solid var(--border-color);
+  flex-shrink: 0;
+}
+
+.notice-strip svg {
+  color: var(--primary-color);
+  flex-shrink: 0;
+}
+
+.notice-strip-text {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.notice-strip-cta {
+  flex-shrink: 0;
+  height: 20px;
+  padding: 0 var(--space-2, 8px);
+  font-size: var(--font-caption, 10px);
+  line-height: 1;
+}
+
+.notice-strip-close {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: transparent;
+  color: var(--text-tertiary);
+  cursor: pointer;
+}
+
+.notice-strip-close:hover {
+  color: var(--text-primary);
+}
+
+/* Trial-grace variant: amber tint, time-boxed conversion window */
+.notice-strip--trial-grace {
+  color: var(--amber-text-dark, #665200);
+  background: #fffbeb;
+}
+:root[data-theme='dark'] .notice-strip--trial-grace {
+  background: rgba(251, 191, 36, 0.08);
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .notice-strip--trial-grace {
+    background: rgba(251, 191, 36, 0.08);
+  }
+}

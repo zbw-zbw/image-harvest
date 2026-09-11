@@ -356,9 +356,9 @@ export async function downloadSingle(img: ImageItem, format: string | null): Pro
     // decide whether to push WebP / JPG conversion as a Pro selling point).
     void track(EVENTS.DOWNLOAD_SINGLE, { format: format || 'original' });
     // Soft paywall (Sprint 2.1): count this toward the threshold that
-    // arms the upgrade banner. Pro users still get counted — the banner
+    // arms the upgrade notice. Pro users still get counted — the banner
     // gate in shared/paywall-state.ts is purely behavioral; the
-    // SoftPaywallBanner component does the actual `state.isProUser`
+    // NoticeStrip component does the actual `state.isProUser`
     // short-circuit on render.
     void recordDownloads(1);
     void recordDownloadForRating(1);
