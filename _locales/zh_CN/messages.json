@@ -1806,5 +1806,8 @@
   },
   "toast_gallery_resolve_no_new": {
     "message": "未发现新图片，未添加任何内容"
+  },
+  "pro_key_fold_summary": {
+    "message": "已有许可证？输入激活码"
   }
 }

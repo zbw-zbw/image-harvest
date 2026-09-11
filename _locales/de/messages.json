@@ -1652,5 +1652,8 @@
   },
   "toast_gallery_resolve_no_new": {
     "message": "Keine neuen Bilder gefunden — nichts hinzugefügt"
+  },
+  "pro_key_fold_summary": {
+    "message": "Bereits eine Lizenz? Aktivierungscode eingeben"
   }
 }

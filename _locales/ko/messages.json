@@ -1652,5 +1652,8 @@
   },
   "toast_gallery_resolve_no_new": {
     "message": "새 이미지가 없습니다. 추가되지 않았습니다"
+  },
+  "pro_key_fold_summary": {
+    "message": "이미 라이선스가 있으신가요? 활성화 코드 입력"
   }
 }

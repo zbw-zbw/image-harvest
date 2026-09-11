@@ -1806,5 +1806,8 @@
   },
   "toast_gallery_resolve_no_new": {
     "message": "新しい画像は見つかりませんでした。追加はありません"
+  },
+  "pro_key_fold_summary": {
+    "message": "すでにライセンスをお持ちですか？アクティベーションコードを入力"
   }
 }

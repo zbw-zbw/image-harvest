@@ -12,6 +12,16 @@
 //     from shared/ab-experiment.ts; B uses a personalized line built from
 //     the user's actual download count, A uses the generic value prop.
 //
+// What changed in v1.2 (UI redesign):
+//   - The CTA section renders for EVERYONE: when the trial is not
+//     eligible the pricing CTA is promoted to primary, so the modal
+//     always keeps a conversion action (pre-v1.2 the whole block —
+//     including the only CTA — vanished for trial-ineligible users).
+//   - The compare list is trimmed to the 4 core rows with Lucide-style
+//     SVG icons (no emoji); the full table lives on the pricing page.
+//   - The key activation form sits in a collapsed <details> at the
+//     bottom (same ids, so license-ui.ts keeps working).
+//
 // Stable id contract preserved (license-ui.ts > bindLicenseModalEvents
 // looks them up by getElementById, so they MUST keep working):
 //   - #pro-upgrade-modal           — modal shell, bindProGuards binds overlay click
@@ -27,6 +37,7 @@
 //   - #btn-pro-modal-pricing       — secondary "View Pricing" CTA
 //   - #pro-modal-trial-error       — error line for the trial CTA path
 
+import type { VNode } from 'preact';
 import { useEffect, useRef, useState } from 'preact/hooks';
 import { useStoreSelector } from './storeHook';
 import { state } from '../state';
@@ -225,49 +236,13 @@ export function ProUpgradeModal() {
           </button>
         </div>
         <div class="modal-body">
-          {/* ── Section 1: license key activation form (top priority) ──── */}
-          <div class="pro-upgrade-input-section">
-            <div class="license-input-row">
-              <input
-                type="text"
-                id="pro-modal-key-input"
-                class="license-input"
-                placeholder="XXXX-XXXX-XXXX-XXXX"
-                maxlength={19}
-                spellcheck={false}
-                autocomplete="off"
-              />
-              <button id="btn-pro-modal-activate" class="btn btn-primary btn-sm">
-                {t('pro_activate')}
-              </button>
-            </div>
-            <p id="pro-modal-error" class={`license-error${ms.errorText ? '' : ' hidden'}`}>
-              {ms.errorText}
-            </p>
-            <p class="pro-upgrade-get-pro-hint">
-              {t('pro_no_key_hint')}{' '}
-              <a id="link-pro-modal-get" href="#" class="license-link" onClick={handlePricingClick}>
-                {t('pro_get_pro_link')}
-              </a>
-            </p>
-          </div>
-
-          {/* ── Section 2: trial / pricing CTAs ────────────────────────── */}
-          {trialEligible ? (
-            <div class="pro-upgrade-cta-section">
-              <div class="pro-upgrade-trial-header">
-                <div class="pro-upgrade-trial-badge">
-                  <span aria-hidden="true">🎁</span>
-                  {t('pro_trial_badge')}
-                </div>
-                <p class="pro-upgrade-trial-desc">{t('pro_trial_desc')}</p>
-              </div>
-              <ul class="pro-upgrade-trial-perks">
-                <li>{t('pro_trial_perk_full_access')}</li>
-                <li>{t('pro_trial_perk_no_card')}</li>
-                <li>{t('pro_trial_perk_cancel')}</li>
-              </ul>
-              <div class="pro-upgrade-cta-row">
+          {/* ── Hero CTA (always present — v1.2 fix: pre-v1.2 the whole
+               block vanished for trial-ineligible users, leaving the
+               modal with no conversion action at all) ─────────────────── */}
+          <div class="pro-upgrade-cta-section">
+            <p class="pro-upgrade-sub">{t('pro_trial_desc')}</p>
+            <div class="pro-upgrade-cta-row">
+              {trialEligible ? (
                 <button
                   id="btn-pro-modal-trial"
                   type="button"
@@ -279,6 +254,17 @@ export function ProUpgradeModal() {
                 >
                   {trialLoading ? t('pro_trial_starting') : t('pro_trial_start_cta')}
                 </button>
+              ) : (
+                <button
+                  id="btn-pro-modal-pricing"
+                  type="button"
+                  class="btn btn-primary btn-cta"
+                  onClick={handlePricingClick}
+                >
+                  {t('paywall_banner_upgrade_cta')}
+                </button>
+              )}
+              {trialEligible && (
                 <button
                   id="btn-pro-modal-pricing"
                   type="button"
@@ -287,15 +273,50 @@ export function ProUpgradeModal() {
                 >
                   {t('pro_pricing_cta')}
                 </button>
+              )}
+            </div>
+            <p class="pro-upgrade-assurance">
+              {t('pro_trial_perk_no_card')} · {t('pro_trial_perk_cancel')}
+            </p>
+            <p id="pro-modal-trial-error" class={`license-error${trialError ? '' : ' hidden'}`}>
+              {trialError}
+            </p>
+          </div>
+
+          {/* ── Core comparison — 4 rows, full list lives on the pricing
+               page ─────────────────────────────────────────────────────── */}
+          <ProFeatureCompareList />
+
+          {/* ── License key activation — folded to the bottom (v1.2: the
+               input no longer occupies the above-the-fold area) ───────── */}
+          <details class="pro-key-fold">
+            <summary>{t('pro_key_fold_summary')}</summary>
+            <div class="pro-upgrade-input-section">
+              <div class="license-input-row">
+                <input
+                  type="text"
+                  id="pro-modal-key-input"
+                  class="license-input"
+                  placeholder="XXXX-XXXX-XXXX-XXXX"
+                  maxlength={19}
+                  spellcheck={false}
+                  autocomplete="off"
+                />
+                <button id="btn-pro-modal-activate" class="btn btn-primary btn-sm">
+                  {t('pro_activate')}
+                </button>
               </div>
-              <p id="pro-modal-trial-error" class={`license-error${trialError ? '' : ' hidden'}`}>
-                {trialError}
+              <p id="pro-modal-error" class={`license-error${ms.errorText ? '' : ' hidden'}`}>
+                {ms.errorText}
+              </p>
+              <p class="pro-upgrade-get-pro-hint">
+                {t('pro_no_key_hint')}{' '}
+                <a id="link-pro-modal-get" href="#" class="license-link" onClick={handlePricingClick}>
+                  {t('pro_get_pro_link')}
+                </a>
               </p>
             </div>
-          ) : null}
-
-          {/* ── Section 3: Pro features with Free vs Pro comparison ──── */}
-          <ProFeatureCompareList />
+          </details>
         </div>
       </div>
     </div>
@@ -309,7 +330,7 @@ function FeatureCompareCard({
   free,
   pro,
 }: {
-  icon: string;
+  icon: VNode;
   gradient: string;
   title: string;
   desc: string;
@@ -341,25 +362,93 @@ function FeatureCompareCard({
   );
 }
 
-// Icon + gradient mapping for known feature keys (fallback for remote copy)
-const FEATURE_ICONS: Record<string, { icon: string; gradient: string }> = {
-  smartExtract: { icon: '🔍', gradient: 'gradient-green' },
-  zipDownload: { icon: '📦', gradient: 'gradient-blue' },
-  batchCopyUrls: { icon: '📋', gradient: 'gradient-blue' },
-  batchDelete: { icon: '🗑️', gradient: 'gradient-red' },
-  batchFavorite: { icon: '⭐', gradient: 'gradient-amber' },
-  collection: { icon: '📁', gradient: 'gradient-amber' },
-  aiTag: { icon: '🏷️', gradient: 'gradient-cyan' },
-  batchHighlight: { icon: '✨', gradient: 'gradient-yellow' },
-  multiTab: { icon: '🖥️', gradient: 'gradient-purple' },
-  dedup: { icon: '🧹', gradient: 'gradient-orange' },
-  formatConvert: { icon: '🔄', gradient: 'gradient-indigo' },
-  liveMonitor: { icon: '📡', gradient: 'gradient-teal' },
-  reverseSearch: { icon: '🔍', gradient: 'gradient-green' },
-  eagleExport: { icon: '🦅', gradient: 'gradient-amber' },
-  colorCopy: { icon: '🎨', gradient: 'gradient-pink' },
-  customNaming: { icon: '📝', gradient: 'gradient-indigo' },
-  advancedGrouping: { icon: '📊', gradient: 'gradient-purple' },
+/** v1.2: the comparison list shows only these 4 core rows — the full
+ *  table lives on the pricing page. */
+const CORE_FEATURE_KEYS = ['zipDownload', 'linkResolve', 'eagleExport', 'colorCopy'];
+
+// Lucide-style stroke icons for the 4 core comparison rows (v1.2: emoji
+// icons are gone — single-color currentColor SVGs only).
+const FEATURE_ICONS: Record<string, { icon: VNode; gradient: string }> = {
+  zipDownload: {
+    icon: (
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M21 8v13H3V8" />
+        <path d="M1 3h22v5H1z" />
+        <path d="M10 12h4" />
+      </svg>
+    ),
+    gradient: 'gradient-blue',
+  },
+  linkResolve: {
+    icon: (
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+      </svg>
+    ),
+    gradient: 'gradient-green',
+  },
+  eagleExport: {
+    icon: (
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+        <polyline points="7 10 12 15 17 10" />
+        <line x1="12" y1="15" x2="12" y2="3" />
+      </svg>
+    ),
+    gradient: 'gradient-amber',
+  },
+  colorCopy: {
+    icon: (
+      <svg
+        width="14"
+        height="14"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"
+      >
+        <circle cx="13.5" cy="6.5" r="2.5" />
+        <circle cx="19" cy="13" r="2.5" />
+        <circle cx="6" cy="12" r="2.5" />
+        <circle cx="10" cy="19" r="2.5" />
+      </svg>
+    ),
+    gradient: 'gradient-pink',
+  },
 };
 
 /** Dynamically builds the feature comparison list from remote copy config,
@@ -385,6 +474,7 @@ function ProFeatureCompareList() {
     maxMonthlyFormatConvert: limits.MAX_MONTHLY_FORMAT_CONVERT,
     maxMonthlyLiveMonitor: limits.MAX_MONTHLY_LIVE_MONITOR,
     maxMonthlyBatchHighlight: limits.MAX_MONTHLY_BATCH_HIGHLIGHT,
+    maxMonthlyLinkResolve: limits.MAX_MONTHLY_LINK_RESOLVE,
     proAiMonthlyQuota: (() => {
       const remote = (globalThis as Record<string, unknown>).__remoteConfig as
         | Record<string, unknown>
@@ -395,8 +485,11 @@ function ProFeatureCompareList() {
 
   // If remote copy is available, build cards dynamically
   if (copy) {
-    // Filter out features where both free and pro show "✓" (not interesting for upsell)
+    // v1.2: only the 4 core rows render here; the full comparison table
+    // lives on the pricing page. Keep the free!==pro filter as a guard
+    // so a misconfigured remote entry never shows an equal-values row.
     const upsellFeatures = copy.featureOrder.filter((key) => {
+      if (!CORE_FEATURE_KEYS.includes(key)) return false;
       const feat = copy.features[key];
       if (!feat) return false;
       const freeVal = feat.free[lang] || feat.free['en'] || '';
@@ -415,7 +508,7 @@ function ProFeatureCompareList() {
         </div>
         {upsellFeatures.map((featureKey) => {
           const feat = copy.features[featureKey]!;
-          const iconInfo = FEATURE_ICONS[featureKey] || { icon: '⚡', gradient: 'gradient-blue' };
+          const iconInfo = FEATURE_ICONS[featureKey] || FEATURE_ICONS.zipDownload;
           const label = feat.label[lang] || feat.label['en'] || featureKey;
           const freeDesc = interpolateFeatureDesc(
             feat.free[lang] || feat.free['en'] || '',
@@ -442,12 +535,10 @@ function ProFeatureCompareList() {
     );
   }
 
-  // Fallback: hardcoded cards
+  // Fallback: 4 hardcoded core cards (v1.2: was 10 rows)
   const perBatch = t('pro_compare_per_batch');
   const timesPerMonth = t('pro_compare_times_per_month');
   const unlimited = t('pro_compare_unlimited');
-  const allEngines = t('pro_compare_all_engines');
-  const engineCount = limits.REVERSE_SEARCH_ENGINES.length;
 
   return (
     <div class="pro-features-compare" style={{ marginTop: '14px' }}>
@@ -458,98 +549,36 @@ function ProFeatureCompareList() {
           <span class="pro-fc-header-label pro-fc-pro">PRO</span>
         </div>
       </div>
-      {/* — Features with free tier (limited usage) — */}
       <FeatureCompareCard
-        icon="📦"
-        gradient="gradient-blue"
+        icon={FEATURE_ICONS.zipDownload.icon}
+        gradient={FEATURE_ICONS.zipDownload.gradient}
         title={t('pro_feature_batch_title')}
         desc={t('pro_feature_batch_desc_pro')}
         free={`${limits.MAX_ZIP_IMAGES} ${perBatch}`}
         pro={unlimited}
       />
       <FeatureCompareCard
-        icon="⚡"
-        gradient="gradient-amber"
-        title={t('pro_feature_batch_ops_title')}
-        desc={t('pro_feature_batch_ops_desc_pro')}
-        free={`${limits.MAX_BATCH_DELETE} ${perBatch}`}
+        icon={FEATURE_ICONS.linkResolve.icon}
+        gradient={FEATURE_ICONS.linkResolve.gradient}
+        title={t('feature_link_resolve')}
+        desc=""
+        free={`${limits.MAX_MONTHLY_LINK_RESOLVE} ${timesPerMonth}`}
         pro={unlimited}
       />
       <FeatureCompareCard
-        icon="🏷️"
-        gradient="gradient-cyan"
-        title={t('pro_feature_ai_tag_title')}
-        desc={t('pro_feature_ai_tag_desc_pro')}
-        free={`${limits.MAX_MONTHLY_AI_TAGS} ${timesPerMonth}`}
-        pro={unlimited}
-      />
-      <FeatureCompareCard
-        icon="🎨"
-        gradient="gradient-pink"
-        title={t('pro_feature_color_title')}
-        desc={t('pro_feature_color_desc_pro')}
-        free={`${limits.MAX_MONTHLY_COLOR_COPY} ${timesPerMonth}`}
-        pro={unlimited}
-      />
-      <FeatureCompareCard
-        icon="🔍"
-        gradient="gradient-green"
-        title={t('pro_feature_reverse_search_title')}
-        desc={t('pro_feature_reverse_search_desc_pro')}
-        free={`${engineCount} ${t('pro_compare_engines')}`}
-        pro={allEngines}
-      />
-      <FeatureCompareCard
-        icon="🦅"
-        gradient="gradient-yellow"
+        icon={FEATURE_ICONS.eagleExport.icon}
+        gradient={FEATURE_ICONS.eagleExport.gradient}
         title={t('pro_feature_eagle_title')}
         desc={t('pro_feature_eagle_desc_pro')}
         free={`${limits.MAX_EAGLE_EXPORT_PER_BATCH} ${perBatch}`}
         pro={unlimited}
       />
-      {/* — Pro-exclusive features (unavailable on free) — */}
       <FeatureCompareCard
-        icon="🖥️"
-        gradient="gradient-purple"
-        title={t('pro_feature_multitab_title')}
-        desc={t('pro_feature_multitab_desc_pro')}
-        free={
-          limits.MAX_MONTHLY_MULTI_TAB > 0
-            ? `${limits.MAX_MONTHLY_MULTI_TAB} ${timesPerMonth}`
-            : '—'
-        }
-        pro={unlimited}
-      />
-      <FeatureCompareCard
-        icon="🧹"
-        gradient="gradient-orange"
-        title={t('pro_feature_dedup_title')}
-        desc={t('pro_feature_dedup_desc_pro')}
-        free={limits.MAX_MONTHLY_DEDUP > 0 ? `${limits.MAX_MONTHLY_DEDUP} ${timesPerMonth}` : '—'}
-        pro={unlimited}
-      />
-      <FeatureCompareCard
-        icon="🔄"
-        gradient="gradient-indigo"
-        title={t('pro_feature_format_title')}
-        desc={t('pro_feature_format_desc_pro')}
-        free={
-          limits.MAX_MONTHLY_FORMAT_CONVERT > 0
-            ? `${limits.MAX_MONTHLY_FORMAT_CONVERT} ${timesPerMonth}`
-            : '—'
-        }
-        pro={unlimited}
-      />
-      <FeatureCompareCard
-        icon="📡"
-        gradient="gradient-teal"
-        title={t('pro_feature_live_monitor_title')}
-        desc={t('pro_feature_live_monitor_desc_pro')}
-        free={
-          limits.MAX_MONTHLY_LIVE_MONITOR > 0
-            ? `${limits.MAX_MONTHLY_LIVE_MONITOR} ${timesPerMonth}`
-            : '—'
-        }
+        icon={FEATURE_ICONS.colorCopy.icon}
+        gradient={FEATURE_ICONS.colorCopy.gradient}
+        title={t('pro_feature_color_title')}
+        desc={t('pro_feature_color_desc_pro')}
+        free={`${limits.MAX_MONTHLY_COLOR_COPY} ${timesPerMonth}`}
         pro={unlimited}
       />
     </div>

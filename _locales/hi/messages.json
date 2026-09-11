@@ -1652,5 +1652,8 @@
   },
   "toast_gallery_resolve_no_new": {
     "message": "कोई नई इमेज नहीं मिली — कुछ भी जोड़ा नहीं गया"
+  },
+  "pro_key_fold_summary": {
+    "message": "पहले से लाइसेंस है? एक्टिवेशन कोड दर्ज करें"
   }
 }

@@ -1652,5 +1652,8 @@
   },
   "toast_gallery_resolve_no_new": {
     "message": "Geen nieuwe afbeeldingen gevonden — niets toegevoegd"
+  },
+  "pro_key_fold_summary": {
+    "message": "Al een licentie? Voer activatiecode in"
   }
 }
