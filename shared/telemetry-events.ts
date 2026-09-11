@@ -114,6 +114,9 @@ export const EVENTS = {
   // Filter events
   AI_TAG_FILTER_APPLIED: 'ai_tag_filter_applied',
   VISIBLE_FILTER_TOGGLED: 'visible_filter_toggled',
+  // v1.2: which filters users actually touch — data for the next-version
+  // decision on whether the filter row earns its 34px.
+  FILTER_APPLIED: 'filter_applied', // props: { filter: string } (size/type/layout/url/filesize/color/sort/group)
 
   // Similar detection
   SIMILAR_DETECTION_COMPLETED: 'similar_detection_completed',
@@ -223,6 +226,7 @@ export const EVENT_PROP_SCHEMAS: Record<TelemetryEventName, readonly string[]> =
   [EVENTS.AI_FREE_MONTHLY_LIMIT]: [],
   [EVENTS.AI_TAG_FILTER_APPLIED]: ['tag'],
   [EVENTS.VISIBLE_FILTER_TOGGLED]: ['enabled'],
+  [EVENTS.FILTER_APPLIED]: ['filter'],
   [EVENTS.SIMILAR_DETECTION_COMPLETED]: ['groupCount', 'totalImages'],
   [EVENTS.LINK_EXTRACT_FOUND]: ['count'],
   [EVENTS.GALLERY_RESOLVE_STARTED]: ['linkCount'],

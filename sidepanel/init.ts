@@ -709,6 +709,7 @@ function bindEvents(): void {
   // Group mode
   if (elements.groupMode) {
     elements.groupMode.addEventListener('change', (e) => {
+      void track(EVENTS.FILTER_APPLIED, { filter: 'group' });
       state.currentGroupMode = (e.target as HTMLSelectElement)
         .value as typeof state.currentGroupMode;
       renderImages();
@@ -727,6 +728,7 @@ function bindEvents(): void {
   // Size filter options
   document.querySelectorAll<HTMLElement>('[data-size-filter]').forEach((opt) => {
     opt.addEventListener('click', () => {
+      void track(EVENTS.FILTER_APPLIED, { filter: 'size' });
       const val = opt.dataset.sizeFilter || 'all';
       state.activeFilters.size = val;
       switch (val) {
@@ -767,6 +769,7 @@ function bindEvents(): void {
   // File size preset options in File Size dropdown
   document.querySelectorAll<HTMLElement>('[data-filesize-filter]').forEach((btn) => {
     btn.addEventListener('click', () => {
+      void track(EVENTS.FILTER_APPLIED, { filter: 'filesize' });
       const preset = btn.dataset.filesizeFilter!;
       document
         .querySelectorAll('[data-filesize-filter]')
@@ -784,6 +787,12 @@ function bindEvents(): void {
       if (input) {
         input.addEventListener('click', (e) => e.stopPropagation());
         input.addEventListener('input', () => applyCustomSizeInputs());
+        // Telemetry fires on change (confirm), not input — typing "500"
+        // must not emit three events.
+        input.addEventListener(
+          'change',
+          () => void track(EVENTS.FILTER_APPLIED, { filter: 'size' })
+        );
       }
     }
   );
@@ -791,6 +800,7 @@ function bindEvents(): void {
   // Type filter checkboxes
   document.querySelectorAll<HTMLInputElement>('.type-checkbox').forEach((cb) => {
     cb.addEventListener('change', () => {
+      void track(EVENTS.FILTER_APPLIED, { filter: 'type' });
       const allCheckbox = document.querySelector<HTMLInputElement>('.type-checkbox[value="all"]');
       const typeCheckboxes = document.querySelectorAll<HTMLInputElement>(
         '.type-checkbox:not([value="all"])'
@@ -818,6 +828,7 @@ function bindEvents(): void {
   // Layout filter options
   document.querySelectorAll<HTMLElement>('[data-layout-filter]').forEach((opt) => {
     opt.addEventListener('click', () => {
+      void track(EVENTS.FILTER_APPLIED, { filter: 'layout' });
       state.activeFilters.layout = opt.dataset.layoutFilter || 'all';
       document
         .querySelectorAll('[data-layout-filter]')
@@ -843,6 +854,7 @@ function bindEvents(): void {
         closeAllFilterDropdowns();
         return;
       }
+      void track(EVENTS.FILTER_APPLIED, { filter: 'group' });
       state.currentGroupMode = val as typeof state.currentGroupMode;
       if (elements.groupMode) (elements.groupMode as HTMLSelectElement).value = val;
       document.querySelectorAll('[data-group-filter]').forEach((o) => o.classList.remove('active'));
@@ -856,6 +868,7 @@ function bindEvents(): void {
   // Sort filter options
   document.querySelectorAll<HTMLElement>('[data-sort-filter]').forEach((opt) => {
     opt.addEventListener('click', () => {
+      void track(EVENTS.FILTER_APPLIED, { filter: 'sort' });
       state.currentSortMode = (opt.dataset.sortFilter || 'natural') as typeof state.currentSortMode;
       document.querySelectorAll('[data-sort-filter]').forEach((o) => o.classList.remove('active'));
       opt.classList.add('active');
@@ -916,6 +929,8 @@ function bindEvents(): void {
   if (elements.filterUrlInput) {
     let isComposing = false;
     const debouncedUrlFilter = debounce((value: string) => {
+      // Name only — the keyword VALUE is never reported (privacy).
+      void track(EVENTS.FILTER_APPLIED, { filter: 'url' });
       state.activeFilters.urlKeyword = value.toLowerCase();
       updateFilterButtonLabels();
       applyFilters();
@@ -942,7 +957,10 @@ function bindEvents(): void {
     'filter-filesize-max'
   ) as HTMLInputElement | null;
   if (fileSizeMinInput || fileSizeMaxInput) {
-    const debouncedFileSize = debounce(() => applyFileSizeInputs(), 400);
+    const debouncedFileSize = debounce(() => {
+      void track(EVENTS.FILTER_APPLIED, { filter: 'filesize' });
+      applyFileSizeInputs();
+    }, 400);
     fileSizeMinInput?.addEventListener('input', debouncedFileSize);
     fileSizeMaxInput?.addEventListener('input', debouncedFileSize);
   }
@@ -952,6 +970,7 @@ function bindEvents(): void {
     opt.addEventListener('click', (e) => {
       e.stopPropagation();
       if (opt.dataset.colorFilter === 'all') {
+        void track(EVENTS.FILTER_APPLIED, { filter: 'color' });
         state.activeFilters.color = null;
         document
           .querySelectorAll('#color-swatches .color-swatch')

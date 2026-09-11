@@ -10,6 +10,8 @@ import { renderImages } from './render';
 import { closeAllFilterDropdowns } from './settings';
 import { elements, state } from './state';
 import { t } from '../shared/i18n';
+import { track } from '../shared/telemetry';
+import { EVENTS } from '../shared/telemetry-events';
 import { escapeHtml } from '../shared/utils';
 import { updateFilterButtonLabels, updateFilterDropdownCounts } from './ui';
 import { getAspectRatioCategory } from './utils';
@@ -190,6 +192,7 @@ export function renderColorSwatches(): void {
   container.querySelectorAll<HTMLElement>('.color-swatch').forEach((swatch) => {
     swatch.addEventListener('click', (e) => {
       e.stopPropagation();
+      void track(EVENTS.FILTER_APPLIED, { filter: 'color' });
       const color = swatch.dataset.colorValue || null;
       if (state.activeFilters.color === color) {
         // Deselect

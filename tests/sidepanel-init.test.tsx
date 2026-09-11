@@ -40,10 +40,23 @@ vi.mock('../sidepanel/actions', () => ({
 
 vi.mock('../sidepanel/filter', () => ({
   applyCustomSizeInputs: vi.fn(),
+  applyFileSizeInputs: vi.fn(),
+  applyFileSizePreset: vi.fn(),
   applyFilters: vi.fn(),
   clearCustomSizeInputs: vi.fn(),
   syncCustomSizeInputsFromSettings: vi.fn(),
 }));
+
+// v1.2 filter_applied telemetry assertions spy on this mock.
+vi.mock('../shared/telemetry', () => ({
+  flushNow: vi.fn().mockResolvedValue(undefined),
+  setEnvelopeMeta: vi.fn(),
+  track: vi.fn().mockResolvedValue(undefined),
+}));
+
+import { track } from '../shared/telemetry';
+
+const mockTrack = vi.mocked(track);
 
 vi.mock('../sidepanel/components/mount', () => ({
   mountPreactComponents: vi.fn(),
@@ -380,3 +393,129 @@ describe('beforeunload cleanup', () => {
     expect(sidePanelClosedCalls.length).toBe(0);
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────
+// filter_applied telemetry (v1.2: filter-row usage data)
+// ─────────────────────────────────────────────────────────────────────
+// Pin: every user-driven filter interaction fires one filter_applied
+// event with a stable filter name — the data behind the v1.2+ "does
+// the filter row earn its 34px" decision. Text inputs (url / filesize /
+// custom size) must NOT fire per keystroke, and the URL keyword VALUE
+// is never reported (privacy contract — name only).
+
+describe('filter_applied telemetry', () => {
+  it('size preset click → {filter:"size"}', async () => {
+    document.body.innerHTML = '<div data-size-filter="large">Large</div>';
+    await loadInitModule();
+
+    document
+      .querySelector('[data-size-filter="large"]')!
+      .dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(mockTrack).toHaveBeenCalledWith('filter_applied', { filter: 'size' });
+  });
+
+  it('custom size input fires ONLY on change (confirm), never per keystroke', async () => {
+    document.body.innerHTML = '<input id="filter-min-width" type="number" />';
+    await loadInitModule();
+
+    const input = document.getElementById('filter-min-width') as HTMLInputElement;
+    input.value = '500';
+    input.dispatchEvent(new Event('input'));
+    expect(mockTrack).not.toHaveBeenCalledWith('filter_applied', { filter: 'size' });
+
+    input.dispatchEvent(new Event('change'));
+    expect(mockTrack).toHaveBeenCalledWith('filter_applied', { filter: 'size' });
+  });
+
+  it('type checkbox change → {filter:"type"}', async () => {
+    document.body.innerHTML =
+      '<input type="checkbox" class="type-checkbox" value="jpg" checked />';
+    await loadInitModule();
+
+    document.querySelector('.type-checkbox')!.dispatchEvent(new Event('change'));
+
+    expect(mockTrack).toHaveBeenCalledWith('filter_applied', { filter: 'type' });
+  });
+
+  it('layout option click → {filter:"layout"}', async () => {
+    document.body.innerHTML = '<div data-layout-filter="landscape">Landscape</div>';
+    await loadInitModule();
+
+    document
+      .querySelector('[data-layout-filter="landscape"]')!
+      .dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(mockTrack).toHaveBeenCalledWith('filter_applied', { filter: 'layout' });
+  });
+
+  it('url keyword input → {filter:"url"} WITHOUT the keyword value (privacy)', async () => {
+    document.body.innerHTML = '<input id="filter-url-input" type="text" />';
+    await loadInitModule();
+
+    const input = document.getElementById('filter-url-input') as HTMLInputElement;
+    input.value = 'cdn.example';
+    input.dispatchEvent(new Event('input'));
+
+    expect(mockTrack).toHaveBeenCalledWith('filter_applied', { filter: 'url' });
+    // The typed keyword must never leave the panel — assert no payload
+    // anywhere in the recorded calls contains it.
+    expect(JSON.stringify(mockTrack.mock.calls)).not.toContain('cdn.example');
+  });
+
+  it('filesize preset click → {filter:"filesize"}', async () => {
+    document.body.innerHTML = '<div data-filesize-filter="1mb">1 MB+</div>';
+    await loadInitModule();
+
+    document
+      .querySelector('[data-filesize-filter="1mb"]')!
+      .dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(mockTrack).toHaveBeenCalledWith('filter_applied', { filter: 'filesize' });
+  });
+
+  it('filesize min input → {filter:"filesize"} on debounce settle', async () => {
+    document.body.innerHTML = '<input id="filter-filesize-min" type="number" />';
+    await loadInitModule();
+
+    const input = document.getElementById('filter-filesize-min') as HTMLInputElement;
+    input.value = '100';
+    input.dispatchEvent(new Event('input'));
+
+    expect(mockTrack).toHaveBeenCalledWith('filter_applied', { filter: 'filesize' });
+  });
+
+  it('color "All Colors" click → {filter:"color"}', async () => {
+    document.body.innerHTML = '<div data-color-filter="all">All Colors</div>';
+    await loadInitModule();
+
+    document
+      .querySelector('[data-color-filter="all"]')!
+      .dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(mockTrack).toHaveBeenCalledWith('filter_applied', { filter: 'color' });
+  });
+
+  it('sort option click → {filter:"sort"}', async () => {
+    document.body.innerHTML = '<div data-sort-filter="name">Name</div>';
+    await loadInitModule();
+
+    document
+      .querySelector('[data-sort-filter="name"]')!
+      .dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(mockTrack).toHaveBeenCalledWith('filter_applied', { filter: 'sort' });
+  });
+
+  it('group option click (free-allowed mode) → {filter:"group"}', async () => {
+    document.body.innerHTML = '<div data-group-filter="format">Format</div>';
+    await loadInitModule();
+
+    document
+      .querySelector('[data-group-filter="format"]')!
+      .dispatchEvent(new MouseEvent('click', { bubbles: true }));
+
+    expect(mockTrack).toHaveBeenCalledWith('filter_applied', { filter: 'group' });
+  });
+});
+

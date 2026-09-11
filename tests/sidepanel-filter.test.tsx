@@ -37,6 +37,11 @@ vi.mock('../sidepanel/ui', () => ({
   updateFilterButtonLabels: vi.fn(),
   updateFilterDropdownCounts: vi.fn(),
 }));
+// v1.2 filter_applied telemetry assertions spy on this mock (filter.ts
+// imports track for the color-swatch click wiring).
+vi.mock('../shared/telemetry', () => ({
+  track: vi.fn().mockResolvedValue(undefined),
+}));
 
 import {
   applyCustomSizeInputs,
@@ -792,6 +797,23 @@ describe('renderColorSwatches', () => {
     expect(updateFilterButtonLabels).toHaveBeenCalled();
     expect(renderMod.renderImages).toHaveBeenCalled();
     expect(settingsMod.closeAllFilterDropdowns).toHaveBeenCalled();
+  });
+
+  it('swatch click emits filter_applied {filter:"color"} (v1.2 filter-row data)', async () => {
+    const container = mountContainer();
+    state.isProUser = false;
+    state.activeFilters = { ...state.activeFilters, color: null };
+    state.allImages = [
+      makeImg({ id: 'a', colors: ['#ff0000'] }),
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    ] as any;
+    state.lastRenderedFilteredIds = null;
+    renderColorSwatches();
+
+    container.querySelector<HTMLElement>('.color-swatch')!.click();
+
+    const { track } = await import('../shared/telemetry');
+    expect(vi.mocked(track)).toHaveBeenCalledWith('filter_applied', { filter: 'color' });
   });
 
   it('click by PRO user → activates swatch + updates state + triggers applyFilters pipeline', async () => {
