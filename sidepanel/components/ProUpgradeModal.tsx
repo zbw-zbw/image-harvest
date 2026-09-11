@@ -311,7 +311,12 @@ export function ProUpgradeModal() {
               </p>
               <p class="pro-upgrade-get-pro-hint">
                 {t('pro_no_key_hint')}{' '}
-                <a id="link-pro-modal-get" href="#" class="license-link" onClick={handlePricingClick}>
+                <a
+                  id="link-pro-modal-get"
+                  href="#"
+                  class="license-link"
+                  onClick={handlePricingClick}
+                >
                   {t('pro_get_pro_link')}
                 </a>
               </p>

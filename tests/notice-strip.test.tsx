@@ -74,9 +74,7 @@ describe('NoticeStrip — priority & rendering', () => {
     state.trialGraceDaysRemaining = 2;
     mockShouldShowBanner.mockResolvedValue(true);
     const { container } = render(<NoticeStrip />);
-    await waitFor(() =>
-      expect(container.querySelector('.notice-strip--trial-grace')).toBeTruthy()
-    );
+    await waitFor(() => expect(container.querySelector('.notice-strip--trial-grace')).toBeTruthy());
     expect(container.querySelector('.notice-strip--paywall')).toBeNull();
     expect(container.querySelector('.notice-strip--referral')).toBeNull();
   });
