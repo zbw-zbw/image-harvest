@@ -1649,5 +1649,8 @@
   },
   "toast_gallery_resolved_last": {
     "message": "{images} Originalbilder hinzugefügt · Monatskontingent für Link-Auflösung aufgebraucht — Pro ist unbegrenzt"
+  },
+  "toast_gallery_resolve_no_new": {
+    "message": "Keine neuen Bilder gefunden — nichts hinzugefügt"
   }
 }

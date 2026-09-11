@@ -1649,5 +1649,8 @@
   },
   "toast_gallery_resolved_last": {
     "message": "{images} मूल चित्र जोड़े गए · इस माह का लिंक रिज़ॉल्व कोटा समाप्त — Pro असीमित है"
+  },
+  "toast_gallery_resolve_no_new": {
+    "message": "कोई नई इमेज नहीं मिली — कुछ भी जोड़ा नहीं गया"
   }
 }

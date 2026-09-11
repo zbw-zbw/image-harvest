@@ -106,12 +106,18 @@ afterEach(() => {
 
 // ── GalleryResolveBar — post-resolve quota toasts ─────────────────────────
 
-describe('GalleryResolveBar — post-resolve quota toasts', () => {
-  const LINKS = [
-    'https://example.com/gallery-detail-1.html',
-    'https://example.com/gallery-detail-2.html',
-  ];
+const LINKS = [
+  'https://example.com/gallery-detail-1.html',
+  'https://example.com/gallery-detail-2.html',
+];
 
+function clickResolve(container: Element): void {
+  const btn = container.querySelector('#btn-gallery-resolve') as HTMLElement | null;
+  expect(btn).toBeTruthy();
+  fireEvent.click(btn!);
+}
+
+describe('GalleryResolveBar — post-resolve quota toasts', () => {
   function mockResolveSuccess(): void {
     (
       globalThis as unknown as { chrome: { runtime: { sendMessage: ReturnType<typeof vi.fn> } } }
@@ -128,12 +134,6 @@ describe('GalleryResolveBar — post-resolve quota toasts', () => {
       resolved: 2,
       failed: 0,
     });
-  }
-
-  function clickResolve(container: Element): void {
-    const btn = container.querySelector('#btn-gallery-resolve') as HTMLElement | null;
-    expect(btn).toBeTruthy();
-    fireEvent.click(btn!);
   }
 
   it('free user, fresh quota → success toast carries the remaining count', async () => {
@@ -182,6 +182,54 @@ describe('GalleryResolveBar — post-resolve quota toasts', () => {
     );
     const calls = (ui.showToast as ReturnType<typeof vi.fn>).mock.calls;
     expect(calls.some(([msg]) => String(msg).includes('left this month'))).toBe(false);
+  });
+});
+
+describe('GalleryResolveBar — resolve adds nothing new (0-new guard)', () => {
+  it('all originals already in list → info toast, quota NOT consumed', async () => {
+    state.galleryLinks = [...LINKS];
+    // Resolve "succeeds" but both originals are already in state.allImages —
+    // the user gains nothing, so quota must not be burned.
+    state.allImages = [
+      { url: 'https://example.com/orig-1.png' },
+      { url: 'https://example.com/orig-2.png' },
+    ] as unknown as typeof state.allImages;
+    const chromeRef = (
+      globalThis as unknown as {
+        chrome: {
+          runtime: { sendMessage: ReturnType<typeof vi.fn> };
+          storage: { local: { set: ReturnType<typeof vi.fn> } };
+        };
+      }
+    ).chrome;
+    chromeRef.runtime.sendMessage.mockResolvedValue({
+      success: true,
+      images: [
+        { url: 'https://example.com/orig-1.png', type: 'link-resolved' },
+        { url: 'https://example.com/orig-2.png', type: 'link-resolved' },
+      ],
+      results: [
+        { url: LINKS[0], status: 'resolved' },
+        { url: LINKS[1], status: 'resolved' },
+      ],
+      resolved: 2,
+      failed: 0,
+    });
+
+    const { container } = render(<GalleryResolveBar />);
+    clickResolve(container);
+
+    await waitFor(() =>
+      expect(ui.showToast).toHaveBeenCalledWith('No new images found — nothing was added', 'info')
+    );
+    // Quota untouched: feature-quota storage never written (no increment).
+    const setCalls = chromeRef.storage.local.set.mock.calls.filter((c: unknown[]) =>
+      String(c[0]).includes('featureQuota')
+    );
+    expect(setCalls.length).toBe(0);
+    // And NOT the success toast (which would mean the increment path ran).
+    const calls = (ui.showToast as ReturnType<typeof vi.fn>).mock.calls;
+    expect(calls.some(([msg]) => String(msg).includes('Added'))).toBe(false);
   });
 });
 

@@ -1803,5 +1803,8 @@
   },
   "toast_gallery_resolved_last": {
     "message": "元画像 {images} 枚を追加 · 今月のリンク解決回数を使い切りました。Pro なら無制限です"
+  },
+  "toast_gallery_resolve_no_new": {
+    "message": "新しい画像は見つかりませんでした。追加はありません"
   }
 }

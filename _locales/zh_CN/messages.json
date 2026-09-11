@@ -1803,5 +1803,8 @@
   },
   "toast_gallery_resolved_last": {
     "message": "已添加 {images} 张原图 · 本月链接解析次数已用完，升级 Pro 无限解析"
+  },
+  "toast_gallery_resolve_no_new": {
+    "message": "未发现新图片，未添加任何内容"
   }
 }

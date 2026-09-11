@@ -162,6 +162,19 @@ export function GalleryResolveBar() {
           return;
         }
 
+        // v1.2 fix: a resolve that succeeded but added NOTHING new (every
+        // original was already in the list) must not burn the free monthly
+        // quota — to the user that's indistinguishable from a bug. Info
+        // toast, no increment, and bail before the quota path.
+        if (toAdd.length === 0) {
+          void track(EVENTS.GALLERY_RESOLVE_COMPLETED, {
+            resolved: response.resolved ?? 0,
+            failed: response.failed ?? 0,
+          });
+          showToast(t('toast_gallery_resolve_no_new'), 'info');
+          return;
+        }
+
         void track(EVENTS.GALLERY_RESOLVE_COMPLETED, {
           resolved: response.resolved ?? 0,
           failed: response.failed ?? 0,

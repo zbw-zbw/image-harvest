@@ -1649,5 +1649,8 @@
   },
   "toast_gallery_resolved_last": {
     "message": "{images} originele afbeeldingen toegevoegd · maandelijks quotum voor link-resolutie op — Pro is onbeperkt"
+  },
+  "toast_gallery_resolve_no_new": {
+    "message": "Geen nieuwe afbeeldingen gevonden — niets toegevoegd"
   }
 }

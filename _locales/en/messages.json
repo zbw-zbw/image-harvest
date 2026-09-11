@@ -1818,5 +1818,8 @@
   },
   "toast_gallery_resolved_last": {
     "message": "Added {images} original images · monthly link-resolve quota used up — Pro is unlimited"
+  },
+  "toast_gallery_resolve_no_new": {
+    "message": "No new images found — nothing was added"
   }
 }

@@ -1806,5 +1806,8 @@
   },
   "toast_gallery_resolved_last": {
     "message": "Se añadieron {images} imágenes originales · cuota mensual de resolución agotada — Pro es ilimitado"
+  },
+  "toast_gallery_resolve_no_new": {
+    "message": "No se encontraron imágenes nuevas — no se añadió nada"
   }
 }

@@ -1649,5 +1649,8 @@
   },
   "toast_gallery_resolved_last": {
     "message": "تمت إضافة {images} صورة أصلية · نفدت حصة تحليل الروابط لهذا الشهر — Pro بلا حدود"
+  },
+  "toast_gallery_resolve_no_new": {
+    "message": "لم يتم العثور على صور جديدة — لم يتم إضافة أي شيء"
   }
 }

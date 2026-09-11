@@ -1803,5 +1803,8 @@
   },
   "toast_gallery_resolved_last": {
     "message": "已新增 {images} 張原圖 · 本月連結解析次數已用完，升級 Pro 可無限解析"
+  },
+  "toast_gallery_resolve_no_new": {
+    "message": "未發現新圖片，未新增任何內容"
   }
 }

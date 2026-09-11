@@ -1649,5 +1649,8 @@
   },
   "toast_gallery_resolved_last": {
     "message": "เพิ่มภาพต้นฉบับ {images} ภาพ · ใช้โควต้าแก้ไขลิงก์ประจำเดือนหมดแล้ว — Pro ไม่จำกัด"
+  },
+  "toast_gallery_resolve_no_new": {
+    "message": "ไม่พบรูปภาพใหม่ — ไม่ได้เพิ่มอะไรเลย"
   }
 }

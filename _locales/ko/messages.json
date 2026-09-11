@@ -1649,5 +1649,8 @@
   },
   "toast_gallery_resolved_last": {
     "message": "원본 이미지 {images}장 추가 · 이번 달 링크 리졸브 횟수를 모두 사용했습니다. Pro는 무제한"
+  },
+  "toast_gallery_resolve_no_new": {
+    "message": "새 이미지가 없습니다. 추가되지 않았습니다"
   }
 }
