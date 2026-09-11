@@ -52,10 +52,9 @@ test('sidepanel page boots and renders core UI elements', async () => {
   await sidepanel.goto(extensionUrl(extensionId, 'pages/sidepanel.html'));
 
   // Core layout regions should be present. Use more specific selectors —
-  // v1.2 renamed the action row to #command-bar (the .toolbar-actions
-  // variant no longer exists); the filter row is .toolbar-filters.
+  // multiple .toolbar variants exist (actions / select-row / filters).
   await expect(sidepanel.locator('#image-grid')).toBeAttached({ timeout: 15_000 });
-  await expect(sidepanel.locator('#command-bar')).toBeAttached();
+  await expect(sidepanel.locator('.toolbar-actions')).toBeAttached();
   await expect(sidepanel.locator('.status-bar')).toBeAttached();
 
   await sidepanel.waitForTimeout(500);

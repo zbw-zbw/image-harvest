@@ -16,6 +16,13 @@
   border-bottom: 1px solid var(--border-color);
 }
 
+.toolbar-actions {
+  padding: 6px 10px;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 4px 8px;
+}
+
 /* Pro Status Area (toolbar, left side) */
 .pro-status-area {
   margin-right: auto;
@@ -38,10 +45,13 @@
   border-radius: 10px;
   cursor: pointer;
   white-space: nowrap;
-  transition: filter 0.2s;
+  transition:
+    box-shadow 0.2s,
+    filter 0.2s;
 }
 
 .btn-upgrade-pro:hover {
+  box-shadow: 0 2px 8px rgba(255, 184, 0, 0.45);
   filter: brightness(1.06);
 }
 
@@ -138,21 +148,24 @@
    labels then go icon-only, so zoom would double-shrink it and make the
    action buttons too small to read. */
 @container panel (max-width: 600px) {
-  .command-bar,
+  .toolbar-actions,
+  .toolbar-select-row,
   .toolbar-filters {
     zoom: 0.9;
   }
 }
 
 @container panel (max-width: 400px) {
-  .command-bar,
+  .toolbar-actions,
+  .toolbar-select-row,
   .toolbar-filters {
     zoom: 0.85;
   }
 }
 
 @container panel (max-width: 320px) {
-  .command-bar,
+  .toolbar-actions,
+  .toolbar-select-row,
   .toolbar-filters {
     zoom: 0.75;
   }
@@ -167,6 +180,10 @@
   font-size: 13px;
   color: var(--text-secondary);
   margin: 0;
+}
+
+.pro-upgrade-input-section {
+  margin-top: 12px;
 }
 
 .pro-upgrade-features {
@@ -245,6 +262,15 @@
   opacity: 0.7;
 }
 
+/* Toolbar Row: Select All + Found Info + Sort/Group */
+.toolbar-select-row {
+  display: flex;
+  align-items: center;
+  padding: 10px 12px;
+  gap: 4px 8px;
+  flex-wrap: wrap;
+}
+
 .toolbar-found-info {
   display: flex;
   align-items: center;
@@ -285,13 +311,16 @@
   min-width: 0;
 }
 
+.toolbar-select-row .filter-actions-right {
+  margin-left: auto;
+  flex-shrink: 0;
+}
 .toolbar-filters {
   flex-wrap: wrap;
   z-index: 10;
   gap: 8px 16px;
-  min-height: 34px;
-  padding-top: 4px;
-  padding-bottom: 4px;
+  padding-top: 8px;
+  padding-bottom: 8px;
 }
 
 .toolbar-filters .toolbar-left {
@@ -303,6 +332,13 @@
   flex: 0 0 auto;
   margin-left: auto;
   padding-left: 8px;
+}
+
+.filter-actions-right {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  position: relative;
 }
 
 .toolbar-left {
@@ -360,14 +396,14 @@
 }
 
 /* ============================================
-   ProUpgradeModal — Sprint 2.2 + v1.2 redesign
+   ProUpgradeModal — Sprint 2.2 redesign
    ============================================ */
-/* Hero CTA section: the one elevated surface in the v1.2 redesign.
-   Renders for every visitor — pricing is promoted to primary when the
-   trial is not eligible. Followed by the 4-row comparison and the
-   collapsed key-activation fold. */
+/* New CTA section: trial badge + primary "Start Free Trial" + secondary
+   "View Pricing". Sits between the value-prop feature list and the
+   legacy already-have-a-key activation form. */
 
 .pro-upgrade-cta-section {
+  margin-top: 18px;
   padding: 16px;
   border-radius: var(--radius-lg, 10px);
   background: color-mix(in srgb, var(--primary-color) 6%, var(--bg-secondary));
@@ -378,23 +414,57 @@
   width: 100%;
 }
 
-/* The hero CTA gets the single elevated shadow of the redesign */
-.pro-upgrade-cta-section .btn-cta.btn-primary {
-  box-shadow: var(--cta-shadow, 0 1px 2px rgba(15, 23, 42, 0.06));
+.pro-upgrade-trial-header {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
-.pro-upgrade-sub {
-  margin: 0;
-  font-size: var(--font-body, 12.5px);
+.pro-upgrade-trial-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: var(--bg-color);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.01em;
+}
+
+.pro-upgrade-trial-desc {
+  font-size: 13px;
   color: var(--text-secondary);
+  margin: 0;
   line-height: 1.5;
 }
 
-.pro-upgrade-assurance {
+.pro-upgrade-trial-perks {
+  list-style: none;
+  padding: 0;
   margin: 0;
-  font-size: var(--font-caption, 10px);
-  color: var(--text-tertiary);
-  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.pro-upgrade-trial-perks li {
+  font-size: 12px;
+  color: var(--text-secondary);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.pro-upgrade-trial-perks li::before {
+  content: '✓';
+  color: var(--primary-color);
+  font-weight: 700;
+  font-size: 11px;
+  flex-shrink: 0;
 }
 
 .pro-upgrade-cta-row {
@@ -426,27 +496,29 @@
   justify-content: center;
 }
 
-/* v1.2: key activation folded at the bottom */
-.pro-key-fold {
-  margin-top: var(--space-3, 12px);
-  border-top: 1px solid var(--border-color);
-  padding-top: var(--space-2, 8px);
+/* "Already have a key?" divider between CTA section and legacy
+   activation form. Pure CSS rule — no extra DOM nodes. */
+.pro-upgrade-divider {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 16px 0 10px;
+  color: var(--text-tertiary);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
 }
 
-.pro-key-fold summary {
-  font-size: var(--font-aux, 11px);
-  color: var(--text-secondary);
-  cursor: pointer;
-  padding: var(--space-1, 4px) 0;
-  list-style: none;
+.pro-upgrade-divider::before,
+.pro-upgrade-divider::after {
+  content: '';
+  flex: 1 1 auto;
+  height: 1px;
+  background: var(--border-color);
 }
 
-.pro-key-fold summary:hover {
-  color: var(--text-primary);
-}
-
-.pro-key-fold .pro-upgrade-input-section {
-  padding-top: var(--space-2, 8px);
+.pro-upgrade-divider span {
+  flex-shrink: 0;
 }
 
 /* The redesigned modal is significantly taller (CTA + features + form);
@@ -471,12 +543,45 @@
   font-size: 12px;
 }
 
-/* Narrow viewport: stack the CTA row when the panel is at minimum
-   width so both buttons stay fully visible. */
+/* Narrow viewport: keep the badge label readable when the panel is at
+   minimum width, and avoid the trial badge wrapping awkwardly. */
 @media (max-width: 380px) {
+  .pro-upgrade-trial-badge {
+    font-size: 10.5px;
+    padding: 3px 8px;
+  }
+
   .pro-upgrade-cta-row {
     flex-direction: column;
   }
+}
+
+/* ============================================
+   Trial Grace Period Banner
+   ============================================ */
+.trial-grace-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  background: linear-gradient(135deg, #fff3cd, #ffeeba);
+  border-bottom: 1px solid #ffc107;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.trial-grace-text {
+  color: var(--amber-muted);
+  font-weight: 500;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.trial-grace-btn {
+  flex-shrink: 0;
+  font-size: 11px;
+  padding: 4px 10px;
 }
 
 /* ============================================
@@ -526,6 +631,26 @@
 }
 
 :root[data-theme='dark'] .trial-expiry-text {
+  color: var(--amber-light);
+}
+
+/* Dark mode (grace banner) */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .trial-grace-banner {
+    background: linear-gradient(135deg, #332b00, #3d3200);
+    border-bottom-color: var(--amber-text-dark);
+  }
+  :root:not([data-theme]) .trial-grace-text {
+    color: var(--amber-light);
+  }
+}
+
+:root[data-theme='dark'] .trial-grace-banner {
+  background: linear-gradient(135deg, #332b00, #3d3200);
+  border-bottom-color: var(--amber-text-dark);
+}
+
+:root[data-theme='dark'] .trial-grace-text {
   color: var(--amber-light);
 }
 
@@ -603,24 +728,28 @@
 
 /* Toolbar responsive — shrink for narrow panels */
 @media (max-width: 500px) {
-  .command-bar .icon-btn {
+  .toolbar-actions .icon-btn {
     width: 28px;
     height: 28px;
   }
-  .command-bar .icon-btn svg {
+  .toolbar-actions .icon-btn svg {
     width: 16px;
     height: 16px;
   }
-  .command-bar {
-    padding: 0 var(--space-2, 8px);
+  .toolbar-actions {
+    padding: 6px 8px;
+    gap: 4px;
+  }
+  .toolbar-select-row {
+    padding: 6px 8px;
     gap: 4px;
   }
   .select-all-btn {
-    font-size: var(--font-aux);
+    font-size: 11px;
     padding: 3px 6px;
   }
   .filter-btn {
-    font-size: var(--font-caption);
+    font-size: 10px;
     padding: 3px 6px;
   }
 }

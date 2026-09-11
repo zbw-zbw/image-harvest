@@ -4,7 +4,7 @@
 // Scope:
 //   - Hidden while more than 3 days remain (and NO impression telemetry)
 //   - Hidden once the trial has expired (daysLeft clamps to 0 — post-expiry
-//     is the notice strip's trial-grace notice, covered by tests/notice-strip.test.tsx)
+//     is TrialGraceBanner's job, covered by tests/trial-grace-banner.test.tsx)
 //   - Renders inside the window + hands daysLeft to
 //     maybeReportTrialExpiryWarning (the once/day/install throttle lives in
 //     shared/trial and is covered by tests/trial.test.ts — here we only
@@ -14,7 +14,7 @@
 //
 // Strategy: mock shared/telemetry + shared/trial so assertions target the
 // call contract; drive the real sidepanel store by direct assignment (same
-// pattern as tests/notice-strip.test.tsx). DOM hooks are the banner's
+// pattern as tests/trial-grace-banner.test.tsx). DOM hooks are the banner's
 // CSS classes (.trial-expiry-warning / .trial-expiry-btn) so tests stay
 // decoupled from the i18n catalogue text.
 

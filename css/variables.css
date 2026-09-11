@@ -28,7 +28,7 @@ html {
   --bg-tertiary: #e5e7eb;
   --text-primary: #111827;
   --text-secondary: #6b7280;
-  --text-tertiary: #64748b; /* was #9ca3af — 3.0:1 fails WCAG AA for caption text */
+  --text-tertiary: #9ca3af;
   --border-color: #d1d5db;
   --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
@@ -47,32 +47,6 @@ html {
   --tag-format-bg: #4a9a42;
   --tag-info-bg: #4b5563;
   --pro-badge-bg: linear-gradient(135deg, #60b557, #3d8b35);
-
-  /* ── v1.2 UI redesign tokens (docs/superpowers/specs/2026-09-10-ui-redesign-design.md §2) ── */
-  /* 8pt spacing scale — component paddings/gaps draw from here */
-  --space-1: 4px;
-  --space-2: 8px;
-  --space-3: 12px;
-  --space-4: 16px;
-  --space-6: 24px;
-  /* Text sizes (dense tool UI, not marketing) */
-  --font-body: 12.5px;
-  --font-aux: 11px;
-  --font-caption: 10px;
-  --font-modal-title: 15px;
-  /* Modal radius (buttons=--radius-md 6, cards=--radius-lg 8 already exist) */
-  --radius-modal: 12px;
-  /* Interaction timing: 150-200ms ease, reduced-motion handled globally */
-  --ease-out: cubic-bezier(0, 0, 0.2, 1);
-  --duration-fast: 150ms;
-  --duration-base: 200ms;
-  /* The ONLY elevated surface in the redesign: the Pro CTA */
-  --cta-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
-  /* AA-safe text colors for tinted badge surfaces (WCAG 4.5:1+ on their
-     own tints; --primary-color/#60b557 is only 2.2:1 on a 15% primary tint,
-     --text-secondary/#6b7280 only 4.16:1 on a 12% tertiary tint) */
-  --primary-strong: #2f7a28;
-  --text-on-tint: #4b5563;
 }
 
 /* Dark Theme - Manual override via data-theme attribute */
@@ -96,7 +70,7 @@ html {
   --bg-tertiary: #333333;
   --text-primary: #e5e5e5;
   --text-secondary: #a0a0a0;
-  --text-tertiary: #8b96a5; /* was #6b7280 — ~3.4:1 on #1a1a1a, now ~5:1 */
+  --text-tertiary: #6b7280;
   --border-color: #3a3a3a;
   --card-bg: #222222;
   --card-border: #3a3a3a;
@@ -107,12 +81,6 @@ html {
   --tag-format-bg: #6bc963;
   --tag-info-bg: #6b7280;
   --pro-badge-bg: linear-gradient(135deg, #7cc975, #60b557);
-  /* Theme-dependent AA text tokens (light values don't hold on dark tints):
-     dark primary is already 5.7:1 on its tint, dark text-secondary 4.8:1 */
-  --primary-strong: #7cc975;
-  --text-on-tint: #a0a0a0;
-  /* v1.2 spacing/typography/motion tokens are theme-independent — defined
-     once in :root above and inherited here. */
 }
 
 /* Dark Theme - System preference auto-detection (only when no manual override) */
@@ -137,7 +105,7 @@ html {
     --bg-tertiary: #333333;
     --text-primary: #e5e5e5;
     --text-secondary: #a0a0a0;
-    --text-tertiary: #8b96a5; /* was #6b7280 — dark-mode contrast fix, same as manual dark */
+    --text-tertiary: #6b7280;
     --border-color: #3a3a3a;
     --card-bg: #222222;
     --card-border: #3a3a3a;
@@ -148,10 +116,6 @@ html {
     --tag-format-bg: #6bc963;
     --tag-info-bg: #6b7280;
     --pro-badge-bg: linear-gradient(135deg, #7cc975, #60b557);
-    /* Theme-dependent AA text tokens — same as manual dark above */
-    --primary-strong: #7cc975;
-    --text-on-tint: #a0a0a0;
-    /* v1.2 spacing/typography/motion tokens are theme-independent — inherited from :root. */
   }
 }
 
@@ -186,16 +150,4 @@ body {
   height: 100vh;
   overflow: hidden;
   position: relative;
-}
-
-/* v1.2: respect OS-level reduced-motion — collapse all transitions and
-   animations to a near-instant step. Applies to every surface that pulls
-   in this stylesheet (sidepanel/popup/welcome/modals). */
-@media (prefers-reduced-motion: reduce) {
-  *,
-  *::before,
-  *::after {
-    animation-duration: 0.01ms !important;
-    transition-duration: 0.01ms !important;
-  }
 }

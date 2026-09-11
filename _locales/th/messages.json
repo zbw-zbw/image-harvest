@@ -1652,8 +1652,5 @@
   },
   "toast_gallery_resolve_no_new": {
     "message": "ไม่พบรูปภาพใหม่ — ไม่ได้เพิ่มอะไรเลย"
-  },
-  "pro_key_fold_summary": {
-    "message": "มีใบอนุญาตอยู่แล้ว? ป้อนรหัสการเปิดใช้งาน"
   }
 }

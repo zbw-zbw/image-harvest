@@ -1,6 +1,4 @@
-// Tests for shared/paywall-state.ts + the paywall notice inside
-// sidepanel/components/NoticeStrip.tsx (v1.2: NoticeStrip consolidated the
-// legacy ReferralBanner / SoftPaywallBanner / TrialGraceBanner trio).
+// Tests for shared/paywall-state.ts + sidepanel/components/SoftPaywallBanner.tsx.
 //
 // Two surfaces:
 //   1. State module (shared/paywall-state.ts) — pure-function level: counter
@@ -8,10 +6,10 @@
 //      sticky terminal state. We use the SDK's __test hooks to swap the
 //      storage adapter and the clock so we can drive 30-day windows
 //      deterministically.
-//   2. Component (NoticeStrip.tsx) — render-level with the REAL paywall
-//      state module: referral fallback when below threshold, paywall notice
-//      once threshold met, ✕ dismiss persists the cooldown state, try CTA
-//      opens the upgrade modal without marking resolved.
+//   2. Component (SoftPaywallBanner.tsx) — render-level: hidden by default,
+//      pops in once shouldShowBanner() resolves true, dismiss / try / close
+//      buttons each fire the right telemetry event and persist the right
+//      state transition.
 
 import { afterEach, beforeEach, describe, expect, test } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/preact';
@@ -26,7 +24,7 @@ import {
   recordDownloads,
   shouldShowBanner,
 } from '../shared/paywall-state';
-import { NoticeStrip } from '../sidepanel/components/NoticeStrip';
+import { SoftPaywallBanner } from '../sidepanel/components/SoftPaywallBanner';
 import { state } from '../sidepanel/state';
 import { __test as telemetryTest } from '../shared/telemetry';
 
@@ -84,8 +82,6 @@ beforeEach(() => {
   paywallTest.setNow(() => now);
   installTelemetryNoOp();
   state.isProUser = false;
-  state.inTrialGracePeriod = false;
-  localStorage.clear();
 });
 
 afterEach(async () => {
@@ -195,71 +191,64 @@ describe('paywall-state: counters track shown', () => {
 });
 
 // ════════════════════════════════════════════════════════════════════════════
-// NoticeStrip component (paywall notice — real paywall-state + real trial
-// eligibility; the strip picks the paywall notice once threshold met)
+// SoftPaywallBanner component
 // ════════════════════════════════════════════════════════════════════════════
 
-describe('<NoticeStrip> paywall notice', () => {
-  test('referral fallback renders when below threshold', async () => {
-    const { container } = render(<NoticeStrip />);
-    await waitFor(() => {
-      expect(container.querySelector('.notice-strip--referral')).not.toBeNull();
-    });
+describe('<SoftPaywallBanner>', () => {
+  test('renders nothing initially (async eligibility check)', () => {
+    render(<SoftPaywallBanner />);
+    expect(screen.queryByText(/Upgrade to Pro/i)).toBeNull();
   });
 
   test('renders nothing for Pro users even when eligible', async () => {
     state.isProUser = true;
     await recordDownloads(SOFT_PAYWALL_THRESHOLD);
-    const { container } = render(<NoticeStrip />);
-    // Let the eligibility microtasks settle, then some extra ticks.
+    render(<SoftPaywallBanner />);
+    // Give the useEffect microtasks a chance to settle.
     await Promise.resolve();
     await Promise.resolve();
-    await new Promise((r) => setTimeout(r, 10));
-    expect(container.querySelector('.notice-strip')).toBeNull();
+    expect(screen.queryByText(/Upgrade to Pro/i)).toBeNull();
   });
 
-  test('paywall notice takes the row once threshold met', async () => {
+  test('renders nothing when below threshold', async () => {
+    await recordDownloads(SOFT_PAYWALL_THRESHOLD - 1);
+    render(<SoftPaywallBanner />);
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(screen.queryByText(/Upgrade to Pro/i)).toBeNull();
+  });
+
+  test('renders banner once threshold met', async () => {
     await recordDownloads(SOFT_PAYWALL_THRESHOLD);
-    const { container } = render(<NoticeStrip />);
+    render(<SoftPaywallBanner />);
     await waitFor(() => {
-      expect(container.querySelector('.notice-strip--paywall')).not.toBeNull();
+      expect(screen.queryByText(/Upgrade to Pro/i)).not.toBeNull();
     });
-    // Legacy CTA id kept; trial-eligible default in the test env.
     expect(screen.queryByRole('button', { name: 'Try Pro Free' })).not.toBeNull();
-    // Referral is displaced while the paywall notice owns the row.
-    expect(container.querySelector('.notice-strip--referral')).toBeNull();
+    expect(screen.queryByRole('button', { name: 'Later' })).not.toBeNull();
   });
 
-  test('✕ (the only dismissal path) persists dismissedAt and frees the row', async () => {
+  test('clicking "Maybe later" dismisses and persists dismissedAt', async () => {
     await recordDownloads(SOFT_PAYWALL_THRESHOLD);
-    const { container } = render(<NoticeStrip />);
-    // Wait for the paywall notice to take the row BEFORE grabbing the ✕ —
-    // the referral fallback also renders an aria-label="Dismiss" close
-    // button synchronously, and findByLabelText would click that one
-    // before the async eligibility check flips the strip to paywall.
-    await waitFor(() => {
-      expect(container.querySelector('.notice-strip--paywall')).not.toBeNull();
-    });
-    const closeBtn = screen.getByLabelText('Dismiss');
+    render(<SoftPaywallBanner />);
+    const laterBtn = await screen.findByRole('button', { name: 'Later' });
 
-    fireEvent.click(closeBtn);
+    fireEvent.click(laterBtn);
 
+    // Banner disappears.
     await waitFor(() => {
-      expect(container.querySelector('.notice-strip--paywall')).toBeNull();
+      expect(screen.queryByText(/Upgrade to Pro/i)).toBeNull();
     });
-    // markDismissed() is fire-and-forget inside the component — the storage
-    // write needs a few extra ticks beyond the UI disappearing.
-    await waitFor(async () => {
-      const s = await getState();
-      expect(s.dismissedAt).toBe(now);
-    });
-    expect((await getState()).resolved).toBe(false);
+    // State reflects the dismissal.
+    const s = await getState();
+    expect(s.dismissedAt).toBe(now);
+    expect(s.resolved).toBe(false);
   });
 
   test('clicking "Try Pro Free" opens the upgrade modal but does NOT mark resolved', async () => {
     state.proUpgradeModalState = { open: false, errorText: '' };
     await recordDownloads(SOFT_PAYWALL_THRESHOLD);
-    render(<NoticeStrip />);
+    render(<SoftPaywallBanner />);
     const tryBtn = await screen.findByRole('button', { name: 'Try Pro Free' });
 
     fireEvent.click(tryBtn);
@@ -268,5 +257,19 @@ describe('<NoticeStrip> paywall notice', () => {
     // resolved stays false — the user hasn't actually converted yet.
     const s = await getState();
     expect(s.resolved).toBe(false);
+  });
+
+  test('clicking close X dismisses with action=close', async () => {
+    await recordDownloads(SOFT_PAYWALL_THRESHOLD);
+    render(<SoftPaywallBanner />);
+    const closeBtn = await screen.findByLabelText('Dismiss');
+
+    fireEvent.click(closeBtn);
+
+    await waitFor(() => {
+      expect(screen.queryByText(/Upgrade to Pro/i)).toBeNull();
+    });
+    const s = await getState();
+    expect(s.dismissedAt).toBe(now);
   });
 });

@@ -1806,8 +1806,5 @@
   },
   "toast_gallery_resolve_no_new": {
     "message": "未發現新圖片，未新增任何內容"
-  },
-  "pro_key_fold_summary": {
-    "message": "已有授權碼？輸入啟用碼"
   }
 }

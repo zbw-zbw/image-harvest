@@ -139,6 +139,7 @@
 
 .rescan-btn-lg:hover {
   transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }
 
 .download-group {
@@ -160,11 +161,11 @@
 
 /* Download button enabled state - more prominent */
 .download-group .btn-primary:not(:disabled) {
-  box-shadow: var(--cta-shadow);
+  box-shadow: 0 1px 4px rgba(96, 181, 87, 0.3);
 }
 
 .download-group .btn-primary:not(:disabled):hover {
-  box-shadow: var(--cta-shadow);
+  box-shadow: 0 2px 8px rgba(96, 181, 87, 0.4);
 }
 
 .btn:disabled {
@@ -330,6 +331,16 @@
   overflow: visible;
 }
 
+.filter-buttons.filter-actions-right {
+  margin-left: auto;
+  flex-shrink: 0;
+}
+
+.filter-buttons.filter-actions-right .filter-dropdown {
+  left: auto;
+  right: 0;
+}
+
 .filter-actions {
   display: flex;
   align-items: center;
@@ -396,8 +407,8 @@
 }
 
 .filter-btn {
-  padding: 4px 8px;
-  font-size: var(--font-aux, 11px);
+  padding: 5px 10px;
+  font-size: 12px;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   background: var(--bg-color);
@@ -412,7 +423,7 @@
   overflow: hidden;
   text-overflow: ellipsis;
   min-width: 0;
-  min-height: 26px;
+  min-height: 30px;
   box-sizing: border-box;
 }
 
@@ -836,8 +847,8 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  padding: 4px 8px;
-  font-size: var(--font-aux, 11px);
+  padding: 5px 10px;
+  font-size: 12px;
   border: 1px solid var(--border-color);
   border-radius: var(--radius-sm);
   background: var(--bg-color);
@@ -846,7 +857,7 @@
   transition: all 0.2s;
   white-space: nowrap;
   flex-shrink: 0;
-  min-height: 26px;
+  min-height: 30px;
   box-sizing: border-box;
   user-select: none;
 }

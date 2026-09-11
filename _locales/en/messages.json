@@ -1821,8 +1821,5 @@
   },
   "toast_gallery_resolve_no_new": {
     "message": "No new images found — nothing was added"
-  },
-  "pro_key_fold_summary": {
-    "message": "Already have a license? Enter activation code"
   }
 }
