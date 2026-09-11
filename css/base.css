@@ -32,6 +32,8 @@
   overflow: hidden;
 }
 
+/* Brand pairing: green = functional actions, amber = paid/Pro surfaces.
+   Deep-brown label on the amber ramp keeps ≥5:1 at both gradient ends. */
 .btn-upgrade-pro {
   display: inline-flex;
   align-items: center;
@@ -39,8 +41,8 @@
   padding: 3px 10px;
   font-size: 11px;
   font-weight: 700;
-  color: #5a3e00;
-  background: linear-gradient(135deg, #ffd700, #ffb800);
+  color: #451a03;
+  background: linear-gradient(135deg, #fbbf24, #d97706);
   border: none;
   border-radius: 10px;
   cursor: pointer;
@@ -51,12 +53,12 @@
 }
 
 .btn-upgrade-pro:hover {
-  box-shadow: 0 2px 8px rgba(255, 184, 0, 0.45);
+  box-shadow: 0 2px 8px rgba(217, 119, 6, 0.4);
   filter: brightness(1.06);
 }
 
 .btn-upgrade-pro svg {
-  stroke: #5a3e00;
+  stroke: #451a03;
   flex-shrink: 0;
 }
 
@@ -77,8 +79,8 @@
   font-size: 11px;
   font-weight: 700;
   line-height: 16px;
-  color: #5a3e00;
-  background: linear-gradient(135deg, #ffd700, #ffb800);
+  color: #451a03;
+  background: linear-gradient(135deg, #fbbf24, #d97706);
   border-radius: 10px;
   white-space: nowrap;
   text-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.3);
@@ -86,7 +88,7 @@
 }
 
 .pro-active-badge svg {
-  stroke: #5a3e00;
+  stroke: #451a03;
   flex-shrink: 0;
 }
 

@@ -8,10 +8,17 @@ html {
 }
 
 /* CSS Variables - Light Theme */
+/* "Harvest Green" brand style: green-tinted neutrals, a deepened interactive
+   green (white text passes WCAG AA at 4.8:1) and the original #60b557 kept
+   as the brand accent for selection borders and the PRO badge. */
 :root {
-  --primary-color: #60b557;
-  --primary-hover: #4a9a42;
-  --secondary-color: #6b7280;
+  --primary-color: #2a8323;
+  --primary-hover: #236f1d;
+  /* Solid-button green stays identical in BOTH themes — a filled button
+     reads as the brand action regardless of surrounding background. */
+  --primary-solid: #2a8323;
+  --primary-solid-hover: #236f1d;
+  --secondary-color: #5c685a;
   --success-color: #10b981;
   --warning-color: #f59e0b;
   --error-color: #ef4444;
@@ -24,27 +31,27 @@ html {
   --orange-hover: #d35400;
   --star-color: #f5b400;
   --bg-color: #ffffff;
-  --bg-secondary: #f3f4f6;
-  --bg-tertiary: #e5e7eb;
-  --text-primary: #111827;
-  --text-secondary: #6b7280;
-  --text-tertiary: #9ca3af;
-  --border-color: #d1d5db;
-  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  --bg-secondary: #f2f5ef;
+  --bg-tertiary: #e7ece2;
+  --text-primary: #18221b;
+  --text-secondary: #5c685a;
+  --text-tertiary: #6b7280; /* was #9ca3af — 3.0:1 fails WCAG for caption text */
+  --border-color: #d9e0d3;
+  --shadow-sm: 0 1px 2px rgba(31, 47, 26, 0.06);
+  --shadow-md: 0 4px 6px -1px rgba(31, 47, 26, 0.09);
+  --shadow-lg: 0 10px 15px -3px rgba(31, 47, 26, 0.1);
   --radius-sm: 4px;
   --radius-md: 6px;
   --radius-lg: 8px;
   --card-bg: #ffffff;
-  --card-border: #e5e7eb;
-  --card-hover-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  --selected-bg: #f0f9ef;
+  --card-border: #e4e9df;
+  --card-hover-shadow: 0 4px 12px rgba(31, 47, 26, 0.1);
+  --selected-bg: #eef7ec;
   --selected-border: #60b557;
-  --checkerboard-color: #f0f0f0;
+  --checkerboard-color: #eef2ea;
   --card-action-bg: rgba(255, 255, 255, 0.85);
   --card-action-bg-hover: #ffffff;
-  --tag-format-bg: #4a9a42;
+  --tag-format-bg: #2a8323;
   --tag-info-bg: #4b5563;
   --pro-badge-bg: linear-gradient(135deg, #60b557, #3d8b35);
 }
@@ -53,6 +60,10 @@ html {
 :root[data-theme='dark'] {
   --primary-color: #7cc975;
   --primary-hover: #60b557;
+  /* Filled buttons keep the same deep green in dark mode (white-label AA);
+     --primary-color stays bright here for icons and small controls. */
+  --primary-solid: #2a8323;
+  --primary-solid-hover: #236f1d;
   --secondary-color: #9ca3af;
   --success-color: #34d399;
   --warning-color: #fbbf24;
@@ -65,17 +76,17 @@ html {
   --orange-color: #f6ad55;
   --orange-hover: #ed8936;
   --star-color: #fbd38d;
-  --bg-color: #1a1a1a;
-  --bg-secondary: #242424;
-  --bg-tertiary: #333333;
-  --text-primary: #e5e5e5;
-  --text-secondary: #a0a0a0;
-  --text-tertiary: #6b7280;
-  --border-color: #3a3a3a;
-  --card-bg: #222222;
-  --card-border: #3a3a3a;
+  --bg-color: #191c19;
+  --bg-secondary: #1f241f;
+  --bg-tertiary: #292e29;
+  --text-primary: #e4e8e3;
+  --text-secondary: #a2aca1;
+  --text-tertiary: #8b958a; /* was #6b7280 — ~3.4:1 on dark bg, now ~5:1 */
+  --border-color: #343a34;
+  --card-bg: #202422;
+  --card-border: #343a34;
   --selected-bg: #2a3a2a;
-  --checkerboard-color: #2a2a2a;
+  --checkerboard-color: #242824;
   --card-action-bg: rgba(40, 40, 40, 0.85);
   --card-action-bg-hover: #444444;
   --tag-format-bg: #6bc963;
@@ -88,6 +99,8 @@ html {
   :root:not([data-theme]) {
     --primary-color: #7cc975;
     --primary-hover: #60b557;
+    --primary-solid: #2a8323;
+    --primary-solid-hover: #236f1d;
     --secondary-color: #9ca3af;
     --success-color: #34d399;
     --warning-color: #fbbf24;
@@ -100,17 +113,17 @@ html {
     --orange-color: #f6ad55;
     --orange-hover: #ed8936;
     --star-color: #fbd38d;
-    --bg-color: #1a1a1a;
-    --bg-secondary: #242424;
-    --bg-tertiary: #333333;
-    --text-primary: #e5e5e5;
-    --text-secondary: #a0a0a0;
-    --text-tertiary: #6b7280;
-    --border-color: #3a3a3a;
-    --card-bg: #222222;
-    --card-border: #3a3a3a;
+    --bg-color: #191c19;
+    --bg-secondary: #1f241f;
+    --bg-tertiary: #292e29;
+    --text-primary: #e4e8e3;
+    --text-secondary: #a2aca1;
+    --text-tertiary: #8b958a; /* same contrast fix as manual dark */
+    --border-color: #343a34;
+    --card-bg: #202422;
+    --card-border: #343a34;
     --selected-bg: #2a3a2a;
-    --checkerboard-color: #2a2a2a;
+    --checkerboard-color: #242824;
     --card-action-bg: rgba(40, 40, 40, 0.85);
     --card-action-bg-hover: #444444;
     --tag-format-bg: #6bc963;

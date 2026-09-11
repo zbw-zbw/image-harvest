@@ -195,14 +195,16 @@
 }
 
 .btn-primary {
-  background: var(--primary-color);
+  /* --primary-solid keeps the deep brand green in both themes so the
+     white label always passes WCAG AA (4.8:1). */
+  background: var(--primary-solid, #2a8323);
   color: white;
-  border-color: var(--primary-color);
+  border-color: var(--primary-solid, #2a8323);
 }
 
 .btn-primary:hover {
-  background: var(--primary-hover);
-  border-color: var(--primary-hover);
+  background: var(--primary-solid-hover, #236f1d);
+  border-color: var(--primary-solid-hover, #236f1d);
 }
 
 .btn-small {
