@@ -257,8 +257,8 @@ function mountNoticeStrip(): void {
 }
 
 /**
- * Gallery resolve bar mount (v1.1.0). Slot sits between the filter toolbar
- * and the image grid. Render directly into the slot (permanent layout
+ * Gallery resolve bar mount (v1.1.0, inlined v1.2). Slot sits inline in
+ * the command bar. Render directly into the slot (permanent layout
  * anchor); the component renders null until candidates exist.
  */
 function mountGalleryResolveBar(): void {

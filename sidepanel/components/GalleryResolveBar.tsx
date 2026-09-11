@@ -1,8 +1,8 @@
-// Deep link-resolution hint bar (v1.1.0).
+// Deep link-resolution inline segment (v1.1.0, inlined v1.2).
 //
-// Renders below the toolbar when the last scan found gallery-link candidates
-// (visible thumbnail wrapped in a NON-image link — likely a detail page).
-// One click asks the background to fetch every candidate and pull its
+// Renders inline in the command bar when the last scan found gallery-link
+// candidates (visible thumbnail wrapped in a NON-image link — likely a detail
+// page). One click asks the background to fetch every candidate and pull its
 // og:image original. Free users draw from the linkResolve monthly soft
 // quota; Pro is unlimited.
 //
@@ -221,46 +221,47 @@ export function GalleryResolveBar() {
   const hiddenCount = galleryCount - shownLinks.length;
 
   return (
-    <div id="gallery-resolve-bar" class="gallery-resolve-bar" role="region">
-      <div class="gallery-resolve-bar-main">
-        <button
-          type="button"
-          class="gallery-resolve-bar-toggle"
-          aria-expanded={expanded}
-          aria-controls="gallery-resolve-collapse"
-          title={t('gallery_resolve_toggle_title')}
-          onClick={() => setExpanded(!expanded)}
-        >
-          <span class={`gallery-resolve-caret${expanded ? ' open' : ''}`}>
-            <svg
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              stroke-width="2.5"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              aria-hidden="true"
-            >
-              <polyline points="9 6 15 12 9 18" />
-            </svg>
-          </span>
-          {t('gallery_resolve_bar_title', { count: galleryCount })}
-        </button>
-        <button
-          id="btn-gallery-resolve"
-          type="button"
-          class="btn btn-primary btn-sm"
-          disabled={isResolving}
-          onClick={() => void handleResolveClick()}
-        >
-          {t('gallery_resolve_action')}
-        </button>
-      </div>
-      <p class="gallery-resolve-hint">{t('gallery_resolve_bar_hint')}</p>
-      {/* The list stays mounted inside a CSS-animated collapse wrapper
-          (grid-template-rows 0fr↔1fr) so expanding/collapsing glides
-          instead of popping. `inert` keeps collapsed links out of the tab
-          order while they are visually hidden. */}
+    <div
+      id="gallery-resolve-bar"
+      class="gallery-resolve-bar gallery-resolve-bar--inline"
+      role="region"
+    >
+      <button
+        type="button"
+        class="gallery-resolve-bar-toggle"
+        aria-expanded={expanded}
+        aria-controls="gallery-resolve-collapse"
+        title={t('gallery_resolve_toggle_title')}
+        onClick={() => setExpanded(!expanded)}
+      >
+        <span class={`gallery-resolve-caret${expanded ? ' open' : ''}`}>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <polyline points="9 6 15 12 9 18" />
+          </svg>
+        </span>
+        {t('gallery_resolve_bar_title', { count: galleryCount })}
+      </button>
+      <button
+        id="btn-gallery-resolve"
+        type="button"
+        class="btn btn-primary btn-sm"
+        disabled={isResolving}
+        onClick={() => void handleResolveClick()}
+      >
+        {t('gallery_resolve_action')}
+      </button>
+      {/* The list drops down from the command bar — absolutely anchored to
+          this inline segment so it overlays the filter row instead of
+          pushing the grid down. Same 0fr↔1fr collapse animation, `inert`
+          keeps collapsed links out of the tab order. */}
       <div
         id="gallery-resolve-collapse"
         class={`gallery-resolve-collapse${expanded ? ' open' : ''}`}

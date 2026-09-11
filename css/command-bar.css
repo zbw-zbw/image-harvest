@@ -69,3 +69,147 @@
     background: rgba(251, 191, 36, 0.08);
   }
 }
+
+/* Command bar (v1.2): single 38px row merging the legacy action row and
+   the select/scan row. Pro status hugs the left (margin-right: auto),
+   everything else flows to the right. */
+.command-bar {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  min-height: 38px;
+  padding: 0 var(--space-3, 12px);
+  border-bottom: 1px solid var(--border-color);
+  background: var(--bg-color);
+  flex-shrink: 0;
+  overflow: visible; /* the resolve dropdown anchors below */
+  min-width: 0;
+}
+
+.command-bar .pro-status-area {
+  margin-right: auto; /* pushes everything else to the right */
+}
+
+.command-bar .select-all-btn {
+  flex-shrink: 0;
+}
+
+.command-bar .toolbar-found-info {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1, 4px);
+  min-width: 0;
+  flex-shrink: 1;
+}
+
+/* Gallery resolve inline segment: compact, sits in the command bar flow.
+   The candidate list drops down as an absolutely-anchored panel so it
+   overlays the filter row instead of pushing the grid down. */
+.gallery-resolve-bar--inline {
+  position: relative; /* anchors the dropdown */
+  display: inline-flex;
+  align-items: center;
+  gap: var(--space-1, 4px);
+  flex-shrink: 0;
+}
+
+.gallery-resolve-bar--inline .gallery-resolve-bar-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  padding: 2px 6px;
+  font-size: var(--font-aux, 11px);
+  color: var(--primary-color);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.gallery-resolve-bar--inline .gallery-resolve-caret {
+  display: inline-flex;
+  transition: transform var(--duration-fast, 150ms) var(--ease-out, ease);
+}
+
+.gallery-resolve-bar--inline .gallery-resolve-caret.open {
+  transform: rotate(90deg);
+}
+
+/* Anchored dropdown: overlays the filter row instead of pushing the grid */
+.gallery-resolve-bar--inline .gallery-resolve-collapse {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: -12px; /* align to the command bar's content box edge */
+  width: max(280px, calc(100vw - 48px));
+  max-width: calc(100vw - 48px);
+  z-index: 40;
+  background: var(--bg-color);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg, 8px);
+  box-shadow: var(--shadow-lg, 0 4px 12px rgba(0, 0, 0, 0.08));
+  display: grid;
+  grid-template-rows: 0fr;
+  visibility: hidden;
+  transition:
+    grid-template-rows var(--duration-base, 200ms) var(--ease-out, ease),
+    visibility 0s linear var(--duration-base, 200ms);
+}
+
+.gallery-resolve-bar--inline .gallery-resolve-collapse.open {
+  grid-template-rows: 1fr;
+  visibility: visible;
+  transition: grid-template-rows var(--duration-base, 200ms) var(--ease-out, ease);
+}
+
+.gallery-resolve-bar--inline .gallery-resolve-collapse > * {
+  overflow: hidden;
+  min-height: 0;
+}
+
+.gallery-resolve-links {
+  margin: 0;
+  padding: var(--space-2, 8px) 0;
+  list-style: none;
+}
+
+.gallery-resolve-links li {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2, 8px);
+  padding: 2px var(--space-3, 12px);
+  font-size: var(--font-caption, 10px);
+}
+
+.gallery-resolve-links a {
+  color: var(--text-secondary);
+  font-family: ui-monospace, 'SF Mono', 'Cascadia Mono', Menlo, Consolas, monospace;
+  text-decoration: none;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.gallery-resolve-links a:hover {
+  color: var(--text-primary);
+  text-decoration: underline;
+}
+
+.gallery-resolve-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--text-tertiary);
+  flex-shrink: 0;
+}
+
+.gallery-resolve-dot.is-resolved {
+  background: var(--success-color);
+}
+
+.gallery-resolve-dot.is-failed {
+  background: var(--danger-color);
+}
+
+.gallery-resolve-links-more {
+  color: var(--text-tertiary);
+}
