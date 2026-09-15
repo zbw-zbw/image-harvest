@@ -570,7 +570,7 @@
     "message": "不再提示"
   },
   "rating_rate_now": {
-    "message": "⭐ 到 Chrome 商店評價"
+    "message": "到 Chrome 商店評價"
   },
   "rating_title": {
     "message": "喜歡 Image Harvest 嗎?"
@@ -1715,7 +1715,7 @@
     "message": "很好，已找到圖片！勾選幾張縮圖試試。"
   },
   "onboarding_tip_download": {
-    "message": "最後一步：點擊下載按鈕，打包成 ZIP 儲存。🎉"
+    "message": "最後一步：點擊下載按鈕，打包成 ZIP 儲存。"
   },
   "onboarding_dismiss": {
     "message": "關閉提示"

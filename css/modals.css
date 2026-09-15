@@ -35,7 +35,7 @@
 }
 
 .batch-op-delete {
-  color: var(--danger, #e05252);
+  color: var(--danger-color);
 }
 
 /* ───────────────────────────────────────────────────────────────────
@@ -313,7 +313,7 @@
 }
 
 .confirm-dialog-content .modal-footer .btn {
-  min-width: 80px;
+  min-width: 72px;
 }
 
 .btn-danger {
@@ -741,7 +741,7 @@
   border-color: var(--selected-border, var(--primary-color));
   border-left-color: var(--primary-color);
   box-shadow:
-    0 0 0 1px rgba(96, 181, 87, 0.2),
+    0 0 0 1px var(--primary-glow),
     var(--shadow-sm);
 }
 
@@ -784,9 +784,9 @@
 }
 
 .collection-card-checkbox.checked {
-  background: var(--primary-color);
-  border-color: var(--primary-color);
-  box-shadow: 0 2px 6px rgba(96, 181, 87, 0.3);
+  background: var(--primary-solid);
+  border-color: var(--primary-solid);
+  box-shadow: 0 2px 6px var(--primary-glow);
 }
 
 .collection-card-checkbox .checkbox-icon {
@@ -1017,9 +1017,9 @@
 }
 
 .tab-checkbox.checked {
-  background: var(--primary-color);
-  border-color: var(--primary-color);
-  box-shadow: 0 2px 6px rgba(96, 181, 87, 0.3);
+  background: var(--primary-solid);
+  border-color: var(--primary-solid);
+  box-shadow: 0 2px 6px var(--primary-glow);
 }
 
 .tab-checkbox.checked .checkbox-icon {
@@ -1477,32 +1477,56 @@
 }
 
 /* ============================================
-   Gallery Resolve Bar (v1.1.0)
+   Gallery Resolve Bar (v1.1.0, restyled)
    ============================================ */
 /* Sits in #gallery-resolve-bar-mount between the filter toolbar and the
    image grid. The mount slot is permanent (zero height when the component
-   renders null) so the layout doesn't jump when the bar appears. */
+   renders null) so the layout doesn't jump when the bar appears.
+   Visual language: a quiet brand-tinted banner — icon chip + title + one
+   primary action; the loud two-tone gradient was flattened into a soft
+   wash with a real border. */
 .gallery-resolve-bar {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  padding: 8px 12px;
-  background: linear-gradient(
-    90deg,
-    color-mix(in srgb, var(--primary-color) 10%, var(--bg-color)) 0%,
-    var(--bg-secondary) 100%
-  );
-  border-bottom: 1px solid var(--border-color);
+  gap: 3px;
+  padding: 2px 10px;
+  background: color-mix(in srgb, var(--primary-color) 5%, var(--bg-color));
+  border-bottom: 1px solid color-mix(in srgb, var(--primary-color) 16%, var(--border-color));
   color: var(--text-primary);
-  font-size: 12.5px;
+  font-size: 12px;
   flex-wrap: wrap;
 }
 
 .gallery-resolve-bar-main {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 8px;
   flex-wrap: wrap;
+}
+
+/* Dense single-row context: the resolve action keeps the shared btn-sm
+   font/radius but sheds vertical padding so the bar stays slim. */
+.gallery-resolve-bar .btn-sm {
+  padding-top: 2px;
+  padding-bottom: 2px;
+}
+
+/* Leading link-icon chip — same tint language as restricted feature chips. */
+.gallery-resolve-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  flex-shrink: 0;
+  background: color-mix(in srgb, var(--primary-color) 12%, transparent);
+  color: var(--primary-color);
+}
+
+.gallery-resolve-icon svg {
+  width: 11px;
+  height: 11px;
 }
 
 /* The count text doubles as the expand/collapse toggle for the candidate
@@ -1513,17 +1537,24 @@
   min-width: 0;
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 5px;
   padding: 0;
   border: none;
   background: none;
   color: var(--text-primary);
   font-size: inherit;
-  font-weight: 500;
+  font-weight: 600;
   font-family: inherit;
   line-height: 1.35;
   text-align: left;
   cursor: pointer;
+}
+
+.gallery-resolve-bar-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .gallery-resolve-bar-toggle:hover {
@@ -1562,54 +1593,54 @@
   color: var(--primary-color);
 }
 
-.gallery-resolve-hint {
-  margin: 0;
-  color: var(--text-tertiary, var(--text-secondary));
-  font-size: 11px;
-  line-height: 1.4;
-}
-
-/* Expand/collapse animation (v1.1.1): the link list stays mounted inside
-   this wrapper; grid-template-rows 0fr↔1fr animates its height without JS
-   measuring, opacity fades in sync, and visibility only flips AFTER the
-   collapse finishes (delayed transition) so the animation is never cut. */
+/* Expand/collapse (v1.1.6): NO height animation — animating height here
+   reflowed the entire image grid below on every frame (visible jank), so
+   the container swaps instantly. The reveal instead runs on the compositor:
+   a top-down clip-path wipe + quick fade reads like the panel unrolls, at
+   zero layout cost. Strong deceleration (easeOutQuint-like) so it lands
+   softly instead of popping. */
 .gallery-resolve-collapse {
-  display: grid;
-  grid-template-rows: 0fr;
-  opacity: 0;
-  visibility: hidden;
-  transition:
-    grid-template-rows 0.25s ease,
-    opacity 0.25s ease,
-    visibility 0s linear 0.25s;
+  display: none;
 }
 
 .gallery-resolve-collapse.open {
-  grid-template-rows: 1fr;
-  opacity: 1;
-  visibility: visible;
-  transition:
-    grid-template-rows 0.25s ease,
-    opacity 0.25s ease,
-    visibility 0s;
+  display: block;
+  animation: gallery-resolve-in 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-/* Candidate link list (v1.1.0 smoke round 3 restyle): sits in a soft inset
-   panel, entries are status-dot + real anchor, and URLs clip with an
-   ellipsis at the ACTUAL right edge — the old fixed 72-char cut left the
-   right half of the bar empty. min-height:0 lets the 0fr wrapper clip it. */
+@keyframes gallery-resolve-in {
+  from {
+    opacity: 0;
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    opacity: 1;
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .gallery-resolve-collapse.open {
+    animation: none;
+  }
+}
+
+/* Candidate link list: a real inset card with a border so it reads as a
+   distinct panel, not floating text. URLs clip with an ellipsis at the
+   ACTUAL right edge. */
 .gallery-resolve-links {
   margin: 2px 0 0;
-  padding: 6px 8px;
+  padding: 3px 8px;
   list-style: none;
   display: flex;
   flex-direction: column;
-  gap: 3px;
+  gap: 2px;
   max-height: 140px;
   overflow-y: auto;
   min-height: 0;
-  background: color-mix(in srgb, var(--bg-color) 55%, transparent);
-  border-radius: 6px;
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: var(--radius-md);
 }
 
 .gallery-resolve-links li {

@@ -160,7 +160,6 @@ function ErrorScreen({ visible }: ScreenProps) {
 // of Image Harvest so users see value even on restricted pages.
 const RESTRICTED_FEATURES = [
   {
-    gradient: 'gradient-blue',
     icon: (
       <svg
         width="20"
@@ -179,7 +178,6 @@ const RESTRICTED_FEATURES = [
     descKey: 'restricted_feature_batch_desc',
   },
   {
-    gradient: 'gradient-purple',
     icon: (
       <svg
         width="20"
@@ -199,7 +197,6 @@ const RESTRICTED_FEATURES = [
     descKey: 'restricted_feature_dedup_desc',
   },
   {
-    gradient: 'gradient-green',
     icon: (
       <svg
         width="20"
@@ -217,7 +214,6 @@ const RESTRICTED_FEATURES = [
     descKey: 'restricted_feature_reverse_desc',
   },
   {
-    gradient: 'gradient-amber',
     icon: (
       <svg
         width="20"
@@ -236,7 +232,6 @@ const RESTRICTED_FEATURES = [
     descKey: 'restricted_feature_multitab_desc',
   },
   {
-    gradient: 'gradient-pink',
     icon: (
       <svg
         width="20"
@@ -255,7 +250,6 @@ const RESTRICTED_FEATURES = [
     descKey: 'restricted_feature_color_desc',
   },
   {
-    gradient: 'gradient-teal',
     icon: (
       <svg
         width="20"
@@ -272,7 +266,6 @@ const RESTRICTED_FEATURES = [
     descKey: 'restricted_feature_filter_desc',
   },
   {
-    gradient: 'gradient-indigo',
     icon: (
       <svg
         width="20"
@@ -289,7 +282,6 @@ const RESTRICTED_FEATURES = [
     descKey: 'restricted_feature_collection_desc',
   },
   {
-    gradient: 'gradient-rose',
     icon: (
       <svg
         width="20"
@@ -376,7 +368,7 @@ function RestrictedScreen({ visible }: ScreenProps) {
         <div class="restricted-features">
           {RESTRICTED_FEATURES.map((feat) => (
             <div class="restricted-feature" key={feat.titleKey}>
-              <div class={`restricted-feature-icon-wrap ${feat.gradient}`}>{feat.icon}</div>
+              <div class="restricted-feature-icon-wrap">{feat.icon}</div>
               <div class="restricted-feature-text">
                 <strong>{t(feat.titleKey)}</strong>
                 <p>{t(feat.descKey)}</p>

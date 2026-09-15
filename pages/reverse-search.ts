@@ -30,7 +30,7 @@ interface FetchImageDataResult {
     wrapper.className = 'error';
 
     const msgP = document.createElement('p');
-    msgP.textContent = `❌ ${message}`;
+    msgP.textContent = message;
     wrapper.appendChild(msgP);
 
     const closeP = document.createElement('p');

@@ -223,6 +223,22 @@ export function GalleryResolveBar() {
   return (
     <div id="gallery-resolve-bar" class="gallery-resolve-bar" role="region">
       <div class="gallery-resolve-bar-main">
+        {/* Brand-tinted link icon anchors the bar's purpose (deeplinks →
+            originals); pure SVG, no emoji. The what-is-this explanation
+            lives on its tooltip instead of a full-width hint line. */}
+        <span class="gallery-resolve-icon" aria-hidden="true" title={t('gallery_resolve_bar_hint')}>
+          <svg
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          >
+            <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71" />
+            <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71" />
+          </svg>
+        </span>
         <button
           type="button"
           class="gallery-resolve-bar-toggle"
@@ -231,6 +247,7 @@ export function GalleryResolveBar() {
           title={t('gallery_resolve_toggle_title')}
           onClick={() => setExpanded(!expanded)}
         >
+          <span class="gallery-resolve-bar-title">{t('gallery_resolve_bar_title', { count: galleryCount })}</span>
           <span class={`gallery-resolve-caret${expanded ? ' open' : ''}`}>
             <svg
               viewBox="0 0 24 24"
@@ -244,7 +261,6 @@ export function GalleryResolveBar() {
               <polyline points="9 6 15 12 9 18" />
             </svg>
           </span>
-          {t('gallery_resolve_bar_title', { count: galleryCount })}
         </button>
         <button
           id="btn-gallery-resolve"
@@ -256,11 +272,12 @@ export function GalleryResolveBar() {
           {t('gallery_resolve_action')}
         </button>
       </div>
-      <p class="gallery-resolve-hint">{t('gallery_resolve_bar_hint')}</p>
-      {/* The list stays mounted inside a CSS-animated collapse wrapper
-          (grid-template-rows 0fr↔1fr) so expanding/collapsing glides
-          instead of popping. `inert` keeps collapsed links out of the tab
-          order while they are visually hidden. */}
+      {/* The list stays mounted but display:none while collapsed. No height
+          animation on purpose: animating height here reflowed the ENTIRE
+          image grid below on every frame (visible jank). The open state
+          instead plays a compositor-only clip-path wipe (see modals.css),
+          which reads like an unroll at zero layout cost. `inert` keeps
+          collapsed links out of the tab order. */}
       <div
         id="gallery-resolve-collapse"
         class={`gallery-resolve-collapse${expanded ? ' open' : ''}`}

@@ -112,10 +112,10 @@
 
 .settings-content .radio-group input[type='radio']:checked + span,
 .settings-content .radio-group label:has(input[type='radio']:checked) {
-  background: var(--primary-color);
+  background: var(--primary-solid);
   color: white;
   font-weight: 600;
-  box-shadow: 0 1px 3px rgba(96, 181, 87, 0.3);
+  box-shadow: 0 1px 3px var(--primary-glow);
 }
 
 /* Custom Select Dropdown - matches filter-dropdown style */
@@ -203,15 +203,17 @@
   margin-left: auto;
 }
 
-/* Reserve fixed-width space for check mark on all options so PRO badge stays aligned */
+/* Reserve fixed-width space for the check icon on all options so PRO badge stays aligned */
 .setting-select-option::before {
-  content: '✓';
-  font-size: 11px;
-  width: 14px;
+  content: '';
+  width: 13px;
+  height: 13px;
   flex-shrink: 0;
-  text-align: center;
   opacity: 0;
   order: -1;
+  background: currentColor;
+  -webkit-mask: var(--icon-check) center / contain no-repeat;
+  mask: var(--icon-check) center / contain no-repeat;
 }
 
 .setting-select-option:hover {
@@ -251,7 +253,7 @@
 .settings-content input[type='number']:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(96, 181, 87, 0.15);
+  box-shadow: 0 0 0 2px var(--primary-glow-soft);
   background-color: var(--bg-color);
 }
 
@@ -278,7 +280,7 @@
 .settings-content textarea:focus {
   outline: none;
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(96, 181, 87, 0.15);
+  box-shadow: 0 0 0 2px var(--primary-glow-soft);
 }
 
 /* Setting Group Label */
@@ -350,17 +352,19 @@
   display: none;
 }
 
-/* Settings Modal Footer */
+/* Settings Modal Footer — compact tier: modal actions shouldn't dwarf the
+   form they belong to (was 8px 20px / 13px, visibly oversized). */
 .settings-content .modal-footer {
-  gap: 12px;
-  padding: 14px 16px;
+  gap: 10px;
+  padding: 12px 16px;
 }
 
 .settings-content .modal-footer .btn {
-  padding: 8px 20px;
-  font-size: 13px;
+  padding: 6px 14px;
+  font-size: 12px;
   font-weight: 600;
   border-radius: var(--radius-md);
+  min-width: 72px;
 }
 
 /* ============================================

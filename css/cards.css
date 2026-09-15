@@ -108,7 +108,7 @@
   border-color: var(--selected-border);
   border-left-color: var(--primary-color);
   box-shadow:
-    0 0 0 1px rgba(96, 181, 87, 0.2),
+    0 0 0 1px var(--primary-glow),
     var(--shadow-sm);
 }
 
@@ -170,22 +170,26 @@
 }
 
 .card-checkbox.checked {
-  background: var(--primary-color);
-  border-color: var(--primary-color);
+  background: var(--primary-solid);
+  border-color: var(--primary-solid);
   border-radius: 5px;
-  box-shadow: 0 2px 6px rgba(96, 181, 87, 0.3);
+  box-shadow: 0 2px 6px var(--primary-glow);
 }
 
 .card-checkbox.checked .checkbox-icon {
   color: white;
 }
 
-/* Card Info Bar - actions left, tags right */
+/* Card Info Bar - tags left, actions right. NEVER wraps: a wrapped info-bar
+   made sibling cards different heights and misaligned the whole grid row.
+   The tags group absorbs any shortage instead (flex-shrink:1 + overflow clip
+   as last resort); the compact/ultra-compact tiers below shrink pills and
+   buttons uniformly so one line genuinely fits at every supported width. */
 .card-info-bar {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
   padding: 8px 10px;
   padding-right: 14px;
   border-top: 1px solid var(--card-border);
@@ -457,9 +461,9 @@
   justify-content: flex-start;
 }
 
-/* Compact mode: scale tags AND action buttons together proportionally.
-   With flex-wrap on info-bar, elements auto-wrap when space is tight —
-   compact just shrinks sizes for a tidier look, no overflow risk. */
+/* Compact mode: scale tags AND action buttons together proportionally —
+   the info-bar never wraps, so these tiers are what keeps one line fitting;
+   .card-tags' overflow clip is only a pathological-case safety net. */
 /* ── Tier 1: compact (~15% shrink) ── */
 .compact-mode .card-info-bar {
   padding: 5px 8px;
@@ -876,16 +880,17 @@
   box-sizing: border-box;
 }
 
-/* Small icons (≤64px): compact thumb instead of the full-height strip — a
-   16×16 glyph floating in 120–160px of empty checkerboard reads as a broken
-   placeholder. Specificity (.image-card .card-thumb.thumb-small) intentionally
-   outranks both .card-thumb and .list-view .card-thumb. */
-.image-card .card-thumb.thumb-small {
-  height: 64px;
-}
-
+/* Small icons (≤64px): the img stays icon-sized instead of being blown up to
+   the full thumb height, but the thumb itself keeps the density height — a
+   shorter thumb in grid mode misaligned the whole row and left dead space at
+   the shorter card's bottom. List view is single-column (no row to align
+   with), so the compact 64px thumb only survives there. */
 .image-card .card-thumb.thumb-small img {
   max-height: 56px;
+}
+
+.list-view .card-thumb.thumb-small {
+  height: 64px;
 }
 
 .list-view .card-colors {
@@ -979,15 +984,16 @@
   grid-template-columns: 1fr;
 }
 
-/* Pro Badge */
+/* Pro Badge — single warm accent (amber ramp), consistent with the
+   header upgrade button / active status pill. */
 .pro-badge {
   display: inline-flex;
   align-items: center;
   padding: 1px 6px;
   font-size: 9px;
   font-weight: 700;
-  color: #5a3e00;
-  background: linear-gradient(135deg, #ffd700, #ffb800);
+  color: var(--pro-gold-text);
+  background: var(--pro-gold-bg);
   border-radius: 3px;
   text-transform: uppercase;
   letter-spacing: 0.5px;

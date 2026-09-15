@@ -328,6 +328,23 @@ export function checkNarrowMode(): void {
 
   const canFitTwoColumns = availableWidth >= minCardWidth * 2 + gridGap;
 
+  // Narrow-mode force-list / restore must run BEFORE the density tiers are
+  // computed: the tiers read state.currentViewMode, and a stale 'list' left
+  // over from a forced narrow switch would silently disable compact-mode on
+  // exactly the narrow 2-column grid that needs it (the info-bar then wraps
+  // per-card and grid rows misalign).
+  if (!canFitTwoColumns) {
+    if (!isNarrowMode) {
+      isNarrowMode = true;
+      applyViewMode('list');
+    }
+  } else {
+    if (isNarrowMode) {
+      isNarrowMode = false;
+      applyViewMode(userViewMode);
+    }
+  }
+
   // 3-tier density based on the ACTUAL card width, not hypothetical.
   // In two-column grid mode the real card width is half the available
   // space, so compact must kick in much earlier than in single-column
@@ -355,18 +372,6 @@ export function checkNarrowMode(): void {
     const toolbarRight = elements.btnViewToggle.closest('.toolbar-right') as HTMLElement | null;
     if (toolbarRight) {
       toolbarRight.style.display = canFitTwoColumns ? '' : 'none';
-    }
-  }
-
-  if (!canFitTwoColumns) {
-    if (!isNarrowMode) {
-      isNarrowMode = true;
-      applyViewMode('list');
-    }
-  } else {
-    if (isNarrowMode) {
-      isNarrowMode = false;
-      applyViewMode(userViewMode);
     }
   }
 }

@@ -41,7 +41,7 @@ export const EVENTS = {
   COPY_URL_SINGLE: 'copy_url_single',
   COPY_URL_BATCH: 'copy_url_batch', // props: { count: number }
 
-  // ⭐ Conversion funnel — the events that decide whether revenue happens
+  // Conversion funnel — the events that decide whether revenue happens
   PRO_UPSELL_SHOWN: 'pro_upsell_shown', // props: { trigger: string }
   PRO_UPSELL_DISMISSED: 'pro_upsell_dismissed',
   PRO_UPSELL_CTA_CLICKED: 'pro_upsell_cta_clicked', // "Get Pro →" / "Start Free Trial"
@@ -169,7 +169,7 @@ export const EVENT_PROP_SCHEMAS: Record<TelemetryEventName, readonly string[]> =
   [EVENTS.COPY_URL_SINGLE]: [],
   [EVENTS.COPY_URL_BATCH]: ['count'],
 
-  // ⭐ Conversion funnel — abBucket is auto-injected by shared/telemetry.ts
+  // Conversion funnel — abBucket is auto-injected by shared/telemetry.ts
   // from the envelope meta when the event schema declares it. We list it
   // explicitly on every conversion event so the funnel can slice control
   // vs. variant on EVERY step (shown / dismissed / cta / pricing / checkout

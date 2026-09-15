@@ -516,7 +516,7 @@
     "message": "Nicht mehr fragen"
   },
   "rating_rate_now": {
-    "message": "⭐ Im Chrome Store bewerten"
+    "message": "Im Chrome Store bewerten"
   },
   "rating_title": {
     "message": "Gefällt Ihnen Image Harvest?"
@@ -1559,7 +1559,7 @@
     "message": "Nice — images found! Tick a few thumbnails to select them."
   },
   "onboarding_tip_download": {
-    "message": "Last step: hit the download button to save them as a ZIP. 🎉"
+    "message": "Last step: hit the download button to save them as a ZIP."
   },
   "onboarding_dismiss": {
     "message": "Dismiss tips"

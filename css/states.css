@@ -20,19 +20,35 @@
 }
 
 .toast {
-  padding: 10px 20px;
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  padding: 9px 16px;
   border-radius: var(--radius-md);
   font-size: 12px;
   font-weight: 500;
   box-shadow: var(--shadow-lg);
   animation: slideUp 0.3s ease;
   margin-top: 8px;
-  background: #60b557;
+  background: var(--toast-info-bg);
   color: white;
   white-space: nowrap;
   max-width: 90vw;
   text-overflow: ellipsis;
   overflow: hidden;
+}
+
+/* Semantic icon leading the message (rendered by ToastContainer). */
+.toast-icon {
+  width: 14px;
+  height: 14px;
+  flex-shrink: 0;
+  display: inline-flex;
+}
+
+.toast-icon svg {
+  width: 14px;
+  height: 14px;
 }
 
 @keyframes slideUp {
@@ -46,19 +62,22 @@
   }
 }
 
+/* Four semantic states — success/info/warning/error. `.toast.warning`
+   previously didn't exist, so warning toasts silently rendered green. */
 .toast.success {
-  background: #60b557;
-  color: white;
+  background: var(--toast-success-bg);
 }
 
 .toast.error {
-  background: #e05252;
-  color: white;
+  background: var(--toast-error-bg);
 }
 
 .toast.info {
-  background: #60b557;
-  color: white;
+  background: var(--toast-info-bg);
+}
+
+.toast.warning {
+  background: var(--toast-warning-bg);
 }
 
 .toast.fade-out {
@@ -156,7 +175,7 @@
 
 .empty-state .btn {
   font-size: 12px;
-  padding: 8px 20px;
+  padding: 7px 16px;
   border-radius: var(--radius-md);
   transition: all 0.2s ease;
 }
@@ -724,6 +743,8 @@
   box-shadow: var(--shadow-md);
 }
 
+/* Icon chip: single brand treatment for every feature — the old rainbow
+   of 9 per-feature gradients fought the Harvest Green palette. */
 .restricted-feature-icon-wrap {
   display: flex;
   align-items: center;
@@ -732,51 +753,8 @@
   height: 38px;
   border-radius: 10px;
   flex-shrink: 0;
-  color: #ffffff;
-}
-
-.restricted-feature-icon-wrap.gradient-blue {
-  background: linear-gradient(135deg, #60b557, #7cc975);
-}
-
-.restricted-feature-icon-wrap.gradient-purple {
-  background: linear-gradient(135deg, #8b5cf6, #a78bfa);
-}
-
-.restricted-feature-icon-wrap.gradient-green {
-  background: linear-gradient(135deg, #10b981, #34d399);
-}
-
-.restricted-feature-icon-wrap.gradient-amber {
-  background: linear-gradient(135deg, #d97706, #f59e0b);
-}
-
-.restricted-feature-icon-wrap.gradient-pink {
-  background: linear-gradient(135deg, #ec4899, #f472b6);
-}
-
-.restricted-feature-icon-wrap.gradient-teal {
-  background: linear-gradient(135deg, #14b8a6, #2dd4bf);
-}
-
-.restricted-feature-icon-wrap.gradient-cyan {
-  background: linear-gradient(135deg, #06b6d4, #22d3ee);
-}
-
-.restricted-feature-icon-wrap.gradient-orange {
-  background: linear-gradient(135deg, #ea580c, #f97316);
-}
-
-.restricted-feature-icon-wrap.gradient-indigo {
-  background: linear-gradient(135deg, #6366f1, #818cf8);
-}
-
-.restricted-feature-icon-wrap.gradient-indigo {
-  background: linear-gradient(135deg, #6366f1, #818cf8);
-}
-
-.restricted-feature-icon-wrap.gradient-rose {
-  background: linear-gradient(135deg, #e11d48, #fb7185);
+  background: color-mix(in srgb, var(--primary-color) 12%, transparent);
+  color: var(--primary-color);
 }
 
 .restricted-feature-text strong {

@@ -31,6 +31,17 @@ interface HighlightEntry {
   cleanup: () => void;
 }
 
+/* Highlight colors are HARDCODED (no CSS variables) because these styles are
+   injected into arbitrary third-party pages where our theme tokens don't
+   exist. Values mirror the Harvest Green palette: #60b557 brand accent for
+   the resting border, deepened #2a8323 for the pulse peak. */
+const HL_BORDER = '#60B557';
+const HL_BORDER_PEAK = '#2a8323';
+const HL_GLOW_NEAR = 'rgba(96, 181, 87, 0.7)';
+const HL_GLOW_FAR = 'rgba(96, 181, 87, 0.35)';
+const HL_GLOW_NEAR_PEAK = 'rgba(42, 131, 35, 0.9)';
+const HL_GLOW_FAR_PEAK = 'rgba(96, 181, 87, 0.45)';
+
 // V2.0: Image Highlight & Locate
 // Multi-highlight state: Map<imageUrl, { element, border, cleanup }>
 const highlightEntries = new Map<string, HighlightEntry>();
@@ -74,19 +85,19 @@ function ensureHighlightStyles(): void {
   highlightStyleElement.textContent = `
     @keyframes image-harvest-pulse {
       0% {
-        box-shadow: 0 0 8px 2px rgba(96, 181, 87, 0.7),
-                    0 0 20px 6px rgba(96, 181, 87, 0.35);
-        border-color: #60B557;
+        box-shadow: 0 0 8px 2px ${HL_GLOW_NEAR},
+                    0 0 20px 6px ${HL_GLOW_FAR};
+        border-color: ${HL_BORDER};
       }
       50% {
-        box-shadow: 0 0 24px 10px rgba(96, 181, 87, 1),
-                    0 0 48px 20px rgba(96, 181, 87, 0.45);
-        border-color: #4da347;
+        box-shadow: 0 0 24px 10px ${HL_GLOW_NEAR_PEAK},
+                    0 0 48px 20px ${HL_GLOW_FAR_PEAK};
+        border-color: ${HL_BORDER_PEAK};
       }
       100% {
-        box-shadow: 0 0 8px 2px rgba(96, 181, 87, 0.7),
-                    0 0 20px 6px rgba(96, 181, 87, 0.35);
-        border-color: #60B557;
+        box-shadow: 0 0 8px 2px ${HL_GLOW_NEAR},
+                    0 0 20px 6px ${HL_GLOW_FAR};
+        border-color: ${HL_BORDER};
       }
     }
     .image-harvest-highlight-border {
@@ -803,12 +814,12 @@ function createSingleHighlight(imageUrl: string, target: Element): void {
     left: ${left - gap}px;
     width: ${rect.width + gap * 2}px;
     height: ${rect.height + gap * 2}px;
-    border: ${borderWidth}px solid #60B557;
+    border: ${borderWidth}px solid ${HL_BORDER};
     border-radius: 6px;
     z-index: 1;
     pointer-events: none;
-    box-shadow: 0 0 8px 2px rgba(96, 181, 87, 0.7),
-                0 0 20px 6px rgba(96, 181, 87, 0.35);
+    box-shadow: 0 0 8px 2px ${HL_GLOW_NEAR},
+                0 0 20px 6px ${HL_GLOW_FAR};
   `;
 
   ensureHighlightHost().appendChild(border);

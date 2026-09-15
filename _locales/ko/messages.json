@@ -516,7 +516,7 @@
     "message": "다시 묻지 않기"
   },
   "rating_rate_now": {
-    "message": "⭐ Chrome 스토어에서 평가하기"
+    "message": "Chrome 스토어에서 평가하기"
   },
   "rating_title": {
     "message": "Image Harvest가 마음에 드시나요?"
@@ -1559,7 +1559,7 @@
     "message": "Nice — images found! Tick a few thumbnails to select them."
   },
   "onboarding_tip_download": {
-    "message": "Last step: hit the download button to save them as a ZIP. 🎉"
+    "message": "Last step: hit the download button to save them as a ZIP."
   },
   "onboarding_dismiss": {
     "message": "Dismiss tips"

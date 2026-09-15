@@ -516,7 +516,7 @@
     "message": "ไม่ต้องถามอีก"
   },
   "rating_rate_now": {
-    "message": "⭐ ให้คะแนนบน Chrome Store"
+    "message": "ให้คะแนนบน Chrome Store"
   },
   "rating_title": {
     "message": "ชอบ Image Harvest ไหม?"
@@ -1559,7 +1559,7 @@
     "message": "Nice — images found! Tick a few thumbnails to select them."
   },
   "onboarding_tip_download": {
-    "message": "Last step: hit the download button to save them as a ZIP. 🎉"
+    "message": "Last step: hit the download button to save them as a ZIP."
   },
   "onboarding_dismiss": {
     "message": "Dismiss tips"

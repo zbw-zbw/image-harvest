@@ -54,6 +54,32 @@ html {
   --tag-format-bg: #2a8323;
   --tag-info-bg: #4b5563;
   --pro-badge-bg: linear-gradient(135deg, #60b557, #3d8b35);
+  /* Unified brand halo for focus rings / checked-state shadows — replaces
+     the scattered rgba(96,181,87,*) literals from the old palette. */
+  --primary-glow: rgba(42, 131, 35, 0.3);
+  --primary-glow-soft: rgba(42, 131, 35, 0.15);
+  /* Elevated surface: floating cards, coach marks (was an undefined
+     --bg-elevated that silently fell back to #fff). */
+  --bg-elevated: #ffffff;
+  /* Toast semantic fills — white label passes WCAG AA on all four. */
+  --toast-success-bg: #2a8323;
+  /* Info shares the success green: pre-redesign every non-error toast was
+     brand green, and the slate-grey info pill read as off-brand. */
+  --toast-info-bg: #2a8323;
+  --toast-warning-bg: #b45309;
+  --toast-error-bg: #dc2626;
+  /* Pro gold — the single warm accent reserved for upsell badges/CTAs. */
+  --pro-gold-bg: linear-gradient(135deg, #fbbf24, #d97706);
+  --pro-gold-text: #451a03;
+  --pro-gold-accent: #b45309;
+  /* Trial urgency banners (grace period / expiry warning). */
+  --trial-banner-bg: linear-gradient(135deg, #fff3cd, #ffeeba);
+  --trial-banner-border: #ffc107;
+  /* Inline SVG icon primitives as mask-image data URIs. The visible color
+     comes from `background` at the usage site (usually currentColor), so a
+     single asset works across light/dark themes. Used for check marks in
+     dropdown options, trial perk bullets, etc. */
+  --icon-check: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='black' stroke-width='3' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M20 6 9 17l-5-5'/%3E%3C/svg%3E");
 }
 
 /* Dark Theme - Manual override via data-theme attribute */
@@ -92,6 +118,14 @@ html {
   --tag-format-bg: #6bc963;
   --tag-info-bg: #6b7280;
   --pro-badge-bg: linear-gradient(135deg, #7cc975, #60b557);
+  --primary-glow: rgba(124, 201, 117, 0.35);
+  --primary-glow-soft: rgba(124, 201, 117, 0.18);
+  --bg-elevated: #262b26;
+  --pro-gold-accent: #fbbf24;
+  /* Toast fills + pro gold stay identical in dark — solid overlays with a
+     white / deep-brown label read the same on either theme. */
+  --trial-banner-bg: linear-gradient(135deg, #332b00, #3d3200);
+  --trial-banner-border: #665200;
 }
 
 /* Dark Theme - System preference auto-detection (only when no manual override) */
@@ -129,6 +163,12 @@ html {
     --tag-format-bg: #6bc963;
     --tag-info-bg: #6b7280;
     --pro-badge-bg: linear-gradient(135deg, #7cc975, #60b557);
+    --primary-glow: rgba(124, 201, 117, 0.35);
+    --primary-glow-soft: rgba(124, 201, 117, 0.18);
+    --bg-elevated: #262b26;
+    --pro-gold-accent: #fbbf24;
+    --trial-banner-bg: linear-gradient(135deg, #332b00, #3d3200);
+    --trial-banner-border: #665200;
   }
 }
 

@@ -620,6 +620,12 @@ describe('checkNarrowMode', () => {
   }
 
   afterEach(() => {
+    // Drain the module-level narrow-mode state machine before the next test:
+    // a stale isNarrowMode=true would make the next checkNarrowMode() restore
+    // userViewMode mid-call and stomp that test's state.currentViewMode setup
+    // (the view restore now runs BEFORE the density-tier computation).
+    mountNarrowDOM(1000);
+    checkNarrowMode();
     delete (elements as Partial<typeof elements>).imageGrid;
     delete (elements as Partial<typeof elements>).btnViewToggle;
   });

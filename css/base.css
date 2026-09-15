@@ -41,8 +41,8 @@
   padding: 3px 10px;
   font-size: 11px;
   font-weight: 700;
-  color: #451a03;
-  background: linear-gradient(135deg, #fbbf24, #d97706);
+  color: var(--pro-gold-text);
+  background: var(--pro-gold-bg);
   border: none;
   border-radius: 10px;
   cursor: pointer;
@@ -58,7 +58,7 @@
 }
 
 .btn-upgrade-pro svg {
-  stroke: #451a03;
+  stroke: var(--pro-gold-text);
   flex-shrink: 0;
 }
 
@@ -79,8 +79,8 @@
   font-size: 11px;
   font-weight: 700;
   line-height: 16px;
-  color: #451a03;
-  background: linear-gradient(135deg, #fbbf24, #d97706);
+  color: var(--pro-gold-text);
+  background: var(--pro-gold-bg);
   border-radius: 10px;
   white-space: nowrap;
   text-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.3);
@@ -88,7 +88,7 @@
 }
 
 .pro-active-badge svg {
-  stroke: #451a03;
+  stroke: var(--pro-gold-text);
   flex-shrink: 0;
 }
 
@@ -400,6 +400,25 @@
 /* ============================================
    ProUpgradeModal — Sprint 2.2 redesign
    ============================================ */
+/* Gold-tinted chip around the header rocket — the one surface where the
+   Pro amber accent leads (same language as .pro-badge / upgrade CTA). */
+.pro-modal-title-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--pro-gold-accent) 14%, transparent);
+  color: var(--pro-gold-accent);
+  flex-shrink: 0;
+}
+
+.pro-modal-title-icon svg {
+  width: 15px;
+  height: 15px;
+}
+
 /* New CTA section: trial badge + primary "Start Free Trial" + secondary
    "View Pricing". Sits between the value-prop feature list and the
    legacy already-have-a-key activation form. */
@@ -422,6 +441,8 @@
   gap: 6px;
 }
 
+/* Trial badge reads as the Pro gold accent — this pill is the entry point
+   to a paid flow, so it shares the --pro-gold-* language. */
 .pro-upgrade-trial-badge {
   display: inline-flex;
   align-items: center;
@@ -429,12 +450,17 @@
   align-self: flex-start;
   padding: 4px 10px;
   border-radius: 999px;
-  background: var(--bg-color);
-  color: var(--text-primary);
-  border: 1px solid var(--border-color);
+  background: var(--pro-gold-bg);
+  color: var(--pro-gold-text);
+  border: none;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.01em;
+}
+
+.pro-upgrade-trial-badge svg {
+  width: 12px;
+  height: 12px;
 }
 
 .pro-upgrade-trial-desc {
@@ -462,11 +488,13 @@
 }
 
 .pro-upgrade-trial-perks li::before {
-  content: '✓';
-  color: var(--primary-color);
-  font-weight: 700;
-  font-size: 11px;
+  content: '';
+  width: 12px;
+  height: 12px;
   flex-shrink: 0;
+  background: var(--primary-color);
+  -webkit-mask: var(--icon-check) center / contain no-repeat;
+  mask: var(--icon-check) center / contain no-repeat;
 }
 
 .pro-upgrade-cta-row {
@@ -484,7 +512,7 @@
   align-items: center;
   font-size: 13px;
   font-weight: 600;
-  padding: 9px 20px;
+  padding: 8px 16px;
   border-radius: var(--radius-md);
   white-space: nowrap;
 }
@@ -567,8 +595,8 @@
   justify-content: space-between;
   gap: 8px;
   padding: 8px 12px;
-  background: linear-gradient(135deg, #fff3cd, #ffeeba);
-  border-bottom: 1px solid #ffc107;
+  background: var(--trial-banner-bg);
+  border-bottom: 1px solid var(--trial-banner-border);
   font-size: 12px;
   flex-shrink: 0;
 }
@@ -597,8 +625,8 @@
   justify-content: space-between;
   gap: 8px;
   padding: 8px 12px;
-  background: linear-gradient(135deg, #fff3cd, #ffeeba);
-  border-bottom: 1px solid #ffc107;
+  background: var(--trial-banner-bg);
+  border-bottom: 1px solid var(--trial-banner-border);
   font-size: 12px;
   flex-shrink: 0;
 }
@@ -616,40 +644,22 @@
   padding: 4px 10px;
 }
 
-/* Dark mode — warning */
+/* Dark mode — the banner surface/border come from --trial-banner-* tokens,
+   which flip with the theme; only the text color needs an override. */
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme]) .trial-expiry-warning {
-    background: linear-gradient(135deg, #332b00, #3d3200);
-    border-bottom-color: var(--amber-text-dark);
-  }
   :root:not([data-theme]) .trial-expiry-text {
     color: var(--amber-light);
   }
-}
-
-:root[data-theme='dark'] .trial-expiry-warning {
-  background: linear-gradient(135deg, #332b00, #3d3200);
-  border-bottom-color: var(--amber-text-dark);
 }
 
 :root[data-theme='dark'] .trial-expiry-text {
   color: var(--amber-light);
 }
 
-/* Dark mode (grace banner) */
 @media (prefers-color-scheme: dark) {
-  :root:not([data-theme]) .trial-grace-banner {
-    background: linear-gradient(135deg, #332b00, #3d3200);
-    border-bottom-color: var(--amber-text-dark);
-  }
   :root:not([data-theme]) .trial-grace-text {
     color: var(--amber-light);
   }
-}
-
-:root[data-theme='dark'] .trial-grace-banner {
-  background: linear-gradient(135deg, #332b00, #3d3200);
-  border-bottom-color: var(--amber-text-dark);
 }
 
 :root[data-theme='dark'] .trial-grace-text {
@@ -669,9 +679,9 @@
   z-index: 60;
   padding: 10px 12px;
   border-radius: 10px;
-  border: 1px solid var(--primary, #60b557);
-  background: var(--bg-elevated, #fff);
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.18);
+  border: 1px solid color-mix(in srgb, var(--primary-color) 35%, var(--border-color));
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow-lg);
   font-size: 12px;
 }
 
@@ -684,7 +694,7 @@
 
 .onboarding-coach-step {
   font-weight: 600;
-  color: var(--primary, #60b557);
+  color: var(--primary-color);
   font-size: 11px;
   letter-spacing: 0.02em;
 }
@@ -711,21 +721,11 @@
   width: 18px;
   height: 3px;
   border-radius: 2px;
-  background: var(--border, #d0d0d0);
+  background: var(--border-color);
 }
 
 .onboarding-coach-dot.is-active {
-  background: var(--primary, #60b557);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root:not([data-theme]) .onboarding-coach {
-    background: #1e1f22;
-  }
-}
-
-:root[data-theme='dark'] .onboarding-coach {
-  background: #1e1f22;
+  background: var(--primary-color);
 }
 
 /* Toolbar responsive — shrink for narrow panels */

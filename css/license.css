@@ -36,7 +36,7 @@
 
 .license-input:focus {
   border-color: var(--primary-color);
-  box-shadow: 0 0 0 2px rgba(96, 181, 87, 0.15);
+  box-shadow: 0 0 0 2px var(--primary-glow-soft);
 }
 
 .license-input::placeholder {
@@ -44,13 +44,8 @@
   letter-spacing: 2px;
 }
 
-.btn-sm {
-  padding: 6px 14px;
-  font-size: 12px;
-  font-weight: 600;
-  border-radius: var(--radius-md);
-  white-space: nowrap;
-}
+/* .btn-sm lives in toolbar.css next to .btn-small — single canonical
+   small-button definition (this file used to carry a larger duplicate). */
 
 .license-error {
   color: var(--danger-color);
@@ -109,16 +104,16 @@
   font-weight: 700;
   padding: 3px 10px;
   border-radius: 20px;
-  color: #5a3e00;
+  color: var(--pro-gold-text);
   text-shadow: 0 0.5px 0 rgba(255, 255, 255, 0.3);
 }
 
 .license-status-badge.active {
-  background: linear-gradient(135deg, #ffd700, #ffb800);
+  background: var(--pro-gold-bg);
 }
 
 .license-status-badge.active svg {
-  stroke: #5a3e00;
+  stroke: var(--pro-gold-text);
 }
 
 .license-plan-badge {
@@ -362,8 +357,9 @@
 }
 
 .referral-banner-icon {
-  font-size: 13px;
+  display: flex;
   flex-shrink: 0;
+  color: var(--primary-color);
 }
 
 .referral-banner-text {
@@ -376,6 +372,8 @@
 
 .referral-banner-btn {
   flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
   padding: 2px 8px;
   border: 1px solid var(--primary-color, #60b557);
   border-radius: 4px;
@@ -446,10 +444,23 @@
   min-width: 0;
 }
 
+/* Feature icon chip: brand-tinted square, single accent (replaces the old
+   per-feature rainbow gradients + emoji glyphs). */
 .pro-fc-icon {
-  font-size: 18px;
+  width: 30px;
+  height: 30px;
   flex-shrink: 0;
-  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--primary-color) 10%, transparent);
+  color: var(--primary-color);
+}
+
+.pro-fc-icon svg {
+  width: 16px;
+  height: 16px;
 }
 
 .pro-fc-info {
@@ -505,8 +516,10 @@
   color: var(--primary-color, #60b557);
 }
 
-.pro-fc-pro.pro-fc-check {
-  font-size: 13px;
+/* ✗/✓ comparison glyphs are inline SVGs now — keep them optically centered
+   inside the pill badges. */
+.pro-fc-badge svg {
+  display: block;
 }
 
 /* ── Pro compare header (FEATURE / FREE / PRO column titles) ── */

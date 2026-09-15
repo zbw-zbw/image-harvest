@@ -516,7 +516,7 @@
     "message": "दोबारा न पूछें"
   },
   "rating_rate_now": {
-    "message": "⭐ Chrome Store पर रेट करें"
+    "message": "Chrome Store पर रेट करें"
   },
   "rating_title": {
     "message": "Image Harvest पसंद आ रहा है?"
@@ -1559,7 +1559,7 @@
     "message": "Nice — images found! Tick a few thumbnails to select them."
   },
   "onboarding_tip_download": {
-    "message": "Last step: hit the download button to save them as a ZIP. 🎉"
+    "message": "Last step: hit the download button to save them as a ZIP."
   },
   "onboarding_dismiss": {
     "message": "Dismiss tips"

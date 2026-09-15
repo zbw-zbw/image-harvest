@@ -570,7 +570,7 @@
     "message": "今後表示しない"
   },
   "rating_rate_now": {
-    "message": "⭐ Chrome ストアで評価"
+    "message": "Chrome ストアで評価"
   },
   "rating_title": {
     "message": "Image Harvest はいかがですか?"
@@ -1715,7 +1715,7 @@
     "message": "画像が見つかりました！サムネイルをいくつか選択してください。"
   },
   "onboarding_tip_download": {
-    "message": "最後のステップ：ダウンロードボタンを押して ZIP で保存します。🎉"
+    "message": "最後のステップ：ダウンロードボタンを押して ZIP で保存します。"
   },
   "onboarding_dismiss": {
     "message": "ヒントを閉じる"

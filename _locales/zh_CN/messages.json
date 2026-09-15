@@ -420,7 +420,7 @@
     "message": "如果我们帮你节省了时间,在 Chrome 应用商店留下 5 星评价对我们意义重大。"
   },
   "rating_rate_now": {
-    "message": "⭐ 去 Chrome 商店评价"
+    "message": "去 Chrome 商店评价"
   },
   "rating_later": {
     "message": "稍后再说"
@@ -1715,7 +1715,7 @@
     "message": "很好，已找到图片！勾选几张缩略图试试。"
   },
   "onboarding_tip_download": {
-    "message": "最后一步：点击下载按钮，打包成 ZIP 保存。🎉"
+    "message": "最后一步：点击下载按钮，打包成 ZIP 保存。"
   },
   "onboarding_dismiss": {
     "message": "关闭提示"

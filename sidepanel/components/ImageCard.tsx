@@ -212,9 +212,9 @@ export function ImageCard({ img, index }: Props) {
   const format = (img.format || 'unknown').toUpperCase();
   const colors = img.colors || [];
 
-  // Small icons (≤64px: page-chrome glyphs, base64 SVG sprites) get a compact
-  // thumb — a 16×16 glyph centered in a 120/160px strip reads as a broken
-  // placeholder (v1.1.1 smoke on Aone: 108 images, most 16×16 icons).
+  // Small icons (≤64px: page-chrome glyphs, base64 SVG sprites) keep the img
+  // icon-sized via .thumb-small, but the thumb box itself stays full density
+  // height in grid mode so rows align; only list view shrinks it to 64px.
   const isSmallIcon = w > 0 && h > 0 && Math.max(w, h) <= 64;
   // Data URIs carry no readable "URL" — the base64 wall is pure noise in the
   // URL row. Show the mime prefix + size instead; the full value stays in the

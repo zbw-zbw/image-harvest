@@ -63,8 +63,8 @@ sync-code.mjs
 dist.zip
 
 # ai-coding-metrics local metadata (contains conversation excerpts — never commit)
-.specs/ai-coding-log.jsonl
-.specs/archive/
+# AI 个人元数据与复盘报告（含用户对话摘录，请勿入库）
+.specs/
 
 # brainstorm visual companion mockups
 .superpowers/

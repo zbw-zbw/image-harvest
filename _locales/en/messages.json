@@ -432,7 +432,7 @@
     "message": "If we've saved you some time, a quick 5-star review on the Chrome Web Store would mean the world to us."
   },
   "rating_rate_now": {
-    "message": "⭐ Rate on Chrome Store"
+    "message": "Rate on Chrome Store"
   },
   "rating_later": {
     "message": "Maybe later"
@@ -1728,7 +1728,7 @@
     "message": "Nice — images found! Tick a few thumbnails to select them."
   },
   "onboarding_tip_download": {
-    "message": "Last step: hit the download button to save them as a ZIP. 🎉"
+    "message": "Last step: hit the download button to save them as a ZIP."
   },
   "onboarding_dismiss": {
     "message": "Dismiss tips"
