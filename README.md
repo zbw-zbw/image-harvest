@@ -87,19 +87,17 @@
 
 ---
 
-## 🆕 What's New (v1.1.6)
+## 🆕 What's New (v1.1.7)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
-- 🔒 **Injection-proof error pages** — reverse-search errors now render as plain text, closing a content-injection vector from the searched page.
-- 🔒 **Tamper-evident license cache** — a locally edited license record now fails signature validation and falls back to a server check.
-- 💳 **Paid subscriptions are update-proof** — installing an update no longer overwrites an active monthly/yearly license with a 7-day trial.
-- 🎁 **Referral bonuses finally work** — the invite-page fingerprint silently never matched the extension's (it read a property the service worker doesn't expose); both ends now compute the same hash.
-- 🤖 **Failed AI tags no longer burn the free quota** — the 5 free monthly tags now only count real results.
-- 🔗 **Gallery "resolve originals" bar stays live** — the button disables while resolving, and the candidate list refreshes on tab switches.
-- 🖼️ **No duplicate cards across tabs** — multi-tab extraction now dedupes the same URL found in several tabs.
-- ⚡ **Faster on huge pages** — image highlighting caps its style scan and duplicate checks use constant-time lookups, so image-heavy pages stop stuttering.
-- 🗓️ **Quota resets align with the server** — monthly quota boundaries use UTC everywhere, matching the backend exactly when counts reset.
+- 🎨 **Fresh "Harvest Green" visual style** — colors, borders, shadows and interaction states unified into one coherent brand system, in both light and dark themes. Same layout, same features.
+- ♿ **Stronger contrast where it matters** — primary buttons and secondary text meet accessibility contrast targets (white-on-green 2.5:1 → 4.8:1).
+- 🗣️ **The upgrade dialog speaks your task** — when a Pro feature blocks you, it says exactly what you were doing ("Zip 40 images at once") and what the free limit is.
+- 🔕 **One reminder per feature** — hitting the same Pro wall twice in a session shows a lightweight toast, not the full-screen dialog again.
+- 🔗 **The pricing page picks up where you left off** — "Upgrade" carries your task context, and the site greets you with a short note about it.
+- 🐛 **Empty link resolution no longer burns a free resolve** — quota stays untouched when all parsed images are already in your results.
+- 📏 **Narrow panels keep their layout** — the two-column info bar no longer wraps at compact widths.
 
 ---
 

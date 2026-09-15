@@ -58,6 +58,34 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
+## [1.1.7] — 2026-09-15
+
+### 🔄 Changed
+
+- **A fresh "Harvest Green" look for the whole panel**: colors, borders, radii, shadows and interaction states now follow one coherent brand system in both light and dark themes — same layout, same features, just visibly more polished.
+
+- **Stronger contrast where it matters**: primary buttons, checked toggles and secondary text now meet accessibility contrast targets (white-on-green was 2.5:1, now 4.8:1), so labels stay readable on any background.
+
+- **The upgrade dialog now speaks your task**: when a Pro feature blocks your action, the dialog says exactly what you were doing — e.g. "Zip 40 images at once" — and what the free limit is, instead of a generic sales pitch.
+
+- **One reminder per feature, not per attempt**: hitting the same Pro wall again in a session shows a lightweight toast instead of re-opening the full-screen dialog.
+
+- **The pricing page picks up where you left off**: clicking "Upgrade" from the extension carries your task context, and the site greets you with a short note about what you were about to unlock.
+
+- **All emoji icons replaced with crisp SVG icons**, with copy re-tuned across all 15 supported languages.
+
+- **Filter usage is now measured**, so future versions can double down on the filters people actually use.
+
+### 🐛 Fixed
+
+- **Successful link resolution that adds nothing no longer burns a free resolve**: when parsing finishes but every image is already in your results, the free monthly quota stays untouched.
+
+- **The two-column info bar never wraps on narrow panels**: compact mode now kicks in reliably, so stats and buttons keep their row even at the minimum panel width.
+
+- **Small thumbnails no longer misalign in two-column grids**: compact-density cards now size their thumbs correctly.
+
+---
+
 ## [1.1.6] — 2026-09-10
 
 ### 🔒 Security
