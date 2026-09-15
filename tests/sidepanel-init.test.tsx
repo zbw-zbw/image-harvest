@@ -429,8 +429,7 @@ describe('filter_applied telemetry', () => {
   });
 
   it('type checkbox change → {filter:"type"}', async () => {
-    document.body.innerHTML =
-      '<input type="checkbox" class="type-checkbox" value="jpg" checked />';
+    document.body.innerHTML = '<input type="checkbox" class="type-checkbox" value="jpg" checked />';
     await loadInitModule();
 
     document.querySelector('.type-checkbox')!.dispatchEvent(new Event('change'));
@@ -518,4 +517,3 @@ describe('filter_applied telemetry', () => {
     expect(mockTrack).toHaveBeenCalledWith('filter_applied', { filter: 'group' });
   });
 });
-

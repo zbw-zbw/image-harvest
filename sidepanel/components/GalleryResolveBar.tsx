@@ -247,7 +247,9 @@ export function GalleryResolveBar() {
           title={t('gallery_resolve_toggle_title')}
           onClick={() => setExpanded(!expanded)}
         >
-          <span class="gallery-resolve-bar-title">{t('gallery_resolve_bar_title', { count: galleryCount })}</span>
+          <span class="gallery-resolve-bar-title">
+            {t('gallery_resolve_bar_title', { count: galleryCount })}
+          </span>
           <span class={`gallery-resolve-caret${expanded ? ' open' : ''}`}>
             <svg
               viewBox="0 0 24 24"
