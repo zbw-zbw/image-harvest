@@ -42,7 +42,7 @@ export const EVENTS = {
   COPY_URL_BATCH: 'copy_url_batch', // props: { count: number }
 
   // Conversion funnel — the events that decide whether revenue happens
-  PRO_UPSELL_SHOWN: 'pro_upsell_shown', // props: { trigger: string }
+  PRO_UPSELL_SHOWN: 'pro_upsell_shown', // props: { trigger: string, feature?: string }
   PRO_UPSELL_DISMISSED: 'pro_upsell_dismissed',
   PRO_UPSELL_CTA_CLICKED: 'pro_upsell_cta_clicked', // "Get Pro →" / "Start Free Trial"
   PRICING_PAGE_VIEWED: 'pricing_viewed', // fired by the marketing site, not the extension
@@ -175,7 +175,7 @@ export const EVENT_PROP_SCHEMAS: Record<TelemetryEventName, readonly string[]> =
   // vs. variant on EVERY step (shown / dismissed / cta / pricing / checkout
   // / activated / trial). Adding abBucket later requires a backfill, which
   // is painful — better to overdeclare now.
-  [EVENTS.PRO_UPSELL_SHOWN]: ['trigger', 'abBucket'],
+  [EVENTS.PRO_UPSELL_SHOWN]: ['trigger', 'abBucket', 'feature'], // feature: wall key ('batch_zip', 'reverse_search', ...) when the modal was opened by a blocked action
   [EVENTS.PRO_UPSELL_DISMISSED]: ['trigger', 'abBucket'],
   [EVENTS.PRO_UPSELL_CTA_CLICKED]: ['trigger', 'abBucket', 'cta'], // cta: "trial" | "pricing" | "activate" | "get_pro"
   [EVENTS.PRICING_PAGE_VIEWED]: ['referrer', 'abBucket'], // referrer: "extension" | "google" | "direct" | ...

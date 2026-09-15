@@ -616,9 +616,32 @@ export async function updateTopProStatus(): Promise<void> {
  * Open the Pro upgrade modal. Visibility is now driven by store state; the
  * input focus + scroll-reset still happen here because they're imperative
  * UX touches that don't fit the declarative store pattern.
+ *
+ * Wall-context variant: when a paywall feature triggers the open, pass its
+ * key (e.g. 'batch_zip') and magnitude (e.g. selected count) so the modal can
+ * answer the task the user was just blocked on instead of a generic pitch.
+ *
+ * Frequency guard: the same wall feature opens the full modal at most ONCE
+ * per panel session — repeat blocks degrade to the toast the caller already
+ * fired. Wall-hit data showed one install shown the modal 10× with 0 CTA
+ * clicks; from the 2nd interruption on it's pure annoyance (uninstall risk),
+ * and the persistent SoftPaywallBanner keeps a non-blocking touchpoint alive.
+ * The set is module-scoped memory: closing/reopening the sidepanel resets it,
+ * which doubles as a natural cooldown between sessions.
  */
-export function showProUpgradeModal(): void {
-  state.proUpgradeModalState = { open: true, errorText: '' };
+const wallModalShownFeatures = new Set<string>();
+
+export function showProUpgradeModal(feature?: string, count?: number): void {
+  if (feature) {
+    if (wallModalShownFeatures.has(feature)) {
+      // Still counts as an upsell touchpoint attempt — the trigger value keeps
+      // 'modal_open' vs 'modal_suppressed' separable in the funnel.
+      void track(EVENTS.PRO_UPSELL_SHOWN, { trigger: 'modal_suppressed', feature });
+      return;
+    }
+    wallModalShownFeatures.add(feature);
+  }
+  state.proUpgradeModalState = { open: true, errorText: '', feature, count };
   const modal = document.getElementById('pro-upgrade-modal');
   const modalBody = modal?.querySelector('.modal-body');
   if (modalBody) {
@@ -635,7 +658,10 @@ export function showProUpgradeModal(): void {
   // call track(PRO_FEATURE_BLOCKED, ...) BEFORE this fn so we always
   // know which feature drove the upsell. abBucket auto-injects from the
   // telemetry envelope (Sprint 2.4) — no need to pass it manually.
-  void track(EVENTS.PRO_UPSELL_SHOWN, { trigger: 'modal_open' });
+  void track(EVENTS.PRO_UPSELL_SHOWN, {
+    trigger: 'modal_open',
+    ...(feature ? { feature } : {}),
+  });
 }
 
 export function closeProUpgradeModal(): void {
@@ -664,7 +690,7 @@ export function bindProGuards(): void {
   // ---- Top toolbar: Upgrade Pro button → open modal ----
   const btnUpgradePro = document.getElementById('btn-upgrade-pro');
   if (btnUpgradePro) {
-    btnUpgradePro.addEventListener('click', showProUpgradeModal);
+    btnUpgradePro.addEventListener('click', () => showProUpgradeModal());
   }
 
   // ---- Pro Upgrade Modal: chrome (close button + overlay) ----
@@ -725,7 +751,7 @@ export function bindProGuards(): void {
             state.multitabModalState = { open: false };
             showToast(quotaBlockedMessage(t, 'feature_multitab', limit), 'warning');
             void track(EVENTS.PRO_FEATURE_BLOCKED, { feature: 'multitab_extract' });
-            showProUpgradeModal();
+            showProUpgradeModal('multitab');
           }
         }
       },
@@ -764,7 +790,7 @@ export function bindProGuards(): void {
             closeSettings();
             showToast(quotaBlockedMessage(t, 'feature_live_monitor', limit), 'warning');
             void track(EVENTS.PRO_FEATURE_BLOCKED, { feature: 'live_monitor' });
-            showProUpgradeModal();
+            showProUpgradeModal('live_monitor');
           } else {
             // Quota available — manually toggle and count usage
             checkbox.checked = !checkbox.checked;

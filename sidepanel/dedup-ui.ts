@@ -97,7 +97,7 @@ export async function removeDuplicates(): Promise<void> {
     if (!allowed) {
       closeDedupModal();
       showToast(quotaBlockedMessage(t, 'feature_dedup', limit), 'warning');
-      showProUpgradeModal();
+      showProUpgradeModal('dedup');
       return;
     }
   }

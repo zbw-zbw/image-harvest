@@ -515,6 +515,57 @@
   "pro_subline_variant_b": {
     "message": "加入數千名進階用戶的行列。"
   },
+  "pro_wall_cta_unlock": {
+    "message": "升級 Pro 解鎖"
+  },
+  "pro_wall_headline_advanced_grouping": {
+    "message": "按尺寸、網域、分頁分組"
+  },
+  "pro_wall_headline_ai_tag": {
+    "message": "AI 智慧標記圖片"
+  },
+  "pro_wall_headline_batch_copy_urls": {
+    "message": "複製全部 {count} 個圖片連結"
+  },
+  "pro_wall_headline_batch_copy_urls_plain": {
+    "message": "複製完整連結清單"
+  },
+  "pro_wall_headline_batch_zip": {
+    "message": "一次打包 {count} 張圖片"
+  },
+  "pro_wall_headline_batch_zip_plain": {
+    "message": "一鍵打包全部圖片"
+  },
+  "pro_wall_headline_collection": {
+    "message": "收藏圖片到收藏集"
+  },
+  "pro_wall_headline_color_copy": {
+    "message": "不限次複製圖片顏色"
+  },
+  "pro_wall_headline_dedup": {
+    "message": "批次找出並移除重複圖片"
+  },
+  "pro_wall_headline_format_convert": {
+    "message": "轉換圖片為 PNG、JPG、WebP"
+  },
+  "pro_wall_headline_link_resolve": {
+    "message": "修復失效的圖片連結"
+  },
+  "pro_wall_headline_live_monitor": {
+    "message": "即時捕捉頁面新圖片"
+  },
+  "pro_wall_headline_multitab": {
+    "message": "跨所有分頁掃描圖片"
+  },
+  "pro_wall_headline_reverse_search": {
+    "message": "解鎖全部以圖搜圖引擎"
+  },
+  "pro_wall_subline_batch_zip": {
+    "message": "免費版單次最多打包 {max} 張，Pro 無限制。"
+  },
+  "pro_wall_subline_reverse_search": {
+    "message": "免費版可用 {max} 個引擎，Pro 解鎖全部。"
+  },
   "pro_trial_badge": {
     "message": "7 天免費試用"
   },

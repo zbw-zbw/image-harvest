@@ -563,3 +563,18 @@
 .pro-fc-badge {
   min-width: 56px;
 }
+
+/* ── Wall-context subline (ProUpgradeModal) ──
+   One-line restatement of the free limit that just blocked the user.
+   Only rendered when the modal was opened by a blocked action — see
+   WALL_COPY in ProUpgradeModal.tsx. Amber/gold: Pro (paid) surface accent. */
+.pro-wall-context {
+  margin: 0 0 12px 0;
+  padding: 8px 12px;
+  border-left: 3px solid var(--pro-gold-accent, #b45309);
+  border-radius: 6px;
+  background: color-mix(in srgb, var(--amber-light, #ffd54f) 14%, transparent);
+  color: var(--amber-text, #5a3e00);
+  font-size: 12px;
+  line-height: 1.5;
+}

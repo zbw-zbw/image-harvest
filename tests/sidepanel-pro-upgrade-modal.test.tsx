@@ -385,6 +385,74 @@ describe('Close interactions', () => {
 // Error reset on close
 // ────────────────────────────────────────────────────────────────────────────
 
+// ────────────────────────────────────────────────────────────────────────
+// Error reset on close
+// ────────────────────────────────────────────────────────────────────────
+
+// ────────────────────────────────────────────────────────────────────────
+// Wall-context variants (opened via showProUpgradeModal(feature, count))
+// ────────────────────────────────────────────────────────────────────────
+
+describe('wall-context variants', () => {
+  async function openWallModal(feature?: string, count?: number): Promise<void> {
+    const { state } = await import('../sidepanel/state');
+    state.proUpgradeModalState = { open: true, errorText: '', feature, count };
+  }
+
+  test('feature=batch_zip + count → task headline + limit subline + unlock CTA', async () => {
+    await openWallModal('batch_zip', 40);
+    const { ProUpgradeModal } = await import('../sidepanel/components/ProUpgradeModal');
+    render(<ProUpgradeModal />);
+
+    await waitFor(() => {
+      // Wall headline answers the blocked task, not the generic value prop.
+      expect(screen.queryByText(/Zip all 40 images at once/i)).not.toBeNull();
+    });
+    // Subline restates the free cap so the user knows WHY they hit the wall.
+    // (Value comes from getFreeLimits().MAX_ZIP_IMAGES — don't pin the number.)
+    expect(screen.queryByText(/Free plan zips up to \d+ images/i)).not.toBeNull();
+    // Secondary CTA becomes the unlock variant.
+    expect(document.getElementById('btn-pro-modal-pricing')!.textContent).toMatch(
+      /unlock with pro/i
+    );
+  });
+
+  test('feature=batch_zip without count → plain headline fallback', async () => {
+    await openWallModal('batch_zip');
+    const { ProUpgradeModal } = await import('../sidepanel/components/ProUpgradeModal');
+    render(<ProUpgradeModal />);
+
+    await waitFor(() => {
+      expect(screen.queryByText(/Zip your whole batch at once/i)).not.toBeNull();
+    });
+  });
+
+  test('unknown feature key → generic headline (graceful fallback)', async () => {
+    await openWallModal('not_a_real_feature');
+    const { ProUpgradeModal } = await import('../sidepanel/components/ProUpgradeModal');
+    render(<ProUpgradeModal />);
+
+    await waitFor(() => {
+      expect(screen.queryByText(/Unlock the Full Power/i)).not.toBeNull();
+    });
+  });
+
+  test('wall CTA click → pricing URL carries utm + feature + count for site hand-off', async () => {
+    await openWallModal('batch_zip', 40);
+    const { ProUpgradeModal } = await import('../sidepanel/components/ProUpgradeModal');
+    render(<ProUpgradeModal />);
+
+    fireEvent.click(document.getElementById('btn-pro-modal-pricing')!);
+
+    expect(chromeStub.tabs.create).toHaveBeenCalledTimes(1);
+    const url = (chromeStub.tabs.create.mock.calls[0] as [{ url: string }])[0].url;
+    expect(url).toContain('utm_source=extension');
+    expect(url).toContain('trigger=modal');
+    expect(url).toContain('feature=batch_zip');
+    expect(url).toContain('count=40');
+  });
+});
+
 describe('error state lifecycle', () => {
   test('trial error clears when the modal re-opens', async () => {
     mockStartTrial.mockResolvedValueOnce({ success: false, error: 'Already used.' });

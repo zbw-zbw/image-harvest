@@ -71,7 +71,7 @@ export function GalleryResolveBar() {
       const { allowed, limit } = await checkFeatureQuota('linkResolve');
       if (!allowed) {
         showToast(quotaBlockedMessage(t, 'feature_link_resolve', limit), 'warning');
-        showProUpgradeModal();
+        showProUpgradeModal('link_resolve');
         void track(EVENTS.PRO_FEATURE_BLOCKED, { feature: 'link_resolve' });
         return;
       }

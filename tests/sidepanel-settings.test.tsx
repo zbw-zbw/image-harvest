@@ -350,6 +350,37 @@ describe('showProUpgradeModal / closeProUpgradeModal', () => {
     expect(state.proUpgradeModalState.open).toBe(true);
   });
 
+  it('wall opens carry feature/count + same feature is suppressed once shown per session', () => {
+    document.body.innerHTML = `
+      <div id="pro-upgrade-modal">
+        <div class="modal-body" style="overflow:auto"></div>
+      </div>
+      <input id="pro-modal-key-input" />
+    `;
+
+    // First blocked action opens the contextual modal with wall context.
+    showProUpgradeModal('batch_zip', 40);
+    expect(state.proUpgradeModalState.open).toBe(true);
+    expect(state.proUpgradeModalState.feature).toBe('batch_zip');
+    expect(state.proUpgradeModalState.count).toBe(40);
+
+    // User closes it, hits the SAME wall again → suppressed, stays closed
+    // (the 38 opens / 0 clicks data showed repeat modals are pure annoyance).
+    closeProUpgradeModal();
+    showProUpgradeModal('batch_zip', 41);
+    expect(state.proUpgradeModalState.open).toBe(false);
+
+    // A different wall still opens — the cap is per-feature, not global.
+    showProUpgradeModal('reverse_search');
+    expect(state.proUpgradeModalState.open).toBe(true);
+    expect(state.proUpgradeModalState.feature).toBe('reverse_search');
+
+    // Non-wall opens (no feature) are never suppressed.
+    closeProUpgradeModal();
+    showProUpgradeModal();
+    expect(state.proUpgradeModalState.open).toBe(true);
+  });
+
   it('closeProUpgradeModal sets open:false + clears errorText (resets for next open)', () => {
     state.proUpgradeModalState = { open: true, errorText: 'Activation failed' };
     closeProUpgradeModal();

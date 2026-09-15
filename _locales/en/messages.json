@@ -771,6 +771,57 @@
   "pro_subline_variant_b": {
     "message": "Join thousands of power users."
   },
+  "pro_wall_cta_unlock": {
+    "message": "Unlock with Pro"
+  },
+  "pro_wall_headline_advanced_grouping": {
+    "message": "Group images by size, domain & tab"
+  },
+  "pro_wall_headline_ai_tag": {
+    "message": "Auto-tag images with AI"
+  },
+  "pro_wall_headline_batch_copy_urls": {
+    "message": "Copy all {count} image URLs"
+  },
+  "pro_wall_headline_batch_copy_urls_plain": {
+    "message": "Copy the full URL list"
+  },
+  "pro_wall_headline_batch_zip": {
+    "message": "Zip all {count} images at once"
+  },
+  "pro_wall_headline_batch_zip_plain": {
+    "message": "Zip your whole batch at once"
+  },
+  "pro_wall_headline_collection": {
+    "message": "Save images to collections"
+  },
+  "pro_wall_headline_color_copy": {
+    "message": "Copy colors without limits"
+  },
+  "pro_wall_headline_dedup": {
+    "message": "Find & remove duplicates in bulk"
+  },
+  "pro_wall_headline_format_convert": {
+    "message": "Convert images to PNG, JPG & WebP"
+  },
+  "pro_wall_headline_link_resolve": {
+    "message": "Restore broken image links"
+  },
+  "pro_wall_headline_live_monitor": {
+    "message": "Catch images as pages load"
+  },
+  "pro_wall_headline_multitab": {
+    "message": "Scan images across every tab"
+  },
+  "pro_wall_headline_reverse_search": {
+    "message": "Search with every reverse engine"
+  },
+  "pro_wall_subline_batch_zip": {
+    "message": "Free plan zips up to {max} images per batch. Pro removes the cap."
+  },
+  "pro_wall_subline_reverse_search": {
+    "message": "Free plan includes {max} engines. Pro unlocks all of them."
+  },
   "pro_trial_badge": {
     "message": "7-Day Free Trial"
   },

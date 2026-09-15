@@ -458,8 +458,14 @@ export const PRICING_PAGE_URL = `${API_BASE}/pricing`;
  * join "which extension touchpoint sent this visit" instead of guessing
  * from the (unreliable) document.referrer.
  */
-export function pricingPageUrl(trigger: string): string {
-  return `${PRICING_PAGE_URL}?utm_source=extension&trigger=${encodeURIComponent(trigger)}`;
+export function pricingPageUrl(trigger: string, feature?: string, count?: number): string {
+  const params = new URLSearchParams({ utm_source: 'extension', trigger });
+  // Wall context: lets the pricing page greet the visitor with the task
+  // they were just blocked on ("finish your 40-image ZIP") instead of a
+  // cold generic pitch. Both params are optional and URL-encoded.
+  if (feature) params.set('feature', feature);
+  if (typeof count === 'number' && count > 0) params.set('count', String(count));
+  return `${PRICING_PAGE_URL}?${params.toString()}`;
 }
 
 export const INVITE_PAGE_URL = `${API_BASE}/invite`;

@@ -515,6 +515,57 @@
   "pro_subline_variant_b": {
     "message": "何千人ものパワーユーザーに参加。"
   },
+  "pro_wall_cta_unlock": {
+    "message": "Proで解除"
+  },
+  "pro_wall_headline_advanced_grouping": {
+    "message": "サイズ・ドメイン・タブごとにグループ化"
+  },
+  "pro_wall_headline_ai_tag": {
+    "message": "AIで画像を自動タグ付け"
+  },
+  "pro_wall_headline_batch_copy_urls": {
+    "message": "{count}件の画像URLをすべてコピー"
+  },
+  "pro_wall_headline_batch_copy_urls_plain": {
+    "message": "URLリストをすべてコピー"
+  },
+  "pro_wall_headline_batch_zip": {
+    "message": "{count}枚の画像をまとめてZIP"
+  },
+  "pro_wall_headline_batch_zip_plain": {
+    "message": "画像を一括ZIPにまとめる"
+  },
+  "pro_wall_headline_collection": {
+    "message": "画像をコレクションに保存"
+  },
+  "pro_wall_headline_color_copy": {
+    "message": "カラーを無制限にコピー"
+  },
+  "pro_wall_headline_dedup": {
+    "message": "重複画像をまとめて検出・削除"
+  },
+  "pro_wall_headline_format_convert": {
+    "message": "画像をPNG・JPG・WebPに変換"
+  },
+  "pro_wall_headline_link_resolve": {
+    "message": "リンク切れの画像を復元"
+  },
+  "pro_wall_headline_live_monitor": {
+    "message": "ページの新着画像をリアルタイムにキャッチ"
+  },
+  "pro_wall_headline_multitab": {
+    "message": "すべてのタブの画像をスキャン"
+  },
+  "pro_wall_headline_reverse_search": {
+    "message": "すべての逆画像検索エンジンを使用"
+  },
+  "pro_wall_subline_batch_zip": {
+    "message": "無料版は1回{max}枚まで。Proは無制限です。"
+  },
+  "pro_wall_subline_reverse_search": {
+    "message": "無料版は{max}エンジン。Proで全エンジン解放。"
+  },
   "pro_trial_badge": {
     "message": "7日間無料トライアル"
   },

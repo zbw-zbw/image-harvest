@@ -646,7 +646,7 @@ function bindEvents(): void {
             // doesn't linger open behind the upgrade modal after ESC.
             lockDlDropdown();
             showToast(quotaBlockedMessage(t, 'feature_format_convert', limit), 'warning');
-            showProUpgradeModal();
+            showProUpgradeModal('format_convert');
             return;
           }
         }
@@ -850,7 +850,7 @@ function bindEvents(): void {
         !getFreeLimits().ALLOWED_GROUP_MODES.includes(val as 'none' | 'format')
       ) {
         showToast(t('pro_feature_blocked_advanced_grouping'), 'warning');
-        showProUpgradeModal();
+        showProUpgradeModal('advanced_grouping');
         closeAllFilterDropdowns();
         return;
       }
@@ -1044,7 +1044,7 @@ function bindEvents(): void {
             dropdown.classList.add('hidden');
             closeSettings();
             showToast(t('pro_feature_blocked_advanced_grouping'), 'warning');
-            showProUpgradeModal();
+            showProUpgradeModal('advanced_grouping');
             return;
           }
           // Quota check for setting-convert-format: PNG/JPG/WebP use monthly quota
@@ -1060,7 +1060,7 @@ function bindEvents(): void {
               dropdown.classList.add('hidden');
               closeSettings();
               showToast(quotaBlockedMessage(t, 'feature_format_convert', limit), 'warning');
-              showProUpgradeModal();
+              showProUpgradeModal('format_convert');
               return;
             }
           }
@@ -1144,7 +1144,7 @@ function bindEvents(): void {
       ) {
         const engineLabel = engine.charAt(0).toUpperCase() + engine.slice(1);
         showToast(t('pro_feature_blocked_reverse_search', { engine: engineLabel }), 'warning');
-        showProUpgradeModal();
+        showProUpgradeModal('reverse_search');
         if (elements.reverseSearchMenu) elements.reverseSearchMenu.classList.add('hidden');
         return;
       }

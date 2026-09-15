@@ -147,7 +147,7 @@ export async function showDedupModal(): Promise<void> {
     const { allowed, limit } = await checkFeatureQuota('dedup');
     if (!allowed) {
       showToast(quotaBlockedMessage(t, 'feature_dedup', limit), 'warning');
-      showProUpgradeModal();
+      showProUpgradeModal('dedup');
       return;
     }
   }
@@ -224,7 +224,7 @@ export async function addToCollection(img: ImageItem, silent = false): Promise<b
             t('toast_collection_limit', { max: getFreeLimits().MAX_COLLECTION_ITEMS }),
             'warning'
           );
-          showProUpgradeModal();
+          showProUpgradeModal('collection');
         }
         void track(EVENTS.COLLECTION_FULL);
         return false;
@@ -354,7 +354,7 @@ export async function showMultiTabModal(): Promise<void> {
     const { allowed, limit } = await checkFeatureQuota('multiTab');
     if (!allowed) {
       showToast(quotaBlockedMessage(t, 'feature_multitab', limit), 'warning');
-      showProUpgradeModal();
+      showProUpgradeModal('multitab');
       return;
     }
   }

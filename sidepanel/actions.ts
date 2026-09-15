@@ -327,7 +327,7 @@ export async function downloadSingle(img: ImageItem, format: string | null): Pro
     const { allowed, limit } = await checkFeatureQuota('formatConvert');
     if (!allowed) {
       showToast(quotaBlockedMessage(t, 'feature_format_convert', limit), 'warning');
-      showProUpgradeModal();
+      showProUpgradeModal('format_convert');
       return;
     }
   }
@@ -393,7 +393,7 @@ export async function downloadSelectedAsZip(
     const { allowed, limit } = await checkFeatureQuota('formatConvert');
     if (!allowed) {
       showToast(quotaBlockedMessage(t, 'feature_format_convert', limit), 'warning');
-      showProUpgradeModal();
+      showProUpgradeModal('format_convert');
       return;
     }
   }
@@ -410,7 +410,7 @@ export async function downloadSelectedAsZip(
       ...(quotaBucket ? { bucket: quotaBucket } : {}),
     });
     showToast(t('pro_zip_limit', { max: String(getFreeLimits().MAX_ZIP_IMAGES) }), 'warning');
-    showProUpgradeModal();
+    showProUpgradeModal('batch_zip', selected.length);
     return;
   }
 
@@ -601,7 +601,7 @@ export async function copyImageUrls(urls: string[]): Promise<boolean> {
   // Free-tier copy cap — same guard pattern as downloadSelectedAsZip.
   if (!state.isProUser && urls.length > getFreeLimits().MAX_BATCH_COPY_URLS) {
     showToast(t('pro_copy_urls_limit', { max: getFreeLimits().MAX_BATCH_COPY_URLS }), 'warning');
-    showProUpgradeModal();
+    showProUpgradeModal('batch_copy_urls', urls.length);
     return false;
   }
   try {
@@ -743,7 +743,7 @@ export async function batchAddToCollection(images: ImageItem[]): Promise<void> {
     const remainingSlots = maxItems - existing.length;
     if (remainingSlots <= 0) {
       showToast(t('toast_collection_limit', { max: maxItems }), 'warning');
-      showProUpgradeModal();
+      showProUpgradeModal('collection');
       return;
     }
   }
@@ -770,7 +770,7 @@ export async function batchAddToCollection(images: ImageItem[]): Promise<void> {
             'warning'
           );
         }
-        showProUpgradeModal();
+        showProUpgradeModal('collection');
         void track(EVENTS.BATCH_FAVORITE, { count: added });
         return;
       }
@@ -793,7 +793,7 @@ export async function batchAiTag(images: ImageItem[]): Promise<void> {
         t('toast_ai_monthly_limit', { max: getFreeLimits().MAX_MONTHLY_AI_TAGS }),
         'warning'
       );
-      showProUpgradeModal();
+      showProUpgradeModal('ai_tag');
       return;
     }
   }
@@ -816,7 +816,7 @@ export async function batchAiTag(images: ImageItem[]): Promise<void> {
           t('toast_ai_monthly_limit', { max: getFreeLimits().MAX_MONTHLY_AI_TAGS }),
           'warning'
         );
-        showProUpgradeModal();
+        showProUpgradeModal('ai_tag');
       } else {
         showToast(t('toast_ai_tag_failed'), 'error');
       }

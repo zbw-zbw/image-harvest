@@ -66,6 +66,49 @@ function variantHeadline(bucket: AbBucket, download: number): string {
   return t('pro_headline_variant_a');
 }
 
+// ── Wall-context copy variants ─────────────────────────────────────────────
+// When the modal was opened BY a blocked action (settings.ts >
+// showProUpgradeModal(feature, count)), the headline answers THAT task
+// instead of the generic value prop. Rationale: the v1.1.5 experiment window
+// measured 38 modal opens / 10 installs / 0 CTA clicks — a mid-task user
+// ignores a generic pitch, but the thing they were JUST blocked on is the
+// one message guaranteed relevant to them. Unknown feature keys (or a
+// missing count) fall back to the plain headline / generic A/B copy.
+interface WallCopyConfig {
+  headline: (count?: number) => string;
+  /** Optional one-liner restating the free limit — shown under the headline. */
+  subline?: (count?: number) => string;
+}
+const WALL_COPY: Record<string, WallCopyConfig> = {
+  batch_zip: {
+    headline: (c) =>
+      c ? t('pro_wall_headline_batch_zip', { count: c }) : t('pro_wall_headline_batch_zip_plain'),
+    subline: () => t('pro_wall_subline_batch_zip', { max: getFreeLimits().MAX_ZIP_IMAGES }),
+  },
+  batch_copy_urls: {
+    headline: (c) =>
+      c
+        ? t('pro_wall_headline_batch_copy_urls', { count: c })
+        : t('pro_wall_headline_batch_copy_urls_plain'),
+  },
+  link_resolve: { headline: () => t('pro_wall_headline_link_resolve') },
+  reverse_search: {
+    headline: () => t('pro_wall_headline_reverse_search'),
+    subline: () =>
+      t('pro_wall_subline_reverse_search', {
+        max: getFreeLimits().REVERSE_SEARCH_ENGINES.length,
+      }),
+  },
+  color_copy: { headline: () => t('pro_wall_headline_color_copy') },
+  ai_tag: { headline: () => t('pro_wall_headline_ai_tag') },
+  dedup: { headline: () => t('pro_wall_headline_dedup') },
+  multitab: { headline: () => t('pro_wall_headline_multitab') },
+  live_monitor: { headline: () => t('pro_wall_headline_live_monitor') },
+  format_convert: { headline: () => t('pro_wall_headline_format_convert') },
+  advanced_grouping: { headline: () => t('pro_wall_headline_advanced_grouping') },
+  collection: { headline: () => t('pro_wall_headline_collection') },
+};
+
 // ── Trial CTA: kicks off the 7-day free trial flow.
 //
 // Implementation note: the actual trial start endpoint + shared/trial.ts
@@ -104,13 +147,14 @@ async function handleStartTrial(
   }
 }
 
-function handlePricingClick(e: MouseEvent): void {
+function handlePricingClick(e: MouseEvent, feature?: string, count?: number): void {
   e.preventDefault();
   void track(EVENTS.PRO_UPSELL_CTA_CLICKED, { trigger: 'modal', cta: 'pricing' });
   // Attribution: 'modal' tells the website funnel WHICH touchpoint sent
   // this visit (vs. the settings get-Pro link) — mirrors the trigger prop
-  // on the telemetry event above.
-  chrome.tabs.create({ url: pricingPageUrl('modal') });
+  // on the telemetry event above. feature/count carry the wall context so
+  // the pricing page can greet the user with the blocked task.
+  chrome.tabs.create({ url: pricingPageUrl('modal', feature, count) });
 }
 
 export function ProUpgradeModal() {
@@ -184,6 +228,11 @@ export function ProUpgradeModal() {
     };
   }, [ms.open]);
 
+  // Wall context (modal opened BY a blocked action): the headline answers
+  // the blocked task instead of the generic A/B value prop, and an optional
+  // subline restates the free limit right where the eye lands.
+  const wall = ms.feature ? WALL_COPY[ms.feature] : undefined;
+
   return (
     <div id="pro-upgrade-modal" class={`modal${ms.open ? '' : ' hidden'}`}>
       <div class="modal-overlay" onClick={close} />
@@ -215,7 +264,7 @@ export function ProUpgradeModal() {
                 <path d="M12 15v5s3.03-.55 4-2c1.08-1.62 0-5 0-5" />
               </svg>
             </span>
-            {variantHeadline(bucket, downloadCount)}
+            {wall ? wall.headline(ms.count) : variantHeadline(bucket, downloadCount)}
           </h2>
           <button id="btn-pro-upgrade-close" class="icon-btn" onClick={close} aria-label="Close">
             <svg
@@ -231,6 +280,10 @@ export function ProUpgradeModal() {
           </button>
         </div>
         <div class="modal-body">
+          {/* ── Section 0: wall context — restates the free limit that just
+              blocked the user. Only present when opened by a blocked action;
+              shown for trial-eligible and ineligible alike. ── */}
+          {wall?.subline ? <p class="pro-wall-context">{wall.subline(ms.count)}</p> : null}
           {/* ── Section 1: trial / pricing CTAs (hero — the value prop) ──── */}
           {trialEligible ? (
             <div class="pro-upgrade-cta-section">
@@ -278,9 +331,9 @@ export function ProUpgradeModal() {
                   id="btn-pro-modal-pricing"
                   type="button"
                   class="btn btn-cta btn-secondary"
-                  onClick={handlePricingClick}
+                  onClick={(e) => handlePricingClick(e, ms.feature, ms.count)}
                 >
-                  {t('pro_pricing_cta')}
+                  {wall ? t('pro_wall_cta_unlock') : t('pro_pricing_cta')}
                 </button>
               </div>
               <p id="pro-modal-trial-error" class={`license-error${trialError ? '' : ' hidden'}`}>
@@ -316,7 +369,12 @@ export function ProUpgradeModal() {
             </p>
             <p class="pro-upgrade-get-pro-hint">
               {t('pro_no_key_hint')}{' '}
-              <a id="link-pro-modal-get" href="#" class="license-link" onClick={handlePricingClick}>
+              <a
+                id="link-pro-modal-get"
+                href="#"
+                class="license-link"
+                onClick={(e) => handlePricingClick(e, ms.feature, ms.count)}
+              >
                 {t('pro_get_pro_link')}
               </a>
             </p>

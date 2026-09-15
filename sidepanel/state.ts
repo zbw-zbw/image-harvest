@@ -290,6 +290,12 @@ export interface ModalState {
 }
 export interface ProUpgradeModalState extends ModalState {
   errorText: string;
+  /** Which paywall feature drove this open (e.g. 'batch_zip'). Absent when
+   *  the modal was opened from a non-wall path (grace banner, soft paywall,
+   *  settings link) — those keep the generic headline. */
+  feature?: string;
+  /** Contextual magnitude for the wall copy (e.g. selected image count). */
+  count?: number;
 }
 
 // ── Confirm dialog ──────────────────────────────────────────────────────────

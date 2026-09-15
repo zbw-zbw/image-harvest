@@ -279,7 +279,7 @@ export function ImageCard({ img, index }: Props) {
       !(getFreeLimits().REVERSE_SEARCH_ENGINES as readonly string[]).includes(engine)
     ) {
       showToast(t('pro_feature_blocked_reverse_search', { engine }), 'warning');
-      showProUpgradeModal();
+      showProUpgradeModal('reverse_search');
       return;
     }
     reverseSearch(img.url, engine);
@@ -341,7 +341,7 @@ export function ImageCard({ img, index }: Props) {
       const { allowed, limit } = await checkFeatureQuota('colorCopy');
       if (!allowed) {
         showToast(quotaBlockedMessage(t, 'feature_color_copy', limit), 'warning');
-        showProUpgradeModal();
+        showProUpgradeModal('color_copy');
         return;
       }
       await incrementFeatureUsage('colorCopy');
@@ -361,7 +361,7 @@ export function ImageCard({ img, index }: Props) {
           'warning'
         );
         void track(EVENTS.AI_FREE_MONTHLY_LIMIT);
-        showProUpgradeModal();
+        showProUpgradeModal('ai_tag');
         return;
       }
     }
@@ -428,7 +428,7 @@ export function ImageCard({ img, index }: Props) {
           'warning'
         );
         void track(EVENTS.AI_FREE_MONTHLY_LIMIT);
-        showProUpgradeModal();
+        showProUpgradeModal('ai_tag');
       } else {
         showToast(t('toast_ai_tag_failed'), 'error');
         void track(EVENTS.AI_TAG_FAILED, { reason: resp?.error || 'unknown' });
