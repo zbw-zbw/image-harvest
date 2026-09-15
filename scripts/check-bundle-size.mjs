@@ -55,7 +55,13 @@ const BUDGETS = {
   // bucket seed + globalThis mirror read in getFreeLimits) push init to
   // ~122.05 kB gzip. Conversion-diagnosis instrumentation, accepted —
   // 0.95 kB headroom left.
-  'init.js': { gzipKb: 123, label: 'sidepanel main' },
+  // Bumped 123 → 127 kB for v1.1.7 Harvest Green + wall-context funnel: the
+  // WALL_COPY context map (12 task-style headlines + free-limit sublines),
+  // 17 new pro_wall_* i18n keys across the 5 contract locales, per-feature
+  // modal suppression, pricing URL params, and the SVG icon migration push
+  // init to ~125.89 kB gzip. User-facing conversion work, accepted —
+  // 1.11 kB headroom left.
+  'init.js': { gzipKb: 127, label: 'sidepanel main' },
   // Background service worker entry. Currently ~5.6 kB gzip.
   'index.ts.js': { gzipKb: 12, label: 'background SW' },
   // Content script entry. Currently ~7.7 kB gzip.
