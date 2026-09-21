@@ -861,6 +861,9 @@
   "trial_expiry_warning": {
     "message": "Your free Pro trial ends in {days} day(s). Upgrade now to keep Pro features."
   },
+  "trial_expiry_warning_today": {
+    "message": "Your free Pro trial ends TODAY. Upgrade now to keep Pro features."
+  },
   "welcome_title": {
     "message": "Welcome to Image Harvest Pro"
   },

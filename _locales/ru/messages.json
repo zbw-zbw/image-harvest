@@ -1529,6 +1529,9 @@
   "trial_expiry_warning": {
     "message": "Your free Pro trial ends in {days} day(s). Upgrade now to keep Pro features."
   },
+  "trial_expiry_warning_today": {
+    "message": "Ваш бесплатный Pro-период заканчивается СЕГОДНЯ. Обновите подписку сейчас, чтобы сохранить функции Pro."
+  },
   "extName": {
     "message": "Image Harvest - Скачивайте все изображения с любой страницы",
     "description": "Extension name shown in the Chrome Web Store and browser UI."

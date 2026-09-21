@@ -806,6 +806,9 @@
   "trial_expiry_warning": {
     "message": "试用即将结束：{days} 天后 Pro 功能将暂停。立即升级以保留全部功能。"
   },
+  "trial_expiry_warning_today": {
+    "message": "试用最后一天：今天结束后 Pro 功能将暂停。立即升级以保留全部功能。"
+  },
   "welcome_title": {
     "message": "欢迎使用 Image Harvest Pro"
   },

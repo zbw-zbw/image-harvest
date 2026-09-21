@@ -86,9 +86,14 @@ export function ProStatusBadge() {
   const daysLeft = isTrial ? trialDaysRemaining(info?.expiresAt) : null;
   // Pre-expiry warning: the trial's final days get an amber banner with an
   // upgrade CTA — the pre-expiry conversion touchpoint (post-expiry is the
-  // TrialGraceBanner). 0 < daysLeft <= TRIAL_EXPIRY_WARNING_DAYS.
+  // TrialGraceBanner). 0 <= daysLeft <= TRIAL_EXPIRY_WARNING_DAYS.
+  // daysLeft === 0 (the expiry day itself) is included on purpose: the old
+  // `> 0` gap left the final day banner-less until the grace banner took
+  // over hours later — a dead zone for users who only opened the panel on
+  // their last trial day (production forensics 2026-09-21: both in-window
+  // installs died exactly there).
   const trialExpiringSoon =
-    isTrial && daysLeft != null && daysLeft > 0 && daysLeft <= TRIAL_EXPIRY_WARNING_DAYS;
+    isTrial && daysLeft != null && daysLeft >= 0 && daysLeft <= TRIAL_EXPIRY_WARNING_DAYS;
 
   // Impression telemetry, throttled to once/day/install inside
   // maybeReportTrialExpiryWarning — the warning is persistent UI for the
@@ -181,7 +186,9 @@ export function ProStatusBadge() {
       {trialExpiringSoon && daysLeft != null && (
         <div class="trial-expiry-warning">
           <span class="trial-expiry-text">
-            {t('trial_expiry_warning', { days: String(daysLeft) })}
+            {daysLeft === 0
+              ? t('trial_expiry_warning_today')
+              : t('trial_expiry_warning', { days: String(daysLeft) })}
           </span>
           <button class="btn btn-small btn-primary trial-expiry-btn" onClick={handleExpiryUpgrade}>
             {t('trial_grace_upgrade_btn')}

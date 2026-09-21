@@ -1151,6 +1151,9 @@
   "trial_expiry_warning": {
     "message": "Su prueba termina en {days} día(s). Actualice ahora para conservar las funciones Pro."
   },
+  "trial_expiry_warning_today": {
+    "message": "Tu prueba Pro gratuita termina HOY. Actualiza ahora para conservar las funciones Pro."
+  },
   "view_grid": {
     "message": "Cuadrícula"
   },

@@ -1529,6 +1529,9 @@
   "trial_expiry_warning": {
     "message": "Your free Pro trial ends in {days} day(s). Upgrade now to keep Pro features."
   },
+  "trial_expiry_warning_today": {
+    "message": "आपका मुफ़्त Pro ट्रायल आज समाप्त हो रहा है। Pro सुविधाएँ बनाए रखने के लिए अभी अपग्रेड करें।"
+  },
   "extName": {
     "message": "Image Harvest - किसी भी वेबपेज से सभी इमेज डाउनलोड करें",
     "description": "Extension name shown in the Chrome Web Store and browser UI."

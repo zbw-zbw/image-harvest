@@ -3,8 +3,9 @@
 //
 // Scope:
 //   - Hidden while more than 3 days remain (and NO impression telemetry)
-//   - Hidden once the trial has expired (daysLeft clamps to 0 — post-expiry
-//     is TrialGraceBanner's job, covered by tests/trial-grace-banner.test.tsx)
+//   - Expiry day itself (daysLeft clamps to 0) renders the today-variant
+//     warning — post-expiry beyond that day is TrialGraceBanner's job,
+//     covered by tests/trial-grace-banner.test.tsx
 //   - Renders inside the window + hands daysLeft to
 //     maybeReportTrialExpiryWarning (the once/day/install throttle lives in
 //     shared/trial and is covered by tests/trial.test.ts — here we only
@@ -83,13 +84,19 @@ describe('<ProStatusBadge> trial expiry warning', () => {
     expect(mockMaybeReport).not.toHaveBeenCalled();
   });
 
-  it('renders no warning for an expired trial (grace banner owns post-expiry)', async () => {
+  it('renders the today-variant warning on the expiry day itself (daysLeft=0 closes the old dead zone)', async () => {
+    // A trial that expired one second ago still sits inside its expiry day,
+    // and the badge keeps treating plan=trial as trial until the next
+    // VALIDATE_LICENSE refresh — exactly the moment where the old
+    // `daysLeft > 0` gap left the user with NO touchpoint until the grace
+    // banner took over hours later. Production forensics 2026-09-21: both
+    // in-window installs were active on their expiry day and saw nothing.
     state.proLicenseInfo = { plan: 'trial', expiresAt: Date.now() - 1_000 };
     const { container } = render(<ProStatusBadge />);
-    expect(container.querySelector('.trial-expiry-warning')).toBeNull();
-    await Promise.resolve();
-    await Promise.resolve();
-    expect(mockMaybeReport).not.toHaveBeenCalled();
+    expect(container.querySelector('.trial-expiry-warning')).not.toBeNull();
+    await waitFor(() => {
+      expect(mockMaybeReport).toHaveBeenCalledWith(0);
+    });
   });
 
   it('renders on the boundary day (3) and hands daysLeft to the throttled reporter', async () => {
@@ -126,5 +133,113 @@ describe('<ProStatusBadge> trial expiry warning', () => {
     });
     expect(state.proUpgradeModalState.open).toBe(true);
     expect(state.proUpgradeModalState.errorText).toBe('');
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// Integration: applyProFeatureVisibility → updateTopProStatus → badge
+// ─────────────────────────────────────────────────────────────────────
+// Production forensics (2026-09-21): the 7d window had 53 trial_expired
+// but 0 trial_expiry_warning_shown, and 2 expired installs WERE active
+// inside the warning window on v1.1.5. This suite pins the full chain
+// (panel init → VALIDATE_LICENSE/GET_LICENSE_STATUS → proLicenseInfo →
+// amber warning) so a future regression can't silently mute the trial's
+// only pre-expiry touchpoint again.
+
+vi.mock('../sidepanel/filter', () => ({
+  applyFilters: vi.fn(),
+  renderColorSwatches: vi.fn(),
+  syncCustomSizeInputsFromSettings: vi.fn(),
+}));
+vi.mock('../sidepanel/pro-features', () => ({
+  detectSimilarImages: vi.fn(),
+}));
+vi.mock('../sidepanel/scan', () => ({
+  fetchImages: vi.fn(),
+  processImageExtras: vi.fn(),
+}));
+vi.mock('../sidepanel/ui', () => ({
+  checkNarrowMode: vi.fn(),
+  showConfirmDialog: vi.fn(),
+  showToast: vi.fn(),
+  updateFilterButtonLabels: vi.fn(),
+}));
+vi.mock('../sidepanel/license-ui', () => ({
+  bindLicenseModalEvents: vi.fn(),
+  updateLicenseUI: vi.fn().mockResolvedValue(undefined),
+}));
+
+import {
+  installChromeMock,
+  uninstallChromeApiMock,
+  type ChromeMock,
+} from './_helpers/chromeApiMock';
+
+describe('applyProFeatureVisibility → <ProStatusBadge> warning (full chain)', () => {
+  let chromeMock: ChromeMock;
+  let applyProFeatureVisibility: (typeof import('../sidepanel/settings'))['applyProFeatureVisibility'];
+
+  beforeEach(async () => {
+    chromeMock = installChromeMock();
+    // Dynamic import (mirrors the ProStatusBadge pattern above): settings.ts
+    // pulls shared/trial through its dependency graph, and the vi.mock
+    // factories above reference consts that must be initialized first.
+    ({ applyProFeatureVisibility } = await import('../sidepanel/settings'));
+  });
+
+  afterEach(() => {
+    uninstallChromeApiMock();
+  });
+
+  it('panel-init chain fills proLicenseInfo and renders the amber warning', async () => {
+    chromeMock.runtime.sendMessage.mockImplementation((msg: { type: string }) => {
+      if (msg.type === 'VALIDATE_LICENSE') return Promise.resolve({ isPro: true });
+      if (msg.type === 'GET_LICENSE_STATUS') {
+        return Promise.resolve({
+          hasLicense: true,
+          plan: 'trial',
+          // One hour shy of two full days so trialDaysRemaining() ceils to 2.
+          expiresAt: Date.now() + 2 * DAY_MS - 3_600_000,
+        });
+      }
+      return Promise.resolve({});
+    });
+    state.isProUser = true; // already-Pro: skip newly-Pro side effects
+    state.proLicenseInfo = null;
+
+    const { container } = render(<ProStatusBadge />);
+    // Before the license payload lands: no warning (badge has no plan info).
+    expect(container.querySelector('.trial-expiry-warning')).toBeNull();
+
+    await applyProFeatureVisibility();
+
+    await waitFor(() => {
+      expect(container.querySelector('.trial-expiry-warning')).not.toBeNull();
+    });
+    expect(state.proLicenseInfo).toEqual({
+      plan: 'trial',
+      expiresAt: expect.any(Number),
+    });
+    await waitFor(() => {
+      expect(mockMaybeReport).toHaveBeenCalledWith(2);
+    });
+  });
+
+  it('free user (isPro:false) gets proLicenseInfo cleared → upgrade CTA side, no warning', async () => {
+    chromeMock.runtime.sendMessage.mockImplementation((msg: { type: string }) => {
+      // VALIDATE_LICENSE says inactive; GET_LICENSE_STATUS won't be called.
+      if (msg.type === 'VALIDATE_LICENSE') return Promise.resolve({ isPro: false });
+      return Promise.resolve({});
+    });
+    state.isProUser = false;
+    state.proLicenseInfo = { plan: 'trial', expiresAt: Date.now() + DAY_MS };
+
+    const { container } = render(<ProStatusBadge />);
+
+    await applyProFeatureVisibility();
+
+    expect(state.proLicenseInfo).toBeNull();
+    expect(container.querySelector('.trial-expiry-warning')).toBeNull();
+    expect(container.querySelector('#btn-upgrade-pro')).toBeTruthy();
   });
 });

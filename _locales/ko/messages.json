@@ -1529,6 +1529,9 @@
   "trial_expiry_warning": {
     "message": "Your free Pro trial ends in {days} day(s). Upgrade now to keep Pro features."
   },
+  "trial_expiry_warning_today": {
+    "message": "무료 Pro 체험이 오늘 종료됩니다. Pro 기능을 유지하려면 지금 업그레이드하세요."
+  },
   "extName": {
     "message": "Image Harvest - 웹페이지 이미지 일괄 다운로드",
     "description": "Extension name shown in the Chrome Web Store and browser UI."

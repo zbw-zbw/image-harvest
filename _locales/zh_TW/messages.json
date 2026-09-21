@@ -1148,6 +1148,9 @@
   "trial_expiry_warning": {
     "message": "試用即將結束：{days} 天後 Pro 功能將暫停。立即升級以保留全部功能。"
   },
+  "trial_expiry_warning_today": {
+    "message": "試用最後一天：今天結束後 Pro 功能將暫停。立即升級以保留全部功能。"
+  },
   "view_grid": {
     "message": "網格"
   },

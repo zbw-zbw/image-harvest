@@ -1529,6 +1529,9 @@
   "trial_expiry_warning": {
     "message": "Your free Pro trial ends in {days} day(s). Upgrade now to keep Pro features."
   },
+  "trial_expiry_warning_today": {
+    "message": "Uw gratis Pro-proefperiode eindigt VANDAAG. Upgrade nu om de Pro-functies te behouden."
+  },
   "extName": {
     "message": "Image Harvest - Download alle afbeeldingen van elke webpagina",
     "description": "Extension name shown in the Chrome Web Store and browser UI."
