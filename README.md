@@ -87,17 +87,11 @@
 
 ---
 
-## 🆕 What's New (v1.1.7)
+## 🆕 What's New (v1.1.8)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
-- 🎨 **Fresh "Harvest Green" visual style** — colors, borders, shadows and interaction states unified into one coherent brand system, in both light and dark themes. Same layout, same features.
-- ♿ **Stronger contrast where it matters** — primary buttons and secondary text meet accessibility contrast targets (white-on-green 2.5:1 → 4.8:1).
-- 🗣️ **The upgrade dialog speaks your task** — when a Pro feature blocks you, it says exactly what you were doing ("Zip 40 images at once") and what the free limit is.
-- 🔕 **One reminder per feature** — hitting the same Pro wall twice in a session shows a lightweight toast, not the full-screen dialog again.
-- 🔗 **The pricing page picks up where you left off** — "Upgrade" carries your task context, and the site greets you with a short note about it.
-- 🐛 **Empty link resolution no longer burns a free resolve** — quota stays untouched when all parsed images are already in your results.
-- 📏 **Narrow panels keep their layout** — the two-column info bar no longer wraps at compact widths.
+- ⏳ **The trial reminder speaks up on the last day** — the "trial ends in N days" notice no longer disappears on your trial's final day; it now clearly says the trial ends today, closing a silent gap before the post-expiry banner takes over.
 
 ---
 

@@ -58,6 +58,22 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
+## [1.1.8] — 2026-09-21
+
+### 🐛 Fixed
+
+- **The trial countdown no longer goes silent on the last day**: the "N days left in your trial" reminder used to disappear once the trial reached its final day, leaving a silent gap until the post-expiry banner kicked in — the panel now clearly tells you the trial ends today.
+
+### 🌍 i18n
+
+- Added the "trial ends today" message in all 15 supported languages.
+
+### 🧪 Test Coverage Expansion
+
+- New integration tests pin the full license-check → Pro status badge rendering chain for the trial-expiry warning, including the expiry-day edge that previously hid it.
+
+---
+
 ## [1.1.7] — 2026-09-15
 
 ### 🔄 Changed
