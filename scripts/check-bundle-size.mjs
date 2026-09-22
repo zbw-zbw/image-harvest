@@ -61,7 +61,11 @@ const BUDGETS = {
   // modal suppression, pricing URL params, and the SVG icon migration push
   // init to ~125.89 kB gzip. User-facing conversion work, accepted —
   // 1.11 kB headroom left.
-  'init.js': { gzipKb: 127, label: 'sidepanel main' },
+  // Bumped 127 → 135 kB for v1.2.0 Deep Scan panel integration: the deepScan()
+  // flow (START_DEEP_SCAN round-trip, daily-quota gate, scan-progress overlay,
+  // cancel handling, wall + settings surfaces) pushes init to ~127.44 kB gzip.
+  // User-facing feature work, accepted — 7.56 kB headroom left.
+  'init.js': { gzipKb: 135, label: 'sidepanel main' },
   // Background service worker entry. Currently ~5.6 kB gzip.
   'index.ts.js': { gzipKb: 12, label: 'background SW' },
   // Content script entry. Currently ~7.7 kB gzip.

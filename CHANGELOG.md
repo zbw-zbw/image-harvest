@@ -56,6 +56,10 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ## [Unreleased]
 
+---
+
+## [1.2.0] — 2026-09-22
+
 ### ✨ Added
 
 - **Deep Scan catches every lazy-loaded image**: long pages and infinite feeds only load images as you scroll — hit the new "Deep scan" toolbar button and Image Harvest auto-scrolls the page for you, triggering every lazy load until the real bottom, then hands you the complete harvest. Free: 3 deep scans per day. Pro: unlimited.
