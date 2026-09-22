@@ -172,13 +172,27 @@ test('D: cancel mid-scan keeps already-discovered images', async () => {
     { timeout: 10_000 }
   );
   await sidepanel.waitForTimeout(800);
+  // Review follow-up: actually wait for discovered images BEFORE cancelling,
+  // otherwise "keeps already-discovered images" is vacuous (the old
+  // final >= initial passed even when nothing was ever discovered).
+  await sidepanel.waitForFunction(
+    (min) => {
+      const w = window as unknown as { __IH__?: IHStore };
+      const imgs = w.__IH__?.store.get('allImages') as unknown[] | undefined;
+      return (imgs?.length ?? 0) > min;
+    },
+    initial,
+    { timeout: 15_000 }
+  );
+  const beforeCancel = await allImagesCount(sidepanel);
   await sidepanel.evaluate(() => {
     document.getElementById('btn-scan-cancel')?.click();
   });
 
-  // Overlay hidden + cancel toast + the initial images are still there.
+  // Overlay hidden + cancel toast + the discoveries made so far survive.
+  // (In-flight increments may still land after the click, hence >=.)
   await expect(
     sidepanel.locator('#toast-container .toast').filter({ hasText: /cancelled/i })
   ).toBeVisible({ timeout: 5_000 });
-  expect(await allImagesCount(sidepanel)).toBeGreaterThanOrEqual(initial);
+  expect(await allImagesCount(sidepanel)).toBeGreaterThanOrEqual(beforeCancel);
 });
