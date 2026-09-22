@@ -5,7 +5,7 @@
 //
 // Storage schema (STORAGE_KEYS.FEATURE_QUOTA):
 //   { monthly: { "2026-06": { multiTab: 2, ..., linkResolve: 1 } },
-//     daily:   { "2026-06-04": { batchHighlight: 2 } } }
+//     daily:   { "2026-06-04": { batchHighlight: 2, deepScan: 1 } } }
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
