@@ -127,6 +127,14 @@ export const EVENTS = {
   GALLERY_RESOLVE_STARTED: 'gallery_resolve_started', // props: { linkCount: number }
   GALLERY_RESOLVE_COMPLETED: 'gallery_resolve_completed', // props: { resolved: number, failed: number }
 
+  // Deep scan (v1.2.0) — auto-scroll extraction funnel. triggered fires at
+  // click intent; completed carries the run stats (stopReason tells us why
+  // the loop ended: bottom | stalled | maxSteps | maxDuration | maxImages |
+  // aborted). cancelled fires when the user aborts mid-run.
+  DEEP_SCAN_TRIGGERED: 'deep_scan_triggered',
+  DEEP_SCAN_COMPLETED: 'deep_scan_completed', // props: { count, newCount, steps, durationMs, stopReason }
+  DEEP_SCAN_CANCELLED: 'deep_scan_cancelled', // props: { steps, durationMs }
+
   // Referral / Share-to-Earn
   REFERRAL_LINK_COPIED: 'referral_link_copied',
   REFERRAL_LINK_SHARED: 'referral_link_shared', // props: { method: string }
@@ -231,6 +239,9 @@ export const EVENT_PROP_SCHEMAS: Record<TelemetryEventName, readonly string[]> =
   [EVENTS.LINK_EXTRACT_FOUND]: ['count'],
   [EVENTS.GALLERY_RESOLVE_STARTED]: ['linkCount'],
   [EVENTS.GALLERY_RESOLVE_COMPLETED]: ['resolved', 'failed'],
+  [EVENTS.DEEP_SCAN_TRIGGERED]: [],
+  [EVENTS.DEEP_SCAN_COMPLETED]: ['count', 'newCount', 'steps', 'durationMs', 'stopReason'],
+  [EVENTS.DEEP_SCAN_CANCELLED]: ['steps', 'durationMs'],
   [EVENTS.REFERRAL_LINK_COPIED]: [],
   [EVENTS.REFERRAL_LINK_SHARED]: ['method'],
   [EVENTS.REFERRAL_CLAIMED]: ['bonusDays'],

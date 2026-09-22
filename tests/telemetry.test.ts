@@ -373,3 +373,45 @@ describe('concurrency', () => {
     expect(mem.store.get('telemetryQueue')).toBeUndefined();
   });
 });
+
+// ── deep scan event catalog (v1.2.0) ──────────────────────────────────────
+
+describe('deep scan event catalog (v1.2.0)', () => {
+  test('registers the three deep scan events with their prop schemas', async () => {
+    const { EVENTS, EVENT_PROP_SCHEMAS, sanitizeEventProps, isKnownEvent } =
+      await import('../shared/telemetry-events');
+
+    expect(EVENTS.DEEP_SCAN_TRIGGERED).toBe('deep_scan_triggered');
+    expect(EVENTS.DEEP_SCAN_COMPLETED).toBe('deep_scan_completed');
+    expect(EVENTS.DEEP_SCAN_CANCELLED).toBe('deep_scan_cancelled');
+
+    expect(EVENT_PROP_SCHEMAS[EVENTS.DEEP_SCAN_TRIGGERED]).toEqual([]);
+    expect(EVENT_PROP_SCHEMAS[EVENTS.DEEP_SCAN_COMPLETED]).toEqual([
+      'count',
+      'newCount',
+      'steps',
+      'durationMs',
+      'stopReason',
+    ]);
+    expect(EVENT_PROP_SCHEMAS[EVENTS.DEEP_SCAN_CANCELLED]).toEqual(['steps', 'durationMs']);
+
+    expect(isKnownEvent('deep_scan_completed')).toBe(true);
+
+    // Sanitizer keeps whitelisted props, drops anything else.
+    const sanitized = sanitizeEventProps('deep_scan_completed', {
+      count: 42,
+      newCount: 7,
+      steps: 5,
+      durationMs: 3200,
+      stopReason: 'bottom',
+      url: 'https://example.com/secret.jpg', // must be dropped
+    });
+    expect(sanitized).toEqual({
+      count: 42,
+      newCount: 7,
+      steps: 5,
+      durationMs: 3200,
+      stopReason: 'bottom',
+    });
+  });
+});
