@@ -8,7 +8,6 @@
 import { describe, expect, it, vi } from 'vitest';
 import type { ImageItem } from '../shared/types';
 import {
-  DEEP_SCAN_LIMITS,
   abortDeepScan,
   createDefaultDeps,
   isDeepScanRunning,
