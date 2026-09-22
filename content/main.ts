@@ -46,6 +46,7 @@ import {
   checkImagesVisibility,
 } from './highlight';
 import { startLiveMonitoring, stopLiveMonitoring } from './monitor';
+import { createDefaultDeps, runDeepScan, abortDeepScan, isDeepScanRunning } from './auto-scroll';
 
 interface ExtractOptions {
   skipIframes?: boolean;
@@ -130,6 +131,45 @@ async function handleMessage(
       sendResponse({ success: true, visibilityMap });
       break;
     }
+
+    case MESSAGE_TYPES.START_DEEP_SCAN: {
+      if (isDeepScanRunning()) {
+        sendResponse({ success: false, error: 'deep_scan_in_progress' });
+        break;
+      }
+      try {
+        // extractImages / pendingGalleryLinks are injected (not imported by
+        // auto-scroll) to keep the module graph acyclic.
+        const result = await runDeepScan({
+          deps: createDefaultDeps(
+            () => extractImages({}),
+            () => state.pendingGalleryLinks
+          ),
+        });
+        sendResponse({
+          success: true,
+          images: result.images,
+          galleryLinks: result.galleryLinks,
+          stats: {
+            count: result.images.length,
+            newCount: result.newCount,
+            steps: result.steps,
+            durationMs: result.durationMs,
+            stopReason: result.stopReason,
+          },
+        });
+      } catch (error) {
+        sendResponse({ success: false, error: (error as Error).message });
+      }
+      break;
+    }
+
+    case MESSAGE_TYPES.CANCEL_DEEP_SCAN:
+      // The run stops at the next step boundary and still returns its
+      // stats — the panel reads them for deep_scan_cancelled telemetry.
+      abortDeepScan();
+      sendResponse({ success: true });
+      break;
 
     default:
       sendResponse({ success: false, error: 'Unknown message type' });

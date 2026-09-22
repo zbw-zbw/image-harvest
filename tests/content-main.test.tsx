@@ -104,6 +104,17 @@ vi.mock('../content/monitor', () => ({
   stopLiveMonitoring: vi.fn(),
 }));
 
+vi.mock('../content/auto-scroll', () => ({
+  DEEP_SCAN_LIMITS: { STEP_RATIO: 0.9 },
+  createDefaultDeps: vi.fn((extractImages: unknown, getGalleryLinks: unknown) => ({
+    extractImages,
+    getGalleryLinks,
+  })),
+  runDeepScan: vi.fn(),
+  abortDeepScan: vi.fn(),
+  isDeepScanRunning: vi.fn(() => false),
+}));
+
 // Capture chrome.runtime.onMessage / onConnect listeners during import.
 let onMessageListener:
   | ((
@@ -817,5 +828,84 @@ describe('extractPictureSources seenUrls dedupe', () => {
     const matches = result.filter((r) => r.url.includes('samefile.jpg'));
     // Dedupe pinned — exactly ONE entry survives.
     expect(matches).toHaveLength(1);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// Deep scan message routing (v1.2.0)
+// ─────────────────────────────────────────────────────────────────────
+
+import * as autoScroll from '../content/auto-scroll';
+
+describe('handleMessage — deep scan (v1.2.0)', () => {
+  it('START_DEEP_SCAN → runs the controller and responds with images + galleryLinks + stats', async () => {
+    const finalImages = [{ url: 'https://x.com/1.jpg' }, { url: 'https://x.com/2.jpg' }];
+    vi.mocked(autoScroll.runDeepScan).mockResolvedValue({
+      images: finalImages,
+      galleryLinks: ['https://x.com/g/1'],
+      newCount: 1,
+      steps: 4,
+      durationMs: 3200,
+      stopReason: 'bottom',
+    } as never);
+
+    const result = (await dispatch({ type: MESSAGE_TYPES.START_DEEP_SCAN })) as Record<
+      string,
+      unknown
+    >;
+
+    expect(autoScroll.runDeepScan).toHaveBeenCalledTimes(1);
+    // main.ts injects its own extractImages + gallery-links reader via
+    // createDefaultDeps — pin the wiring, not the dep internals.
+    expect(autoScroll.createDefaultDeps).toHaveBeenCalledWith(
+      expect.any(Function),
+      expect.any(Function)
+    );
+    expect(result).toEqual({
+      success: true,
+      images: finalImages,
+      galleryLinks: ['https://x.com/g/1'],
+      stats: {
+        count: 2,
+        newCount: 1,
+        steps: 4,
+        durationMs: 3200,
+        stopReason: 'bottom',
+      },
+    });
+  });
+
+  it('START_DEEP_SCAN while one is running → deep_scan_in_progress, controller NOT called', async () => {
+    vi.mocked(autoScroll.isDeepScanRunning).mockReturnValue(true);
+
+    const result = (await dispatch({ type: MESSAGE_TYPES.START_DEEP_SCAN })) as Record<
+      string,
+      unknown
+    >;
+
+    expect(result).toEqual({ success: false, error: 'deep_scan_in_progress' });
+    expect(autoScroll.runDeepScan).not.toHaveBeenCalled();
+  });
+
+  it('START_DEEP_SCAN controller throw → success:false with the error message', async () => {
+    vi.mocked(autoScroll.isDeepScanRunning).mockReturnValue(false);
+    vi.mocked(autoScroll.runDeepScan).mockRejectedValue(new Error('boom'));
+
+    const result = (await dispatch({ type: MESSAGE_TYPES.START_DEEP_SCAN })) as Record<
+      string,
+      unknown
+    >;
+
+    expect(result).toEqual({ success: false, error: 'boom' });
+  });
+
+  it('CANCEL_DEEP_SCAN → abortDeepScan + success:true', async () => {
+    const result = (await dispatch({ type: MESSAGE_TYPES.CANCEL_DEEP_SCAN })) as Record<
+      string,
+      unknown
+    >;
+
+    expect(autoScroll.abortDeepScan).toHaveBeenCalledTimes(1);
+    expect(result).toEqual({ success: true });
   });
 });
