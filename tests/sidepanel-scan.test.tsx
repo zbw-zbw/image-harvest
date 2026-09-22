@@ -270,3 +270,52 @@ describe('handleScanCancel', () => {
     expect(ui.showToast).toHaveBeenCalledWith('Scan cancelled', 'info');
   });
 });
+
+// ─────────────────────────────────────────────────────────────────────
+// handleScanCancel — deep-scan branch (v1.2.0)
+// ─────────────────────────────────────────────────────────────────────
+
+import { MESSAGE_TYPES } from '../shared/constants';
+
+describe('handleScanCancel — deep scan running', () => {
+  it('sends CANCEL_DEEP_SCAN to the current tab + clears isDeepScanning', async () => {
+    const sendMessage = vi.fn().mockResolvedValue({ success: true });
+    vi.stubGlobal('chrome', { runtime: { sendMessage } });
+    state.isDeepScanning = true;
+    state.isScanning = true;
+    state.currentTabId = 42;
+
+    handleScanCancel();
+
+    expect(sendMessage).toHaveBeenCalledWith({
+      type: MESSAGE_TYPES.CANCEL_DEEP_SCAN,
+      tabId: 42,
+    });
+    expect(state.isDeepScanning).toBe(false);
+    expect(state.scanAborted).toBe(true);
+    vi.unstubAllGlobals();
+  });
+
+  it('does NOT message the tab for a normal (non-deep-scan) cancel', () => {
+    const sendMessage = vi.fn().mockResolvedValue({ success: true });
+    vi.stubGlobal('chrome', { runtime: { sendMessage } });
+    state.isDeepScanning = false;
+
+    handleScanCancel();
+
+    expect(sendMessage).not.toHaveBeenCalled();
+    vi.unstubAllGlobals();
+  });
+
+  it('skips the cancel message when currentTabId is null (teardown race)', () => {
+    const sendMessage = vi.fn().mockResolvedValue({ success: true });
+    vi.stubGlobal('chrome', { runtime: { sendMessage } });
+    state.isDeepScanning = true;
+    state.currentTabId = null;
+
+    handleScanCancel();
+
+    expect(sendMessage).not.toHaveBeenCalled();
+    vi.unstubAllGlobals();
+  });
+});

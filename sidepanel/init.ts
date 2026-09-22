@@ -47,7 +47,7 @@ import {
   toggleMultitabSelectAll,
 } from './pro-features';
 import { renderImages } from './render';
-import { handleScanCancel } from './scan';
+import { handleScanCancel, deepScan } from './scan';
 import {
   applyDensity,
   applyProFeatureVisibility,
@@ -488,6 +488,7 @@ function cacheElements(): void {
     'found-info',
     'found-action-count',
     'btn-refresh',
+    'btn-deep-scan',
     'filter-url-input',
     'reverse-search-menu',
     'dedup-modal',
@@ -577,6 +578,31 @@ function bindEvents(): void {
       // Show loading overlay immediately to prevent stale content flash
       showLoading();
       loadCurrentTab(true, state.currentTabId ?? undefined).catch(() => {});
+    });
+  }
+
+  // Deep scan (v1.2.0): auto-scroll the page to harvest lazy-loaded images.
+  if (elements.btnDeepScan) {
+    elements.btnDeepScan.addEventListener('click', async () => {
+      if (state.isFetching) return;
+      if (state.currentTabId == null) return;
+
+      // Free tier: daily quota gate (Pro bypasses). Same pattern as the
+      // format-convert gate above.
+      if (!state.isProUser) {
+        const { checkFeatureQuota, quotaBlockedMessage } = await import('../shared/feature-quota');
+        const { allowed, limit } = await checkFeatureQuota('deepScan');
+        if (!allowed) {
+          showToast(quotaBlockedMessage(t, 'feature_deep_scan', limit, 'daily'), 'warning');
+          showProUpgradeModal('deep_scan');
+          void track(EVENTS.PRO_FEATURE_BLOCKED, { feature: 'deep_scan' });
+          return;
+        }
+      }
+
+      const tabId = state.currentTabId;
+      const tabUrl = state.tabCache.get(tabId)?.url || '';
+      void deepScan(tabId, tabUrl);
     });
   }
 

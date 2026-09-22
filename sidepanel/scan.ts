@@ -28,11 +28,22 @@ import { fetchImageMeta, generateId } from './utils';
  * whatever images have been discovered so far.
  */
 export function handleScanCancel(): void {
+  const wasDeepScanning = state.isDeepScanning;
   state.scanAborted = true;
   state.isScanning = false;
+  state.isDeepScanning = false;
   state.isFetching = false;
   hideScanOverlay();
   hideLoading();
+
+  if (wasDeepScanning && state.currentTabId != null) {
+    // Best-effort abort: the content-side run stops at the next step
+    // boundary and still returns its stats — deepScan() consumes them
+    // for deep_scan_cancelled telemetry when its await resolves.
+    chrome.runtime
+      .sendMessage({ type: MESSAGE_TYPES.CANCEL_DEEP_SCAN, tabId: state.currentTabId })
+      .catch(() => {});
+  }
 
   if (state.allImages.length > 0) {
     applyFilters();
@@ -392,6 +403,195 @@ export async function rescanWithProgress(tabId: number, tabUrl: string): Promise
     }
     console.warn('Rescan with progress failed:', error);
     hideScanOverlay();
+  } finally {
+    state.isFetching = false;
+  }
+}
+
+/**
+ * Deep scan (v1.2.0): auto-scroll the page to harvest lazy-loaded images.
+ *
+ * Same guards + merge pipeline as rescanWithProgress (isFetching lock, tab
+ * locking, scanDiscoveredImages merge, AI tag restore, tabCache save,
+ * processImageExtras). While the run scrolls, live-monitor IMAGES_DISCOVERED
+ * increments flow through the existing message.ts `isScanning` branch —
+ * the scan overlay shows real-time discovery with zero new wiring.
+ */
+export async function deepScan(tabId: number, tabUrl: string): Promise<void> {
+  if (state.isFetching) return;
+  state.isFetching = true;
+  state.isScanning = true; // enables the IMAGES_DISCOVERED incremental branch
+  state.isDeepScanning = true;
+  state.scanDiscoveredCount = 0;
+  state.scanDiscoveredImages = [];
+  state.scanAborted = false;
+
+  const previousCount = state.allImages.length;
+
+  state.scanProgress = {
+    ...state.scanProgress,
+    title: t('scan_deep_scanning'),
+    indeterminate: true,
+  };
+  showScanOverlay(0, 0);
+
+  void track(EVENTS.DEEP_SCAN_TRIGGERED);
+
+  try {
+    // Lock the tab like rescanWithProgress — never query the active tab.
+    let targetTab: chrome.tabs.Tab | undefined;
+    try {
+      targetTab = await chrome.tabs.get(tabId);
+    } catch {
+      // Tab may have been closed
+    }
+    if (!targetTab || state.currentTabId !== tabId) {
+      state.isScanning = false;
+      state.isDeepScanning = false;
+      hideScanOverlay();
+      return;
+    }
+
+    const currentTabTitle = targetTab.title || t('group_unknown_tab');
+    const currentTabIndex = targetTab.index ?? 0;
+
+    const response = await chrome.runtime.sendMessage({
+      type: MESSAGE_TYPES.START_DEEP_SCAN,
+      tabId,
+    });
+
+    state.isScanning = false;
+    state.isDeepScanning = false;
+
+    // User cancelled mid-run: handleScanCancel already rendered whatever
+    // was discovered. The content script still returns its run stats after
+    // an abort — forward them so the funnel sees how far users get.
+    if (state.scanAborted) {
+      const stats = response?.stats as { steps?: number; durationMs?: number } | undefined;
+      void track(EVENTS.DEEP_SCAN_CANCELLED, {
+        steps: stats?.steps ?? 0,
+        durationMs: stats?.durationMs ?? 0,
+      });
+      return;
+    }
+
+    // Discard results if the user switched tabs mid-run.
+    if (state.currentTabId !== tabId) {
+      hideScanOverlay();
+      return;
+    }
+
+    if (response && response.success && response.images) {
+      state.galleryLinks = Array.isArray(response.galleryLinks) ? response.galleryLinks : [];
+      const freshImages: ImageItem[] = response.images.map((img: ImageItem) => ({
+        ...img,
+        id: img.id || generateId(img.url),
+        tabTitle: img.tabTitle || currentTabTitle,
+        tabIndex: img.tabIndex ?? currentTabIndex,
+        isCurrentTab: !img.tabTitle,
+        colors: undefined,
+        phash: null,
+      }));
+
+      // Merge live-monitor discoveries that the final pass missed (same
+      // contract as rescanWithProgress).
+      const freshUrls = new Set(freshImages.map((img) => img.url));
+      const extraDiscovered: ImageItem[] = state.scanDiscoveredImages
+        .filter((img) => !freshUrls.has(img.url))
+        .map((img) => ({
+          ...img,
+          id: img.id || generateId(img.url),
+          tabTitle: img.tabTitle || currentTabTitle,
+          tabIndex: img.tabIndex ?? currentTabIndex,
+          isCurrentTab: !img.tabTitle,
+          colors: undefined,
+          phash: null,
+        }));
+      const mergedImages = [...freshImages, ...extraDiscovered];
+      trackLinkExtractFound(mergedImages);
+
+      const previousSelection = new Set(state.selectedImages);
+      state.allImages = preserveInjectedItems(mergedImages, tabId);
+
+      // Restore persisted AI tags into the merged list.
+      const tagMap = await loadAiTagsMap();
+      if (Object.keys(tagMap).length > 0) {
+        state.allImages = state.allImages.map((img) =>
+          tagMap[img.url] ? { ...img, aiTags: tagMap[img.url] } : img
+        );
+      }
+
+      state.selectedImages = new Set(
+        [...previousSelection].filter((id) => mergedImages.some((img) => img.id === id))
+      );
+
+      hideScanOverlay();
+
+      if (state.activeFilters.showVisibleOnly) {
+        await refreshVisibility();
+      }
+
+      applyFilters();
+      updateSelectionUI();
+
+      const stats = response.stats as
+        | {
+            count: number;
+            newCount: number;
+            steps: number;
+            durationMs: number;
+            stopReason: string;
+          }
+        | undefined;
+      const newCount = stats?.newCount ?? Math.max(0, state.allImages.length - previousCount);
+
+      // Quota charge (plan header refinement #1): only when the run
+      // actually scrolled AND surfaced new images — the link-resolve
+      // "0 results = no charge" precedent.
+      if (stats && stats.steps > 0 && newCount > 0 && !state.isProUser) {
+        const { incrementFeatureUsage } = await import('../shared/feature-quota');
+        await incrementFeatureUsage('deepScan');
+      }
+
+      // Toast: total found (matches the status bar) + the deep-scan delta.
+      showToast(
+        `${t('status_found_images', { count: state.filteredImages.length })} · ${t('toast_deep_scan_new', { count: newCount })}`,
+        'success'
+      );
+
+      void track(EVENTS.DEEP_SCAN_COMPLETED, {
+        count: state.allImages.length,
+        newCount,
+        steps: stats?.steps ?? 0,
+        durationMs: stats?.durationMs ?? 0,
+        stopReason: stats?.stopReason ?? 'unknown',
+      });
+
+      state.tabCache.set(tabId, {
+        url: tabUrl,
+        images: [...state.allImages],
+        selectedImages: new Set(state.selectedImages),
+        lastAccessed: Date.now(),
+      });
+      saveTabImageCache(tabId, tabUrl, state.allImages);
+
+      if (state.currentTabId === tabId) {
+        await processImageExtras(state.allImages);
+      }
+    } else {
+      hideScanOverlay();
+      // Keep already-discovered images; just report the failure.
+      showToast(t('toast_deep_scan_failed'), 'warning');
+    }
+  } catch (error) {
+    state.isScanning = false;
+    state.isDeepScanning = false;
+    if (state.scanAborted) {
+      return;
+    }
+    console.warn('Deep scan failed:', error);
+    hideScanOverlay();
+    showToast(t('toast_deep_scan_failed'), 'warning');
   } finally {
     state.isFetching = false;
   }

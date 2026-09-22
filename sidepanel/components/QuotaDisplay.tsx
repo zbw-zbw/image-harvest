@@ -63,7 +63,7 @@ function buildQuotaRows(
 
   // Settings page only shows features with monthly/daily usage quotas
   // that the user actively consumes (AI tags, color copy, link resolve).
-  const SETTINGS_QUOTA_FEATURES = new Set(['aiTag', 'colorCopy', 'linkResolve']);
+  const SETTINGS_QUOTA_FEATURES = new Set(['aiTag', 'colorCopy', 'linkResolve', 'deepScan']);
 
   for (const featureKey of copy.featureOrder) {
     const feat = copy.features[featureKey];
@@ -107,6 +107,7 @@ function buildFallbackRows(
   featureExhausted: (f: TrackedFeature) => boolean
 ): QuotaRow[] {
   const perMonth = t('quota_per_month');
+  const perDay = t('quota_per_day');
 
   // Only show features with trackable monthly/daily quotas.
   // Fixed per-batch limits and non-quota features are excluded.
@@ -142,6 +143,14 @@ function buildFallbackRows(
       proLimit: t('quota_unlimited'),
       remaining: featureRemaining('linkResolve'),
       exhausted: featureExhausted('linkResolve'),
+    },
+    // Deep scan (auto-scroll extraction) — daily quota
+    {
+      label: t('quota_deep_scan'),
+      freeLimit: `${limits.MAX_DAILY_DEEP_SCAN}${perDay}`,
+      proLimit: t('quota_unlimited'),
+      remaining: featureRemaining('deepScan'),
+      exhausted: featureExhausted('deepScan'),
     },
   ];
 }
@@ -197,6 +206,7 @@ export function QuotaDisplay() {
     formatConvert: 'formatConvert',
     colorCopy: 'colorCopy',
     linkResolve: 'linkResolve',
+    deepScan: 'deepScan',
   };
 
   // Build the flat limits record for template interpolation
@@ -215,6 +225,7 @@ export function QuotaDisplay() {
     maxMonthlyLiveMonitor: limits.MAX_MONTHLY_LIVE_MONITOR,
     maxMonthlyBatchHighlight: limits.MAX_MONTHLY_BATCH_HIGHLIGHT,
     maxMonthlyLinkResolve: limits.MAX_MONTHLY_LINK_RESOLVE,
+    maxDailyDeepScan: limits.MAX_DAILY_DEEP_SCAN,
     proAiMonthlyQuota: aiQuotaLimit,
   };
 

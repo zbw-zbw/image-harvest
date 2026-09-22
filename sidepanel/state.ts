@@ -354,6 +354,8 @@ export interface SidepanelState {
   // Scan / fetch lifecycle flags
   isFetching: boolean;
   isScanning: boolean;
+  /** True while a deep scan (auto-scroll extraction) is running. */
+  isDeepScanning: boolean;
   isSilentScanning: boolean;
   isInitialized: boolean;
   isTabSwitching: boolean;
@@ -508,6 +510,7 @@ function createInitialState(): SidepanelState {
 
     isFetching: false,
     isScanning: false,
+    isDeepScanning: false,
     isSilentScanning: false,
     isInitialized: false,
     isTabSwitching: false,

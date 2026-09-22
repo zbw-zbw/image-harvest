@@ -92,6 +92,11 @@ const WALL_COPY: Record<string, WallCopyConfig> = {
         : t('pro_wall_headline_batch_copy_urls_plain'),
   },
   link_resolve: { headline: () => t('pro_wall_headline_link_resolve') },
+  deep_scan: {
+    headline: () => t('pro_wall_headline_deep_scan'),
+    subline: () =>
+      t('pro_wall_subline_deep_scan', { max: getFreeLimits().MAX_DAILY_DEEP_SCAN }),
+  },
   reverse_search: {
     headline: () => t('pro_wall_headline_reverse_search'),
     subline: () =>
