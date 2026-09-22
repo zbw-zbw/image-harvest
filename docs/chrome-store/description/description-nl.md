@@ -4,6 +4,10 @@ Image Harvest is een slimme afbeeldingsdownloader die elke afbeelding op elke we
 
 Vindt automatisch elke afbeelding op elke webpagina — inclusief standaardafbeeldingen, CSS-achtergronden, responsieve afbeeldingen en hoogwaardige varianten. Doorzoekt Shadow DOM en iframes grondig voor volledige dekking. Livemonitoring detecteert nieuwe afbeeldingen tijdens het scrollen (Pro).
 
+🌀 Diepe scan — geen lazy-load afbeelding meer missen
+
+Lange pagina's en eindeloze feeds laden afbeeldingen pas bij het scrollen. De diepe scan scrollt de pagina automatisch voor je, triggert elke lazy-load tot aan de echte onderkant en levert de complete oogst met één klik. Gratis: 3 diepe scans per dag; Pro: onbeperkt.
+
 🔗 Haal de originele afbeelding achter de link op
 
 Pagina's met thumbnails die naar detailpagina's linken (galerijen in Reddit-stijl, productrasters) verbergen de afbeelding in volledige resolutie achter elke klik. Image Harvest volgt die links voor je: directe afbeeldingslinks worden bij elke scan automatisch geëxtraheerd, klik met de rechtermuisknop op een afbeelding of link om deze direct naar het paneel te sturen, en Pro-gebruikers kunnen alle galerijlinks in één keer verwerken om de originele afbeelding van elke detailpagina op te halen.

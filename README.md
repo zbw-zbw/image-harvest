@@ -351,6 +351,7 @@ To install in Chrome: `chrome://extensions/` → Developer mode → **Load unpac
 | Image collection                       | ⚡ 10 items       | ✅ Unlimited               |
 | Multi-tab extraction                   | ⚡ 3/mo           | ✅ Cross-tab               |
 | Reverse image search                   | ⚡ 2 engines      | ✅ 4 engines               |
+| Deep scan (auto-scroll)                | ⚡ 3/day          | ✅ Unlimited               |
 | Interface languages                    | ✅ EN/中/繁/日/Es | ✅ EN/中/繁/日/Es          |
 
 ---

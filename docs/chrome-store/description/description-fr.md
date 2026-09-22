@@ -4,6 +4,10 @@ Image Harvest est un téléchargeur d'images intelligent qui détecte et enregis
 
 Trouve automatiquement chaque image de n'importe quelle page web — images standard, fonds CSS, images responsives et variantes haute résolution inclus. Explore en profondeur le Shadow DOM et les iframes pour une couverture complète. La surveillance en direct détecte les nouvelles images pendant le défilement (Pro).
 
+🌀 Analyse approfondie — aucune image à chargement différé oubliée
+
+Les pages longues et les flux infinis ne chargent les images qu'au défilement. L'analyse approfondie fait défiler la page pour vous, déclenche chaque chargement différé jusqu'au vrai bas de page, puis vous remet la récolte complète en un clic. Gratuit : 3 analyses approfondies par jour ; Pro : illimité.
+
 🔗 Récupérez l'image originale derrière le lien
 
 Les pages à vignettes pointant vers des pages détaillées (galeries façon Reddit, grilles de produits) cachent l'image en pleine résolution derrière chaque clic. Image Harvest suit ces liens pour vous : les liens directs vers des images sont extraits automatiquement à chaque analyse, faites un clic droit sur n'importe quelle image ou lien pour l'envoyer directement au panneau, et les utilisateurs Pro peuvent résoudre tous les liens de la galerie en un clic pour récupérer l'image originale de chaque page de détail.

@@ -4,6 +4,10 @@ O Image Harvest é um baixador de imagens inteligente que encontra e salva em lo
 
 Encontra automaticamente todas as imagens em qualquer página — incluindo imagens padrão, fundos CSS, imagens responsivas e variantes em alta resolução. Escaneia profundamente Shadow DOM e iframes para cobertura total. O monitoramento em tempo real detecta novas imagens conforme você rola a página (Pro).
 
+🌀 Varredura profunda — nenhuma imagem de carregamento lento fica para trás
+
+Páginas longas e feeds infinitos só carregam imagens conforme você rola. A varredura profunda rola a página por você, acionando cada carregamento lento até o fim real, e entrega a coleção completa com um clique. Grátis: 3 varreduras profundas por dia; Pro: ilimitado.
+
 🔗 Obtenha a imagem original por trás do link
 
 Páginas de miniaturas com links para detalhes (galerias estilo Reddit, listagens de produtos) escondem a imagem em alta resolução atrás de cada clique. O Image Harvest segue esses links por você: links diretos para imagens são extraídos automaticamente em cada varredura, clique com o botão direito em qualquer imagem ou link para enviá-la direto ao painel, e usuários Pro podem resolver todos os links da galeria de uma vez para obter a imagem original de cada página de detalhe.

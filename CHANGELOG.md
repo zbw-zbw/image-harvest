@@ -56,6 +56,18 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ## [Unreleased]
 
+### ✨ Added
+
+- **Deep Scan catches every lazy-loaded image**: long pages and infinite feeds only load images as you scroll — hit the new "Deep scan" toolbar button and Image Harvest auto-scrolls the page for you, triggering every lazy load until the real bottom, then hands you the complete harvest. Free: 3 deep scans per day. Pro: unlimited.
+
+### 🌍 i18n
+
+- Deep Scan UI (toolbar button, progress overlay, result toasts, quota wall) translated into all 15 supported languages.
+
+### 🧪 Test Coverage Expansion
+
+- New unit tests pin the scroll controller's stop conditions (bottom / stalled / step / duration / image-count caps, abort) and the panel↔background↔content message chain; new e2e tests drive a real lazy-loading page end-to-end, including the free-quota wall and mid-scan cancel.
+
 ---
 
 ## [1.1.8] — 2026-09-21

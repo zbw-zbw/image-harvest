@@ -4,6 +4,10 @@ Image Harvest is a smart image downloader that finds and batch-saves every image
 
 Automatically finds every image on any webpage — including standard images, CSS backgrounds, responsive images, and high-resolution variants. Scans deep into Shadow DOM and iframes for complete coverage. Live monitoring detects new images as you scroll (Pro).
 
+🌀 Deep Scan — No Lazy Image Left Behind
+
+Long pages and infinite feeds only load images as you scroll. Deep Scan auto-scrolls the page for you — triggering every lazy load and watching for new arrivals until the real bottom — then hands you the complete harvest in one click. Free users get 3 deep scans a day; Pro users scan without limits.
+
 🔗 Get the Original Behind the Link
 
 Thumbnail-to-detail pages (Reddit-style galleries, product grids) hide the full-size image behind every click. Image Harvest follows those links for you: direct image links are extracted automatically on every scan, right-click any image or link to send it straight to the panel, and Pro users can resolve all gallery links in one click to pull each detail page's original image.

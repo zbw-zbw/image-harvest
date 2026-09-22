@@ -4,6 +4,10 @@ Image Harvest è un downloader di immagini intelligente che trova e salva in blo
 
 Trova automaticamente tutte le immagini di qualsiasi pagina web — incluse immagini standard, sfondi CSS, immagini responsive e varianti ad alta risoluzione. Scansiona a fondo Shadow DOM e iframe per una copertura completa. Il monitoraggio in tempo reale rileva le nuove immagini durante lo scorrimento (Pro).
 
+🌀 Scansione profonda — nessuna immagine lazy lasciata indietro
+
+Le pagine lunghe e i feed infiniti caricano le immagini solo mentre scorri. La scansione profonda scorre la pagina per te, attivando ogni caricamento lazy fino al vero fondo, e ti consegna la raccolta completa con un clic. Gratis: 3 scansioni profonde al giorno; Pro: illimitato.
+
 🔗 Ottieni l'immagine originale dietro il link
 
 Le pagine con miniature che rimandano ai dettagli (gallerie in stile Reddit, griglie di prodotti) nascondono l'immagine in alta risoluzione dietro ogni clic. Image Harvest segue quei link per te: i link diretti alle immagini vengono estratti automaticamente a ogni scansione, fai clic con il tasto destro su qualsiasi immagine o link per inviarla direttamente al pannello, e gli utenti Pro possono risolvere tutti i link della galleria con un clic per ottenere l'immagine originale di ogni pagina di dettaglio.
