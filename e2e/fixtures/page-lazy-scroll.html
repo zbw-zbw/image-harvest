@@ -1,0 +1,138 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Image Harvest e2e — lazy scroll fixture</title>
+    <style>
+      body {
+        font-family: system-ui, sans-serif;
+        margin: 24px;
+        background: #fafafa;
+      }
+      h1 {
+        font-size: 18px;
+      }
+      .cell {
+        background: #fff;
+        border: 1px solid #e0e0e0;
+        padding: 8px;
+        margin: 12px 0;
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Lazy-load fixture: scrolling appends image batches</h1>
+    <div id="grid">
+      <!-- Initial 5 images (60..180px) — same data-URI SVG pattern as
+           page-with-images.html so the plain scan finds 5+. -->
+      <div class="cell">
+        <img
+          alt="initial 1"
+          width="60"
+          height="60"
+          src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2260%22%20height%3D%2260%22%3E%3Crect%20width%3D%2260%22%20height%3D%2260%22%20fill%3D%22%23e74c3c%22%2F%3E%3C%2Fsvg%3E"
+        />
+      </div>
+      <div class="cell">
+        <img
+          alt="initial 2"
+          width="90"
+          height="90"
+          src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2290%22%20height%3D%2290%22%3E%3Crect%20width%3D%2290%22%20height%3D%2290%22%20fill%3D%22%233498db%22%2F%3E%3C%2Fsvg%3E"
+        />
+      </div>
+      <div class="cell">
+        <img
+          alt="initial 3"
+          width="120"
+          height="120"
+          src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22120%22%20height%3D%22120%22%3E%3Crect%20width%3D%22120%22%20height%3D%22120%22%20fill%3D%22%2327ae60%22%2F%3E%3C%2Fsvg%3E"
+        />
+      </div>
+      <div class="cell">
+        <img
+          alt="initial 4"
+          width="150"
+          height="150"
+          src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22150%22%20height%3D%22150%22%3E%3Crect%20width%3D%22150%22%20height%3D%22150%22%20fill%3D%22%239b59b6%22%2F%3E%3C%2Fsvg%3E"
+        />
+      </div>
+      <div class="cell">
+        <img
+          alt="initial 5"
+          width="180"
+          height="180"
+          src="data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22180%22%20height%3D%22180%22%3E%3Crect%20width%3D%22180%22%20height%3D%22180%22%20fill%3D%22%23e67e22%22%2F%3E%3C%2Fsvg%3E"
+        />
+      </div>
+    </div>
+    <!-- Spacer keeps the page scrollable before lazy batches arrive;
+         batches are inserted BEFORE it so the document keeps growing.
+         Height is tuned to the controller's stall budget: with ~612px
+         scroll steps and STALL_STEPS=3, the near-bottom trigger zone
+         (scrollY >= docH - 500 - innerHeight) must be reachable within
+         2 steps or the run stops as 'stalled' before the first batch.
+         2500px failed that budget in practice; 1200px reaches it in 2. -->
+    <div id="bottom-spacer" style="height: 1200px"></div>
+    <script>
+      (function () {
+        var grid = document.getElementById('grid');
+        var spacer = document.getElementById('bottom-spacer');
+        var colors = ['f1c40f', '1abc9c', 'e91e63', '795548', '607d8b', 'ff5722'];
+        var batch = 0;
+        var MAX_BATCHES = 6; // 6 batches × 2 images = 12 lazy images
+
+        function addBatch() {
+          if (batch >= MAX_BATCHES) return;
+          for (var i = 0; i < 2; i++) {
+            var n = batch * 2 + i + 6; // lazy images numbered 6..17
+            var size = 60 + ((n * 37) % 120); // 60..179 deterministic sizes
+            var color = colors[(n - 6) % colors.length];
+            var cell = document.createElement('div');
+            cell.className = 'cell';
+            var img = document.createElement('img');
+            img.width = size;
+            img.height = size;
+            img.alt = 'lazy ' + n;
+            img.src =
+              'data:image/svg+xml;utf8,' +
+              encodeURIComponent(
+                '<svg xmlns="http://www.w3.org/2000/svg" width="' +
+                  size +
+                  '" height="' +
+                  size +
+                  '"><rect width="' +
+                  size +
+                  '" height="' +
+                  size +
+                  '" fill="#' +
+                  color +
+                  '"/></svg>'
+              );
+            cell.appendChild(img);
+            grid.insertBefore(cell, null); // append at grid end
+          }
+          batch += 1;
+          // Shrink the spacer as real content arrives (keeps total height
+          // plausible while still growing the image count).
+          spacer.style.height = Math.max(0, 1200 - batch * 150) + 'px';
+        }
+
+        var pending = false;
+        window.addEventListener('scroll', function () {
+          if (pending) return;
+          var nearBottom =
+            window.scrollY + window.innerHeight >= document.documentElement.scrollHeight - 500;
+          if (nearBottom) {
+            pending = true;
+            setTimeout(function () {
+              addBatch();
+              pending = false;
+            }, 40);
+          }
+        });
+      })();
+    </script>
+  </body>
+</html>
