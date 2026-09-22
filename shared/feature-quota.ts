@@ -8,7 +8,7 @@
  * {
  *   featureQuota: {
  *     monthly: { "2026-06": { multiTab: 2, dedup: 1, formatConvert: 3, liveMonitor: 0 } },
- *     daily: { "2026-06-04": { batchHighlight: 2 } }
+ *     daily: { "2026-06-04": { batchHighlight: 2, deepScan: 1 } }
  *   }
  * }
  */
@@ -25,7 +25,7 @@ export type MonthlyFeature =
   | 'linkResolve';
 
 /** Features tracked on a daily reset cycle. */
-export type DailyFeature = 'batchHighlight';
+export type DailyFeature = 'batchHighlight' | 'deepScan';
 
 export type TrackedFeature = MonthlyFeature | DailyFeature;
 
@@ -42,7 +42,7 @@ const MONTHLY_FEATURES: MonthlyFeature[] = [
   'colorCopy',
   'linkResolve',
 ];
-const DAILY_FEATURES: DailyFeature[] = ['batchHighlight'];
+const DAILY_FEATURES: DailyFeature[] = ['batchHighlight', 'deepScan'];
 
 function currentMonthKey(): string {
   const d = new Date();
@@ -111,6 +111,8 @@ function getLimit(feature: TrackedFeature): number {
       return limits.MAX_MONTHLY_LINK_RESOLVE;
     case 'batchHighlight':
       return limits.MAX_MONTHLY_BATCH_HIGHLIGHT;
+    case 'deepScan':
+      return limits.MAX_DAILY_DEEP_SCAN;
   }
 }
 
@@ -164,7 +166,12 @@ export async function incrementFeatureUsage(feature: TrackedFeature): Promise<nu
   } else {
     const dayKey = currentDayKey();
     if (!data.daily[dayKey]) {
-      data.daily[dayKey] = { batchHighlight: 0 };
+      data.daily[dayKey] = { batchHighlight: 0, deepScan: 0 };
+    }
+    // Ensure the field exists — older daily records may lack fields for
+    // features added after the record was first created (e.g. deepScan).
+    if (data.daily[dayKey][feature as DailyFeature] == null) {
+      data.daily[dayKey][feature as DailyFeature] = 0;
     }
     data.daily[dayKey][feature as DailyFeature] += 1;
     await saveQuotaData(data);
@@ -200,16 +207,18 @@ export async function getAllFeatureQuotas(): Promise<
  * Build the appropriate toast message when a feature quota check fails.
  * When limit is 0 the feature is Pro-exclusive — use a clean "Pro feature"
  * message instead of the confusing "0 times per month" wording.
+ * `period` selects the daily vs monthly exhausted copy (default monthly).
  */
 export function quotaBlockedMessage(
   translationFn: (key: string, params?: Record<string, string | number>) => string,
   featureI18nKey: string,
-  limit: number
+  limit: number,
+  period: 'monthly' | 'daily' = 'monthly'
 ): string {
   if (limit === 0) {
     return translationFn('pro_feature_upgrade_required');
   }
-  return translationFn('quota_exhausted_monthly', {
+  return translationFn(period === 'daily' ? 'quota_exhausted_daily' : 'quota_exhausted_monthly', {
     feature: translationFn(featureI18nKey),
     limit: String(limit),
   });

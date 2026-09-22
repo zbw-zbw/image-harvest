@@ -142,6 +142,12 @@ export const MESSAGE_TYPES = {
   // Visibility re-check (side panel → content script)
   CHECK_VISIBILITY: 'CHECK_VISIBILITY',
   BG_SCAN_LIMIT_EXCEEDED: 'BG_SCAN_LIMIT_EXCEEDED',
+
+  // Deep scan (v1.2.0): auto-scroll extraction.
+  /** Panel → background → content: start an auto-scroll deep scan. */
+  START_DEEP_SCAN: 'START_DEEP_SCAN',
+  /** Panel → background → content: abort a running deep scan. */
+  CANCEL_DEEP_SCAN: 'CANCEL_DEEP_SCAN',
 } as const;
 
 export type MessageType = (typeof MESSAGE_TYPES)[keyof typeof MESSAGE_TYPES];
@@ -262,6 +268,9 @@ export const FREE_LIMITS = {
   // Link penetration: free users get a taste of gallery-link resolving each
   // month ("first wow" strategy) — Pro is unlimited.
   MAX_MONTHLY_LINK_RESOLVE: 3,
+  // Deep scan (v1.2.0): auto-scroll the page to trigger lazy loads.
+  // Daily quota ("first wow" for long pages) — Pro is unlimited.
+  MAX_DAILY_DEEP_SCAN: 3,
 } as const;
 
 /**
@@ -339,6 +348,9 @@ export function getFreeLimits(): typeof FREE_LIMITS {
         MAX_MONTHLY_LINK_RESOLVE: (typeof remote.maxMonthlyLinkResolve === 'number'
           ? remote.maxMonthlyLinkResolve
           : FREE_LIMITS.MAX_MONTHLY_LINK_RESOLVE) as typeof FREE_LIMITS.MAX_MONTHLY_LINK_RESOLVE,
+        MAX_DAILY_DEEP_SCAN: (typeof remote.maxDailyDeepScan === 'number'
+          ? remote.maxDailyDeepScan
+          : FREE_LIMITS.MAX_DAILY_DEEP_SCAN) as typeof FREE_LIMITS.MAX_DAILY_DEEP_SCAN,
         ALLOWED_GROUP_MODES: Array.isArray(remote.allowedGroupModes)
           ? (remote.allowedGroupModes as unknown as typeof FREE_LIMITS.ALLOWED_GROUP_MODES)
           : FREE_LIMITS.ALLOWED_GROUP_MODES,
