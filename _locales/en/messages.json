@@ -100,6 +100,12 @@
   "toast_scan_cancelled": {
     "message": "Scan cancelled"
   },
+  "toast_deep_scan_new": {
+    "message": "Deep scan found {count} new images"
+  },
+  "toast_deep_scan_failed": {
+    "message": "Deep scan failed — discovered images kept"
+  },
   "toast_download_completed": {
     "message": "Downloaded {count} images",
     "description": "{count} = number of images to download"
@@ -187,6 +193,9 @@
   },
   "toolbar_rescan": {
     "message": "Rescan"
+  },
+  "toolbar_deep_scan": {
+    "message": "Deep scan"
   },
   "toolbar_download_all": {
     "message": "Download"
@@ -807,6 +816,9 @@
   "pro_wall_headline_link_resolve": {
     "message": "Restore broken image links"
   },
+  "pro_wall_headline_deep_scan": {
+    "message": "Get every lazy-loaded image"
+  },
   "pro_wall_headline_live_monitor": {
     "message": "Catch images as pages load"
   },
@@ -818,6 +830,9 @@
   },
   "pro_wall_subline_batch_zip": {
     "message": "Free plan zips up to {max} images per batch. Pro removes the cap."
+  },
+  "pro_wall_subline_deep_scan": {
+    "message": "Free plan includes {max} deep scans per day. Pro is unlimited."
   },
   "pro_wall_subline_reverse_search": {
     "message": "Free plan includes {max} engines. Pro unlocks all of them."
@@ -960,6 +975,9 @@
   "scan_updating": {
     "message": "Updating..."
   },
+  "scan_deep_scanning": {
+    "message": "Deep scanning..."
+  },
   "status_n_selected": {
     "message": "{count} selected"
   },
@@ -980,6 +998,9 @@
   },
   "title_rescan": {
     "message": "Rescan images"
+  },
+  "title_deep_scan": {
+    "message": "Deep scan: auto-scroll to load more images"
   },
   "title_select_all": {
     "message": "Click to select all"
@@ -1602,6 +1623,9 @@
   "quota_exhausted_monthly": {
     "message": "Free plan: up to {limit} {feature} per month. Upgrade to Pro for unlimited!"
   },
+  "quota_exhausted_daily": {
+    "message": "Free plan: up to {limit} {feature} per day. Upgrade to Pro for unlimited!"
+  },
   "feature_multitab": {
     "message": "Multi-Tab Extract"
   },
@@ -1822,6 +1846,9 @@
   "feature_link_resolve": {
     "message": "Deep Link Resolve"
   },
+  "feature_deep_scan": {
+    "message": "Deep Scan"
+  },
   "gallery_resolve_bar_hint": {
     "message": "These thumbnails link to detail pages — resolving opens each page and adds its main image to the results."
   },
@@ -1866,6 +1893,9 @@
   },
   "quota_link_resolve": {
     "message": "Link Resolve"
+  },
+  "quota_deep_scan": {
+    "message": "Deep Scan"
   },
   "toast_gallery_resolved_remaining": {
     "message": "Added {images} original images · {remaining} link resolves left this month"

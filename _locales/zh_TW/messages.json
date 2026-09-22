@@ -551,6 +551,9 @@
   "pro_wall_headline_link_resolve": {
     "message": "修復失效的圖片連結"
   },
+  "pro_wall_headline_deep_scan": {
+    "message": "取得每一張延遲載入圖片"
+  },
   "pro_wall_headline_live_monitor": {
     "message": "即時捕捉頁面新圖片"
   },
@@ -562,6 +565,9 @@
   },
   "pro_wall_subline_batch_zip": {
     "message": "免費版單次最多打包 {max} 張，Pro 無限制。"
+  },
+  "pro_wall_subline_deep_scan": {
+    "message": "免費版每天可深度掃描 {max} 次，Pro 無限次。"
   },
   "pro_wall_subline_reverse_search": {
     "message": "免費版可用 {max} 個引擎，Pro 解鎖全部。"
@@ -703,6 +709,9 @@
   },
   "scan_updating": {
     "message": "更新中..."
+  },
+  "scan_deep_scanning": {
+    "message": "深度掃描中..."
   },
   "settings_all_frames": {
     "message": "搜尋所有 iframe"
@@ -944,6 +953,9 @@
   "title_rescan": {
     "message": "重新掃描圖片"
   },
+  "title_deep_scan": {
+    "message": "深度掃描：自動捲動載入更多圖片"
+  },
   "title_select_all": {
     "message": "點擊全選"
   },
@@ -1076,6 +1088,12 @@
   "toast_scan_cancelled": {
     "message": "掃描已取消"
   },
+  "toast_deep_scan_new": {
+    "message": "深度掃描發現 {count} 張新圖片"
+  },
+  "toast_deep_scan_failed": {
+    "message": "深度掃描失敗 — 已發現的圖片已保留"
+  },
   "toast_select_at_least_one_tab": {
     "message": "請至少選擇一個分頁"
   },
@@ -1114,6 +1132,9 @@
   },
   "toolbar_rescan": {
     "message": "重新掃描"
+  },
+  "toolbar_deep_scan": {
+    "message": "深度掃描"
   },
   "toolbar_select_all": {
     "message": "全選"
@@ -1535,6 +1556,9 @@
   "quota_exhausted_monthly": {
     "message": "免費版：每月最多 {limit} 次{feature}，升級 Pro 無限使用！"
   },
+  "quota_exhausted_daily": {
+    "message": "免費版：{feature} 每天最多 {limit} 次。升級 Pro 無限使用！"
+  },
   "feature_multitab": {
     "message": "Multi-Tab Extract"
   },
@@ -1807,6 +1831,9 @@
   "feature_link_resolve": {
     "message": "深度連結解析"
   },
+  "feature_deep_scan": {
+    "message": "深度掃描"
+  },
   "gallery_resolve_bar_hint": {
     "message": "這些縮圖指向詳細頁——點擊解析會逐頁取得其中的原圖並加入結果。"
   },
@@ -1851,6 +1878,9 @@
   },
   "quota_link_resolve": {
     "message": "連結解析"
+  },
+  "quota_deep_scan": {
+    "message": "深度掃描"
   },
   "toast_gallery_resolved_remaining": {
     "message": "已新增 {images} 張原圖 · 本月還剩 {remaining} 次連結解析"

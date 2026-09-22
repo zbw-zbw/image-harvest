@@ -551,6 +551,9 @@
   "pro_wall_headline_link_resolve": {
     "message": "リンク切れの画像を復元"
   },
+  "pro_wall_headline_deep_scan": {
+    "message": "遅延読み込み画像をすべて取得"
+  },
   "pro_wall_headline_live_monitor": {
     "message": "ページの新着画像をリアルタイムにキャッチ"
   },
@@ -562,6 +565,9 @@
   },
   "pro_wall_subline_batch_zip": {
     "message": "無料版は1回{max}枚まで。Proは無制限です。"
+  },
+  "pro_wall_subline_deep_scan": {
+    "message": "無料プランは 1 日 {max} 回までディープスキャン可能。Pro は無制限。"
   },
   "pro_wall_subline_reverse_search": {
     "message": "無料版は{max}エンジン。Proで全エンジン解放。"
@@ -703,6 +709,9 @@
   },
   "scan_updating": {
     "message": "更新中..."
+  },
+  "scan_deep_scanning": {
+    "message": "ディープスキャン中..."
   },
   "settings_all_frames": {
     "message": "すべてのフレームを検索"
@@ -944,6 +953,9 @@
   "title_rescan": {
     "message": "画像を再スキャン"
   },
+  "title_deep_scan": {
+    "message": "ディープスキャン：自動スクロールで画像をさらに読み込む"
+  },
   "title_select_all": {
     "message": "クリックして全選択"
   },
@@ -1076,6 +1088,12 @@
   "toast_scan_cancelled": {
     "message": "スキャンがキャンセルされました"
   },
+  "toast_deep_scan_new": {
+    "message": "ディープスキャンで {count} 件の新しい画像を発見"
+  },
+  "toast_deep_scan_failed": {
+    "message": "ディープスキャンに失敗しました — 検出済みの画像は保持されています"
+  },
   "toast_select_at_least_one_tab": {
     "message": "タブを1つ以上選択してください"
   },
@@ -1114,6 +1132,9 @@
   },
   "toolbar_rescan": {
     "message": "再スキャン"
+  },
+  "toolbar_deep_scan": {
+    "message": "ディープスキャン"
   },
   "toolbar_select_all": {
     "message": "すべて選択"
@@ -1535,6 +1556,9 @@
   "quota_exhausted_monthly": {
     "message": "Free plan: up to {limit} {feature} per month. Upgrade to Pro for unlimited!"
   },
+  "quota_exhausted_daily": {
+    "message": "無料プラン：{feature} は 1 日 {limit} 回まで。Pro にアップグレードで無制限！"
+  },
   "feature_multitab": {
     "message": "Multi-Tab Extract"
   },
@@ -1807,6 +1831,9 @@
   "feature_link_resolve": {
     "message": "ディープリンク解決"
   },
+  "feature_deep_scan": {
+    "message": "ディープスキャン"
+  },
   "gallery_resolve_bar_hint": {
     "message": "これらのサムネイルは詳細ページへリンクしています。解析すると各ページのメイン画像を結果に追加します。"
   },
@@ -1851,6 +1878,9 @@
   },
   "quota_link_resolve": {
     "message": "リンク解決"
+  },
+  "quota_deep_scan": {
+    "message": "ディープスキャン"
   },
   "toast_gallery_resolved_remaining": {
     "message": "元画像 {images} 枚を追加 · 今月のリンク解決はあと {remaining} 回"

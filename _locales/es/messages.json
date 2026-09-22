@@ -552,6 +552,9 @@
   "pro_wall_headline_link_resolve": {
     "message": "Restaura enlaces de imágenes rotos"
   },
+  "pro_wall_headline_deep_scan": {
+    "message": "Consigue cada imagen de carga diferida"
+  },
   "pro_wall_headline_live_monitor": {
     "message": "Captura imágenes al cargarse las páginas"
   },
@@ -563,6 +566,9 @@
   },
   "pro_wall_subline_batch_zip": {
     "message": "El plan gratuito comprime hasta {max} imágenes por lote. Pro elimina el límite."
+  },
+  "pro_wall_subline_deep_scan": {
+    "message": "El plan gratuito incluye {max} escaneos profundos al día. Pro es ilimitado."
   },
   "pro_wall_subline_reverse_search": {
     "message": "El plan gratuito incluye {max} motores. Pro los desbloquea todos."
@@ -704,6 +710,9 @@
   },
   "scan_updating": {
     "message": "Actualizando..."
+  },
+  "scan_deep_scanning": {
+    "message": "Escaneo profundo en curso..."
   },
   "settings_all_frames": {
     "message": "Buscar en todos los marcos"
@@ -945,6 +954,9 @@
   "title_rescan": {
     "message": "Reescanear imágenes"
   },
+  "title_deep_scan": {
+    "message": "Escaneo profundo: desplazamiento automático para cargar más imágenes"
+  },
   "title_select_all": {
     "message": "Clic para seleccionar todo"
   },
@@ -1079,6 +1091,12 @@
   "toast_scan_cancelled": {
     "message": "Escaneo cancelado"
   },
+  "toast_deep_scan_new": {
+    "message": "El escaneo profundo encontró {count} imágenes nuevas"
+  },
+  "toast_deep_scan_failed": {
+    "message": "Error en el escaneo profundo — se conservan las imágenes descubiertas"
+  },
   "toast_select_at_least_one_tab": {
     "message": "Seleccione al menos una pestaña"
   },
@@ -1117,6 +1135,9 @@
   },
   "toolbar_rescan": {
     "message": "Reescanear"
+  },
+  "toolbar_deep_scan": {
+    "message": "Escaneo profundo"
   },
   "toolbar_select_all": {
     "message": "Seleccionar todo"
@@ -1538,6 +1559,9 @@
   "quota_exhausted_monthly": {
     "message": "Free plan: up to {limit} {feature} per month. Upgrade to Pro for unlimited!"
   },
+  "quota_exhausted_daily": {
+    "message": "Plan gratuito: hasta {limit} {feature} al día. ¡Mejora a Pro para uso ilimitado!"
+  },
   "feature_multitab": {
     "message": "Multi-Tab Extract"
   },
@@ -1810,6 +1834,9 @@
   "feature_link_resolve": {
     "message": "Resolución de enlaces profundos"
   },
+  "feature_deep_scan": {
+    "message": "Escaneo profundo"
+  },
   "gallery_resolve_bar_hint": {
     "message": "Estas miniaturas enlazan a páginas de detalle; resolver abre cada página y añade su imagen principal a los resultados."
   },
@@ -1854,6 +1881,9 @@
   },
   "quota_link_resolve": {
     "message": "Resolución de enlaces"
+  },
+  "quota_deep_scan": {
+    "message": "Escaneo profundo"
   },
   "toast_gallery_resolved_remaining": {
     "message": "Se añadieron {images} imágenes originales · quedan {remaining} resoluciones este mes"

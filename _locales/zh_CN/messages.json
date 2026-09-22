@@ -95,6 +95,12 @@
   "toast_scan_cancelled": {
     "message": "扫描已取消"
   },
+  "toast_deep_scan_new": {
+    "message": "深度扫描发现 {count} 张新图片"
+  },
+  "toast_deep_scan_failed": {
+    "message": "深度扫描失败 — 已发现的图片已保留"
+  },
   "toast_download_completed": {
     "message": "已下载 {count} 张图片"
   },
@@ -175,6 +181,9 @@
   },
   "toolbar_rescan": {
     "message": "重新扫描"
+  },
+  "toolbar_deep_scan": {
+    "message": "深度扫描"
   },
   "toolbar_download_all": {
     "message": "下载"
@@ -752,6 +761,9 @@
   "pro_wall_headline_link_resolve": {
     "message": "修复失效的图片链接"
   },
+  "pro_wall_headline_deep_scan": {
+    "message": "获取每一张懒加载图片"
+  },
   "pro_wall_headline_live_monitor": {
     "message": "实时捕捉页面新图片"
   },
@@ -763,6 +775,9 @@
   },
   "pro_wall_subline_batch_zip": {
     "message": "免费版单次最多打包 {max} 张，Pro 无限制。"
+  },
+  "pro_wall_subline_deep_scan": {
+    "message": "免费版每天可深度扫描 {max} 次，Pro 无限次。"
   },
   "pro_wall_subline_reverse_search": {
     "message": "免费版可用 {max} 个引擎，Pro 解锁全部。"
@@ -905,6 +920,9 @@
   "scan_updating": {
     "message": "更新中..."
   },
+  "scan_deep_scanning": {
+    "message": "深度扫描中..."
+  },
   "status_n_selected": {
     "message": "已选 {count} 张"
   },
@@ -925,6 +943,9 @@
   },
   "title_rescan": {
     "message": "重新扫描图片"
+  },
+  "title_deep_scan": {
+    "message": "深度扫描：自动滚动加载更多图片"
   },
   "title_select_all": {
     "message": "点击全选"
@@ -1589,6 +1610,9 @@
   "quota_exhausted_monthly": {
     "message": "免费版：每月最多 {limit} 次{feature}，升级 Pro 无限使用！"
   },
+  "quota_exhausted_daily": {
+    "message": "免费版：{feature} 每天最多 {limit} 次。升级 Pro 无限使用！"
+  },
   "feature_multitab": {
     "message": "多标签页提取"
   },
@@ -1807,6 +1831,9 @@
   "feature_link_resolve": {
     "message": "深度链接解析"
   },
+  "feature_deep_scan": {
+    "message": "深度扫描"
+  },
   "gallery_resolve_bar_hint": {
     "message": "这些缩略图指向详情页——点击解析会逐页获取其中的原图并加入结果。"
   },
@@ -1851,6 +1878,9 @@
   },
   "quota_link_resolve": {
     "message": "链接解析"
+  },
+  "quota_deep_scan": {
+    "message": "深度扫描"
   },
   "toast_gallery_resolved_remaining": {
     "message": "已添加 {images} 张原图 · 本月还剩 {remaining} 次链接解析"

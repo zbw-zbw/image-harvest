@@ -599,6 +599,9 @@
   "scan_updating": {
     "message": "جارٍ التحديث..."
   },
+  "scan_deep_scanning": {
+    "message": "جارٍ الفحص العميق..."
+  },
   "settings_all_frames": {
     "message": "البحث في جميع الإطارات"
   },
@@ -839,6 +842,9 @@
   "title_rescan": {
     "message": "إعادة مسح الصور"
   },
+  "title_deep_scan": {
+    "message": "الفحص العميق: تمرير تلقائي لتحميل المزيد من الصور"
+  },
   "title_select_all": {
     "message": "انقر لتحديد الكل"
   },
@@ -938,6 +944,12 @@
   "toast_scan_cancelled": {
     "message": "تم إلغاء الفحص"
   },
+  "toast_deep_scan_new": {
+    "message": "وجد الفحص العميق {count} صورًا جديدة"
+  },
+  "toast_deep_scan_failed": {
+    "message": "فشل الفحص العميق — تم الاحتفاظ بالصور المكتشفة"
+  },
   "toast_settings_reset": {
     "message": "تمت إعادة الإعدادات إلى الافتراضية"
   },
@@ -973,6 +985,9 @@
   },
   "toolbar_rescan": {
     "message": "إعادة المسح"
+  },
+  "toolbar_deep_scan": {
+    "message": "فحص عميق"
   },
   "toolbar_select_all": {
     "message": "تحديد الكل"
@@ -1379,6 +1394,9 @@
   "quota_exhausted_monthly": {
     "message": "Free plan: up to {limit} {feature} per month. Upgrade to Pro for unlimited!"
   },
+  "quota_exhausted_daily": {
+    "message": "الخطة المجانية: حتى {limit} {feature} يوميًا. قم بالترقية إلى Pro للاستخدام غير المحدود!"
+  },
   "feature_multitab": {
     "message": "Multi-Tab Extract"
   },
@@ -1602,6 +1620,9 @@
   "feature_link_resolve": {
     "message": "Deep Link Resolve"
   },
+  "feature_deep_scan": {
+    "message": "فحص عميق"
+  },
   "gallery_resolve_bar_hint": {
     "message": "تربط هذه الصور المصغّرة بصفحات تفاصيل؛ يقوم التحليل بفتح كل صفحة وإضافة صورتها الرئيسية إلى النتائج."
   },
@@ -1646,6 +1667,15 @@
   },
   "quota_link_resolve": {
     "message": "تحليل الروابط"
+  },
+  "quota_deep_scan": {
+    "message": "فحص عميق"
+  },
+  "pro_wall_headline_deep_scan": {
+    "message": "احصل على كل صورة بطيئة التحميل"
+  },
+  "pro_wall_subline_deep_scan": {
+    "message": "تشمل الخطة المجانية {max} عمليات فحص عميق يوميًا. Pro غير محدود."
   },
   "toast_gallery_resolved_remaining": {
     "message": "تمت إضافة {images} صورة أصلية · متبقٍ {remaining} تحليل روابط هذا الشهر"

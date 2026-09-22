@@ -599,6 +599,9 @@
   "scan_updating": {
     "message": "Atualizando..."
   },
+  "scan_deep_scanning": {
+    "message": "Varredura profunda em andamento..."
+  },
   "settings_all_frames": {
     "message": "Buscar em todos os frames"
   },
@@ -839,6 +842,9 @@
   "title_rescan": {
     "message": "Reescanear imagens"
   },
+  "title_deep_scan": {
+    "message": "Varredura profunda: rolagem automática para carregar mais imagens"
+  },
   "title_select_all": {
     "message": "Clique para selecionar tudo"
   },
@@ -938,6 +944,12 @@
   "toast_scan_cancelled": {
     "message": "Verificação cancelada"
   },
+  "toast_deep_scan_new": {
+    "message": "A varredura profunda encontrou {count} novas imagens"
+  },
+  "toast_deep_scan_failed": {
+    "message": "Falha na varredura profunda — as imagens descobertas foram mantidas"
+  },
   "toast_settings_reset": {
     "message": "Configurações redefinidas para o padrão"
   },
@@ -973,6 +985,9 @@
   },
   "toolbar_rescan": {
     "message": "Reescanear"
+  },
+  "toolbar_deep_scan": {
+    "message": "Varredura profunda"
   },
   "toolbar_select_all": {
     "message": "Selecionar tudo"
@@ -1379,6 +1394,9 @@
   "quota_exhausted_monthly": {
     "message": "Free plan: up to {limit} {feature} per month. Upgrade to Pro for unlimited!"
   },
+  "quota_exhausted_daily": {
+    "message": "Plano gratuito: até {limit} {feature} por dia. Atualize para o Pro e use sem limites!"
+  },
   "feature_multitab": {
     "message": "Multi-Tab Extract"
   },
@@ -1602,6 +1620,9 @@
   "feature_link_resolve": {
     "message": "Deep Link Resolve"
   },
+  "feature_deep_scan": {
+    "message": "Varredura profunda"
+  },
   "gallery_resolve_bar_hint": {
     "message": "Estas miniaturas apontam para páginas de detalhe; resolver abre cada página e adiciona a sua imagem principal aos resultados."
   },
@@ -1646,6 +1667,15 @@
   },
   "quota_link_resolve": {
     "message": "Resolução de links"
+  },
+  "quota_deep_scan": {
+    "message": "Varredura profunda"
+  },
+  "pro_wall_headline_deep_scan": {
+    "message": "Obtenha todas as imagens de carregamento lento"
+  },
+  "pro_wall_subline_deep_scan": {
+    "message": "O plano gratuito inclui {max} varreduras profundas por dia. O Pro é ilimitado."
   },
   "toast_gallery_resolved_remaining": {
     "message": "{images} imagens originais adicionadas · restam {remaining} resoluções neste mês"
