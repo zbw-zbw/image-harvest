@@ -92,7 +92,8 @@ function installChromeStub(tabs: TabFixture[]): ChromeStub {
   return stub;
 }
 
-const { processMultiTabExtract, getImagesFromTab } = await import('../background/extractor');
+const { processMultiTabExtract, getImagesFromTab, getDeepScanFromTab, cancelDeepScan } =
+  await import('../background/extractor');
 const { uiPorts } = await import('../background/utils');
 
 interface BroadcastCapture {
@@ -716,5 +717,137 @@ describe('getImagesFromTab — concurrent gallery-links fan-out', () => {
 
     releaseMonitor();
     await Promise.all([p1, p2]);
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// getDeepScanFromTab / cancelDeepScan (v1.2.0)
+// ─────────────────────────────────────────────────────────────────────
+
+describe('getDeepScanFromTab', () => {
+  const deepStats = {
+    count: 9,
+    newCount: 4,
+    steps: 5,
+    durationMs: 3600,
+    stopReason: 'bottom',
+  };
+
+  function stubDeepScanResponses(): void {
+    chromeStub.tabs.sendMessage.mockImplementation(
+      async (_tabId: number, message: { type: string }) => {
+        if (message.type === MESSAGE_TYPES.PING) return { pong: true };
+        if (message.type === MESSAGE_TYPES.START_LIVE_MONITOR) return { success: true };
+        if (message.type === MESSAGE_TYPES.START_DEEP_SCAN) {
+          return {
+            success: true,
+            images: [{ url: 'd1' }, { url: 'd2' }],
+            galleryLinks: ['https://x.com/g/1'],
+            stats: deepStats,
+          };
+        }
+        return undefined;
+      }
+    );
+  }
+
+  it('happy path: inject → START_LIVE_MONITOR (before) → START_DEEP_SCAN → returns images + stats', async () => {
+    chromeStub = installChromeStub([{ id: 7, title: 'Deep', url: 'https://deep.com', images: [] }]);
+    stubDeepScanResponses();
+
+    const result = await getDeepScanFromTab(7);
+
+    expect(result.images).toEqual([{ url: 'd1' }, { url: 'd2' }]);
+    expect(result.galleryLinks).toEqual(['https://x.com/g/1']);
+    expect(result.stats).toEqual(deepStats);
+
+    // Pin the ordering: live monitor MUST be started before the scroll run
+    // so the panel receives IMAGES_DISCOVERED increments during the run.
+    const sentTypes = chromeStub.tabs.sendMessage.mock.calls.map((c) => c[1].type);
+    expect(sentTypes).toEqual([
+      MESSAGE_TYPES.PING,
+      MESSAGE_TYPES.START_LIVE_MONITOR,
+      MESSAGE_TYPES.START_DEEP_SCAN,
+    ]);
+  });
+
+  it('restricted tab (chrome://) → throws "Cannot access", no messages sent', async () => {
+    chromeStub = installChromeStub([
+      { id: 3, title: 'Bad', url: 'should-not-use', restricted: true, images: [] },
+    ]);
+
+    await expect(getDeepScanFromTab(3)).rejects.toThrow(/browser internal/i);
+    expect(chromeStub.tabs.sendMessage).not.toHaveBeenCalled();
+  });
+
+  it('second run on the same tab while active → deep_scan_in_progress', async () => {
+    chromeStub = installChromeStub([{ id: 9, title: 'Slow', url: 'https://slow.com', images: [] }]);
+    let release!: () => void;
+    chromeStub.tabs.sendMessage.mockImplementation(
+      async (_tabId: number, message: { type: string }) => {
+        if (message.type === MESSAGE_TYPES.PING) return { pong: true };
+        if (message.type === MESSAGE_TYPES.START_LIVE_MONITOR) return { success: true };
+        if (message.type === MESSAGE_TYPES.START_DEEP_SCAN) {
+          await new Promise<void>((r) => {
+            release = r;
+          });
+          return { success: true, images: [], galleryLinks: [], stats: deepStats };
+        }
+        return undefined;
+      }
+    );
+
+    const first = getDeepScanFromTab(9);
+    await expect(getDeepScanFromTab(9)).rejects.toThrow('deep_scan_in_progress');
+    release();
+    await first;
+  });
+
+  it('content reports failure → throws with the content error message', async () => {
+    chromeStub = installChromeStub([{ id: 11, title: 'Err', url: 'https://err.com', images: [] }]);
+    chromeStub.tabs.sendMessage.mockImplementation(
+      async (_tabId: number, message: { type: string }) => {
+        if (message.type === MESSAGE_TYPES.PING) return { pong: true };
+        if (message.type === MESSAGE_TYPES.START_LIVE_MONITOR) return { success: true };
+        if (message.type === MESSAGE_TYPES.START_DEEP_SCAN) {
+          return { success: false, error: 'deep_scan_in_progress' };
+        }
+        return undefined;
+      }
+    );
+
+    await expect(getDeepScanFromTab(11)).rejects.toThrow('deep_scan_in_progress');
+    // The re-entry guard was released even on failure — a retry works.
+    await expect(getDeepScanFromTab(11)).rejects.toThrow('deep_scan_in_progress'); // same content answer, guard is NOT stuck
+    expect(chromeStub.tabs.sendMessage).toHaveBeenCalled();
+  });
+});
+
+describe('cancelDeepScan', () => {
+  it('forwards CANCEL_DEEP_SCAN to the tab (frameId 0)', async () => {
+    chromeStub = installChromeStub([{ id: 7, title: 'Deep', url: 'https://deep.com', images: [] }]);
+
+    await cancelDeepScan(7);
+
+    expect(chromeStub.tabs.sendMessage).toHaveBeenCalledWith(
+      7,
+      { type: MESSAGE_TYPES.CANCEL_DEEP_SCAN },
+      { frameId: 0 }
+    );
+  });
+
+  it('swallows send failures (tab navigated away mid-run)', async () => {
+    chromeStub = installChromeStub([{ id: 7, title: 'Deep', url: 'https://deep.com', images: [] }]);
+    chromeStub.tabs.sendMessage.mockRejectedValue(new Error('No tab with id'));
+
+    await expect(cancelDeepScan(7)).resolves.toBeUndefined();
+  });
+
+  it('undefined tabId → no-op, no message', async () => {
+    chromeStub = installChromeStub([]);
+
+    await cancelDeepScan(undefined);
+
+    expect(chromeStub.tabs.sendMessage).not.toHaveBeenCalled();
   });
 });

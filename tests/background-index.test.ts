@@ -52,6 +52,8 @@ vi.mock('../background/display-mode', () => ({
 vi.mock('../background/extractor', () => ({
   getImagesFromTab: vi.fn(),
   processMultiTabExtract: vi.fn(),
+  getDeepScanFromTab: vi.fn(),
+  cancelDeepScan: vi.fn(),
 }));
 
 vi.mock('../background/reverse-search', () => ({
@@ -1233,5 +1235,55 @@ describe('handleMessage — default + error', () => {
       error: ERROR_CODES.CSP_BLOCKED,
       workaround: 'Right-click and save manually',
     });
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// Deep scan routes (v1.2.0)
+// ─────────────────────────────────────────────────────────────────────
+
+describe('handleMessage — deep scan routes', () => {
+  it('START_DEEP_SCAN → delegates to getDeepScanFromTab and spreads the result', async () => {
+    vi.mocked(bgExtractor.getDeepScanFromTab).mockResolvedValue({
+      images: [{ url: 'd1' }],
+      galleryLinks: ['https://x.com/g/1'],
+      stats: { count: 1, newCount: 1, steps: 3, durationMs: 2100, stopReason: 'bottom' },
+    } as never);
+
+    const result = await dispatch({ type: MESSAGE_TYPES.START_DEEP_SCAN, tabId: 42 });
+
+    expect(bgExtractor.getDeepScanFromTab).toHaveBeenCalledWith(42);
+    expect(result).toEqual({
+      success: true,
+      images: [{ url: 'd1' }],
+      galleryLinks: ['https://x.com/g/1'],
+      stats: { count: 1, newCount: 1, steps: 3, durationMs: 2100, stopReason: 'bottom' },
+    });
+  });
+
+  it('START_DEEP_SCAN extractor throw → outer catch responds success:false + message', async () => {
+    vi.mocked(bgExtractor.getDeepScanFromTab).mockRejectedValue(
+      new Error('Cannot access this page: browser internal pages are not supported')
+    );
+
+    const result = await dispatch({ type: MESSAGE_TYPES.START_DEEP_SCAN, tabId: 1 });
+
+    // The outer catch maps any uncoded extractor throw to the shared
+    // INJECTION_FAILED envelope (same as GET_IMAGES failures).
+    expect(result).toEqual({
+      success: false,
+      error: 'INJECTION_FAILED',
+      message: 'Cannot access this page: browser internal pages are not supported',
+      workaround: null,
+    });
+  });
+
+  it('CANCEL_DEEP_SCAN → delegates to cancelDeepScan, responds success:true', async () => {
+    vi.mocked(bgExtractor.cancelDeepScan).mockResolvedValue(undefined as never);
+
+    const result = await dispatch({ type: MESSAGE_TYPES.CANCEL_DEEP_SCAN, tabId: 7 });
+
+    expect(bgExtractor.cancelDeepScan).toHaveBeenCalledWith(7);
+    expect(result).toEqual({ success: true });
   });
 });

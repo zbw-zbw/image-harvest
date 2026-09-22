@@ -206,6 +206,116 @@ async function doGetImagesFromTab(tabId: number, options: ExtractOptions): Promi
   return allImages;
 }
 
+// ── Deep scan (v1.2.0) ───────────────────────────────────────────────
+
+export interface DeepScanStats {
+  count: number;
+  newCount: number;
+  steps: number;
+  durationMs: number;
+  stopReason: string;
+}
+
+export interface DeepScanTabResult {
+  images: ImageItem[];
+  galleryLinks: string[];
+  stats: DeepScanStats;
+}
+
+interface DeepScanContentResponse {
+  success?: boolean;
+  error?: string;
+  images?: ImageItem[];
+  galleryLinks?: string[];
+  stats?: DeepScanStats;
+}
+
+// Per-tab re-entry guard: a deep scan can run up to MAX_DURATION_MS
+// (45s), far longer than a plain extract, so double-clicks / retry loops
+// must not stack parallel scroll runs on the same page.
+const activeDeepScans = new Set<number>();
+
+/**
+ * Run an auto-scroll deep scan on a tab: inject the content script, start
+ * live monitoring FIRST (so the panel gets IMAGES_DISCOVERED increments
+ * during the run — the incremental channel is the existing one), then let
+ * the content-side controller scroll + extract.
+ */
+export async function getDeepScanFromTab(tabId: number | undefined): Promise<DeepScanTabResult> {
+  if (!tabId) {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (tab && isRestrictedUrl(tab.url)) {
+      throw new Error('Cannot access this page: browser internal pages are not supported');
+    }
+    tabId = tab?.id;
+  }
+  if (!tabId) {
+    throw new Error('No active tab found');
+  }
+
+  if (activeDeepScans.has(tabId)) {
+    throw new Error('deep_scan_in_progress');
+  }
+  activeDeepScans.add(tabId);
+
+  try {
+    const tabInfo = await chrome.tabs.get(tabId);
+    if (isRestrictedUrl(tabInfo.url)) {
+      throw new Error('Cannot access this page: browser internal pages are not supported');
+    }
+
+    const injectionResult = await injectContentScript(tabId);
+    if (injectionResult.success === false) {
+      const error: InjectionError = new Error(
+        injectionResult.message || 'Failed to inject content script'
+      );
+      error.code = injectionResult.error;
+      error.workaround = injectionResult.workaround;
+      throw error;
+    }
+
+    // Live monitor BEFORE the scroll run — the panel's scan overlay reads
+    // its IMAGES_DISCOVERED increments as real-time deep-scan progress.
+    try {
+      await chrome.tabs.sendMessage(
+        tabId,
+        { type: MESSAGE_TYPES.START_LIVE_MONITOR, config: { debounceMs: 500 } },
+        { frameId: 0 }
+      );
+    } catch {
+      // Best-effort: the final extract still delivers the full image list.
+    }
+
+    const response: DeepScanContentResponse = await chrome.tabs.sendMessage(
+      tabId,
+      { type: MESSAGE_TYPES.START_DEEP_SCAN },
+      { frameId: 0 }
+    );
+
+    if (!response?.success) {
+      throw new Error(response?.error || 'Deep scan failed');
+    }
+
+    return {
+      images: response.images || [],
+      galleryLinks: response.galleryLinks || [],
+      stats: response.stats as DeepScanStats,
+    };
+  } finally {
+    activeDeepScans.delete(tabId);
+  }
+}
+
+/** Best-effort abort — the content script may be gone after navigation. */
+export async function cancelDeepScan(tabId: number | undefined): Promise<void> {
+  if (!tabId) return;
+  try {
+    await chrome.tabs.sendMessage(tabId, { type: MESSAGE_TYPES.CANCEL_DEEP_SCAN }, { frameId: 0 });
+  } catch {
+    // Tab navigated away or content script reloaded — the run is dead anyway.
+  }
+}
+
 interface MultiTabResult {
   success: true;
   images: ImageItem[];

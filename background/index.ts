@@ -24,7 +24,12 @@ import { EVENTS } from '../shared/telemetry-events';
 import { uiPorts, sidePanelOpenedTabs, getAccessibleTabId, broadcastToPopup } from './utils';
 import { initLicenseAlarm } from './license';
 import { initDisplayMode, initTabActivationListener } from './display-mode';
-import { getImagesFromTab, processMultiTabExtract } from './extractor';
+import {
+  getImagesFromTab,
+  processMultiTabExtract,
+  getDeepScanFromTab,
+  cancelDeepScan,
+} from './extractor';
 import { resolveLinkImages } from './link-resolver';
 import { generateId, getDomain, getFileFormat, isDirectImageUrl } from '../shared/utils';
 import type { ImageItem } from '../shared/types';
@@ -399,6 +404,17 @@ async function handleMessage(
           ...message,
           fromTabId: sender.tab?.id ?? null,
         });
+        sendResponse({ success: true });
+        break;
+
+      case MESSAGE_TYPES.START_DEEP_SCAN: {
+        const result = await getDeepScanFromTab(message.tabId as number | undefined);
+        sendResponse({ success: true, ...result });
+        break;
+      }
+
+      case MESSAGE_TYPES.CANCEL_DEEP_SCAN:
+        await cancelDeepScan(message.tabId as number | undefined);
         sendResponse({ success: true });
         break;
 
