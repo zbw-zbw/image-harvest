@@ -72,6 +72,11 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 - New unit tests pin the scroll controller's stop conditions (bottom / stalled / step / duration / image-count caps, abort) and the panel↔background↔content message chain; new e2e tests drive a real lazy-loading page end-to-end, including the free-quota wall and mid-scan cancel.
 
+### 🐛 Fixed
+
+- Removed a ~65px dead scroll zone at the bottom of the image list — the hidden card dropdowns still occupied layout below the last card, inflating the scrollable area (present since v1.1.1).
+- Data-URI image cards no longer show the byte size twice — the URL row's "(265 B)" suffix is gone; the size tag keeps it.
+
 ---
 
 ## [1.1.8] — 2026-09-21
