@@ -110,7 +110,7 @@ describe('ImageCard – rendering', () => {
     expect(c2.querySelector('.card-thumb.thumb-small')).toBeNull();
   });
 
-  it('renders data-URI urls as mime prefix + size, keeping the full value in title', () => {
+  it('renders data-URI urls as the mime prefix only (size lives in the card tag)', () => {
     const img = makeImage({
       url: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciLz4=',
       format: 'svg',
@@ -120,7 +120,8 @@ describe('ImageCard – rendering', () => {
     });
     const { container } = render(<ImageCard img={img} index={0} />);
     const urlEl = container.querySelector('.card-url')!;
-    expect(urlEl.textContent).toBe('data:image/svg+xml;… (457 B)');
+    // No " (457 B)" suffix — the size tag already shows estimatedSize.
+    expect(urlEl.textContent).toBe('data:image/svg+xml;…');
     // Full value stays one hover away (tooltip) for copy/inspection.
     expect(urlEl.getAttribute('title')).toBe(img.url);
   });

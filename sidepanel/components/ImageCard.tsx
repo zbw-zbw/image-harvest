@@ -217,16 +217,18 @@ export function ImageCard({ img, index }: Props) {
   // height in grid mode so rows align; only list view shrinks it to 64px.
   const isSmallIcon = w > 0 && h > 0 && Math.max(w, h) <= 64;
   // Data URIs carry no readable "URL" — the base64 wall is pure noise in the
-  // URL row. Show the mime prefix + size instead; the full value stays in the
-  // title tooltip and the copy/open actions.
+  // URL row. Show the mime prefix only; the byte size lives in the card's
+  // size tag (estimatedSize) and the full value stays in the title tooltip
+  // and the copy/open actions.
   const isDataUri = img.url.startsWith('data:');
   const urlText = isDataUri
-    ? `${img.url.slice(0, img.url.indexOf(';') > 0 ? img.url.indexOf(';') + 1 : 16)}…${size ? ` (${size})` : ''}`
+    ? `${img.url.slice(0, img.url.indexOf(';') > 0 ? img.url.indexOf(';') + 1 : 16)}…`
     : img.url;
 
-  // ── Dropup: default to opening upward so the dropdown doesn't cover
-  //    the URL-row actions (copy / open-in-new-tab) below the card.
-  //    Only fall back to downward when there isn't enough room above. ──
+  // ── Dropdown direction: default upward (CSS default) so the menu
+  //    doesn't cover the URL-row actions below the card and its hidden
+  //    layout can't leak into the grid's bottom scroll overflow. JS
+  //    flips to .drop-down when there isn't enough room above. ──
   const handleDropdownHover = (e: MouseEvent) => {
     const group = e.currentTarget as HTMLElement;
     // Re-entering the group should clear any leftover "dismissed" state so
@@ -239,10 +241,11 @@ export function ImageCard({ img, index }: Props) {
     const rect = group.getBoundingClientRect();
     const spaceAbove = rect.top;
     // Estimate dropdown height; 200px is a safe upper bound for 4-5 items.
-    // Default to dropup (open upward); only open downward when there
+    // The CSS default opens upward (keeps the hidden menu's layout out of
+    // the grid's bottom scroll overflow); flip downward only when there
     // isn't enough room above.
     const shouldDropDown = spaceAbove < 200;
-    dropdown.classList.toggle('dropup', !shouldDropDown);
+    dropdown.classList.toggle('drop-down', shouldDropDown);
   };
 
   // ── Dismiss: hide the dropdown immediately after a click ──

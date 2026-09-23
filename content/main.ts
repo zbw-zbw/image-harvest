@@ -20,7 +20,6 @@ import {
   ensureImageLoaded,
   parseSrcset,
   skipElement,
-  sendDiscoveredImages,
   isElementAccessibleWithoutInteraction,
   pickBestSrcsetUrl,
 } from './utils';

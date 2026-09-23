@@ -224,7 +224,13 @@
 
 .card-dl-dropdown {
   position: absolute;
-  top: 100%;
+  /* Anchored ABOVE the card by default: a hidden (visibility:hidden) menu
+     still occupies layout, so a top:100% anchor would stick ~65px past the
+     last card into the grid's scrollable overflow — a dead scroll zone the
+     user sees as "too much bottom whitespace". JS flips to .drop-down when
+     there isn't enough room above. */
+  top: auto;
+  bottom: 100%;
   right: 0;
   margin-top: 0;
   margin-bottom: 0;
@@ -247,7 +253,8 @@
 .card-dl-dropdown::before {
   content: '';
   position: absolute;
-  top: -8px;
+  top: auto;
+  bottom: -8px;
   left: 0;
   right: 0;
   height: 8px;
@@ -291,7 +298,10 @@
 
 .card-search-dropdown {
   position: absolute;
-  top: 100%;
+  /* Above the card by default — same dead-scroll-zone reasoning as
+     .card-dl-dropdown. */
+  top: auto;
+  bottom: 100%;
   left: 0;
   margin-top: 0;
   background: var(--bg-color);
@@ -313,7 +323,8 @@
 .card-search-dropdown::before {
   content: '';
   position: absolute;
-  top: -8px;
+  top: auto;
+  bottom: -8px;
   left: 0;
   right: 0;
   height: 8px;
@@ -376,21 +387,22 @@
   margin-left: auto;
 }
 
-/* ── Dropup: auto-flip when near viewport bottom ───────────────────
-   JS adds .dropup on hover when there isn't enough room below. */
-.card-dl-dropdown.dropup,
-.card-search-dropdown.dropup {
-  top: auto;
-  bottom: 100%;
+/* ── Drop-down flip: not enough room above ──────────────────────────
+   JS adds .drop-down on hover when there isn't enough room above the
+   card; the default (no class) opens upward. */
+.card-dl-dropdown.drop-down,
+.card-search-dropdown.drop-down {
+  top: 100%;
+  bottom: auto;
   margin-top: 0;
   margin-bottom: 0;
 }
 
-/* Flip the invisible bridge to the bottom edge for dropup */
-.card-dl-dropdown.dropup::before,
-.card-search-dropdown.dropup::before {
-  top: auto;
-  bottom: -8px;
+/* Flip the invisible bridge back to the top edge for .drop-down */
+.card-dl-dropdown.drop-down::before,
+.card-search-dropdown.drop-down::before {
+  top: -8px;
+  bottom: auto;
 }
 
 /* ── Dismissed: force-hide the dropdown right after a click ──────────
