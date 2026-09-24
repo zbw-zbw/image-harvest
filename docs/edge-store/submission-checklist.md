@@ -12,7 +12,7 @@
 
 ## 2. 提交包与兼容性
 
-- [x] 复用 Chrome 同一构建产物：从 GitHub Release 下载 `image-harvest-v1.2.0.zip`（https://github.com/zbw-zbw/image-harvest/releases/tag/v1.2.0 — 2026-09-23 CI 重建，已含死滚动区/重复字节修复；本地 `npm run zip` 产物等效）。MV3 包 Edge 直接兼容，无需改 manifest
+- [x] 复用 Chrome 同一构建产物：`image-harvest-v1.2.0.zip`（https://github.com/zbw-zbw/image-harvest/releases/tag/v1.2.0 或本地 `image-harvest-v1.2.0.zip`，两者一致）。**2026-09-24 更新：Edge 校验器拒绝含 `.vite/manifest.json` 的包（"More than one manifest.json file"），已重打 Edge-clean 包**（排除 `.vite/`，1,163,267 B，唯一 manifest、version 1.2.0、含死滚动区/重复字节修复）；打包脚本与 CI 均已固化排除（e71f232），Release 附件已同步替换。Chrome 上传同样建议用这个新包。MV3 包 Edge 直接兼容，无需改 manifest
 - [ ] Edge Stable 侧载冒烟（`edge://extensions` → 开发者模式 → 加载已解压的 `dist/`）：
   - [ ] 侧边栏打开、扫描 fixture 页出图
   - [ ] 工具栏出现 Deep scan 按钮且完整跑通一次深扫（`chrome.sidePanel` 在 Edge 111+ 受支持；若运行环境不支持，display-mode 已有 popup 兜底，按钮行为一致）
