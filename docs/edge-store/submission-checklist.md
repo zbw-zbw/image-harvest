@@ -5,8 +5,8 @@
 
 ## 1. 账号与合规（owner）
 
-- [x] 注册/登录 Partner Center 开发者账号：已有账号（2026-09-24 登录确认；但 Edge Add-ons 计划尚未加入——直接访问 /dashboard/microsoftedge/ 会被重定向回 dashboard/home）
-- [ ] 加入 Edge Add-ons 计划：右上角齿轮 → Account settings → 左侧 Programs → 找到 Microsoft Edge 卡片 → 点 Get started。注意：必须用**个人 Microsoft 账号（MSA）**；账户类型选 Individual；publisher display name 建议 "Image Harvest"（商店页开发者名）；个人账号验证通常几分钟到几小时，开通后 Edge 后台入口才会出现
+- [x] 注册/登录 Partner Center 开发者账号：已有账号（2026-09-24 登录确认）
+- [x] 加入 Edge Add-ons 计划：2026-09-24 完成（Individual 个人账户，通过 Account settings → Programs → Microsoft Edge → Get started 注册）
 - [ ] 完成开发者身份验证（首次需要，审核 1–7 天）
 - [ ] 保留扩展名称 "Image Harvest"
 
@@ -21,21 +21,29 @@
 
 ## 3. 商店列表（复用 CWS 资产）
 
-- [ ] en-US 描述：粘贴 `docs/chrome-store/description/description-en.md` 全文
-- [ ] zh-CN 描述：粘贴 `docs/chrome-store/description/description-zh_CN.md` 全文（先上两种主要语言，其余语言上架后按需增量）
-- [ ] 短摘要（≤ 132 字符）：复用 `docs/chrome-store/summary.md` 的 en 文案（131/132 字符，已核）
-- [ ] 分类：Productivity（与 CWS 一致）
-- [x] 截图：`assets/screenshots/sidepanel-1280.png` + `assets/screenshots/deepscan-1280.png`（1280×800，Edge 规格双尺寸之一；2026-09-24 生成 — demo 页 fixture `e2e/fixtures/store-demo.html` + 临时 e2e spec（playwright runner 截图后即删），展示了列表视图与 v1.2.0 深扫 overlay 两种状态）
+- [x] en-US 描述：粘贴 `docs/chrome-store/description/description-en.md` 全文（2026-09-24 已提交）
+- [ ] zh-CN 描述：其余 14 语言上架后按需增量（English listing 完整即可过审，其他语言为可选）
+- [x] 短摘要（≤ 132 字符）：复用 `docs/chrome-store/summary.md` 的 en 文案（131/132 字符，已核）
+- [x] 分类：Productivity（与 CWS 一致）
+- [x] 搜索关键词：image downloader / download images / bulk image downloader / image grabber / download all images / image harvest（7 条上限用了 6 条，16/21 words）
+- [x] 截图：13 张全家福已产出（`assets/screenshots/*-1280.png`，1280×800，面板 680px+演示页 600px 比例）；本次提交用 sidepanel + deepscan 两张，其余 11 张可随时在后台 Store listings 增补
 - [x] 商店图标：`assets/promo/icon-300.png`（300×300 PNG，从 `icons/logo.png` 500×500 源导出）
+- [x] 认证说明：选 Yes（Pro 功能有条件锁定），说明 7 天一键试用解锁路径 + 免费层限额明细 + 遥测披露（约 1500 字符）
 
 ## 4. 提交后跟进
 
-- [ ] 在下方「提交记录」表登记提交日期与认证状态
+- [x] 在下方「提交记录」表登记提交日期与认证状态（2026-09-24）
 - [ ] 官网下载区追加 Edge CTA：复用 hero 区现有 CTA 模式（`src/messages/en.json` 的 `installButton` 文案结构 + chromewebstore 链接位），新增并列按钮 "Install for Edge"，href 先指向 `#edge-coming-soon`，上架通过后替换为正式商店 URL —— 走独立小 PR，**不阻塞** v1.2.0 插件提审
 - [ ] 上架通过后：正式商店 URL 回填官网 CTA + README 徽章区 + 本文件状态改为「已上架」
 
 ## 提交记录
 
-| 日期       | 版本  | 状态   | 备注 |
-| ---------- | ----- | ------ | ---- |
-| （待登记） | 1.2.0 | 未提交 |      |
+| 日期       | 版本  | 状态      | 备注                                                                                                                 |
+| ---------- | ----- | --------- | -------------------------------------------------------------------------------------------------------------------- |
+| 2026-09-24 | 1.2.0 | In review | Store ID `0RDCKDQGR9XG`；CRX ID `ldcpblieinfbpgachbnnbaphkagfemaj`；官方审核期最长 7 个工作日；过审后 Store URL 可用 |
+
+Edge 后台关键凭据（过审后回填官网/README 用）：
+
+- Store ID: `0RDCKDQGR9XG`
+- CRX ID: `ldcpblieinfbpgachbnnbaphkagfemaj`
+- 正式商店 URL：过审后生成（`https://microsoftedge.microsoft.com/addons/detail/.../0RDCKDQGR9XG`）
