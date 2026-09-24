@@ -263,9 +263,11 @@ To install in Chrome: `chrome://extensions/` → Developer mode → **Load unpac
 
 ## 📸 Screenshots
 
-|                 Side Panel Mode                 |               Popup Mode               |
-| :---------------------------------------------: | :------------------------------------: |
-| ![Side Panel](assets/screenshots/sidepanel.png) | ![Popup](assets/screenshots/popup.png) |
+|                   Side Panel Mode                    |                     Popup Mode                     |
+| :--------------------------------------------------: | :------------------------------------------------: |
+| ![Side Panel](assets/screenshots/sidepanel-1280.png) |    ![Popup](assets/screenshots/popup-1280.png)     |
+|   ![Filters](assets/screenshots/filters-1280.png)    |  ![AI Tags](assets/screenshots/ai-tags-1280.png)   |
+| ![Similar Dedup](assets/screenshots/dedup-1280.png)  | ![Deep Scan](assets/screenshots/deepscan-1280.png) |
 
 > Screenshots may be added/updated post-launch. See `assets/screenshots/` for the latest assets.
 

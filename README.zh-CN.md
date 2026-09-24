@@ -167,9 +167,11 @@
 
 ## 📸 截图
 
-|                   侧边栏模式                    |                弹窗模式                |
-| :---------------------------------------------: | :------------------------------------: |
-| ![Side Panel](assets/screenshots/sidepanel.png) | ![Popup](assets/screenshots/popup.png) |
+|                      侧边栏模式                      |                      弹窗模式                      |
+| :--------------------------------------------------: | :------------------------------------------------: |
+| ![Side Panel](assets/screenshots/sidepanel-1280.png) |    ![Popup](assets/screenshots/popup-1280.png)     |
+|   ![Filters](assets/screenshots/filters-1280.png)    |  ![AI Tags](assets/screenshots/ai-tags-1280.png)   |
+|     ![Dedup](assets/screenshots/dedup-1280.png)      | ![Deep Scan](assets/screenshots/deepscan-1280.png) |
 
 > 上线后截图可能持续更新，最新截图见 `assets/screenshots/` 目录。
 
