@@ -69,7 +69,11 @@ if (existsSync(zipPath)) {
   rmSync(zipPath);
 }
 
-execSync(`zip -r ${JSON.stringify(zipPath)} .`, {
+// Exclude dist/.vite/ (crxjs's internal build manifest): nothing reads it,
+// and Microsoft Edge's package validator rejects archives containing a
+// second manifest.json ("More than one manifest.json file is present in
+// the package"). Chrome tolerated it; Edge does not.
+execSync(`zip -r ${JSON.stringify(zipPath)} . -x ".vite/*"`, {
   cwd: distDir,
   stdio: 'inherit',
 });

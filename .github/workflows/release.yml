@@ -157,13 +157,16 @@ jobs:
       #   1. image-harvest-vX.Y.Z.zip  → upload-to-Chrome-Web-Store-ready
       #      The Web Store rejects archives whose top-level entry is a
       #      directory, so we zip the *contents* of dist/ from inside it.
+      #      dist/.vite/ (crxjs's internal build manifest) is excluded —
+      #      Microsoft Edge's validator rejects a second manifest.json
+      #      ("More than one manifest.json file is present in the package").
       #   2. The same zip becomes the GitHub Release asset.
       - name: Package extension zip
         id: package
         run: |
           VERSION="${GITHUB_REF#refs/tags/v}"
           ZIP_NAME="image-harvest-v${VERSION}.zip"
-          (cd dist && zip -r "../${ZIP_NAME}" .)
+          (cd dist && zip -r "../${ZIP_NAME}" . -x ".vite/*")
           ls -lh "${ZIP_NAME}"
           echo "zip_name=${ZIP_NAME}" >> "$GITHUB_OUTPUT"
           echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
