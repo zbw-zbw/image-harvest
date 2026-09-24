@@ -5,7 +5,8 @@
 
 ## 1. 账号与合规（owner）
 
-- [x] 注册/登录 Partner Center 开发者账号：https://partner.microsoft.com/dashboard/microsoftedge/ （已有账号；若 Edge 计划未开通，在 Partner Center 首次进入 Edge Add-ons 时会引导同意条款）
+- [x] 注册/登录 Partner Center 开发者账号：已有账号（2026-09-24 登录确认；但 Edge Add-ons 计划尚未加入——直接访问 /dashboard/microsoftedge/ 会被重定向回 dashboard/home）
+- [ ] 加入 Edge Add-ons 计划：右上角齿轮 → Account settings → 左侧 Programs → 找到 Microsoft Edge 卡片 → 点 Get started。注意：必须用**个人 Microsoft 账号（MSA）**；账户类型选 Individual；publisher display name 建议 "Image Harvest"（商店页开发者名）；个人账号验证通常几分钟到几小时，开通后 Edge 后台入口才会出现
 - [ ] 完成开发者身份验证（首次需要，审核 1–7 天）
 - [ ] 保留扩展名称 "Image Harvest"
 
