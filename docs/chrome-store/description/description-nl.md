@@ -62,7 +62,7 @@ Volledig vertaald in 15 talen: English, 简体中文, 繁體中文, 日本語, E
 
 🔒 Privacy Voorop
 
-Image Harvest verwerkt alles lokaal in je browser. Geen enkele afbeelding, URL of persoonlijke gegevens verlaten je apparaat. Optionele anonieme gebruiksstatistieken (alleen gebeurtenisaantallen — geen URL's, afbeeldingen of identificatiecodes) kun je inschakelen via Instellingen → Help verbeteren; standaard uitgeschakeld.
+Image Harvest verwerkt alles lokaal in je browser. Geen enkele afbeelding, URL of persoonlijke gegevens verlaten je apparaat. Anonieme gebruiksstatistieken (alleen gebeurtenisaantallen — geen URL's, afbeeldingen of identificatiecodes) worden standaard verzonden om de extensie te verbeteren; je kunt ze altijd uitschakelen via Instellingen → Anonieme gebruiksgegevens delen.
 
 ⌨️ Sneltoetsen
 

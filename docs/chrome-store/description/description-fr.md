@@ -62,7 +62,7 @@ Entièrement traduit en 15 langues : English, 简体中文, 繁體中文, 日本
 
 🔒 Confidentialité d'Abord
 
-Image Harvest traite tout localement dans votre navigateur. Aucune image, URL ni donnée personnelle ne quitte votre appareil. Les statistiques d'utilisation anonymes (optionnelles ; simple comptage d'événements — sans URL, images ni identifiants) peuvent être activées dans Paramètres → Contribuer à l'amélioration ; désactivées par défaut.
+Image Harvest traite tout localement dans votre navigateur. Aucune image, URL ni donnée personnelle ne quitte votre appareil. Les statistiques d'utilisation anonymes (simple comptage d'événements — sans URL, images ni identifiants) sont envoyées par défaut pour contribuer à l'amélioration ; vous pouvez les désactiver à tout moment dans Paramètres → Partager les données d'utilisation anonymes.
 
 ⌨️ Raccourcis Clavier
 

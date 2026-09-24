@@ -62,7 +62,7 @@ Fully translated into 15 languages: English, 简体中文, 繁體中文, 日本�
 
 🔒 Privacy First
 
-Image Harvest processes everything locally in your browser. No images, URLs, or personal data ever leave your device. Optional anonymous usage statistics (event counts only — no URLs, no images, no identifiers) can be enabled in Settings → Help Improve; off by default.
+Image Harvest processes everything locally in your browser. No images, URLs, or personal data ever leave your device. Anonymous usage statistics (event counts only — no URLs, no images, no identifiers) are sent by default to help improve the extension; you can switch them off anytime in Settings → Share anonymous usage data.
 
 ⌨️ Keyboard Shortcuts
 

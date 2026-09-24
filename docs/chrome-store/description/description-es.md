@@ -62,7 +62,7 @@ Traducido por completo a 15 idiomas: English, 简体中文, 繁體中文, 日本
 
 🔒 Privacidad Primero
 
-Image Harvest procesa todo localmente en tu navegador. Ninguna imagen, URL ni dato personal sale de tu dispositivo. Las estadísticas anónimas de uso opcionales (solo recuentos de eventos — sin URLs, imágenes ni identificadores) pueden activarse en Ajustes → Ayudar a mejorar; desactivadas por defecto.
+Image Harvest procesa todo localmente en tu navegador. Ninguna imagen, URL ni dato personal sale de tu dispositivo. Las estadísticas anónimas de uso (solo recuentos de eventos — sin URLs, imágenes ni identificadores) se envían por defecto para ayudar a mejorar la extensión; puedes desactivarlas en cualquier momento en Ajustes → Compartir datos de uso anónimos.
 
 ⌨️ Atajos de Teclado
 

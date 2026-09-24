@@ -62,7 +62,7 @@ Tradotto completamente in 15 lingue: English, 简体中文, 繁體中文, 日本
 
 🔒 Prima la Privacy
 
-Image Harvest elabora tutto localmente nel tuo browser. Nessuna immagine, URL o dato personale lascia il tuo dispositivo. Le statistiche anonime di utilizzo facoltative (solo conteggi di eventi — senza URL, immagini o identificatori) si attivano da Impostazioni → Contribuisci al miglioramento; disattivate per impostazione predefinita.
+Image Harvest elabora tutto localmente nel tuo browser. Nessuna immagine, URL o dato personale lascia il tuo dispositivo. Le statistiche anonime di utilizzo (solo conteggi di eventi — senza URL, immagini o identificatori) vengono inviate per impostazione predefinita; puoi disattivarle in qualsiasi momento da Impostazioni → Condividi dati di utilizzo anonimi.
 
 ⌨️ Scorciatoie da Tastiera
 

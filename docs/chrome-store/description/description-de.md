@@ -62,7 +62,7 @@ Vollständig übersetzt in 15 Sprachen: English, 简体中文, 繁體中文, 日
 
 🔒 Privatsphäre zuerst
 
-Image Harvest verarbeitet alles lokal in deinem Browser. Keine Bilder, URLs oder persönlichen Daten verlassen dein Gerät. Optionale anonyme Nutzungsstatistiken (nur Ereigniszähler — keine URLs, Bilder oder Kennungen) lassen sich unter Einstellungen → Verbesserung unterstützen aktivieren; standardmäßig deaktiviert.
+Image Harvest verarbeitet alles lokal in deinem Browser. Keine Bilder, URLs oder persönlichen Daten verlassen dein Gerät. Anonyme Nutzungsstatistiken (nur Ereigniszähler — keine URLs, Bilder oder Kennungen) werden standardmäßig gesendet, um die Erweiterung zu verbessern; du kannst sie jederzeit unter Einstellungen → Anonyme Nutzungsdaten teilen deaktivieren.
 
 ⌨️ Tastenkürzel
 
