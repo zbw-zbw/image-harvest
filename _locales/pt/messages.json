@@ -1544,6 +1544,9 @@
   "trial_grace_upgrade_btn": {
     "message": "Upgrade Now"
   },
+  "trial_value_moment_message": {
+    "message": "Você baixou {count} imagens de uma vez. Restam {days} dia(s) da sua avaliação do Pro."
+  },
   "trial_expiry_warning": {
     "message": "Your free Pro trial ends in {days} day(s). Upgrade now to keep Pro features."
   },

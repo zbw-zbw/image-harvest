@@ -529,6 +529,27 @@ export async function downloadSelectedAsZip(
     // Batch completion is the strongest "moment of delight" — re-check the
     // rating gate immediately instead of waiting for the next panel open.
     if (successCount > 0) state.ratingCheckTick += 1;
+    // Trial value-moment banner (B-plan): for trial users a ≥50-image batch
+    // completion surfaces the trial countdown + Pro anchor right at the
+    // moment of delight. isProUser includes trial users; getTrialState()
+    // then filters out paid plans (returns null unless plan === 'trial').
+    // FREE users can also legally hit exactly 50 (MAX_ZIP_IMAGES) — the
+    // isProUser gate excludes them. Isolated IIFE: a failure here must not
+    // affect the download-completion toast path.
+    if (successCount >= 50 && state.isProUser) {
+      void (async () => {
+        try {
+          const { getTrialState } = await import('../shared/trial');
+          const snap = await getTrialState();
+          if (!snap || !snap.active) return;
+          const daysRemaining = Math.max(1, Math.ceil(snap.msRemaining / 86_400_000));
+          state.trialValueMoment = { count: successCount, daysRemaining };
+          void track(EVENTS.TRIAL_VALUE_MOMENT_SHOWN, { count: successCount, daysRemaining });
+        } catch {
+          // Storage/license read failure — the banner is best-effort UI.
+        }
+      })();
+    }
     if (targetFormat && !state.isProUser) {
       import('../shared/feature-quota').then(({ incrementFeatureUsage }) =>
         incrementFeatureUsage('formatConvert')

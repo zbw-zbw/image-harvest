@@ -1544,6 +1544,9 @@
   "trial_grace_upgrade_btn": {
     "message": "Upgrade Now"
   },
+  "trial_value_moment_message": {
+    "message": "이미지 {count}개를 한 번에 다운로드했습니다. Pro 체험판이 {days}일 남았습니다."
+  },
   "trial_expiry_warning": {
     "message": "Your free Pro trial ends in {days} day(s). Upgrade now to keep Pro features."
   },

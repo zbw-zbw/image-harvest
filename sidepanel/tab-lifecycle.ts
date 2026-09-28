@@ -293,6 +293,9 @@ export async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Pr
 
   // Clear stale toasts from the previous tab
   state.toasts = [];
+  // …and the trial value-moment banner — it belongs to the tab that earned
+  // it, and a user switching tabs has moved on from the moment of delight.
+  state.trialValueMoment = null;
 
   // Cancel any pending "new images discovered" debounce timer
   cancelDiscoveredToast();

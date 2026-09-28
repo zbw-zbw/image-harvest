@@ -1544,6 +1544,9 @@
   "trial_grace_upgrade_btn": {
     "message": "Upgrade Now"
   },
+  "trial_value_moment_message": {
+    "message": "आपने {count} चित्र एक बार में डाउनलोड किए। आपके Pro ट्रायल में {days} दिन बचे हैं।"
+  },
   "trial_expiry_warning": {
     "message": "Your free Pro trial ends in {days} day(s). Upgrade now to keep Pro features."
   },

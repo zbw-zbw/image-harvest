@@ -22,6 +22,13 @@ HTML document — it omits the surrounding
              height-zero div in the common case. -->
         <div id="referral-banner-mount" data-preact-mount="referral-banner-mount"></div>
         <div id="soft-paywall-banner-mount" data-preact-mount="soft-paywall-banner-mount"></div>
+        <!-- Trial value-moment banner (B-plan). Same no-op slot pattern:
+             renders null until a trial user completes a ≥50-image batch
+             download, then shows the amber value line + Pro anchor. -->
+        <div
+          id="trial-value-moment-banner-mount"
+          data-preact-mount="trial-value-moment-banner-mount"
+        ></div>
         <!-- Toolbar Row 1: Pro status (left) + Live + PRO actions + Settings (right) -->
         <div class="toolbar toolbar-actions">
           <!-- Pro Status Area (left side) -->

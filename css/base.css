@@ -667,6 +667,48 @@
 }
 
 /* ============================================
+   Trial Value-Moment Banner (B-plan 2026-09-28)
+   Shown right after a trial user completes a ≥50-image batch download —
+   the "moment of delight" touchpoint. Same amber language as the warning
+   and grace banners so all three trial stages read as one family, with a
+   success-tone message body (the user just accomplished something big).
+   ============================================ */
+.trial-value-moment-banner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--trial-banner-bg);
+  border-bottom: 1px solid var(--trial-banner-border);
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.trial-value-moment-text {
+  color: var(--amber-muted);
+  font-weight: 500;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.trial-value-moment-btn {
+  flex-shrink: 0;
+  font-size: 11px;
+  padding: 4px 10px;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme]) .trial-value-moment-text {
+    color: var(--amber-light);
+  }
+}
+
+:root[data-theme='dark'] .trial-value-moment-text {
+  color: var(--amber-light);
+}
+
+/* ============================================
    Onboarding Coach Marks (Phase 2a activation)
    Fixed to the panel bottom so it never fights the toolbar or the image
    grid's scroll position, and stays visible while the user selects images.

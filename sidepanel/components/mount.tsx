@@ -23,6 +23,7 @@ import { ProUpgradeModal } from './ProUpgradeModal';
 // is opt-in by default with a Settings toggle; see shared/telemetry.ts)
 import { SoftPaywallBanner } from './SoftPaywallBanner';
 import { TrialGraceBanner } from './TrialGraceBanner';
+import { TrialValueMomentBanner } from './TrialValueMomentBanner';
 import { GalleryResolveBar } from './GalleryResolveBar';
 import { BatchUrlCopyButton } from './BatchUrlCopyButton';
 import { EagleExportButton } from './EagleExportButton';
@@ -196,6 +197,10 @@ export function mountPreactComponents(): void {
   // is missing (popup variant or hot-reload race).
   mountSoftPaywallBanner();
   mountTrialGraceBanner();
+  // Trial value-moment banner (B-plan): mounts alongside the other trial
+  // banners but renders null until actions.ts sets state.trialValueMoment
+  // after a ≥50-image batch download by a trial user.
+  mountTrialValueMomentBanner();
   mountReferralBanner();
   // Link penetration (v1.1.0): gallery-link hint bar below the filters.
   mountGalleryResolveBar();
@@ -277,6 +282,21 @@ function mountTrialGraceBanner(): void {
   mount.dataset.preactMount = 'trial-grace-banner-mount';
   app.insertBefore(mount, app.firstChild);
   renderSafe(<TrialGraceBanner />, mount, 'trial-grace-banner-mount');
+}
+
+function mountTrialValueMomentBanner(): void {
+  const slot = document.getElementById('trial-value-moment-banner-mount');
+  if (slot) {
+    renderSafe(<TrialValueMomentBanner />, slot, 'trial-value-moment-banner-mount');
+    return;
+  }
+  const app = document.getElementById('app');
+  if (!app) return;
+  const mount = document.createElement('div');
+  mount.id = 'trial-value-moment-banner-mount';
+  mount.dataset.preactMount = 'trial-value-moment-banner-mount';
+  app.insertBefore(mount, app.firstChild);
+  renderSafe(<TrialValueMomentBanner />, mount, 'trial-value-moment-banner-mount');
 }
 
 function mountReferralBanner(): void {

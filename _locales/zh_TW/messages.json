@@ -1166,6 +1166,9 @@
   "trial_grace_upgrade_btn": {
     "message": "立即升級"
   },
+  "trial_value_moment_message": {
+    "message": "一次下載了 {count} 張圖片。Pro 試用還剩 {days} 天。"
+  },
   "trial_expiry_warning": {
     "message": "試用即將結束：{days} 天後 Pro 功能將暫停。立即升級以保留全部功能。"
   },

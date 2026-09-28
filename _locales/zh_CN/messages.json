@@ -818,6 +818,9 @@
   "trial_grace_upgrade_btn": {
     "message": "立即升级"
   },
+  "trial_value_moment_message": {
+    "message": "一次性下载了 {count} 张图片。Pro 试用还剩 {days} 天。"
+  },
   "trial_expiry_warning": {
     "message": "试用即将结束：{days} 天后 Pro 功能将暂停。立即升级以保留全部功能。"
   },

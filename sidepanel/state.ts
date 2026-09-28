@@ -397,6 +397,14 @@ export interface SidepanelState {
   isProUser: boolean;
   inTrialGracePeriod: boolean;
   trialGraceDaysRemaining: number;
+  /**
+   * Trial value-moment banner (B-plan): set right after a trial user
+   * completes a ≥50-image batch download, null otherwise. Cleared on tab
+   * switch together with toasts — the banner belongs to the tab that
+   * earned it. The ONLY in-trial conversion touchpoint (SoftPaywallBanner
+   * short-circuits on isProUser).
+   */
+  trialValueMoment: { count: number; daysRemaining: number } | null;
 
   // AI tagging
   aiQuotaRemaining: number;
@@ -530,6 +538,7 @@ function createInitialState(): SidepanelState {
     isProUser: false,
     inTrialGracePeriod: false,
     trialGraceDaysRemaining: 0,
+    trialValueMoment: null,
 
     aiQuotaRemaining: 100,
     aiQuotaLimit: 100,

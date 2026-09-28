@@ -60,6 +60,15 @@ export const EVENTS = {
   // conversion touchpoint. Same once/day/install throttle as grace.
   TRIAL_EXPIRY_WARNING_SHOWN: 'trial_expiry_warning_shown', // props: { daysRemaining: number }
   TRIAL_EXPIRY_CTA_CLICKED: 'trial_expiry_cta_clicked', // props: { daysRemaining: number }
+  // Trial value moment (B-plan, 2026-09-28): a big batch download's
+  // completion is the strongest "moment of delight" — trial users see a
+  // non-blocking banner there ("Downloaded N images · X days left") with
+  // a Pro anchor. Trial users see NO other touchpoint mid-trial
+  // (SoftPaywallBanner short-circuits on isProUser), so these are the
+  // only in-trial conversion signals. NOT throttled: each trigger is a
+  // real reach (≥50-image batches are naturally rare).
+  TRIAL_VALUE_MOMENT_SHOWN: 'trial_value_moment_shown', // props: { count: number, daysRemaining: number }
+  TRIAL_VALUE_MOMENT_CTA_CLICKED: 'trial_value_moment_cta_clicked', // props: { count: number, daysRemaining: number }
 
   // Welcome page (Phase 2)
   WELCOME_PAGE_VIEWED: 'welcome_page_viewed', // props: { source: string }
@@ -196,6 +205,8 @@ export const EVENT_PROP_SCHEMAS: Record<TelemetryEventName, readonly string[]> =
   [EVENTS.TRIAL_GRACE_CTA_CLICKED]: ['abBucket'],
   [EVENTS.TRIAL_EXPIRY_WARNING_SHOWN]: ['daysRemaining', 'abBucket'],
   [EVENTS.TRIAL_EXPIRY_CTA_CLICKED]: ['daysRemaining', 'abBucket'],
+  [EVENTS.TRIAL_VALUE_MOMENT_SHOWN]: ['count', 'daysRemaining', 'abBucket'],
+  [EVENTS.TRIAL_VALUE_MOMENT_CTA_CLICKED]: ['count', 'daysRemaining', 'abBucket'],
 
   [EVENTS.WELCOME_PAGE_VIEWED]: ['source'],
   [EVENTS.WELCOME_CTA_CLICKED]: ['action'],

@@ -1169,6 +1169,9 @@
   "trial_grace_upgrade_btn": {
     "message": "Actualizar ahora"
   },
+  "trial_value_moment_message": {
+    "message": "Has descargado {count} imágenes de una vez. A tu prueba de Pro le quedan {days} día(s)."
+  },
   "trial_expiry_warning": {
     "message": "Su prueba termina en {days} día(s). Actualice ahora para conservar las funciones Pro."
   },
