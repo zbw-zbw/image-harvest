@@ -14,6 +14,19 @@
 // 200 and never touch the network, no matter which module captured fetch
 // or when.
 //
+// Rule 2 (2026-09-28 incident): hostname matching alone is NOT enough.
+// constants.ts derives API_BASE from import.meta.env.VITE_API_BASE
+// (.env.local exists for local dev), so a test run executed while
+// VITE_API_BASE=http://localhost:3000 and a local Next.js dev server
+// (wired to the PRODUCTION Supabase keys) was up sent test telemetry to
+// that dev server — which relayed it into the production tables. Exactly
+// that leaked 12 license_activated rows (version=0.0.0, plan=yearly mock
+// value) on 2026-09-13/24-25, invisible to the hostname rule because the
+// host was localhost. ALL extension↔backend data calls live under the
+// /api/v1/ surface path (see constants.ts API_V1_BASE), so we block that
+// path on ANY host. Eagle's local API on localhost:41595 does not use
+// /api/v1 — unaffected.
+//
 // tests/prod-api-guard.test.ts asserts this file is wired into
 // vitest.config.ts setupFiles — keep both or neither.
 
@@ -30,13 +43,33 @@ if (!globalThis.__prodApiFetchBlocked) {
   globalThis.__prodApiFetchBlocked = true;
   const realFetch = globalThis.fetch.bind(globalThis);
 
+  // Surface the misconfiguration itself, loudly: tests running with an
+  // overridden API base are how the 2026-09-28 leak started.
+  const envBase = (import.meta.env?.VITE_API_BASE as string | undefined) ?? undefined;
+  if (envBase) {
+    console.warn(
+      `[block-prod-api] VITE_API_BASE=${envBase} is set — unit tests are running with an overridden API base (2026-09-28 leak vector). /api/v1/* requests are force-blocked regardless of host.`
+    );
+  }
+
   globalThis.fetch = (async (input: RequestInfo | URL, init?: RequestInit) => {
     const url = typeof input === 'string' ? input : input instanceof URL ? input.href : input.url;
     try {
-      const { hostname } = new URL(url);
-      // All production surfaces (extension API + website) live under
-      // kyriewen.cn. Unit tests must never reach any of them.
-      if (hostname === 'kyriewen.cn' || hostname.endsWith('.kyriewen.cn')) {
+      const { hostname, pathname } = new URL(url);
+      // Rule 1: All production surfaces (extension API + website) live
+      // under kyriewen.cn. Unit tests must never reach any of them.
+      // Rule 2: The /api/v1/* surface path is the extension↔backend data
+      // API on whatever host API_BASE resolved to (VITE_API_BASE can point
+      // it at a local dev server with production credentials). Block it on
+      // ANY host — see header comment for the 2026-09-28 incident.
+      const isProdHost = hostname === 'kyriewen.cn' || hostname.endsWith('.kyriewen.cn');
+      const isApiV1Path = pathname === '/api/v1' || pathname.startsWith('/api/v1/');
+      if (isProdHost || isApiV1Path) {
+        if (!isProdHost) {
+          console.warn(
+            `[block-prod-api] blocked /api/v1 request to non-production host ${hostname} (${pathname}) — tests must never write to a real backend.`
+          );
+        }
         return new Response(JSON.stringify({ ok: true }), {
           status: 200,
           headers: { 'content-type': 'application/json' },
