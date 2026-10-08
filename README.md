@@ -22,6 +22,9 @@
   <a href="https://chromewebstore.google.com/detail/iecgnjidmogebokcfnejncgnelcepffo">
     <img src="https://img.shields.io/chrome-web-store/rating/iecgnjidmogebokcfnejncgnelcepffo?label=rating&color=4285F4" alt="Chrome Web Store rating">
   </a>
+  <a href="https://microsoftedge.microsoft.com/addons/detail/image-harvest-download-/ldcpblieinfbpgachbnnbaphkagfemaj">
+    <img src="https://img.shields.io/badge/Edge%20Add-ons-Available-0078D7?logo=microsoftedge&logoColor=white" alt="Microsoft Edge Add-ons">
+  </a>
   <a href="https://github.com/zbw-zbw/image-harvest/stargazers">
     <img src="https://img.shields.io/github/stars/zbw-zbw/image-harvest?style=flat&logo=github&color=yellow" alt="GitHub stars">
   </a>
@@ -41,6 +44,10 @@
 <p align="center">
   <a href="https://chromewebstore.google.com/detail/iecgnjidmogebokcfnejncgnelcepffo">
     <strong>🛒 Install from Chrome Web Store</strong>
+  </a>
+  &nbsp;·&nbsp;
+  <a href="https://microsoftedge.microsoft.com/addons/detail/image-harvest-download-/ldcpblieinfbpgachbnnbaphkagfemaj">
+    <strong>🧭 Install for Microsoft Edge</strong>
   </a>
   &nbsp;·&nbsp;
   <a href="https://image-harvest.kyriewen.cn">
@@ -285,7 +292,17 @@ To install in Chrome: `chrome://extensions/` → Developer mode → **Load unpac
 
 > Enjoying Image Harvest? Please consider [leaving a review](https://chromewebstore.google.com/detail/iecgnjidmogebokcfnejncgnelcepffo/reviews) — it helps a lot for a small solo project. 🙏
 
-### Option 2: From Source (Developer Mode)
+### Option 2: Microsoft Edge Add-ons
+
+[![Install from Microsoft Edge Add-ons](https://img.shields.io/badge/Edge%20Add-ons-Install%20Image%20Harvest-0078D7?style=for-the-badge&logo=microsoftedge&logoColor=white)](https://microsoftedge.microsoft.com/addons/detail/image-harvest-download-/ldcpblieinfbpgachbnnbaphkagfemaj)
+
+1. Visit the [Edge Add-ons listing](https://microsoftedge.microsoft.com/addons/detail/image-harvest-download-/ldcpblieinfbpgachbnnbaphkagfemaj)
+2. Click **Get**
+3. Pin the extension to your toolbar for quick access
+
+> Enjoying Image Harvest? Please consider [leaving a review](https://microsoftedge.microsoft.com/addons/detail/image-harvest-download-/ldcpblieinfbpgachbnnbaphkagfemaj) — it helps a lot for a small solo project. 🙏
+
+### Option 3: From Source (Developer Mode)
 
 1. **Clone the repository**
 

@@ -1,5 +1,7 @@
 # Microsoft Edge Add-ons 上架核对单（v1.2.0）
 
+> 状态：**已上架**（2026-10-08 过审，v1.2.0）。
+> 正式 URL：https://microsoftedge.microsoft.com/addons/detail/image-harvest-download-/ldcpblieinfbpgachbnnbaphkagfemaj
 > 目标：把 Image Harvest 提交到 Microsoft Edge Add-ons（Partner Center）。
 > 标注 **owner** 的条目需要人工在 Partner Center 网页操作，不在代码仓库内完成。
 
@@ -33,17 +35,18 @@
 ## 4. 提交后跟进
 
 - [x] 在下方「提交记录」表登记提交日期与认证状态（2026-09-24）
-- [ ] 官网下载区追加 Edge CTA：复用 hero 区现有 CTA 模式（`src/messages/en.json` 的 `installButton` 文案结构 + chromewebstore 链接位），新增并列按钮 "Install for Edge"，href 先指向 `#edge-coming-soon`，上架通过后替换为正式商店 URL —— 走独立小 PR，**不阻塞** v1.2.0 插件提审
-- [ ] 上架通过后：正式商店 URL 回填官网 CTA + README 徽章区 + 本文件状态改为「已上架」
+- [x] 官网下载区追加 Edge CTA：2026-10-08 过审后直接落地为 hero 区 freeNote 下的低调文本链接（`alsoOnEdge`，`src/components/hero-with-gif.tsx`），直链正式商店 URL，不与主 CTA 竞争；未走「并列按钮 + #edge-coming-soon 占位」方案（过审前无必要占位）
+- [x] 上架通过后：正式商店 URL 回填官网 CTA + README 徽章区 + 本文件状态改为「已上架」（2026-10-08 完成：官网 hero CTA、README/README.zh-CN 徽章区 + 链接行 + 安装段 Option 2）
 
 ## 提交记录
 
-| 日期       | 版本  | 状态      | 备注                                                                                                                 |
-| ---------- | ----- | --------- | -------------------------------------------------------------------------------------------------------------------- |
-| 2026-09-24 | 1.2.0 | In review | Store ID `0RDCKDQGR9XG`；CRX ID `ldcpblieinfbpgachbnnbaphkagfemaj`；官方审核期最长 7 个工作日；过审后 Store URL 可用 |
+| 日期       | 版本  | 状态      | 备注                                                                                                                                                                                                          |
+| ---------- | ----- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-09-24 | 1.2.0 | In review | Store ID `0RDCKDQGR9XG`；CRX ID `ldcpblieinfbpgachbnnbaphkagfemaj`；官方审核期最长 7 个工作日；过审后 Store URL 可用                                                                                          |
+| 2026-10-08 | 1.2.0 | Approved  | 约 14 天过审（含十一假期）；正式 URL 按 CRX ID 路由（slug 段为规范 slug `image-harvest-download-`，与 Store ID 无关）；已回填官网 hero + README；商店页确认 15 语言、v1.2.0、Updated 2026-09-24、描述全文一致 |
 
 Edge 后台关键凭据（过审后回填官网/README 用）：
 
 - Store ID: `0RDCKDQGR9XG`
 - CRX ID: `ldcpblieinfbpgachbnnbaphkagfemaj`
-- 正式商店 URL：过审后生成（`https://microsoftedge.microsoft.com/addons/detail/.../0RDCKDQGR9XG`）
+- 正式商店 URL：`https://microsoftedge.microsoft.com/addons/detail/image-harvest-download-/ldcpblieinfbpgachbnnbaphkagfemaj`（2026-10-08 过审生成；注意 storefront 按 CRX ID 路由，用 Store ID 拼 URL 会 404）

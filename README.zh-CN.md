@@ -22,6 +22,9 @@
   <a href="https://chromewebstore.google.com/detail/iecgnjidmogebokcfnejncgnelcepffo">
     <img src="https://img.shields.io/chrome-web-store/rating/iecgnjidmogebokcfnejncgnelcepffo?label=rating&color=4285F4" alt="Chrome Web Store 评分">
   </a>
+  <a href="https://microsoftedge.microsoft.com/addons/detail/image-harvest-download-/ldcpblieinfbpgachbnnbaphkagfemaj">
+    <img src="https://img.shields.io/badge/Edge%20Add-ons-Available-0078D7?logo=microsoftedge&logoColor=white" alt="Microsoft Edge 加载项">
+  </a>
   <a href="https://github.com/zbw-zbw/image-harvest/stargazers">
     <img src="https://img.shields.io/github/stars/zbw-zbw/image-harvest?style=flat&logo=github&color=yellow" alt="GitHub stars">
   </a>
@@ -41,6 +44,10 @@
 <p align="center">
   <a href="https://chromewebstore.google.com/detail/iecgnjidmogebokcfnejncgnelcepffo">
     <strong>🛒 从 Chrome Web Store 安装</strong>
+  </a>
+  &nbsp;·&nbsp;
+  <a href="https://microsoftedge.microsoft.com/addons/detail/image-harvest-download-/ldcpblieinfbpgachbnnbaphkagfemaj">
+    <strong>🧭 从 Microsoft Edge 加载项安装</strong>
   </a>
   &nbsp;·&nbsp;
   <a href="./docs/README.md">
@@ -189,7 +196,15 @@
 
 > 喜欢 Image Harvest？欢迎 [留下一条评价](https://chromewebstore.google.com/detail/iecgnjidmogebokcfnejncgnelcepffo/reviews) —— 这对一个独立开发的小项目意义重大。🙏
 
-### 方式二：源码加载（开发者模式）
+### 方式二：Microsoft Edge 加载项
+
+[![从 Microsoft Edge 加载项安装](https://img.shields.io/badge/Edge%20Add-ons-安装%20Image%20Harvest-0078D7?style=for-the-badge&logo=microsoftedge&logoColor=white)](https://microsoftedge.microsoft.com/addons/detail/image-harvest-download-/ldcpblieinfbpgachbnnbaphkagfemaj)
+
+1. 访问 [Edge 加载项页面](https://microsoftedge.microsoft.com/addons/detail/image-harvest-download-/ldcpblieinfbpgachbnnbaphkagfemaj)
+2. 点击 **获取**
+3. 将插件固定到工具栏以便快速访问
+
+### 方式三：源码加载（开发者模式）
 
 1. **克隆仓库**
 
