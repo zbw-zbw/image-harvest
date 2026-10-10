@@ -360,7 +360,7 @@ Image Harvest 的官方营销站（着陆页、定价、常见问题、License �
 
 完整发布历史详见 [CHANGELOG.md](./CHANGELOG.md)。
 
-**最新版本**：`v1.1.8` —— 🐛 试用到期触点修复：到期日当天不再静默，面板会明确提示「试用今日到期」，衔接过期后的宽限提示。完整列表见 [CHANGELOG.md](./CHANGELOG.md)。
+**最新版本**：`v1.2.1` —— ✨ 试用价值时刻横幅：批量下载 ≥50 张完成时展示「已下载 N 张 · 试用剩 X 天」与一键升级入口；🌐 扩展已上架 Microsoft Edge 加载项。完整列表见 [CHANGELOG.md](./CHANGELOG.md)。
 
 ---
 

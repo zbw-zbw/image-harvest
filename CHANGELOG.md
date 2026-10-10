@@ -58,6 +58,22 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
+## [1.2.1] — 2026-10-10
+
+### ✨ Added
+
+- **A nudge at the moment your trial proves its worth**: finish a big batch download (50+ images at once) while your trial is active, and the panel joins the celebration — "Downloaded N images · X days left in your trial" — with a one-click path to keep it all with Pro. It never interrupts the download itself, and it only appears for big harvests (free users never see it).
+
+### 🌍 i18n
+
+- The value-moment banner message is translated into all 15 supported languages.
+
+### 🧪 Test Coverage Expansion
+
+- New component tests pin the banner's lifecycle: no render without a trigger, the correct count/days display, and the CTA's telemetry payload plus upgrade-dialog handoff.
+
+---
+
 ## [1.2.0] — 2026-09-22
 
 ### ✨ Added

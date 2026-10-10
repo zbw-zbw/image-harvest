@@ -94,11 +94,11 @@
 
 ---
 
-## 🆕 What's New (v1.1.8)
+## 🆕 What's New (v1.2.1)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
-- ⏳ **The trial reminder speaks up on the last day** — the "trial ends in N days" notice no longer disappears on your trial's final day; it now clearly says the trial ends today, closing a silent gap before the post-expiry banner takes over.
+- 🌾 **The panel celebrates your biggest harvests**: during your trial, finish a 50+ image batch download and a friendly banner appears — "Downloaded N images · X days left" — with a one-click path to keep the full power with Pro.
 
 ---
 
@@ -458,7 +458,7 @@ The marketing site for Image Harvest (landing page, pricing, FAQ, license activa
 
 See [CHANGELOG.md](./CHANGELOG.md) for the full release history.
 
-**Latest**: `v1.0.7` — 🐛 Bug fixes (download count, highlight, grid threshold), ⭐ Collection batch operations, 📊 Free vs Pro alignment across all surfaces. See [CHANGELOG.md](./CHANGELOG.md) for the full list.
+**Latest**: `v1.2.1` — ✨ Trial value-moment banner (50+ image batch downloads), 🌐 Now also on Microsoft Edge Add-ons. See [CHANGELOG.md](./CHANGELOG.md) for the full list.
 
 ---
 
