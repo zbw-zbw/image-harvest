@@ -144,6 +144,18 @@ export const EVENTS = {
   DEEP_SCAN_COMPLETED: 'deep_scan_completed', // props: { count, newCount, steps, durationMs, stopReason }
   DEEP_SCAN_CANCELLED: 'deep_scan_cancelled', // props: { steps, durationMs }
 
+  // Growth experiments (2026-10-13 batch, from the full-funnel audit of
+  // 1070 installs): 455 installs scanned but never downloaded — the
+  // biggest funnel break. The download nudge bar is a prominent CTA strip
+  // above the image grid after every completed scan.
+  DOWNLOAD_NUDGE_SHOWN: 'download_nudge_shown', // props: { count: number }
+  DOWNLOAD_NUDGE_CTA_CLICKED: 'download_nudge_cta_clicked', // props: { count: number }
+  DOWNLOAD_NUDGE_DISMISSED: 'download_nudge_dismissed', // props: { count: number }
+  // Win-back hero for expired trials inside ProUpgradeModal (575/692
+  // trials expired with no re-engagement touchpoint once grace ends).
+  // Click telemetry reuses pro_upsell_cta_clicked with cta='winback_pricing'.
+  PRO_WINBACK_SHOWN: 'pro_winback_shown', // props: { count: number }
+
   // Referral / Share-to-Earn
   REFERRAL_LINK_COPIED: 'referral_link_copied',
   REFERRAL_LINK_SHARED: 'referral_link_shared', // props: { method: string }
@@ -253,6 +265,12 @@ export const EVENT_PROP_SCHEMAS: Record<TelemetryEventName, readonly string[]> =
   [EVENTS.DEEP_SCAN_TRIGGERED]: [],
   [EVENTS.DEEP_SCAN_COMPLETED]: ['count', 'newCount', 'steps', 'durationMs', 'stopReason'],
   [EVENTS.DEEP_SCAN_CANCELLED]: ['steps', 'durationMs'],
+  // Growth experiments (2026-10-13) — abBucket declared for the same
+  // "overdeclare now, avoid backfill later" reason as the funnel events.
+  [EVENTS.DOWNLOAD_NUDGE_SHOWN]: ['count', 'abBucket'],
+  [EVENTS.DOWNLOAD_NUDGE_CTA_CLICKED]: ['count', 'abBucket'],
+  [EVENTS.DOWNLOAD_NUDGE_DISMISSED]: ['count', 'abBucket'],
+  [EVENTS.PRO_WINBACK_SHOWN]: ['count', 'abBucket'],
   [EVENTS.REFERRAL_LINK_COPIED]: [],
   [EVENTS.REFERRAL_LINK_SHARED]: ['method'],
   [EVENTS.REFERRAL_CLAIMED]: ['bonusDays'],
