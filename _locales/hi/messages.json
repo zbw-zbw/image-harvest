@@ -506,20 +506,35 @@
   "rating_close": {
     "message": "बंद करें"
   },
-  "rating_desc": {
-    "message": "अगर हमने आपका समय बचाया है, तो Chrome Web Store पर एक 5-स्टार समीक्षा हमारे लिए बहुत मायने रखेगी।"
-  },
   "rating_later": {
     "message": "बाद में"
   },
   "rating_never": {
     "message": "दोबारा न पूछें"
   },
-  "rating_rate_now": {
-    "message": "Chrome Store पर रेट करें"
+  "nudge_download_message": {
+    "message": "{count} इमेज डाउनलोड के लिए तैयार हैं"
+  },
+  "nudge_download_cta": {
+    "message": "सभी डाउनलोड करें"
   },
   "rating_title": {
-    "message": "Image Harvest पसंद आ रहा है?"
+    "message": "Image Harvest कैसा लग रहा है?"
+  },
+  "rating_desc": {
+    "message": "आपने अब तक {count} इमेज सेव की हैं। अगर यह उपयोगी लगा है, तो Chrome Web Store पर एक छोटी रेटिंग दें — इससे दूसरों को इसे खोजने में मदद मिलेगी।"
+  },
+  "rating_rate_now": {
+    "message": "Image Harvest को रेट करें"
+  },
+  "winback_message": {
+    "message": "आपने Image Harvest के साथ {count} इमेज सेव की हैं। Pro पूरा टूलकिट वापस लाता है — असीमित बैच ZIP, डीप स्कैन और भी बहुत कुछ।"
+  },
+  "winback_message_generic": {
+    "message": "आपका Pro टूलकिट आपका इंतज़ार कर रहा है — असीमित बैच ZIP, डीप स्कैन और भी बहुत कुछ।"
+  },
+  "winback_cta": {
+    "message": "Pro पाएं"
   },
   "restricted_feature_batch_desc": {
     "message": "एक क्लिक में किसी भी वेबपेज से सभी छवियां चुनें और डाउनलोड करें। आकार, फॉर्मेट, या लेआउट से फ़िल्टर करें।"
@@ -946,6 +961,9 @@
   },
   "toast_deep_scan_new": {
     "message": "डीप स्कैन में {count} नई छवियां मिलीं"
+  },
+  "toast_deep_scan_none": {
+    "message": "डीप स्कैन पूरा हुआ — कोई नई इमेज नहीं मिली"
   },
   "toast_deep_scan_failed": {
     "message": "डीप स्कैन विफल — खोजी गई छवियां सुरक्षित हैं"

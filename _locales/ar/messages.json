@@ -506,20 +506,35 @@
   "rating_close": {
     "message": "إغلاق"
   },
-  "rating_desc": {
-    "message": "إذا وفّرنا لك بعض الوقت، فإن تقييمًا سريعًا بـ 5 نجوم على Chrome Web Store سيعني لنا الكثير."
-  },
   "rating_later": {
     "message": "ربما لاحقًا"
   },
   "rating_never": {
     "message": "لا تسأل مجددًا"
   },
-  "rating_rate_now": {
-    "message": "قيّم على Chrome Store"
+  "nudge_download_message": {
+    "message": "{count} صور جاهزة للتنزيل"
+  },
+  "nudge_download_cta": {
+    "message": "تنزيل الكل"
   },
   "rating_title": {
-    "message": "هل تستمتع بـ Image Harvest؟"
+    "message": "ما رأيك في Image Harvest؟"
+  },
+  "rating_desc": {
+    "message": "لقد حفظت {count} صورة حتى الآن. إذا كان مفيدًا لك، فالتقييم على Chrome Web Store سيساعد الآخرين على اكتشافه."
+  },
+  "rating_rate_now": {
+    "message": "قيّم Image Harvest"
+  },
+  "winback_message": {
+    "message": "لقد حفظت {count} صورة باستخدام Image Harvest. يستعيد Pro مجموعة الأدوات الكاملة — ملفات ZIP دفعية غير محدودة، فحصًا عميقًا، والمزيد."
+  },
+  "winback_message_generic": {
+    "message": "مجموعة أدوات Pro في انتظارك — ملفات ZIP دفعية غير محدودة، فحصًا عميقًا، والمزيد."
+  },
+  "winback_cta": {
+    "message": "احصل على Pro"
   },
   "restricted_feature_batch_desc": {
     "message": "حدد وحمّل جميع الصور من أي صفحة ويب بنقرة واحدة. صفّي حسب الحجم أو الصيغة أو التخطيط."
@@ -946,6 +961,9 @@
   },
   "toast_deep_scan_new": {
     "message": "وجد الفحص العميق {count} صورًا جديدة"
+  },
+  "toast_deep_scan_none": {
+    "message": "اكتمل الفحص العميق — لم يتم العثور على صور جديدة"
   },
   "toast_deep_scan_failed": {
     "message": "فشل الفحص العميق — تم الاحتفاظ بالصور المكتشفة"

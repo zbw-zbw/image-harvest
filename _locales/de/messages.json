@@ -506,20 +506,35 @@
   "rating_close": {
     "message": "Schließen"
   },
-  "rating_desc": {
-    "message": "Wenn wir Ihnen Zeit gespart haben, würde uns eine 5-Sterne-Bewertung im Chrome Web Store sehr freuen."
-  },
   "rating_later": {
     "message": "Vielleicht später"
   },
   "rating_never": {
     "message": "Nicht mehr fragen"
   },
-  "rating_rate_now": {
-    "message": "Im Chrome Store bewerten"
+  "nudge_download_message": {
+    "message": "{count} Bilder zum Herunterladen bereit"
+  },
+  "nudge_download_cta": {
+    "message": "Alle herunterladen"
   },
   "rating_title": {
-    "message": "Gefällt Ihnen Image Harvest?"
+    "message": "Wie gefällt Ihnen Image Harvest?"
+  },
+  "rating_desc": {
+    "message": "Sie haben bisher {count} Bilder gespeichert. Wenn Image Harvest Ihnen geholfen hat, hilft eine kurze Bewertung im Chrome Web Store anderen, es zu entdecken."
+  },
+  "rating_rate_now": {
+    "message": "Image Harvest bewerten"
+  },
+  "winback_message": {
+    "message": "Sie haben {count} Bilder mit Image Harvest gespeichert. Pro stellt das komplette Toolkit wieder her — unbegrenzte Batch-ZIPs, Tiefenscans und mehr."
+  },
+  "winback_message_generic": {
+    "message": "Ihr Pro-Toolkit wartet auf Sie — unbegrenkte Batch-ZIPs, Tiefenscans und mehr."
+  },
+  "winback_cta": {
+    "message": "Pro holen"
   },
   "restricted_feature_batch_desc": {
     "message": "Wählen und laden Sie alle Bilder einer Webseite mit einem Klick herunter. Filtern Sie nach Größe, Format oder Layout."
@@ -946,6 +961,9 @@
   },
   "toast_deep_scan_new": {
     "message": "Tiefenscan hat {count} neue Bilder gefunden"
+  },
+  "toast_deep_scan_none": {
+    "message": "Tiefenscan abgeschlossen — keine neuen Bilder gefunden"
   },
   "toast_deep_scan_failed": {
     "message": "Tiefenscan fehlgeschlagen — gefundene Bilder bleiben erhalten"

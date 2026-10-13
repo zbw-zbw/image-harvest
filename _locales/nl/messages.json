@@ -506,20 +506,35 @@
   "rating_close": {
     "message": "Sluiten"
   },
-  "rating_desc": {
-    "message": "Als we je tijd hebben bespaard, zou een korte 5-sterren review op de Chrome Web Store heel veel voor ons betekenen."
-  },
   "rating_later": {
     "message": "Misschien later"
   },
   "rating_never": {
     "message": "Niet meer vragen"
   },
-  "rating_rate_now": {
-    "message": "Beoordeel op Chrome Store"
+  "nudge_download_message": {
+    "message": "{count} afbeeldingen klaar om te downloaden"
+  },
+  "nudge_download_cta": {
+    "message": "Alles downloaden"
   },
   "rating_title": {
-    "message": "Bevalt Image Harvest?"
+    "message": "Bevalt Image Harvest je?"
+  },
+  "rating_desc": {
+    "message": "Je hebt tot nu toe {count} afbeeldingen opgeslagen. Als het je heeft geholpen, helpt een korte beoordeling in de Chrome Web Store anderen om het te ontdekken."
+  },
+  "rating_rate_now": {
+    "message": "Beoordeel Image Harvest"
+  },
+  "winback_message": {
+    "message": "Je hebt {count} afbeeldingen opgeslagen met Image Harvest. Pro herstelt de volledige toolkit — onbeperkte batch-ZIP's, diepe scans en meer."
+  },
+  "winback_message_generic": {
+    "message": "Je Pro-toolkit staat voor je klaar — onbeperkte batch-ZIP's, diepe scans en meer."
+  },
+  "winback_cta": {
+    "message": "Pro nemen"
   },
   "restricted_feature_batch_desc": {
     "message": "Selecteer en download alle afbeeldingen van elke webpagina met één klik. Filter op grootte, formaat of layout."
@@ -946,6 +961,9 @@
   },
   "toast_deep_scan_new": {
     "message": "Diepe scan heeft {count} nieuwe afbeeldingen gevonden"
+  },
+  "toast_deep_scan_none": {
+    "message": "Diepe scan voltooid — geen nieuwe afbeeldingen gevonden"
   },
   "toast_deep_scan_failed": {
     "message": "Diepe scan mislukt — gevonden afbeeldingen blijven behouden"

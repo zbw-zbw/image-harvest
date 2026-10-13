@@ -506,20 +506,35 @@
   "rating_close": {
     "message": "ปิด"
   },
-  "rating_desc": {
-    "message": "หากเราช่วยประหยัดเวลาของคุณได้ รีวิว 5 ดาวบน Chrome Web Store จะมีความหมายมากสำหรับเรา"
-  },
   "rating_later": {
     "message": "ไว้ทีหลัง"
   },
   "rating_never": {
     "message": "ไม่ต้องถามอีก"
   },
-  "rating_rate_now": {
-    "message": "ให้คะแนนบน Chrome Store"
+  "nudge_download_message": {
+    "message": "มีรูปภาพ {count} รูปพร้อมดาวน์โหลด"
+  },
+  "nudge_download_cta": {
+    "message": "ดาวน์โหลดทั้งหมด"
   },
   "rating_title": {
-    "message": "ชอบ Image Harvest ไหม?"
+    "message": "Image Harvest ใช้แล้วเป็นอย่างไรบ้าง?"
+  },
+  "rating_desc": {
+    "message": "คุณบันทึกรูปภาพไปแล้ว {count} รูป หากมีประโยชน์กับคุณ การให้คะแนนบน Chrome Web Store จะช่วยให้คนอื่นค้นพบได้ง่ายขึ้น"
+  },
+  "rating_rate_now": {
+    "message": "ให้คะแนน Image Harvest"
+  },
+  "winback_message": {
+    "message": "คุณบันทึกรูปภาพไปแล้ว {count} รูปด้วย Image Harvest Pro จะคืนค่าชุดเครื่องมือครบทุกอย่าง — ZIP แบบแบตช์ไม่จำกัด สแกนเชิงลึก และอื่นๆ"
+  },
+  "winback_message_generic": {
+    "message": "ชุดเครื่องมือ Pro ของคุณกำลังรออยู่ — ZIP แบบแบตช์ไม่จำกัด สแกนเชิงลึก และอื่นๆ"
+  },
+  "winback_cta": {
+    "message": "รับ Pro"
   },
   "restricted_feature_batch_desc": {
     "message": "เลือกและดาวน์โหลดรูปภาพทั้งหมดจากหน้าเว็บใดก็ได้ในคลิกเดียว กรองตามขนาด รูปแบบ หรือเค้าโครง"
@@ -946,6 +961,9 @@
   },
   "toast_deep_scan_new": {
     "message": "สแกนเชิงลึกพบรูปภาพใหม่ {count} รูป"
+  },
+  "toast_deep_scan_none": {
+    "message": "สแกนเชิงลึกเสร็จสิ้น — ไม่พบรูปภาพใหม่"
   },
   "toast_deep_scan_failed": {
     "message": "สแกนเชิงลึกล้มเหลว — รูปภาพที่พบถูกเก็บไว้"

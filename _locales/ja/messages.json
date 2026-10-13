@@ -617,20 +617,35 @@
   "rating_close": {
     "message": "閉じる"
   },
-  "rating_desc": {
-    "message": "お役に立てたなら、Chrome ウェブストアでの 5 つ星レビューが大きな励みになります。"
-  },
   "rating_later": {
     "message": "後で"
   },
   "rating_never": {
     "message": "今後表示しない"
   },
-  "rating_rate_now": {
-    "message": "Chrome ストアで評価"
+  "nudge_download_message": {
+    "message": "{count} 枚の画像がダウンロードできます"
+  },
+  "nudge_download_cta": {
+    "message": "すべてダウンロード"
   },
   "rating_title": {
-    "message": "Image Harvest はいかがですか?"
+    "message": "Image Harvest の調子はいかがですか？"
+  },
+  "rating_desc": {
+    "message": "これまでに {count} 枚の画像を保存しました。お役に立てたなら、Chrome ウェブストアで評価していただけると、他のユーザーにも見つけてもらいやすくなります。"
+  },
+  "rating_rate_now": {
+    "message": "Image Harvest を評価"
+  },
+  "winback_message": {
+    "message": "Image Harvest で {count} 枚の画像を保存しました。Pro に戻れば、無制限のバッチ ZIP、ディープスキャンなど、フルツールキットが使えます。"
+  },
+  "winback_message_generic": {
+    "message": "無制限のバッチ ZIP、ディープスキャンなど、Pro のフルツールキットがお待ちしています。"
+  },
+  "winback_cta": {
+    "message": "Pro を入手"
   },
   "restricted_feature_batch_desc": {
     "message": "ワンクリックで任意のウェブページからすべての画像を選択してダウンロード。サイズ、形式、レイアウトでフィルタリング可能。"
@@ -1090,6 +1105,9 @@
   },
   "toast_deep_scan_new": {
     "message": "ディープスキャンで {count} 件の新しい画像を発見"
+  },
+  "toast_deep_scan_none": {
+    "message": "ディープスキャンで新しい画像は見つかりませんでした"
   },
   "toast_deep_scan_failed": {
     "message": "ディープスキャンに失敗しました — 検出済みの画像は保持されています"

@@ -98,6 +98,9 @@
   "toast_deep_scan_new": {
     "message": "深度扫描发现 {count} 张新图片"
   },
+  "toast_deep_scan_none": {
+    "message": "深度扫描未发现新图片"
+  },
   "toast_deep_scan_failed": {
     "message": "深度扫描失败 — 已发现的图片已保留"
   },
@@ -422,20 +425,35 @@
   "status_similar": {
     "message": "相似"
   },
-  "rating_title": {
-    "message": "喜欢 Image Harvest 吗?"
-  },
-  "rating_desc": {
-    "message": "如果我们帮你节省了时间,在 Chrome 应用商店留下 5 星评价对我们意义重大。"
-  },
-  "rating_rate_now": {
-    "message": "去 Chrome 商店评价"
-  },
   "rating_later": {
     "message": "稍后再说"
   },
   "rating_never": {
     "message": "不再提示"
+  },
+  "nudge_download_message": {
+    "message": "共 {count} 张图片可下载"
+  },
+  "nudge_download_cta": {
+    "message": "全部下载"
+  },
+  "rating_title": {
+    "message": "Image Harvest 用得还顺手吗？"
+  },
+  "rating_desc": {
+    "message": "你已保存 {count} 张图片。如果它帮到了你，在 Chrome Web Store 留个评分，能让更多人发现我们。"
+  },
+  "rating_rate_now": {
+    "message": "为 Image Harvest 评分"
+  },
+  "winback_message": {
+    "message": "你已用 Image Harvest 保存了 {count} 张图片。Pro 可恢复完整工具箱——无限批量 ZIP、深度扫描等。"
+  },
+  "winback_message_generic": {
+    "message": "你的 Pro 工具箱随时恭候——无限批量 ZIP、深度扫描等。"
+  },
+  "winback_cta": {
+    "message": "升级 Pro"
   },
   "rating_close": {
     "message": "关闭"

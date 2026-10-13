@@ -617,20 +617,35 @@
   "rating_close": {
     "message": "關閉"
   },
-  "rating_desc": {
-    "message": "如果我們幫你節省了時間,在 Chrome 應用商店留下 5 星評價對我們意義重大。"
-  },
   "rating_later": {
     "message": "稍後再說"
   },
   "rating_never": {
     "message": "不再提示"
   },
-  "rating_rate_now": {
-    "message": "到 Chrome 商店評價"
+  "nudge_download_message": {
+    "message": "共 {count} 張圖片可下載"
+  },
+  "nudge_download_cta": {
+    "message": "全部下載"
   },
   "rating_title": {
-    "message": "喜歡 Image Harvest 嗎?"
+    "message": "Image Harvest 用得還順手嗎？"
+  },
+  "rating_desc": {
+    "message": "你已保存 {count} 張圖片。如果它幫到了你，到 Chrome Web Store 留個評分，能讓更多人發現我們。"
+  },
+  "rating_rate_now": {
+    "message": "為 Image Harvest 評分"
+  },
+  "winback_message": {
+    "message": "你已用 Image Harvest 保存了 {count} 張圖片。Pro 可恢復完整工具箱——無限批次 ZIP、深度掃描等。"
+  },
+  "winback_message_generic": {
+    "message": "你的 Pro 工具箱隨時恭候——無限批次 ZIP、深度掃描等。"
+  },
+  "winback_cta": {
+    "message": "升級 Pro"
   },
   "restricted_feature_batch_desc": {
     "message": "一鍵選取並下載任意網頁上的所有圖片。可依尺寸、格式或版面進行篩選。"
@@ -1090,6 +1105,9 @@
   },
   "toast_deep_scan_new": {
     "message": "深度掃描發現 {count} 張新圖片"
+  },
+  "toast_deep_scan_none": {
+    "message": "深度掃描未發現新圖片"
   },
   "toast_deep_scan_failed": {
     "message": "深度掃描失敗 — 已發現的圖片已保留"

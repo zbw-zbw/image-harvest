@@ -506,20 +506,35 @@
   "rating_close": {
     "message": "Закрыть"
   },
-  "rating_desc": {
-    "message": "Если мы сэкономили вам время, быстрый отзыв на 5 звёзд в Chrome Web Store будет очень значить для нас."
-  },
   "rating_later": {
     "message": "Может быть позже"
   },
   "rating_never": {
     "message": "Больше не спрашивать"
   },
-  "rating_rate_now": {
-    "message": "Оценить в Chrome Store"
+  "nudge_download_message": {
+    "message": "Готово к загрузке: {count} изображений"
+  },
+  "nudge_download_cta": {
+    "message": "Скачать все"
   },
   "rating_title": {
-    "message": "Нравится Image Harvest?"
+    "message": "Как вам Image Harvest?"
+  },
+  "rating_desc": {
+    "message": "Вы уже сохранили {count} изображений. Если расширение оказалось полезным, оставьте, пожалуйста, оценку в Chrome Web Store — это поможет другим его найти."
+  },
+  "rating_rate_now": {
+    "message": "Оценить Image Harvest"
+  },
+  "winback_message": {
+    "message": "Вы сохранили {count} изображений с помощью Image Harvest. Pro возвращает полный набор инструментов — неограниченные ZIP-пакеты, глубокое сканирование и многое другое."
+  },
+  "winback_message_generic": {
+    "message": "Ваши инструменты Pro ждут вас — неограниченные ZIP-пакеты, глубокое сканирование и многое другое."
+  },
+  "winback_cta": {
+    "message": "Получить Pro"
   },
   "restricted_feature_batch_desc": {
     "message": "Выберите и скачайте все изображения с любой веб-страницы одним нажатием. Фильтруйте по размеру, формату или ориентации."
@@ -946,6 +961,9 @@
   },
   "toast_deep_scan_new": {
     "message": "Глубокое сканирование нашло {count} новых изображений"
+  },
+  "toast_deep_scan_none": {
+    "message": "Глубокое сканирование завершено — новые изображения не найдены"
   },
   "toast_deep_scan_failed": {
     "message": "Ошибка глубокого сканирования — найденные изображения сохранены"

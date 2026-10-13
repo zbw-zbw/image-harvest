@@ -618,20 +618,35 @@
   "rating_close": {
     "message": "Cerrar"
   },
-  "rating_desc": {
-    "message": "Si te hemos ahorrado tiempo, una reseña de 5 estrellas en Chrome Web Store significaría mucho para nosotros."
-  },
   "rating_later": {
     "message": "Quizás más tarde"
   },
   "rating_never": {
     "message": "No volver a preguntar"
   },
-  "rating_rate_now": {
-    "message": "Calificar en Chrome Store"
+  "nudge_download_message": {
+    "message": "{count} imágenes listas para descargar"
+  },
+  "nudge_download_cta": {
+    "message": "Descargar todo"
   },
   "rating_title": {
-    "message": "¿Te gusta Image Harvest?"
+    "message": "¿Qué te parece Image Harvest?"
+  },
+  "rating_desc": {
+    "message": "Has guardado {count} imágenes hasta ahora. Si te ha resultado útil, una valoración en la Chrome Web Store ayudará a otros a descubrirlo."
+  },
+  "rating_rate_now": {
+    "message": "Valorar Image Harvest"
+  },
+  "winback_message": {
+    "message": "Has guardado {count} imágenes con Image Harvest. Pro restaura el kit de herramientas completo: ZIP por lotes ilimitados, análisis profundos y más."
+  },
+  "winback_message_generic": {
+    "message": "Tu kit de herramientas Pro te espera: ZIP por lotes ilimitados, análisis profundos y más."
+  },
+  "winback_cta": {
+    "message": "Obtener Pro"
   },
   "restricted_feature_batch_desc": {
     "message": "Selecciona y descarga todas las imágenes de cualquier página web con un clic. Filtra por tamaño, formato o disposición."
@@ -1093,6 +1108,9 @@
   },
   "toast_deep_scan_new": {
     "message": "El escaneo profundo encontró {count} imágenes nuevas"
+  },
+  "toast_deep_scan_none": {
+    "message": "Análisis profundo completado: no se encontraron imágenes nuevas"
   },
   "toast_deep_scan_failed": {
     "message": "Error en el escaneo profundo — se conservan las imágenes descubiertas"

@@ -506,20 +506,35 @@
   "rating_close": {
     "message": "Chiudi"
   },
-  "rating_desc": {
-    "message": "Se ti abbiamo fatto risparmiare tempo, una recensione a 5 stelle sul Chrome Web Store significherebbe molto per noi."
-  },
   "rating_later": {
     "message": "Forse più tardi"
   },
   "rating_never": {
     "message": "Non chiedere più"
   },
-  "rating_rate_now": {
-    "message": "Valuta sul Chrome Store"
+  "nudge_download_message": {
+    "message": "{count} immagini pronte per il download"
+  },
+  "nudge_download_cta": {
+    "message": "Scarica tutto"
   },
   "rating_title": {
-    "message": "Ti piace Image Harvest?"
+    "message": "Come ti sembra Image Harvest?"
+  },
+  "rating_desc": {
+    "message": "Hai salvato {count} immagini finora. Se ti è stato utile, una breve valutazione sul Chrome Web Store aiuterà altri a scoprirlo."
+  },
+  "rating_rate_now": {
+    "message": "Valuta Image Harvest"
+  },
+  "winback_message": {
+    "message": "Hai salvato {count} immagini con Image Harvest. Pro ripristina il set completo di strumenti — ZIP in batch illimitati, scansioni approfondite e altro ancora."
+  },
+  "winback_message_generic": {
+    "message": "Il tuo set di strumenti Pro ti aspetta — ZIP in batch illimitati, scansioni approfondite e altro ancora."
+  },
+  "winback_cta": {
+    "message": "Ottieni Pro"
   },
   "restricted_feature_batch_desc": {
     "message": "Seleziona e scarica tutte le immagini da qualsiasi pagina web con un clic. Filtra per dimensione, formato o layout."
@@ -946,6 +961,9 @@
   },
   "toast_deep_scan_new": {
     "message": "La scansione profonda ha trovato {count} nuove immagini"
+  },
+  "toast_deep_scan_none": {
+    "message": "Scansione approfondita completata — nessuna nuova immagine trovata"
   },
   "toast_deep_scan_failed": {
     "message": "Scansione profonda non riuscita — le immagini trovate sono state mantenute"
