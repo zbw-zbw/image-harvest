@@ -452,6 +452,12 @@
   "rating_never": {
     "message": "Don't ask again"
   },
+  "nudge_download_message": {
+    "message": "{count} images ready to download"
+  },
+  "nudge_download_cta": {
+    "message": "Download all"
+  },
   "rating_close": {
     "message": "Close"
   },

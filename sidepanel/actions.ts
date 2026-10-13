@@ -529,6 +529,9 @@ export async function downloadSelectedAsZip(
     // Batch completion is the strongest "moment of delight" — re-check the
     // rating gate immediately instead of waiting for the next panel open.
     if (successCount > 0) state.ratingCheckTick += 1;
+    // The download nudge bar has served its purpose (2026-10-13 experiment
+    // #1) — hide it until the next scan or tab switch surfaces new images.
+    if (successCount > 0) state.downloadNudgeDismissed = true;
     // Trial value-moment banner (B-plan): for trial users a ≥50-image batch
     // completion surfaces the trial countdown + Pro anchor right at the
     // moment of delight. isProUser includes trial users; getTrialState()

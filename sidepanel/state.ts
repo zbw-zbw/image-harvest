@@ -406,6 +406,15 @@ export interface SidepanelState {
    */
   trialValueMoment: { count: number; daysRemaining: number } | null;
 
+  /**
+   * Download nudge bar (2026-10-13 growth experiment #1): true once the
+   * user completed a batch download or closed the bar — the nudge has
+   * served its purpose and hides. Reset to false at the start of every
+   * visible scan (new images = new chance to act) and on tab switch
+   * (the next tab's images haven't been downloaded).
+   */
+  downloadNudgeDismissed: boolean;
+
   // AI tagging
   aiQuotaRemaining: number;
   /** Pro AI monthly quota limit — fetched from remote config, fallback to default */
@@ -539,6 +548,7 @@ function createInitialState(): SidepanelState {
     inTrialGracePeriod: false,
     trialGraceDaysRemaining: 0,
     trialValueMoment: null,
+    downloadNudgeDismissed: false,
 
     aiQuotaRemaining: 100,
     aiQuotaLimit: 100,

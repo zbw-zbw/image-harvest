@@ -25,6 +25,7 @@ import { SoftPaywallBanner } from './SoftPaywallBanner';
 import { TrialGraceBanner } from './TrialGraceBanner';
 import { TrialValueMomentBanner } from './TrialValueMomentBanner';
 import { GalleryResolveBar } from './GalleryResolveBar';
+import { DownloadNudgeBar } from './DownloadNudgeBar';
 import { BatchUrlCopyButton } from './BatchUrlCopyButton';
 import { EagleExportButton } from './EagleExportButton';
 import { BatchOpsButton, BatchDeleteButton } from './BatchOpsButton';
@@ -204,6 +205,10 @@ export function mountPreactComponents(): void {
   mountReferralBanner();
   // Link penetration (v1.1.0): gallery-link hint bar below the filters.
   mountGalleryResolveBar();
+  // Download nudge bar (2026-10-13 experiment #1): between the filter
+  // toolbar and the grid — the audit found the only other download CTA
+  // is a btn-small in the footer, far below a full grid's fold.
+  mountDownloadNudgeBar();
 
   // Batch URL copy button (Sprint 3.4). Renders into the
   // `#batch-url-copy-mount` slot in toolbar row 2. The slot is a
@@ -323,6 +328,17 @@ function mountGalleryResolveBar(): void {
   const slot = document.getElementById('gallery-resolve-bar-mount');
   if (!slot) return;
   renderSafe(<GalleryResolveBar />, slot, 'gallery-resolve-bar-mount');
+}
+
+/**
+ * Download nudge bar mount. Render directly into the slot between the
+ * filter toolbar and the image grid (permanent layout anchor); the
+ * component renders null whenever its visibility conditions fail.
+ */
+function mountDownloadNudgeBar(): void {
+  const slot = document.getElementById('download-nudge-bar-mount');
+  if (!slot) return;
+  renderSafe(<DownloadNudgeBar />, slot, 'download-nudge-bar-mount');
 }
 
 /**

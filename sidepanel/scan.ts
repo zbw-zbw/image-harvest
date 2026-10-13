@@ -269,6 +269,9 @@ export async function rescanWithProgress(tabId: number, tabUrl: string): Promise
   state.scanDiscoveredCount = 0;
   state.scanDiscoveredImages = [];
   state.scanAborted = false;
+  // Fresh scan → fresh nudge (2026-10-13 experiment #1): the download bar
+  // re-appears with the new results even if the user dismissed it earlier.
+  state.downloadNudgeDismissed = false;
 
   // Show scan overlay on top of the existing image grid (don't replace with skeletons).
   // Title flips to "Updating..." (vs. the default "Scanning...") and we go
@@ -425,6 +428,8 @@ export async function deepScan(tabId: number, tabUrl: string): Promise<void> {
   state.scanDiscoveredCount = 0;
   state.scanDiscoveredImages = [];
   state.scanAborted = false;
+  // Fresh scan → fresh nudge (2026-10-13 experiment #1).
+  state.downloadNudgeDismissed = false;
 
   const previousCount = state.allImages.length;
 
@@ -610,6 +615,8 @@ export async function fetchImages(targetTabId?: number): Promise<void> {
   state.isScanning = true;
   state.scanDiscoveredCount = 0;
   state.scanDiscoveredImages = [];
+  // Fresh scan → fresh nudge (2026-10-13 experiment #1).
+  state.downloadNudgeDismissed = false;
 
   // Lock the tab id at scan start so it stays consistent across awaits.
   // The shared sidepanel instance may receive tab-switch events mid-scan;

@@ -296,6 +296,9 @@ export async function handleTabChange(activeInfo: chrome.tabs.TabActiveInfo): Pr
   // …and the trial value-moment banner — it belongs to the tab that earned
   // it, and a user switching tabs has moved on from the moment of delight.
   state.trialValueMoment = null;
+  // The download nudge bar gets a fresh chance on the next tab (2026-10-13
+  // experiment #1) — that tab's images haven't been downloaded yet.
+  state.downloadNudgeDismissed = false;
 
   // Cancel any pending "new images discovered" debounce timer
   cancelDiscoveredToast();

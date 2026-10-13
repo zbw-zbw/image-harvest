@@ -709,6 +709,53 @@
 }
 
 /* ============================================
+   Download Nudge Bar (2026-10-13 growth experiment #1)
+   Prominent CTA strip between the filter toolbar and the image grid,
+   shown whenever a scan's results are on screen. Brand-green tint (the
+   bar is a positive action prompt, not a warning) with the primary
+   button carrying the action; the text keeps --text-primary for contrast
+   in both themes.
+   ============================================ */
+.download-nudge-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  background: color-mix(in srgb, var(--primary-color) 9%, var(--bg-color));
+  border-bottom: 1px solid color-mix(in srgb, var(--primary-color) 25%, var(--border-color));
+  flex-shrink: 0;
+}
+
+.download-nudge-icon {
+  color: var(--primary-color);
+  flex-shrink: 0;
+  display: inline-flex;
+}
+
+.download-nudge-text {
+  color: var(--text-primary);
+  font-size: 12px;
+  font-weight: 600;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.download-nudge-btn {
+  flex-shrink: 0;
+}
+
+.download-nudge-close {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  color: var(--text-tertiary);
+}
+
+.download-nudge-close:hover {
+  color: var(--text-primary);
+}
+
+/* ============================================
    Onboarding Coach Marks (Phase 2a activation)
    Fixed to the panel bottom so it never fights the toolbar or the image
    grid's scroll position, and stays visible while the user selects images.
