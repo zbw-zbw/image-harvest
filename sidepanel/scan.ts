@@ -615,10 +615,10 @@ export async function fetchImages(targetTabId?: number): Promise<void> {
   state.isScanning = true;
   state.scanDiscoveredCount = 0;
   state.scanDiscoveredImages = [];
-  // Fresh scan → fresh nudge (2026-10-13 experiment #1).
-  state.downloadNudgeDismissed = false;
 
   // Lock the tab id at scan start so it stays consistent across awaits.
+  // Fresh scan → fresh nudge (2026-10-13 experiment #1).
+  state.downloadNudgeDismissed = false;
   // The shared sidepanel instance may receive tab-switch events mid-scan;
   // using a snapshot avoids cross-tab data contamination.
   const scanTabId = targetTabId ?? state.currentTabId;
