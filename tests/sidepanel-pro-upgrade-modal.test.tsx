@@ -572,9 +572,6 @@ describe('win-back hero', () => {
       expect(document.getElementById('btn-pro-modal-trial')).not.toBeNull();
     });
     expect(document.getElementById('btn-pro-modal-winback')).toBeNull();
-    expect(mockTrack).not.toHaveBeenCalledWith(
-      'pro_winback_shown',
-      expect.anything()
-    );
+    expect(mockTrack).not.toHaveBeenCalledWith('pro_winback_shown', expect.anything());
   });
 });
