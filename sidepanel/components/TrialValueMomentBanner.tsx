@@ -15,7 +15,9 @@ import { useStoreSelector } from './storeHook';
  * Impression telemetry (TRIAL_VALUE_MOMENT_SHOWN) is fired by the trigger
  * in actions.ts, NOT here — the banner has no mount/effect lifecycle of
  * its own (unlike TrialGraceBanner), so the trigger site is the accurate
- * "actually shown" moment. NOT throttled: ≥50-image batches are rare.
+ * "actually shown" moment. Daily-capped since 2026-10-13 by
+ * claimTrialValueMomentToday (one impression per UTC day) after a trial
+ * user triggered the banner 20+ times in one day via ~1000-image batches.
  */
 export function TrialValueMomentBanner() {
   const moment = useStoreSelector((s) => s.trialValueMoment);

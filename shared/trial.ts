@@ -40,6 +40,7 @@ const STORAGE_KEY_TRIAL_REDEEMED = '_trial_redeemed_at';
 const STORAGE_KEY_TRIAL_EXPIRED_REPORTED = '_trial_expired_reported';
 const STORAGE_KEY_GRACE_BANNER_DAY = '_trial_grace_banner_day';
 const STORAGE_KEY_EXPIRY_WARNING_DAY = '_trial_expiry_warning_day';
+const STORAGE_KEY_VALUE_MOMENT_DAY = '_trial_value_moment_day';
 
 /** The trial shows an amber "expiring soon" warning during these final days. */
 export const TRIAL_EXPIRY_WARNING_DAYS = 3;
@@ -289,6 +290,33 @@ export async function maybeReportTrialExpiryWarning(daysRemaining: number): Prom
   }
   await track(EVENTS.TRIAL_EXPIRY_WARNING_SHOWN, { daysRemaining });
   return true;
+}
+
+/**
+ * Daily frequency cap for the trial value-moment banner (2026-10-13).
+ *
+ * Production data (10-10 launch → 10-13) showed one trial user triggering
+ * the banner 20+ times in a single day via repeated ~1000-image batches —
+ * the "≥50-image batches are rare" assumption at launch badly underestimates
+ * heavy harvesters. After the first impression of the day the banner stops
+ * converting and starts annoying, so claims are one per UTC day.
+ *
+ * Claim semantics (unlike the maybeReport* throttles above, which only gate
+ * telemetry): returning TRUE means the caller owns today's slot and should
+ * show the banner; FALSE means someone already claimed it — show nothing.
+ * Storage failure is treated as claimed (fail-closed) to stay conservative
+ * on a purely additive UI surface.
+ */
+export async function claimTrialValueMomentToday(): Promise<boolean> {
+  const today = new Date().toISOString().slice(0, 10);
+  try {
+    const data = await chrome.storage.local.get(STORAGE_KEY_VALUE_MOMENT_DAY);
+    if (data[STORAGE_KEY_VALUE_MOMENT_DAY] === today) return false;
+    await chrome.storage.local.set({ [STORAGE_KEY_VALUE_MOMENT_DAY]: today });
+    return true;
+  } catch {
+    return false;
+  }
 }
 
 /**

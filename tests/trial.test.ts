@@ -516,6 +516,36 @@ describe('maybeReportTrialGraceBanner', () => {
   });
 });
 
+// ────────────────────────────────────────────────────────────────────────────
+// claimTrialValueMomentToday (daily cap for the value-moment banner)
+// ────────────────────────────────────────────────────────────────────────────
+
+describe('claimTrialValueMomentToday', () => {
+  it('first call of the day → claims the slot (true) + sets sentinel', async () => {
+    const { claimTrialValueMomentToday } = await import('../shared/trial');
+    expect(await claimTrialValueMomentToday()).toBe(true);
+    expect(storage.get('_trial_value_moment_day')).toBe(new Date().toISOString().slice(0, 10));
+  });
+
+  it('same-day second call → slot already claimed (false)', async () => {
+    storage.set('_trial_value_moment_day', new Date().toISOString().slice(0, 10));
+    const { claimTrialValueMomentToday } = await import('../shared/trial');
+    expect(await claimTrialValueMomentToday()).toBe(false);
+  });
+
+  it('next day → claims again', async () => {
+    storage.set('_trial_value_moment_day', '2000-01-01');
+    const { claimTrialValueMomentToday } = await import('../shared/trial');
+    expect(await claimTrialValueMomentToday()).toBe(true);
+  });
+
+  it('storage failure → fail-closed (false)', async () => {
+    chromeStub.storage.local.get.mockRejectedValueOnce(new Error('storage down'));
+    const { claimTrialValueMomentToday } = await import('../shared/trial');
+    expect(await claimTrialValueMomentToday()).toBe(false);
+  });
+});
+
 describe('isInTrialGracePeriod', () => {
   it('returns inGrace=false when no license data', async () => {
     mockGetLicenseData.mockResolvedValue(null);

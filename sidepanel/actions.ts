@@ -536,12 +536,15 @@ export async function downloadSelectedAsZip(
     // FREE users can also legally hit exactly 50 (MAX_ZIP_IMAGES) — the
     // isProUser gate excludes them. Isolated IIFE: a failure here must not
     // affect the download-completion toast path.
+    // Daily cap (2026-10-13): one impression per UTC day — see
+    // claimTrialValueMomentToday for the production data that motivated it.
     if (successCount >= 50 && state.isProUser) {
       void (async () => {
         try {
-          const { getTrialState } = await import('../shared/trial');
+          const { getTrialState, claimTrialValueMomentToday } = await import('../shared/trial');
           const snap = await getTrialState();
           if (!snap || !snap.active) return;
+          if (!(await claimTrialValueMomentToday())) return;
           const daysRemaining = Math.max(1, Math.ceil(snap.msRemaining / 86_400_000));
           state.trialValueMoment = { count: successCount, daysRemaining };
           void track(EVENTS.TRIAL_VALUE_MOMENT_SHOWN, { count: successCount, daysRemaining });
