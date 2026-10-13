@@ -103,6 +103,9 @@
   "toast_deep_scan_new": {
     "message": "Deep scan found {count} new images"
   },
+  "toast_deep_scan_none": {
+    "message": "Deep scan complete — no new images"
+  },
   "toast_deep_scan_failed": {
     "message": "Deep scan failed — discovered images kept"
   },

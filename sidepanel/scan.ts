@@ -554,9 +554,15 @@ export async function deepScan(tabId: number, tabUrl: string): Promise<void> {
       }
 
       // Toast: total found (matches the status bar) + the deep-scan delta.
+      // Zero-new runs get their own copy instead of "found 0 new images" —
+      // with the swap-src observer fix most true zeros are now "nothing
+      // lazy below your current position", and the old phrasing read like
+      // a malfunction.
+      const deltaText =
+        newCount > 0 ? t('toast_deep_scan_new', { count: newCount }) : t('toast_deep_scan_none');
       showToast(
-        `${t('status_found_images', { count: state.filteredImages.length })} · ${t('toast_deep_scan_new', { count: newCount })}`,
-        'success'
+        `${t('status_found_images', { count: state.filteredImages.length })} · ${deltaText}`,
+        newCount > 0 ? 'success' : 'info'
       );
 
       void track(EVENTS.DEEP_SCAN_COMPLETED, {

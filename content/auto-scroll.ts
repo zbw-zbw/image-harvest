@@ -96,6 +96,23 @@ export function createDefaultDeps(
       const observer = new MutationObserver((mutations) => {
         let added = 0;
         for (const m of mutations) {
+          if (m.type === 'attributes') {
+            // swap-src lazy loading (2026-10-13 fix): many sites keep an
+            // <img data-src="..."> in the initial DOM and only assign the
+            // real src when it scrolls into view. That is an ATTRIBUTE
+            // mutation, not a childList one — watching only addedNodes let
+            // every such step look idle, so three "empty" steps aborted the
+            // run as 'stalled' long before the page finished loading (95%
+            // of v1.2.0 runs surfaced zero new images; half stopped stalled).
+            // Counting the swap as lazy-load activity keeps the run alive
+            // until the DOM settles, and the final extraction pass picks up
+            // the new URLs either way.
+            const el = m.target as Element;
+            if (el.tagName === 'IMG' || el.tagName === 'PICTURE' || el.tagName === 'SOURCE') {
+              added += 1;
+            }
+            continue;
+          }
           m.addedNodes.forEach((node) => {
             if (node.nodeType !== Node.ELEMENT_NODE) return;
             const el = node as Element;
@@ -105,7 +122,12 @@ export function createDefaultDeps(
         }
         if (added > 0) cb(added);
       });
-      observer.observe(document.body, { childList: true, subtree: true });
+      observer.observe(document.body, {
+        childList: true,
+        subtree: true,
+        attributes: true,
+        attributeFilter: ['src', 'srcset', 'data-src', 'data-srcset'],
+      });
       return () => observer.disconnect();
     },
   };
