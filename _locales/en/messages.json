@@ -458,6 +458,15 @@
   "nudge_download_cta": {
     "message": "Download all"
   },
+  "winback_message": {
+    "message": "You've saved {count} images with Image Harvest. Pro restores the full toolkit — unlimited batch ZIPs, deep scans, and more."
+  },
+  "winback_message_generic": {
+    "message": "Your Pro toolkit is waiting — unlimited batch ZIPs, deep scans, and more."
+  },
+  "winback_cta": {
+    "message": "Get Pro"
+  },
   "rating_close": {
     "message": "Close"
   },

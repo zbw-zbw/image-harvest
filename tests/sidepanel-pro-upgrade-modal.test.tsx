@@ -37,6 +37,7 @@ const mockTrack = vi.fn();
 const mockFlushNow = vi.fn();
 const mockShowToast = vi.fn();
 const mockStartTrial = vi.fn();
+const mockIsTrialEligible = vi.fn();
 
 vi.mock('../shared/ab-experiment', () => ({
   getProUpsellBucket: mockGetBucket,
@@ -59,7 +60,7 @@ vi.mock('../sidepanel/ui', () => ({
 
 vi.mock('../shared/trial', () => ({
   startTrial: mockStartTrial,
-  isTrialEligible: vi.fn().mockResolvedValue(true),
+  isTrialEligible: mockIsTrialEligible,
 }));
 
 vi.mock('../shared/license', () => ({
@@ -114,6 +115,7 @@ beforeEach(() => {
   mockTrack.mockResolvedValue(undefined);
   mockFlushNow.mockResolvedValue(undefined);
   mockStartTrial.mockResolvedValue({ success: true, plan: 'trial' });
+  mockIsTrialEligible.mockResolvedValue(true);
 });
 
 afterEach(() => {
@@ -477,5 +479,102 @@ describe('error state lifecycle', () => {
       // unrelated upsell open.
       expect(errEl.textContent?.trim() || '').toBe('');
     });
+  });
+});
+
+// ────────────────────────────────────────────────────────────────────────────
+// Win-back hero (2026-10-13 experiment #2) — trial-ineligible users
+// ────────────────────────────────────────────────────────────────────────────
+
+describe('win-back hero', () => {
+  test('trial-ineligible → winback hero replaces the null hero, fires PRO_WINBACK_SHOWN with count', async () => {
+    mockIsTrialEligible.mockResolvedValue(false);
+    mockGetPaywallState.mockResolvedValue({
+      downloadCount: 87,
+      shownCount: 0,
+      shownAt: 0,
+      dismissedAt: 0,
+      resolved: false,
+    });
+    await openModal();
+    const { ProUpgradeModal } = await import('../sidepanel/components/ProUpgradeModal');
+    render(<ProUpgradeModal />);
+
+    await waitFor(() => {
+      expect(document.getElementById('btn-pro-modal-winback')).not.toBeNull();
+    });
+    // The trial CTA hero must be gone in this variant.
+    expect(document.getElementById('btn-pro-modal-trial')).toBeNull();
+    // Personalized line interpolates the download count.
+    expect(document.querySelector('.pro-winback-message')!.textContent).toContain('87');
+    await waitFor(() => {
+      expect(mockTrack).toHaveBeenCalledWith('pro_winback_shown', { count: 87 });
+    });
+  });
+
+  test('trial-ineligible + downloadCount < 5 → generic message (never "saved 0 images")', async () => {
+    mockIsTrialEligible.mockResolvedValue(false);
+    mockGetPaywallState.mockResolvedValue({
+      downloadCount: 2,
+      shownCount: 0,
+      shownAt: 0,
+      dismissedAt: 0,
+      resolved: false,
+    });
+    await openModal();
+    const { ProUpgradeModal } = await import('../sidepanel/components/ProUpgradeModal');
+    render(<ProUpgradeModal />);
+
+    await waitFor(() => {
+      const msg = document.querySelector('.pro-winback-message')!.textContent;
+      expect(msg).toMatch(/toolkit is waiting/i);
+      expect(msg).not.toContain('2');
+    });
+  });
+
+  test('winback CTA click → pro_upsell_cta_clicked cta=winback_pricing + pricing page in new tab', async () => {
+    mockIsTrialEligible.mockResolvedValue(false);
+    mockGetPaywallState.mockResolvedValue({
+      downloadCount: 47,
+      shownCount: 0,
+      shownAt: 0,
+      dismissedAt: 0,
+      resolved: false,
+    });
+    await openModal();
+    const { ProUpgradeModal } = await import('../sidepanel/components/ProUpgradeModal');
+    render(<ProUpgradeModal />);
+
+    const btn = await waitFor(() => {
+      const el = document.getElementById('btn-pro-modal-winback')!;
+      expect(el).not.toBeNull();
+      return el;
+    });
+    fireEvent.click(btn);
+
+    expect(mockTrack).toHaveBeenCalledWith(
+      'pro_upsell_cta_clicked',
+      expect.objectContaining({ cta: 'winback_pricing' })
+    );
+    expect(chromeStub.tabs.create).toHaveBeenCalledTimes(1);
+    expect(chromeStub.tabs.create).toHaveBeenCalledWith(
+      expect.objectContaining({ url: expect.stringMatching(/^https?:\/\//) })
+    );
+  });
+
+  test('trial-eligible → no winback hero (regression guard for the A/B funnel split)', async () => {
+    mockIsTrialEligible.mockResolvedValue(true);
+    await openModal();
+    const { ProUpgradeModal } = await import('../sidepanel/components/ProUpgradeModal');
+    render(<ProUpgradeModal />);
+
+    await waitFor(() => {
+      expect(document.getElementById('btn-pro-modal-trial')).not.toBeNull();
+    });
+    expect(document.getElementById('btn-pro-modal-winback')).toBeNull();
+    expect(mockTrack).not.toHaveBeenCalledWith(
+      'pro_winback_shown',
+      expect.anything()
+    );
   });
 });

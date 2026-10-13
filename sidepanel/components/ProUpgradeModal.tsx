@@ -151,9 +151,14 @@ async function handleStartTrial(
   }
 }
 
-function handlePricingClick(e: MouseEvent, feature?: string, count?: number): void {
+function handlePricingClick(
+  e: MouseEvent,
+  feature?: string,
+  count?: number,
+  cta: string = 'pricing'
+): void {
   e.preventDefault();
-  void track(EVENTS.PRO_UPSELL_CTA_CLICKED, { trigger: 'modal', cta: 'pricing' });
+  void track(EVENTS.PRO_UPSELL_CTA_CLICKED, { trigger: 'modal', cta });
   // Attribution: 'modal' tells the website funnel WHICH touchpoint sent
   // this visit (vs. the settings get-Pro link) — mirrors the trigger prop
   // on the telemetry event above. feature/count carry the wall context so
@@ -236,6 +241,21 @@ export function ProUpgradeModal() {
   // the blocked task instead of the generic A/B value prop, and an optional
   // subline restates the free limit right where the eye lands.
   const wall = ms.feature ? WALL_COPY[ms.feature] : undefined;
+
+  // Win-back hero (2026-10-13 experiment #2): trial-ineligible users
+  // (trial used + expired — 575/692 of all trials) previously saw NO hero
+  // here — the section short-circuited to null, leaving only the feature
+  // comparison list. This hero restores a value prop + purchase CTA.
+  // Impression telemetry fires once per modal open (re-armed on close).
+  const winbackVisible = ms.open && !trialEligible;
+  const winbackReported = useRef(false);
+  useEffect(() => {
+    if (winbackVisible && !winbackReported.current) {
+      winbackReported.current = true;
+      void track(EVENTS.PRO_WINBACK_SHOWN, { count: downloadCount });
+    }
+    if (!ms.open) winbackReported.current = false;
+  }, [winbackVisible, ms.open, downloadCount]);
 
   return (
     <div id="pro-upgrade-modal" class={`modal${ms.open ? '' : ' hidden'}`}>
@@ -344,7 +364,27 @@ export function ProUpgradeModal() {
                 {trialError}
               </p>
             </div>
-          ) : null}
+          ) : (
+            <div class="pro-upgrade-cta-section pro-winback-section">
+              <p class="pro-winback-message">
+                {/* Same >=5 threshold as variantHeadline B — never render
+                    "saved 0 images" to a user whose trial expired unused. */}
+                {downloadCount >= 5
+                  ? t('winback_message', { count: downloadCount })
+                  : t('winback_message_generic')}
+              </p>
+              <div class="pro-upgrade-cta-row">
+                <button
+                  id="btn-pro-modal-winback"
+                  type="button"
+                  class="btn btn-primary btn-cta"
+                  onClick={(e) => handlePricingClick(e, ms.feature, ms.count, 'winback_pricing')}
+                >
+                  {t('winback_cta')}
+                </button>
+              </div>
+            </div>
+          )}
 
           {/* ── Section 2: Pro features with Free vs Pro comparison ──── */}
           <ProFeatureCompareList />

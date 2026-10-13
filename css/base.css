@@ -470,6 +470,17 @@
   line-height: 1.5;
 }
 
+/* Win-back hero (2026-10-13 experiment #2): the trial-ineligible variant
+   of the CTA section — a single personalized value line + purchase CTA.
+   Slightly larger + primary-tinted so it reads as the hero it replaced. */
+.pro-winback-message {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
+  margin: 0;
+  line-height: 1.55;
+}
+
 .pro-upgrade-trial-perks {
   list-style: none;
   padding: 0;
