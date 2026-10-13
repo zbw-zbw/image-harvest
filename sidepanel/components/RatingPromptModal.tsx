@@ -19,6 +19,7 @@
 // avoid overlapping with the loading overlay.
 import { useEffect, useState } from 'preact/hooks';
 import {
+  getRatingPromptState,
   markRatingPromptDismissed,
   markRatingPromptResolved,
   markRatingPromptShown,
@@ -42,6 +43,12 @@ export const CHROME_STORE_REVIEW_URL =
 
 export function RatingPromptModal() {
   const [visible, setVisible] = useState(false);
+  // Cumulative download count at prompt time — personalizes the copy
+  // (2026-10-13 experiment #4: the audit showed CTA distribution
+  // later 56 / never 12 / rate 3; the old beg-style copy gave the user
+  // no concrete reason to engage. Grounding the ask in their own number
+  // reframes it as feedback on work they actually did.)
+  const [downloadCount, setDownloadCount] = useState(0);
   // Re-run the gate check when a download completes (see actions.ts).
   const ratingCheckTick = useStoreSelector((s) => s.ratingCheckTick);
 
@@ -61,6 +68,9 @@ export function RatingPromptModal() {
 
       const ok = await shouldShowRatingPrompt();
       if (cancelled || !ok) return;
+      const rs = await getRatingPromptState();
+      if (cancelled) return;
+      setDownloadCount(rs.downloadCount);
       await markRatingPromptShown();
       // trigger distinguishes the "moment of delight" re-check (download)
       // from the legacy panel-open check so the funnel can compare their
@@ -150,7 +160,7 @@ export function RatingPromptModal() {
         <h2 id="rating-prompt-title" class="rating-prompt-title">
           {t('rating_title')}
         </h2>
-        <p class="rating-prompt-desc">{t('rating_desc')}</p>
+        <p class="rating-prompt-desc">{t('rating_desc', { count: String(downloadCount) })}</p>
 
         <div class="rating-prompt-actions">
           <button

@@ -437,15 +437,6 @@
   "status_similar": {
     "message": "Similar"
   },
-  "rating_title": {
-    "message": "Enjoying Image Harvest?"
-  },
-  "rating_desc": {
-    "message": "If we've saved you some time, a quick 5-star review on the Chrome Web Store would mean the world to us."
-  },
-  "rating_rate_now": {
-    "message": "Rate on Chrome Store"
-  },
   "rating_later": {
     "message": "Maybe later"
   },
@@ -457,6 +448,15 @@
   },
   "nudge_download_cta": {
     "message": "Download all"
+  },
+  "rating_title": {
+    "message": "How's Image Harvest working for you?"
+  },
+  "rating_desc": {
+    "message": "You've saved {count} images so far. If it's been useful, a quick rating on the Chrome Web Store helps others find us."
+  },
+  "rating_rate_now": {
+    "message": "Rate Image Harvest"
   },
   "winback_message": {
     "message": "You've saved {count} images with Image Harvest. Pro restores the full toolkit — unlimited batch ZIPs, deep scans, and more."
