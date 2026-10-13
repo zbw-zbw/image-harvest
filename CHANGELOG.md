@@ -58,6 +58,33 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
+## [1.2.2] — 2026-10-13
+
+### ✨ Added
+
+- **A clear next step after every scan**: once the results are on screen, a compact bar sits above the grid — "N images ready to download" with a **Download all** button. No manual selecting needed; close it or complete a download and it steps aside until the next scan brings new images.
+- **A proper welcome back for expired trials**: opening the upgrade dialog after your trial ended no longer shows an empty pitch. Instead you get a personal line — "You've saved N images with Image Harvest…" — and a direct path back to the full toolkit.
+- **The rating prompt now counts your harvests**: "You've saved N images so far" leads the ask, replacing the generic favor request.
+
+### 🔄 Changed
+
+- **The trial value-moment banner shows at most once a day**: completing several big batches in one day no longer repeats the same celebration over and over.
+
+### 🐛 Fixed
+
+- **Deep Scan no longer stops early on sites that swap image sources**: galleries that replace (not just append) lazy `src` attributes kept the scan moving to their real bottom instead of falsely reading as stalled.
+- **A deep scan that finds nothing new now says so calmly**: "Deep scan complete — no new images" replaces the alarming "found 0 new images" phrasing.
+
+### 🌍 i18n
+
+- All new copy ships translated in all 15 supported languages.
+
+### 🧪 Test Coverage Expansion
+
+- 78 new tests pin the five growth changes: nudge-bar lifecycle and telemetry, win-back hero variants, the daily impression cap, the swap-src observer fix, and the personalized rating copy.
+
+---
+
 ## [1.2.1] — 2026-10-10
 
 ### ✨ Added

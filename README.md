@@ -94,11 +94,13 @@
 
 ---
 
-## 🆕 What's New (v1.2.1)
+## 🆕 What's New (v1.2.2)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
-- 🌾 **The panel celebrates your biggest harvests**: during your trial, finish a 50+ image batch download and a friendly banner appears — "Downloaded N images · X days left" — with a one-click path to keep the full power with Pro.
+- ⬇️ **Your next step, one click away**: after every scan, a clear "N images ready — Download all" bar sits above the grid. No manual selecting, no hunting for the button.
+- 🏠 **Expired trials get a warm welcome back**: the upgrade dialog now opens with what you've already harvested — "You've saved N images…" — and a direct path back to the full toolkit.
+- 🔍 **Deep Scan fixes**: no more stopping early on sites that swap image sources, and a calm "no new images" message instead of a confusing "found 0".
 
 ---
 
