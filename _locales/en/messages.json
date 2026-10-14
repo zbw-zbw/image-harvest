@@ -113,6 +113,10 @@
     "message": "Downloaded {count} images",
     "description": "{count} = number of images to download"
   },
+  "toast_download_completed_trial": {
+    "message": "Downloaded {count} images · {days} trial days left",
+    "description": "{count} = images saved; {days} = trial days remaining (v1.2.5 trial value toast)"
+  },
   "toast_no_images_selected": {
     "message": "No images selected"
   },

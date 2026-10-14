@@ -1034,6 +1034,9 @@
   "toast_download_completed": {
     "message": "{count} 枚の画像をダウンロードしました"
   },
+  "toast_download_completed_trial": {
+    "message": "{count} 枚の画像をダウンロードしました · トライアル残り {days} 日"
+  },
   "toast_download_failed": {
     "message": "ダウンロードに失敗しました"
   },

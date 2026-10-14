@@ -911,6 +911,9 @@
   "toast_download_completed": {
     "message": "{count} छवियां डाउनलोड हुईं"
   },
+  "toast_download_completed_trial": {
+    "message": "{count} छवियां डाउनलोड हुईं · परीक्षण के {days} दिन शेष"
+  },
   "toast_download_failed": {
     "message": "डाउनलोड विफल"
   },

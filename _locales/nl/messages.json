@@ -911,6 +911,9 @@
   "toast_download_completed": {
     "message": "{count} afbeeldingen gedownload"
   },
+  "toast_download_completed_trial": {
+    "message": "{count} afbeeldingen gedownload · nog {days} proefdagen"
+  },
   "toast_download_failed": {
     "message": "Download mislukt"
   },

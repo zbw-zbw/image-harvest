@@ -47,6 +47,10 @@ export const EVENTS = {
   PRO_UPSELL_CTA_CLICKED: 'pro_upsell_cta_clicked', // "Get Pro →" / "Start Free Trial"
   PRICING_PAGE_VIEWED: 'pricing_viewed', // fired by the marketing site, not the extension
   CHECKOUT_STARTED: 'checkout_started', // fired by the marketing site
+  // v1.2.5 pricing-page alternate CTA click ("No PayPal account? Pay by email
+  // invoice") — client-side on the marketing site; the form submit itself
+  // already surfaces server-side as invoice_requested.
+  INVOICE_OFFER_CTA_CLICKED: 'invoice_offer_cta_clicked', // fired by the marketing site
   LICENSE_ACTIVATED: 'license_activated', // props: { plan: string }
   // Attribution bridge (v1.2.4): fired with license activation, carrying the
   // license-side instance id hash so paid licenses can join to telemetry —
@@ -213,6 +217,7 @@ export const EVENT_PROP_SCHEMAS: Record<TelemetryEventName, readonly string[]> =
   [EVENTS.PRO_UPSELL_CTA_CLICKED]: ['trigger', 'abBucket', 'cta'], // cta: "trial" | "pricing" | "activate" | "get_pro"
   [EVENTS.PRICING_PAGE_VIEWED]: ['referrer', 'abBucket'], // referrer: "extension" | "google" | "direct" | ...
   [EVENTS.CHECKOUT_STARTED]: ['plan', 'abBucket'],
+  [EVENTS.INVOICE_OFFER_CTA_CLICKED]: ['plan', 'abBucket'],
   [EVENTS.LICENSE_ACTIVATED]: ['plan', 'abBucket'],
   [EVENTS.LICENSE_LINK]: ['linkHash'],
   [EVENTS.TRIAL_STARTED]: ['abBucket'],

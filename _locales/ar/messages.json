@@ -911,6 +911,9 @@
   "toast_download_completed": {
     "message": "تم تحميل {count} صورة"
   },
+  "toast_download_completed_trial": {
+    "message": "تم تحميل {count} صورة · متبقٍ {days} يومًا في التجربة"
+  },
   "toast_download_failed": {
     "message": "فشل التحميل"
   },

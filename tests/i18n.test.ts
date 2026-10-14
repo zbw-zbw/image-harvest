@@ -152,6 +152,10 @@ describe('t()', () => {
     expect(t('pro_zip_limit', { max: 30 })).toBe(
       'Free plan: up to 30 images per ZIP. Upgrade to Pro for unlimited!'
     );
+    // v1.2.5 trial value toast — two placeholders in one message.
+    expect(t('toast_download_completed_trial', { count: 7, days: 3 })).toBe(
+      'Downloaded 7 images \u00b7 3 trial days left'
+    );
   });
 
   it('leaves unmatched placeholders untouched (so QA notices missing params)', () => {

@@ -911,6 +911,9 @@
   "toast_download_completed": {
     "message": "ดาวน์โหลด {count} รูปภาพแล้ว"
   },
+  "toast_download_completed_trial": {
+    "message": "ดาวน์โหลด {count} รูปภาพแล้ว · เหลืออีก {days} วันทดลองใช้"
+  },
   "toast_download_failed": {
     "message": "ดาวน์โหลดล้มเหลว"
   },

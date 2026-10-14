@@ -107,6 +107,9 @@
   "toast_download_completed": {
     "message": "{count}개의 이미지를 다운로드했습니다"
   },
+  "toast_download_completed_trial": {
+    "message": "{count}개의 이미지를 다운로드했습니다 · 체험판 {days}일 남음"
+  },
   "toast_no_images_selected": {
     "message": "선택된 이미지가 없습니다"
   },

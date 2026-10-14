@@ -911,6 +911,9 @@
   "toast_download_completed": {
     "message": "{count} imagens baixadas"
   },
+  "toast_download_completed_trial": {
+    "message": "{count} imagens baixadas · restam {days} dias de teste"
+  },
   "toast_download_failed": {
     "message": "Falha no download"
   },

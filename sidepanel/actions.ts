@@ -427,6 +427,17 @@ export async function downloadSelectedAsZip(
 
   let aborted = false;
 
+  // v1.2.5: pre-fetch the trial snapshot in parallel with the ZIP build so
+  // the completion toast can merge the trial value line ("saved N · X days
+  // left") synchronously at the moment of delight. showToast is
+  // replace-only (state.toasts = [toast]) — a second toast would ERASE the
+  // completion one, so the value line must live IN the completion toast.
+  // Gated on isProUser (trial ⊂ pro) to skip the storage read for free
+  // users; getTrialState() itself returns null for paid plans.
+  const trialSnapPromise = state.isProUser
+    ? import('../shared/trial').then(({ getTrialState }) => getTrialState())
+    : null;
+
   showProgress(t('progress_downloading'), () => {
     aborted = true;
     showToast(t('toast_download_cancelled'), 'info');
@@ -521,7 +532,20 @@ export async function downloadSelectedAsZip(
     if (successCount === 0) {
       showToast(t('toast_download_all_failed'), 'error');
     } else {
-      showToast(t('toast_download_completed', { count: successCount }), 'success');
+      // v1.2.5 trial value toast: every trial-user batch completion carries
+      // "saved N · X trial days left" — no ≥50 threshold or daily cap (the
+      // banner CTR=0 lesson: value perception rides the existing moment, and
+      // the toast is inherently lightweight). Paid/free keep the plain toast.
+      const snap = await trialSnapPromise;
+      if (snap?.active) {
+        const daysRemaining = Math.max(1, Math.ceil(snap.msRemaining / 86_400_000));
+        showToast(
+          t('toast_download_completed_trial', { count: successCount, days: daysRemaining }),
+          'success'
+        );
+      } else {
+        showToast(t('toast_download_completed', { count: successCount }), 'success');
+      }
     }
     void track(EVENTS.DOWNLOAD_BATCH, { count: successCount });
     if (successCount > 0) void recordDownloads(successCount);

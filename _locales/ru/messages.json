@@ -911,6 +911,9 @@
   "toast_download_completed": {
     "message": "Скачано {count} изображений"
   },
+  "toast_download_completed_trial": {
+    "message": "Скачано {count} изображений · осталось {days} дн. пробного периода"
+  },
   "toast_download_failed": {
     "message": "Ошибка загрузки"
   },

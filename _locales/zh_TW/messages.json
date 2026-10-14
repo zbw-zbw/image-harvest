@@ -1034,6 +1034,9 @@
   "toast_download_completed": {
     "message": "已下載 {count} 張圖片"
   },
+  "toast_download_completed_trial": {
+    "message": "已下載 {count} 張圖片 · 試用剩 {days} 天"
+  },
   "toast_download_failed": {
     "message": "下載失敗"
   },
