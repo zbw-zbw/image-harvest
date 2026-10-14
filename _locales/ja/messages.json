@@ -414,10 +414,10 @@
     "message": "ライセンスキーをお持ちですか？"
   },
   "pro_collection_limit": {
-    "message": "Free plan: up to {max} favorites. Upgrade to Pro for unlimited!"
+    "message": "無料プランではコレクションは最大{max}件です。Pro にアップグレードで無制限に！"
   },
   "pro_copy_urls_limit": {
-    "message": "Free plan: up to {max} URLs per batch. Upgrade to Pro for unlimited!"
+    "message": "無料プランでは1回のバッチで最大{max}件のURLです。Pro にアップグレードで無制限に！"
   },
   "pro_deactivate_tooltip": {
     "message": "ライセンスを無効化"
@@ -432,25 +432,25 @@
     "message": "一括ダウンロード"
   },
   "pro_feature_blocked_advanced_grouping": {
-    "message": "Advanced grouping is a Pro feature. Upgrade to unlock!"
+    "message": "高度なグループ化はProの機能です。Pro にアップグレード！"
   },
   "pro_feature_blocked_collection": {
-    "message": "Collection is a Pro feature. Upgrade to unlock!"
+    "message": "コレクションはProの機能です。Pro にアップグレード！"
   },
   "pro_feature_blocked_color_copy": {
-    "message": "Color copy is a Pro feature. Upgrade to unlock!"
+    "message": "カラーコピーはProの機能です。Pro にアップグレード！"
   },
   "pro_feature_blocked_dedup": {
-    "message": "Free plan: up to {max} duplicate checks per month. Upgrade to Pro for unlimited!"
+    "message": "無料プランでは毎月最大{max}回の重複チェックです。Pro にアップグレードで無制限に！"
   },
   "pro_feature_blocked_format_conversion": {
-    "message": "Free plan: up to {max} format conversions per month. Upgrade to Pro for unlimited!"
+    "message": "無料プランでは毎月最大{max}回のフォーマット変換です。Pro にアップグレードで無制限に！"
   },
   "pro_feature_blocked_multitab": {
-    "message": "Free plan: up to {max} multi-tab extracts per month. Upgrade to Pro for unlimited!"
+    "message": "無料プランでは毎月最大{max}回のマルチタブ抽出です。Pro にアップグレードで無制限に！"
   },
   "pro_feature_blocked_reverse_search": {
-    "message": "{engine} reverse search is a Pro feature. Upgrade to unlock!"
+    "message": "{engine}の逆画像検索はProの機能です。Pro にアップグレード！"
   },
   "pro_feature_color_desc": {
     "message": "主要色で画像をフィルタリング"
@@ -603,7 +603,7 @@
     "message": "トライアルは利用できません"
   },
   "pro_zip_limit": {
-    "message": "Free plan: up to {max} images per ZIP. Upgrade to Pro for unlimited!"
+    "message": "無料プランではZIPあたり最大{max}枚です。Pro にアップグレードで無制限に！"
   },
   "progress_downloading": {
     "message": "ダウンロード中..."
@@ -1089,13 +1089,13 @@
     "message": "Proアクティベート成功！"
   },
   "toast_pro_color_filter": {
-    "message": "Color filtering is a Pro feature. Upgrade to unlock!"
+    "message": "カラーフィルターはProの機能です。Pro にアップグレード！"
   },
   "toast_pro_naming_locked": {
-    "message": "Custom naming is a Pro feature. Upgrade to unlock!"
+    "message": "ファイル名カスタマイズはProの機能です。Pro にアップグレード！"
   },
   "toast_pro_setting_locked": {
-    "message": "This setting is a Pro feature. Upgrade to unlock!"
+    "message": "この設定はProの機能です。Pro にアップグレード！"
   },
   "toast_refresh_retry": {
     "message": "ページを更新して再試行してください"
@@ -1203,70 +1203,70 @@
     "message": "トライアル"
   },
   "welcome_title": {
-    "message": "Welcome to Image Harvest Pro"
+    "message": "Image Harvest Proへようこそ"
   },
   "welcome_subtitle": {
-    "message": "The smartest way to find, filter, and batch-download images from any webpage. Your 7-day Pro trial is now active."
+    "message": "あらゆるウェブページから画像を検索・フィルター・一括ダウンロードする最もスマートな方法。7日間のProトライアルが有効になりました。"
   },
   "welcome_trial_active": {
-    "message": "Your Pro Trial is Active"
+    "message": "Proトライアルが有効です"
   },
   "welcome_trial_desc": {
-    "message": "All Pro features are unlocked. Explore everything — no credit card required."
+    "message": "すべてのPro機能が解放されています。クレジットカード不要でじっくりお試しください。"
   },
   "welcome_days_left": {
-    "message": "days left"
+    "message": "日残り"
   },
   "welcome_features_title": {
-    "message": "What's Included in Pro"
+    "message": "Proに含まれる機能"
   },
   "welcome_feature_batch_title": {
-    "message": "Unlimited Batch Download"
+    "message": "無制限バッチダウンロード"
   },
   "welcome_feature_batch_desc": {
-    "message": "Download up to 1000 images as ZIP. Convert formats on the fly (PNG, JPG, WebP)."
+    "message": "最大1000枚の画像をZIPでダウンロード。フォーマット変換もその場で（PNG、JPG、WebP）。"
   },
   "welcome_feature_multitab_title": {
-    "message": "Multi-Tab Extract"
+    "message": "マルチタブ抽出"
   },
   "welcome_feature_multitab_desc": {
-    "message": "Scan images across multiple open tabs at once. Perfect for research and comparison."
+    "message": "開いている複数タブの画像を一度にスキャン。調査・比較に最適です。"
   },
   "welcome_feature_similar_title": {
-    "message": "Similar Image Detection"
+    "message": "類似画像検出"
   },
   "welcome_feature_similar_desc": {
-    "message": "Find duplicates and near-duplicates using perceptual hashing (pHash) technology."
+    "message": "知覚ハッシュ（pHash）技術で重複と類似画像を検出。"
   },
   "welcome_feature_grouping_title": {
-    "message": "Smart Grouping"
+    "message": "スマートグループ化"
   },
   "welcome_feature_grouping_desc": {
-    "message": "Group images by domain, format, size range, or tab. 5 smart grouping modes."
+    "message": "ドメイン・形式・サイズ帯・タブごとにグループ化。5つのスマートグループ化モード。"
   },
   "welcome_feature_color_title": {
-    "message": "Color Palette Extract"
+    "message": "カラーパレット抽出"
   },
   "welcome_feature_color_desc": {
-    "message": "Extract dominant colors from any image. Copy HEX codes and filter by color."
+    "message": "どの画像からでも主要色を抽出。HEXコードをコピーして色でフィルター。"
   },
   "welcome_feature_collections_title": {
-    "message": "Image Collections"
+    "message": "画像コレクション"
   },
   "welcome_feature_collections_desc": {
-    "message": "Save images with tags and notes. Organize across sessions and export as ZIP."
+    "message": "タグとメモ付きで画像を保存。セッションをまたいで整理し、ZIPとしてエクスポート。"
   },
   "welcome_cta_title": {
-    "message": "Ready to Start?"
+    "message": "始める準備はできましたか？"
   },
   "welcome_cta_desc": {
-    "message": "Visit any webpage and click the Image Harvest icon to begin scanning."
+    "message": "任意のウェブページを開き、Image Harvestのアイコンをクリックするとスキャンを開始できます。"
   },
   "welcome_cta_button": {
-    "message": "Start Exploring"
+    "message": "使ってみる"
   },
   "welcome_footer": {
-    "message": "Your trial ends in 7 days · No credit card required"
+    "message": "トライアルはあと7日間 · クレジットカード不要"
   },
   "eagle_export_label": {
     "message": "Eagle"
@@ -1287,13 +1287,13 @@
     "message": "{count} 枚の画像を Eagle にエクスポートしました！"
   },
   "toast_pro_eagle_export": {
-    "message": "Free plan: up to {max} images per Eagle export. Upgrade to Pro for unlimited!"
+    "message": "無料プランでは1回のEagleエクスポートで最大{max}枚です。Pro にアップグレードで無制限に！"
   },
   "card_ai_tag": {
     "message": "AI タグ"
   },
   "toast_pro_ai_tag": {
-    "message": "Free plan: up to {max} AI tags per month. Upgrade to Pro for unlimited!"
+    "message": "無料プランでは毎月最大{max}件のAIタグです。Pro にアップグレードで無制限に！"
   },
   "toast_ai_tag_success": {
     "message": "AI タグが追加されました"
@@ -1323,13 +1323,13 @@
     "message": "画像が小さすぎて AI タグ付けできません"
   },
   "toast_ai_daily_limit": {
-    "message": "Free plan: up to {max} AI tags per month. Upgrade to Pro for unlimited!"
+    "message": "無料プランでは毎月最大{max}件のAIタグです。Pro にアップグレードで無制限に！"
   },
   "toast_collection_limit": {
-    "message": "Free plan: up to {max} favorites. Upgrade to Pro for unlimited!"
+    "message": "無料プランではコレクションは最大{max}件です。Pro にアップグレードで無制限に！"
   },
   "toast_eagle_free_limit": {
-    "message": "Free plan: up to {max} images per Eagle export. Upgrade to Pro for unlimited!"
+    "message": "無料プランでは1回のEagleエクスポートで最大{max}枚です。Pro にアップグレードで無制限に！"
   },
   "trial_days_remaining": {
     "message": "トライアル: 残り{days}日"
@@ -1338,7 +1338,7 @@
     "message": "トライアル終了 — Pro アクセス残り{days}日。"
   },
   "pro_batch_operation": {
-    "message": "Batch AI tagging is a Pro feature. Upgrade to unlock!"
+    "message": "AIタグの一括処理はProの機能です。Pro にアップグレード！"
   },
   "toolbar_batch_favorite": {
     "message": "お気に入り"
@@ -1428,7 +1428,7 @@
     "message": "選択した画像をダウンロード"
   },
   "toast_ai_monthly_limit": {
-    "message": "Free plan: up to {max} AI tags per month. Upgrade to Pro for unlimited!"
+    "message": "無料プランでは毎月最大{max}件のAIタグです。Pro にアップグレードで無制限に！"
   },
   "filter_visible_only": {
     "message": "表示中のみ"
@@ -1440,7 +1440,7 @@
     "message": "{visible}枚の表示画像を表示中（{hidden}枚の非表示をフィルター）"
   },
   "toast_visible_only_off": {
-    "message": "Filter removed — showing all {total} images"
+    "message": "フィルターを解除しました — {total}枚すべて表示中"
   },
   "settings_section_quotas": {
     "message": "使用量とクォータ"
@@ -1482,7 +1482,7 @@
     "message": "機能"
   },
   "quota_header_free": {
-    "message": "Free"
+    "message": "無料"
   },
   "quota_remaining": {
     "message": "残り"
@@ -1491,7 +1491,7 @@
     "message": "{used}/{max} 使用済み"
   },
   "toast_batch_limit": {
-    "message": "Free plan: up to {limit} items per batch. Upgrade to Pro for unlimited!"
+    "message": "無料プランでは1回あたり最大{limit}件です。Pro にアップグレードで無制限に！"
   },
   "restricted_section_title": {
     "message": "Image Harvestでできること"
@@ -1560,112 +1560,112 @@
     "message": "件"
   },
   "quota_usage_title": {
-    "message": "Your usage this month"
+    "message": "今月の使用状況"
   },
   "referral_cta_title": {
-    "message": "Share & Get 3 Days Pro"
+    "message": "共有してPro 3日間をゲット"
   },
   "referral_cta_desc": {
-    "message": "Invite a friend — you both get 3 extra days of Pro access"
+    "message": "友だちを招待 — 双方ともProアクセスが3日間追加されます"
   },
   "referral_cta_button": {
-    "message": "Copy Link"
+    "message": "リンクをコピー"
   },
   "referral_link_copied": {
-    "message": "Referral link copied to clipboard!"
+    "message": "招待リンクをクリップボードにコピーしました！"
   },
   "quota_exhausted_monthly": {
-    "message": "Free plan: up to {limit} {feature} per month. Upgrade to Pro for unlimited!"
+    "message": "無料プランでは毎月{limit}回の{feature}までです。Pro にアップグレードで無制限に！"
   },
   "quota_exhausted_daily": {
     "message": "無料プラン：{feature} は 1 日 {limit} 回まで。Pro にアップグレードで無制限！"
   },
   "feature_multitab": {
-    "message": "Multi-Tab Extract"
+    "message": "マルチタブ抽出"
   },
   "feature_dedup": {
-    "message": "Similar Image Detection"
+    "message": "類似画像検出"
   },
   "feature_format_convert": {
-    "message": "Format Conversion"
+    "message": "フォーマット変換"
   },
   "feature_live_monitor": {
-    "message": "Live Monitoring"
+    "message": "ライブモニタリング"
   },
   "quota_multitab": {
-    "message": "Multi-Tab Extract"
+    "message": "マルチタブ抽出"
   },
   "quota_dedup": {
-    "message": "Duplicate Detection"
+    "message": "重複検出"
   },
   "quota_format_convert": {
-    "message": "Format Conversion"
+    "message": "フォーマット変換"
   },
   "quota_live_monitor": {
-    "message": "Live Monitor"
+    "message": "ライブモニタリング"
   },
   "quota_batch_highlight": {
-    "message": "Batch Highlight"
+    "message": "一括ハイライト"
   },
   "quota_reverse_search": {
-    "message": "Reverse Search"
+    "message": "逆画像検索"
   },
   "quota_group_core": {
-    "message": "Core Pro"
+    "message": "Proコア機能"
   },
   "quota_group_ai": {
     "message": "AI"
   },
   "quota_group_batch": {
-    "message": "Batch Operations"
+    "message": "バッチ操作"
   },
   "quota_group_storage": {
-    "message": "Storage & Conversion"
+    "message": "保存と変換"
   },
   "quota_per_day": {
-    "message": "/day"
+    "message": "/日"
   },
   "quota_engines": {
-    "message": "engines"
+    "message": "エンジン"
   },
   "referral_banner_text": {
-    "message": "Share & get 3 days Pro free"
+    "message": "共有してPro 3日間無料をゲット"
   },
   "referral_banner_copy": {
-    "message": "Copy Link"
+    "message": "リンクをコピー"
   },
   "referral_match_success": {
-    "message": "Welcome! You earned {days} days of Pro from a friend's invite."
+    "message": "ようこそ！友だちの招待で{days}日間のProを獲得しました。"
   },
   "pro_feature_ai_tag_title": {
-    "message": "AI Smart Tagging"
+    "message": "AIスマートタグ付け"
   },
   "pro_feature_ai_tag_desc_pro": {
-    "message": "Auto-tag images with AI descriptions. Search and organize instantly."
+    "message": "AIの説明で画像を自動タグ付け。検索も整理もすぐにできます。"
   },
   "pro_feature_eagle_title": {
-    "message": "Eagle Export"
+    "message": "Eagleエクスポート"
   },
   "pro_feature_eagle_desc_pro": {
-    "message": "Send images directly to Eagle app with tags and metadata preserved."
+    "message": "タグとメタデータを保持したまま、画像をEagleアプリに直接送信。"
   },
   "pro_feature_format_title": {
-    "message": "Format Conversion"
+    "message": "フォーマット変換"
   },
   "pro_feature_format_desc_pro": {
-    "message": "Convert images to PNG, JPG, or WebP before downloading."
+    "message": "ダウンロード前にPNG・JPG・WebPへ変換。"
   },
   "pro_feature_live_monitor_title": {
-    "message": "Live Monitoring"
+    "message": "ライブモニタリング"
   },
   "pro_feature_live_monitor_desc_pro": {
-    "message": "Auto-detect new images as they load on the page in real time."
+    "message": "ページの読み込みに合わせて新しい画像をリアルタイムに自動検出。"
   },
   "pro_compare_feature": {
     "message": "Feature"
   },
   "pro_compare_free": {
-    "message": "Free"
+    "message": "無料"
   },
   "pro_compare_pro": {
     "message": "Pro"
@@ -1674,103 +1674,103 @@
     "message": "20/day"
   },
   "pro_compare_batch_pro": {
-    "message": "Unlimited"
+    "message": "無制限"
   },
   "pro_compare_search_free": {
-    "message": "2 engines"
+    "message": "2エンジン"
   },
   "pro_compare_search_pro": {
-    "message": "All engines"
+    "message": "全エンジン"
   },
   "pro_compare_ai_free": {
     "message": "5/day"
   },
   "pro_compare_per_month": {
-    "message": "/mo"
+    "message": "/月"
   },
   "pro_compare_per_day": {
-    "message": "/day"
+    "message": "/日"
   },
   "pro_compare_unlimited": {
-    "message": "Unlimited"
+    "message": "無制限"
   },
   "pro_compare_all_engines": {
-    "message": "All engines"
+    "message": "全エンジン"
   },
   "pro_compare_engines": {
-    "message": "engines"
+    "message": "エンジン"
   },
   "pro_batch_favorite_limit": {
-    "message": "Free plan: up to {max} favorites per batch. Upgrade to Pro for unlimited!"
+    "message": "無料プランでは1回のバッチで最大{max}件のコレクション追加です。Pro にアップグレードで無制限に！"
   },
   "pro_batch_ai_tag_limit": {
-    "message": "Free plan: up to {max} AI tags per batch. Upgrade to Pro for unlimited!"
+    "message": "無料プランでは1回のバッチで最大{max}件のAIタグです。Pro にアップグレードで無制限に！"
   },
   "pro_batch_delete_limit": {
-    "message": "Free plan: up to {max} deletions per batch. Upgrade to Pro for unlimited!"
+    "message": "無料プランでは1回のバッチで最大{max}件の削除です。Pro にアップグレードで無制限に！"
   },
   "toast_download_all_failed": {
-    "message": "Download failed — all images could not be fetched"
+    "message": "ダウンロードに失敗しました — すべての画像を取得できませんでした"
   },
   "toast_highlight_not_found": {
-    "message": "Cannot highlight — image may be in a cross-origin iframe or hidden element"
+    "message": "ハイライトできません — 画像がクロスオリジンiframeまたは非表示要素内にある可能性があります"
   },
   "pro_batch_limit_exceeded": {
-    "message": "Free plan: up to {max} items per batch. Upgrade to Pro for unlimited!"
+    "message": "無料プランでは1回あたり最大{max}件です。Pro にアップグレードで無制限に！"
   },
   "toast_batch_favorite_partial": {
-    "message": "Added {added} items. Free plan limit: {max} favorites. Upgrade to Pro for unlimited!"
+    "message": "{added}件を追加しました。無料プランの上限は{max}件です。Pro にアップグレードで無制限に！"
   },
   "pro_feature_upgrade_required": {
-    "message": "This feature requires Pro. Upgrade to unlock!"
+    "message": "この機能にはProが必要です。Pro にアップグレード！"
   },
   "collection_search_url_placeholder": {
-    "message": "Search by URL..."
+    "message": "URLで検索…"
   },
   "confirm_delete_title": {
-    "message": "Confirm Delete"
+    "message": "削除の確認"
   },
   "confirm_delete_collection_message": {
-    "message": "Remove this image from your collection?"
+    "message": "この画像をコレクションから削除しますか？"
   },
   "collection_select_all": {
-    "message": "Select all"
+    "message": "すべて選択"
   },
   "collection_batch_download": {
-    "message": "Download selected"
+    "message": "選択項目をダウンロード"
   },
   "collection_batch_delete": {
-    "message": "Delete selected"
+    "message": "選択項目を削除"
   },
   "collection_count": {
-    "message": "{total} items"
+    "message": "{total}件"
   },
   "collection_count_selected": {
-    "message": "{selected}/{total} selected"
+    "message": "{selected}/{total}を選択中"
   },
   "collection_batch_delete_confirm": {
-    "message": "Delete {count} selected items from collection?"
+    "message": "選択した{count}件をコレクションから削除しますか？"
   },
   "toast_collection_batch_deleted": {
-    "message": "Deleted {count} items from collection"
+    "message": "コレクションから{count}件を削除しました"
   },
   "feature_color_copy": {
-    "message": "Color copy"
+    "message": "カラーコピー"
   },
   "quota_color_copy": {
-    "message": "Color Copy"
+    "message": "カラーコピー"
   },
   "pro_feature_batch_ops_title": {
-    "message": "Batch Operations"
+    "message": "バッチ操作"
   },
   "pro_feature_batch_ops_desc_pro": {
-    "message": "Batch delete, favorite, AI tag, and Eagle export — all unlimited."
+    "message": "一括削除・コレクション追加・AIタグ・Eagleエクスポート — すべて無制限。"
   },
   "pro_compare_per_batch": {
-    "message": "imgs/batch"
+    "message": "枚/バッチ"
   },
   "pro_compare_times_per_month": {
-    "message": "times/mo"
+    "message": "回/月"
   },
   "toast_ai_tag_svg_unsupported": {
     "message": "SVG画像はAIタグ付けに対応していません"

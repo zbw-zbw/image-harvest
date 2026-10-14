@@ -28,6 +28,7 @@ import en from '../_locales/en/messages.json';
 import zhCN from '../_locales/zh_CN/messages.json';
 import zhTW from '../_locales/zh_TW/messages.json';
 import ja from '../_locales/ja/messages.json';
+import ko from '../_locales/ko/messages.json';
 import es from '../_locales/es/messages.json';
 
 interface StorageStub {
@@ -257,10 +258,13 @@ describe('catalogue parity', () => {
   // gap that should be flagged in CI.
   const enKeys = new Set(Object.keys(en));
 
+  // ko joined the parity roster in v1.2.4: it had been silently lagging 69
+  // keys behind en because no test covered it.
   const localeMap: Partial<Record<Exclude<Locale, 'en'>, Record<string, unknown>>> = {
     'zh-CN': zhCN,
     'zh-TW': zhTW,
     ja,
+    ko,
     es,
   };
 
