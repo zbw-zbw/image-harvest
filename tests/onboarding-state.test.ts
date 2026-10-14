@@ -13,6 +13,7 @@
 
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import {
+  claimOnboardingStarted,
   getOnboardingState,
   isOnboardingActive,
   resolveOnboarding,
@@ -90,5 +91,33 @@ describe('onboarding-state', () => {
     __test.setStorage(storage);
     // resolved wins over active — the flag pair can only mean "retired".
     expect(await isOnboardingActive()).toBe(false);
+  });
+});
+
+describe('claimOnboardingStarted — one-shot start-event report (v1.2.4)', () => {
+  it('claims exactly once per arm: first sighting true, panel re-open false', async () => {
+    await startOnboarding();
+    // First panel open: the coach becomes visible and fires the funnel's
+    // start event.
+    expect(await claimOnboardingStarted()).toBe(true);
+    // Panel closed and re-opened while the flow is still active — a fresh
+    // JS context would otherwise re-fire onboarding_started.
+    expect(await claimOnboardingStarted()).toBe(false);
+    expect(await claimOnboardingStarted()).toBe(false);
+    expect((await getOnboardingState()).startedReported).toBe(true);
+  });
+
+  it('a resolved flow never claims — the coach cannot fire post-retirement', async () => {
+    await startOnboarding();
+    await resolveOnboarding();
+    expect(await claimOnboardingStarted()).toBe(false);
+  });
+
+  it('hydrates startedReported from storage (old persisted state reports once more)', async () => {
+    const storage = makeFakeStorage();
+    await storage.set('onboardingState', { active: true, startedAt: 123, resolved: false });
+    __test.setStorage(storage);
+    expect(await claimOnboardingStarted()).toBe(true);
+    expect(await claimOnboardingStarted()).toBe(false);
   });
 });

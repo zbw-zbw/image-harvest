@@ -18,7 +18,11 @@
 // after the first download so it never reappears.
 
 import { useEffect, useState } from 'preact/hooks';
-import { isOnboardingActive, resolveOnboarding } from '../../shared/onboarding-state';
+import {
+  claimOnboardingStarted,
+  isOnboardingActive,
+  resolveOnboarding,
+} from '../../shared/onboarding-state';
 import { track, flushNow } from '../../shared/telemetry';
 import { EVENTS } from '../../shared/telemetry-events';
 import { EXPERIMENTS, getExperimentBucket } from '../../shared/ab-experiment';
@@ -37,12 +41,24 @@ export function OnboardingCoach() {
   // Re-render on language switch so t() picks up the new catalogue.
   useStoreSelector((s) => s.localeTick);
 
-  // Gate: only show when the welcome CTA armed the flow.
+  // Gate: visible once the flow is armed. Since v1.2.4 the arm happens at
+  // install time in the background — the old arm point (the welcome page's
+  // "Try it now" CTA) was unreachable in practice — so this first sighting
+  // is also where onboarding_started belongs: the arm point no longer
+  // implies a human saw anything. claimOnboardingStarted() keeps the event
+  // one-shot across panel re-opens (each open is a fresh JS context).
   useEffect(() => {
     let cancelled = false;
     void (async () => {
       const active = await isOnboardingActive();
-      if (!cancelled && active) setVisible(true);
+      if (!cancelled && active) {
+        setVisible(true);
+        if (await claimOnboardingStarted()) {
+          const bucket = await getExperimentBucket(EXPERIMENTS.ONBOARDING_FLOW).catch(() => 'b');
+          void track(EVENTS.ONBOARDING_STARTED, { bucket });
+          void flushNow();
+        }
+      }
     })();
     return () => {
       cancelled = true;

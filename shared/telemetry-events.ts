@@ -81,7 +81,7 @@ export const EVENTS = {
   // Onboarding activation funnel (Phase 2a). `bucket` is the
   // onboarding_flow_v1 variant — shipped explicitly because the envelope
   // abBucket is reserved for the pro-upsell experiment.
-  ONBOARDING_STARTED: 'onboarding_started', // welcome "Try it" clicked
+  ONBOARDING_STARTED: 'onboarding_started', // coach first sighted in the panel (v1.2.4; was the welcome CTA)
   ONBOARDING_SCAN_DONE: 'onboarding_scan_done', // first scan produced images
   ONBOARDING_DOWNLOAD_DONE: 'onboarding_download_done', // first download completed
 

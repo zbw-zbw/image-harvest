@@ -130,6 +130,9 @@ beforeAll(async () => {
       },
       // initTelemetry() reads version from here at module init time.
       getManifest: vi.fn(() => ({ version: '1.0.1' })),
+      // The install branch of onInstalled opens the welcome tab via
+      // getURL — first exercised by the v1.2.4 onboarding-arm tests.
+      getURL: vi.fn((path: string) => `chrome-extension://test/${path}`),
     },
     downloads: {
       onChanged: {
@@ -1285,5 +1288,79 @@ describe('handleMessage — deep scan routes', () => {
 
     expect(bgExtractor.cancelDeepScan).toHaveBeenCalledWith(7);
     expect(result).toEqual({ success: true });
+  });
+});
+
+// ─────────────────────────────────────────────────────────────────────
+// onInstalled — panel-first onboarding arm (v1.2.4)
+//
+// The coach-mark arm moved from the welcome CTA (unreachable in the field:
+// 2,189 installs, zero onboarding_started events) to install time. These
+// cases pin who gets armed: bucket b + install → armed; bucket a + install
+// → not armed (experiment control stays clean); bucket b + update → not
+// armed (long-time users never see a retro-active coach).
+
+describe('onInstalled — panel-first onboarding arm (v1.2.4)', () => {
+  const chromeAny = () => (globalThis as unknown as { chrome: Record<string, unknown> }).chrome;
+  let storageSet: ReturnType<typeof vi.fn>;
+
+  beforeEach(() => {
+    // The shared chrome stub (beforeAll) has no storage — inject a minimal
+    // chrome.storage.local so onboarding-state's default adapter can round-
+    // trip, and point the ab-experiment cache at a forced bucket.
+    storageSet = vi.fn(async () => {});
+    const storageGet = vi.fn(async () => ({}));
+    chromeAny().storage = { local: { get: storageGet, set: storageSet } };
+  });
+
+  afterEach(async () => {
+    // Remove the injected storage so later suites see the stub they were
+    // written against, and drop both modules' in-memory caches.
+    delete chromeAny().storage;
+    const { __test: abTest } = await import('../shared/ab-experiment');
+    abTest.reset();
+    const { __test: obTest } = await import('../shared/onboarding-state');
+    obTest.reset();
+  });
+
+  async function armBucket(bucket: 'a' | 'b'): Promise<void> {
+    const { EXPERIMENTS, __test: abTest } = await import('../shared/ab-experiment');
+    abTest.reset();
+    abTest.setBucket(bucket, EXPERIMENTS.ONBOARDING_FLOW);
+    const { __test: obTest } = await import('../shared/onboarding-state');
+    obTest.reset();
+  }
+
+  it('install + bucket b → arms onboardingState for the first panel open', async () => {
+    await armBucket('b');
+    onInstalledListener!({ reason: 'install' } as chrome.runtime.InstalledDetails);
+
+    // The arm chain is async (dynamic imports) — wait for the write.
+    await vi.waitFor(() => {
+      expect(storageSet).toHaveBeenCalled();
+    });
+    const writes = storageSet.mock.calls.map((c) => c[0]);
+    const arm = writes.find((w) => w && typeof w === 'object' && 'onboardingState' in w);
+    expect(arm).toBeDefined();
+    expect(arm.onboardingState).toMatchObject({ active: true });
+  });
+
+  it('install + bucket a → control stays unarmed', async () => {
+    await armBucket('a');
+    onInstalledListener!({ reason: 'install' } as chrome.runtime.InstalledDetails);
+
+    // Give the (non-)arm chain a moment to settle, then assert no arm write.
+    await new Promise((r) => setTimeout(r, 50));
+    const writes = storageSet.mock.calls.map((c) => c[0]);
+    expect(writes.some((w) => w && typeof w === 'object' && 'onboardingState' in w)).toBe(false);
+  });
+
+  it('update + bucket b → existing installs are never retro-armed', async () => {
+    await armBucket('b');
+    onInstalledListener!({ reason: 'update' } as chrome.runtime.InstalledDetails);
+
+    await new Promise((r) => setTimeout(r, 50));
+    const writes = storageSet.mock.calls.map((c) => c[0]);
+    expect(writes.some((w) => w && typeof w === 'object' && 'onboardingState' in w)).toBe(false);
   });
 });

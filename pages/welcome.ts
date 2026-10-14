@@ -63,8 +63,11 @@ function init(): void {
     setTimeout(() => window.close(), 200);
   });
 
-  // Track page view
+  // Track page view. Flush immediately: installs routinely close this tab
+  // within the 5s queue window (field data 2026-10: 2,189 installs produced
+  // only 3 viewed events — the rest vanished unflushed).
   void track(EVENTS.WELCOME_PAGE_VIEWED, { source: 'install' });
+  void flushNow();
 
   // Guided onboarding (bucket b only)
   void setupOnboarding();
@@ -89,9 +92,12 @@ async function setupOnboarding(): Promise<void> {
   btnTry.addEventListener('click', () => {
     void (async () => {
       // Arm the side panel's coach marks BEFORE opening it, so the panel sees
-      // the flag on its very first read.
+      // the flag on its very first read. (Redundant with the install-time
+      // arm since v1.2.4 — kept as a backfill for the rare case the install
+      // arm failed. onboarding_started itself now fires at the coach's
+      // first sighting in the panel, not here.)
       await startOnboarding();
-      void track(EVENTS.ONBOARDING_STARTED, { bucket });
+      void track(EVENTS.WELCOME_CTA_CLICKED, { action: 'try_now' });
       void flushNow();
       const opened = await openSidePanelHere();
       if (opened && hint) {

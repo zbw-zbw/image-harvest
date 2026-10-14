@@ -13,16 +13,22 @@ const STORAGE_KEY = 'onboardingState';
 export interface OnboardingState {
   /** True from CTA click until done/dismissed. */
   active: boolean;
-  /** Epoch ms of the CTA click. 0 = never started. */
+  /** Epoch ms of the arm (install-time since v1.2.4, or CTA click). 0 = never. */
   startedAt: number;
   /** Sticky terminal flag — first download completed or coach dismissed. */
   resolved: boolean;
+  /** Sticky one-shot: onboarding_started already reported for this arm.
+   *  The coach fires the funnel's start event at its first sighting, but a
+   *  panel is a fresh JS context on every open — without this flag each
+   *  re-open (coach still active) would re-fire the event. */
+  startedReported: boolean;
 }
 
 const DEFAULT_STATE: OnboardingState = {
   active: false,
   startedAt: 0,
   resolved: false,
+  startedReported: false,
 };
 
 interface StorageAdapter {
@@ -62,6 +68,16 @@ export async function startOnboarding(): Promise<void> {
   const s = await load();
   if (s.resolved) return; // never re-arm after completion/dismissal
   await save({ ...s, active: true, startedAt: Date.now() });
+}
+
+/** Claim the one-shot onboarding_started report: true exactly once per arm,
+ *  at the coach's first sighting. Subsequent panel re-opens return false,
+ *  and a resolved flow never reports. */
+export async function claimOnboardingStarted(): Promise<boolean> {
+  const s = await load();
+  if (s.startedReported || s.resolved) return false;
+  await save({ ...s, startedReported: true });
+  return true;
 }
 
 /** Should the side panel render the coach marks right now? */

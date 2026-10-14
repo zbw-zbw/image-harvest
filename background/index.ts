@@ -247,6 +247,25 @@ chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'install') {
     void track(EVENTS.EXTENSION_INSTALLED);
     void autoStartTrial('install');
+    // Panel-first onboarding arm (v1.2.4): arm the coach marks AT INSTALL
+    // for bucket b of onboarding_flow_v1. The previous arm point — the
+    // welcome page's "Try it now" CTA — was effectively unreachable (field
+    // data 2026-10: 2,189 installs, zero onboarding_started events; users
+    // close the welcome tab within seconds). Arming here means the FIRST
+    // sidepanel open — the real first-use moment — shows the coach whether
+    // or not the welcome tab was ever read. reason==='update' never reaches
+    // this branch, so existing installs never see a retro-active coach.
+    void import('../shared/ab-experiment')
+      .then(({ EXPERIMENTS, getExperimentBucket }) =>
+        getExperimentBucket(EXPERIMENTS.ONBOARDING_FLOW)
+      )
+      .then((bucket) => {
+        if (bucket !== 'b') return;
+        return import('../shared/onboarding-state').then(({ startOnboarding }) =>
+          startOnboarding()
+        );
+      })
+      .catch((err) => console.warn('Onboarding arm failed:', err));
     // Attempt to match a pending referral (from the invite landing page).
     // Runs async in background — non-blocking, best-effort. The .catch keeps
     // a failed module load from surfacing as an unhandled rejection in the
