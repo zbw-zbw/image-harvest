@@ -40,11 +40,12 @@
 
 ## 提交记录
 
-| 日期       | 版本  | 状态      | 备注                                                                                                                                                                                                          |
-| ---------- | ----- | --------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-09-24 | 1.2.0 | In review | Store ID `0RDCKDQGR9XG`；CRX ID `ldcpblieinfbpgachbnnbaphkagfemaj`；官方审核期最长 7 个工作日；过审后 Store URL 可用                                                                                          |
-| 2026-10-08 | 1.2.0 | Approved  | 约 14 天过审（含十一假期）；正式 URL 按 CRX ID 路由（slug 段为规范 slug `image-harvest-download-`，与 Store ID 无关）；已回填官网 hero + README；商店页确认 15 语言、v1.2.0、Updated 2026-09-24、描述全文一致 |
-| 2026-10-10 | 1.2.1 | In review | 版本更新提交（trial value-moment banner）；认证说明存底 `docs/edge-store/certification-notes-v1.2.1.md`（每次提交都要重新粘贴 notes）；CWS 侧同日提交、同日过审                                               |
+| 日期       | 版本  | 状态      | 备注                                                                                                                                                                                                                        |
+| ---------- | ----- | --------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-09-24 | 1.2.0 | In review | Store ID `0RDCKDQGR9XG`；CRX ID `ldcpblieinfbpgachbnnbaphkagfemaj`；官方审核期最长 7 个工作日；过审后 Store URL 可用                                                                                                        |
+| 2026-10-08 | 1.2.0 | Approved  | 约 14 天过审（含十一假期）；正式 URL 按 CRX ID 路由（slug 段为规范 slug `image-harvest-download-`，与 Store ID 无关）；已回填官网 hero + README；商店页确认 15 语言、v1.2.0、Updated 2026-09-24、描述全文一致               |
+| 2026-10-10 | 1.2.1 | In review | 版本更新提交（trial value-moment banner）；认证说明存底 `docs/edge-store/certification-notes-v1.2.1.md`（每次提交都要重新粘贴 notes）；CWS 侧同日提交、同日过审                                                             |
+| 2026-10-14 | 1.2.4 | In review | 版本更新提交（深扫完成检测修复、ko/ja 全量本地化、安装时引导布防 A/B）；认证说明存底 `docs/edge-store/certification-notes-v1.2.4.md`；zip 为 GitHub Release CI 产物（已验证唯一 manifest、version 1.2.4）；CWS 侧同批待提交 |
 
 Edge 后台关键凭据（过审后回填官网/README 用）：
 
