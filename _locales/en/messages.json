@@ -1798,7 +1798,7 @@
     "message": "Detected {total} elements, scanned first 2000"
   },
   "extName": {
-    "message": "Image Harvest - Download Any Image from Any Webpage",
+    "message": "Image Harvest - Batch Image Downloader",
     "description": "Extension name shown in the Chrome Web Store and browser UI."
   },
   "extDesc": {

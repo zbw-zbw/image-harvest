@@ -58,6 +58,15 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
+## [1.2.3] — 2026-10-14
+
+### 🔄 Changed
+
+- **A clearer store listing name**: the Chrome Web Store title is now "Image Harvest - Batch Image Downloader" (ja/ko/es titles updated to the same pattern), naming the category users actually search for instead of a tagline. Same extension, same icon — just easier to find.
+- **(website) Uninstall feedback registers instantly**: picking a reason on the farewell page records it the moment you click; the optional follow-up question no longer gates it.
+
+---
+
 ## [1.2.2] — 2026-10-13
 
 ### ✨ Added

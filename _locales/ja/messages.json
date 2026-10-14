@@ -1785,7 +1785,7 @@
     "message": "{total}個の要素を検出、先頭2000個をスキャンしました"
   },
   "extName": {
-    "message": "Image Harvest - ウェブページの画像を一括ダウンロード",
+    "message": "Image Harvest - 画像一括ダウンローダー",
     "description": "Extension name shown in the Chrome Web Store and browser UI."
   },
   "extDesc": {

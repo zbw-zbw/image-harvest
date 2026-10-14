@@ -1788,7 +1788,7 @@
     "message": "Detectados {total} elementos, escaneados los primeros 2000"
   },
   "extName": {
-    "message": "Image Harvest - Descarga todas las imágenes de cualquier página",
+    "message": "Image Harvest - Descargador de Imágenes",
     "description": "Extension name shown in the Chrome Web Store and browser UI."
   },
   "extDesc": {

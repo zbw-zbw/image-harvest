@@ -94,13 +94,12 @@
 
 ---
 
-## 🆕 What's New (v1.2.2)
+## 🆕 What's New (v1.2.3)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
-- ⬇️ **Your next step, one click away**: after every scan, a clear "N images ready — Download all" bar sits above the grid. No manual selecting, no hunting for the button.
-- 🏠 **Expired trials get a warm welcome back**: the upgrade dialog now opens with what you've already harvested — "You've saved N images…" — and a direct path back to the full toolkit.
-- 🔍 **Deep Scan fixes**: no more stopping early on sites that swap image sources, and a calm "no new images" message instead of a confusing "found 0".
+- 🏷️ **A clearer store name**: now listed as "Image Harvest - Batch Image Downloader" — the category term people actually search for (ja/ko/es titles follow the same pattern).
+- 🫡 **(website) Uninstall feedback registers instantly**: your reason is recorded the moment you tap it; the optional follow-up no longer gates it.
 
 ---
 
