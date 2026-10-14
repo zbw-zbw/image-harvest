@@ -94,13 +94,13 @@
 
 ---
 
-## 🆕 What's New (v1.2.4)
+## 🆕 What's New (v1.2.5)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
-- 🐛 **Deep Scan finish detection fixed**: long pages that had fully loaded no longer get misjudged as "stalled" right at the end.
-- 🌏 **Japanese & Korean fully localized**: 250+ strings that had slipped back to English are translated again, plus 69 Korean messages that had never shipped.
-- 🫵 **First-use guidance shows reliably**: the coach marks now appear the first time you open the side panel — no longer gated on a welcome-page button almost everyone closed instantly.
+- ⏳ **Trial value toast**: every successful batch download now ends with "Downloaded N images · X trial days left" during your trial — the countdown rides the moment, in your language.
+- 🧾 **Pay by email invoice, on every plan card** (website): no PayPal account? The card-payment option now sits directly under each purchase button — before the checkout wall, not only after rescue.
+- 📊 **Upgrade CTR telemetry fixed**: modal click-through rates were unmeasurable due to mismatched event values — now aligned.
 
 ---
 

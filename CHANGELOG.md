@@ -58,6 +58,21 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
+## [1.2.5] — 2026-10-14
+
+### ✨ Added
+
+- **Trial value toast**: trial users see "Downloaded N images · X trial days left" on every successful batch download — the countdown now rides the moment of delight instead of living in a separate banner. Localized in all 15 languages.
+- **Email-invoice checkout on every plan card** (website): buyers without a PayPal account find the card-payment option directly under each purchase button — before hitting the checkout login wall, not only after being rescued from it.
+
+### 🐛 Fixed
+
+- **Upgrade-modal conversion telemetry**: CTA clicks were logged with a trigger value that didn't match the modal's own shown events, making click-through-rate math impossible — the value domains now align.
+
+### 🧹 Housekeeping
+
+- Declared the website's `invoice_offer_cta_clicked` event in the extension telemetry catalogue so both repositories' event lists stay aligned.
+
 ## [1.2.4] — 2026-10-14
 
 ### 🐛 Fixed
