@@ -124,7 +124,10 @@ async function handleStartTrial(
   setError: (msg: string) => void,
   setLoading: (loading: boolean) => void
 ): Promise<void> {
-  void track(EVENTS.PRO_UPSELL_CTA_CLICKED, { trigger: 'modal', cta: 'trial' });
+  // 'modal_open' matches the pro_upsell_shown trigger value domain
+  // (settings.ts emits modal_open / modal_suppressed) — 'modal' was a legacy
+  // value that made trigger-level CTR unjoinable (2026-10-14 audit).
+  void track(EVENTS.PRO_UPSELL_CTA_CLICKED, { trigger: 'modal_open', cta: 'trial' });
 
   setError('');
   setLoading(true);
@@ -158,11 +161,13 @@ function handlePricingClick(
   cta: string = 'pricing'
 ): void {
   e.preventDefault();
-  void track(EVENTS.PRO_UPSELL_CTA_CLICKED, { trigger: 'modal', cta });
+  // Same value-domain fix as handleStartTrial — shown/clicked triggers must
+  // agree for CTR math. The pricingPageUrl arg below stays 'modal': that is
+  // the website-side URL referrer, a separate value domain.
+  void track(EVENTS.PRO_UPSELL_CTA_CLICKED, { trigger: 'modal_open', cta });
   // Attribution: 'modal' tells the website funnel WHICH touchpoint sent
-  // this visit (vs. the settings get-Pro link) — mirrors the trigger prop
-  // on the telemetry event above. feature/count carry the wall context so
-  // the pricing page can greet the user with the blocked task.
+  // this visit (vs. the settings get-Pro link). feature/count carry the wall
+  // context so the pricing page can greet the user with the blocked task.
   chrome.tabs.create({ url: pricingPageUrl('modal', feature, count) });
 }
 
