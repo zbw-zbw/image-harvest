@@ -58,6 +58,16 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
+## [1.2.4] — 2026-10-14
+
+### 🐛 Fixed
+
+- **Deep Scan no longer misreports finished pages as stuck**: long pages that had already scrolled to their real bottom could look "stalled" right at the finish line (the progress logic was watching the wrong stability signal). Completion is now detected correctly.
+- **Japanese and Korean are fully localized again**: 110 Japanese and 143 Korean strings that had drifted back to English are retranslated, and Korean also gains the 69 messages it had never had (filters, settings, upgrade prompts and more).
+- **First-use guidance now shows reliably**: the in-panel coach marks appear the first time a new install opens the side panel. They used to arm only through a button on the welcome tab — one nearly everyone closed within seconds — so the guidance almost never appeared.
+
+---
+
 ## [1.2.3] — 2026-10-14
 
 ### 🔄 Changed

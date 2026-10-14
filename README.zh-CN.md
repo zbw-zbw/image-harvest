@@ -360,7 +360,7 @@ Image Harvest 的官方营销站（着陆页、定价、常见问题、License �
 
 完整发布历史详见 [CHANGELOG.md](./CHANGELOG.md)。
 
-**最新版本**：`v1.2.3` —— 🏷️ 商店标题更名「Image Harvest - Batch Image Downloader」（日/韩/西语同步），对齐用户真实搜索的品类词；官网卸载反馈页改为点击即记录，追问不再拦截。完整列表 见 [CHANGELOG.md](./CHANGELOG.md)。
+**最新版本**：`v1.2.4` —— 🐛 深度扫描完成检测修复：已滚动到底的长页面不再被误判为「卡住」；日/韩语界面补全 253 条回退英文的翻译，韩语另补 69 条缺失文案；新用户引导改为打开侧边栏首次即显示，不再依赖欢迎页按钮。完整列表 见 [CHANGELOG.md](./CHANGELOG.md)。
 
 ---
 

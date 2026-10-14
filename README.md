@@ -94,12 +94,13 @@
 
 ---
 
-## 🆕 What's New (v1.2.3)
+## 🆕 What's New (v1.2.4)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
-- 🏷️ **A clearer store name**: now listed as "Image Harvest - Batch Image Downloader" — the category term people actually search for (ja/ko/es titles follow the same pattern).
-- 🫡 **(website) Uninstall feedback registers instantly**: your reason is recorded the moment you tap it; the optional follow-up no longer gates it.
+- 🐛 **Deep Scan finish detection fixed**: long pages that had fully loaded no longer get misjudged as "stalled" right at the end.
+- 🌏 **Japanese & Korean fully localized**: 250+ strings that had slipped back to English are translated again, plus 69 Korean messages that had never shipped.
+- 🫵 **First-use guidance shows reliably**: the coach marks now appear the first time you open the side panel — no longer gated on a welcome-page button almost everyone closed instantly.
 
 ---
 
