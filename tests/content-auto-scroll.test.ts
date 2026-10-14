@@ -106,6 +106,34 @@ describe('runDeepScan — stop conditions', () => {
     expect(result.steps).toBe(2);
   });
 
+  it('stable-height page with no lazy-load increment scrolls to the real bottom → "bottom" (v1.2.4)', async () => {
+    // Regression pin for the second stalled class: a page longer than
+    // STALL_STEPS viewport-steps whose images all load eagerly used to be
+    // reported 'stalled' at step 3 even though scrolling advanced normally.
+    // Field data 2026-10: every stalled sample had steps === STALL_STEPS,
+    // newCount === 0, count 7–142 — i.e. nothing left to lazy-load.
+    const h = makeDeps();
+    h.setDocHeight(6000); // > 3.7 viewport-heights → old code stopped stalled
+    const result = await runDeepScan({ deps: h.deps, limits: FAST });
+
+    expect(result.stopReason).toBe('bottom');
+    // 0→900→1800→2700→3600→4500→5000(clamp)→5000 = 7 steps.
+    expect(result.steps).toBe(7);
+  });
+
+  it('scrollY cannot advance (fixed-viewport SPA) with no new images → "stalled"', async () => {
+    const h = makeDeps();
+    h.setDocHeight(6000);
+    h.deps.scrollBy = () => {}; // window scroll is a no-op on this page
+    const result = await runDeepScan({
+      deps: h.deps,
+      limits: { ...FAST, STALL_STEPS: 2 },
+    });
+
+    expect(result.stopReason).toBe('stalled');
+    expect(result.steps).toBe(2);
+  });
+
   it('mutation batches beyond MAX_NEW_IMAGES → "maxImages"', async () => {
     const h = makeDeps();
     h.deps.observeMutations = (cb) => {

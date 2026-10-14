@@ -233,6 +233,7 @@ async function doRunDeepScan(options: DeepScanOptions, run: ActiveRun): Promise<
       }
 
       const heightBefore = deps.getDocumentHeight();
+      const scrollYBefore = deps.getScrollY();
       const stepDelta = Math.max(1, Math.floor(deps.getViewportHeight() * limits.STEP_RATIO));
 
       let stepAdded = 0;
@@ -256,7 +257,20 @@ async function doRunDeepScan(options: DeepScanOptions, run: ActiveRun): Promise<
         bottomStreak = 0;
       }
 
-      if (zeroNewStreak >= limits.STALL_STEPS && bottomStreak === 0) {
+      // A page that still scrolls and whose height is stable simply has
+      // more ground to cover — "no new images YET" is not a stall (field
+      // data 2026-10: every stalled sample was a fully-loaded long page
+      // misreported at exactly STALL_STEPS). Genuinely stuck is either a
+      // page that keeps growing without producing content (endless feed
+      // with a broken loader) or one whose scrollY cannot advance at all
+      // (fixed-viewport SPA).
+      const scrollAdvanced = deps.getScrollY() > scrollYBefore + 1;
+      const heightGrew = deps.getDocumentHeight() > heightBefore;
+      if (
+        zeroNewStreak >= limits.STALL_STEPS &&
+        (heightGrew || !scrollAdvanced) &&
+        bottomStreak === 0
+      ) {
         // Only while NOT in the bottom zone: once the bottom branch starts
         // accumulating (bottomStreak > 0), the run belongs to 'bottom' — a
         // short page must not be misreported as 'stalled'.
