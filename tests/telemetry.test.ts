@@ -12,7 +12,15 @@
 //      with vi.useFakeTimers() without racing chrome.* polyfills.
 
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import { __test, flushNow, isOptedIn, setEnvelopeMeta, setOptIn, track } from '../shared/telemetry';
+import {
+  __test,
+  flushNow,
+  isOptedIn,
+  setEnvelopeMeta,
+  setOptIn,
+  track,
+  trackLicenseLink,
+} from '../shared/telemetry';
 import { EVENTS } from '../shared/telemetry-events';
 import {
   TELEMETRY_BATCH_SIZE,
@@ -413,5 +421,66 @@ describe('deep scan event catalog (v1.2.0)', () => {
       durationMs: 3200,
       stopReason: 'bottom',
     });
+  });
+});
+
+describe('trackLicenseLink (attribution bridge, v1.2.4)', () => {
+  test('enqueues license_link with a 16-hex linkHash of the license-side id', async () => {
+    await trackLicenseLink('inst_abc123');
+    const ev = __test.getQueueSnapshot().find((e) => e.event === 'license_link');
+    expect(ev).toBeDefined();
+    const linkHash = (ev?.props as Record<string, string> | undefined)?.linkHash;
+    // Format pin: lowercase hex, exactly 16 chars — the joinable shape the
+    // dashboard's license-attribution query relies on.
+    expect(linkHash).toMatch(/^[0-9a-f]{16}$/);
+  });
+
+  test('linkHash is deterministic and distinct per license id', async () => {
+    await trackLicenseLink('inst_same');
+    await trackLicenseLink('inst_same'); // same id again
+    await trackLicenseLink('inst_other');
+    const snap = __test
+      .getQueueSnapshot()
+      .filter((e) => e.event === 'license_link') as unknown as Array<{
+      props: { linkHash: string };
+    }>;
+    expect(snap).toHaveLength(3);
+    expect(snap[0].props.linkHash).toBe(snap[1].props.linkHash); // same id → same hash
+    expect(snap[2].props.linkHash).not.toBe(snap[0].props.linkHash); // different id → different hash
+  });
+
+  test('linkHash equals SHA-256(id).slice(0,16) when SubtleCrypto is available', async () => {
+    const subtle = (globalThis as { crypto?: { subtle?: SubtleCrypto } }).crypto?.subtle;
+    if (!subtle) {
+      // jsdom without WebCrypto runs the non-crypto fallback digest — the
+      // format/determinism pins above cover that path.
+      return;
+    }
+    const digest = await subtle.digest('SHA-256', new TextEncoder().encode('inst_abc123'));
+    const expected = [...new Uint8Array(digest)]
+      .map((b) => b.toString(16).padStart(2, '0'))
+      .join('')
+      .slice(0, 16);
+    await trackLicenseLink('inst_abc123');
+    const ev = __test.getQueueSnapshot().find((e) => e.event === 'license_link');
+    expect((ev?.props as Record<string, string> | undefined)?.linkHash).toBe(expected);
+  });
+
+  test('never throws on internal failure (activation must not break)', async () => {
+    // Storage that rejects everything — track()'s isOptedIn read fails, the
+    // try/catch must swallow it and resolve cleanly.
+    const broken = {
+      get: async () => {
+        throw new Error('storage down');
+      },
+      set: async () => {
+        throw new Error('storage down');
+      },
+      remove: async () => {
+        throw new Error('storage down');
+      },
+    };
+    __test.setStorage(broken as unknown as Parameters<typeof __test.setStorage>[0]);
+    await expect(trackLicenseLink('inst_x')).resolves.toBeUndefined();
   });
 });

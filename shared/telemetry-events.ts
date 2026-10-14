@@ -48,6 +48,10 @@ export const EVENTS = {
   PRICING_PAGE_VIEWED: 'pricing_viewed', // fired by the marketing site, not the extension
   CHECKOUT_STARTED: 'checkout_started', // fired by the marketing site
   LICENSE_ACTIVATED: 'license_activated', // props: { plan: string }
+  // Attribution bridge (v1.2.4): fired with license activation, carrying the
+  // license-side instance id hash so paid licenses can join to telemetry —
+  // see shared/telemetry.ts trackLicenseLink.
+  LICENSE_LINK: 'license_link', // props: { linkHash: string }
   TRIAL_STARTED: 'trial_started',
   TRIAL_AUTO_STARTED: 'trial_auto_started', // props: { source: 'install' | 'update' }
   TRIAL_EXPIRED: 'trial_expired',
@@ -210,6 +214,7 @@ export const EVENT_PROP_SCHEMAS: Record<TelemetryEventName, readonly string[]> =
   [EVENTS.PRICING_PAGE_VIEWED]: ['referrer', 'abBucket'], // referrer: "extension" | "google" | "direct" | ...
   [EVENTS.CHECKOUT_STARTED]: ['plan', 'abBucket'],
   [EVENTS.LICENSE_ACTIVATED]: ['plan', 'abBucket'],
+  [EVENTS.LICENSE_LINK]: ['linkHash'],
   [EVENTS.TRIAL_STARTED]: ['abBucket'],
   [EVENTS.TRIAL_AUTO_STARTED]: ['source', 'abBucket'],
   [EVENTS.TRIAL_EXPIRED]: ['abBucket'],

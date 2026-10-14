@@ -338,6 +338,20 @@ async function sha256Hex(input: string): Promise<string> {
   return n.toString(16).padStart(16, '0').repeat(4); // 64 hex chars to mirror SHA-256
 }
 
+/** Attribution bridge for license activation (v1.2.4). Reports the
+ * LICENSE-side instance id hash — same SHA-256 recipe as the envelope's
+ * telemetry-side hash — so the server can join licenses.activated_instances
+ * to this install's full behavioral telemetry. The two id namespaces are
+ * otherwise unlinkable by design. Pseudonymous hash only, no PII. */
+export async function trackLicenseLink(licenseInstanceId: string): Promise<void> {
+  try {
+    const linkHash = (await sha256Hex(licenseInstanceId)).slice(0, 16);
+    await track(EVENTS.LICENSE_LINK, { linkHash });
+  } catch {
+    /* attribution must never break activation */
+  }
+}
+
 async function buildEnvelope(events: TelemetryEvent[]): Promise<TelemetryEnvelope> {
   return {
     instanceIdHash: await getInstanceHash(),

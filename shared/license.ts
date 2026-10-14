@@ -15,7 +15,7 @@ import { verifyLicenseSignature } from './license-verify';
 
 /** 3-day grace period after trial expiry (mirrors trial.ts constant). */
 const TRIAL_EXPIRY_GRACE_MS = 3 * 24 * 60 * 60 * 1000;
-import { track, setEnvelopeMeta, flushNow } from './telemetry';
+import { track, setEnvelopeMeta, flushNow, trackLicenseLink } from './telemetry';
 import { EVENTS } from './telemetry-events';
 
 interface DeactivationResult {
@@ -295,6 +295,10 @@ export async function activateLicense(licenseKey: string): Promise<LicenseActiva
   try {
     setEnvelopeMeta({ plan: licenseData.plan || 'pro' });
     await track(EVENTS.LICENSE_ACTIVATED, { plan: licenseData.plan || 'pro' });
+    // Attribution bridge: this event's envelope hash (telemetry-side id) +
+    // linkHash (license-side id) together connect the paid license to this
+    // install's behavioral history.
+    await trackLicenseLink(instanceId);
     await flushNow();
   } catch {
     /* telemetry must never block activation success */
