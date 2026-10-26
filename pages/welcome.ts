@@ -89,14 +89,18 @@ async function setupOnboarding(): Promise<void> {
 
   section.hidden = false;
 
+  // Arm at page load, not at CTA click. The install-time arm (background
+  // onInstalled) is fire-and-forget — MV3 routinely kills the service worker
+  // before that dynamic-import chain finishes, and field data (2026-10: 157
+  // installs, zero onboarding_started) shows it never lands. This page is the
+  // reliable backfill: a normal tab that install always opens and that
+  // outlives the service worker. startOnboarding() is idempotent and fires no
+  // event by itself — onboarding_started is still reported at the coach's
+  // first sighting in the panel.
+  await startOnboarding();
+
   btnTry.addEventListener('click', () => {
     void (async () => {
-      // Arm the side panel's coach marks BEFORE opening it, so the panel sees
-      // the flag on its very first read. (Redundant with the install-time
-      // arm since v1.2.4 — kept as a backfill for the rare case the install
-      // arm failed. onboarding_started itself now fires at the coach's
-      // first sighting in the panel, not here.)
-      await startOnboarding();
       void track(EVENTS.WELCOME_CTA_CLICKED, { action: 'try_now' });
       void flushNow();
       const opened = await openSidePanelHere();
