@@ -58,7 +58,11 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
-## [1.2.5] — 2026-10-14
+## [1.2.6] — 2026-10-26
+
+### 🐛 Fixed
+
+- **Guided first-run tour now reliably starts**: the install-time setup could be cut short by the browser before it finished writing its flag — new installs landed in the panel without the 3-step coach marks. The welcome page (opened on every install) now completes the setup itself, so the tour appears on the first panel open as designed.
 
 ### ✨ Added
 

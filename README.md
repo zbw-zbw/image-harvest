@@ -94,13 +94,11 @@
 
 ---
 
-## 🆕 What's New (v1.2.5)
+## 🆕 What's New (v1.2.6)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
-- ⏳ **Trial value toast**: every successful batch download now ends with "Downloaded N images · X trial days left" during your trial — the countdown rides the moment, in your language.
-- 🧾 **Pay by email invoice, on every plan card** (website): no PayPal account? The card-payment option now sits directly under each purchase button — before the checkout wall, not only after rescue.
-- 📊 **Upgrade CTR telemetry fixed**: modal click-through rates were unmeasurable due to mismatched event values — now aligned.
+- 🐛 **First-run tour reliably starts**: a race with the browser's background shutdown could keep the 3-step guided tour from ever appearing for new installs — the welcome page now arms it directly.
 
 ---
 
