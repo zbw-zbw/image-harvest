@@ -13,9 +13,10 @@
 //   2. select → satisfied once at least one image is selected
 //   3. download → satisfied by actions.ts calling markOnboardingDownload()
 //
-// Only rendered for bucket b of onboarding_flow_v1 (the welcome CTA arms
-// shared/onboarding-state.ts). Dismissible at any time; resolved forever
-// after the first download so it never reappears.
+// Only rendered for bucket b of onboarding_flow_v1 (armed by the welcome
+// page / background install handler in shared/onboarding-state.ts; the
+// bucket gate itself is checked at mount below). Dismissible at any time;
+// resolved forever after the first download so it never reappears.
 
 import { useEffect, useState } from 'preact/hooks';
 import {
@@ -41,23 +42,29 @@ export function OnboardingCoach() {
   // Re-render on language switch so t() picks up the new catalogue.
   useStoreSelector((s) => s.localeTick);
 
-  // Gate: visible once the flow is armed. Since v1.2.4 the arm happens at
-  // install time in the background — the old arm point (the welcome page's
-  // "Try it now" CTA) was unreachable in practice — so this first sighting
-  // is also where onboarding_started belongs: the arm point no longer
-  // implies a human saw anything. claimOnboardingStarted() keeps the event
-  // one-shot across panel re-opens (each open is a fresh JS context).
+  // Gate: visible once the flow is armed AND this install is in bucket b.
+  // Since v1.2.7 the welcome page arms unconditionally (a single storage
+  // write that survives fast tab closes — the old bucket-then-arm chain
+  // lost the race), so the experiment gate lives HERE, in the long-lived
+  // panel context where the extra storage read always completes. Bucket a
+  // sees the legacy no-coach behaviour; onboarding_started is still
+  // reported only at the coach's first sighting, and
+  // claimOnboardingStarted() keeps the event one-shot across panel
+  // re-opens (each open is a fresh JS context).
   useEffect(() => {
     let cancelled = false;
     void (async () => {
-      const active = await isOnboardingActive();
-      if (!cancelled && active) {
-        setVisible(true);
-        if (await claimOnboardingStarted()) {
-          const bucket = await getExperimentBucket(EXPERIMENTS.ONBOARDING_FLOW).catch(() => 'b');
-          void track(EVENTS.ONBOARDING_STARTED, { bucket });
-          void flushNow();
-        }
+      const [active, bucket] = await Promise.all([
+        isOnboardingActive(),
+        getExperimentBucket(EXPERIMENTS.ONBOARDING_FLOW).catch(() => 'a' as const),
+      ]);
+      if (cancelled || !active || bucket !== 'b') return;
+      setVisible(true);
+      if (await claimOnboardingStarted()) {
+        // v1.2.7 race fix: track() must resolve before flushNow() — see
+        // pages/welcome.ts for the full field-data writeup.
+        await track(EVENTS.ONBOARDING_STARTED, { bucket });
+        await flushNow();
       }
     })();
     return () => {
@@ -71,8 +78,8 @@ export function OnboardingCoach() {
     if (!visible || downloadTick === 0) return;
     void (async () => {
       const bucket = await getExperimentBucket(EXPERIMENTS.ONBOARDING_FLOW).catch(() => 'b');
-      void track(EVENTS.ONBOARDING_DOWNLOAD_DONE, { bucket });
-      void flushNow();
+      await track(EVENTS.ONBOARDING_DOWNLOAD_DONE, { bucket });
+      await flushNow();
       await resolveOnboarding();
     })();
     setVisible(false);
@@ -83,7 +90,7 @@ export function OnboardingCoach() {
     if (!visible || imageCount === 0) return;
     void (async () => {
       const bucket = await getExperimentBucket(EXPERIMENTS.ONBOARDING_FLOW).catch(() => 'b');
-      void track(EVENTS.ONBOARDING_SCAN_DONE, { bucket });
+      await track(EVENTS.ONBOARDING_SCAN_DONE, { bucket });
     })();
     // Intentionally keyed on "has any image at all" rather than the exact
     // count, so a re-scan doesn't re-fire the event.

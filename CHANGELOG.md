@@ -58,6 +58,24 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
+## [1.2.7] — 2026-11-02
+
+### 🐛 Fixed
+
+- **First-run guidance never appeared for most new installs.** The welcome
+  page armed the 3-step coach marks only after a chain of storage reads that
+  almost never finished before new users closed the tab — field data showed
+  2,189+ installs producing single-digit page-view events and zero guided
+  flows. The arm is now a single storage write that lands immediately, the
+  experiment variant is checked later (in the side panel, which always lives
+  long enough), and telemetry events from the welcome page flush before the
+  page can close.
+- Welcome-page telemetry events shipped with a placeholder version number,
+  which made per-version funnel splits blind to this very bug. They now
+  carry the real extension version.
+
+---
+
 ## [1.2.6] — 2026-10-26
 
 ### 🐛 Fixed
