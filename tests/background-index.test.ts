@@ -1296,9 +1296,11 @@ describe('handleMessage — deep scan routes', () => {
 //
 // The coach-mark arm moved from the welcome CTA (unreachable in the field:
 // 2,189 installs, zero onboarding_started events) to install time. These
-// cases pin who gets armed: bucket b + install → armed; bucket a + install
-// → not armed (experiment control stays clean); bucket b + update → not
-// armed (long-time users never see a retro-active coach).
+// cases pin who gets armed: install (either bucket) → armed, because the
+// bucket gate now lives in the OnboardingCoach consumer — gating the write
+// here only added an async hop that could lose the race against the panel's
+// first mount; update → not armed (long-time users never see a retro-active
+// coach).
 
 describe('onInstalled — panel-first onboarding arm (v1.2.4)', () => {
   const chromeAny = () => (globalThis as unknown as { chrome: Record<string, unknown> }).chrome;
@@ -1345,14 +1347,17 @@ describe('onInstalled — panel-first onboarding arm (v1.2.4)', () => {
     expect(arm.onboardingState).toMatchObject({ active: true });
   });
 
-  it('install + bucket a → control stays unarmed', async () => {
+  it('install + bucket a → still armed (bucket gate moved to the coach)', async () => {
     await armBucket('a');
     onInstalledListener!({ reason: 'install' } as chrome.runtime.InstalledDetails);
 
-    // Give the (non-)arm chain a moment to settle, then assert no arm write.
-    await new Promise((r) => setTimeout(r, 50));
+    await vi.waitFor(() => {
+      expect(storageSet).toHaveBeenCalled();
+    });
     const writes = storageSet.mock.calls.map((c) => c[0]);
-    expect(writes.some((w) => w && typeof w === 'object' && 'onboardingState' in w)).toBe(false);
+    const arm = writes.find((w) => w && typeof w === 'object' && 'onboardingState' in w);
+    expect(arm).toBeDefined();
+    expect(arm.onboardingState).toMatchObject({ active: true });
   });
 
   it('update + bucket b → existing installs are never retro-armed', async () => {

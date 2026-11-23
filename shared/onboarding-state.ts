@@ -1,9 +1,10 @@
 // Onboarding state — owns the "is the guided first-run flow active?" flag.
 //
-// Written by the welcome page when the "Try it now" CTA fires (bucket b of
-// onboarding_flow_v1), read by the side panel's <OnboardingCoach/> to decide
-// whether to render the 3-step coach marks, and resolved forever once the
-// user completes their first download (or dismisses the coach).
+// Written by the background service worker at install time (every bucket —
+// the A/B gate lives in <OnboardingCoach/>), read by the side panel's
+// <OnboardingCoach/> to decide whether to render the 3-step coach marks, and
+// resolved forever once the user completes their first download (or dismisses
+// the coach).
 //
 // Same storage conventions as paywall-state / rating-prompt-state: one
 // chrome.storage.local key, test-injectable adapter, in-memory cache.

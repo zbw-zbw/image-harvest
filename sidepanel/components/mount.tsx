@@ -242,11 +242,34 @@ export function mountPreactComponents(): void {
   // so shipping it in the main chunk would cost every user ~1 kB gzip (and
   // pushed the sidepanel bundle over its budget). We check the cheap storage
   // flag first and only then pull in the component.
+  //
+  // The install-time arm is asynchronous (dynamic import + one storage write)
+  // and can land AFTER this panel's first mount — the service worker may
+  // still be resolving modules when the user already has the panel open.
+  // A one-shot read here would then miss the arm forever, so when the flag
+  // is not set yet we watch storage until it lands.
   void (async () => {
     const { isOnboardingActive } = await import('../../shared/onboarding-state');
-    if (!(await isOnboardingActive())) return;
-    const { OnboardingCoach } = await import('./OnboardingCoach');
-    mountFreshComponent('onboarding-coach-mount', OnboardingCoach);
+    const mountCoach = async (): Promise<void> => {
+      const { OnboardingCoach } = await import('./OnboardingCoach');
+      mountFreshComponent('onboarding-coach-mount', OnboardingCoach);
+    };
+    if (await isOnboardingActive()) {
+      await mountCoach();
+      return;
+    }
+    if (typeof chrome === 'undefined' || !chrome.storage?.onChanged) return;
+    const onChanged = (
+      changes: Record<string, chrome.storage.StorageChange>,
+      area: string
+    ): void => {
+      if (area !== 'local' || !changes.onboardingState?.newValue) return;
+      const next = changes.onboardingState.newValue as { active?: boolean; resolved?: boolean };
+      if (!next.active || next.resolved) return;
+      chrome.storage.onChanged.removeListener(onChanged);
+      void mountCoach();
+    };
+    chrome.storage.onChanged.addListener(onChanged);
   })();
 }
 

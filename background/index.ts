@@ -247,24 +247,24 @@ chrome.runtime.onInstalled.addListener((details) => {
   if (details.reason === 'install') {
     void track(EVENTS.EXTENSION_INSTALLED);
     void autoStartTrial('install');
-    // Panel-first onboarding arm (v1.2.4): arm the coach marks AT INSTALL
-    // for bucket b of onboarding_flow_v1. The previous arm point — the
-    // welcome page's "Try it now" CTA — was effectively unreachable (field
-    // data 2026-10: 2,189 installs, zero onboarding_started events; users
-    // close the welcome tab within seconds). Arming here means the FIRST
-    // sidepanel open — the real first-use moment — shows the coach whether
-    // or not the welcome tab was ever read. reason==='update' never reaches
-    // this branch, so existing installs never see a retro-active coach.
-    void import('../shared/ab-experiment')
-      .then(({ EXPERIMENTS, getExperimentBucket }) =>
-        getExperimentBucket(EXPERIMENTS.ONBOARDING_FLOW)
-      )
-      .then((bucket) => {
-        if (bucket !== 'b') return;
-        return import('../shared/onboarding-state').then(({ startOnboarding }) =>
-          startOnboarding()
-        );
-      })
+    // Panel-first onboarding arm (v1.2.4): arm the coach marks AT INSTALL.
+    // The previous arm point — the welcome page's "Try it now" CTA — was
+    // effectively unreachable (field data 2026-10: 2,189 installs, zero
+    // onboarding_started events; users close the welcome tab within seconds).
+    // Arming here means the FIRST sidepanel open — the real first-use moment —
+    // shows the coach whether or not the welcome tab was ever read.
+    // reason==='update' never reaches this branch, so existing installs never
+    // see a retro-active coach.
+    // Arm the coach marks on EVERY install; the bucket gate lives in the
+    // panel consumer (OnboardingCoach renders only for bucket b), so gating
+    // the write here bought nothing and cost the arm a chance to lose a race.
+    // The chain used to be dynamic-import → experiment bucket read → another
+    // dynamic import → storage write, while the panel's one-shot
+    // `isOnboardingActive()` check could run first — a user who opened the
+    // panel right after install got no coach at all. Field data 2026-11-15:
+    // 135 installs, 134 panel opens, 0 onboarding_started.
+    void import('../shared/onboarding-state')
+      .then(({ startOnboarding }) => startOnboarding())
       .catch((err) => console.warn('Onboarding arm failed:', err));
     // Attempt to match a pending referral (from the invite landing page).
     // Runs async in background — non-blocking, best-effort. The .catch keeps
