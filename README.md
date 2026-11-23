@@ -94,11 +94,11 @@
 
 ---
 
-## 🆕 What's New (v1.2.6)
+## 🆕 What's New (v1.2.8)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
-- 🐛 **First-run tour reliably starts**: a race with the browser's background shutdown could keep the 3-step guided tour from ever appearing for new installs — the welcome page now arms it directly.
+- 🐛 **First-run tour actually shows up now**: a race between the background setup and the side panel could leave new installs with no guided tour at all (measured 2026-11-15: 135 installs, 0 tours). The panel now waits for the setup instead of checking once and giving up.
 
 ---
 

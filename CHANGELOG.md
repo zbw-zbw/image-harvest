@@ -58,6 +58,20 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
+## [1.2.8] — 2026-11-23
+
+### 🐛 Fixed
+
+- **First-run tour now shows up for every new install, and on time.** The
+  install-time setup still waited on an experiment read before writing its
+  flag, so a side panel opened right after install could check first and
+  never show the 3-step coach. Field data for 2026-11-15: 135 installs, 134
+  panel opens, zero tours started. The flag is now written immediately, the
+  panel waits for it instead of giving up after one check, and the experiment
+  variant is checked by the coach itself — so the tour appears either way.
+
+---
+
 ## [1.2.7] — 2026-11-02
 
 ### 🐛 Fixed
