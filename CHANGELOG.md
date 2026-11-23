@@ -58,6 +58,25 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
+## [1.2.9] — 2026-11-23
+
+### 🐛 Fixed
+
+- **The welcome page and the first-run tour now actually appear.** 1.2.7 and
+  1.2.8 only changed the order of the install-time setup; the setup itself was
+  crashing in the extension's background worker before it could save anything,
+  so every new install still opened without a welcome tab and without the
+  3-step tour. That crash is fixed at the root.
+
+### 🧪 Test Coverage Expansion
+
+- New end-to-end test loads the packaged extension in a real browser and
+  asserts the install-time onboarding flag is written from inside the
+  background worker. Unit tests had mocked that module, so they stayed green
+  while every real install failed.
+
+---
+
 ## [1.2.8] — 2026-11-23
 
 ### 🐛 Fixed

@@ -94,11 +94,11 @@
 
 ---
 
-## 🆕 What's New (v1.2.8)
+## 🆕 What's New (v1.2.9)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
-- 🐛 **First-run tour actually shows up now**: a race between the background setup and the side panel could leave new installs with no guided tour at all (measured 2026-11-15: 135 installs, 0 tours). The panel now waits for the setup instead of checking once and giving up.
+- 🐛 **Welcome page and first-run tour now actually open**: 1.2.7 and 1.2.8 only reordered a setup step that was crashing inside the background worker, so new installs still got no welcome tab and no tour. Fixed at the root and covered by a real-browser regression test.
 
 ---
 
