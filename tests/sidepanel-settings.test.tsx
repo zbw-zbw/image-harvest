@@ -902,6 +902,28 @@ describe('applyProFeatureVisibility', () => {
     expect(state.isProUser).toBe(true);
   });
 
+  it('keeps Pro access during the trial grace window', async () => {
+    const expiresAt = Date.now() - 60_000;
+    chromeMock.runtime.sendMessage.mockResolvedValue({
+      isPro: true,
+      plan: 'trial',
+      status: 'expired',
+      expiresAt,
+      inGracePeriod: true,
+    });
+    // The user was Pro a millisecond ago (mid-trial), so no transition.
+    state.isProUser = true;
+
+    await applyProFeatureVisibility();
+
+    // Pin: the grace banner promises "Pro features available for N more
+    // day(s)". Downgrading here made that copy false and hard-locked the
+    // trial on expiry day instead of at the end of the win-back window.
+    expect(state.isProUser).toBe(true);
+    expect(state.inTrialGracePeriod).toBe(true);
+    expect(state.trialGraceDaysRemaining).toBeGreaterThan(0);
+  });
+
   it('sets state.isProUser=false when VALIDATE_LICENSE throws (defensive default)', async () => {
     chromeMock.runtime.sendMessage.mockRejectedValue(new Error('bg unavailable'));
     state.isProUser = true;

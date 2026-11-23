@@ -467,10 +467,15 @@ export async function applyProFeatureVisibility(): Promise<void> {
   try {
     const proStatus = await chrome.runtime.sendMessage({ type: MESSAGE_TYPES.VALIDATE_LICENSE });
     state.inTrialGracePeriod = proStatus?.inGracePeriod === true;
-    // During trial grace period, treat user as free so quota checks apply.
-    // The grace banner still shows (driven by inTrialGracePeriod), but all
-    // feature gates use the free-tier limits instead of bypassing them.
-    state.isProUser = proStatus?.isPro === true && !state.inTrialGracePeriod;
+    // Grace means grace: the background (shared/license.ts) and the backend
+    // (validateAnyLicense) both keep a just-expired trial as Pro for the
+    // 3-day window, and the grace banner tells the user "Pro features
+    // available for N more day(s)". Forcing isProUser=false here made that
+    // promise false and silently ended the trial on expiry day — the exact
+    // hard lock the win-back window is supposed to avoid. Pro is revoked
+    // when the window closes (proStatus.isPro flips to false), which is the
+    // single source of truth for every gate below.
+    state.isProUser = proStatus?.isPro === true;
     state.trialGraceDaysRemaining = 0;
     if (state.inTrialGracePeriod && proStatus?.expiresAt) {
       const elapsed = Date.now() - proStatus.expiresAt;
