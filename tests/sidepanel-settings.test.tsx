@@ -924,6 +924,40 @@ describe('applyProFeatureVisibility', () => {
     expect(state.trialGraceDaysRemaining).toBeGreaterThan(0);
   });
 
+  it('computes trialDaysLeft for an active trial from VALIDATE_LICENSE', async () => {
+    const expiresAt = Date.now() + 2 * 86_400_000 - 3_600_000;
+    chromeMock.runtime.sendMessage.mockResolvedValue({
+      isPro: true,
+      plan: 'trial',
+      status: 'active',
+      expiresAt,
+    });
+    state.isProUser = true;
+
+    await applyProFeatureVisibility();
+
+    // Pin: the pre-expiry warning reads this field instead of depending on
+    // the separate GET_LICENSE_STATUS round-trip, which could come back
+    // empty and hide the warning for the whole trial (0 production rows).
+    expect(state.inTrialGracePeriod).toBe(false);
+    expect(state.trialGraceDaysRemaining).toBe(0);
+    expect(state.trialDaysLeft).toBe(2);
+  });
+
+  it('clears trialDaysLeft for a paid plan', async () => {
+    chromeMock.runtime.sendMessage.mockResolvedValue({
+      isPro: true,
+      plan: 'yearly',
+      status: 'active',
+      expiresAt: Date.now() + 30 * 86_400_000,
+    });
+    state.trialDaysLeft = 3;
+
+    await applyProFeatureVisibility();
+
+    expect(state.trialDaysLeft).toBeNull();
+  });
+
   it('sets state.isProUser=false when VALIDATE_LICENSE throws (defensive default)', async () => {
     chromeMock.runtime.sendMessage.mockRejectedValue(new Error('bg unavailable'));
     state.isProUser = true;

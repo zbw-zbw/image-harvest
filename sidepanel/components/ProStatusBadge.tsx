@@ -79,11 +79,20 @@ function trialDaysRemaining(expiresAt: number | string | undefined): number | nu
 export function ProStatusBadge() {
   const isPro = useStoreSelector((s) => s.isProUser);
   const info = useStoreSelector((s) => s.proLicenseInfo);
+  // Countdown from the VALIDATE_LICENSE payload (settings.ts). Preferred
+  // over deriving it from proLicenseInfo because the badge must not
+  // depend on a second, separate GET_LICENSE_STATUS round-trip: when that
+  // one came back empty the pre-expiry warning vanished silently
+  // (production: 0 impressions in 90 days across ~1k trials).
+  const trialDaysFromLicense = useStoreSelector((s) => s.trialDaysLeft);
+  const inGrace = useStoreSelector((s) => s.inTrialGracePeriod);
   // Subscribe to localeTick so a runtime language switch triggers re-render
   useStoreSelector((s) => s.localeTick);
   const planLabel = info?.plan ? PLAN_LABELS[info.plan]?.() || info.plan : '';
-  const isTrial = info?.plan === 'trial';
-  const daysLeft = isTrial ? trialDaysRemaining(info?.expiresAt) : null;
+  // A trial is identified by EITHER payload: plan from GET_LICENSE_STATUS
+  // or the countdown computed from VALIDATE_LICENSE.
+  const isTrial = info?.plan === 'trial' || trialDaysFromLicense != null;
+  const daysLeft = isTrial ? (trialDaysFromLicense ?? trialDaysRemaining(info?.expiresAt)) : null;
   // Pre-expiry warning: the trial's final days get an amber banner with an
   // upgrade CTA — the pre-expiry conversion touchpoint (post-expiry is the
   // TrialGraceBanner). 0 <= daysLeft <= TRIAL_EXPIRY_WARNING_DAYS.
@@ -92,8 +101,15 @@ export function ProStatusBadge() {
   // over hours later — a dead zone for users who only opened the panel on
   // their last trial day (production forensics 2026-09-21: both in-window
   // installs died exactly there).
+  // Suppressed during the post-expiry grace window: an expired trial also
+  // clamps to daysLeft=0, so without this gate BOTH banners rendered at
+  // once and the pre-expiry copy contradicted the grace copy.
   const trialExpiringSoon =
-    isTrial && daysLeft != null && daysLeft >= 0 && daysLeft <= TRIAL_EXPIRY_WARNING_DAYS;
+    !inGrace &&
+    isTrial &&
+    daysLeft != null &&
+    daysLeft >= 0 &&
+    daysLeft <= TRIAL_EXPIRY_WARNING_DAYS;
 
   // Impression telemetry, throttled to once/day/install inside
   // maybeReportTrialExpiryWarning — the warning is persistent UI for the

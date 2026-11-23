@@ -477,16 +477,29 @@ export async function applyProFeatureVisibility(): Promise<void> {
     // when the window closes (proStatus.isPro flips to false), which is the
     // single source of truth for every gate below.
     state.isProUser = proStatus?.isPro === true;
+    // Single source of truth for the trial countdown. Both the grace
+    // banner and the pre-expiry warning read their day count from this
+    // one payload, so a failing GET_LICENSE_STATUS round-trip can no
+    // longer hide the pre-expiry UI (see state.trialDaysLeft).
     state.trialGraceDaysRemaining = 0;
-    if (state.inTrialGracePeriod && proStatus?.expiresAt) {
-      const elapsed = Date.now() - proStatus.expiresAt;
-      const graceMs = 3 * 24 * 60 * 60 * 1000;
-      state.trialGraceDaysRemaining = Math.ceil((graceMs - elapsed) / (24 * 60 * 60 * 1000));
+    state.trialDaysLeft = null;
+    if (proStatus?.plan === 'trial' && proStatus?.expiresAt) {
+      if (state.inTrialGracePeriod) {
+        const elapsed = Date.now() - proStatus.expiresAt;
+        const graceMs = 3 * 24 * 60 * 60 * 1000;
+        state.trialGraceDaysRemaining = Math.ceil((graceMs - elapsed) / (24 * 60 * 60 * 1000));
+      } else {
+        state.trialDaysLeft = Math.max(
+          0,
+          Math.ceil((proStatus.expiresAt - Date.now()) / 86_400_000)
+        );
+      }
     }
   } catch {
     state.isProUser = false;
     state.inTrialGracePeriod = false;
     state.trialGraceDaysRemaining = 0;
+    state.trialDaysLeft = null;
   }
 
   // When user just became Pro, auto-enable Pro default features and persist

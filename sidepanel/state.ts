@@ -399,6 +399,18 @@ export interface SidepanelState {
   inTrialGracePeriod: boolean;
   trialGraceDaysRemaining: number;
   /**
+   * Days left in an ACTIVE trial (0 on the expiry day), null when the
+   * install is not in a trial or is already in the post-expiry grace
+   * window. Computed by applyProFeatureVisibility from the same
+   * VALIDATE_LICENSE payload that drives the grace banner.
+   *
+   * <ProStatusBadge> used to derive this from proLicenseInfo
+   * (GET_LICENSE_STATUS) only — a second round-trip that, when it came
+   * back empty, silently hid the pre-expiry warning (production: zero
+   * trial_expiry_warning_shown rows in 90 days across ~1k trials).
+   */
+  trialDaysLeft: number | null;
+  /**
    * Trial value-moment banner (B-plan): set right after a trial user
    * completes a ≥50-image batch download, null otherwise. Cleared on tab
    * switch together with toasts — the banner belongs to the tab that
@@ -570,6 +582,7 @@ function createInitialState(): SidepanelState {
     isProUser: false,
     inTrialGracePeriod: false,
     trialGraceDaysRemaining: 0,
+    trialDaysLeft: null,
     trialValueMoment: null,
     downloadNudgeDismissed: false,
 

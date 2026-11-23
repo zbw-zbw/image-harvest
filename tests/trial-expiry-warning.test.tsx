@@ -60,6 +60,8 @@ function setTrial(daysLeft: number): void {
 function resetState(): void {
   state.isProUser = false;
   state.proLicenseInfo = null;
+  state.inTrialGracePeriod = false;
+  state.trialDaysLeft = null;
   state.proUpgradeModalState = { open: false, errorText: '' };
 }
 
@@ -117,6 +119,36 @@ describe('<ProStatusBadge> trial expiry warning', () => {
       expect(mockMaybeReport).toHaveBeenCalledTimes(1);
     });
     expect(mockMaybeReport).toHaveBeenCalledWith(2);
+  });
+
+  it('stays hidden during the post-expiry grace window (TrialGraceBanner owns it)', async () => {
+    // An expired trial clamps to daysLeft=0, which used to satisfy the
+    // pre-expiry condition — so the amber "expiring soon" warning and the
+    // grace banner rendered together with contradictory copy.
+    state.isProUser = true;
+    state.inTrialGracePeriod = true;
+    state.trialGraceDaysRemaining = 2;
+    state.proLicenseInfo = { plan: 'trial', expiresAt: Date.now() - DAY_MS };
+
+    const { container } = render(<ProStatusBadge />);
+    expect(container.querySelector('.trial-expiry-warning')).toBeNull();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(mockMaybeReport).not.toHaveBeenCalled();
+  });
+
+  it('renders from the VALIDATE_LICENSE countdown alone (no proLicenseInfo)', async () => {
+    // Production regression pin: the warning used to depend solely on
+    // proLicenseInfo (GET_LICENSE_STATUS). When that second round-trip
+    // came back empty the banner vanished for the whole trial.
+    state.isProUser = true;
+    state.trialDaysLeft = 2;
+
+    const { container } = render(<ProStatusBadge />);
+    expect(container.querySelector('.trial-expiry-warning')).not.toBeNull();
+    await waitFor(() => {
+      expect(mockMaybeReport).toHaveBeenCalledWith(2);
+    });
   });
 
   it('upgrade CTA fires trial_expiry_cta_clicked with daysRemaining and opens the modal', async () => {
