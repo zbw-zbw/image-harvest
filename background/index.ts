@@ -20,6 +20,8 @@ import {
 } from '../shared/license';
 import { setEnvelopeMeta, track, flushNow } from '../shared/telemetry';
 import { EVENTS } from '../shared/telemetry-events';
+import { startOnboarding } from '../shared/onboarding-state';
+import { matchReferral } from '../shared/referral';
 
 import { uiPorts, sidePanelOpenedTabs, getAccessibleTabId, broadcastToPopup } from './utils';
 import { initLicenseAlarm } from './license';
@@ -263,21 +265,24 @@ chrome.runtime.onInstalled.addListener((details) => {
     // `isOnboardingActive()` check could run first — a user who opened the
     // panel right after install got no coach at all. Field data 2026-11-15:
     // 135 installs, 134 panel opens, 0 onboarding_started.
-    void import('../shared/onboarding-state')
-      .then(({ startOnboarding }) => startOnboarding())
-      .catch((err) => console.warn('Onboarding arm failed:', err));
+    // Both modules are imported statically at the top of this file. They used
+    // to be dynamic imports, which Vite rewrites into __vitePreload(); that
+    // helper calls `window.dispatchEvent` when a preloaded dependency fails,
+    // and a service worker has no `window`. The arm therefore threw
+    // "ReferenceError: window is not defined" on EVERY real install (unit
+    // tests mocked it away) — v1.2.7 and v1.2.8 only reordered the same
+    // broken chain, which is why both shipped without fixing anything.
+    void startOnboarding().catch((err) => console.warn('Onboarding arm failed:', err));
     // Attempt to match a pending referral (from the invite landing page).
     // Runs async in background — non-blocking, best-effort. The .catch keeps
     // a failed module load from surfacing as an unhandled rejection in the
     // service worker's error reporting.
-    void import('../shared/referral')
-      .then(({ matchReferral }) =>
-        matchReferral().then((result) => {
-          if (result) {
-            void track(EVENTS.REFERRAL_CLAIMED, { bonusDays: result.bonusDays });
-          }
-        })
-      )
+    void matchReferral()
+      .then((result) => {
+        if (result) {
+          void track(EVENTS.REFERRAL_CLAIMED, { bonusDays: result.bonusDays });
+        }
+      })
       .catch((err) => console.warn('Referral match failed:', err));
     chrome.tabs.create({ url: chrome.runtime.getURL('pages/welcome.html') });
   } else if (details.reason === 'update') {
