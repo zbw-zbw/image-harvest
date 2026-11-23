@@ -1730,5 +1730,8 @@
   },
   "trial_recap_anchor": {
     "message": "Pro बनाए रखें: $29.99/वर्ष — यानी $2.49/माह।"
+  },
+  "trial_recap_features": {
+    "message": "आपने पहले ही उपयोग किया:"
   }
 }

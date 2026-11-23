@@ -1730,5 +1730,8 @@
   },
   "trial_recap_anchor": {
     "message": "احتفظ بـ Pro مقابل $29.99 سنويًا — أي $2.49 شهريًا."
+  },
+  "trial_recap_features": {
+    "message": "استخدمت بالفعل:"
   }
 }

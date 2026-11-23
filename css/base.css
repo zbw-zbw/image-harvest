@@ -703,6 +703,32 @@
   min-width: 0;
 }
 
+/* Day-3/5/7 recap: the Pro features the trial actually used. Naming them
+   beats another countdown — "what would I lose" is concrete. Wraps instead
+   of truncating: a long translated label must stay readable. */
+.trial-recap-features {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 4px;
+  margin-top: 4px;
+}
+
+.trial-recap-features-label {
+  font-size: 10px;
+  font-weight: 600;
+  opacity: 0.85;
+}
+
+.trial-recap-chip {
+  padding: 1px 6px;
+  border: 1px solid var(--trial-banner-border);
+  border-radius: 9px;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 /* Day-3/5/7 recap: the annual anchor sits on its own line so the price is
    not lost in the middle of a wrapping sentence. */
 .trial-recap-anchor {

@@ -9,6 +9,7 @@ import { state } from './state';
 import { track } from '../shared/telemetry';
 import { EVENTS } from '../shared/telemetry-events';
 import { getLocale, t } from '../shared/i18n';
+import { recordProFeatureUse } from '../shared/trial-pro-usage';
 import { checkNarrowMode, showConfirmDialog, showToast, updateFilterButtonLabels } from './ui';
 
 // ============================================
@@ -800,6 +801,7 @@ export function bindProGuards(): void {
             // Quota available — manually toggle and count usage
             checkbox.checked = !checkbox.checked;
             if (checkbox.checked) {
+              void recordProFeatureUse('liveMonitor');
               await incrementFeatureUsage('liveMonitor');
             }
             // Trigger change so saveSettings picks it up

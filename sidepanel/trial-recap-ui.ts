@@ -12,6 +12,7 @@ import { getState } from '../shared/paywall-state';
 import { track } from '../shared/telemetry';
 import { EVENTS } from '../shared/telemetry-events';
 import { getDueTrialRecap, markTrialRecapShown } from '../shared/trial-recap';
+import { getTrialProFeaturesUsed } from '../shared/trial-pro-usage';
 import { state } from './state';
 
 export async function maybeShowTrialRecap(): Promise<void> {
@@ -24,6 +25,11 @@ export async function maybeShowTrialRecap(): Promise<void> {
     // for a trial user this is exactly the trial's download total.
     const { downloadCount } = await getState();
 
+    // Named back to the user on the recap ("you've used: …"). A trial that
+    // only shows a download count undersells the quiet Pro features, and an
+    // empty list is fine — the banner then renders the count alone.
+    const features = await getTrialProFeaturesUsed();
+
     await markTrialRecapShown(due.day);
 
     state.trialValueMoment = {
@@ -31,6 +37,7 @@ export async function maybeShowTrialRecap(): Promise<void> {
       day: due.day,
       count: downloadCount,
       daysRemaining: due.daysRemaining,
+      features,
     };
 
     void track(EVENTS.TRIAL_RECAP_SHOWN, {

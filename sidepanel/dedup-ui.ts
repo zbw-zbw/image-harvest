@@ -10,6 +10,7 @@
 
 import { t } from '../shared/i18n';
 import { escapeHtml } from '../shared/utils';
+import { recordProFeatureUse } from '../shared/trial-pro-usage';
 import { applyFilters } from './filter';
 import { closeDedupModal, detectSimilarImages } from './pro-features';
 import { showProUpgradeModal } from './settings';
@@ -147,6 +148,10 @@ export async function removeDuplicates(): Promise<void> {
   applyFilters();
   detectSimilarImages();
   showToast(t('toast_duplicates_removed', { count: toRemove.size }), 'success');
+
+  // Trial bookkeeping also covers Pro-plan trials (the recorder checks the
+  // plan itself); quota still only accrues for free users.
+  void recordProFeatureUse('dedup');
 
   // Increment dedup quota usage after successful operation
   if (!state.isProUser) {

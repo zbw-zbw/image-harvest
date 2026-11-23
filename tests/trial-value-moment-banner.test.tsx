@@ -112,7 +112,13 @@ describe('<TrialValueMomentBanner>', () => {
   // point of the milestone) and report under its own event name carrying
   // the day, so reach per milestone stays separable.
   it('recap variant renders the annual anchor and fires the recap CTA event', () => {
-    state.trialValueMoment = { count: 310, daysRemaining: 5, variant: 'recap', day: 3 };
+    state.trialValueMoment = {
+      count: 310,
+      daysRemaining: 5,
+      variant: 'recap',
+      day: 3,
+      features: [],
+    };
     const { container } = render(<TrialValueMomentBanner />);
 
     expect(container.querySelector('.trial-recap-anchor')).not.toBeNull();
@@ -129,5 +135,50 @@ describe('<TrialValueMomentBanner>', () => {
       count: 310,
       daysRemaining: 5,
     });
+  });
+
+  // Phase 1: the recap names the Pro features the trial actually used, so an
+  // expiring trial reads as "here is what you'd lose" instead of a countdown.
+  it('recap variant names the Pro features the trial used', () => {
+    state.trialValueMoment = {
+      count: 310,
+      daysRemaining: 5,
+      variant: 'recap',
+      day: 3,
+      features: ['dedup', 'formatConvert'],
+    };
+    const { container } = render(<TrialValueMomentBanner />);
+
+    const chips = container.querySelectorAll('.trial-recap-chip');
+    expect(chips.length).toBe(2);
+    expect(container.textContent).toContain('Duplicate Detection');
+    expect(container.textContent).toContain('Format Conversion');
+  });
+
+  it('caps the recap chips at three so the banner stays one line tall', () => {
+    state.trialValueMoment = {
+      count: 40,
+      daysRemaining: 2,
+      variant: 'recap',
+      day: 5,
+      features: ['multiTab', 'dedup', 'formatConvert', 'colorCopy', 'deepScan'],
+    };
+    const { container } = render(<TrialValueMomentBanner />);
+
+    expect(container.querySelectorAll('.trial-recap-chip').length).toBe(3);
+  });
+
+  it('omits the chip row when the trial used no Pro features yet', () => {
+    state.trialValueMoment = {
+      count: 8,
+      daysRemaining: 4,
+      variant: 'recap',
+      day: 3,
+      features: [],
+    };
+    const { container } = render(<TrialValueMomentBanner />);
+
+    expect(container.querySelector('.trial-recap-features')).toBeNull();
+    expect(container.textContent).toContain('8');
   });
 });

@@ -1935,5 +1935,8 @@
   },
   "trial_recap_anchor": {
     "message": "保留 Pro：$29.99/年，相當於每月 $2.49。"
+  },
+  "trial_recap_features": {
+    "message": "你已用過："
   }
 }

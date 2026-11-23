@@ -39,6 +39,7 @@ import {
   incrementFeatureUsage,
   quotaBlockedMessage,
 } from '../../shared/feature-quota';
+import { recordProFeatureUse } from '../../shared/trial-pro-usage';
 import { useStoreSelector } from './storeHook';
 import { state } from '../state';
 import { applyFilters } from '../filter';
@@ -348,9 +349,9 @@ export function ImageCard({ img, index }: Props) {
         return;
       }
       await incrementFeatureUsage('colorCopy');
-      copyColor(color);
-      return;
     }
+    // Reached only on the success path (a blocked click returned above).
+    void recordProFeatureUse('colorCopy');
     copyColor(color);
   };
 

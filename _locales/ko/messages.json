@@ -1937,5 +1937,8 @@
   },
   "trial_recap_anchor": {
     "message": "Pro 유지: 연 $29.99 (월 $2.49)."
+  },
+  "trial_recap_features": {
+    "message": "사용한 기능:"
   }
 }

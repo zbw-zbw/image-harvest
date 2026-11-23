@@ -1730,5 +1730,8 @@
   },
   "trial_recap_anchor": {
     "message": "Pro behalten für $29.99/Jahr — nur $2.49 pro Monat."
+  },
+  "trial_recap_features": {
+    "message": "Schon genutzt:"
   }
 }

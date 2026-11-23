@@ -1730,5 +1730,8 @@
   },
   "trial_recap_anchor": {
     "message": "Mantieni Pro a $29.99/anno, cioè $2.49 al mese."
+  },
+  "trial_recap_features": {
+    "message": "Hai già usato:"
   }
 }

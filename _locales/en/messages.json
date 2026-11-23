@@ -1951,5 +1951,8 @@
   },
   "trial_recap_anchor": {
     "message": "Keep Pro for $29.99/year — that's $2.49/month."
+  },
+  "trial_recap_features": {
+    "message": "You've used:"
   }
 }

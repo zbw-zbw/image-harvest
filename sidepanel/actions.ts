@@ -21,6 +21,7 @@ import { isRestrictedUrl } from '../shared/utils';
 import { isSafeImageUrl } from '../shared/url-validator';
 import { track } from '../shared/telemetry';
 import { EVENTS } from '../shared/telemetry-events';
+import { recordProFeatureUse } from '../shared/trial-pro-usage';
 import { EXPERIMENTS, getCachedBucket } from '../shared/ab-experiment';
 import { getRemainingMonthlyFreeAiTags } from '../shared/ai-free-quota';
 import { recordDownloads } from '../shared/paywall-state';
@@ -366,10 +367,13 @@ export async function downloadSingle(img: ImageItem, format: string | null): Pro
     // received a file — the best moment to ask for a review.
     state.ratingCheckTick += 1;
     // Increment format conversion quota after successful download
-    if (format && !state.isProUser) {
-      import('../shared/feature-quota').then(({ incrementFeatureUsage }) =>
-        incrementFeatureUsage('formatConvert')
-      );
+    if (format) {
+      void recordProFeatureUse('formatConvert');
+      if (!state.isProUser) {
+        import('../shared/feature-quota').then(({ incrementFeatureUsage }) =>
+          incrementFeatureUsage('formatConvert')
+        );
+      }
     }
   } catch (error) {
     console.error('Download error:', error);
@@ -580,10 +584,13 @@ export async function downloadSelectedAsZip(
         }
       })();
     }
-    if (targetFormat && !state.isProUser) {
-      import('../shared/feature-quota').then(({ incrementFeatureUsage }) =>
-        incrementFeatureUsage('formatConvert')
-      );
+    if (targetFormat) {
+      void recordProFeatureUse('formatConvert');
+      if (!state.isProUser) {
+        import('../shared/feature-quota').then(({ incrementFeatureUsage }) =>
+          incrementFeatureUsage('formatConvert')
+        );
+      }
     }
   } catch (error) {
     if (!aborted) {

@@ -19,6 +19,7 @@
 import { isRestrictedUrl, escapeHtml } from '../shared/utils';
 import { t } from '../shared/i18n';
 import type { ImageItem } from '../shared/types';
+import { recordProFeatureUse } from '../shared/trial-pro-usage';
 import { clearSelection } from './actions';
 import { applyFilters } from './filter';
 import { closeMultiTabModal } from './pro-features';
@@ -359,6 +360,9 @@ export async function startMultiTabExtract(tabIds: number[]): Promise<void> {
 
       if (addedCount > 0) {
         processImageExtras(newImages);
+        // Sits outside the free-user guard on purpose: the recorder checks
+        // the plan itself and only stores usage for trial users.
+        void recordProFeatureUse('multiTab');
         // Increment quota usage only after successful extraction
         if (!state.isProUser) {
           import('../shared/feature-quota').then(({ incrementFeatureUsage }) =>

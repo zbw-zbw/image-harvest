@@ -1730,5 +1730,8 @@
   },
   "trial_recap_anchor": {
     "message": "Houd Pro voor $29.99/jaar — dat is $2.49 per maand."
+  },
+  "trial_recap_features": {
+    "message": "Al gebruikt:"
   }
 }

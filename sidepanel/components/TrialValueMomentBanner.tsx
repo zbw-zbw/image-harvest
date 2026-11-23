@@ -2,8 +2,12 @@ import { t } from '../../shared/i18n';
 import { getFreeLimits } from '../../shared/constants';
 import { track } from '../../shared/telemetry';
 import { EVENTS } from '../../shared/telemetry-events';
+import { proFeatureLabelKey } from '../../shared/trial-pro-usage';
 import { state } from '../state';
 import { useStoreSelector } from './storeHook';
+
+/** The panel is narrow; three chips is the readable ceiling. */
+const MAX_RECAP_FEATURES = 3;
 
 /**
  * Trial value-moment banner (B-plan, 2026-09-28).
@@ -86,6 +90,16 @@ export function TrialValueMomentBanner() {
     <div class="trial-value-moment-banner">
       <span class="trial-value-moment-text">
         {message}
+        {moment.variant === 'recap' && moment.features.length > 0 && (
+          <span class="trial-recap-features">
+            <span class="trial-recap-features-label">{t('trial_recap_features')}</span>
+            {moment.features.slice(0, MAX_RECAP_FEATURES).map((feature) => (
+              <span class="trial-recap-chip" key={feature}>
+                {t(proFeatureLabelKey(feature))}
+              </span>
+            ))}
+          </span>
+        )}
         {moment.variant === 'recap' && (
           <span class="trial-recap-anchor">{t('trial_recap_anchor')}</span>
         )}

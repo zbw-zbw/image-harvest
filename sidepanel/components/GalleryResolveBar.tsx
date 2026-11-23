@@ -16,6 +16,7 @@ import { useState } from 'preact/hooks';
 import { t } from '../../shared/i18n';
 import { track } from '../../shared/telemetry';
 import { EVENTS } from '../../shared/telemetry-events';
+import { recordProFeatureUse } from '../../shared/trial-pro-usage';
 import { MESSAGE_TYPES } from '../../shared/constants';
 import type { ImageItem } from '../../shared/types';
 import { state } from '../state';
@@ -179,6 +180,8 @@ export function GalleryResolveBar() {
           resolved: response.resolved ?? 0,
           failed: response.failed ?? 0,
         });
+
+        void recordProFeatureUse('linkResolve');
 
         // Increment quota usage only after a successful resolve (free users).
         // The returned remaining count turns the success toast into a soft

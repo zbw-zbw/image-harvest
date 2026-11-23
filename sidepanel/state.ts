@@ -12,6 +12,7 @@
 // imports `state` / `elements` explicitly.
 
 import type { AppSettings, FilterConfig, ImageItem } from '../shared/types';
+import type { ProFeatureKey } from '../shared/trial-pro-usage';
 import { DEFAULT_APP_SETTINGS, DEFAULT_FILTER_CONFIG } from '../shared/constants';
 
 // ── Filter UI state ─────────────────────────────────────────────────────────
@@ -410,7 +411,14 @@ export interface SidepanelState {
    */
   trialValueMoment:
     | { count: number; daysRemaining: number; variant: 'batch' | 'first_scan' }
-    | { count: number; daysRemaining: number; variant: 'recap'; day: number }
+    | {
+        count: number;
+        daysRemaining: number;
+        variant: 'recap';
+        day: number;
+        /** Pro features this trial has actually used, in order of first use. */
+        features: ProFeatureKey[];
+      }
     | null;
 
   /**

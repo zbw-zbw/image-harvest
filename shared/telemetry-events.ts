@@ -113,7 +113,10 @@ export const EVENTS = {
 
   // Pro-feature touchpoints — tells us WHICH paywall is most effective
   PRO_FEATURE_BLOCKED: 'pro_feature_blocked', // props: { feature: string }
-  PRO_FEATURE_USED: 'pro_feature_used', // props: { feature: string } (Pro users)
+  // Fired once per feature per install, and only while the license plan is
+  // 'trial' (shared/trial-pro-usage.ts) — the quota counters deliberately
+  // skip Pro users, so this is the only record of what a trial actually used.
+  PRO_FEATURE_USED: 'pro_feature_used', // props: { feature: string }
 
   // Soft paywall (Sprint 2)
   SOFT_PAYWALL_SHOWN: 'soft_paywall_shown',

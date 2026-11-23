@@ -8,6 +8,7 @@ import type { ImageItem } from '../shared/types';
 import { getFileFormat } from '../shared/utils';
 import { track } from '../shared/telemetry';
 import { EVENTS } from '../shared/telemetry-events';
+import { recordProFeatureUse } from '../shared/trial-pro-usage';
 import { updateSelectionUI } from './actions';
 import { applyFilters, refreshVisibility, renderColorSwatches } from './filter';
 import { isWithinTabSwitchGrace } from './tab-lifecycle';
@@ -553,9 +554,12 @@ export async function deepScan(tabId: number, tabUrl: string): Promise<void> {
       // Quota charge (plan header refinement #1): only when the run
       // actually scrolled AND surfaced new images — the link-resolve
       // "0 results = no charge" precedent.
-      if (stats && stats.steps > 0 && newCount > 0 && !state.isProUser) {
-        const { incrementFeatureUsage } = await import('../shared/feature-quota');
-        await incrementFeatureUsage('deepScan');
+      if (stats && stats.steps > 0 && newCount > 0) {
+        void recordProFeatureUse('deepScan');
+        if (!state.isProUser) {
+          const { incrementFeatureUsage } = await import('../shared/feature-quota');
+          await incrementFeatureUsage('deepScan');
+        }
       }
 
       // Toast: total found (matches the status bar) + the deep-scan delta.
