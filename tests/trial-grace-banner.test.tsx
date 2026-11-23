@@ -6,7 +6,8 @@
 //   - Renders inside grace + hands daysLeft to maybeReportTrialGraceBanner
 //     (the once/day/install throttle lives in shared/trial and is covered by
 //     tests/trial.test.ts — here we only assert the component hand-off)
-//   - Upgrade CTA fires trial_grace_cta_clicked and opens the upgrade modal
+//   - Upgrade CTA fires trial_grace_cta_clicked and opens the pricing page
+//     tagged trigger=trial_expired (no longer the in-panel modal)
 //
 // Strategy: mock shared/telemetry + shared/trial so assertions target the
 // call contract; drive the real sidepanel store by direct assignment (same
@@ -22,6 +23,7 @@ import { cleanup, fireEvent, render, waitFor } from '@testing-library/preact';
 // module resolves them, by which time these consts are initialized.
 const mockTrack = vi.fn(() => Promise.resolve());
 const mockMaybeReport = vi.fn(() => Promise.resolve(true));
+const mockTabsCreate = vi.fn();
 
 vi.mock('../shared/telemetry', () => ({
   track: mockTrack,
@@ -49,11 +51,16 @@ function resetState(): void {
 beforeEach(() => {
   vi.clearAllMocks();
   resetState();
+  // The grace CTA opens the pricing page in a new tab.
+  (globalThis as unknown as { chrome: unknown }).chrome = {
+    tabs: { create: mockTabsCreate },
+  };
 });
 
 afterEach(() => {
   cleanup();
   resetState();
+  delete (globalThis as unknown as { chrome?: unknown }).chrome;
 });
 
 describe('<TrialGraceBanner>', () => {
@@ -77,7 +84,7 @@ describe('<TrialGraceBanner>', () => {
     expect(mockMaybeReport).toHaveBeenCalledWith(2);
   });
 
-  it('upgrade CTA fires trial_grace_cta_clicked and opens the upgrade modal', async () => {
+  it('upgrade CTA fires trial_grace_cta_clicked and opens pricing with trial_expired attribution', async () => {
     state.inTrialGracePeriod = true;
     state.trialGraceDaysRemaining = 2;
     const { container } = render(<TrialGraceBanner />);
@@ -88,7 +95,12 @@ describe('<TrialGraceBanner>', () => {
 
     expect(mockTrack).toHaveBeenCalledTimes(1);
     expect(mockTrack).toHaveBeenCalledWith(EVENTS.TRIAL_GRACE_CTA_CLICKED);
-    expect(state.proUpgradeModalState.open).toBe(true);
-    expect(state.proUpgradeModalState.errorText).toBe('');
+    expect(mockTabsCreate).toHaveBeenCalledTimes(1);
+    const url = new URL(mockTabsCreate.mock.calls[0][0].url as string);
+    expect(url.pathname).toBe('/pricing');
+    expect(url.searchParams.get('utm_source')).toBe('extension');
+    expect(url.searchParams.get('trigger')).toBe('trial_expired');
+    // Direct navigation replaced the modal detour.
+    expect(state.proUpgradeModalState.open).toBe(false);
   });
 });
