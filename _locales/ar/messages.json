@@ -1721,5 +1721,14 @@
   },
   "trial_first_scan_message": {
     "message": "تم العثور على {count} صورة. تنتهي تجربة Pro خلال {days} يوم/أيام؛ بعد ذلك يُحدَّد ملف ZIP بـ {zip} صورة."
+  },
+  "trial_recap_cta": {
+    "message": "احتفظ بـ Pro"
+  },
+  "trial_recap_message": {
+    "message": "اليوم {day} من تجربتك · تم تنزيل {count} صورة حتى الآن."
+  },
+  "trial_recap_anchor": {
+    "message": "احتفظ بـ Pro مقابل $29.99 سنويًا — أي $2.49 شهريًا."
   }
 }

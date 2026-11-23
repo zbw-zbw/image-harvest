@@ -1721,5 +1721,14 @@
   },
   "trial_first_scan_message": {
     "message": "Найдено изображений: {count}. Пробный период Pro закончится через {days} дн.; после этого ZIP будет ограничен {zip} изображениями."
+  },
+  "trial_recap_cta": {
+    "message": "Оставить Pro"
+  },
+  "trial_recap_message": {
+    "message": "День {day} пробного периода · скачано изображений: {count}."
+  },
+  "trial_recap_anchor": {
+    "message": "Оставить Pro: $29.99 в год — всего $2.49 в месяц."
   }
 }

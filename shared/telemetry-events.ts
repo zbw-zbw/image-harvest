@@ -83,6 +83,11 @@ export const EVENTS = {
   // shown→cta pair is a clean one-shot reach measurement, not panel opens.
   TRIAL_FIRST_SCAN_NOTICE_SHOWN: 'trial_first_scan_notice_shown', // props: { count: number, daysRemaining: number }
   TRIAL_FIRST_SCAN_CTA_CLICKED: 'trial_first_scan_cta_clicked', // props: { count: number, daysRemaining: number }
+  // Day-3/5/7 value recap. One impression per milestone per install, so the
+  // funnel can read reach per day (does a day-3 recap move day-7 clicks?)
+  // instead of a single blended number.
+  TRIAL_RECAP_SHOWN: 'trial_recap_shown', // props: { day: number, count: number, daysRemaining: number }
+  TRIAL_RECAP_CTA_CLICKED: 'trial_recap_cta_clicked', // props: { day: number, count: number, daysRemaining: number }
 
   // Welcome page (Phase 2)
   WELCOME_PAGE_VIEWED: 'welcome_page_viewed', // props: { source: string }
@@ -237,6 +242,8 @@ export const EVENT_PROP_SCHEMAS: Record<TelemetryEventName, readonly string[]> =
   [EVENTS.TRIAL_VALUE_MOMENT_CTA_CLICKED]: ['count', 'daysRemaining', 'abBucket'],
   [EVENTS.TRIAL_FIRST_SCAN_NOTICE_SHOWN]: ['count', 'daysRemaining', 'abBucket'],
   [EVENTS.TRIAL_FIRST_SCAN_CTA_CLICKED]: ['count', 'daysRemaining', 'abBucket'],
+  [EVENTS.TRIAL_RECAP_SHOWN]: ['day', 'count', 'daysRemaining', 'abBucket'],
+  [EVENTS.TRIAL_RECAP_CTA_CLICKED]: ['day', 'count', 'daysRemaining', 'abBucket'],
 
   [EVENTS.WELCOME_PAGE_VIEWED]: ['source'],
   [EVENTS.WELCOME_CTA_CLICKED]: ['action'],

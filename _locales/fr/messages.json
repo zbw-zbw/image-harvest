@@ -1721,5 +1721,14 @@
   },
   "trial_first_scan_message": {
     "message": "{count} images trouvées. Votre essai Pro se termine dans {days} jour(s) ; ensuite, les ZIP sont limités à {zip} images."
+  },
+  "trial_recap_cta": {
+    "message": "Garder Pro"
+  },
+  "trial_recap_message": {
+    "message": "Jour {day} de votre essai · {count} images téléchargées jusqu'ici."
+  },
+  "trial_recap_anchor": {
+    "message": "Gardez Pro pour $29.99/an, soit $2.49 par mois."
   }
 }

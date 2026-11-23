@@ -703,6 +703,15 @@
   min-width: 0;
 }
 
+/* Day-3/5/7 recap: the annual anchor sits on its own line so the price is
+   not lost in the middle of a wrapping sentence. */
+.trial-recap-anchor {
+  display: block;
+  margin-top: 2px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
 .trial-value-moment-btn {
   flex-shrink: 0;
   font-size: 11px;

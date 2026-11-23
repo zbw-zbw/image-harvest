@@ -1721,5 +1721,14 @@
   },
   "trial_first_scan_message": {
     "message": "{count} Bilder gefunden. Deine Pro-Testphase läuft noch {days} Tag(e); danach sind ZIPs auf {zip} Bilder begrenzt."
+  },
+  "trial_recap_cta": {
+    "message": "Pro behalten"
+  },
+  "trial_recap_message": {
+    "message": "Tag {day} deiner Testphase · bisher {count} Bilder heruntergeladen."
+  },
+  "trial_recap_anchor": {
+    "message": "Pro behalten für $29.99/Jahr — nur $2.49 pro Monat."
   }
 }

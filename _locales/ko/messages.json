@@ -1928,5 +1928,14 @@
   },
   "trial_first_scan_message": {
     "message": "이미지 {count}장을 찾았습니다. Pro 체험은 {days}일 남았으며, 이후 ZIP 다운로드는 {zip}장으로 제한됩니다."
+  },
+  "trial_recap_cta": {
+    "message": "Pro 유지"
+  },
+  "trial_recap_message": {
+    "message": "체험 {day}일차 · 지금까지 이미지 {count}장을 다운로드했습니다."
+  },
+  "trial_recap_anchor": {
+    "message": "Pro 유지: 연 $29.99 (월 $2.49)."
   }
 }

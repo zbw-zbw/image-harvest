@@ -404,15 +404,14 @@ export interface SidepanelState {
    * earned it.
    *
    * Also carries the one-shot first-scan echo (variant 'first_scan',
-   * 2026-09): the same slot, a different promise — see
-   * claimTrialFirstScanNotice() for why the first result grid is the right
-   * place to restate the trial.
+   * 2026-09) and the day-3/5/7 recap (variant 'recap', 2026-09). Both
+   * reuse this slot because it is the only non-blocking surface that sits
+   * directly above the result grid.
    */
-  trialValueMoment: {
-    count: number;
-    daysRemaining: number;
-    variant: 'batch' | 'first_scan';
-  } | null;
+  trialValueMoment:
+    | { count: number; daysRemaining: number; variant: 'batch' | 'first_scan' }
+    | { count: number; daysRemaining: number; variant: 'recap'; day: number }
+    | null;
 
   /**
    * Download nudge bar (2026-10-13 growth experiment #1): true once the

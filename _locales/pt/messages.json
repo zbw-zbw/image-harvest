@@ -1721,5 +1721,14 @@
   },
   "trial_first_scan_message": {
     "message": "{count} imagens encontradas. Seu teste Pro termina em {days} dia(s); depois, os ZIPs ficam limitados a {zip} imagens."
+  },
+  "trial_recap_cta": {
+    "message": "Manter Pro"
+  },
+  "trial_recap_message": {
+    "message": "Dia {day} do seu teste · {count} imagens baixadas até agora."
+  },
+  "trial_recap_anchor": {
+    "message": "Mantenha o Pro por $29.99/ano — apenas $2.49 por mês."
   }
 }

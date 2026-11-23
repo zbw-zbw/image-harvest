@@ -1721,5 +1721,14 @@
   },
   "trial_first_scan_message": {
     "message": "{count} immagini trovate. La prova Pro scade tra {days} giorno/i; dopo, gli ZIP si fermano a {zip} immagini."
+  },
+  "trial_recap_cta": {
+    "message": "Mantieni Pro"
+  },
+  "trial_recap_message": {
+    "message": "Giorno {day} della prova · {count} immagini scaricate finora."
+  },
+  "trial_recap_anchor": {
+    "message": "Mantieni Pro a $29.99/anno, cioè $2.49 al mese."
   }
 }

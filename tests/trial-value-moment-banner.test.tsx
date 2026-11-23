@@ -107,4 +107,27 @@ describe('<TrialValueMomentBanner>', () => {
     });
     expect(state.proUpgradeModalState.open).toBe(true);
   });
+
+  // Phase 1: day-3/5/7 recap. It must render the annual anchor (the whole
+  // point of the milestone) and report under its own event name carrying
+  // the day, so reach per milestone stays separable.
+  it('recap variant renders the annual anchor and fires the recap CTA event', () => {
+    state.trialValueMoment = { count: 310, daysRemaining: 5, variant: 'recap', day: 3 };
+    const { container } = render(<TrialValueMomentBanner />);
+
+    expect(container.querySelector('.trial-recap-anchor')).not.toBeNull();
+    expect(container.textContent).toContain('29.99');
+    expect(container.textContent).toContain('310');
+
+    const btn = container.querySelector('.trial-value-moment-btn') as HTMLElement | null;
+    expect(btn).not.toBeNull();
+    fireEvent.click(btn as HTMLElement);
+
+    expect(mockTrack).toHaveBeenCalledTimes(1);
+    expect(mockTrack).toHaveBeenCalledWith(EVENTS.TRIAL_RECAP_CTA_CLICKED, {
+      day: 3,
+      count: 310,
+      daysRemaining: 5,
+    });
+  });
 });

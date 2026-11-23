@@ -1926,5 +1926,14 @@
   },
   "trial_first_scan_message": {
     "message": "{count} 枚の画像が見つかりました。Pro トライアルは残り {days} 日、終了後は ZIP の上限が {zip} 枚になります。"
+  },
+  "trial_recap_cta": {
+    "message": "Pro を継続"
+  },
+  "trial_recap_message": {
+    "message": "トライアル {day} 日目 · これまでに {count} 枚をダウンロードしました。"
+  },
+  "trial_recap_anchor": {
+    "message": "Pro を継続：年額 $29.99（月あたり $2.49）。"
   }
 }

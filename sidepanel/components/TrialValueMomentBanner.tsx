@@ -8,63 +8,90 @@ import { useStoreSelector } from './storeHook';
 /**
  * Trial value-moment banner (B-plan, 2026-09-28).
  *
- * Rendered right after a trial user completes a ≥50-image batch download —
- * the strongest "moment of delight" in the whole product. Non-blocking:
- * a single amber line ("Downloaded N images · X days left") with a Pro
- * anchor button. Cleared on tab switch together with toasts.
+ * One slot, three promises:
  *
- * Impression telemetry (TRIAL_VALUE_MOMENT_SHOWN) is fired by the trigger
- * in actions.ts, NOT here — the banner has no mount/effect lifecycle of its
- * own (unlike TrialGraceBanner), so the trigger site is the accurate
- * "actually shown" moment. Daily-capped since 2026-10-13 by
- * claimTrialValueMomentToday (one impression per UTC day) after a trial
- * user triggered the banner 20+ times in one day via ~1000-image batches.
+ *   batch      A trial user just completed a ≥50-image batch download — the
+ *              strongest "moment of delight" in the product. Daily-capped
+ *              (claimTrialValueMomentToday) since 2026-10-13: a heavy
+ *              harvester was triggering it 20+ times a day.
+ *   first_scan One-shot echo after the first successful scan. The install
+ *              page promised 7 days of Pro; this is where the promise meets
+ *              actual images on screen, so it names the free floor.
+ *   recap      Day 3 / 5 / 7 of the trial. Between the install page and the
+ *              3-day expiry warning there was previously no signal at all,
+ *              so the trial could lapse without the user ever noticing what
+ *              they had. One impression per milestone, and the last one
+ *              carries the annual anchor ($29.99/yr = $2.49/mo).
  *
- * Variant 'first_scan' (Phase 1) reuses the same slot for the one-shot echo
- * after the first successful scan: same promise (you are on Pro, here is how
- * long it lasts), but it names the free floor while the results are on
- * screen. Fired once per install from scan.ts.
+ * Impression telemetry is fired by each trigger site, not here: this
+ * component has no mount/effect lifecycle of its own (unlike
+ * TrialGraceBanner), so the trigger is the accurate "actually shown" moment.
+ * Keeping it a pure render also means a failed t() lookup can never cost a
+ * telemetry event.
  */
 export function TrialValueMomentBanner() {
   const moment = useStoreSelector((s) => s.trialValueMoment);
 
   if (!moment) return null;
 
-  const isFirstScan = moment.variant === 'first_scan';
-
   const handleUpgrade = () => {
-    if (isFirstScan) {
-      void track(EVENTS.TRIAL_FIRST_SCAN_CTA_CLICKED, {
-        count: moment.count,
-        daysRemaining: moment.daysRemaining,
-      });
-    } else {
-      void track(EVENTS.TRIAL_VALUE_MOMENT_CTA_CLICKED, {
-        count: moment.count,
-        daysRemaining: moment.daysRemaining,
-      });
+    switch (moment.variant) {
+      case 'first_scan':
+        void track(EVENTS.TRIAL_FIRST_SCAN_CTA_CLICKED, {
+          count: moment.count,
+          daysRemaining: moment.daysRemaining,
+        });
+        break;
+      case 'recap':
+        void track(EVENTS.TRIAL_RECAP_CTA_CLICKED, {
+          day: moment.day,
+          count: moment.count,
+          daysRemaining: moment.daysRemaining,
+        });
+        break;
+      default:
+        void track(EVENTS.TRIAL_VALUE_MOMENT_CTA_CLICKED, {
+          count: moment.count,
+          daysRemaining: moment.daysRemaining,
+        });
     }
     state.proUpgradeModalState = { open: true, errorText: '' };
   };
 
-  // Note: the trigger sites own the claimed/shown telemetry and the one-shot
-  // gating, so this component stays a pure render of whatever state holds.
-  const message = isFirstScan
-    ? t('trial_first_scan_message', {
-        count: moment.count,
-        days: moment.daysRemaining,
-        zip: getFreeLimits().MAX_ZIP_IMAGES,
-      })
-    : t('trial_value_moment_message', {
-        count: moment.count,
-        days: moment.daysRemaining,
-      });
+  let message: string;
+  let cta: string;
+  if (moment.variant === 'first_scan') {
+    message = t('trial_first_scan_message', {
+      count: moment.count,
+      days: moment.daysRemaining,
+      zip: getFreeLimits().MAX_ZIP_IMAGES,
+    });
+    cta = t('trial_first_scan_cta');
+  } else if (moment.variant === 'recap') {
+    message = t('trial_recap_message', {
+      day: moment.day,
+      count: moment.count,
+      days: moment.daysRemaining,
+    });
+    cta = t('trial_recap_cta');
+  } else {
+    message = t('trial_value_moment_message', {
+      count: moment.count,
+      days: moment.daysRemaining,
+    });
+    cta = t('trial_grace_upgrade_btn');
+  }
 
   return (
     <div class="trial-value-moment-banner">
-      <span class="trial-value-moment-text">{message}</span>
+      <span class="trial-value-moment-text">
+        {message}
+        {moment.variant === 'recap' && (
+          <span class="trial-recap-anchor">{t('trial_recap_anchor')}</span>
+        )}
+      </span>
       <button class="btn btn-small btn-primary trial-value-moment-btn" onClick={handleUpgrade}>
-        {isFirstScan ? t('trial_first_scan_cta') : t('trial_grace_upgrade_btn')}
+        {cta}
       </button>
     </div>
   );

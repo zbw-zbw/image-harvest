@@ -1721,5 +1721,14 @@
   },
   "trial_first_scan_message": {
     "message": "พบ {count} รูป ทรัยัล Pro เหลืออีก {days} วัน หลังจากนั้น ZIP จะจำกัดที่ {zip} รูป"
+  },
+  "trial_recap_cta": {
+    "message": "คง Pro ไว้"
+  },
+  "trial_recap_message": {
+    "message": "วันที่ {day} ของทรัยัล · ดาวน์โหลดไปแล้ว {count} รูป"
+  },
+  "trial_recap_anchor": {
+    "message": "คง Pro ไว้ที่ $29.99/ปี เฉลี่ย $2.49/เดือน"
   }
 }

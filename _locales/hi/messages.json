@@ -1721,5 +1721,14 @@
   },
   "trial_first_scan_message": {
     "message": "{count} इमेज मिलीं। Pro ट्रायल में {days} दिन बाकी हैं; उसके बाद ZIP {zip} इमेज तक सीमित हो जाएगा।"
+  },
+  "trial_recap_cta": {
+    "message": "Pro रखें"
+  },
+  "trial_recap_message": {
+    "message": "ट्रायल का दिन {day} · अब तक {count} इमेज डाउनलोड हुईं।"
+  },
+  "trial_recap_anchor": {
+    "message": "Pro बनाए रखें: $29.99/वर्ष — यानी $2.49/माह।"
   }
 }

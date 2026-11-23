@@ -1721,5 +1721,14 @@
   },
   "trial_first_scan_message": {
     "message": "{count} afbeeldingen gevonden. Je Pro-proefperiode duurt nog {days} dag(en); daarna zijn ZIP's beperkt tot {zip} afbeeldingen."
+  },
+  "trial_recap_cta": {
+    "message": "Pro behouden"
+  },
+  "trial_recap_message": {
+    "message": "Dag {day} van je proefperiode · tot nu toe {count} afbeeldingen gedownload."
+  },
+  "trial_recap_anchor": {
+    "message": "Houd Pro voor $29.99/jaar — dat is $2.49 per maand."
   }
 }

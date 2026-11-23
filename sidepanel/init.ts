@@ -36,6 +36,7 @@ import {
   syncCustomSizeInputsFromSettings,
 } from './filter';
 import { mountPreactComponents } from './components/mount';
+import { maybeShowTrialRecap } from './trial-recap-ui';
 import { handleKeyDown, handleMessage } from './message';
 import { drainPendingContextItems, restoreInjectedItems } from './injected-items';
 import {
@@ -251,6 +252,12 @@ async function init(): Promise<void> {
   // and toggles UI badges — none of which blocks image scanning. Running it
   // non-blocking lets loadCurrentTab start immediately, saving ~1.2s.
   const proVisibilityPromise = applyProFeatureVisibility();
+
+  // Trial day-3/5/7 value recap (Phase 1): the only mid-trial signal between
+  // the install page and the 3-day expiry warning. Chained after the license
+  // check so a not-yet-redeemed trial cannot be mistaken for a live one, and
+  // fire-and-forget so it never delays the first scan.
+  void proVisibilityPromise.then(() => maybeShowTrialRecap());
 
   // Start AI quota load early (in parallel with scan) so the badge is ready
   // by the time image cards render and the user can click AI Tag.

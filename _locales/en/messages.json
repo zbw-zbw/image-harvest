@@ -1942,5 +1942,14 @@
   },
   "trial_first_scan_message": {
     "message": "{count} images found. Your Pro trial has {days} day(s) left — after that, ZIP downloads drop to {zip} images."
+  },
+  "trial_recap_cta": {
+    "message": "Keep Pro"
+  },
+  "trial_recap_message": {
+    "message": "Day {day} of your trial · {count} images downloaded so far."
+  },
+  "trial_recap_anchor": {
+    "message": "Keep Pro for $29.99/year — that's $2.49/month."
   }
 }

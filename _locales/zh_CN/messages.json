@@ -1926,5 +1926,14 @@
   },
   "trial_first_scan_message": {
     "message": "找到 {count} 张图片。Pro 试用还剩 {days} 天，到期后 ZIP 打包上限降为 {zip} 张。"
+  },
+  "trial_recap_cta": {
+    "message": "保留 Pro"
+  },
+  "trial_recap_message": {
+    "message": "试用第 {day} 天 · 目前已下载 {count} 张图片。"
+  },
+  "trial_recap_anchor": {
+    "message": "保留 Pro：$29.99/年，相当于每月 $2.49。"
   }
 }
