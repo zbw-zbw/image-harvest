@@ -1944,5 +1944,11 @@
   },
   "trial_ended_notice_cta": {
     "message": "恢復 Pro"
+  },
+  "trial_weekly_winback_message": {
+    "message": "已下載 {count} 張圖片——免費版每次 ZIP 上限 {zip} 張，Pro 解除限制並恢復全部 Pro 功能。"
+  },
+  "trial_weekly_winback_cta": {
+    "message": "恢復 Pro"
   }
 }

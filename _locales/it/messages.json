@@ -1739,5 +1739,11 @@
   },
   "trial_ended_notice_cta": {
     "message": "Ripristina Pro"
+  },
+  "trial_weekly_winback_message": {
+    "message": "{count} immagini scaricate finora. Nel piano gratuito gli ZIP sono limitati a {zip} — Pro rimuove il limite e riporta tutti gli strumenti Pro."
+  },
+  "trial_weekly_winback_cta": {
+    "message": "Riprendi Pro"
   }
 }

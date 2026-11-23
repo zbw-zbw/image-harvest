@@ -93,6 +93,12 @@ export const EVENTS = {
   // that used to be dropped silently once the grace banner disappeared.
   TRIAL_ENDED_NOTICE_SHOWN: 'trial_ended_notice_shown', // props: { daysSinceExpiry: number, count: number }
   TRIAL_ENDED_NOTICE_CTA_CLICKED: 'trial_ended_notice_cta_clicked', // props: { daysSinceExpiry: number, count: number }
+  // Weekly win-back (Phase 2). The ended notice is one-shot inside days
+  // 3-33 after expiry; past that window the panel used to go silent for
+  // good. `week` is 1-based (1..4) and counts reminders actually seen, so
+  // the funnel can tell a first nudge from a last one.
+  TRIAL_WEEKLY_WINBACK_SHOWN: 'trial_weekly_winback_shown', // props: { week: number, count: number }
+  TRIAL_WEEKLY_WINBACK_CTA_CLICKED: 'trial_weekly_winback_cta_clicked', // props: { week: number, count: number }
 
   // Welcome page (Phase 2)
   WELCOME_PAGE_VIEWED: 'welcome_page_viewed', // props: { source: string }
@@ -254,6 +260,8 @@ export const EVENT_PROP_SCHEMAS: Record<TelemetryEventName, readonly string[]> =
   [EVENTS.TRIAL_RECAP_CTA_CLICKED]: ['day', 'count', 'daysRemaining', 'abBucket'],
   [EVENTS.TRIAL_ENDED_NOTICE_SHOWN]: ['daysSinceExpiry', 'count', 'abBucket'],
   [EVENTS.TRIAL_ENDED_NOTICE_CTA_CLICKED]: ['daysSinceExpiry', 'count', 'abBucket'],
+  [EVENTS.TRIAL_WEEKLY_WINBACK_SHOWN]: ['week', 'count', 'abBucket'],
+  [EVENTS.TRIAL_WEEKLY_WINBACK_CTA_CLICKED]: ['week', 'count', 'abBucket'],
 
   [EVENTS.WELCOME_PAGE_VIEWED]: ['source'],
   [EVENTS.WELCOME_CTA_CLICKED]: ['action'],

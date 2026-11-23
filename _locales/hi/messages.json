@@ -1739,5 +1739,11 @@
   },
   "trial_ended_notice_cta": {
     "message": "Pro वापस पाएँ"
+  },
+  "trial_weekly_winback_message": {
+    "message": "अब तक {count} छवियाँ डाउनलोड हुईं। मुफ़्त प्लान में ZIP {zip} तक सीमित है — Pro सीमा हटाता है और सभी Pro टूल्स वापस लाता है।"
+  },
+  "trial_weekly_winback_cta": {
+    "message": "Pro वापस पाएँ"
   }
 }

@@ -1739,5 +1739,11 @@
   },
   "trial_ended_notice_cta": {
     "message": "Pro zurückholen"
+  },
+  "trial_weekly_winback_message": {
+    "message": "Bisher {count} Bilder heruntergeladen. Im kostenlosen Plan sind ZIPs auf {zip} begrenzt — Pro hebt das auf und bringt alle Pro-Funktionen zurück."
+  },
+  "trial_weekly_winback_cta": {
+    "message": "Pro zurückholen"
   }
 }

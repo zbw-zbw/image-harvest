@@ -228,4 +228,48 @@ describe('<TrialValueMomentBanner>', () => {
     expect(String(createTab.mock.calls[0][0].url)).toContain('trigger=trial_ended');
     expect(state.proUpgradeModalState.open).toBe(false);
   });
+
+  // Phase 2: the weekly win-back reuses the same layout for trials that
+  // expired past the ended-notice window; only the trigger and telemetry
+  // props differ.
+  it('weekly variant names the features used and keeps the annual anchor', () => {
+    state.trialValueMoment = {
+      count: 512,
+      variant: 'weekly',
+      week: 2,
+      features: ['dedup'],
+    };
+    const { container } = render(<TrialValueMomentBanner />);
+
+    expect(container.querySelector('.trial-recap-anchor')).not.toBeNull();
+    expect(container.querySelectorAll('.trial-recap-chip').length).toBe(1);
+    expect(container.textContent).toContain('512');
+  });
+
+  it('weekly CTA reports the week and opens pricing with trigger=trial_weekly', () => {
+    const createTab = vi.fn();
+    (globalThis as unknown as { chrome: { tabs: { create: unknown } } }).chrome = {
+      tabs: { create: createTab },
+    };
+    state.trialValueMoment = {
+      count: 512,
+      variant: 'weekly',
+      week: 3,
+      features: [],
+    };
+    const { container } = render(<TrialValueMomentBanner />);
+    const btn = container.querySelector('.trial-value-moment-btn') as HTMLElement | null;
+    expect(btn).not.toBeNull();
+
+    fireEvent.click(btn as HTMLElement);
+
+    expect(mockTrack).toHaveBeenCalledTimes(1);
+    expect(mockTrack).toHaveBeenCalledWith(EVENTS.TRIAL_WEEKLY_WINBACK_CTA_CLICKED, {
+      week: 3,
+      count: 512,
+    });
+    expect(createTab).toHaveBeenCalledTimes(1);
+    expect(String(createTab.mock.calls[0][0].url)).toContain('trigger=trial_weekly');
+    expect(state.proUpgradeModalState.open).toBe(false);
+  });
 });

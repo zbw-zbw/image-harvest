@@ -417,9 +417,10 @@ export interface SidepanelState {
    * earned it.
    *
    * Also carries the one-shot first-scan echo (variant 'first_scan',
-   * 2026-09), the day-3/5/7 recap (variant 'recap', 2026-09) and the
-   * post-grace expiry notice (variant 'ended', 2026-11). All reuse this
-   * slot because it is the only non-blocking surface that sits directly
+   * 2026-09), the day-3/5/7 recap (variant 'recap', 2026-09), the
+   * post-grace expiry notice (variant 'ended', 2026-11) and the weekly
+   * win-back for long-expired trials (variant 'weekly', 2026-11). All reuse
+   * this slot because it is the only non-blocking surface that sits directly
    * above the result grid.
    */
   trialValueMoment:
@@ -437,6 +438,13 @@ export interface SidepanelState {
         variant: 'ended';
         /** Whole days since the trial expired (before the grace period). */
         daysSinceExpiry: number;
+        features: ProFeatureKey[];
+      }
+    | {
+        count: number;
+        variant: 'weekly';
+        /** 1-based reminder index (1..4) for this install. */
+        week: number;
         features: ProFeatureKey[];
       }
     | null;

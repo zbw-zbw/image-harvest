@@ -1739,5 +1739,11 @@
   },
   "trial_ended_notice_cta": {
     "message": "Recuperar Pro"
+  },
+  "trial_weekly_winback_message": {
+    "message": "{count} imagens baixadas até agora. No plano grátis os ZIPs são limitados a {zip} — o Pro remove o limite e devolve todas as ferramentas Pro."
+  },
+  "trial_weekly_winback_cta": {
+    "message": "Recuperar o Pro"
   }
 }

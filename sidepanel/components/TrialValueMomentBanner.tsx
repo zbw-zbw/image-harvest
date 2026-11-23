@@ -30,6 +30,10 @@ const MAX_RECAP_FEATURES = 3;
  *              install (2026-11). Reopens the conversation for a cohort the
  *              grace banner drops silently: what they used, what it costs
  *              now, and where to pay — one click instead of a modal detour.
+ *   weekly     Long-expired trials (Phase 2, 2026-11). The ended notice is
+ *              one-shot inside days 3-33 after expiry; past that the panel
+ *              used to go silent forever. At most four reminders, one per
+ *              week, only on panel open.
  *
  * Impression telemetry is fired by each trigger site, not here: this
  * component has no mount/effect lifecycle of its own (unlike
@@ -68,6 +72,16 @@ export function TrialValueMomentBanner() {
         });
         chrome.tabs.create({ url: pricingPageUrl('trial_ended') });
         return;
+      case 'weekly':
+        // Same reasoning as 'ended': a returning expired trial user gets the
+        // price, not the pitch. The trigger keeps weekly win-backs separable
+        // from the one-shot post-grace notice in the website funnel.
+        void track(EVENTS.TRIAL_WEEKLY_WINBACK_CTA_CLICKED, {
+          week: moment.week,
+          count: moment.count,
+        });
+        chrome.tabs.create({ url: pricingPageUrl('trial_weekly') });
+        return;
       default:
         void track(EVENTS.TRIAL_VALUE_MOMENT_CTA_CLICKED, {
           count: moment.count,
@@ -96,6 +110,12 @@ export function TrialValueMomentBanner() {
   } else if (moment.variant === 'ended') {
     message = t('trial_ended_notice_message');
     cta = t('trial_ended_notice_cta');
+  } else if (moment.variant === 'weekly') {
+    message = t('trial_weekly_winback_message', {
+      count: moment.count,
+      zip: getFreeLimits().MAX_ZIP_IMAGES,
+    });
+    cta = t('trial_weekly_winback_cta');
   } else {
     message = t('trial_value_moment_message', {
       count: moment.count,
@@ -104,9 +124,10 @@ export function TrialValueMomentBanner() {
     cta = t('trial_grace_upgrade_btn');
   }
 
-  // Recaps and the post-grace notice both name what the user actually used
-  // and what keeping it costs; the batch/first_scan variants do not.
-  const showsUsage = moment.variant === 'recap' || moment.variant === 'ended';
+  // Recaps, the post-grace notice and the weekly win-back all name what the
+  // user actually used and what keeping it costs; batch/first_scan do not.
+  const showsUsage =
+    moment.variant === 'recap' || moment.variant === 'ended' || moment.variant === 'weekly';
 
   return (
     <div class="trial-value-moment-banner">

@@ -1944,5 +1944,11 @@
   },
   "trial_ended_notice_cta": {
     "message": "Pro を再開"
+  },
+  "trial_weekly_winback_message": {
+    "message": "これまでに {count} 枚の画像をダウンロード。無料版の ZIP は {zip} 枚までですが、Pro なら制限なしで全 Pro 機能が戻ります。"
+  },
+  "trial_weekly_winback_cta": {
+    "message": "Pro を再開"
   }
 }

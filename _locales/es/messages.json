@@ -1947,5 +1947,11 @@
   },
   "trial_ended_notice_cta": {
     "message": "Recuperar Pro"
+  },
+  "trial_weekly_winback_message": {
+    "message": "{count} imágenes descargadas hasta ahora. En el plan gratis los ZIP se limitan a {zip}; Pro quita el límite y recupera todas las funciones Pro."
+  },
+  "trial_weekly_winback_cta": {
+    "message": "Recuperar Pro"
   }
 }

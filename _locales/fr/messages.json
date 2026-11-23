@@ -1739,5 +1739,11 @@
   },
   "trial_ended_notice_cta": {
     "message": "Retrouver Pro"
+  },
+  "trial_weekly_winback_message": {
+    "message": "{count} images téléchargées jusqu'ici. En gratuit, les ZIP sont limités à {zip} — Pro supprime la limite et restaure tous les outils Pro."
+  },
+  "trial_weekly_winback_cta": {
+    "message": "Retrouver Pro"
   }
 }

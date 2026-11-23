@@ -1739,5 +1739,11 @@
   },
   "trial_ended_notice_cta": {
     "message": "Pro terugzetten"
+  },
+  "trial_weekly_winback_message": {
+    "message": "{count} afbeeldingen gedownload. In het gratis plan zijn ZIP's beperkt tot {zip} — Pro heft de limiet op en brengt alle Pro-tools terug."
+  },
+  "trial_weekly_winback_cta": {
+    "message": "Pro terughalen"
   }
 }

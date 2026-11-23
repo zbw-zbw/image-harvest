@@ -1960,5 +1960,11 @@
   },
   "trial_ended_notice_cta": {
     "message": "Get Pro back"
+  },
+  "trial_weekly_winback_message": {
+    "message": "{count} images downloaded so far. On the free plan ZIPs cap at {zip} — Pro lifts that and brings back every Pro tool."
+  },
+  "trial_weekly_winback_cta": {
+    "message": "Get Pro back"
   }
 }
