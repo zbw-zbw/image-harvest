@@ -546,6 +546,30 @@ describe('claimTrialValueMomentToday', () => {
   });
 });
 
+// ────────────────────────────────────────────────────────────────────────────
+// claimTrialFirstScanNotice (one-shot first-scan trial echo)
+// ────────────────────────────────────────────────────────────────────────────
+
+describe('claimTrialFirstScanNotice', () => {
+  it('first call → claims the one-shot notice + sets sentinel', async () => {
+    const { claimTrialFirstScanNotice } = await import('../shared/trial');
+    expect(await claimTrialFirstScanNotice()).toBe(true);
+    expect(storage.get('_trial_first_scan_notice')).toEqual(expect.any(Number));
+  });
+
+  it('after claiming → never claims again (one-shot, not daily)', async () => {
+    const { claimTrialFirstScanNotice } = await import('../shared/trial');
+    expect(await claimTrialFirstScanNotice()).toBe(true);
+    expect(await claimTrialFirstScanNotice()).toBe(false);
+  });
+
+  it('storage failure → fail-closed (false)', async () => {
+    chromeStub.storage.local.get.mockRejectedValueOnce(new Error('storage down'));
+    const { claimTrialFirstScanNotice } = await import('../shared/trial');
+    expect(await claimTrialFirstScanNotice()).toBe(false);
+  });
+});
+
 describe('isInTrialGracePeriod', () => {
   it('returns inGrace=false when no license data', async () => {
     mockGetLicenseData.mockResolvedValue(null);

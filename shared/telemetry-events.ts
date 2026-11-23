@@ -77,6 +77,12 @@ export const EVENTS = {
   // real reach (≥50-image batches are naturally rare).
   TRIAL_VALUE_MOMENT_SHOWN: 'trial_value_moment_shown', // props: { count: number, daysRemaining: number }
   TRIAL_VALUE_MOMENT_CTA_CLICKED: 'trial_value_moment_cta_clicked', // props: { count: number, daysRemaining: number }
+  // First-scan trial echo (Phase 1): the welcome page promises a 7-day trial;
+  // the first successful scan is where that promise becomes concrete. Fired
+  // once per install (shared/trial.ts claimTrialFirstScanNotice), so the
+  // shown→cta pair is a clean one-shot reach measurement, not panel opens.
+  TRIAL_FIRST_SCAN_NOTICE_SHOWN: 'trial_first_scan_notice_shown', // props: { count: number, daysRemaining: number }
+  TRIAL_FIRST_SCAN_CTA_CLICKED: 'trial_first_scan_cta_clicked', // props: { count: number, daysRemaining: number }
 
   // Welcome page (Phase 2)
   WELCOME_PAGE_VIEWED: 'welcome_page_viewed', // props: { source: string }
@@ -229,6 +235,8 @@ export const EVENT_PROP_SCHEMAS: Record<TelemetryEventName, readonly string[]> =
   [EVENTS.TRIAL_EXPIRY_CTA_CLICKED]: ['daysRemaining', 'abBucket'],
   [EVENTS.TRIAL_VALUE_MOMENT_SHOWN]: ['count', 'daysRemaining', 'abBucket'],
   [EVENTS.TRIAL_VALUE_MOMENT_CTA_CLICKED]: ['count', 'daysRemaining', 'abBucket'],
+  [EVENTS.TRIAL_FIRST_SCAN_NOTICE_SHOWN]: ['count', 'daysRemaining', 'abBucket'],
+  [EVENTS.TRIAL_FIRST_SCAN_CTA_CLICKED]: ['count', 'daysRemaining', 'abBucket'],
 
   [EVENTS.WELCOME_PAGE_VIEWED]: ['source'],
   [EVENTS.WELCOME_CTA_CLICKED]: ['action'],

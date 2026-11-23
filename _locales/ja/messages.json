@@ -1920,5 +1920,11 @@
   },
   "welcome_trial_keep_items": {
     "message": "{zip} 枚までの ZIP・逆画像検索 {engines} エンジン・お気に入り {favs} 件"
+  },
+  "trial_first_scan_cta": {
+    "message": "Pro プランを見る"
+  },
+  "trial_first_scan_message": {
+    "message": "{count} 枚の画像が見つかりました。Pro トライアルは残り {days} 日、終了後は ZIP の上限が {zip} 枚になります。"
   }
 }

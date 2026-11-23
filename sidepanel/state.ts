@@ -401,10 +401,18 @@ export interface SidepanelState {
    * Trial value-moment banner (B-plan): set right after a trial user
    * completes a ≥50-image batch download, null otherwise. Cleared on tab
    * switch together with toasts — the banner belongs to the tab that
-   * earned it. The ONLY in-trial conversion touchpoint (SoftPaywallBanner
-   * short-circuits on isProUser).
+   * earned it.
+   *
+   * Also carries the one-shot first-scan echo (variant 'first_scan',
+   * 2026-09): the same slot, a different promise — see
+   * claimTrialFirstScanNotice() for why the first result grid is the right
+   * place to restate the trial.
    */
-  trialValueMoment: { count: number; daysRemaining: number } | null;
+  trialValueMoment: {
+    count: number;
+    daysRemaining: number;
+    variant: 'batch' | 'first_scan';
+  } | null;
 
   /**
    * Download nudge bar (2026-10-13 growth experiment #1): true once the

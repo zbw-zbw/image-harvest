@@ -1715,5 +1715,11 @@
   },
   "welcome_trial_keep_items": {
     "message": "{zip} इमेज तक ZIP · {engines} रिवर्स-सर्च इंजन · {favs} पसंदीदा"
+  },
+  "trial_first_scan_cta": {
+    "message": "Pro प्लान देखें"
+  },
+  "trial_first_scan_message": {
+    "message": "{count} इमेज मिलीं। Pro ट्रायल में {days} दिन बाकी हैं; उसके बाद ZIP {zip} इमेज तक सीमित हो जाएगा।"
   }
 }

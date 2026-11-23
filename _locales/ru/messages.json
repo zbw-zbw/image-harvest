@@ -1715,5 +1715,11 @@
   },
   "welcome_trial_keep_items": {
     "message": "ZIP до {zip} изображений · {engines} обратного поиска · {favs} в избранном"
+  },
+  "trial_first_scan_cta": {
+    "message": "Смотреть тарифы Pro"
+  },
+  "trial_first_scan_message": {
+    "message": "Найдено изображений: {count}. Пробный период Pro закончится через {days} дн.; после этого ZIP будет ограничен {zip} изображениями."
   }
 }

@@ -1936,5 +1936,11 @@
   },
   "welcome_trial_keep_items": {
     "message": "{zip}-image ZIP · {engines} reverse-search engines · {favs} favorites"
+  },
+  "trial_first_scan_cta": {
+    "message": "See Pro plans"
+  },
+  "trial_first_scan_message": {
+    "message": "{count} images found. Your Pro trial has {days} day(s) left — after that, ZIP downloads drop to {zip} images."
   }
 }

@@ -1715,5 +1715,11 @@
   },
   "welcome_trial_keep_items": {
     "message": "ZIP mit {zip} Bildern · {engines} Reverse-Search-Engines · {favs} Favoriten"
+  },
+  "trial_first_scan_cta": {
+    "message": "Pro-Tarife ansehen"
+  },
+  "trial_first_scan_message": {
+    "message": "{count} Bilder gefunden. Deine Pro-Testphase läuft noch {days} Tag(e); danach sind ZIPs auf {zip} Bilder begrenzt."
   }
 }

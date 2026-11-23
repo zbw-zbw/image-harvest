@@ -1715,5 +1715,11 @@
   },
   "welcome_trial_keep_items": {
     "message": "ZIP met {zip} afbeeldingen · {engines} reverse-search-engines · {favs} favorieten"
+  },
+  "trial_first_scan_cta": {
+    "message": "Bekijk Pro-abonnementen"
+  },
+  "trial_first_scan_message": {
+    "message": "{count} afbeeldingen gevonden. Je Pro-proefperiode duurt nog {days} dag(en); daarna zijn ZIP's beperkt tot {zip} afbeeldingen."
   }
 }

@@ -1920,5 +1920,11 @@
   },
   "welcome_trial_keep_items": {
     "message": "每次 {zip} 张的 ZIP · {engines} 个以图搜图引擎 · {favs} 个收藏"
+  },
+  "trial_first_scan_cta": {
+    "message": "查看 Pro 方案"
+  },
+  "trial_first_scan_message": {
+    "message": "找到 {count} 张图片。Pro 试用还剩 {days} 天，到期后 ZIP 打包上限降为 {zip} 张。"
   }
 }

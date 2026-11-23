@@ -1922,5 +1922,11 @@
   },
   "welcome_trial_keep_items": {
     "message": "ZIP 최대 {zip}장 · 역방향 이미지 검색 {engines}개 · 즐겨찾기 {favs}개"
+  },
+  "trial_first_scan_cta": {
+    "message": "Pro 요금제 보기"
+  },
+  "trial_first_scan_message": {
+    "message": "이미지 {count}장을 찾았습니다. Pro 체험은 {days}일 남았으며, 이후 ZIP 다운로드는 {zip}장으로 제한됩니다."
   }
 }

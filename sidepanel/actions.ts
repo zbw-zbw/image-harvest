@@ -573,7 +573,7 @@ export async function downloadSelectedAsZip(
           if (!snap || !snap.active) return;
           if (!(await claimTrialValueMomentToday())) return;
           const daysRemaining = Math.max(1, Math.ceil(snap.msRemaining / 86_400_000));
-          state.trialValueMoment = { count: successCount, daysRemaining };
+          state.trialValueMoment = { count: successCount, daysRemaining, variant: 'batch' };
           void track(EVENTS.TRIAL_VALUE_MOMENT_SHOWN, { count: successCount, daysRemaining });
         } catch {
           // Storage/license read failure — the banner is best-effort UI.

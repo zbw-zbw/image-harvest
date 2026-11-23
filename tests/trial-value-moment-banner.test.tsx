@@ -62,7 +62,7 @@ describe('<TrialValueMomentBanner>', () => {
   });
 
   it('renders the banner when the trigger sets the moment payload', () => {
-    state.trialValueMoment = { count: 120, daysRemaining: 5 };
+    state.trialValueMoment = { count: 120, daysRemaining: 5, variant: 'batch' };
     const { container } = render(<TrialValueMomentBanner />);
     expect(container.querySelector('.trial-value-moment-banner')).not.toBeNull();
     expect(container.querySelector('.trial-value-moment-btn')).not.toBeNull();
@@ -73,7 +73,7 @@ describe('<TrialValueMomentBanner>', () => {
   });
 
   it('upgrade CTA fires trial_value_moment_cta_clicked with count/daysRemaining and opens the upgrade modal', () => {
-    state.trialValueMoment = { count: 87, daysRemaining: 3 };
+    state.trialValueMoment = { count: 87, daysRemaining: 3, variant: 'batch' };
     const { container } = render(<TrialValueMomentBanner />);
     const btn = container.querySelector('.trial-value-moment-btn') as HTMLElement | null;
     expect(btn).not.toBeNull();
@@ -87,5 +87,24 @@ describe('<TrialValueMomentBanner>', () => {
     });
     expect(state.proUpgradeModalState.open).toBe(true);
     expect(state.proUpgradeModalState.errorText).toBe('');
+  });
+
+  // Phase 1: the first-scan echo reuses this slot but must not be counted
+  // as an ordinary batch value moment — the shown/cta pair has its own event
+  // names so one-shot reach stays separable in the funnel.
+  it('first-scan variant fires its own CTA event, not the batch one', () => {
+    state.trialValueMoment = { count: 42, daysRemaining: 7, variant: 'first_scan' };
+    const { container } = render(<TrialValueMomentBanner />);
+    const btn = container.querySelector('.trial-value-moment-btn') as HTMLElement | null;
+    expect(btn).not.toBeNull();
+
+    fireEvent.click(btn as HTMLElement);
+
+    expect(mockTrack).toHaveBeenCalledTimes(1);
+    expect(mockTrack).toHaveBeenCalledWith(EVENTS.TRIAL_FIRST_SCAN_CTA_CLICKED, {
+      count: 42,
+      daysRemaining: 7,
+    });
+    expect(state.proUpgradeModalState.open).toBe(true);
   });
 });

@@ -41,6 +41,7 @@ const STORAGE_KEY_TRIAL_EXPIRED_REPORTED = '_trial_expired_reported';
 const STORAGE_KEY_GRACE_BANNER_DAY = '_trial_grace_banner_day';
 const STORAGE_KEY_EXPIRY_WARNING_DAY = '_trial_expiry_warning_day';
 const STORAGE_KEY_VALUE_MOMENT_DAY = '_trial_value_moment_day';
+const STORAGE_KEY_FIRST_SCAN_NOTICE = '_trial_first_scan_notice';
 
 /** The trial shows an amber "expiring soon" warning during these final days. */
 export const TRIAL_EXPIRY_WARNING_DAYS = 3;
@@ -313,6 +314,32 @@ export async function claimTrialValueMomentToday(): Promise<boolean> {
     const data = await chrome.storage.local.get(STORAGE_KEY_VALUE_MOMENT_DAY);
     if (data[STORAGE_KEY_VALUE_MOMENT_DAY] === today) return false;
     await chrome.storage.local.set({ [STORAGE_KEY_VALUE_MOMENT_DAY]: today });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Claim the one-shot "your trial is running" echo shown after the first
+ * successful scan.
+ *
+ * Why after the scan rather than on panel open: the install page already
+ * announced the trial, and a panel-open banner is indistinguishable from
+ * chrome. The first result grid is the first moment the trial has visible
+ * value to attach the expiry date to, and it is the only mid-trial moment
+ * where the free floor (50-image ZIPs) is directly relevant to what is on
+ * screen.
+ *
+ * One-shot forever, not per install date: re-arming would turn a milestone
+ * into recurring chrome. Fails closed (returns false) on storage errors —
+ * purely additive UI, and showing it twice is worse than not at all.
+ */
+export async function claimTrialFirstScanNotice(): Promise<boolean> {
+  try {
+    const data = await chrome.storage.local.get(STORAGE_KEY_FIRST_SCAN_NOTICE);
+    if (data[STORAGE_KEY_FIRST_SCAN_NOTICE]) return false;
+    await chrome.storage.local.set({ [STORAGE_KEY_FIRST_SCAN_NOTICE]: Date.now() });
     return true;
   } catch {
     return false;

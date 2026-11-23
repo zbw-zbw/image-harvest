@@ -1715,5 +1715,11 @@
   },
   "welcome_trial_keep_items": {
     "message": "ZIP da {zip} immagini · {engines} motori di ricerca inversa · {favs} preferiti"
+  },
+  "trial_first_scan_cta": {
+    "message": "Vedi i piani Pro"
+  },
+  "trial_first_scan_message": {
+    "message": "{count} immagini trovate. La prova Pro scade tra {days} giorno/i; dopo, gli ZIP si fermano a {zip} immagini."
   }
 }

@@ -1715,5 +1715,11 @@
   },
   "welcome_trial_keep_items": {
     "message": "ZIP สูงสุด {zip} รูป · ค้นหารูปย้อนกลับ {engines} ระบบ · รายการโปรด {favs} รายการ"
+  },
+  "trial_first_scan_cta": {
+    "message": "ดูแพ็กเกจ Pro"
+  },
+  "trial_first_scan_message": {
+    "message": "พบ {count} รูป ทรัยัล Pro เหลืออีก {days} วัน หลังจากนั้น ZIP จะจำกัดที่ {zip} รูป"
   }
 }

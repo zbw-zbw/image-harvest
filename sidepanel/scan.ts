@@ -782,6 +782,32 @@ export async function fetchImages(targetTabId?: number): Promise<void> {
       });
       void track(EVENTS.IMAGES_SHOWN, { count: state.allImages.length });
 
+      // Trial onboarding echo (Phase 1): the install page promised 7 days of
+      // Pro; the first result grid is where that promise becomes concrete, and
+      // it is the only mid-trial moment where the free floor (50-image ZIPs)
+      // applies to something the user can actually see. One-shot per install,
+      // trial users only. Isolated IIFE: a failure here must never affect the
+      // scan result, so `foundCount` is captured before any await.
+      if (state.filteredImages.length > 0) {
+        const foundCount = state.filteredImages.length;
+        void (async () => {
+          try {
+            const { getTrialState, claimTrialFirstScanNotice } = await import('../shared/trial');
+            const snap = await getTrialState();
+            if (!snap || !snap.active) return;
+            if (!(await claimTrialFirstScanNotice())) return;
+            const daysRemaining = Math.max(1, Math.ceil(snap.msRemaining / 86_400_000));
+            state.trialValueMoment = { count: foundCount, daysRemaining, variant: 'first_scan' };
+            void track(EVENTS.TRIAL_FIRST_SCAN_NOTICE_SHOWN, {
+              count: foundCount,
+              daysRemaining,
+            });
+          } catch {
+            // Storage/license read failure — the notice is best-effort UI.
+          }
+        })();
+      }
+
       // Persist to session storage using the locked scanTabId to avoid
       // writing into the wrong tab's cache slot after a mid-scan switch.
       if (scanTabId != null) {
