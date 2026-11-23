@@ -156,12 +156,26 @@ jobs:
       # e2e/_helpers/launchExtension.ts also refuses to run without the
       # dist/.e2e-build marker as a second line of defense.
       - run: npm run build:e2e
-      # `playwright install --with-deps` pulls Chromium + the system libs
-      # (libnss3, libatk, etc). No xvfb needed: the suite runs in the new
-      # headless mode (full Chromium kernel), which supports MV3 service
-      # workers and extensions.
-      - name: Install Playwright
-        run: npx playwright install --with-deps chromium
+      # Cache the browser download: a hit turns the next step into a no-op,
+      # which also means a flaky CDN can't fail an otherwise-green PR.
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+      # Browser and system libs are installed separately on purpose.
+      # `--with-deps` bundles them into one step, so a transient apt mirror
+      # error (404 on a package, GPG/keyserver hiccup, mirror timeout) turned
+      # the whole pipeline red even though the browser downloaded fine. The
+      # ubuntu-latest image already ships the shared libraries Chromium needs
+      # in practice, so the deps step is best-effort and time-boxed.
+      - name: Install Playwright browser
+        run: npx playwright install chromium
+        timeout-minutes: 10
+      - name: Install Playwright system dependencies
+        run: npx playwright install-deps chromium
+        timeout-minutes: 10
+        continue-on-error: true
       - name: Run Playwright smoke tests
         run: npm run test:e2e
       - name: Upload Playwright report
