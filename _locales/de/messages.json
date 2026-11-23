@@ -1733,5 +1733,11 @@
   },
   "trial_recap_features": {
     "message": "Schon genutzt:"
+  },
+  "trial_ended_notice_message": {
+    "message": "Deine Pro-Testphase ist beendet – Bilder, Sammlungen und Einstellungen bleiben erhalten."
+  },
+  "trial_ended_notice_cta": {
+    "message": "Pro zurückholen"
   }
 }

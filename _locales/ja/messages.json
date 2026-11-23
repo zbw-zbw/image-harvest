@@ -1938,5 +1938,11 @@
   },
   "trial_recap_features": {
     "message": "使った機能："
+  },
+  "trial_ended_notice_message": {
+    "message": "Pro トライアルは終了しました。画像・コレクション・設定はそのまま残っています。"
+  },
+  "trial_ended_notice_cta": {
+    "message": "Pro を再開"
   }
 }

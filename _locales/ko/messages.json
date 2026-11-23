@@ -1940,5 +1940,11 @@
   },
   "trial_recap_features": {
     "message": "사용한 기능:"
+  },
+  "trial_ended_notice_message": {
+    "message": "Pro 체험이 종료되었습니다. 이미지·컬렉션·설정은 그대로 남아 있습니다."
+  },
+  "trial_ended_notice_cta": {
+    "message": "Pro 다시 켜기"
   }
 }

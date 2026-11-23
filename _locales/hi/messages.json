@@ -1733,5 +1733,11 @@
   },
   "trial_recap_features": {
     "message": "आपने पहले ही उपयोग किया:"
+  },
+  "trial_ended_notice_message": {
+    "message": "आपका Pro ट्रायल समाप्त हो गया — आपकी छवियाँ, संग्रह और सेटिंग्स अभी भी मौजूद हैं।"
+  },
+  "trial_ended_notice_cta": {
+    "message": "Pro वापस पाएँ"
   }
 }

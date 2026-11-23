@@ -1733,5 +1733,11 @@
   },
   "trial_recap_features": {
     "message": "Уже использовано:"
+  },
+  "trial_ended_notice_message": {
+    "message": "Пробный период Pro закончился — изображения, коллекции и настройки на месте."
+  },
+  "trial_ended_notice_cta": {
+    "message": "Вернуть Pro"
   }
 }

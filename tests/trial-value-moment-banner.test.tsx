@@ -52,6 +52,7 @@ beforeEach(() => {
 afterEach(() => {
   cleanup();
   resetState();
+  delete (globalThis as unknown as { chrome?: unknown }).chrome;
 });
 
 describe('<TrialValueMomentBanner>', () => {
@@ -180,5 +181,51 @@ describe('<TrialValueMomentBanner>', () => {
 
     expect(container.querySelector('.trial-recap-features')).toBeNull();
     expect(container.textContent).toContain('8');
+  });
+
+  // Phase 2: the post-grace notice reuses the recap layout (what they used,
+  // what it costs) but its CTA leaves for the pricing page instead of the
+  // modal — an expired user already knows what Pro does, so the shortest
+  // path to checkout wins.
+  it('ended variant names the features used and keeps the annual anchor', () => {
+    state.trialValueMoment = {
+      count: 204,
+      variant: 'ended',
+      daysSinceExpiry: 6,
+      features: ['dedup', 'deepScan'],
+    };
+    const { container } = render(<TrialValueMomentBanner />);
+
+    expect(container.querySelector('.trial-recap-anchor')).not.toBeNull();
+    expect(container.textContent).toContain('29.99');
+    expect(container.querySelectorAll('.trial-recap-chip').length).toBe(2);
+    expect(container.textContent).toContain('Duplicate Detection');
+  });
+
+  it('ended CTA opens the pricing page with trigger=trial_ended and skips the modal', () => {
+    const createTab = vi.fn();
+    (globalThis as unknown as { chrome: { tabs: { create: unknown } } }).chrome = {
+      tabs: { create: createTab },
+    };
+    state.trialValueMoment = {
+      count: 204,
+      variant: 'ended',
+      daysSinceExpiry: 6,
+      features: [],
+    };
+    const { container } = render(<TrialValueMomentBanner />);
+    const btn = container.querySelector('.trial-value-moment-btn') as HTMLElement | null;
+    expect(btn).not.toBeNull();
+
+    fireEvent.click(btn as HTMLElement);
+
+    expect(mockTrack).toHaveBeenCalledTimes(1);
+    expect(mockTrack).toHaveBeenCalledWith(EVENTS.TRIAL_ENDED_NOTICE_CTA_CLICKED, {
+      daysSinceExpiry: 6,
+      count: 204,
+    });
+    expect(createTab).toHaveBeenCalledTimes(1);
+    expect(String(createTab.mock.calls[0][0].url)).toContain('trigger=trial_ended');
+    expect(state.proUpgradeModalState.open).toBe(false);
   });
 });

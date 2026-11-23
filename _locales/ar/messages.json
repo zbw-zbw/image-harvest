@@ -1733,5 +1733,11 @@
   },
   "trial_recap_features": {
     "message": "استخدمت بالفعل:"
+  },
+  "trial_ended_notice_message": {
+    "message": "انتهت فترة تجربة Pro — صورك ومجموعاتك وإعداداتك ما زالت هنا."
+  },
+  "trial_ended_notice_cta": {
+    "message": "استعادة Pro"
   }
 }

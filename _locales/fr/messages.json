@@ -1733,5 +1733,11 @@
   },
   "trial_recap_features": {
     "message": "Déjà utilisés :"
+  },
+  "trial_ended_notice_message": {
+    "message": "Votre essai Pro est terminé — vos images, collections et réglages sont toujours là."
+  },
+  "trial_ended_notice_cta": {
+    "message": "Retrouver Pro"
   }
 }

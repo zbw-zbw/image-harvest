@@ -1,5 +1,5 @@
 import { t } from '../../shared/i18n';
-import { getFreeLimits } from '../../shared/constants';
+import { getFreeLimits, pricingPageUrl } from '../../shared/constants';
 import { track } from '../../shared/telemetry';
 import { EVENTS } from '../../shared/telemetry-events';
 import { proFeatureLabelKey } from '../../shared/trial-pro-usage';
@@ -26,6 +26,10 @@ const MAX_RECAP_FEATURES = 3;
  *              so the trial could lapse without the user ever noticing what
  *              they had. One impression per milestone, and the last one
  *              carries the annual anchor ($29.99/yr = $2.49/mo).
+ *   ended      First panel open after the 3-day grace window, once per
+ *              install (2026-11). Reopens the conversation for a cohort the
+ *              grace banner drops silently: what they used, what it costs
+ *              now, and where to pay — one click instead of a modal detour.
  *
  * Impression telemetry is fired by each trigger site, not here: this
  * component has no mount/effect lifecycle of its own (unlike
@@ -53,6 +57,17 @@ export function TrialValueMomentBanner() {
           daysRemaining: moment.daysRemaining,
         });
         break;
+      case 'ended':
+        // Straight to pricing, like TrialGraceBanner: someone who has already
+        // spent the trial inside the product does not need the modal's "what
+        // is Pro" pitch, and trigger=trial_ended gives the website funnel its
+        // own segment.
+        void track(EVENTS.TRIAL_ENDED_NOTICE_CTA_CLICKED, {
+          daysSinceExpiry: moment.daysSinceExpiry,
+          count: moment.count,
+        });
+        chrome.tabs.create({ url: pricingPageUrl('trial_ended') });
+        return;
       default:
         void track(EVENTS.TRIAL_VALUE_MOMENT_CTA_CLICKED, {
           count: moment.count,
@@ -78,6 +93,9 @@ export function TrialValueMomentBanner() {
       days: moment.daysRemaining,
     });
     cta = t('trial_recap_cta');
+  } else if (moment.variant === 'ended') {
+    message = t('trial_ended_notice_message');
+    cta = t('trial_ended_notice_cta');
   } else {
     message = t('trial_value_moment_message', {
       count: moment.count,
@@ -86,11 +104,15 @@ export function TrialValueMomentBanner() {
     cta = t('trial_grace_upgrade_btn');
   }
 
+  // Recaps and the post-grace notice both name what the user actually used
+  // and what keeping it costs; the batch/first_scan variants do not.
+  const showsUsage = moment.variant === 'recap' || moment.variant === 'ended';
+
   return (
     <div class="trial-value-moment-banner">
       <span class="trial-value-moment-text">
         {message}
-        {moment.variant === 'recap' && moment.features.length > 0 && (
+        {showsUsage && moment.features.length > 0 && (
           <span class="trial-recap-features">
             <span class="trial-recap-features-label">{t('trial_recap_features')}</span>
             {moment.features.slice(0, MAX_RECAP_FEATURES).map((feature) => (
@@ -100,9 +122,7 @@ export function TrialValueMomentBanner() {
             ))}
           </span>
         )}
-        {moment.variant === 'recap' && (
-          <span class="trial-recap-anchor">{t('trial_recap_anchor')}</span>
-        )}
+        {showsUsage && <span class="trial-recap-anchor">{t('trial_recap_anchor')}</span>}
       </span>
       <button class="btn btn-small btn-primary trial-value-moment-btn" onClick={handleUpgrade}>
         {cta}

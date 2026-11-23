@@ -1733,5 +1733,11 @@
   },
   "trial_recap_features": {
     "message": "คุณใช้ไปแล้ว:"
+  },
+  "trial_ended_notice_message": {
+    "message": "ทดลองใช้ Pro สิ้นสุดแล้ว — รูปภาพ คอลเลกชัน และการตั้งค่ายังอยู่ครบ"
+  },
+  "trial_ended_notice_cta": {
+    "message": "กลับมาใช้ Pro"
   }
 }

@@ -1733,5 +1733,11 @@
   },
   "trial_recap_features": {
     "message": "Al gebruikt:"
+  },
+  "trial_ended_notice_message": {
+    "message": "Je Pro-proefperiode is afgelopen — je afbeeldingen, collecties en instellingen staan er nog."
+  },
+  "trial_ended_notice_cta": {
+    "message": "Pro terugzetten"
   }
 }

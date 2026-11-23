@@ -88,6 +88,11 @@ export const EVENTS = {
   // instead of a single blended number.
   TRIAL_RECAP_SHOWN: 'trial_recap_shown', // props: { day: number, count: number, daysRemaining: number }
   TRIAL_RECAP_CTA_CLICKED: 'trial_recap_cta_clicked', // props: { day: number, count: number, daysRemaining: number }
+  // Post-grace expiry notice. One impression per install, so `shown` counts
+  // expired trials that actually reopened the panel after grace — the cohort
+  // that used to be dropped silently once the grace banner disappeared.
+  TRIAL_ENDED_NOTICE_SHOWN: 'trial_ended_notice_shown', // props: { daysSinceExpiry: number, count: number }
+  TRIAL_ENDED_NOTICE_CTA_CLICKED: 'trial_ended_notice_cta_clicked', // props: { daysSinceExpiry: number, count: number }
 
   // Welcome page (Phase 2)
   WELCOME_PAGE_VIEWED: 'welcome_page_viewed', // props: { source: string }
@@ -247,6 +252,8 @@ export const EVENT_PROP_SCHEMAS: Record<TelemetryEventName, readonly string[]> =
   [EVENTS.TRIAL_FIRST_SCAN_CTA_CLICKED]: ['count', 'daysRemaining', 'abBucket'],
   [EVENTS.TRIAL_RECAP_SHOWN]: ['day', 'count', 'daysRemaining', 'abBucket'],
   [EVENTS.TRIAL_RECAP_CTA_CLICKED]: ['day', 'count', 'daysRemaining', 'abBucket'],
+  [EVENTS.TRIAL_ENDED_NOTICE_SHOWN]: ['daysSinceExpiry', 'count', 'abBucket'],
+  [EVENTS.TRIAL_ENDED_NOTICE_CTA_CLICKED]: ['daysSinceExpiry', 'count', 'abBucket'],
 
   [EVENTS.WELCOME_PAGE_VIEWED]: ['source'],
   [EVENTS.WELCOME_CTA_CLICKED]: ['action'],

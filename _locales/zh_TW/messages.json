@@ -1938,5 +1938,11 @@
   },
   "trial_recap_features": {
     "message": "你已用過："
+  },
+  "trial_ended_notice_message": {
+    "message": "Pro 試用已結束——圖片、收藏和設定都還在。"
+  },
+  "trial_ended_notice_cta": {
+    "message": "恢復 Pro"
   }
 }

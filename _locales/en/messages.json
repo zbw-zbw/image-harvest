@@ -1954,5 +1954,11 @@
   },
   "trial_recap_features": {
     "message": "You've used:"
+  },
+  "trial_ended_notice_message": {
+    "message": "Your Pro trial ended — your images, collections and settings are still here."
+  },
+  "trial_ended_notice_cta": {
+    "message": "Get Pro back"
   }
 }

@@ -1733,5 +1733,11 @@
   },
   "trial_recap_features": {
     "message": "Hai già usato:"
+  },
+  "trial_ended_notice_message": {
+    "message": "La prova Pro è terminata: immagini, raccolte e impostazioni sono ancora qui."
+  },
+  "trial_ended_notice_cta": {
+    "message": "Ripristina Pro"
   }
 }
