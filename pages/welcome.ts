@@ -14,7 +14,7 @@ import { track, flushNow, setEnvelopeMeta } from '../shared/telemetry';
 import { EVENTS } from '../shared/telemetry-events';
 import { EXPERIMENTS, getExperimentBucket, type AbBucket } from '../shared/ab-experiment';
 import { startOnboarding } from '../shared/onboarding-state';
-import { MESSAGE_TYPES } from '../shared/constants';
+import { MESSAGE_TYPES, getFreeLimits } from '../shared/constants';
 
 function applyI18n(): void {
   document.querySelectorAll<HTMLElement>('[data-i18n]').forEach((el) => {
@@ -23,6 +23,31 @@ function applyI18n(): void {
     const msg = chrome.i18n.getMessage(key);
     if (msg) el.textContent = msg;
   });
+}
+
+/**
+ * Fill the "what stays free" line from the live free-tier limits rather than
+ * hardcoding today's numbers in 15 catalogues: MAX_ZIP_IMAGES and friends are
+ * remote-config overridable, and a stale promise about the free tier is worse
+ * than no promise at all.
+ *
+ * The welcome page has no remote-config global (the service worker populates
+ * that), so getFreeLimits() yields the shipped defaults here — which is exactly
+ * what a fresh install actually gets until the first sync lands.
+ *
+ * Deliberately not driven by data-i18n: applyI18n() would print the raw
+ * "{zip}-image ..." template before the substitution runs.
+ */
+function renderTrialKeepItems(): void {
+  const el = document.getElementById('trial-keep-items');
+  if (!el) return;
+  const msg = chrome.i18n.getMessage('welcome_trial_keep_items');
+  if (!msg) return;
+  const limits = getFreeLimits();
+  el.textContent = msg
+    .replace('{zip}', String(limits.MAX_ZIP_IMAGES))
+    .replace('{engines}', String(limits.REVERSE_SEARCH_ENGINES.length))
+    .replace('{favs}', String(limits.MAX_COLLECTION_ITEMS));
 }
 
 /**
@@ -53,6 +78,7 @@ function init(): void {
 
   window.scrollTo(0, 0);
   applyI18n();
+  renderTrialKeepItems();
 
   // Display version
   const versionEl = document.getElementById('version');

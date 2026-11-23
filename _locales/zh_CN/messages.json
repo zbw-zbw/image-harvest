@@ -1914,5 +1914,11 @@
   },
   "toast_gallery_resolve_no_new": {
     "message": "未发现新图片，未添加任何内容"
+  },
+  "welcome_trial_keep_label": {
+    "message": "试用结束后仍免费保留"
+  },
+  "welcome_trial_keep_items": {
+    "message": "每次 {zip} 张的 ZIP · {engines} 个以图搜图引擎 · {favs} 个收藏"
   }
 }

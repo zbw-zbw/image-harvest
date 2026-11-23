@@ -1709,5 +1709,11 @@
   },
   "toast_gallery_resolve_no_new": {
     "message": "Geen nieuwe afbeeldingen gevonden — niets toegevoegd"
+  },
+  "welcome_trial_keep_label": {
+    "message": "Gratis na de proefperiode"
+  },
+  "welcome_trial_keep_items": {
+    "message": "ZIP met {zip} afbeeldingen · {engines} reverse-search-engines · {favs} favorieten"
   }
 }

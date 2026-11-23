@@ -1709,5 +1709,11 @@
   },
   "toast_gallery_resolve_no_new": {
     "message": "لم يتم العثور على صور جديدة — لم يتم إضافة أي شيء"
+  },
+  "welcome_trial_keep_label": {
+    "message": "يبقى مجانيًا بعد انتهاء التجربة"
+  },
+  "welcome_trial_keep_items": {
+    "message": "ZIP حتى {zip} صورة · {engines} محركات بحث عكسي · {favs} مفضلة"
   }
 }

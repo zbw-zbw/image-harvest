@@ -1930,5 +1930,11 @@
   },
   "toast_gallery_resolve_no_new": {
     "message": "No new images found — nothing was added"
+  },
+  "welcome_trial_keep_label": {
+    "message": "Kept free after the trial"
+  },
+  "welcome_trial_keep_items": {
+    "message": "{zip}-image ZIP · {engines} reverse-search engines · {favs} favorites"
   }
 }

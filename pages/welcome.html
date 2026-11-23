@@ -387,6 +387,25 @@
         line-height: 1.5;
       }
 
+      /* Honest downside framing: a trial page that only lists what you gain
+         makes the day-8 downgrade feel like a bait-and-switch. Stating the
+         free floor up front is what keeps the trial → paid ask credible. */
+      .trial-keep {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: baseline;
+        gap: 4px 8px;
+        margin-top: 8px;
+        font-size: 12px;
+        line-height: 1.5;
+        color: var(--text-tertiary);
+      }
+
+      .trial-keep-label {
+        font-weight: 700;
+        color: var(--text-secondary);
+      }
+
       .trial-countdown {
         display: flex;
         flex-direction: column;
@@ -937,6 +956,14 @@
             </h2>
             <p data-i18n="welcome_trial_desc">
               All Pro features are fully unlocked. Explore everything — no credit card required.
+            </p>
+            <p class="trial-keep">
+              <span class="trial-keep-label" data-i18n="welcome_trial_keep_label"
+                >Kept free after the trial</span
+              >
+              <span id="trial-keep-items"
+                >50-image ZIP · 2 reverse-search engines · 10 favorites</span
+              >
             </p>
           </div>
         </div>

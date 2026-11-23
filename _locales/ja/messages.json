@@ -1914,5 +1914,11 @@
   },
   "toast_gallery_resolve_no_new": {
     "message": "新しい画像は見つかりませんでした。追加はありません"
+  },
+  "welcome_trial_keep_label": {
+    "message": "トライアル終了後も無料で使える機能"
+  },
+  "welcome_trial_keep_items": {
+    "message": "{zip} 枚までの ZIP・逆画像検索 {engines} エンジン・お気に入り {favs} 件"
   }
 }

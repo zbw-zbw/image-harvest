@@ -1709,5 +1709,11 @@
   },
   "toast_gallery_resolve_no_new": {
     "message": "Aucune nouvelle image trouvée — rien n'a été ajouté"
+  },
+  "welcome_trial_keep_label": {
+    "message": "Conservé gratuitement après l'essai"
+  },
+  "welcome_trial_keep_items": {
+    "message": "ZIP de {zip} images · {engines} moteurs de recherche inversée · {favs} favoris"
   }
 }

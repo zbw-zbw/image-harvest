@@ -1709,5 +1709,11 @@
   },
   "toast_gallery_resolve_no_new": {
     "message": "ไม่พบรูปภาพใหม่ — ไม่ได้เพิ่มอะไรเลย"
+  },
+  "welcome_trial_keep_label": {
+    "message": "ใช้ฟรีต่อหลังสิ้นสุดช่วงทดลอง"
+  },
+  "welcome_trial_keep_items": {
+    "message": "ZIP สูงสุด {zip} รูป · ค้นหารูปย้อนกลับ {engines} ระบบ · รายการโปรด {favs} รายการ"
   }
 }
