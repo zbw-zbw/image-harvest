@@ -58,6 +58,48 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
+## [1.2.10] — 2026-11-23
+
+### ✨ Added
+
+- **Your trial now tells you what it is doing, while you are using it.** A
+  short strip at the top of the side panel recaps the trial on day 3, 5 and
+  7 — how many images you downloaded, which Pro tools you actually used, and
+  what Pro costs per year. One more strip warns you before the trial ends,
+  one appears if you come back after it expired, and after that a single
+  weekly reminder (four in total) keeps the door open. All of it happens
+  inside the panel: no browser notifications, and downloads are never
+  blocked.
+- The recap now names the Pro tools the trial used (multi-tab extract,
+  duplicate detection, format conversion, …) instead of only counting
+  images.
+
+### 🔄 Changed
+
+- The welcome page now states what the free plan includes, so the trial
+  starts from a known baseline.
+- The "trial over" banner opens the pricing page directly instead of the
+  in-panel upgrade dialog — one click to the only place a purchase can
+  happen.
+- Pro features now stay available for the whole 3-day grace window after a
+  trial ends, exactly as the grace banner promises.
+
+### 🐛 Fixed
+
+- **The "trial ends soon" warning now appears for every trial.** Its
+  countdown was read from a second license lookup that often came back
+  empty, so the warning could stay hidden for an entire trial. It also no
+  longer shows during the grace window, where it contradicted the grace
+  banner.
+
+### 🧪 Test Coverage Expansion
+
+- New end-to-end coverage for the pre-expiry warning and the grace window,
+  and unit tests for the reminder windows and their "one per week, four in
+  total" caps (1,844 tests total).
+
+---
+
 ## [1.2.9] — 2026-11-23
 
 ### 🐛 Fixed
