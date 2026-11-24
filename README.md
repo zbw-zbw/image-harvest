@@ -94,11 +94,12 @@
 
 ---
 
-## 🆕 What's New (v1.2.9)
+## 🆕 What's New (v1.2.11)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
-- 🐛 **Welcome page and first-run tour now actually open**: 1.2.7 and 1.2.8 only reordered a setup step that was crashing inside the background worker, so new installs still got no welcome tab and no tour. Fixed at the root and covered by a real-browser regression test.
+- 🔄 **Free plan numbers match everywhere now**: 30 images per ZIP batch and 5 free favorites, the same numbers the store listing and pricing page have always shown. If our remote settings were unreachable, the extension used to fall back to 50 and 10.
+- 🗑️ **The September quota experiment is retired**: installs that were capped at 10 images per batch now get the same 30 as everyone else.
 
 ---
 

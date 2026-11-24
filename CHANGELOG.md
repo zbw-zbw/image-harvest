@@ -56,6 +56,10 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ## [Unreleased]
 
+---
+
+## [1.2.11] — 2026-11-24
+
 ### 🔄 Changed
 
 - **The free plan now matches what the store listing and pricing page say.**
