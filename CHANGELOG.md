@@ -56,6 +56,22 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ## [Unreleased]
 
+### 🔄 Changed
+
+- **The free plan now matches what the store listing and pricing page say.**
+  ZIP downloads are capped at 30 images per batch and free favorites at 5. The
+  built-in fallback used when our remote settings could not be reached was
+  still 50 and 10, so a small number of people briefly saw a bigger limit than
+  any of our pages promised.
+
+### 🗑️ Removed
+
+- The September quota experiment is retired. There was a group of installs
+  capped at 10 images per batch; the cap was raised back to 30 in September,
+  and now the experiment code is gone too. Every free user gets the same 30.
+  Download attempts over the cap are still reported, just without the
+  experimental label.
+
 ---
 
 ## [1.2.10] — 2026-11-23

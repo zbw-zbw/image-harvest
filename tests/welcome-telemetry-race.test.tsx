@@ -57,7 +57,6 @@ const ab = vi.hoisted(() => ({
   EXPERIMENTS: {
     PRO_UPSELL_COPY: 'pro_upsell_copy_v1',
     ONBOARDING_FLOW: 'onboarding_flow_v1',
-    QUOTA_TIGHTEN_V1: 'quota_tighten_v1',
   },
 }));
 vi.mock('../shared/ab-experiment', () => ab);

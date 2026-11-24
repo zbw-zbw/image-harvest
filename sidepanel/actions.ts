@@ -22,7 +22,6 @@ import { isSafeImageUrl } from '../shared/url-validator';
 import { track } from '../shared/telemetry';
 import { EVENTS } from '../shared/telemetry-events';
 import { recordProFeatureUse } from '../shared/trial-pro-usage';
-import { EXPERIMENTS, getCachedBucket } from '../shared/ab-experiment';
 import { getRemainingMonthlyFreeAiTags } from '../shared/ai-free-quota';
 import { recordDownloads } from '../shared/paywall-state';
 import { recordDownloadForRating } from '../shared/rating-prompt-state';
@@ -402,17 +401,10 @@ export async function downloadSelectedAsZip(
     }
   }
 
-  // Free tier: per-batch image count limit
+  // Free tier: per-batch image count limit. Report the block — this used to
+  // fire no telemetry at all, so zip-wall hits were invisible in funnels.
   if (!state.isProUser && selected.length > getFreeLimits().MAX_ZIP_IMAGES) {
-    // Report the block with the quota experiment's surface-level bucket —
-    // this used to fire no telemetry at all, so zip-wall hits (the primary
-    // signal for quota_tighten_v1) were invisible in funnels. The key is
-    // omitted when the experiment hasn't resolved yet (bucket === null).
-    const quotaBucket = getCachedBucket(EXPERIMENTS.QUOTA_TIGHTEN_V1);
-    void track(EVENTS.PRO_FEATURE_BLOCKED, {
-      feature: 'batch_zip',
-      ...(quotaBucket ? { bucket: quotaBucket } : {}),
-    });
+    void track(EVENTS.PRO_FEATURE_BLOCKED, { feature: 'batch_zip' });
     showToast(t('pro_zip_limit', { max: String(getFreeLimits().MAX_ZIP_IMAGES) }), 'warning');
     showProUpgradeModal('batch_zip', selected.length);
     return;
@@ -564,7 +556,7 @@ export async function downloadSelectedAsZip(
     // completion surfaces the trial countdown + Pro anchor right at the
     // moment of delight. isProUser includes trial users; getTrialState()
     // then filters out paid plans (returns null unless plan === 'trial').
-    // FREE users can also legally hit exactly 50 (MAX_ZIP_IMAGES) — the
+    // FREE users can also legally hit exactly 30 (MAX_ZIP_IMAGES) — the
     // isProUser gate excludes them. Isolated IIFE: a failure here must not
     // affect the download-completion toast path.
     // Daily cap (2026-10-13): one impression per UTC day — see

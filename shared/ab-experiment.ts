@@ -59,17 +59,6 @@ export const EXPERIMENTS = {
    * 7 days (onboarding_download_done vs download_* baseline).
    */
   ONBOARDING_FLOW: 'onboarding_flow_v1',
-  /**
-   * Conversion diagnosis experiment (2026-09). Usage data shows free users
-   * never reach the zip quota wall, so no purchase pressure ever forms.
-   * a = control (current limits: remote config or FREE_LIMITS default),
-   * b = treatment: per-batch zip quota tightened to a fixed 10 (single
-   * variable — see getFreeLimits overlay). Primary signal: does
-   * pro_feature_blocked(feature=batch_zip) fire, and does anyone flow to
-   * soft_paywall_* → checkout. Sample is small (~350 installs): read
-   * direction only, no significance testing.
-   */
-  QUOTA_TIGHTEN_V1: 'quota_tighten_v1',
 } as const;
 export type ExperimentId = (typeof EXPERIMENTS)[keyof typeof EXPERIMENTS];
 
@@ -128,14 +117,6 @@ export function bucketFor(
 export async function getExperimentBucket(experimentId: ExperimentId): Promise<AbBucket> {
   const cached = cachedBuckets.get(experimentId);
   if (cached) return cached;
-  // E2E builds pin quota experiments to the control bucket: suites like
-  // download-many-warning.e2e.ts assert behavior against FREE_LIMITS
-  // defaults, and a persistent context that happens to hash into 'b' would
-  // change enforced limits mid-suite. Not cached so production behavior
-  // is untouched by this branch.
-  if (typeof __E2E__ !== 'undefined' && __E2E__ && experimentId === EXPERIMENTS.QUOTA_TIGHTEN_V1) {
-    return 'a';
-  }
   let bucket: AbBucket;
   try {
     const id = await getOrCreateInstanceId();

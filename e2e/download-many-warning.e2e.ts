@@ -109,7 +109,7 @@ async function seedManyAndClickDownload(
   // background (trial/license check) can land between the seeding
   // evaluate and this one and flip isProUser back to false via
   // applyProFeatureVisibility — which would divert the 150 images into
-  // the free-tier zip guard (MAX_ZIP_IMAGES=50) instead of the >100
+  // the free-tier zip guard (MAX_ZIP_IMAGES=30) instead of the >100
   // warning dialog under test. The click handler reads state.isProUser
   // synchronously, so setting it right before the click is race-free.
   await sidepanel.evaluate(() => {

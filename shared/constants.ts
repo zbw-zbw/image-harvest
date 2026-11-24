@@ -227,18 +227,19 @@ export const PRO_FEATURES = [
 // than one who only saw it greyed out. Specifically:
 export const VALID_REVERSE_SEARCH_ENGINES = ['google', 'tineye', 'baidu', 'yandex'] as const;
 
-//   - MAX_ZIP_IMAGES: 20 → 30  (covers the long tail of "single page download")
+//   - MAX_ZIP_IMAGES: 30  (covers the long tail of "single page download")
 //   - REVERSE_SEARCH_ENGINES: + 'tineye'  (most useful free engine after Google)
 //   - MAX_COLLECTION_ITEMS: 5  (was: collection fully Pro; now 5 free favorites)
+//
+// These are fallbacks only — live values come from feature_limits in the admin
+// dashboard (free.max_zip_images / free.max_collection_items). They stayed at
+// 50 / 10 after the 2026-09 quota experiment ended, so any client that could
+// not reach remote config claimed 50 free images while the pricing page and
+// the store listing both said 30.
 export const FREE_LIMITS = {
-  MAX_ZIP_IMAGES: 50,
-  // QUOTA_TIGHTEN_V1 treatment fallback — remote-configurable via
-  // system.quota_tighten_b_zip_images (remote.quotaTightenBZipImages);
-  // used only when the remote override is missing or invalid.
-  // Exported for tests and for the blocked-event reporting in actions.ts.
-  QUOTA_TIGHTEN_B_MAX_ZIP_IMAGES: 10,
+  MAX_ZIP_IMAGES: 30,
   MAX_BATCH_COPY_URLS: 10,
-  MAX_COLLECTION_ITEMS: 10,
+  MAX_COLLECTION_ITEMS: 5,
   MAX_MONTHLY_AI_TAGS: 5,
   MAX_EAGLE_EXPORT_PER_BATCH: 10,
   MAX_BATCH_DELETE: 15,
@@ -385,41 +386,6 @@ export function getFreeLimits(): typeof FREE_LIMITS {
     /* fall through to defaults */
   }
 
-  // QUOTA_TIGHTEN_V1 overlay — applied LAST so it wins over both the default
-  // and remote config. Single variable: bucket b tightens the per-batch zip
-  // quota; bucket a (and not-yet-resolved) keeps the merged value. The bucket
-  // is read from the globalThis mirror (NOT a static import of ab-experiment —
-  // constants is the most-imported module in the repo, and that edge would
-  // drag license.ts into every consumer's loading graph, breaking vi.mock
-  // hoisting in test files that mock shared/telemetry). ab-experiment mirrors
-  // every resolved bucket there; sidepanel init seeds it at startup. Before
-  // it resolves we conservatively serve control behavior. Returns a copy —
-  // never mutate the FREE_LIMITS constant. The cast is the same lie the
-  // remote-merge above already tells: the literal type is 50 but runtime is
-  // dynamic.
-  // The treatment value is remote-configurable (system.quota_tighten_b_zip_images,
-  // mapped to remote.quotaTightenBZipImages) so ops can retune it without a
-  // release; the constant below stays as the fallback default. Changing it
-  // mid-experiment makes pre/post wall-hit counts incomparable — the admin
-  // limits page labels it accordingly.
-  const abBuckets = (globalThis as Record<string, unknown>).__abBuckets as
-    | Record<string, string>
-    | undefined;
-  if (abBuckets?.['quota_tighten_v1'] === 'b') {
-    // `remote` above is scoped to the try/catch merge; re-read the mirror
-    // here (same pattern the merge uses).
-    const remoteCfg = (globalThis as Record<string, unknown>).__remoteConfig as
-      | Record<string, unknown>
-      | undefined;
-    const remoteB = remoteCfg?.quotaTightenBZipImages;
-    return {
-      ...limits,
-      MAX_ZIP_IMAGES:
-        typeof remoteB === 'number' && remoteB > 0
-          ? remoteB
-          : FREE_LIMITS.QUOTA_TIGHTEN_B_MAX_ZIP_IMAGES,
-    } as unknown as typeof FREE_LIMITS;
-  }
   return limits;
 }
 
