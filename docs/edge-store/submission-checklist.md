@@ -1,7 +1,7 @@
 # Microsoft Edge Add-ons 上架核对单（v1.2.0 → 1.2.10）
 
-> 状态：**已上架**（2026-10-08 过审，v1.2.0），商店线上版本停在 **1.2.6**。
-> 提交队列：1.2.8 In review（2026-11-23）；1.2.10 待提交（材料已备，见下方提交记录）。
+> 状态：**已上架**，商店线上版本 **1.2.10**（2026-11-24 双通道发布成功：Edge + Chrome Web Store 同一 zip）。
+> 提交队列：空。1.2.8（2026-11-23 提交）已被 1.2.10 覆盖，无需再跟进。
 > 正式 URL：https://microsoftedge.microsoft.com/addons/detail/image-harvest-download-/ldcpblieinfbpgachbnnbaphkagfemaj
 > 目标：把 Image Harvest 提交到 Microsoft Edge Add-ons（Partner Center）。
 > 标注 **owner** 的条目需要人工在 Partner Center 网页操作，不在代码仓库内完成。
@@ -50,7 +50,7 @@
 | 2026-10-14 | 1.2.5  | In review | 版本更新提交（trial 价值 toast、pro_upsell CTR 遥测值域修复；官网 invoice CTA 不在包内不入 notes）；认证说明存底 `docs/edge-store/certification-notes-v1.2.5.md`；zip 为 GitHub Release CI 产物（tag v1.2.5，Release workflow success）；紧接 v1.2.4 提交——若 v1.2.4 先过审会直接跳到 v1.2.5                                                                                                                                                                               |
 | 2026-10-26 | 1.2.6  | Approved  | 版本更新提交（onboarding arm 修复、welcome 页 A/B 分组说明）；认证说明存底 `docs/edge-store/certification-notes-v1.2.6.md`。本次提交当时未登记，2026-11-23 按商店事实回填：Edge 商店版本号实测已为 1.2.6，lastUpdate 2026-10-27                                                                                                                                                                                                                                            |
 | 2026-11-23 | 1.2.8  | In review | 版本更新提交，从线上 1.2.6 直接跨到 1.2.8（1.2.7 全部改动已含在包内，无需补提 1.2.7）；内容为引导链两轮竞态修复（welcome 页即时写 flag + 面板等待 + coach 内做 A/B 判定）；认证说明存底 `docs/edge-store/certification-notes-v1.2.8.md`（notes 内已写明跨版本与 A/B 分组，避免审核员落对照组 误判）；zip 与 CWS 同一份 GitHub Release 产物（tag v1.2.8）                                                                                                                   |
-| 2026-11-23 | 1.2.10 | 待提交    | 版本更新包：trial 提醒链（day 3/5/7 价值回顾 + 临期警示 + 到期提示 + 每周回访，最多 4 次/7 天间隔，全部只在面板内渲染、不申请 notifications、不阻塞下载），顺带包含 1.2.9 的 welcome/tour 根因修复；若 1.2.8 仍在审核，直接从线上 1.2.6 跳到 1.2.10 即可（跨版本叙述已写进 notes）。认证说明存底 `docs/edge-store/certification-notes-v1.2.10.md`（正文 1,974 字符，限额 2,000）；manifest 权限列表未变。zip 用 tag `v1.2.10` 的 Release 产物（Edge-clean，排除 `.vite/`） |
+| 2026-11-24 | 1.2.10 | Approved  | 版本更新包：trial 提醒链（day 3/5/7 价值回顾 + 临期警示 + 到期提示 + 每周回访，最多 4 次/7 天间隔，全部只在面板内渲染、不申请 notifications、不阻塞下载），顺带包含 1.2.9 的 welcome/tour 根因修复；若 1.2.8 仍在审核，直接从线上 1.2.6 跳到 1.2.10 即可（跨版本叙述已写进 notes）。认证说明存底 `docs/edge-store/certification-notes-v1.2.10.md`（正文 1,974 字符，限额 2,000）；manifest 权限列表未变。zip 用 tag `v1.2.10` 的 Release 产物（Edge-clean，排除 `.vite/`） |
 
 Edge 后台关键凭据（过审后回填官网/README 用）：
 
