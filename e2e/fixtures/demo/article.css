@@ -185,3 +185,17 @@ footer {
   font-size: 11.5px;
   color: #9b9da0;
 }
+
+/* The store shots dock a 600px panel beside the page, which leaves 680px of
+   article. Three columns would be ~175px each — too small to read as photos. */
+@media (max-width: 760px) {
+  .wrap {
+    padding: 0 28px;
+  }
+  .grid {
+    columns: 2;
+  }
+  .lede h1 {
+    font-size: 36px;
+  }
+}

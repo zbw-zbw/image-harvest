@@ -80,7 +80,7 @@ CWS 搜索结果页（`/search/...`）每个结果项除图标、评分、短描
 | `scripts/take-store-screenshots.mjs`                  | Playwright 加载 `VITE_E2E` 构建的扩展，逐 shot 操作后合成 1280×800 |
 | `e2e/fixtures/store-demo.html`                        | 被截的演示页（虚构摄影手记「Field Notes」，9 张真实照片）          |
 | `e2e/fixtures/store-demo-2.html`、`store-demo-3.html` | 同一站点的另两篇文章，供 multitab 截出三行不同标题                 |
-| `e2e/fixtures/demo/article.css`                       | 三篇文章共用的排版，改版式只改这一处                               |
+| `e2e/fixtures/demo/article.css`                       | 三篇文章共用的排版 + 760px 两列断点                                |
 | `scripts/prep-demo-photos.py`                         | 把源照片裁成 1.9–2.2:1 并压到 17–100 KB                            |
 
 ```bash
@@ -91,11 +91,18 @@ node scripts/take-store-screenshots.mjs --shot=batch-select --out=/tmp/x.png
 
 几个关键点，改脚本时不要退回去：
 
-- 侧栏 400px、演示页 880px（`--panel=` 可调），不是 640/640。
+- 侧栏 600px、演示页 680px（`--panel=` 可调），不是 640/640。为什么是 600：面板
+  ≤540px 时 `@container panel` 会把所有 `.btn-label` 藏掉，底部只剩一排光秃秃的图标；
+  600 是「Copy URLs (5) … Download (5)」六个文案都完整、整行不溢出的最小宽度。
+  演示页剩下的 680px 用两列照片（`article.css` 的 760px 断点），三列会窄到认不出。
 - 图片 URL 走 `--host-resolver-rules=MAP fieldnotes.test 127.0.0.1`，卡片上显示的是
   `http://fieldnotes.test/demo/vestfjorden.jpg`，不会露出 `127.0.0.1:54321`。
-- 照片裁成 1.9–2.2:1：侧栏缩略框约 2.2:1 且用 `object-fit: contain`，方一点就会在
-  两边留出大片白边。
+- 照片裁成 1.9–2.2:1，与 `.list-view .card-thumb` 的 2.2:1 对齐。缩略框以前是固定
+  160px 高 + `object-fit: contain`，面板一宽就在照片两边各留 120px 白边，现在框跟着宽度
+  走，照片基本填满。
+- 收藏弹窗在 600px 面板下是两列。`.collection-grid` 的列宽从 260px 收到 250px：弹窗正文
+  正好 520px，而 `2×260 + 10` 是 530，差 10px 就退成一列，90px 高的缩略图会飘在
+  520px 卡片的正中间。
 - 截图前要关掉三样东西：页面高亮遮罩（`rgba(0,0,0,.5)`）、首次使用引导条、toast。
 - `ai-tags` 的标签由 `seedStorage` 预置：`VITE_E2E` 构建走不到真实 AI 接口，标签内容
   必须和照片对得上（fjord / cliffs / water），否则一眼假。
@@ -128,7 +135,7 @@ node scripts/take-store-screenshots.mjs --shot=batch-select --out=/tmp/x.png
 | 位次 | 文件                    | 说明                                |
 | ---- | ----------------------- | ----------------------------------- |
 | 1    | `hero-1280.png`         | 275×175 下唯一可读的位置            |
-| 2    | `batch-select-1280.png` | 批量选中 + Download(11)，价值最直观 |
+| 2    | `batch-select-1280.png` | 批量选中 + Download (5)，价值最直观 |
 | 3    | `filters-1280.png`      | 尺寸/类型/可见性筛选                |
 | 4    | `collection-1280.png`   | 收藏与跨页复用                      |
 | 5    | `ai-tags-1280.png`      | AI 标注，与竞品差异最大             |
@@ -138,6 +145,31 @@ node scripts/take-store-screenshots.mjs --shot=batch-select --out=/tmp/x.png
 
 `batch-select` / `filters` / `collection` / `ai-tags` 均已由新流水线重出（2026-11-25），
 5 张可以一次全部替换，不再需要混用旧图。
+
+### 官网 / README 的 demo 片段（hero.mp4 / hero.gif）
+
+同一套面板、同一个演示页，由 `scripts/record-hero-video.mjs` 录制：面板是唯一活动的
+一半（Chromium `recordVideo` 只录面板），页面半边是一张静帧，最后 `hstack` 拼成
+1280×800。
+
+```bash
+npm run build:e2e
+node scripts/record-hero-video.mjs           # 写 assets/demo 的 mp4 / gif / poster
+```
+
+片段走的是主线而不是单个手势：尺寸筛选 11→2→11、勾选三张、真实下载一个 ZIP（用 CDP
+把浏览器下载目录指到临时目录，否则 `chrome.downloads` 会把文件写进真实 ~/Downloads）、
+收藏两张并打开收藏夹。约 17s，比原来 7.9s 只演示「勾选三张」的那版长一倍多。
+
+几个只在这条链路上才会踩的点：
+
+- 三个卡片一屏放不下（600px 下每张约 330px），点击前要先把卡片 `scrollIntoView`，否则
+  Playwright 的自动滚动会让假光标停在一个已经移位的坐标上。
+- 假光标要单独注入（`#__record_cursor`），真实 hover 还需额外 `mouse.move`。
+- 裁掉开头的 marker 用洋红闪屏 + ffmpeg 采样定位，不能用 `Date.now()`——screencast
+  丢帧后时间戳对不上。
+- 剪辑参数：24fps / crf 22 的 mp4 约 1.7 MB；GIF 10fps / 720px / 128 色约 1.7 MB（抖动
+  比帧率更吃体积）。
 
 ### 度量（没有对照就没有结论）
 

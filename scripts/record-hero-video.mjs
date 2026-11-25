@@ -9,10 +9,16 @@
  * the store screenshots are composited:
  *
  *     ┌───────────────────────────────┬──────────────┐
- *     │ demo page  880 px (still)     │ side panel   │
- *     │                               │ 400 px (live)│
+ *     │ demo page  680 px (still)     │ side panel   │
+ *     │                               │ 600 px (live)│
  *     └───────────────────────────────┴──────────────┘
  *                        1280 × 800
+ *
+ * The clip walks the main flow, not just the scan: narrow the grid with the
+ * size filter, tick three photos, download them as one ZIP (a real download,
+ * so the toast carries the real count), then save two to the collection and
+ * open the library. It runs ~17s instead of the 8s single-gesture cut it
+ * replaces.
  *
  * Only the panel moves, so only the panel is recorded (Chromium records a page
  * at its real frame rate); the page half is a still. A synthetic cursor is
@@ -32,7 +38,15 @@
  */
 import { chromium } from '@playwright/test';
 import { execFileSync } from 'node:child_process';
-import { copyFileSync, existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import {
+  copyFileSync,
+  existsSync,
+  mkdirSync,
+  mkdtempSync,
+  readdirSync,
+  rmSync,
+  writeFileSync,
+} from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -40,6 +54,7 @@ import { DEMO_HOST, startFixtureServer } from './_demo-page-server.mjs';
 import {
   dismissNudges,
   dismissPageHighlight,
+  enablePro,
   scrollToTop,
   waitForThumbnails,
   waitForToastsToClear,
@@ -48,12 +63,12 @@ import {
 const REPO = resolve(fileURLToPath(import.meta.url), '..', '..');
 const DIST = join(REPO, 'dist');
 
-const PAGE_W = 880;
-const PANEL_W = 400;
+const PAGE_W = 680;
+const PANEL_W = 600;
 const HEIGHT = 800;
 
 /** Idle beat between the marker flash and the first click. */
-const IDLE_LEAD = 1_400;
+const IDLE_LEAD = 1_000;
 /** The marker is sampled at this rate, independent of the screencast's. */
 const MARKER_FPS = 50;
 
@@ -138,11 +153,8 @@ async function setCursor(panel, x, y) {
   );
 }
 
-/** Ease the fake cursor to a point, then click the element for real. */
-async function clickWithCursor(panel, locator, { ms = 480 } = {}) {
-  const box = await locator.boundingBox();
-  if (!box) throw new Error('Cannot click an element that is not visible');
-  const to = { x: box.x + box.width / 2, y: box.y + box.height / 2 };
+/** Ease the fake cursor to a point. `hover` also moves the real mouse there. */
+async function moveCursorTo(panel, to, { ms = 480, hover = false } = {}) {
   const from = await panel.evaluate(() => {
     const m = /translate\(([-\d.]+)px, ([-\d.]+)px\)/.exec(
       document.getElementById('__record_cursor')?.style.transform ?? ''
@@ -156,7 +168,51 @@ async function clickWithCursor(panel, locator, { ms = 480 } = {}) {
     await setCursor(panel, from.x + (to.x - from.x) * e, from.y + (to.y - from.y) * e);
     await sleep(ms / steps);
   }
+  if (hover) await panel.mouse.move(to.x, to.y);
+}
+
+/** Ease the fake cursor to an element, then click it for real. */
+async function clickWithCursor(panel, locator, { ms = 480 } = {}) {
+  const box = await locator.boundingBox();
+  if (!box) throw new Error('Cannot click an element that is not visible');
+  await moveCursorTo(panel, { x: box.x + box.width / 2, y: box.y + box.height / 2 }, { ms });
   await locator.click();
+}
+
+/**
+ * Tick one card, scrolling the grid first when the card is off-screen.
+ *
+ * At 600px the list thumbnails are ~273px tall, so only two cards fit above
+ * the fold and locator.click() would scroll instantly mid-glide — the cursor
+ * would travel to a stale coordinate and the click would land off-camera.
+ */
+async function selectCard(panel, index, { ms = 420 } = {}) {
+  const card = panel.locator('#image-grid .image-card').nth(index);
+  const box = await card.boundingBox();
+  if (!box || box.y < 0 || box.y + box.height > HEIGHT) {
+    await card.evaluate((el) => el.scrollIntoView({ block: 'center', behavior: 'smooth' }));
+    await sleep(520);
+  }
+  await clickWithCursor(panel, card.locator('.card-checkbox'), { ms });
+}
+
+/** Wait for a toast containing `text`; throws instead of recording a dead beat. */
+async function waitForToast(panel, text, timeout = 15_000) {
+  try {
+    await panel.waitForFunction(
+      (needle) =>
+        [...document.querySelectorAll('#toast-container .toast')].some((el) =>
+          (el.textContent ?? '').includes(needle)
+        ),
+      text,
+      { timeout }
+    );
+  } catch {
+    const seen = await panel.evaluate(() =>
+      [...document.querySelectorAll('#toast-container .toast')].map((el) => el.textContent)
+    );
+    throw new Error(`Toast "${text}" never appeared (saw: ${JSON.stringify(seen)})`);
+  }
 }
 
 // ---------------------------------------------------------------------------
@@ -201,7 +257,7 @@ function findMarkerEnd(videoPath) {
       '-i',
       videoPath,
       '-vf',
-      `fps=${MARKER_FPS},crop=8:8:384:784,scale=1:1`,
+      `fps=${MARKER_FPS},crop=8:8:${PANEL_W - 8}:${HEIGHT - 8},scale=1:1`,
       '-f',
       'rawvideo',
       '-pix_fmt',
@@ -223,7 +279,7 @@ function findMarkerEnd(videoPath) {
 // ---------------------------------------------------------------------------
 // Timeline
 // ---------------------------------------------------------------------------
-async function record({ context, extensionId }) {
+async function record({ context, extensionId, downloadDir }) {
   const page = await context.newPage();
   await page.goto(`http://${DEMO_HOST}/store-demo.html`);
   await page.waitForLoadState('networkidle');
@@ -232,6 +288,16 @@ async function record({ context, extensionId }) {
   // The panel's screencast is anchored to the moment the browser context
   // started, not to this page's creation — see videoZero in main().
   const panel = await context.newPage();
+  // The ZIP is saved through chrome.downloads.download(), i.e. the browser's
+  // own download manager, which Playwright's per-page download handler does
+  // not intercept. Point the manager at the scratch dir or the file lands in
+  // the real ~/Downloads of whoever runs this.
+  const cdp = await context.newCDPSession(panel);
+  await cdp.send('Browser.setDownloadBehavior', {
+    behavior: 'allow',
+    downloadPath: downloadDir,
+    eventsEnabled: true,
+  });
   await panel.addInitScript(() => {
     window.__IH_E2E__ = true;
   });
@@ -247,6 +313,9 @@ async function record({ context, extensionId }) {
   await panel.waitForFunction(() => window.__IH__?.store.get('isInitialized') === true, undefined, {
     timeout: 15_000,
   });
+  // Collection is a Pro feature, and the panel re-validates on open — the stub
+  // has to be in place before the first favourite, not after.
+  await enablePro(panel);
   await scrollToTop(panel);
   await waitForThumbnails(panel);
 
@@ -268,10 +337,28 @@ async function record({ context, extensionId }) {
   await flashMarker(panel);
   await sleep(IDLE_LEAD);
 
-  const checkboxes = panel.locator('#image-grid .image-card .card-checkbox');
+  // ── Size filter ───────────────────────────────────────────────────────────
+  // Opening beat, and applied before anything is ticked: the status bar counts
+  // the selection, so filtering after selecting would leave "(3)" above a
+  // two-card grid. Medium keeps the two 480px frames, so the grid visibly
+  // reflows instead of losing two cards below the fold (Large keeps 9 of 11).
+  const sizeBtn = panel.locator('.filter-btn[data-filter="size"]');
+  await clickWithCursor(panel, sizeBtn, { ms: 460 });
+  await panel.waitForSelector('#filter-size:not(.hidden)', { timeout: 5_000 });
+  await sleep(320);
+  await clickWithCursor(panel, panel.locator('[data-size-filter="medium"]'), { ms: 560 });
+  await sleep(900);
+
+  await clickWithCursor(panel, sizeBtn, { ms: 440 });
+  await panel.waitForSelector('#filter-size:not(.hidden)', { timeout: 5_000 });
+  await sleep(220);
+  await clickWithCursor(panel, panel.locator('[data-size-filter="all"]'), { ms: 540 });
+  await sleep(400);
+
+  // ── Tick three photos ─────────────────────────────────────────────────────
   for (const index of [0, 1, 2]) {
-    await clickWithCursor(panel, checkboxes.nth(index));
-    await sleep(300);
+    await selectCard(panel, index);
+    await sleep(250);
   }
 
   // The third checkbox scrolls the grid; bring the first card back so the
@@ -279,27 +366,46 @@ async function record({ context, extensionId }) {
   await panel.evaluate(() =>
     document.getElementById('image-grid')?.scrollTo({ top: 0, behavior: 'smooth' })
   );
-  await sleep(700);
+  await sleep(650);
   // Selecting dims the demo page and scrolls it to the matching image. That is
   // a real feature, but the still half of the video wants the page's own hero.
   await dismissPageHighlight(page, PAGE_W);
   await page.evaluate(() => window.scrollTo(0, 0));
   await waitForThumbnails(panel);
 
-  // Poster frame: the ticked cards and the "(3)" action bar, which is the
-  // promise the clip is making. The batch itself finishes in a couple of
-  // hundred milliseconds against local files, so there is nothing to watch —
-  // and its completion toast miscounts multi-image batches today.
-  await sleep(2_000);
+  // Poster frame: the ticked cards above "Copy URLs (3) / … / Download (3)",
+  // which is the promise the clip is making.
+  await sleep(600);
   const posterPng = await panel.screenshot();
   const pagePng = await page.screenshot();
 
+  // ── Download the selection as one ZIP ─────────────────────────────────────
+  // Three local files build in a couple hundred milliseconds, so the progress
+  // modal is a blink; the completion toast is the beat worth holding.
+  await clickWithCursor(panel, panel.locator('#btn-download'), { ms: 520 });
+  await waitForToast(panel, 'Downloaded 3');
+  await sleep(1_000);
+
+  // ── Save two to the collection, then show the library ─────────────────────
+  const favorites = panel.locator('#image-grid .image-card .btn-favorite');
+  for (const index of [0, 1]) {
+    await clickWithCursor(panel, favorites.nth(index), { ms: 420 });
+    await sleep(300);
+  }
+  await clickWithCursor(panel, panel.locator('#btn-collection'), { ms: 560 });
+  await panel.waitForFunction(
+    () => document.querySelectorAll('#collection-body .collection-card').length > 0,
+    undefined,
+    { timeout: 15_000 }
+  );
+  await sleep(1_800);
+  const panelVideo = panel.video();
+
   // The video handle has to be taken before the page closes.
-  const video = panel.video();
   await panel.close();
   await page.close();
 
-  return { pagePng, posterPng, video };
+  return { pagePng, posterPng, video: panelVideo };
 }
 
 // ---------------------------------------------------------------------------
@@ -310,11 +416,13 @@ function run(command, args) {
 }
 
 function encode({ videoPath, pagePngPath, outDir, offset }) {
-  // Normalise the recorded panel to a constant 30 fps, then stack it beside the
-  // still page half. Both inputs are forced to the same size and SAR so hstack
-  // cannot refuse the inputs. The still is an infinite `-loop 1` input, so
-  // hstack has to stop at the shortest side or ffmpeg never finishes writing —
-  // that also makes the poster hold the last frame of the clip.
+  // Normalise the recorded panel to a constant 24 fps (screencasts come back at
+  // 25, and 24 is enough for cursor glides while costing a fifth less bitrate),
+  // then stack it beside the still page half. Both inputs are forced to the
+  // same size and SAR so hstack cannot refuse the inputs. The still is an
+  // infinite `-loop 1` input, so hstack has to stop at the shortest side or
+  // ffmpeg never finishes writing — that also makes the poster hold the last
+  // frame of the clip.
   run('ffmpeg', [
     '-y',
     '-loop',
@@ -327,20 +435,22 @@ function encode({ videoPath, pagePngPath, outDir, offset }) {
     videoPath,
     '-filter_complex',
     `[0:v]scale=${PAGE_W}:${HEIGHT},setsar=1[page];` +
-      `[1:v]fps=30,scale=${PANEL_W}:${HEIGHT},setsar=1[panel];` +
+      `[1:v]fps=24,scale=${PANEL_W}:${HEIGHT},setsar=1[panel];` +
       `[page][panel]hstack=inputs=2:shortest=1[out]`,
     '-map',
     '[out]',
     // Without this the hstacked pair inherits the fps the screencast hands
     // back and the file grows for motion nobody can see.
     '-r',
-    '30',
+    '24',
     '-c:v',
     'libx264',
     '-preset',
     'slow',
+    // 22 instead of 20: the long grid scrolls are what pushed the first cut to
+    // 2.4 MB, and at 1280x800 the difference is invisible on UI text.
     '-crf',
-    '20',
+    '22',
     '-pix_fmt',
     'yuv420p',
     '-movflags',
@@ -349,16 +459,17 @@ function encode({ videoPath, pagePngPath, outDir, offset }) {
     join(outDir, 'hero.mp4'),
   ]);
 
-  // README-only copy. 12 fps and a 192-colour palette with ordered dithering
-  // keeps a photographic clip near 2 MB instead of the 6.7 MB it replaces.
+  // README-only copy. 10 fps, 720 px and a 128-colour palette with ordered
+  // dithering keeps the clip near 2 MB; dithering is what makes the photo
+  // halves compress badly, so the palette and scale matter more than the fps.
   run('ffmpeg', [
     '-y',
     '-i',
     join(outDir, 'hero.mp4'),
     '-vf',
-    'fps=12,scale=720:-1:flags=lanczos,' +
-      'split[a][b];[a]palettegen=max_colors=192:stats_mode=diff[p];' +
-      '[b][p]paletteuse=dither=bayer:bayer_scale=4',
+    'fps=10,scale=720:-1:flags=lanczos,' +
+      'split[a][b];[a]palettegen=max_colors=128:stats_mode=diff[p];' +
+      '[b][p]paletteuse=dither=bayer:bayer_scale=3',
     '-loop',
     '0',
     join(outDir, 'hero.gif'),
@@ -374,11 +485,13 @@ async function main() {
 
   const server = await startFixtureServer();
   const workDir = mkdtempSync(join(tmpdir(), 'image-harvest-hero-frames-'));
+  const downloadDir = join(workDir, 'downloads');
+  mkdirSync(downloadDir, { recursive: true });
   const { context, userDataDir, extensionId } = await launch(server.port, opts);
   let closed = false;
 
   try {
-    const { pagePng, posterPng, video } = await record({ context, extensionId });
+    const { pagePng, posterPng, video } = await record({ context, extensionId, downloadDir });
     if (!video) throw new Error('No video handle: recordVideo did not attach to the panel page');
 
     // Composites happen in a plain page: no image library, no extra process.
@@ -417,6 +530,9 @@ async function main() {
     console.log(`                trimmed the first ${offset.toFixed(2)}s of setup`);
     console.log(`hero.gif        → ${join(opts.outDir, 'hero.gif')}`);
     console.log(`hero-poster.jpg → ${join(opts.outDir, 'hero-poster.jpg')}`);
+    // Evidence the download beat was real: the ZIP the toast counted is on disk.
+    const zips = readdirSync(downloadDir).filter((name) => name.endsWith('.zip'));
+    console.log(`                saved ${zips.length} zip (${zips.join(', ') || 'none'})`);
   } finally {
     if (!closed) await context.close().catch(() => {});
     await server.close();

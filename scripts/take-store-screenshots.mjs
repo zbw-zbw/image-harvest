@@ -6,8 +6,8 @@
  * window with the side panel docked:
  *
  *     ┌───────────────────────────────┬──────────────┐
- *     │ demo page  880 px             │ side panel   │
- *     │ (e2e/fixtures/store-demo.html)│ 400 px       │
+ *     │ demo page  680 px             │ side panel   │
+ *     │ (e2e/fixtures/store-demo.html)│ 600 px       │
  *     └───────────────────────────────┴──────────────┘
  *                        1280 × 800
  *
@@ -15,6 +15,12 @@
  * the thumbnails were all identical `SVG 400x300 505 B` tiles and the split
  * was 640/640 (a real side panel is ~400 px, so everything looked oversized
  * and unconvincing).
+ *
+ * The panel is 600px rather than Chrome's 400px default because the status bar
+ * drops every button label below 540px: at 400 the bottom row is a row of bare
+ * icons, which reads as a mystery toolbar in a static screenshot. 540+ keeps
+ * "Copy URLs (5) / Favorite (5) / … / Download(5)" legible. The article gets
+ * the remaining 680px and switches to two photo columns.
  *
  * One shot (`popup`) is the browser-action surface instead: the article at full
  * width with the real 600×600 popup floating over it, the way Chrome draws it
@@ -28,7 +34,7 @@
  * Options
  *   --shot=<name>    capture one shot (repeatable); default: all
  *   --out=<path>     output file; only valid together with a single --shot
- *   --panel=<px>     side panel width (default 400); the demo page gets the rest
+ *   --panel=<px>     side panel width (default 600); the demo page gets the rest
  *   --pro            run as a licensed Pro user (stubs VALIDATE_LICENSE)
  *   --raw-dir=<dir>  also write the uncropped page/panel halves there
  *   --headed         show the browser window while capturing
@@ -56,7 +62,7 @@ const CANVAS_W = 1280;
 const HEIGHT = 800;
 
 // Both are mutable so --panel can shift the split; the page keeps the rest.
-let PANEL_W = 400;
+let PANEL_W = 600;
 let PAGE_W = CANVAS_W - PANEL_W;
 
 // ---------------------------------------------------------------------------
