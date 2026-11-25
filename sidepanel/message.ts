@@ -2,6 +2,7 @@
 
 import { MESSAGE_TYPES } from '../shared/constants';
 import { t } from '../shared/i18n';
+import { consumeSelfReportedDownload } from '../shared/self-downloads';
 import type { ImageItem } from '../shared/types';
 import {
   downloadSelectedAsZip,
@@ -61,6 +62,8 @@ interface IncomingMessage {
   current?: string;
   imageCount?: number;
   count?: number;
+  /** chrome.downloads id — lets the echo of our own ZIP be recognised. */
+  downloadId?: number;
   error?: string;
   success?: boolean;
   tabCount?: number;
@@ -201,6 +204,9 @@ export function handleMessage(message: IncomingMessage): void {
 
     case MESSAGE_TYPES.DOWNLOAD_COMPLETE:
       hideProgress();
+      // Batch ZIPs and collection exports toast their own count; the
+      // background's count=1 echo would overwrite it.
+      if (consumeSelfReportedDownload(message.downloadId)) break;
       showToast(t('toast_download_completed', { count: message.count ?? 0 }), 'success');
       break;
 

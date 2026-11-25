@@ -11,6 +11,7 @@
 import type JSZipType from 'jszip';
 import { collectionGetAll } from '../shared/collection';
 import { escapeHtml } from '../shared/utils';
+import { markSelfReportedDownload } from '../shared/self-downloads';
 import { t } from '../shared/i18n';
 import type { CollectionItem, ImageItem } from '../shared/types';
 import {
@@ -160,11 +161,14 @@ async function batchDownloadCollection(): Promise<void> {
     const blobUrl = URL.createObjectURL(content);
     const ts = formatTimestamp(new Date());
     try {
-      await chrome.downloads.download({
+      const downloadId = await chrome.downloads.download({
         url: blobUrl,
         filename: `collection-${ts}.zip`,
         saveAs: false,
       });
+      // "Downloaded N images" below is the true count; without this the
+      // background echo replaces it with "1 file".
+      markSelfReportedDownload(downloadId);
     } finally {
       // Revoke even when the download call throws — the blob backing a
       // large zip must not leak.
@@ -525,11 +529,13 @@ export async function exportCollection(): Promise<void> {
     const blobUrl = URL.createObjectURL(content);
     const ts = formatTimestamp(new Date());
     try {
-      await chrome.downloads.download({
+      const downloadId = await chrome.downloads.download({
         url: blobUrl,
         filename: `collection-${ts}.zip`,
         saveAs: false,
       });
+      // "Collection exported" below is the true outcome; drop the echo.
+      markSelfReportedDownload(downloadId);
     } finally {
       // Revoke even when the download call throws — the blob backing a
       // large zip must not leak.

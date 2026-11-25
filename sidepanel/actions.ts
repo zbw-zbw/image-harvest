@@ -25,6 +25,7 @@ import { recordProFeatureUse } from '../shared/trial-pro-usage';
 import { getRemainingMonthlyFreeAiTags } from '../shared/ai-free-quota';
 import { recordDownloads } from '../shared/paywall-state';
 import { recordDownloadForRating } from '../shared/rating-prompt-state';
+import { markSelfReportedDownload } from '../shared/self-downloads';
 import { applyFilters } from './filter';
 import { renderImages } from './render';
 import { showProUpgradeModal } from './settings';
@@ -514,11 +515,14 @@ export async function downloadSelectedAsZip(
     const content = await zip.generateAsync({ type: 'blob' });
     const blobUrl = URL.createObjectURL(content);
     try {
-      await chrome.downloads.download({
+      const downloadId = await chrome.downloads.download({
         url: blobUrl,
         filename: `${pageInfo.domain}-${ts}.zip`,
         saveAs: false,
       });
+      // The completion toast below is the true count; background would
+      // otherwise re-announce this same download as "1 file".
+      markSelfReportedDownload(downloadId);
     } finally {
       // Revoke even when the download call throws (disk full / cancelled
       // save dialog) — the blob backing a large zip must not leak.

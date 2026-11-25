@@ -61,6 +61,7 @@ vi.mock('../sidepanel/ui', () => ({
 
 import { showDiscoveredToastDebounced, handleMessage, handleKeyDown } from '../sidepanel/message';
 import { state, store, elements } from '../sidepanel/state';
+import { markSelfReportedDownload } from '../shared/self-downloads';
 import type { ImageItem } from '../shared/types';
 
 beforeEach(() => {
@@ -425,6 +426,19 @@ describe('handleMessage — DOWNLOAD branches', () => {
     const ui = await import('../sidepanel/ui');
     expect(ui.hideProgress).toHaveBeenCalledTimes(1);
     expect(ui.showToast).toHaveBeenCalledWith('Downloaded 5 images', 'success');
+  });
+
+  it('DOWNLOAD_COMPLETE for a self-reported ZIP drops the count=1 echo', async () => {
+    markSelfReportedDownload(4242);
+    handleMessage({ type: MESSAGE_TYPES.DOWNLOAD_COMPLETE, count: 1, downloadId: 4242 });
+    const ui = await import('../sidepanel/ui');
+    // Progress still hides; only the wrong "Downloaded 1 file" toast is skipped.
+    expect(ui.hideProgress).toHaveBeenCalledTimes(1);
+    expect(ui.showToast).not.toHaveBeenCalled();
+
+    // A download the panel did not speak for still gets the echo.
+    handleMessage({ type: MESSAGE_TYPES.DOWNLOAD_COMPLETE, count: 1, downloadId: 4243 });
+    expect(ui.showToast).toHaveBeenCalledTimes(1);
   });
 
   it('DOWNLOAD_ERROR → hideProgress + error toast with reason (or bare message when no reason)', async () => {
