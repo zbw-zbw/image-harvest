@@ -56,6 +56,10 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ## [Unreleased]
 
+---
+
+## [1.2.13] — 2026-11-25
+
 ### 🔄 Changed
 
 - **Wide side panels use the width they have.** Two layouts still assumed a

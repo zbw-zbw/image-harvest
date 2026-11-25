@@ -94,13 +94,12 @@
 
 ---
 
-## 🆕 What's New (v1.2.12)
+## 🆕 What's New (v1.2.13)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
-- 🐛 **The batch download toast keeps the right count**: picking 11 images and downloading them used to end with "Downloaded 1"; it now reports the number you actually downloaded.
-- 🐛 **The Pro comparison table fits the default panel**: the FREE / PRO badges used to squeeze each feature description into four lines on a 400px side panel; they now sit on their own row.
-- 🔄 **Store screenshots are real captures now**: the listing shows the extension running on an actual photo article instead of a mock-up.
+- 📐 **A wider panel puts the extra width to work**: two layouts still assumed the default 400px width. List thumbnails stayed a fixed 160px strip, so at 600px each photo floated in about 120px of empty space on both sides, and the collection modal fell back to a single column with a small thumbnail stranded in the middle. Thumbnails now fill the card, and the collection grid shows two columns.
+- 🔄 **The store listing now shows the real panel**: the first screenshot pairs the actual side panel with a short headline instead of an abstract graphic, and both promo tiles use the same brand gradient. What you see in the store is what the extension looks like.
 
 ---
 
