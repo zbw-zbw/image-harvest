@@ -1,0 +1,187 @@
+/* Shared styles for the store-listing demo site ("Field Notes").
+   Two articles use this: /store-demo.html and /store-demo-2.html, so the
+   multi-tab screenshot can show two tabs of one believable site instead of
+   the same title twice. Served by scripts/_demo-page-server.mjs. */
+
+:root {
+  --paper: #fbfaf8;
+  --ink: #17181a;
+  --ink-soft: #55585d;
+  --rule: rgba(23, 24, 26, 0.1);
+}
+* {
+  box-sizing: border-box;
+}
+html {
+  background: var(--paper);
+}
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+.wrap {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 40px;
+}
+
+/* Masthead */
+.masthead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 68px;
+  border-bottom: 1px solid var(--rule);
+}
+.wordmark {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 17px;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--ink);
+  text-decoration: none;
+}
+.nav {
+  display: flex;
+  gap: 26px;
+}
+.nav a {
+  font-size: 12.5px;
+  letter-spacing: 0.02em;
+  color: var(--ink-soft);
+  text-decoration: none;
+}
+.nav a[aria-current] {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 5px;
+  text-decoration-thickness: 1px;
+}
+
+/* Lede */
+.lede {
+  padding: 44px 0 30px;
+  max-width: 640px;
+}
+.lede h1 {
+  margin: 0;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-weight: 400;
+  font-size: 42px;
+  line-height: 1.14;
+  letter-spacing: -0.01em;
+}
+.lede p {
+  margin: 14px 0 0;
+  font-size: 15px;
+  line-height: 1.62;
+  color: var(--ink-soft);
+}
+.kicker {
+  margin-top: 18px;
+  font-size: 10.5px;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #8d8f93;
+}
+.kicker span + span::before {
+  content: '·';
+  margin: 0 9px;
+  color: #c3c4c6;
+}
+
+/* Photo masonry */
+.grid {
+  columns: 3;
+  column-gap: 22px;
+  padding-bottom: 8px;
+}
+figure {
+  break-inside: avoid;
+  margin: 0 0 26px;
+}
+figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  background: #e9e6e1;
+}
+figcaption {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 8px;
+}
+.title {
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 13.5px;
+  color: #26282b;
+}
+.exif {
+  font-size: 10.5px;
+  letter-spacing: 0.04em;
+  color: #a2a4a7;
+  white-space: nowrap;
+}
+
+/* Print shop strip. The same two frames the article uses, offered at two
+   thumbnail sizes — exactly the "same photo, different URL width" case the
+   extension's duplicate detection is built for. */
+.prints {
+  margin: 6px 0 0;
+  padding: 26px 0 0;
+  border-top: 1px solid var(--rule);
+}
+.prints h2,
+.about h2 {
+  margin: 0;
+  font-size: 10.5px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #8d8f93;
+}
+.prints-row {
+  display: flex;
+  gap: 26px;
+  margin-top: 16px;
+}
+.prints-row figure {
+  margin: 0;
+  width: 190px;
+}
+.prints-row img {
+  width: 190px;
+  height: auto;
+}
+
+/* Footer matter — also what makes the page worth scrolling (deep scan) */
+.about {
+  margin: 30px 0 0;
+  padding: 30px 0 0;
+  border-top: 1px solid var(--rule);
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  gap: 40px;
+}
+.about p {
+  margin: 0 0 12px;
+  max-width: 560px;
+  font-family: Georgia, 'Times New Roman', serif;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #3c3e42;
+}
+footer {
+  margin-top: 34px;
+  padding: 22px 0 46px;
+  border-top: 1px solid var(--rule);
+  display: flex;
+  justify-content: space-between;
+  font-size: 11.5px;
+  color: #9b9da0;
+}
