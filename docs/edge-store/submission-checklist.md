@@ -1,8 +1,8 @@
 # Microsoft Edge Add-ons 上架核对单（v1.2.0 → 1.2.13）
 
-> 状态：**已上架**。Edge 线上 **1.2.10**（2026-11-24 过审）；**1.2.13 已于 2026-11-25 提交，审核中**。Chrome Web Store 线上 **1.2.11**，列表素材（首图 + 两张促销图）已于 2026-11-25 换成真实面板版。
-> 提交队列：无，等 1.2.13 审结。下一次发版从 1.2.14 起。
-> 待确认：CWS 的包版本是否随本次一起提了 1.2.12 / 1.2.13。若只换了素材，CWS 线上版本仍是 1.2.11。
+> 状态：**已上架**。**Edge 线上 1.2.13**（2026-11-25 审核通过；商店接口实测 version 1.2.13、lastUpdate 2026-11-25 16:05）；**Chrome Web Store 线上 1.2.11**（2026-11-25 18:30 实测，详情页 Version 1.2.11 / Updated November 24, 2026）。
+> 提交队列：无。下一次发版从 1.2.14 起。
+> ⚠️ 素材未生效（2026-11-25 18:37 实测）：两个商店的列表图**都还是旧图**。Edge 只有 1 张截图，还是手工拼的「Visual Moods」渐变色块页（`SVG 400×300 505 B`、`data:image/svg+xml`）；Edge 大促销图还是 5 月版「Download Any Image from Any Webpage」。CWS 轮播 6 项 = 1 个旧视频 + 5 张同款旧图。确认方式见文末。
 > 正式 URL：https://microsoftedge.microsoft.com/addons/detail/image-harvest-download-/ldcpblieinfbpgachbnnbaphkagfemaj
 > 目标：把 Image Harvest 提交到 Microsoft Edge Add-ons（Partner Center）。
 > 标注 **owner** 的条目需要人工在 Partner Center 网页操作，不在代码仓库内完成。
@@ -54,10 +54,24 @@
 | 2026-11-23 | 1.2.8  | In review | 版本更新提交，从线上 1.2.6 直接跨到 1.2.8（1.2.7 全部改动已含在包内，无需补提 1.2.7）；内容为引导链两轮竞态修复（welcome 页即时写 flag + 面板等待 + coach 内做 A/B 判定）；认证说明存底 `docs/edge-store/certification-notes-v1.2.8.md`（notes 内已写明跨版本与 A/B 分组，避免审核员落对照组 误判）；zip 与 CWS 同一份 GitHub Release 产物（tag v1.2.8）                                                                                                                   |
 | 2026-11-24 | 1.2.10 | Approved  | 版本更新包：trial 提醒链（day 3/5/7 价值回顾 + 临期警示 + 到期提示 + 每周回访，最多 4 次/7 天间隔，全部只在面板内渲染、不申请 notifications、不阻塞下载），顺带包含 1.2.9 的 welcome/tour 根因修复；若 1.2.8 仍在审核，直接从线上 1.2.6 跳到 1.2.10 即可（跨版本叙述已写进 notes）。认证说明存底 `docs/edge-store/certification-notes-v1.2.10.md`（正文 1,974 字符，限额 2,000）；manifest 权限列表未变。zip 用 tag `v1.2.10` 的 Release 产物（Edge-clean，排除 `.vite/`） |
 | 2026-11-25 | 1.2.12 | 待提交    | 两条可见缺陷修复：批量 ZIP 完成提示的计数被 background 回声覆盖成 1；400px 面板下 Pro 对比卡徽章挤压描述。无新增权限。认证说明存底 `docs/edge-store/certification-notes-v1.2.12.md`（正文 1,904 字符）；若 Edge 线上仍为 1.2.10，本次同时带上 1.2.11 的额度统一与配额实验移除。zip 用 tag `v1.2.12` 的 Release 产物（Edge-clean）                                                                                                                                          |
-| 2026-11-25 | 1.2.13 | In review | 两处「宽面板仍按 400px 计算」的布局修补：列表缩略图固定 160px（600px 面板下两边各空 ~120px）、Collection 弹窗退回单列。无新增权限、无新界面。认证说明存底 `docs/edge-store/certification-notes-v1.2.13.md`（正文 1,975 字符 / 限额 2,000）；同批把商店首图与两张促销图换成「真实面板 + 品牌绿」，上传时一并替换。zip 用 tag `v1.2.13` 的 Release 产物（Edge-clean），2026-11-25 已提交                                                                                     |
+| 2026-11-25 | 1.2.13 | Approved  | 两处「宽面板仍按 400px 计算」的布局修补：列表缩略图固定 160px（600px 面板下两边各空 ~120px）、Collection 弹窗退回单列。无新增权限、无新界面。认证说明存底 `docs/edge-store/certification-notes-v1.2.13.md`（正文 1,975 字符 / 限额 2,000）。zip 用 tag `v1.2.13` 的 Release 产物（Edge-clean），当日审核通过；接口实测 `version` = 1.2.13、`lastUpdateDate` = 2026-11-25 16:05（UTC+8）。列表素材未随之更新，见文末                                                        |
 
 Edge 后台关键凭据（过审后回填官网/README 用）：
 
 - Store ID: `0RDCKDQGR9XG`
 - CRX ID: `ldcpblieinfbpgachbnnbaphkagfemaj`
 - 正式商店 URL：`https://microsoftedge.microsoft.com/addons/detail/image-harvest-download-/ldcpblieinfbpgachbnnbaphkagfemaj`（2026-10-08 过审生成；注意 storefront 按 CRX ID 路由，用 Store ID 拼 URL 会 404）
+
+## 列表素材上线核实（不必登录后台）
+
+两个商店都有可直接读的接口，核对“线上到底是什么”比看后台状态可靠：
+
+- **Edge 包版本 + 素材**：`https://microsoftedge.microsoft.com/addons/getproductdetailsbycrxid/ldcpblieinfbpgachbnnbaphkagfemaj`。
+  返回 JSON，看 `version`、`lastUpdateDate`（epoch 秒）、`screenshots[]`、`largePromotionImage.uri`。
+  2026-11-25 18:37 实测：`version` 1.2.13；`screenshots` 只有 1 项，且仍是旧图。
+- **CWS 包版本**：`https://clients2.google.com/service/update2/crx?response=redirect&prodversion=120&acceptformat=crx2,crx3&x=id%3Diecgnjidmogebokcfnejncgnelcepffo%26uc`。
+  返回的就是当前分发的 CRX；跳过 CRX3 头（`12 + header_len`）后当 zip 打开，读 `manifest.json` 的 `version`，这是浏览器真实拿到的版本。
+  2026-11-25 18:37 实测：1.2.11。
+- **CWS 图片是否已切**：详情页轮播数。现在是 6 项（1 视频 + 5 截图），若首图仍是深色视频海报，说明素材未切。
+
+判断新图是否真的上线的唯一可靠办法：取商店返回的图片字节，和仓库里的 `assets/screenshots/hero-1280.png` / `assets/promo/top-new.png` 做对比，尺寸一致且缩到 8×8 后逐格均色差 < 10 才算命中。文件名不同、数量相同都不能证明已替换。
