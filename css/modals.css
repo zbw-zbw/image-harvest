@@ -592,7 +592,11 @@
 /* Collection Grid - matches image-grid card layout (max 2 columns) */
 .collection-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  /* 250px, not 260: the modal body is ~520px at a 600px panel, and
+     2×260 + 10px gap is 530 — 10px short of two columns, so every card fell
+     back to a single 520px row and the 90px thumb floated in ~150px of
+     checkerboard on each side. */
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 10px;
   padding: 4px 0;
   max-width: 100%;

@@ -56,6 +56,15 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ## [Unreleased]
 
+### 🔄 Changed
+
+- **Wide side panels use the width they have.** Two layouts still assumed a
+  400px panel: list thumbnails were a fixed 160px strip, so at 600px every
+  photo floated in about 120px of empty space on both sides, and the collection
+  modal dropped to a single 520px column with a 90px thumbnail stranded in the
+  middle. Thumbnails now follow the card's width, and the collection grid fits
+  two columns.
+
 ---
 
 ## [1.2.12] — 2026-11-25

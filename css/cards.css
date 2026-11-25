@@ -868,13 +868,19 @@
 
 .list-view .card-thumb {
   width: 100%;
-  height: 160px;
+  /* List view is single-column, so the thumb can follow the panel width.
+     A fixed 160px height letterboxed every wide photo as soon as the panel
+     grew past ~450px — the 600px popup showed ~120px of empty space on each
+     side. 2.2:1 matches how the photos are cropped, and is close to the old
+     height at the 400px default (164px vs 160px). */
+  aspect-ratio: 2.2 / 1;
+  height: auto;
   flex-shrink: 0;
   border-radius: 0;
 }
 
 .list-view .card-thumb img {
-  max-height: 160px;
+  max-height: 100%;
 }
 
 .list-view .card-url-row {
