@@ -1,8 +1,8 @@
 # Microsoft Edge Add-ons 上架核对单（v1.2.0 → 1.2.13）
 
-> 状态：**已上架**。**Edge 线上 1.2.13**（2026-11-25 审核通过；商店接口实测 version 1.2.13、lastUpdate 2026-11-25 16:05）；**Chrome Web Store 线上 1.2.11**（2026-11-25 18:30 实测，详情页 Version 1.2.11 / Updated November 24, 2026）。
+> 状态：**已上架**。**Edge 线上 1.2.13**（2026-11-25 审核通过；商店接口实测 version 1.2.13、lastUpdate 2026-11-25 16:05）；**Chrome Web Store 1.2.13 待审核**（线上仍为 1.2.11，2026-11-25 18:30 实测）。CWS 这次是包 + 列表素材同一次提交，审过之后版本号和新图一起生效，不需要事后再传一遍。
 > 提交队列：无。下一次发版从 1.2.14 起。
-> ⚠️ 素材未生效（2026-11-25 18:37 实测）：两个商店的列表图**都还是旧图**。Edge 只有 1 张截图，还是手工拼的「Visual Moods」渐变色块页（`SVG 400×300 505 B`、`data:image/svg+xml`）；Edge 大促销图还是 5 月版「Download Any Image from Any Webpage」。CWS 轮播 6 项 = 1 个旧视频 + 5 张同款旧图。确认方式见文末。
+> ⚠ Edge 的**列表图不在包的审核范围里**（2026-11-25 18:37 实测）：包已过，但 `screenshots` 仍只有 1 张——手工拼的「Visual Moods」渐变色块页（`SVG 400×300 505 B`、`data:image/svg+xml`），`largePromotionImage` 还是 5 月版「Download Any Image from Any Webpage」。要单独提一次 Store listing 更新（5 张截图 + 两张 tile），审核范围与包无关。确认方式见文末。
 > 正式 URL：https://microsoftedge.microsoft.com/addons/detail/image-harvest-download-/ldcpblieinfbpgachbnnbaphkagfemaj
 > 目标：把 Image Harvest 提交到 Microsoft Edge Add-ons（Partner Center）。
 > 标注 **owner** 的条目需要人工在 Partner Center 网页操作，不在代码仓库内完成。
@@ -72,6 +72,6 @@ Edge 后台关键凭据（过审后回填官网/README 用）：
 - **CWS 包版本**：`https://clients2.google.com/service/update2/crx?response=redirect&prodversion=120&acceptformat=crx2,crx3&x=id%3Diecgnjidmogebokcfnejncgnelcepffo%26uc`。
   返回的就是当前分发的 CRX；跳过 CRX3 头（`12 + header_len`）后当 zip 打开，读 `manifest.json` 的 `version`，这是浏览器真实拿到的版本。
   2026-11-25 18:37 实测：1.2.11。
-- **CWS 图片是否已切**：详情页轮播数。现在是 6 项（1 视频 + 5 截图），若首图仍是深色视频海报，说明素材未切。
+- **CWS 图片是否已切**：详情页轮播数。现在是 6 项（1 视频 + 5 截图）；待审核期间一定还是旧图，审过后再核。注意第一格是视频，搜索结果的 275×175 很可能取视频海报而不是新首图——通过后要么删视频，要么把它挪到最后。
 
 判断新图是否真的上线的唯一可靠办法：取商店返回的图片字节，和仓库里的 `assets/screenshots/hero-1280.png` / `assets/promo/top-new.png` 做对比，尺寸一致且缩到 8×8 后逐格均色差 < 10 才算命中。文件名不同、数量相同都不能证明已替换。
