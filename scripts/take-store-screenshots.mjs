@@ -30,15 +30,22 @@
  *   --headed         show the browser window while capturing
  */
 import { chromium } from '@playwright/test';
-import { createServer } from 'node:http';
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { dirname, extname, join, resolve } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { DEMO_HOST, startFixtureServer } from './_demo-page-server.mjs';
+import {
+  dismissNudges,
+  dismissPageHighlight,
+  enablePro,
+  scrollToTop as resetPanelScroll,
+  waitForThumbnails,
+  waitForToastsToClear,
+} from './_panel-controls.mjs';
 
 const REPO = resolve(fileURLToPath(import.meta.url), '..', '..');
 const DIST = join(REPO, 'dist');
-const FIXTURES = join(REPO, 'e2e', 'fixtures');
 const OUT_DIR = join(REPO, 'assets', 'screenshots');
 
 const CANVAS_W = 1280;
@@ -47,61 +54,6 @@ const HEIGHT = 800;
 // Both are mutable so --panel can shift the split; the page keeps the rest.
 let PANEL_W = 400;
 let PAGE_W = CANVAS_W - PANEL_W;
-
-// Images are requested as `demo/foo.jpg`, so the URL printed on every card
-// would otherwise read `127.0.0.1:54321/demo/foo.jpg` — the loudest tell that
-// the page is a fixture. Map a plain hostname onto the local fixture server
-// instead; nothing leaves the machine.
-const DEMO_HOST = 'fieldnotes.test';
-
-const MIME = {
-  '.html': 'text/html; charset=utf-8',
-  '.svg': 'image/svg+xml',
-  '.png': 'image/png',
-  '.jpg': 'image/jpeg',
-  '.jpeg': 'image/jpeg',
-  '.css': 'text/css; charset=utf-8',
-  '.js': 'application/javascript; charset=utf-8',
-};
-
-// ---------------------------------------------------------------------------
-// Fixture server
-// ---------------------------------------------------------------------------
-function startFixtureServer() {
-  return new Promise((resolveStart, rejectStart) => {
-    const server = createServer((req, res) => {
-      if (!req.url || req.method !== 'GET') {
-        res.statusCode = 405;
-        res.end();
-        return;
-      }
-      const path = decodeURIComponent(req.url.split('?')[0]);
-      const fullPath = join(FIXTURES, path);
-      if (!fullPath.startsWith(FIXTURES)) {
-        res.statusCode = 403;
-        res.end();
-        return;
-      }
-      try {
-        const body = readFileSync(fullPath);
-        res.setHeader('Content-Type', MIME[extname(fullPath)] ?? 'application/octet-stream');
-        res.setHeader('Cache-Control', 'no-store');
-        res.end(body);
-      } catch {
-        res.statusCode = 404;
-        res.end();
-      }
-    });
-    server.on('error', rejectStart);
-    server.listen(0, '127.0.0.1', () => {
-      const { port } = server.address();
-      resolveStart({
-        port,
-        close: () => new Promise((done) => server.close(() => done())),
-      });
-    });
-  });
-}
 
 // ---------------------------------------------------------------------------
 // Shots
@@ -249,95 +201,10 @@ async function launch(port, { headed }) {
   return { context, extensionId };
 }
 
-async function enablePro(panel) {
-  await panel.waitForFunction(() => Boolean(window.__IH__), undefined, { timeout: 10_000 });
-  await panel.evaluate(() => {
-    const chromeApi = window.chrome;
-    const original = chromeApi.runtime.sendMessage.bind(chromeApi.runtime);
-    chromeApi.runtime.sendMessage = (request, ...rest) => {
-      if (request && request.type === 'VALIDATE_LICENSE') {
-        return Promise.resolve({ isPro: true, expiresAt: null });
-      }
-      return original(request, ...rest);
-    };
-    window.__IH__.store.set('isProUser', true);
-  });
-}
-
-/** Wait until every on-screen thumbnail has decoded, so no shot catches a blank card. */
-async function waitForThumbnails(panel) {
-  await panel.waitForFunction(
-    () => {
-      const imgs = [...document.querySelectorAll('#image-grid .card-thumb img')];
-      const visible = imgs.filter((img) => {
-        const box = img.getBoundingClientRect();
-        return box.top < window.innerHeight && box.bottom > 0;
-      });
-      return visible.length > 0 && visible.every((img) => img.complete && img.naturalWidth > 0);
-    },
-    undefined,
-    { timeout: 15_000 }
-  );
-}
-
-/**
- * Selecting a card from the panel dims the page to 50% black and outlines the
- * matching image — the extension's "show me this one on the page" view. It is
- * the right behaviour in use, but in a still frame it just reads as a dimmed,
- * muddy screenshot, so a click exits it (which the UI supports) and keeps the
- * selection intact.
- */
-async function dismissPageHighlight(page) {
-  const dimmed = await page.evaluate(() =>
-    Boolean(document.querySelector('.image-harvest-overlay'))
-  );
-  if (!dimmed) return;
-  // Empty area to the right of the headline — no link, no image.
-  await page.mouse.click(PAGE_W - 120, 110);
-  await page.waitForTimeout(250);
-}
-
-/**
- * First-run chrome (referral banner, "N images ready to download" bar, the
- * 3-step coach mark) is designed to be dismissed on first use. Every real
- * screenshot of a working session has it out of the way already.
- */
-async function dismissNudges(panel) {
-  for (const selector of [
-    '.referral-banner-close',
-    '.download-nudge-close',
-    '.onboarding-coach-close',
-  ]) {
-    const button = panel.locator(selector).first();
-    if ((await button.count()) && (await button.isVisible())) {
-      await button.click({ timeout: 2_000 }).catch(() => {});
-      await panel.waitForTimeout(200);
-    }
-  }
-}
-
-/**
- * Reset both scroll positions. `#image-grid` is its own scroll container, so
- * window.scrollTo() alone leaves the grid wherever the last clicked card was —
- * which silently crops the first card's checkbox out of the frame.
- */
+/** Both halves at the top of their scroll containers. */
 async function scrollToTop(page, panel) {
   if (page) await page.evaluate(() => window.scrollTo(0, 0));
-  await panel.evaluate(() => {
-    window.scrollTo(0, 0);
-    document.getElementById('image-grid')?.scrollTo(0, 0);
-  });
-}
-
-/** Toasts ("Found 9 images", "Downloaded 5 files") auto-fade; wait them out. */
-async function waitForToastsToClear(panel) {
-  await panel
-    .waitForFunction(
-      () => document.querySelectorAll('#toast-container .toast').length === 0,
-      undefined,
-      { timeout: 8_000 }
-    )
-    .catch(() => {});
+  await resetPanelScroll(panel);
 }
 
 /** Composite the two halves on a throwaway page — no image library needed. */
@@ -451,7 +318,7 @@ async function capture(name, shot, { context, extensionId, opts }) {
   await shot.run({ page, panel });
   // A rescan re-arms the "N images ready to download" bar.
   await dismissNudges(panel);
-  await dismissPageHighlight(page);
+  await dismissPageHighlight(page, PAGE_W);
   // Deep scan lands at the end of the document; the frame is worth more when it
   // shows content the panel found below the fold instead of the same hero shot
   // every other screenshot already has.
