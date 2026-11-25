@@ -22,6 +22,7 @@ import { setEnvelopeMeta, track, flushNow } from '../shared/telemetry';
 import { EVENTS } from '../shared/telemetry-events';
 import { startOnboarding } from '../shared/onboarding-state';
 import { matchReferral } from '../shared/referral';
+import { getBrowserFamily } from '../shared/browser-family';
 
 import { uiPorts, sidePanelOpenedTabs, getAccessibleTabId, broadcastToPopup } from './utils';
 import { initLicenseAlarm } from './license';
@@ -247,7 +248,7 @@ chrome.runtime.onInstalled.addListener((details) => {
   });
 
   if (details.reason === 'install') {
-    void track(EVENTS.EXTENSION_INSTALLED);
+    void track(EVENTS.EXTENSION_INSTALLED, { browser: getBrowserFamily() });
     void autoStartTrial('install');
     // Panel-first onboarding arm (v1.2.4): arm the coach marks AT INSTALL.
     // The previous arm point — the welcome page's "Try it now" CTA — was
@@ -285,6 +286,17 @@ chrome.runtime.onInstalled.addListener((details) => {
       })
       .catch((err) => console.warn('Referral match failed:', err));
     chrome.tabs.create({ url: chrome.runtime.getURL('pages/welcome.html') });
+    // First-open nudge (v1.2.12): the welcome tab only reaches ~7% of
+    // installs (2026-11 data) and chrome.sidePanel.open() requires a user
+    // gesture we never get, so a global toolbar badge is the one surface
+    // left. sidepanel/init.ts clears it on the first panel open; the
+    // per-tab image-count badge is tab-scoped and unaffected.
+    void chrome.action.setBadgeText({ text: '1' }).catch(() => {
+      /* restricted profile — the nudge is optional */
+    });
+    void chrome.action.setBadgeBackgroundColor({ color: '#2a8323' }).catch(() => {
+      /* non-fatal */
+    });
   } else if (details.reason === 'update') {
     void track(EVENTS.EXTENSION_UPDATED, {
       fromVersion: details.previousVersion || 'unknown',

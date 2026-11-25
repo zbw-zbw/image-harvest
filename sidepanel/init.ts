@@ -159,6 +159,13 @@ async function init(): Promise<void> {
   cacheElements();
   showLoading();
 
+  // The install nudge badge (set in background onInstalled) is spent the
+  // moment the panel opens. Clearing is unconditional: a stale "1" that
+  // survives one open reads as a stuck notification.
+  void Promise.resolve(chrome.action?.setBadgeText?.({ text: '' })).catch(() => {
+    /* non-fatal */
+  });
+
   // ── i18n: resolve user / browser locale ─────────────────────────────────
   // Catalogue lookup is sync once detectLocale() resolves, so subsequent
   // t() calls inside loadSettings / applyTranslations see the right

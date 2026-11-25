@@ -170,6 +170,8 @@ beforeAll(async () => {
     },
     action: {
       setPopup: vi.fn(() => Promise.resolve()),
+      setBadgeText: vi.fn(() => Promise.resolve()),
+      setBadgeBackgroundColor: vi.fn(() => Promise.resolve()),
     },
   };
 

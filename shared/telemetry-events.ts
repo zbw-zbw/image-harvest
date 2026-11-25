@@ -216,7 +216,10 @@ export const TELEMETRY_EVENT_WHITELIST: ReadonlySet<string> = new Set(Object.val
 // shape. If you need a new event, add it to EVENTS first AND add its prop
 // keys here AND update the server whitelist test.
 export const EVENT_PROP_SCHEMAS: Record<TelemetryEventName, readonly string[]> = {
-  [EVENTS.EXTENSION_INSTALLED]: [],
+  // browser: 'chrome' | 'edge' | 'other' — the Chrome Web Store GA4
+  // property cannot see Edge Add-ons installs, so channel splits need
+  // this self-reported tag.
+  [EVENTS.EXTENSION_INSTALLED]: ['browser'],
   [EVENTS.EXTENSION_UPDATED]: ['fromVersion', 'toVersion'],
   [EVENTS.EXTENSION_FIRST_OPEN]: [],
 
