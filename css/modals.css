@@ -560,6 +560,19 @@
   border-color: var(--primary-color);
 }
 
+/* The side panel is routinely 320-460px wide. At that size the action cluster
+   eats the row and the search input collapses to its 80px min, which truncates
+   the placeholder to "Search b". Give it a row of its own instead. */
+@media (max-width: 460px) {
+  .collection-toolbar {
+    flex-wrap: wrap;
+  }
+
+  .collection-search-input {
+    flex: 1 1 100%;
+  }
+}
+
 /* Fixed height so the modal doesn't jump when filtering changes item count */
 .collection-content {
   height: 85vh;
