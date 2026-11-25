@@ -119,6 +119,27 @@ const openFilter = async (panel, label) => {
   await panel.waitForTimeout(250);
 };
 
+/**
+ * AI tagging calls the real backend, which the VITE_E2E build cannot reach.
+ * `loadAiTagsMap()` reads chrome.storage.local on every scan instead, so seeding
+ * the cache is enough to render the tags exactly as a tagged session would.
+ */
+const AI_TAGS = {
+  'http://fieldnotes.test/demo/vestfjorden.jpg': ['fjord', 'cliffs', 'water'],
+  'http://fieldnotes.test/demo/mountain-road.jpg': ['road', 'hills', 'cloud'],
+  'http://fieldnotes.test/demo/city-dusk.jpg': ['city', 'skyline', 'dusk'],
+  'http://fieldnotes.test/demo/ridge-sunset.jpg': ['ridge', 'rock', 'sunset'],
+  'http://fieldnotes.test/demo/waterfall.jpg': ['waterfall', 'forest', 'moss'],
+  'http://fieldnotes.test/demo/sea-cliffs.jpg': ['sea', 'cliffs', 'overcast'],
+};
+
+async function seedStorage(context, extensionId, data) {
+  const page = await context.newPage();
+  await page.goto(`chrome-extension://${extensionId}/pages/sidepanel.html`);
+  await page.evaluate((payload) => chrome.storage.local.set(payload), data);
+  await page.close();
+}
+
 const SHOTS = {
   // Batch selection + the sticky action bar. The headline capability, and the
   // only state where the price of "select a few, download as one ZIP" is
@@ -140,28 +161,34 @@ const SHOTS = {
     },
   },
 
-  // AI tagging — the feature competitors do not have.
+  // AI tagging — the feature competitors do not have. Tags live in an overlay on
+  // the thumbnail, so a few cards tagged reads better than one.
   'ai-tags': {
     pro: true,
+    seed: ({ context, extensionId }) => seedStorage(context, extensionId, { aiTags: AI_TAGS }),
     run: async ({ panel }) => {
       await selectCards(panel, [0, 1, 2]);
-      const card = panel.locator('#image-grid .image-card').first();
-      const aiButton = card.locator('.btn-ai-tag');
-      if (await aiButton.count()) {
-        await aiButton.click();
-        await panel.waitForTimeout(2500);
-      }
+      await panel.waitForTimeout(400);
       await panel.mouse.move(0, 0);
     },
   },
 
-  // Collections (Pro) — the "keep a library across pages" story.
+  // Collections (Pro) — the "keep a library across pages" story. Favourite a
+  // few cards through the real code path, then open the collection modal so the
+  // saved library is actually on screen.
   collection: {
     pro: true,
     run: async ({ panel }) => {
-      const fav = panel.locator('#image-grid .image-card .btn-favorite').first();
-      await fav.click();
-      await panel.waitForTimeout(1200);
+      const favs = panel.locator('#image-grid .image-card .btn-favorite');
+      for (const i of [0, 1, 2, 3, 5]) await favs.nth(i).click();
+      await panel.waitForTimeout(400);
+      await panel.locator('#btn-collection').click();
+      await panel.waitForFunction(
+        () => document.querySelectorAll('#collection-body .collection-card').length > 0,
+        undefined,
+        { timeout: 15_000 }
+      );
+      await panel.waitForTimeout(600);
       await panel.mouse.move(0, 0);
     },
   },
@@ -169,6 +196,7 @@ const SHOTS = {
   // Deep scan (Pro) — scrolls the page itself.
   deepscan: {
     pro: true,
+    pageScroll: 'bottom',
     run: async ({ panel }) => {
       const scan = panel.locator('#btn-deep-scan, .btn-deep-scan').first();
       if (await scan.count()) {
@@ -179,8 +207,10 @@ const SHOTS = {
     },
   },
 
-  // Nothing selected: the default state a user sees on first open.
+  // Nothing selected: the default state a user sees on first open. Saved as
+  // sidepanel-* because that is the name the READMEs and the listing use.
   default: {
+    file: 'sidepanel',
     run: async () => {},
   },
 };
@@ -292,7 +322,7 @@ async function dismissNudges(panel) {
  * which silently crops the first card's checkbox out of the frame.
  */
 async function scrollToTop(page, panel) {
-  await page.evaluate(() => window.scrollTo(0, 0));
+  if (page) await page.evaluate(() => window.scrollTo(0, 0));
   await panel.evaluate(() => {
     window.scrollTo(0, 0);
     document.getElementById('image-grid')?.scrollTo(0, 0);
@@ -362,73 +392,91 @@ async function main() {
   }
 
   const server = await startFixtureServer();
-  const { context, extensionId } = await launch(server.port, opts);
   mkdirSync(OUT_DIR, { recursive: true });
 
   try {
     for (const name of names) {
       const shot = SHOTS[name];
-      const page = await context.newPage();
-      await page.goto(`http://${DEMO_HOST}/store-demo.html`);
-      await page.waitForLoadState('networkidle');
-      await page.bringToFront();
-
-      const panel = await context.newPage();
-      // sidepanel/init.ts only attaches window.__IH__ when this flag is set,
-      // and the readiness check below needs it. Has nothing to do with Pro —
-      // it just opens the test hooks.
-      await panel.addInitScript(() => {
-        window.__IH_E2E__ = true;
-      });
-      await panel.setViewportSize({ width: PANEL_W, height: HEIGHT });
-      await panel.goto(`chrome-extension://${extensionId}/pages/sidepanel.html`);
-      await page.bringToFront();
-
-      await panel.waitForFunction(
-        () => document.querySelectorAll('#image-grid .image-card').length > 0,
-        undefined,
-        { timeout: 30_000 }
-      );
-      await panel.waitForFunction(
-        () => window.__IH__?.store.get('isInitialized') === true,
-        undefined,
-        { timeout: 15_000 }
-      );
-      if (opts.pro || shot.pro) await enablePro(panel);
-
-      await panel.evaluate(() => window.scrollTo(0, 0));
-      // Dismiss first-run chrome before the shot runs: its close buttons are
-      // clicks on the document, which would immediately close any dropdown the
-      // shot opened.
-      await dismissNudges(panel);
-      await shot.run({ page, panel });
-      await dismissPageHighlight(page);
-      await scrollToTop(page, panel);
-      await waitForToastsToClear(panel);
-      await panel.mouse.move(0, 0);
-      await panel.waitForTimeout(250);
-      await waitForThumbnails(panel);
-
-      const pagePng = await page.screenshot();
-      const panelPng = await panel.screenshot();
-      if (opts.rawDir) {
-        mkdirSync(opts.rawDir, { recursive: true });
-        writeFileSync(join(opts.rawDir, `${name}-page.png`), pagePng);
-        writeFileSync(join(opts.rawDir, `${name}-panel.png`), panelPng);
+      // Fresh profile per shot. The collection shot writes favourites to
+      // IndexedDB and the ai-tags shot seeds chrome.storage; sharing one profile
+      // leaked both into whatever was captured next.
+      const { context, extensionId } = await launch(server.port, opts);
+      try {
+        await capture(name, shot, { context, extensionId, opts });
+      } finally {
+        await context.close();
       }
-
-      const outPath = opts.out ?? join(OUT_DIR, `${name}-1280.png`);
-      mkdirSync(dirname(outPath), { recursive: true });
-      await compose(context, pagePng, panelPng, outPath);
-      console.log(`${name.padEnd(14)} → ${outPath}`);
-
-      await panel.close();
-      await page.close();
     }
   } finally {
-    await context.close();
     await server.close();
   }
+}
+
+async function capture(name, shot, { context, extensionId, opts }) {
+  // Runs before the panel mounts: the first scan is what reads the seeded
+  // cache, so it cannot happen after navigation.
+  if (shot.seed) await shot.seed({ context, extensionId });
+
+  const page = await context.newPage();
+  await page.goto(`http://${DEMO_HOST}/store-demo.html`);
+  await page.waitForLoadState('networkidle');
+  await page.bringToFront();
+
+  const panel = await context.newPage();
+  // sidepanel/init.ts only attaches window.__IH__ when this flag is set,
+  // and the readiness check below needs it. Has nothing to do with Pro —
+  // it just opens the test hooks.
+  await panel.addInitScript(() => {
+    window.__IH_E2E__ = true;
+  });
+  await panel.setViewportSize({ width: PANEL_W, height: HEIGHT });
+  await panel.goto(`chrome-extension://${extensionId}/pages/sidepanel.html`);
+  await page.bringToFront();
+
+  await panel.waitForFunction(
+    () => document.querySelectorAll('#image-grid .image-card').length > 0,
+    undefined,
+    { timeout: 30_000 }
+  );
+  await panel.waitForFunction(() => window.__IH__?.store.get('isInitialized') === true, undefined, {
+    timeout: 15_000,
+  });
+  if (opts.pro || shot.pro) await enablePro(panel);
+
+  await panel.evaluate(() => window.scrollTo(0, 0));
+  // Dismiss first-run chrome before the shot runs: its close buttons are
+  // clicks on the document, which would immediately close any dropdown the
+  // shot opened.
+  await dismissNudges(panel);
+  await shot.run({ page, panel });
+  // A rescan re-arms the "N images ready to download" bar.
+  await dismissNudges(panel);
+  await dismissPageHighlight(page);
+  // Deep scan lands at the end of the document; the frame is worth more when it
+  // shows content the panel found below the fold instead of the same hero shot
+  // every other screenshot already has.
+  await scrollToTop(shot.pageScroll === 'bottom' ? null : page, panel);
+  if (shot.pageScroll === 'bottom') {
+    await page.evaluate(() => window.scrollTo(0, document.body.scrollHeight));
+    await page.waitForTimeout(400);
+  }
+  await waitForToastsToClear(panel);
+  await panel.mouse.move(0, 0);
+  await panel.waitForTimeout(250);
+  await waitForThumbnails(panel);
+
+  const pagePng = await page.screenshot();
+  const panelPng = await panel.screenshot();
+  if (opts.rawDir) {
+    mkdirSync(opts.rawDir, { recursive: true });
+    writeFileSync(join(opts.rawDir, `${name}-page.png`), pagePng);
+    writeFileSync(join(opts.rawDir, `${name}-panel.png`), panelPng);
+  }
+
+  const outPath = opts.out ?? join(OUT_DIR, `${shot.file ?? name}-1280.png`);
+  mkdirSync(dirname(outPath), { recursive: true });
+  await compose(context, pagePng, panelPng, outPath);
+  console.log(`${name.padEnd(14)} → ${outPath}`);
 }
 
 main().catch((err) => {
