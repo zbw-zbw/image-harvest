@@ -66,6 +66,38 @@ CWS 搜索结果页（`/search/...`）每个结果项除图标、评分、短描
   落在 96px 安全边距内，无出血裁切）。
 - `scripts/make-cws-hero.py`：改文案后重新出图，不必回到图形工具。
 
+### 真实截图流水线（2026-11-25 起）
+
+此前的 13 张是手工拼的：左 640px 演示页 + 右 640px 侧栏，卡片元数据清一色
+`SVG 400×300 505 B`、URL 是 `data:image/svg+xml,...`。两处破绽各自都能被
+一眼看出来——真实 Chrome 侧栏只有 320–400px，五五开把所有元素撑大失真；
+占位色块则说明演示页是假的。
+
+现在每张都是「真跑一遍、真截两张、并排合成」：
+
+| 文件                                 | 作用                                                               |
+| ------------------------------------ | ------------------------------------------------------------------ |
+| `scripts/take-store-screenshots.mjs` | Playwright 加载 `VITE_E2E` 构建的扩展，逐 shot 操作后合成 1280×800 |
+| `e2e/fixtures/store-demo.html`       | 被截的演示页（虚构摄影手记「Field Notes」，9 张真实照片）          |
+| `scripts/prep-demo-photos.py`        | 把源照片裁成 1.9–2.2:1 并压到 17–100 KB                            |
+
+```bash
+npm run build:e2e                       # 必须先有 dist/.e2e-build
+node scripts/take-store-screenshots.mjs # 全部 shot
+node scripts/take-store-screenshots.mjs --shot=batch-select --out=/tmp/x.png
+```
+
+几个关键点，改脚本时不要退回去：
+
+- 侧栏 400px、演示页 880px（`--panel=` 可调），不是 640/640。
+- 图片 URL 走 `--host-resolver-rules=MAP fieldnotes.test 127.0.0.1`，卡片上显示的是
+  `http://fieldnotes.test/demo/vestfjorden.jpg`，不会露出 `127.0.0.1:54321`。
+- 照片裁成 1.9–2.2:1：侧栏缩略框约 2.2:1 且用 `object-fit: contain`，方一点就会在
+  两边留出大片白边。
+- 截图前要关掉三样东西：页面高亮遮罩（`rgba(0,0,0,.5)`）、首次使用引导条、toast。
+- `ai-tags` 走真实后端 AI 接口，`VITE_E2E` 构建下不可用，暂不产出；`collection`
+  目前只截到收藏态，收藏弹窗还没有被打开。
+
 ### 上传位置与顺序（CWS 后台手动操作）
 
 入口：`chrome.google.com/webstore/devconsole` → 选扩展 → 左侧 `Store listing` →
@@ -92,6 +124,9 @@ CWS 搜索结果页（`/search/...`）每个结果项除图标、评分、短描
 
 不要放 `deepscan-1280.png`：它是 “Deep scanning…” 的进行中状态，截图里放 loading
 会让产品显得慢。
+
+`batch-select` / `filters` 已由新流水线重出；`collection` / `ai-tags` 待补（见上一节
+的两条限制），补完之前第 4、5 位沿用旧图。
 
 ### 度量（没有对照就没有结论）
 
