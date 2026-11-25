@@ -1,7 +1,7 @@
-# Microsoft Edge Add-ons 上架核对单（v1.2.0 → 1.2.12）
+# Microsoft Edge Add-ons 上架核对单（v1.2.0 → 1.2.13）
 
-> 状态：**已上架**。Chrome Web Store 线上 **1.2.11**（2026-11-24），Edge 线上 **1.2.10**（2026-11-24 过审）；**1.2.12 已备包，待手动提交**。
-> 提交队列：1.2.12。若 Edge 仍未提 1.2.11，本次包已包含其全部改动，认证说明里写了跨版本。
+> 状态：**已上架**。Chrome Web Store 线上 **1.2.11**（2026-11-24），Edge 线上 **1.2.10**（2026-11-24 过审）；**1.2.13 已备包，待手动提交**。
+> 提交队列：1.2.13。若 Edge 仍未提 1.2.12，本次包已包含其全部改动，认证说明里写了跨版本。
 > 正式 URL：https://microsoftedge.microsoft.com/addons/detail/image-harvest-download-/ldcpblieinfbpgachbnnbaphkagfemaj
 > 目标：把 Image Harvest 提交到 Microsoft Edge Add-ons（Partner Center）。
 > 标注 **owner** 的条目需要人工在 Partner Center 网页操作，不在代码仓库内完成。
@@ -29,9 +29,9 @@
 - [x] 短摘要（≤ 132 字符）：复用 `docs/chrome-store/summary.md` 的 en 文案（131/132 字符，已核）
 - [x] 分类：Productivity（与 CWS 一致）
 - [x] 搜索关键词：image downloader / download images / bulk image downloader / image grabber / download all images / image harvest（7 条上限用了 6 条，16/21 words）
-- [x] 截图：13 张全家福已全部由真实扩展重拍（`assets/screenshots/*-1280.png`，1280×800，880px 真实文章 + 400px 侧栏）；本次提交用 hero + batch-select + filters + collection + ai-tags 五张，顺序见 `docs/chrome-store/listing-optimization-2026-10.md`
+- [x] 截图：全部由真实扩展重拍（`assets/screenshots/*-1280.png`，1280×800；680px 真实文章 + 600px 侧栏，不再五五开）；本次提交用 hero + batch-select + filters + collection + ai-tags 五张，顺序见 `docs/chrome-store/listing-optimization-2026-10.md`；另传两张促销图 `assets/promo/small-new.png`（440×280）与 `top-new.png`（1400×560）
 - [x] 商店图标：`assets/promo/icon-300.png`（300×300 PNG，从 `icons/logo.png` 500×500 源导出）
-- [x] 认证说明：选 Yes（Pro 功能有条件锁定），说明 7 天一键试用解锁路径 + 免费层限额明细 + 遥测披露（约 1500 字符）
+- [x] 认证说明：选 Yes（Pro 功能有条件锁定），说明 7 天一键试用解锁路径 + 免费层限额明细 + 遥测披露。每次提交前按当版存底重新粘贴（当前为 `certification-notes-v1.2.13.md`，正文 1,975/2,000 字符）
 
 ## 4. 提交后跟进
 
@@ -52,6 +52,7 @@
 | 2026-11-23 | 1.2.8  | In review | 版本更新提交，从线上 1.2.6 直接跨到 1.2.8（1.2.7 全部改动已含在包内，无需补提 1.2.7）；内容为引导链两轮竞态修复（welcome 页即时写 flag + 面板等待 + coach 内做 A/B 判定）；认证说明存底 `docs/edge-store/certification-notes-v1.2.8.md`（notes 内已写明跨版本与 A/B 分组，避免审核员落对照组 误判）；zip 与 CWS 同一份 GitHub Release 产物（tag v1.2.8）                                                                                                                   |
 | 2026-11-24 | 1.2.10 | Approved  | 版本更新包：trial 提醒链（day 3/5/7 价值回顾 + 临期警示 + 到期提示 + 每周回访，最多 4 次/7 天间隔，全部只在面板内渲染、不申请 notifications、不阻塞下载），顺带包含 1.2.9 的 welcome/tour 根因修复；若 1.2.8 仍在审核，直接从线上 1.2.6 跳到 1.2.10 即可（跨版本叙述已写进 notes）。认证说明存底 `docs/edge-store/certification-notes-v1.2.10.md`（正文 1,974 字符，限额 2,000）；manifest 权限列表未变。zip 用 tag `v1.2.10` 的 Release 产物（Edge-clean，排除 `.vite/`） |
 | 2026-11-25 | 1.2.12 | 待提交    | 两条可见缺陷修复：批量 ZIP 完成提示的计数被 background 回声覆盖成 1；400px 面板下 Pro 对比卡徽章挤压描述。无新增权限。认证说明存底 `docs/edge-store/certification-notes-v1.2.12.md`（正文 1,904 字符）；若 Edge 线上仍为 1.2.10，本次同时带上 1.2.11 的额度统一与配额实验移除。zip 用 tag `v1.2.12` 的 Release 产物（Edge-clean）                                                                                                                                          |
+| 2026-11-25 | 1.2.13 | 待提交    | 两处「宽面板仍按 400px 计算」的布局修补：列表缩略图固定 160px（600px 面板下两边各空 ~120px）、Collection 弹窗退回单列。无新增权限、无新界面。认证说明存底 `docs/edge-store/certification-notes-v1.2.13.md`（正文 1,975 字符 / 限额 2,000）；同批把商店首图与两张促销图换成「真实面板 + 品牌绿」，上传时一并替换。zip 用 tag `v1.2.13` 的 Release 产物（Edge-clean）                                                                                                        |
 
 Edge 后台关键凭据（过审后回填官网/README 用）：
 
