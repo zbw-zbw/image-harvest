@@ -516,6 +516,22 @@
   color: var(--primary-color, #60b557);
 }
 
+/* At the default 400px panel width the badges ("30 imgs/batch" + "Unlimited")
+   leave barely 100px for the description, which then wraps to four lines.
+   Give the badges their own row on narrow surfaces; they stay right-aligned
+   with the FREE / PRO header above. */
+@media (max-width: 520px) {
+  .pro-fc-card {
+    flex-wrap: wrap;
+    row-gap: 4px;
+  }
+
+  .pro-fc-badges {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
+
 /* ✗/✓ comparison glyphs are inline SVGs now — keep them optically centered
    inside the pill badges. */
 .pro-fc-badge svg {
