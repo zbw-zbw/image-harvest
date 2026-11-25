@@ -91,19 +91,24 @@ def backdrop(w, h):
     return Image.fromarray(np.clip(rgb, 0, 255).astype(np.uint8), "RGB").convert("RGBA")
 
 
-def panel_capture(w, h):
-    shot = Image.open(PANEL_SRC).convert("RGB").crop(PANEL_CROP)
+def panel_capture(w, h, crop=PANEL_CROP):
+    shot = Image.open(PANEL_SRC).convert("RGB").crop(crop)
     return shot.resize((w, h), Image.LANCZOS).convert("RGBA")
 
 
-def paste_panel(canvas, x, y, w, h, radius=20):
-    shot = panel_capture(w, h)
+def paste_panel(canvas, x, y, w, h, radius=20, crop=PANEL_CROP, shadow_offset=(0, 12)):
+    shot = panel_capture(w, h, crop)
     mask = Image.new("L", (w, h), 0)
-    ImageDraw.Draw(mask).rounded_rectangle([0, 0, w - 1, h - 1], radius=radius, fill=255)
+    box = ImageDraw.Draw(mask)
+    if radius:
+        box.rounded_rectangle([0, 0, w - 1, h - 1], radius=radius, fill=255)
+    else:
+        box.rectangle([0, 0, w - 1, h - 1], fill=255)
 
+    sx, sy = shadow_offset
     shadow = Image.new("RGBA", canvas.size, (0, 0, 0, 0))
     ImageDraw.Draw(shadow).rounded_rectangle(
-        [x, y + 12, x + w - 1, y + h + 12], radius=radius, fill=(0, 0, 0, 120)
+        [x + sx, y + sy, x + w - 1 + sx, y + h - 1 + sy], radius=radius, fill=(0, 0, 0, 120)
     )
     canvas.alpha_composite(shadow.filter(ImageFilter.GaussianBlur(26)))
     canvas.paste(shot, (x, y), mask)
@@ -187,17 +192,21 @@ def write_small(path):
     canvas = backdrop(W, H)
     draw = ImageDraw.Draw(canvas)
 
-    plate = icon_mark(canvas, 64, 64, 88)
+    # 440x280 is a third of the hero's height, so the same lockup at hero scale
+    # left the tile two-thirds empty. The icon now takes half the height, and
+    # both halves are centred on the same horizontal line (y=140): icon spans
+    # 68-212, the four text rows span 76-204. Margins land at 28/35 left-right
+    # and 68/68 top-bottom, so no side looks emptier than another.
+    # Brand 30 and tagline 18 are the largest sizes whose widest line still
+    # clears a 216px column.
+    plate = icon_mark(canvas, 28, 68, 144)
     draw = ImageDraw.Draw(canvas)
 
-    # Centred as a block: icon + text spans 64..369 on a 440 canvas.
-    # Bold at 18, not regular: the small tile's text sits on the mid-ramp of the
-    # gradient, where regular white lands at about 3:1 and reads thin.
-    tx = 64 + plate + 24
-    draw.text((tx, 112), "Image Harvest", font=font(BOLD, 27), fill=WHITE, anchor="ls")
-    draw.text((tx, 150), "Batch download", font=font(BOLD, 18), fill=WHITE, anchor="ls")
-    draw.text((tx, 176), "every image on a page.", font=font(BOLD, 18), fill=WHITE, anchor="ls")
-    draw.text((tx, 216), "Free  ·  Chrome & Edge", font=font(BOLD, 14), fill=MINT, anchor="ls")
+    tx = 28 + plate + 20
+    draw.text((tx, 97), "Image Harvest", font=font(BOLD, 30), fill=WHITE, anchor="ls")
+    draw.text((tx, 129), "Batch download", font=font(BOLD, 18), fill=WHITE, anchor="ls")
+    draw.text((tx, 153), "every image on a page.", font=font(BOLD, 18), fill=WHITE, anchor="ls")
+    pill(draw, tx, 193, "Free  ·  Chrome & Edge", size=14, pad_x=16, pad_y=9)
 
     path.parent.mkdir(parents=True, exist_ok=True)
     canvas.convert("RGB").save(path, "PNG")
@@ -209,29 +218,39 @@ def write_top(path):
     canvas = backdrop(W, H)
     draw = ImageDraw.Draw(canvas)
 
-    pw, ph = 396, 528
-    px, py = W - pw - 48, 16
-    paste_panel(canvas, px, py, pw, ph)
+    # The panel bleeds off the top, right and bottom edges. Cutting at y=136 is
+    # the card grid's first row: everything above it is the toolbar and filter
+    # row, and a cut anywhere inside those two left half-drawn labels sitting on
+    # the banner's top edge (y=60 did exactly that). Dropping both rows makes the
+    # capture 600x664 instead of 600x800, which at 560 tall is 506 wide -- 28%
+    # wider than the 396px the first pass used and 11% wider than 454.
+    pw, ph = 506, 560
+    px, py = W - pw, 0
+    paste_panel(canvas, px, py, pw, ph, radius=0, crop=(680, 136, 1280, 800),
+                shadow_offset=(-14, 0))
     draw = ImageDraw.Draw(canvas)
 
-    col = 80
-    col_w = px - 64 - col
+    col = 64
+    col_w = px - 56 - col
 
     plate = icon_mark(canvas, col, 84, 96)
     draw = ImageDraw.Draw(canvas)
     draw.text((col + plate + 26, 84 + plate / 2), "Image Harvest",
               font=font(BOLD, 42), fill=WHITE, anchor="lm")
 
-    lines = ["Batch download", "every image", "on a page."]
-    # 68 is the ceiling: at 76 the first line sat directly under the wordmark.
-    size = fit_size(draw, lines, BOLD, col_w, 68, 48)
-    line = round(size * 1.14)
-    base = 248
+    # Two lines instead of three: "Batch download" alone left 100px of dead ramp
+    # between the copy and the panel, which is what made the banner look split.
+    # At 768px of column the fit lands on 68px, and the longest line stops 59px
+    # short of the panel -- close enough that the two halves read as one block.
+    lines = ["Download every image", "on a page at once."]
+    size = fit_size(draw, lines, BOLD, col_w, 76, 48)
+    line = round(size * 1.16)
+    base = 302
     for i, text in enumerate(lines):
         draw.text((col, base + i * line), text,
-                  font=font(BOLD, size), fill=MINT if i == 2 else WHITE, anchor="ls")
+                  font=font(BOLD, size), fill=MINT if i == 1 else WHITE, anchor="ls")
 
-    pill(draw, col, base + 2 * line + 72, "Select a few. Save one ZIP.", size=24)
+    pill(draw, col, base + line + 78, "Select a few. Save one ZIP.", size=24)
 
     path.parent.mkdir(parents=True, exist_ok=True)
     canvas.convert("RGB").save(path, "PNG")
