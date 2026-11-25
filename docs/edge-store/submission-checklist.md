@@ -2,7 +2,7 @@
 
 > 状态：**已上架**。**Edge 线上 1.2.13**（2026-11-25 审核通过；商店接口实测 version 1.2.13、lastUpdate 2026-11-25 16:05）；**Chrome Web Store 1.2.13 待审核**（线上仍为 1.2.11，2026-11-25 18:30 实测）。CWS 这次是包 + 列表素材同一次提交，审过之后版本号和新图一起生效，不需要事后再传一遍。
 > 提交队列：无。下一次发版从 1.2.14 起。
-> ⚠ Edge 的**列表图不在包的审核范围里**（2026-11-25 18:37 实测）：包已过，但 `screenshots` 仍只有 1 张——手工拼的「Visual Moods」渐变色块页（`SVG 400×300 505 B`、`data:image/svg+xml`），`largePromotionImage` 还是 5 月版「Download Any Image from Any Webpage」。要单独提一次 Store listing 更新（5 张截图 + 两张 tile），审核范围与包无关。确认方式见文末。
+> Edge 列表图：2026-11-25 已按 5 张截图 + 两张 tile 单独提交 Store listing 更新（待审核；包审核不包含这一层）。提交前实测仍是 1 张旧图——手工拼的「Visual Moods」渐变色块页（`SVG 400×300 505 B`、`data:image/svg+xml`），大促销图也还是 5 月版；过审后按文末方法复核。
 > 正式 URL：https://microsoftedge.microsoft.com/addons/detail/image-harvest-download-/ldcpblieinfbpgachbnnbaphkagfemaj
 > 目标：把 Image Harvest 提交到 Microsoft Edge Add-ons（Partner Center）。
 > 标注 **owner** 的条目需要人工在 Partner Center 网页操作，不在代码仓库内完成。
