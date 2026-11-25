@@ -522,10 +522,10 @@
     "message": "Comment trouvez-vous Image Harvest ?"
   },
   "rating_desc": {
-    "message": "Vous avez enregistré {count} images jusqu'à présent. S'il vous a été utile, une note sur le Chrome Web Store aidera d'autres utilisateurs à le découvrir."
+    "message": "Vous avez enregistré {count} images jusqu'à présent. Si l'extension vous a été utile, un avis aide d'autres utilisateurs à la découvrir. Nous ouvrons l'onglet des avis du store — comptez 30 secondes."
   },
   "rating_rate_now": {
-    "message": "Noter Image Harvest"
+    "message": "Rédiger un avis"
   },
   "winback_message": {
     "message": "Vous avez enregistré {count} images avec Image Harvest. Pro restaure la boîte à outils complète — ZIP groupés illimités, analyses approfondies et plus encore."

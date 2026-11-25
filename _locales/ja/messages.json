@@ -633,10 +633,10 @@
     "message": "Image Harvest の調子はいかがですか？"
   },
   "rating_desc": {
-    "message": "これまでに {count} 枚の画像を保存しました。お役に立てたなら、Chrome ウェブストアで評価していただけると、他のユーザーにも見つけてもらいやすくなります。"
+    "message": "これまでに {count} 枚の画像を保存しました。お役に立てたなら、レビューを書いていただけると他のユーザーにも見つけてもらいやすくなります。ストアのレビュー画面を開きます（30 秒ほど）。"
   },
   "rating_rate_now": {
-    "message": "Image Harvest を評価"
+    "message": "レビューを書く"
   },
   "winback_message": {
     "message": "Image Harvest で {count} 枚の画像を保存しました。Pro に戻れば、無制限のバッチ ZIP、ディープスキャンなど、フルツールキットが使えます。"

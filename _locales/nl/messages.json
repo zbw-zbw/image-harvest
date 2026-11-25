@@ -522,10 +522,10 @@
     "message": "Bevalt Image Harvest je?"
   },
   "rating_desc": {
-    "message": "Je hebt tot nu toe {count} afbeeldingen opgeslagen. Als het je heeft geholpen, helpt een korte beoordeling in de Chrome Web Store anderen om het te ontdekken."
+    "message": "Je hebt tot nu toe {count} afbeeldingen opgeslagen. Als het je heeft geholpen, helpt een beoordeling anderen om het te ontdekken. We openen het beoordelingstabblad van de store — ongeveer 30 seconden."
   },
   "rating_rate_now": {
-    "message": "Beoordeel Image Harvest"
+    "message": "Beoordeling schrijven"
   },
   "winback_message": {
     "message": "Je hebt {count} afbeeldingen opgeslagen met Image Harvest. Pro herstelt de volledige toolkit — onbeperkte batch-ZIP's, diepe scans en meer."

@@ -522,10 +522,10 @@
     "message": "Wie gefällt Ihnen Image Harvest?"
   },
   "rating_desc": {
-    "message": "Sie haben bisher {count} Bilder gespeichert. Wenn Image Harvest Ihnen geholfen hat, hilft eine kurze Bewertung im Chrome Web Store anderen, es zu entdecken."
+    "message": "Sie haben bisher {count} Bilder gespeichert. Wenn Image Harvest Ihnen geholfen hat: Eine Bewertung hilft anderen, es zu finden. Wir öffnen dafür die Bewertungsseite im Store — etwa 30 Sekunden."
   },
   "rating_rate_now": {
-    "message": "Image Harvest bewerten"
+    "message": "Bewertung schreiben"
   },
   "winback_message": {
     "message": "Sie haben {count} Bilder mit Image Harvest gespeichert. Pro stellt das komplette Toolkit wieder her — unbegrenzte Batch-ZIPs, Tiefenscans und mehr."

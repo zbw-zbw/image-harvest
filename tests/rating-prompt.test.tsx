@@ -242,7 +242,7 @@ describe('<RatingPromptModal/>', () => {
     vi.spyOn(ratingState, 'markRatingPromptShown').mockResolvedValue();
     const markResolved = vi.spyOn(ratingState, 'markRatingPromptResolved').mockResolvedValue();
     const { findByText } = render(<RatingPromptModal />);
-    const btn = await findByText('Rate Image Harvest');
+    const btn = await findByText('Write a review');
     fireEvent.click(btn);
     expect(openSpy).toHaveBeenCalledWith(CHROME_STORE_REVIEW_URL, '_blank', 'noopener,noreferrer');
     expect(markResolved).toHaveBeenCalledTimes(1);
@@ -301,7 +301,7 @@ describe('<RatingPromptModal/>', () => {
   });
 
   it.each([
-    ['Rate Image Harvest', 'rate'],
+    ['Write a review', 'rate'],
     ['Maybe later', 'later'],
     ["Don't ask again", 'never'],
   ])('emits rating_prompt_cta action=%s', async (label, action) => {

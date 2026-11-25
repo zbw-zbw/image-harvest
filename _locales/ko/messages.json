@@ -450,10 +450,10 @@
     "message": "Image Harvest는 어떠신가요?"
   },
   "rating_desc": {
-    "message": "지금까지 {count}개의 이미지를 저장하셨습니다. 도움이 되셨다면 Chrome 웹 스토어에 평점을 남겨 주세요. 다른 사용자들이 Image Harvest를 찾는 데 큰 힘이 됩니다."
+    "message": "지금까지 {count}개의 이미지를 저장하셨습니다. 도움이 되셨다면 리뷰를 남겨 주세요. 스토어의 리뷰 화면이 열리며, 30초면 충분합니다."
   },
   "rating_rate_now": {
-    "message": "Image Harvest 평가하기"
+    "message": "리뷰 쓰기"
   },
   "winback_message": {
     "message": "Image Harvest로 {count}개의 이미지를 저장하셨습니다. Pro로 돌아오시면 무제한 배치 ZIP, 딥 스캔 등 모든 도구를 다시 사용하실 수 있습니다."

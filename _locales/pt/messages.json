@@ -522,10 +522,10 @@
     "message": "Como está achando o Image Harvest?"
   },
   "rating_desc": {
-    "message": "Você já salvou {count} imagens. Se ele tem sido útil, uma avaliação na Chrome Web Store ajuda outras pessoas a descobri-lo."
+    "message": "Você já salvou {count} imagens. Se ele tem sido útil, uma avaliação ajuda outras pessoas a descobri-lo. Vamos abrir a aba de avaliações da loja — leva cerca de 30 segundos."
   },
   "rating_rate_now": {
-    "message": "Avaliar o Image Harvest"
+    "message": "Escrever uma avaliação"
   },
   "winback_message": {
     "message": "Você salvou {count} imagens com o Image Harvest. O Pro restaura o kit de ferramentas completo — ZIPs em lote ilimitados, análises profundas e muito mais."

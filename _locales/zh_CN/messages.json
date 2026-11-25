@@ -444,10 +444,10 @@
     "message": "Image Harvest 用得还顺手吗？"
   },
   "rating_desc": {
-    "message": "你已保存 {count} 张图片。如果它帮到了你，在 Chrome Web Store 留个评分，能让更多人发现我们。"
+    "message": "你已保存 {count} 张图片。如果它帮到了你，留个评价能让更多人发现我们。我们会打开商店的评价页，大约 30 秒。"
   },
   "rating_rate_now": {
-    "message": "为 Image Harvest 评分"
+    "message": "写个评价"
   },
   "winback_message": {
     "message": "你已用 Image Harvest 保存了 {count} 张图片。Pro 可恢复完整工具箱——无限批量 ZIP、深度扫描等。"

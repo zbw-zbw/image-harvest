@@ -457,10 +457,10 @@
     "message": "How's Image Harvest working for you?"
   },
   "rating_desc": {
-    "message": "You've saved {count} images so far. If it's been useful, a quick rating on the Chrome Web Store helps others find us."
+    "message": "You've saved {count} images. If it's been useful, a review helps others find us. We'll open the store's review tab — it takes about 30 seconds."
   },
   "rating_rate_now": {
-    "message": "Rate Image Harvest"
+    "message": "Write a review"
   },
   "winback_message": {
     "message": "You've saved {count} images with Image Harvest. Pro restores the full toolkit — unlimited batch ZIPs, deep scans, and more."
