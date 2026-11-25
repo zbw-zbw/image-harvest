@@ -58,6 +58,26 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
+## [1.2.12] — 2026-11-25
+
+### 🐛 Fixed
+
+- **Batch downloads keep the right count in the finished toast.** When a ZIP
+  finished, the panel briefly said "Downloaded 1" no matter how many images you
+  had picked, because the download completion from the browser was reported
+  again on its own. It now stays at the number you actually downloaded.
+- **The Pro comparison cards are readable in the default panel width.** In the
+  400px side panel the FREE / PRO badges squeezed each feature description into
+  about 100px, so a one-line explanation wrapped to four lines. The badges now
+  move to their own row on narrow panels.
+
+### 🔄 Changed
+
+- Every screenshot on the store listing is now a real capture of the extension
+  running on a real photo article, instead of a hand-assembled mock-up.
+
+---
+
 ## [1.2.11] — 2026-11-24
 
 ### 🔄 Changed

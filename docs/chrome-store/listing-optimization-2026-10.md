@@ -75,11 +75,13 @@ CWS 搜索结果页（`/search/...`）每个结果项除图标、评分、短描
 
 现在每张都是「真跑一遍、真截两张、并排合成」：
 
-| 文件                                 | 作用                                                               |
-| ------------------------------------ | ------------------------------------------------------------------ |
-| `scripts/take-store-screenshots.mjs` | Playwright 加载 `VITE_E2E` 构建的扩展，逐 shot 操作后合成 1280×800 |
-| `e2e/fixtures/store-demo.html`       | 被截的演示页（虚构摄影手记「Field Notes」，9 张真实照片）          |
-| `scripts/prep-demo-photos.py`        | 把源照片裁成 1.9–2.2:1 并压到 17–100 KB                            |
+| 文件                                                  | 作用                                                               |
+| ----------------------------------------------------- | ------------------------------------------------------------------ |
+| `scripts/take-store-screenshots.mjs`                  | Playwright 加载 `VITE_E2E` 构建的扩展，逐 shot 操作后合成 1280×800 |
+| `e2e/fixtures/store-demo.html`                        | 被截的演示页（虚构摄影手记「Field Notes」，9 张真实照片）          |
+| `e2e/fixtures/store-demo-2.html`、`store-demo-3.html` | 同一站点的另两篇文章，供 multitab 截出三行不同标题                 |
+| `e2e/fixtures/demo/article.css`                       | 三篇文章共用的排版，改版式只改这一处                               |
+| `scripts/prep-demo-photos.py`                         | 把源照片裁成 1.9–2.2:1 并压到 17–100 KB                            |
 
 ```bash
 npm run build:e2e                       # 必须先有 dist/.e2e-build
@@ -95,8 +97,17 @@ node scripts/take-store-screenshots.mjs --shot=batch-select --out=/tmp/x.png
 - 照片裁成 1.9–2.2:1：侧栏缩略框约 2.2:1 且用 `object-fit: contain`，方一点就会在
   两边留出大片白边。
 - 截图前要关掉三样东西：页面高亮遮罩（`rgba(0,0,0,.5)`）、首次使用引导条、toast。
-- `ai-tags` 走真实后端 AI 接口，`VITE_E2E` 构建下不可用，暂不产出；`collection`
-  目前只截到收藏态，收藏弹窗还没有被打开。
+- `ai-tags` 的标签由 `seedStorage` 预置：`VITE_E2E` 构建走不到真实 AI 接口，标签内容
+  必须和照片对得上（fjord / cliffs / water），否则一眼假。
+- `collection` 走真实收藏代码路径点 5 张，再打开收藏弹窗，列表里的计数由组件自己算。
+- `popup` 是独立 600×600 表面。Playwright 无法让 popup 跟随文章 tab，脚本在
+  init script 里包一层 `chrome.tabs.query`，把 active 查询重排到演示文章上，
+  否则 popup 会锁在自己的扩展 tab 上显示 restricted 占位。
+- `dedup` 的重复组是真的：演示站把两张照片以 `?w=600` 变体再出一遍，命中
+  `detectSimilarImages()` 的 URL 归一化阶段。
+- `multitab` 必须先按 tab id 删掉 harness 自己开的扩展 tab；`.tab-url` 已被
+  `truncateUrl(…, 50)` 截断，用文本前缀判断会失败。
+- `reverse-search` 用 `keepCursor` 保留悬停，否则鼠标移开会关掉引擎菜单。
 
 ### 上传位置与顺序（CWS 后台手动操作）
 
@@ -125,8 +136,8 @@ node scripts/take-store-screenshots.mjs --shot=batch-select --out=/tmp/x.png
 不要放 `deepscan-1280.png`：它是 “Deep scanning…” 的进行中状态，截图里放 loading
 会让产品显得慢。
 
-`batch-select` / `filters` 已由新流水线重出；`collection` / `ai-tags` 待补（见上一节
-的两条限制），补完之前第 4、5 位沿用旧图。
+`batch-select` / `filters` / `collection` / `ai-tags` 均已由新流水线重出（2026-11-25），
+5 张可以一次全部替换，不再需要混用旧图。
 
 ### 度量（没有对照就没有结论）
 

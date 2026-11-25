@@ -94,12 +94,13 @@
 
 ---
 
-## 🆕 What's New (v1.2.11)
+## 🆕 What's New (v1.2.12)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
-- 🔄 **Free plan numbers match everywhere now**: 30 images per ZIP batch and 5 free favorites, the same numbers the store listing and pricing page have always shown. If our remote settings were unreachable, the extension used to fall back to 50 and 10.
-- 🗑️ **The September quota experiment is retired**: installs that were capped at 10 images per batch now get the same 30 as everyone else.
+- 🐛 **The batch download toast keeps the right count**: picking 11 images and downloading them used to end with "Downloaded 1"; it now reports the number you actually downloaded.
+- 🐛 **The Pro comparison table fits the default panel**: the FREE / PRO badges used to squeeze each feature description into four lines on a 400px side panel; they now sit on their own row.
+- 🔄 **Store screenshots are real captures now**: the listing shows the extension running on an actual photo article instead of a mock-up.
 
 ---
 
