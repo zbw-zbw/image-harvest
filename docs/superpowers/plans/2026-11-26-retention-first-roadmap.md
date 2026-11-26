@@ -414,7 +414,7 @@ Ratings   6
 
 **1.2.15 的内容已经确定：** `trial_badge`（Task 5）落在 `v1.2.14` tag 之后；tag 之后还有 `e21bf66`（init 预算 135 → 136 kB，两步式评分需要）。两者都会随 1.2.15 发布。**1.2.14 已过审，版本号闸门解除，可以提审 1.2.15。**
 
-**更新（2026-11-26 19:01）：1.2.15 已构建并发布 Release，等人工上传 CWS。** tag `v1.2.15` → commit `c836bb8`；Release workflow 全绿，产出 `image-harvest-v1.2.15.zip`（1.17 MB）。因此：
+**更新（2026-11-26 19:17）：1.2.15 已重打并发布 Release，等人工上传 CWS。** tag `v1.2.15` → commit `1cc4f3b`（原 `c836bb8`；为把 `Batch and bulk image downloader` 写进 manifest 短描述而重打一次，商店短描述无法在 dashboard 单独改）。Release workflow 全绿，产出 `image-harvest-v1.2.15.zip`（1.17 MB），已下载校验包内 `extDesc` = 新文案、124 字符。因此：
 
 - 门槛 3（`trial_badge_shown`）的观测窗口**从 1.2.15 过审上线日起算**，不是从 tag 起算；之前读到的 0 只代表新构建还没到用户手里。
 - 官网 `website/package.json` 已同步到 1.2.15（`b348a50`）。
