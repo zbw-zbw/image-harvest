@@ -110,9 +110,12 @@ describe('decideTrialBadge', () => {
 
 describe('refreshTrialBadge', () => {
   it('sets the badge, records the sentinel, and reports reach', async () => {
-    mockGetLicenseData.mockResolvedValue(license('trial', Date.now() - 2 * DAY));
+    // Pin `now`: daysSinceExpiry is Math.ceil(elapsed / DAY), so letting the
+    // test clock drift even 1 ms past the boundary flips 2 to 3.
+    const expiresAt = Date.now() - 2 * DAY;
+    mockGetLicenseData.mockResolvedValue(license('trial', expiresAt));
 
-    await expect(refreshTrialBadge()).resolves.toBe('set');
+    await expect(refreshTrialBadge(expiresAt + 2 * DAY)).resolves.toBe('set');
 
     expect(setBadgeText).toHaveBeenCalledWith({ text: TRIAL_BADGE_TEXT });
     expect(setBadgeBackgroundColor).toHaveBeenCalledWith({ color: TRIAL_BADGE_COLOR });
