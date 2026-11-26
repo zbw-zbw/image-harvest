@@ -1821,7 +1821,7 @@
     "description": "Extension name shown in the Chrome Web Store and browser UI."
   },
   "extDesc": {
-    "message": "Image downloader that finds every image on a page. Batch save as ZIP, multi-tab extract, AI tags, duplicate detection and more.",
+    "message": "Batch and bulk image downloader. Finds every image on a page, saves as ZIP, multi-tab extract, AI tags, duplicate detection.",
     "description": "Store summary max 132 chars. Fed into manifest description."
   },
   "welcome_demo_title": {

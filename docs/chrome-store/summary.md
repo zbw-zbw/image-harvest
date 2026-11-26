@@ -8,14 +8,16 @@
 ## English (current, 132 chars max)
 
 ```
-Batch download images. Multi-tab extract, AI tagging, Eagle export, similar detection, reverse search, collections, color extract.
+Batch and bulk image downloader. Finds every image on a page, saves as ZIP, multi-tab extract, AI tags, duplicate detection.
 ```
 
-字符数：**131 / 132** ✅
+字符数：**124 / 132** ✅
+
+> 2026-11-26 改动：把 `Batch and bulk image downloader` 提到句首，为「batch image downloader」（当时排第 11）与 bulk 词补足位。上一版以「Image downloader」开头，只含 batch 不含 bulk。
 
 ---
 
-## ⭐ 推荐新稿（随 v1.0.13 更新 manifest description）
+## ⭐ 上一版（v1.0.13 已生效，保留作备选）
 
 ```
 Image downloader that finds every image on a page. Batch save as ZIP, multi-tab extract, AI tags, duplicate detection and more.
