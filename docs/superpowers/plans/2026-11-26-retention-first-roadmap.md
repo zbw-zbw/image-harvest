@@ -101,7 +101,7 @@
 
 **为什么先做：** 现在唯一的"完成率"来自一个只认 Creem 单号的脚本，把 34 条 PayPal 会话整体判为"不可查"。在修好这个口径之前，任何 A/B 都无法判断胜负。
 
-- [ ] **Step 1: 写脚本骨架**
+- [x] **Step 1: 写脚本骨架**
 
 ```ts
 // scripts/pay-attribution.ts
@@ -114,7 +114,7 @@
 
 结构固定为四段输出：`by-provider`、`by-plan`、`unmatched detail`、`attribution health`。
 
-- [ ] **Step 2: 实现三路 join**
+- [x] **Step 2: 实现三路 join**
 
 完成集必须同时取三个来源，缺一不可：
 
@@ -132,7 +132,7 @@ for (const l of licenses) {
 
 PayPal 订单号不是 `I-` 前缀，`isCreemSession` 那套前缀判断必须显式改成按 `props.provider` 优先、前缀兜底。
 
-- [ ] **Step 3: 输出归因健康度**
+- [x] **Step 3: 输出归因健康度**
 
 脚本末尾必须打印这一行，任何后续决策都先看它：
 
@@ -142,19 +142,31 @@ attribution health: licenses with provider id 4/106 (3.8%) — below 50%, comple
 
 阈值写死在脚本里（50%），低于阈值时退出码仍为 0，但会在末尾打印 `⚠` 前缀。
 
-- [ ] **Step 4: 跑通并记录基线**
+- [x] **Step 4: 跑通并记录基线**
 
 Run: `cd image-harvest-backend/website && pnpm exec tsx scripts/pay-attribution.ts 24`
 
-Expected（2026-11-26 实测应输出）：
+Actual（2026-11-26 实跑）：
 
 ```
-creem:  18 created / 1 completed (5.6%)
-paypal: 34 created / 2 completed (5.9%)
-attribution health: licenses with provider id 4/106 (3.8%) ⚠
+checkout_created rows: 52 (distinct sessions 52, duplicates 0, rows without id 0)
+licenses: 106
+
+== Completion by provider ==
+  creem       18 created /   1 completed (5.6%)
+  paypal      34 created /   0 completed (0.0%)
+
+== Completion by plan ==
+  monthly     28 created /   1 completed (3.6%)
+  lifetime    19 created /   0 completed (0.0%)
+  yearly       5 created /   0 completed (0.0%)
+
+⚠ attribution health: 4/106 licenses carry a provider id (3.8%) — below 50%, completion rates are a floor not a fact
 ```
 
-- [ ] **Step 5: 提交**
+**修正一条此前的判断：** PayPal 的 0.0% 不是「PayPal 拦住了所有人」，而是 `licenses.paypal_order_id` 几乎全为空——9 月确实产生了 2 张 lifetime 授权，但它们没有回写单号，所以 join 必然看不见。这坐实了 Task 1 的价值：**旧口径把「查不到」当成了「没成交」**。
+
+- [x] **Step 5: 提交**
 
 ```bash
 cd image-harvest-backend/website
@@ -164,180 +176,111 @@ git commit -m "feat(analytics): unify checkout attribution across creem and payp
 
 **验收：** 脚本一条命令同时给出两个供应商的完成率与归因健康度；不打印任何邮箱、license key、原始 instance id。
 
----
-
-## Task 2：首日激活 —— 让"扫到图"变成"存下图"
-
-**Files:**
-
-- Modify: `sidepanel/components/DownloadNudgeBar.tsx`
-- Modify: `sidepanel/init.ts`
-- Modify: `_locales/*/messages.json`（15 个）
-- Test: `tests/download-nudge.test.tsx`
-
-**基线：** 918 个试用实例扫描成功，只有 408 个下载过（44.4%）。缺口 510 人/月，是全站最大的绝对损失。
-
-- [ ] **Step 1: 先量清楚 nudge 现在触达多少**
-
-Run:
-
-```bash
-cd image-harvest-backend/website
-pnpm exec tsx -e "
-const {getSupabase}=await import('./src/lib/supabase.ts');
-const sb=getSupabase();
-for (const e of ['download_nudge_shown','download_nudge_cta_clicked','download_nudge_dismissed','images_shown','download_single']) {
-  const {count}=await sb.from('telemetry_events').select('*',{count:'exact',head:true}).eq('event',e).gte('received_at','2026-09-01');
-  console.log(e, count);
-}"
-```
-
-Expected: 先拿到四个数字再改代码。若 `download_nudge_shown` 远小于 `images_shown`，说明触发条件太窄——这正是要修的点。
-
-- [ ] **Step 2: 写失败测试（触发条件）**
-
-```tsx
-// tests/download-nudge.test.tsx
-it('shows the nudge on the first scan that returned images but no download', async () => {
-  state.images = Array.from({ length: 12 }, (_, i) => makeImage(i));
-  state.downloadCount = 0;
-  const { findByText } = render(<DownloadNudgeBar />);
-  await findByText(/Save all|Click any image/i);
-});
-```
-
-Run: `npm test -- tests/download-nudge.test.tsx`
-Expected: FAIL（当前实现没有这条触发路径，或条件不满足）
-
-- [ ] **Step 3: 把触发条件收敛成"有图、没下载、首次"**
-
-`DownloadNudgeBar` 的显示条件改为三合一，不再依赖下载计数阈值：
-
-```ts
-const shouldShow = images.length > 0 && downloadCount === 0 && !dismissedThisSession;
-```
-
-- [ ] **Step 4: 文案只讲一个动作**
-
-新增 i18n key（15 个 locale 同步，英文为准）：
-
-```json
-"nudge_first_save": { "message": "Click any image to save it — or save all $COUNT$ at once." }
-```
-
-不写功能列表、不写价格。这一步的目标是让人完成第一次保存，不是卖 Pro。
-
-- [ ] **Step 5: 全量验证并提交**
-
-Run: `npm test -- tests/download-nudge.test.tsx && npm run typecheck && npm run test:i18n`
-Expected: 目标测试 PASS；i18n 23/23；typecheck 无输出。
-
-```bash
-git add sidepanel/components/DownloadNudgeBar.tsx sidepanel/init.ts _locales tests/download-nudge.test.tsx
-git commit -m "feat(activation): prompt the first save on the first scan with results"
-```
-
-**验收（W2 结束读）：** `download_single|download_batch` 实例占比从 44.4%（占扫描者）提升到 ≥62%；`download_nudge_shown` 与 `images_shown` 的比值 ≥ 0.8。
+**完成记录（2026-11-26）：** commit `d51abd9`；`pnpm typecheck` 与 `eslint scripts/pay-attribution.ts` 均干净。同时补交了早前漏提交的官网版本同步 `3e83356`（package.json 1.2.13 → 1.2.14）。
 
 ---
 
-## Task 3：SKU 结构 —— lifetime 提为主力，月付降级
+## Task 2：首日激活 —— 结论：现成方案已在跑，不产出代码
 
-**Files:**
+**状态：前提被证伪（2026-11-26）。** 原假设是「引导条没覆盖到没下载的人」，实测相反。
 
-- Modify: `src/components/pricing-cards.tsx`
-- Modify: `src/app/[locale]/pricing/page.tsx`
-- Modify: `src/messages/en.json`、`src/messages/zh.json`
+**实测：**
 
-**基线：** 5 个付费客户里 4 个买 lifetime；月付活跃 1 个，续费 0。使用形态均值 1.34 天。
+- 511 个「扫描过但从未下载」的试用实例中，**262 个（51.3%）见过引导条**——覆盖不是瓶颈。
+- 见过引导条的实例中 142 个点了 CTA（25.9%）；**点过 CTA 的实例里 116 个（81.7%）后来真的下载了**——点击有效。
+- 每张图卡本身已有独立下载按钮与格式菜单（`ImageCard.tsx`，`card_tooltip_download`）。
+- 引导条 2026-10-13 已上线（`DownloadNudgeBar.tsx` 头注释）；三个月里「扫描者中下载占比」从 29% 只走到 29.5%。
+- 按扫描结果分层：扫到 60+ 张的实例下载率 49%，扫到 6-20 张的只有 16%。
 
-- [ ] **Step 1: 调整卡片顺序与视觉权重**
+**结论：不是发现不了，是不想存。** 剩下 74% 看过 CTA 也不点的人，缺的不是按钮，是「现在就该存」的理由。再加一条提示只会提高打扰率，不会提高下载率。
 
-lifetime 卡放在最左（移动端最上），`data-primary-checkout` 只保留在 lifetime 按钮上；monthly 改为 "or $3.99/month" 的次级样式。
+**因此本 Task 不产出代码。** 若要继续攻这一段，必须先有新假设（例如「用户只想存其中一张」或「存到一半卡在权限/压缩」），并用埋点或访谈验证，而不是先改 UI。
 
-- [ ] **Step 2: 改文案，把"买断"讲成对单次工具的正确答案**
-
-```json
-// src/messages/en.json → Pricing
-"lifetimeBadge": { "message": "Most popular for one-off projects" },
-"lifetimeSub": { "message": "Pay once. No renewal, no expiry." }
-```
-
-中文同步：「一次性买断，适合按项目使用，不续费、不过期。」
-
-- [ ] **Step 3: 价格页加入税费预告（为 Task 4 铺路）**
-
-在价格区下方加一行小字，两种语言：
-
-```json
-"taxNote": { "message": "Prices exclude VAT. Tax is calculated at checkout based on your country." }
-```
-
-- [ ] **Step 4: 验证并提交**
-
-Run: `pnpm typecheck && pnpm lint`
-Expected: 无输出/无错误。
-
-```bash
-git add src/components/pricing-cards.tsx src/app/[locale]/pricing/page.tsx src/messages/en.json src/messages/zh.json
-git commit -m "feat(pricing): make lifetime the primary offer"
-```
-
-**验收（W4 结束读）：** 新产生的付费中 lifetime 占比 ≥ 80%；价格页 → 结账点击率不低于改动前。
+**保留的观察指标：** `download_single|download_batch` 占扫描实例比例（当前 44.4%）。任何后续实验都以此为分母。
 
 ---
 
-## Task 4：结账 —— 同 tab 跳转 + 税费不再突袭
+## Task 3：SKU 结构 —— 已于 2026-11-24 完成
+
+**状态：已完成，无需重做。**
+
+- commit `8127294` `feat(pricing): recommend lifetime instead of yearly`。
+- `pricing-cards.tsx` 的 `HERO_PLAN_ID = "lifetime"`，`pricing_default_plan_v1`（yearly vs monthly）已退役，理由写在源码注释里：月度订阅只贡献过 $3.99 且无续费。
+- 买断与年付的「几个月回本」换算 `breakEvenMonths()` 已存在。
+- 税费提示已存在：`src/messages/en.json:208` 的 `taxNotice`，渲染在 `src/app/[locale]/pricing/page.tsx:267`。
+
+**唯一剩余动作是回读数据**（W4 结束）：新产生的付费中 lifetime 占比 ≥ 80%，价格页 → 结账点击率不低于改动前。不满足再调，不满足之前不再动文案。
+
+---
+
+## Task 4：结账 —— 同 tab 跳转（代码已完成，税费项待人工）
 
 **Files:**
 
-- Modify: `src/lib/purchase.ts`
-- Modify: `src/app/[locale]/pricing/page.tsx`（承接 Task 3 的文案）
+- Modify: `src/lib/purchase.ts`（已完成）
+- Create: `tests/purchase-navigation.test.ts`（已完成）
+- 只读：`src/components/checkout-rescue-card.tsx`（确认救援卡未受影响）
 
 **基线：** 17 条 Creem 弃单中 13 条从未开始填卡；2 条因 GB 增值税 +20% 在支付环节失败。
 
-- [ ] **Step 1: 新开 tab 改成同 tab**
+- [x] **Step 1: 新开 tab 改成同 tab**
 
-`handlePurchase` 里 `window.open("", "_blank")` 的乐观占位是历史包袱（为绕过异步弹窗拦截）。同 tab 跳转不需要手势上下文，直接删掉：
+`window.open("", "_blank")` 的乐观占位是历史包袱（为绕过异步弹窗拦截）。同 tab 跳转不需要手势上下文，占位窗买不到任何东西，已删除。
 
-```ts
-// before: const checkoutWindow = window.open("", "_blank");
-// after: 不开窗，拿到 URL 后 window.location.href = url
-```
-
-`navigateToCheckout` 简化为单一路径，同时删除 `checkoutWindow?.close()`。
-
-- [ ] **Step 2: 保住"回到价格页"的体验**
-
-同 tab 跳转会让返回键回到价格页，但 `PENDING_CHECKOUT_STORAGE_KEY` 的救援卡依赖"另一个 tab 失焦"。改为在 `pagehide` 时写入、在 `pageshow`（`event.persisted`）时读取，确保返回时救援卡仍能出现。
-
-- [ ] **Step 3: 写测试锁住行为**
+实际落地时把「跳转」抽成可注入依赖，而不是直接在函数里写 `window.location`——否则 jsdom 下无法断言：
 
 ```ts
-it('navigates the current tab instead of opening a popup', async () => {
-  const assign = vi.fn();
-  vi.stubGlobal('location', { ...window.location, href: '', assign });
-  await handlePurchase('lifetime', 'one-time', 'en');
-  expect(assign).toHaveBeenCalledWith(expect.stringContaining('creem'));
-});
+export type Navigator = (url: string) => void;
+
+const hardNavigate: Navigator = (url) => window.location.assign(url);
+
+export async function handlePurchase(
+  planId: string,
+  type: 'subscription' | 'one-time',
+  locale?: string,
+  navigate: Navigator = hardNavigate
+): Promise<void>;
 ```
 
-Run: `pnpm test -- purchase`
-Expected: 新增用例 PASS，旧有用例按新行为调整后 PASS。
+同时删除 `navigateToCheckout()`、`checkoutWindow?.close()`，以及 catch 里的收尾逻辑——现在没有打开的窗口需要清理。
 
-- [ ] **Step 4: 在 Creem 后台确认税费展示方式（需人工）**
+- [x] **Step 2: 保住"回到价格页"的救援卡**
 
-登录 Creem Dashboard → 产品价格设置，确认是否支持「价格含税」。若支持，改为含税定价，价格页文案同步改为 `Prices include VAT where applicable.`；若不支持，保留 Task 3 的"税费在结账时计算"预告。
+原计划写的是「改为 `pagehide` 写入、`pageshow` 读取」，实际**不需要**：
+
+- marker 在 `navigate()` 之前就写进 `localStorage`，不依赖任何生命周期事件；
+- `checkout-rescue-card.tsx` 的 `checkReturnVisit` 既挂在 `visibilitychange` 上，也在挂载时用 `requestAnimationFrame` 跑一次。同 tab 返回会重新挂载价格页，首次 rAF 就会读到 marker。
+
+因此该步**未采用计划中的写法**，救援卡行为保持不变，由 Step 3 的 PayPal 用例覆盖（断言 marker 在跳转前写入）。
+
+- [x] **Step 3: 写测试锁住行为**
+
+`tests/purchase-navigation.test.ts`，`// @vitest-environment jsdom`，3 个用例：
+
+| 用例         | 断言                                                                |
+| ------------ | ------------------------------------------------------------------- |
+| Creem 同 tab | `navigate` 收到 `checkoutUrl`；`window.open` 未被调用               |
+| PayPal       | 跳转前写入 `PENDING_CHECKOUT_STORAGE_KEY`，且 `plan === "lifetime"` |
+| 供应商报错   | `rejects.toThrow("boom")` 且 `navigate` 未被调用                    |
+
+Run: `pnpm test`
+Actual: **36 files / 281 tests 全绿**；`pnpm typecheck` 与 `eslint` 干净。
+
+注：`openSpy` 需 `let openSpy: any` + 单行 `eslint-disable`，原因是 `vi.spyOn(window, "open")` 的重载推断不接受窄化的测试替身（沿用扩展仓 rating-prompt 测试的做法）。
+
+- [ ] **Step 4: 在 Creem 后台确认税费展示方式（需人工，唯一未完成项）**
+
+登录 Creem Dashboard → 产品价格设置，确认是否支持「价格含税」。若支持，改为含税定价，价格页文案同步改为 `Prices include taxes where applicable.`；若不支持，保留 Task 3 已有的「税费在结账时计算」预告（`taxNotice`）。
 
 **此项无法由代码完成，做完在计划里打勾并记录结论。**
 
-- [ ] **Step 5: 提交**
+- [x] **Step 5: 提交**
 
-```bash
-git add src/lib/purchase.ts && git commit -m "fix(checkout): navigate in place and warn about tax before checkout"
-```
+**完成记录（2026-11-26）：** commit `64169eb` `fix(checkout): navigate in place instead of a placeholder tab`。
 
 **验收（W4 结束读）：** 新产生的 Creem 会话中 `no_payment_attempt` 占比从 76% 降到 ≤50%；结账完成率从 5.8% 提到 ≥20%。
+
+**已知风险：** 同 tab 跳转意味着用户在托管页点「返回」会结束结账流程（原来是关掉那个空白 tab）。缓解手段是救援卡（回到价格页即弹 `checkout_rescue`），但救援卡本身**不给折扣**，只给「继续结账」。若 W4 数据显示 `checkout_rescued` 触发变多但完成率没涨，说明折扣或邮件挽回才是下一步，而不是继续改跳转方式。
 
 ---
 
