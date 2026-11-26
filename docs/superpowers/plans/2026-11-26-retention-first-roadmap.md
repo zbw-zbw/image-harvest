@@ -406,9 +406,9 @@ Expected: `sentiment=up` 占比与 `up → rate` 转化分开看。硬指标：`
 
 在 CWS 短描述里补 `batch` 与 `bulk`（当前 `batch image downloader` 排名 11，差一位进首屏）。不改标题，只改描述与截图首图文案。
 
-- [ ] **Step 4: 记录到快照文件**
+- [x] **Step 4: 记录到快照文件（§5.4 已写，待过审后补回读）**
 
-Modify: `marketing/snapshots/2026-11-25-pre-listing-refresh.md`，新增 §5.4「1.2.14 生效与评分回读」。
+Modify: `marketing/snapshots/2026-11-25-pre-listing-refresh.md`，新增 §5.4「版本生效核查」+ §6 第 5 条待办。已记录 11-26 实测（1.2.13 / Nov 25 / 6 ratings）与“评分漏斗观察窗口从过审日算起”。
 
 ```bash
 git add marketing/snapshots/2026-11-25-pre-listing-refresh.md
