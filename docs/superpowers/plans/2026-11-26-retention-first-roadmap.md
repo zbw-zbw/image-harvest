@@ -575,6 +575,7 @@ pnpm exec tsx scripts/funnel-baseline.ts
 - ✅ 竞品对比文（`blog/best-image-extractor-chrome`）的价格顺序改为 lifetime 优先。
 - ✅ 对比页（Task 8）原文已是「lifetime 是默认，月/年是备选」，无需改。
 - ✅ 代码路径核对：Creem 与 PayPal 都按 `planId=lifetime` / `type=one-time` 起结账，`purchase.ts` 据此走 PayPal 的 one-time 端点。
+- ✅ 首页 Pro 卡补税费预告（`tComparison('proTaxNote')`）：CTA 改成直接起 lifetime 结账后，§基线证据里那条「GB $49.99 → $59.99」的价格差必须在首页就说清楚，不能只留在定价页。
 - ✅ `scripts/funnel-baseline.ts` 新增 `Checkout plan split`：按 plan 打出 `checkout_started`，零值也打，这是当前唯一可读的 SKU 信号。
 - ⏳ CWS 描述：1.2.14 在审期间不动商店侧，过审后再改。
 - 未改 `TrialExpiredBanner` 的「annual plan is the cheapest way in」：那是到期挽回的刻意选择（年付折算月价最低），不属于本次口径统一。
