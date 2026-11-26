@@ -58,6 +58,16 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ### ✨ Added
 
+### 🔄 Changed
+
+### 🐛 Fixed
+
+---
+
+## [1.2.15] — 2026-11-26
+
+### ✨ Added
+
 - **The toolbar icon tells you when your free trial has ended.** If the trial
   lapses and you have not upgraded, the icon shows a small `!` once, so you
   can find your way back to the panel without remembering to open it. Opening

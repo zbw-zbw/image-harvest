@@ -94,11 +94,11 @@
 
 ---
 
-## 🆕 What's New (v1.2.14)
+## 🆕 What's New (v1.2.15)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
-- 👍 **A lighter review ask**: the rating prompt now starts with a one-click question — "How's Image Harvest working for you?" Answer "Works great" and it takes you to the store review page; answer "Needs work" and it opens the feedback form instead, so we can fix what's wrong. Same trigger (50 saved images), same "Maybe later" / "Don't ask again" controls.
+- 🔔 **The toolbar icon tells you when your trial ends.** If your free trial lapses and you haven't upgraded, the icon shows a small `!` once, so you can find your way back to the panel without remembering to open it. Opening the panel clears it for good.
 
 ---
 
