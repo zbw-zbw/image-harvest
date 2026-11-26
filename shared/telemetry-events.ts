@@ -99,6 +99,10 @@ export const EVENTS = {
   // the funnel can tell a first nudge from a last one.
   TRIAL_WEEKLY_WINBACK_SHOWN: 'trial_weekly_winback_shown', // props: { week: number, count: number }
   TRIAL_WEEKLY_WINBACK_CTA_CLICKED: 'trial_weekly_winback_cta_clicked', // props: { week: number, count: number }
+  // Toolbar badge lit after expiry (2026-11-26). Fires once per install, from
+  // the service worker, so it measures reach of the only surface that does
+  // not require the panel to be open.
+  TRIAL_BADGE_SHOWN: 'trial_badge_shown', // props: { daysSinceExpiry: number }
 
   // Welcome page (Phase 2)
   WELCOME_PAGE_VIEWED: 'welcome_page_viewed', // props: { source: string }
@@ -269,6 +273,7 @@ export const EVENT_PROP_SCHEMAS: Record<TelemetryEventName, readonly string[]> =
   [EVENTS.TRIAL_ENDED_NOTICE_CTA_CLICKED]: ['daysSinceExpiry', 'count', 'abBucket'],
   [EVENTS.TRIAL_WEEKLY_WINBACK_SHOWN]: ['week', 'count', 'abBucket'],
   [EVENTS.TRIAL_WEEKLY_WINBACK_CTA_CLICKED]: ['week', 'count', 'abBucket'],
+  [EVENTS.TRIAL_BADGE_SHOWN]: ['daysSinceExpiry', 'abBucket'],
 
   [EVENTS.WELCOME_PAGE_VIEWED]: ['source'],
   [EVENTS.WELCOME_CTA_CLICKED]: ['action'],

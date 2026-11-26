@@ -26,6 +26,7 @@ import { getBrowserFamily } from '../shared/browser-family';
 
 import { uiPorts, sidePanelOpenedTabs, getAccessibleTabId, broadcastToPopup } from './utils';
 import { initLicenseAlarm } from './license';
+import { refreshTrialBadge } from './trial-badge';
 import { initDisplayMode, initTabActivationListener } from './display-mode';
 import {
   getImagesFromTab,
@@ -55,6 +56,12 @@ import { syncRemoteConfig, getRemoteConfig } from '../shared/remote-config';
 
 initLicenseAlarm();
 initAutoTrialAlarm();
+// SW startup is the only moment an install that never triggers the 24h alarm
+// (or a user returning after the alarm was cleared) gets reconciled. Cheap:
+// one storage read and, after the first light, a noop.
+void refreshTrialBadge().catch(() => {
+  /* badge is additive — never let it break boot */
+});
 
 // ── Remote Config ───────────────────────────────────────────────────────────
 // Restore cached config into memory on SW startup, then refresh in background.
@@ -796,6 +803,9 @@ async function handleMessage(
           // Fire-and-forget: idempotent trial_expired reporting (sentinel
           // inside). Must not block the response the sidepanel waits on.
           void reportTrialExpiryIfNeeded();
+          // Expiry day itself is first observed here when the panel asks for
+          // status — light the badge without waiting for the 24h alarm.
+          void refreshTrialBadge();
           sendResponse(proStatus);
         } catch (error) {
           sendResponse({ isPro: false, error: (error as Error).message });

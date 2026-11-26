@@ -29,6 +29,12 @@ vi.mock('../shared/trial', () => ({
   reportTrialExpiryIfNeeded: vi.fn(() => Promise.resolve(false)),
 }));
 
+// The expiry badge lives in the service worker too; mock it so this suite
+// stays about the alarm wiring (its own rules are covered by trial-badge.test).
+vi.mock('../background/trial-badge', () => ({
+  refreshTrialBadge: vi.fn(() => Promise.resolve('noop')),
+}));
+
 interface AlarmsStub {
   get: ReturnType<typeof vi.fn>;
   create: ReturnType<typeof vi.fn>;
@@ -59,6 +65,7 @@ const { initLicenseAlarm } = await import('../background/license');
 const { uiPorts } = await import('../background/utils');
 const sharedLicense = await import('../shared/license');
 const sharedTrial = await import('../shared/trial');
+const trialBadge = await import('../background/trial-badge');
 
 interface BroadcastCapture {
   type: string;
@@ -156,6 +163,7 @@ describe('initLicenseAlarm — onAlarm callback', () => {
     // Other onAlarm cases in this file also trigger the call — clear the
     // shared mock record so this assertion is about THIS alarm fire only.
     vi.mocked(sharedTrial.reportTrialExpiryIfNeeded).mockClear();
+    vi.mocked(trialBadge.refreshTrialBadge).mockClear();
 
     initLicenseAlarm();
     const onAlarm = chromeStub.alarms.onAlarm.addListener.mock.calls[0][0] as (
@@ -165,6 +173,9 @@ describe('initLicenseAlarm — onAlarm callback', () => {
     await onAlarm({ name: 'license-periodic-check', scheduledTime: Date.now() });
 
     expect(sharedTrial.reportTrialExpiryIfNeeded).toHaveBeenCalledTimes(1);
+    // The badge is the panel-free expiry channel, so it must be reconciled on
+    // the same tick as trial_expired.
+    expect(trialBadge.refreshTrialBadge).toHaveBeenCalledTimes(1);
   });
 
   it('broadcasts full ProUserInfo (plan + status) when the check returns a pro user', async () => {

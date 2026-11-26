@@ -2,6 +2,7 @@
 import { MESSAGE_TYPES, LICENSE_CHECK_INTERVAL } from '../shared/constants';
 import { periodicLicenseCheck } from '../shared/license';
 import { reportTrialExpiryIfNeeded } from '../shared/trial';
+import { refreshTrialBadge } from './trial-badge';
 import { broadcastToPopup } from './utils';
 
 const LICENSE_ALARM_NAME = 'license-periodic-check';
@@ -23,6 +24,9 @@ export function initLicenseAlarm(): void {
     // VALIDATE_LICENSE handler so the event lands on expiry day even when
     // the 24h alarm is still hours away.
     await reportTrialExpiryIfNeeded();
+    // The badge is the only expiry surface that does not need the panel open;
+    // reconcile it on the same tick the 24h check runs.
+    await refreshTrialBadge();
     // `periodicLicenseCheck` may return either { isPro: false } or full ProUserInfo.
     // Forward whatever fields exist; `plan`/`status` may be undefined for the
     // never-licensed case, which is fine for the broadcast payload.
