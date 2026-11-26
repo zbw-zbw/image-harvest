@@ -575,10 +575,17 @@ pnpm exec tsx scripts/funnel-baseline.ts
 - ✅ 竞品对比文（`blog/best-image-extractor-chrome`）的价格顺序改为 lifetime 优先。
 - ✅ 对比页（Task 8）原文已是「lifetime 是默认，月/年是备选」，无需改。
 - ✅ 代码路径核对：Creem 与 PayPal 都按 `planId=lifetime` / `type=one-time` 起结账，`purchase.ts` 据此走 PayPal 的 one-time 端点。
+- ✅ `scripts/funnel-baseline.ts` 新增 `Checkout plan split`：按 plan 打出 `checkout_started`，零值也打，这是当前唯一可读的 SKU 信号。
 - ⏳ CWS 描述：1.2.14 在审期间不动商店侧，过审后再改。
 - 未改 `TrialExpiredBanner` 的「annual plan is the cheapest way in」：那是到期挽回的刻意选择（年付折算月价最低），不属于本次口径统一。
 
-判据：`pricing_viewed → checkout_created`（口径修好后才有意义）。上线后 14 天读。
+**判据（2026-11-26 修正口径）：**
+
+原句写的 `pricing_viewed → checkout_created` 跨两套 instance id：官网事件用 web id，`checkout_created` 用服务端 hash，这个比率算不出来。同源可读的是 `pricing_viewed → checkout_started`，两者都在 `PricingPageTracker` / `PurchaseButton` 里用同一个 web id。
+
+**改前基线（30 天）：** `pricing_viewed` 60 → `checkout_started` 8 次 / 7 个实例（12%）；**8 次全部是 `monthly`，`lifetime` 0 次**，且 8 次都发生在 11-24 之前——那时 lifetime 还不是默认 SKU。11-24（默认 lifetime）起 15 次浏览、0 次结账。
+
+**因此判据只看二值信号：** 上线 30 天后 `lifetime` 的 `checkout_started` 是否 > 0。日流量约 5 次定价页浏览，比率在这个样本上没有意义；「lifetime 从 0 变成非 0」才证明首页那张卡真的把一次性付费卖出去了。若 30 天仍为 0，问题在 offer 本身（价格/定位），不在文案，不再继续改页面文字。
 
 **Task 14：团队版触发条件（只登记，不实现）**
 
