@@ -527,6 +527,21 @@
   "rating_rate_now": {
     "message": "Bewertung schreiben"
   },
+  "rating_sentiment_desc": {
+    "message": "Du hast bisher {count} Bilder gespeichert. Funktioniert Image Harvest gut für dich?"
+  },
+  "rating_thumbs_up": {
+    "message": "Funktioniert super"
+  },
+  "rating_thumbs_down": {
+    "message": "Geht so"
+  },
+  "rating_step2_title": {
+    "message": "Freut uns, dass es klappt!"
+  },
+  "rating_step2_desc": {
+    "message": "Magst du eine kurze Bewertung schreiben? Sie hilft anderen, uns zu finden — dauert etwa 30 Sekunden."
+  },
   "winback_message": {
     "message": "Sie haben {count} Bilder mit Image Harvest gespeichert. Pro stellt das komplette Toolkit wieder her — unbegrenzte Batch-ZIPs, Tiefenscans und mehr."
   },

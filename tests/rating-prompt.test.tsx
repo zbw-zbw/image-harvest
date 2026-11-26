@@ -172,6 +172,7 @@ import {
   RatingPromptModal,
   CHROME_STORE_REVIEW_URL,
 } from '../sidepanel/components/RatingPromptModal';
+import { UNINSTALL_FEEDBACK_URL } from '../shared/constants';
 import * as ratingState from '../shared/rating-prompt-state';
 import { state } from '../sidepanel/state';
 import { track } from '../shared/telemetry';
@@ -242,6 +243,8 @@ describe('<RatingPromptModal/>', () => {
     vi.spyOn(ratingState, 'markRatingPromptShown').mockResolvedValue();
     const markResolved = vi.spyOn(ratingState, 'markRatingPromptResolved').mockResolvedValue();
     const { findByText } = render(<RatingPromptModal />);
+    // Two-step flow: the store ask only appears after the sentiment gate.
+    fireEvent.click(await findByText('Works great'));
     const btn = await findByText('Write a review');
     fireEvent.click(btn);
     expect(openSpy).toHaveBeenCalledWith(CHROME_STORE_REVIEW_URL, '_blank', 'noopener,noreferrer');
@@ -266,10 +269,46 @@ describe('<RatingPromptModal/>', () => {
     vi.spyOn(ratingState, 'markRatingPromptShown').mockResolvedValue();
     const markResolved = vi.spyOn(ratingState, 'markRatingPromptResolved').mockResolvedValue();
     const { findByText } = render(<RatingPromptModal />);
+    fireEvent.click(await findByText('Works great'));
     const btn = await findByText("Don't ask again");
     fireEvent.click(btn);
     expect(markResolved).toHaveBeenCalledTimes(1);
     expect(openSpy).not.toHaveBeenCalled();
+  });
+
+  // ── Two-step sentiment gate (2026-11-26) ────────────────────────────
+
+  it('step 1 shows the sentiment gate, not the store ask', async () => {
+    vi.spyOn(ratingState, 'shouldShowRatingPrompt').mockResolvedValue(true);
+    vi.spyOn(ratingState, 'markRatingPromptShown').mockResolvedValue();
+    const { findByText, queryByText } = render(<RatingPromptModal />);
+    await findByText('Works great');
+    expect(queryByText('Write a review')).toBeNull();
+    expect(queryByText("Don't ask again")).toBeNull();
+  });
+
+  it('thumbs-up emits sentiment=up and advances to the store ask', async () => {
+    vi.spyOn(ratingState, 'shouldShowRatingPrompt').mockResolvedValue(true);
+    vi.spyOn(ratingState, 'markRatingPromptShown').mockResolvedValue();
+    const { findByText } = render(<RatingPromptModal />);
+    fireEvent.click(await findByText('Works great'));
+    expect(mockTrack).toHaveBeenCalledWith('rating_prompt_sentiment', { sentiment: 'up' });
+    await findByText('Write a review');
+    expect(openSpy).not.toHaveBeenCalled();
+  });
+
+  it('thumbs-down emits sentiment=down, opens the feedback form and cools down (NOT resolved)', async () => {
+    vi.spyOn(ratingState, 'shouldShowRatingPrompt').mockResolvedValue(true);
+    vi.spyOn(ratingState, 'markRatingPromptShown').mockResolvedValue();
+    const markDismissed = vi.spyOn(ratingState, 'markRatingPromptDismissed').mockResolvedValue();
+    const markResolved = vi.spyOn(ratingState, 'markRatingPromptResolved').mockResolvedValue();
+    const { findByText, container } = render(<RatingPromptModal />);
+    fireEvent.click(await findByText('Needs work'));
+    expect(mockTrack).toHaveBeenCalledWith('rating_prompt_sentiment', { sentiment: 'down' });
+    expect(openSpy).toHaveBeenCalledWith(UNINSTALL_FEEDBACK_URL, '_blank', 'noopener,noreferrer');
+    expect(markDismissed).toHaveBeenCalledTimes(1);
+    expect(markResolved).not.toHaveBeenCalled();
+    expect(container.querySelector('#rating-prompt-modal')).toBeNull();
   });
 
   // ── Telemetry + delight-moment re-check (growth B2) ──────────────────
@@ -301,15 +340,18 @@ describe('<RatingPromptModal/>', () => {
   });
 
   it.each([
-    ['Write a review', 'rate'],
-    ['Maybe later', 'later'],
-    ["Don't ask again", 'never'],
-  ])('emits rating_prompt_cta action=%s', async (label, action) => {
+    ['Write a review', 'rate', true],
+    ['Maybe later', 'later', false],
+    ["Don't ask again", 'never', true],
+  ])('emits rating_prompt_cta action=%s', async (label, action, needsGate) => {
     vi.spyOn(ratingState, 'shouldShowRatingPrompt').mockResolvedValue(true);
     vi.spyOn(ratingState, 'markRatingPromptShown').mockResolvedValue();
     vi.spyOn(ratingState, 'markRatingPromptResolved').mockResolvedValue();
     vi.spyOn(ratingState, 'markRatingPromptDismissed').mockResolvedValue();
     const { findByText } = render(<RatingPromptModal />);
+    // Store-step CTAs only exist after the sentiment gate; "Maybe later"
+    // is available on step 1 already.
+    if (needsGate) fireEvent.click(await findByText('Works great'));
     fireEvent.click(await findByText(label as string));
     expect(mockTrack).toHaveBeenCalledWith('rating_prompt_cta', { action });
   });

@@ -639,6 +639,21 @@
   "rating_rate_now": {
     "message": "Escribir una reseña"
   },
+  "rating_sentiment_desc": {
+    "message": "Has guardado {count} imágenes hasta ahora. ¿Image Harvest te está funcionando bien?"
+  },
+  "rating_thumbs_up": {
+    "message": "Funciona genial"
+  },
+  "rating_thumbs_down": {
+    "message": "Mejorable"
+  },
+  "rating_step2_title": {
+    "message": "¡Nos alegra que funcione!"
+  },
+  "rating_step2_desc": {
+    "message": "¿Te animas a dejar una reseña rápida? Ayuda a que otros nos encuentren: unos 30 segundos."
+  },
   "winback_message": {
     "message": "Has guardado {count} imágenes con Image Harvest. Pro restaura el kit de herramientas completo: ZIP por lotes ilimitados, análisis profundos y más."
   },

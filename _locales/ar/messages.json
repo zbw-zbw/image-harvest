@@ -527,6 +527,21 @@
   "rating_rate_now": {
     "message": "اكتب تقييمًا"
   },
+  "rating_sentiment_desc": {
+    "message": "لقد حفظت {count} صورة حتى الآن. هل يقوم Image Harvest بعمله على أكمل وجه؟"
+  },
+  "rating_thumbs_up": {
+    "message": "يعمل بشكل رائع"
+  },
+  "rating_thumbs_down": {
+    "message": "يحتاج تحسينًا"
+  },
+  "rating_step2_title": {
+    "message": "سعداء لأنه يعمل معك!"
+  },
+  "rating_step2_desc": {
+    "message": "هل تمانع في كتابة تقييم سريع؟ سيساعد الآخرين في العثور علينا — يستغرق نحو 30 ثانية."
+  },
   "winback_message": {
     "message": "لقد حفظت {count} صورة باستخدام Image Harvest. يستعيد Pro مجموعة الأدوات الكاملة — ملفات ZIP دفعية غير محدودة، فحصًا عميقًا، والمزيد."
   },

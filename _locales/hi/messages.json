@@ -527,6 +527,21 @@
   "rating_rate_now": {
     "message": "समीक्षा लिखें"
   },
+  "rating_sentiment_desc": {
+    "message": "आपने अब तक {count} इमेज सेव की हैं। क्या Image Harvest आपके लिए ठीक काम कर रहा है?"
+  },
+  "rating_thumbs_up": {
+    "message": "बहुत बढ़िया"
+  },
+  "rating_thumbs_down": {
+    "message": "ठीक नहीं"
+  },
+  "rating_step2_title": {
+    "message": "खुशी हुई कि यह काम आया!"
+  },
+  "rating_step2_desc": {
+    "message": "एक छोटा रिव्यू लिखेंगे? इससे दूसरों को हमें खोजने में मदद मिलती है — करीब 30 सेकंड लगते हैं।"
+  },
   "winback_message": {
     "message": "आपने Image Harvest के साथ {count} इमेज सेव की हैं। Pro पूरा टूलकिट वापस लाता है — असीमित बैच ZIP, डीप स्कैन और भी बहुत कुछ।"
   },

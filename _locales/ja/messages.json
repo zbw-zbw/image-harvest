@@ -638,6 +638,21 @@
   "rating_rate_now": {
     "message": "レビューを書く"
   },
+  "rating_sentiment_desc": {
+    "message": "これまでに {count} 枚の画像を保存しました。Image Harvest は役に立っていますか？"
+  },
+  "rating_thumbs_up": {
+    "message": "使いやすい"
+  },
+  "rating_thumbs_down": {
+    "message": "いまいち"
+  },
+  "rating_step2_title": {
+    "message": "お役に立てて嬉しいです！"
+  },
+  "rating_step2_desc": {
+    "message": "30秒ほどでレビューを書いてみませんか？あなたのレビューが他の方の発見につながります。"
+  },
   "winback_message": {
     "message": "Image Harvest で {count} 枚の画像を保存しました。Pro に戻れば、無制限のバッチ ZIP、ディープスキャンなど、フルツールキットが使えます。"
   },

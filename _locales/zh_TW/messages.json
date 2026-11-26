@@ -638,6 +638,21 @@
   "rating_rate_now": {
     "message": "寫個評價"
   },
+  "rating_sentiment_desc": {
+    "message": "你已經儲存了 {count} 張圖片。Image Harvest 用著順手嗎？"
+  },
+  "rating_thumbs_up": {
+    "message": "很好用"
+  },
+  "rating_thumbs_down": {
+    "message": "不太行"
+  },
+  "rating_step2_title": {
+    "message": "很高興幫到你！"
+  },
+  "rating_step2_desc": {
+    "message": "願意花 30 秒寫個評價嗎？你的評價能幫更多人發現我們。"
+  },
   "winback_message": {
     "message": "你已用 Image Harvest 保存了 {count} 張圖片。Pro 可恢復完整工具箱——無限批次 ZIP、深度掃描等。"
   },

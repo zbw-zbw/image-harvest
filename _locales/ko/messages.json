@@ -455,6 +455,21 @@
   "rating_rate_now": {
     "message": "리뷰 쓰기"
   },
+  "rating_sentiment_desc": {
+    "message": "지금까지 {count}개의 이미지를 저장했어요. Image Harvest, 쓸 만한가요?"
+  },
+  "rating_thumbs_up": {
+    "message": "아주 좋아요"
+  },
+  "rating_thumbs_down": {
+    "message": "아쉬워요"
+  },
+  "rating_step2_title": {
+    "message": "도움이 되었다니 기뻐요!"
+  },
+  "rating_step2_desc": {
+    "message": "30초면 리뷰를 남길 수 있어요. 여러분의 리뷰가 다른 사용자에게 큰 힘이 됩니다."
+  },
   "winback_message": {
     "message": "Image Harvest로 {count}개의 이미지를 저장하셨습니다. Pro로 돌아오시면 무제한 배치 ZIP, 딥 스캔 등 모든 도구를 다시 사용하실 수 있습니다."
   },

@@ -462,6 +462,21 @@
   "rating_rate_now": {
     "message": "Write a review"
   },
+  "rating_sentiment_desc": {
+    "message": "You've saved {count} images so far. Is Image Harvest doing its job?"
+  },
+  "rating_thumbs_up": {
+    "message": "Works great"
+  },
+  "rating_thumbs_down": {
+    "message": "Needs work"
+  },
+  "rating_step2_title": {
+    "message": "Glad it's working!"
+  },
+  "rating_step2_desc": {
+    "message": "Mind leaving a quick review? It helps others find us — takes about 30 seconds."
+  },
   "winback_message": {
     "message": "You've saved {count} images with Image Harvest. Pro restores the full toolkit — unlimited batch ZIPs, deep scans, and more."
   },

@@ -139,6 +139,10 @@ export const EVENTS = {
   // than the legacy mount-time check.
   RATING_PROMPT_SHOWN: 'rating_prompt_shown', // props: { trigger: 'mount' | 'download' }
   RATING_PROMPT_CTA: 'rating_prompt_cta', // props: { action: 'rate' | 'later' | 'never' }
+  // Two-step prompt (2026-11-26): step 1 sentiment gate. 90d funnel showed
+  // 62% "later" on the direct store ask; 👍 advances to the store CTA,
+  // 👎 opens the feedback form instead of the store.
+  RATING_PROMPT_SENTIMENT: 'rating_prompt_sentiment', // props: { sentiment: 'up' | 'down' }
 
   // Batch operations (Round 2)
   BATCH_FAVORITE: 'batch_favorite',
@@ -293,6 +297,7 @@ export const EVENT_PROP_SCHEMAS: Record<TelemetryEventName, readonly string[]> =
 
   [EVENTS.RATING_PROMPT_SHOWN]: ['trigger'], // trigger: "mount" | "download"
   [EVENTS.RATING_PROMPT_CTA]: ['action'], // action: "rate" | "later" | "never"
+  [EVENTS.RATING_PROMPT_SENTIMENT]: ['sentiment'], // sentiment: "up" | "down"
 
   [EVENTS.BATCH_FAVORITE]: ['count'],
   [EVENTS.BATCH_AI_TAG]: ['count'],

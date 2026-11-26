@@ -527,6 +527,21 @@
   "rating_rate_now": {
     "message": "Написать отзыв"
   },
+  "rating_sentiment_desc": {
+    "message": "Вы уже сохранили {count} изображений. Image Harvest хорошо справляется?"
+  },
+  "rating_thumbs_up": {
+    "message": "Отлично работает"
+  },
+  "rating_thumbs_down": {
+    "message": "Так себе"
+  },
+  "rating_step2_title": {
+    "message": "Рады, что всё работает!"
+  },
+  "rating_step2_desc": {
+    "message": "Оставите короткий отзыв? Он поможет другим найти нас — это около 30 секунд."
+  },
   "winback_message": {
     "message": "Вы сохранили {count} изображений с помощью Image Harvest. Pro возвращает полный набор инструментов — неограниченные ZIP-пакеты, глубокое сканирование и многое другое."
   },

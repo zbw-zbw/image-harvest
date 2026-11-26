@@ -1462,6 +1462,18 @@
   width: 100%;
 }
 
+/* Sentiment gate buttons (step 1): icon + label on one line. */
+.rating-prompt-thumb {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.rating-prompt-thumb svg {
+  flex-shrink: 0;
+}
+
 .rating-prompt-never {
   /* Subdued tertiary action — visually de-emphasized but still clickable.
      We don't use display:none because users who really don't want the

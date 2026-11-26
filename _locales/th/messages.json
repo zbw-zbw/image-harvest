@@ -527,6 +527,21 @@
   "rating_rate_now": {
     "message": "เขียนรีวิว"
   },
+  "rating_sentiment_desc": {
+    "message": "คุณบันทึกภาพไปแล้ว {count} รูป Image Harvest ใช้งานได้ดีไหม?"
+  },
+  "rating_thumbs_up": {
+    "message": "ใช้งานดีมาก"
+  },
+  "rating_thumbs_down": {
+    "message": "ยังไม่ใช่"
+  },
+  "rating_step2_title": {
+    "message": "ดีใจที่ช่วยคุณได้!"
+  },
+  "rating_step2_desc": {
+    "message": "ช่วยเขียนรีวิวสั้น ๆ ได้ไหม? รีวิวของคุณช่วยให้คนอื่นค้นพบเรา ใช้เวลาประมาณ 30 วินาที"
+  },
   "winback_message": {
     "message": "คุณบันทึกรูปภาพไปแล้ว {count} รูปด้วย Image Harvest Pro จะคืนค่าชุดเครื่องมือครบทุกอย่าง — ZIP แบบแบตช์ไม่จำกัด สแกนเชิงลึก และอื่นๆ"
   },

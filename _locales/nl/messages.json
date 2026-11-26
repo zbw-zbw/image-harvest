@@ -527,6 +527,21 @@
   "rating_rate_now": {
     "message": "Beoordeling schrijven"
   },
+  "rating_sentiment_desc": {
+    "message": "Je hebt tot nu toe {count} afbeeldingen opgeslagen. Doet Image Harvest zijn werk goed?"
+  },
+  "rating_thumbs_up": {
+    "message": "Werkt geweldig"
+  },
+  "rating_thumbs_down": {
+    "message": "Kan beter"
+  },
+  "rating_step2_title": {
+    "message": "Fijn dat het werkt!"
+  },
+  "rating_step2_desc": {
+    "message": "Wil je een korte review achterlaten? Die helpt anderen ons te vinden — duurt ongeveer 30 seconden."
+  },
   "winback_message": {
     "message": "Je hebt {count} afbeeldingen opgeslagen met Image Harvest. Pro herstelt de volledige toolkit — onbeperkte batch-ZIP's, diepe scans en meer."
   },
