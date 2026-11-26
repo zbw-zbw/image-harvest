@@ -284,61 +284,68 @@ Actual: **36 files / 281 tests 全绿**；`pnpm typecheck` 与 `eslint` 干净�
 
 ---
 
-## Task 5：到期触达 —— 用工具栏 badge 替代打不开的面板
+## Task 5：到期触达 —— 工具栏 badge（已完成）
 
 **Files:**
 
-- Create: `background/trial-badge.ts`
-- Modify: `background/index.ts`
-- Modify: `background/license.ts`
-- Modify: `_locales/*/messages.json`（15 个）
-- Test: `tests/trial-badge.test.ts`
+- Create: `background/trial-badge.ts`（已完成）
+- Create: `tests/trial-badge.test.ts`（已完成）
+- Modify: `background/index.ts`、`background/license.ts`（已完成）
+- Modify: `shared/telemetry-events.ts` + 官网 `src/lib/telemetry-schema.ts`（已完成，新增 `trial_badge_shown`）
+- 不需要改：`_locales/*/messages.json`（badge 文本是 `!`，没有可翻译文案）
 
 **基线：** 992 个到期里，面板内的到期提示只触达 3 个。badge 不需要新权限（manifest 已无 `notifications`），是唯一零成本、非侵入的回归通道。
 
-- [ ] **Step 1: 写失败测试**
+- [x] **Step 1: 写失败测试**
+
+`tests/trial-badge.test.ts`，10 个用例，先红后绿。覆盖两组契约：
+
+- `decideTrialBadge` 纯函数矩阵：到期未亮 → `set`；已亮 → `noop`；试用中 → `noop`；已付费且亮过 → `clear`；已付费未亮 → `noop`。
+- `refreshTrialBadge` 的 IO 行为：点亮时写 sentinel + 上报 `trial_badge_shown`；第二次调用不重复点亮；active trial 不碰 badge；升级 lifetime 后清空。
+
+- [x] **Step 2: 实现幂等 badge**
 
 ```ts
-// tests/trial-badge.test.ts
-it('sets a badge once when the trial has expired and a paid license is absent', async () => {
-  const setBadgeText = vi.fn().mockResolvedValue(undefined);
-  globalThis.chrome = { action: { setBadgeText, setBadgeBackgroundColor: vi.fn() } } as any;
-  await syncTrialBadge({ trialExpired: true, hasPaidLicense: false, alreadyShown: false });
-  expect(setBadgeText).toHaveBeenCalledWith({ text: '!' });
-});
-```
-
-Run: `npm test -- tests/trial-badge.test.ts`
-Expected: FAIL（模块不存在）
-
-- [ ] **Step 2: 实现幂等 badge**
-
-```ts
-// background/trial-badge.ts
-// 到期后点亮一次，打开面板即清除。用 storage 记录已提示，避免每次 SW 唤醒都写。
-export async function syncTrialBadge(input: {
-  trialExpired: boolean;
-  hasPaidLicense: boolean;
-  alreadyShown: boolean;
-}): Promise<'set' | 'clear' | 'noop'> {
-  /* ... */
+export function decideTrialBadge(input: TrialBadgeInput): TrialBadgeAction {
+  if (input.hasPaidLicense) return input.alreadyLit ? 'clear' : 'noop';
+  if (!input.trialExpired || input.alreadyLit) return 'noop';
+  return 'set';
 }
+
+export async function refreshTrialBadge(now = Date.now()): Promise<TrialBadgeAction>;
 ```
 
-规则只有三条：到期且未付费且未提示过 → `!`（背景 `#2a8323`）；已付费或试用中 → 清空；已提示过 → 不动。
+确定的三条规则：
 
-- [ ] **Step 3: 接到 license 状态变化与 SW 启动两个入口**
+| 状态                         | 动作                                              |
+| ---------------------------- | ------------------------------------------------- |
+| 试用到期 + 无付费 + 从未点亮 | `!`（背景 `#2a8323`）+ 写 `_trial_badge_shown_at` |
+| 已点亮过（不论面板是否清过） | `noop`，不跟面板的清理抢                          |
+| 已付费                       | 亮过则清空，未亮过则 `noop`                       |
 
-`background/index.ts` 的 `onStartup` 与 license 校验回调里各调一次 `syncTrialBadge`；面板打开时（`sidepanel/init.ts` 已有的 `setBadgeText({text:''})`）顺带写入"已提示"。
+**与计划的一处关键差异：** 原计划写「已付费或试用中 → 清空」。实际不能清——全局 badge 槽位同时被 `onInstalled` 的安装引导（`1`）占用，SW 启动时无条件清空会直接把安装引导抹掉。因此只有**本模块点亮过**的 badge 才会被清，其余分支一律 `noop`。
 
-- [ ] **Step 4: 提交**
+- [x] **Step 3: 接到三个入口**
 
-```bash
-git add background/trial-badge.ts background/index.ts background/license.ts tests/trial-badge.test.ts
-git commit -m "feat(retention): surface trial expiry in the toolbar badge"
-```
+| 入口               | 位置                                                       | 理由                                       |
+| ------------------ | ---------------------------------------------------------- | ------------------------------------------ |
+| SW 启动            | `background/index.ts` `initLicenseAlarm()` 之后            | 冷启动/浏览器重启用，覆盖错过 alarm 的安装 |
+| 24h license alarm  | `background/license.ts` `reportTrialExpiryIfNeeded()` 之后 | 与服务端校验同拍                           |
+| `VALIDATE_LICENSE` | `background/index.ts` 消息处理                             | 到期当天首次被观察到的位置（面板问状态）   |
 
-**验收（W4 结束读）：** 到期 cohort 中 badge 点亮人数 / 到期人数 ≥ 60%；点亮后 7 天内重新打开面板的比例 ≥ 25%。
+面板打开时不需要新增代码：`sidepanel/init.ts` 本来就无条件 `setBadgeText({ text: '' })`，sentinel 保证下一次 wake 不会重新点亮。
+
+- [x] **Step 4: 提交**
+
+**完成记录（2026-11-26）：**
+
+- 扩展仓 `463ff45` `feat(retention): light a one-shot toolbar badge when the trial expires`。
+- 官网仓 `8b915cb` `feat(telemetry): accept the trial badge reach event`（parity 测试 2/2 通过）。
+- `npm test` **81 files / 1,854 tests 全绿**；`npm run typecheck` 与 eslint 干净；`npm run build` + `npm run size` 三项预算均通过（sidepanel 135.36/136 kB、background 10.00/12 kB、content 11.49/14 kB）。
+
+**验收（W4 结束读）：** 到期 cohort 中 `trial_badge_shown` 人数 / `trial_expired` 人数 ≥ 60%；点亮后 7 天内重新打开面板的比例 ≥ 25%。
+
+**已知风险：** 对 9 月之前就已到期、且一直留在免费档的老安装，下一次 SW 启动会补点一次 badge（sentinel 为空）。这是一次性补触达，不是循环打扰；但如果 W4 看到 `daysSinceExpiry` 集中在 30+ 的那一批占比过高，说明补触达拉高了分母，应该把「超过 30 天不再点亮」写成规则而不是继续累计。
 
 ---
 
