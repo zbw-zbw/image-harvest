@@ -425,13 +425,32 @@ git commit -m "docs(marketing): record 1.2.14 rollout and rating funnel readback
 
 ## Task 7：12-10 复核与推广 go/no-go
 
-- [ ] **Step 1: 固定口径重跑三个脚本**
+- [ ] **Step 1: 固定口径重跑四个脚本**
 
 ```bash
 cd image-harvest-backend/website
-pnpm exec tsx scripts/pay-attribution.ts 24
+pnpm exec tsx scripts/go-no-go.ts          # 三个可计数的门槛，分母写死在脚本里
+pnpm exec tsx scripts/pay-attribution.ts 24 # 第四个门槛：结账完成率
 pnpm exec tsx scripts/rating-funnel.ts
 pnpm exec tsx scripts/funnel-baseline.ts
+```
+
+> `go-no-go.ts`（2026-11-26 新增）把三个门槛的分母固定下来，避免 12-10 当天手拼：
+>
+> - lifetime 占比 = `licenses` 中 `status=active` 按 `plan` 分组，lifetime 数 / active 总数
+> - 试用付费转化 = `trials` 中 `converted_at` 非空的行数 / `trials` 全表行数
+> - badge 触达 = `trial_badge_shown` 去重实例数 / `trial_expired` 去重实例数（两个事件在 `shared/trial.ts` 与 `background/trial-badge.ts` 各带一次性 sentinel，每实例最多一次，所以去重实例是正确的分子分母）
+>
+> 第四个门槛不重算：`pay-attribution.ts` 的供应商归因 join 写在 `main()` 内，没有导出函数，为了一个读数去重构一个已验证的脚本不划算，脚本里直接打印它的命令。
+>
+> **无数据一律 `UNTESTED`，不打 `0%`。** `trial_badge_shown` 只有 1.2.15 起才存在，读到 0 意味着这个构建还没到用户手里，不是「没人看到」。
+
+**11-26 预演读数（脚本实跑，不是 12-10 结论）：**
+
+```
+lifetime share of active paid  80.00% (4/5)    >= 80%   PASS
+trial -> paid (all-time)       0.12% (3/2524)  >= 0.40% FAIL
+trial badge reach              0.00% (0/960)   >= 60%   UNTESTED
 ```
 
 - [ ] **Step 2: 只看四个数**
@@ -449,6 +468,8 @@ pnpm exec tsx scripts/funnel-baseline.ts
 
 四个门槛里 ≥3 个达标 → 允许开始 X/Reddit 的 build in public（每周 2 条，只讲数据与实现细节，不投广告）。
 <2 个达标 → 不推广，把 W5-W8 全部投在回访者减负与单次工具的商业化上。
+
+> **恰好 2 个达标是计划未定义的灰区**（2026-11-26 发现）。原文只写了 ≥3 与 <2 两端，`go-no-go.ts` 会把这句话原样打出来。当天遇到 2 个时必须显式写下走哪一端并给出理由，不要四舍五入成 3。
 
 **若 12-10 时 1.2.14 仍未过审：** 依赖新版才生效的三个指标（lifetime 占比、付费转化、badge 触达）全部视为「未测」，不参与计数。决策顺延到过审后 14 天，口径不变——不因为发版延期而调低门槛，也不拿旧版本的数据冒充新版本的结果。
 
