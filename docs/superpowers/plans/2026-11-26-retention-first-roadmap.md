@@ -4,7 +4,7 @@
 
 **Goal:** 把「2,520 个试用 → 3 个付费（0.12%）」拆成四个可独立验证的环节，用四周依次修复首日激活、付费触发、结账完成、商店分发，并在 12-10 用固定口径决定是否投入付费推广。
 
-**Architecture:** 先修口径再修产品。所有改动以生产 Supabase 遥测为唯一事实源；每个 Task 自带"改动前基线 → 改动 → 验收指标"，禁止在没有基线的环节上动手。扩展侧改动按版本批次发布（W2 末 v1.2.15、W4 末 v1.2.16），官网侧改动随 push 即时生效。
+**Architecture:** 先修口径再修产品。所有改动以生产 Supabase 遥测为唯一事实源；每个 Task 自带"改动前基线 → 改动 → 验收指标"，禁止在没有基线的环节上动手。扩展侧改动按版本批次发布（当前仓库 1.2.14 尚未上传商店，`trial_badge` 建议随 1.2.14 一起审），官网侧改动随 push 即时生效。
 
 **Tech Stack:** Chrome MV3 扩展（TypeScript / Vite / Preact / Vitest）、Next.js 16 官网（pnpm / Supabase / Creem + PayPal）、Telemetry（`telemetry_events` 表）。
 
@@ -16,6 +16,20 @@
 
 - 扩展仓：`image-harvest/`（下文未加前缀的路径均相对此仓）
 - 官网仓：`image-harvest-backend/website/`（用 **pnpm**）
+
+**进度（2026-11-26 更新）：**
+
+| Task | 内容                      | 状态                                       |
+| ---- | ------------------------- | ------------------------------------------ |
+| 1    | 统一结账归因口径          | ✅ `d51abd9`                               |
+| 2    | 首日激活                  | ⛔ 前提被证伪，不产出代码                  |
+| 3    | SKU 结构（lifetime 主推） | ✅ 早于本计划已完成 `8127294`              |
+| 4    | 同 tab 结账               | ✅ `64169eb`；税费确认待人工               |
+| 5    | 到期 toolbar badge        | ✅ `463ff45` + 官网 `8b915cb`              |
+| 6    | 商店分发                  | ⏳ 1.2.14 未上传（人工），评分回读从此起算 |
+| 7    | 12-10 复核与 go/no-go     | ⏳ 等数据                                  |
+
+> 代码可完成的部分到 Task 5 为止。Task 6/7 分别卡在“人工上传商店”与“时间窗口”，不应为了推进而提前宣布达标。
 
 ---
 
@@ -71,28 +85,26 @@
 
 **Website（`image-harvest-backend/website/`）：**
 
-- Create: `scripts/pay-attribution.ts` — 统一 Creem + PayPal 的结账归因，替代只看 Creem 的旧脚本
-- Modify: `src/lib/purchase.ts` — 结账改为同 tab 跳转
-- Modify: `src/components/pricing-cards.tsx` — lifetime 提为主 CTA，月付降级
-- Modify: `src/app/[locale]/pricing/page.tsx` — 价格页加入税费说明与 SKU 排序
-- Modify: `src/messages/en.json` / `src/messages/zh.json` — 新增税费与 SKU 文案
-- Modify: `src/components/pro-purchase-button.tsx` — 透传 `plan` 到结账（若需要）
+- Create: `scripts/pay-attribution.ts` — 统一 Creem + PayPal 的结账归因 ✅
+- Modify: `src/lib/purchase.ts` — 结账改为同 tab 跳转 ✅
+- Create: `tests/purchase-navigation.test.ts` — 锁住同 tab + PayPal marker ✅
+- Modify: `src/lib/telemetry-schema.ts` — 新增 `trial_badge_shown` 白名单 ✅
+- Modify: `src/components/pricing-cards.tsx` — lifetime 主 CTA（早于本计划已完成）
+- Modify: `src/app/[locale]/pricing/page.tsx` / `src/messages/*.json` — 税费预告（已存在）
 
 **Extension（`image-harvest/`）：**
 
-- Modify: `sidepanel/init.ts` — 首扫后的一句话引导（激活）+ badge 清理
-- Modify: `sidepanel/components/DownloadNudgeBar.tsx` — 提前到"扫到图但未下载"时出现
-- Modify: `sidepanel/components/ProUpgradeModal.tsx` — CTA 顺序按 lifetime 优先
-- Modify: `shared/constants.ts` — pricing URL 增加 `plan=lifetime` 默认
-- Modify: `background/index.ts` — 到期后设置工具栏 badge（零新权限）
-- Modify: `background/license.ts` — 暴露到期状态给 badge 判定
-- Create: `background/trial-badge.ts` — badge 文案/配色与去重
-- Modify: `_locales/*/messages.json`（15 个）— 新增 badge 与激活引导文案
-- Test: `tests/trial-badge.test.ts`、`tests/download-nudge.test.tsx`
+- Create: `background/trial-badge.ts` — 到期 badge 的决策表与一次性点亮 ✅
+- Modify: `background/index.ts` — SW 启动 + `VALIDATE_LICENSE` 两个入口 ✅
+- Modify: `background/license.ts` — 24h alarm 同拍 reconcile ✅
+- Modify: `shared/telemetry-events.ts` — `trial_badge_shown` + prop schema ✅
+- Create: `tests/trial-badge.test.ts`（10 例）✅
+- Modify: `CHANGELOG.md` — Unreleased 补用户可读说明 ✅
+- 不做：`DownloadNudgeBar` / `ProUpgradeModal` / `shared/constants.ts` / `_locales/*`——实测前提不成立或已有实现，理由见 Task 2、Task 3
 
 ---
 
-## Task 1：结账归因口径统一（立即执行）
+## Task 1：结账归因口径统一（已完成）
 
 **Files:**
 
@@ -353,18 +365,36 @@ export async function refreshTrialBadge(now = Date.now()): Promise<TrialBadgeAct
 
 **Files:**
 
-- Modify: `scripts/*`（不新增；复用 `marketing/snapshots/`）
+- Modify: `marketing/snapshots/2026-11-25-pre-listing-refresh.md`（官网仓）
 - 只读：CWS 公开页、`rating_prompt_sentiment` 事件
 
-- [ ] **Step 1: 核查公开页是否已切到 1.2.14**
+- [x] **Step 1: 核查公开页版本（已完成，结论：未上线）**
 
 ```bash
-curl -s "https://chromewebstore.google.com/detail/image-harvest/<id>?cb=$RANDOM" | grep -o "Version[^<]*" | head -3
+/usr/bin/curl -sL -A "Mozilla/5.0 …Chrome/131" \
+  "https://chromewebstore.google.com/detail/iecgnjidmogebokcfnejncgnelcepffo?cb=$RANDOM" \
+  | grep -o 'QDHp8e">Version</div><div>[^<]*'
 ```
 
-Expected: 出现 `1.2.14`。若仍是 `1.2.13` 且 `Updated` 未变，说明审核未通过或未上线，**不得**对外宣称已发布。
+注：裸 URL 会返回 301，必须 `-L`；Extension ID 是 `iecgnjidmogebokcfnejncgnelcepffo`（直接拼 slug 不生效）。
 
-- [ ] **Step 2: 两步式评分的转化回读（12-03 之后）**
+Actual（2026-11-26 15:30）：
+
+```
+Version   1.2.13
+Updated   November 25, 2026
+Ratings   6
+```
+
+**含义：1.2.14 还没提交。** 仓库今天 14:21 才打出 `v1.2.14`（两步式评分），`docs/edge-store/submission-checklist.md` 写明「提交队列：无，下一次发版从 1.2.14 起」。所以：
+
+- 两步式评分目前**零触达**，Step 2 的 12-03 回读前提不成立；
+- 本 Task 后续三步全部依赖一次人工上传 + 审核，不在代码范围内；
+- 对外**不得**宣称 1.2.14 已发布。
+
+**建议的发布组合：** 把本次的 `trial_badge`（Task 5）与两步式评分一起放进 1.2.14 一并上传——前者需要一次审核窗口才能到达用户，拖到 1.2.15 等于把到期挽回再往后推一个版本。版本号不需要再动（仓库已是 1.2.14，CHANGELOG 已记录）。
+
+- [ ] **Step 2: 两步式评分的转化回读（上传过审后 7 天）**
 
 ```bash
 cd image-harvest-backend/website && pnpm exec tsx scripts/rating-funnel.ts
@@ -372,7 +402,7 @@ cd image-harvest-backend/website && pnpm exec tsx scripts/rating-funnel.ts
 
 Expected: `sentiment=up` 占比与 `up → rate` 转化分开看。硬指标：`up → rate` ≥ 25%（旧路径直接问时 rate 只有 4%）。
 
-- [ ] **Step 3: 标题/简介加入主搜索词**
+- [ ] **Step 3: 标题/简介加入主搜索词（人工，商店后台）**
 
 在 CWS 短描述里补 `batch` 与 `bulk`（当前 `batch image downloader` 排名 11，差一位进首屏）。不改标题，只改描述与截图首图文案。
 
