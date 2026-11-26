@@ -578,7 +578,8 @@ pnpm exec tsx scripts/funnel-baseline.ts
 - ✅ 首页 Pro 卡补税费预告（`tComparison('proTaxNote')`）：CTA 改成直接起 lifetime 结账后，§基线证据里那条「GB $49.99 → $59.99」的价格差必须在首页就说清楚，不能只留在定价页。
 - ✅ `scripts/funnel-baseline.ts` 新增 `Checkout plan split`：按 plan 打出 `checkout_started`，零值也打，这是当前唯一可读的 SKU 信号。
 - ⏳ CWS 描述：1.2.14 在审期间不动商店侧，过审后再改。
-- 未改 `TrialExpiredBanner` 的「annual plan is the cheapest way in」：那是到期挽回的刻意选择（年付折算月价最低），不属于本次口径统一。
+- 未改 `TrialExpiredBanner` 的「annual plan is the cheapest way in」：那是到期挽回的刻意选择（年付折算月价最低），不属于本次口径统一。扩展侧 `TrialValueMomentBanner` 用同一个年付锚点（`$29.99/yr = $2.49/mo`），理由相同，且它在 1.2.14 在审包里，本轮不动。
+- 扩展侧无 SKU 预设：`ProUpgradeModal` / `TrialGraceBanner` / `TrialValueMomentBanner` 全部调 `pricingPageUrl(trigger, feature, count)`，不带 plan，默认选中由定价页的 `HERO_PLAN_ID` 决定，已经一致。
 
 **判据（2026-11-26 修正口径）：**
 
