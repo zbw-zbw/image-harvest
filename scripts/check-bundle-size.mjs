@@ -65,7 +65,11 @@ const BUDGETS = {
   // flow (START_DEEP_SCAN round-trip, daily-quota gate, scan-progress overlay,
   // cancel handling, wall + settings surfaces) pushes init to ~127.44 kB gzip.
   // User-facing feature work, accepted — 7.56 kB headroom left.
-  'init.js': { gzipKb: 135, label: 'sidepanel main' },
+  // Bumped 135 → 136 kB for v1.2.14 two-step rating prompt: the sentiment gate
+  // (step-1 markup + two thumb SVG icons) pushes init to ~135.37 kB gzip.
+  // Conversion work backed by the 90d funnel (62% "later" on the direct ask),
+  // accepted — 0.63 kB headroom left.
+  'init.js': { gzipKb: 136, label: 'sidepanel main' },
   // Background service worker entry. Currently ~5.6 kB gzip.
   'index.ts.js': { gzipKb: 12, label: 'background SW' },
   // Content script entry. Currently ~7.7 kB gzip.
