@@ -437,30 +437,39 @@ pnpm exec tsx scripts/funnel-baseline.ts
 
 > `go-no-go.ts`（2026-11-26 新增）把三个门槛的分母固定下来，避免 12-10 当天手拼：
 >
-> - lifetime 占比 = `licenses` 中 `status=active` 按 `plan` 分组，lifetime 数 / active 总数
+> - lifetime 占比 = **11-24 之后创建且带支付渠道单号**的 `licenses` 中 lifetime 数 / 总数（促销赠送不计）；全部 active 的 4/5 只作上下文，不作门槛
 > - 试用付费转化 = `trials` 中 `converted_at` 非空的行数 / `trials` 全表行数
 > - badge 触达 = `trial_badge_shown` 去重实例数 / `trial_expired` 去重实例数（两个事件在 `shared/trial.ts` 与 `background/trial-badge.ts` 各带一次性 sentinel，每实例最多一次，所以去重实例是正确的分子分母）
 >
 > 第四个门槛不重算：`pay-attribution.ts` 的供应商归因 join 写在 `main()` 内，没有导出函数，为了一个读数去重构一个已验证的脚本不划算，脚本里直接打印它的命令。
 >
 > **无数据一律 `UNTESTED`，不打 `0%`。** `trial_badge_shown` 只有 1.2.15 起才存在，读到 0 意味着这个构建还没到用户手里，不是「没人看到」。
+>
+> **lifetime 门槛的口径在 2026-11-26 修正过一次。** 原写法用全部 active 授权作分母，读到 4/5 = 80%
+> PASS；但查 `licenses.created_at` 后发现这 5 单全部创建于 11-24 之前（最近一单是 11-12 的 monthly），
+> 切换默认 SKU 之后新增付费为 **0**。这个 80% 描述的是旧 SKU 结构，不是用户在新默认下的选择，所以门槛改为只数切换后的新付费，
+> 零单即 `UNTESTED`。
 
 **11-26 预演读数（脚本实跑，不是 12-10 结论）：**
 
 ```
-lifetime share of active paid  80.00% (4/5)    >= 80%   PASS
-trial -> paid (all-time)       0.12% (3/2524)  >= 0.40% FAIL
-trial badge reach              0.00% (0/960)   >= 60%   UNTESTED
+lifetime share of new paid  — (0/0)                 >= 80%       UNTESTED
+trial -> paid (all-time)    0.12% (3/2524)          >= 0.40%     FAIL
+trial badge reach           0.00% (0/960)           >= 60%       UNTESTED
+
+context, not a gate: all-time active paid 80.00% (4/5) lifetime, but the gate above only counts
+licenses created on/after 2026-11-24.
+computed gates: 1/3 measured, 0 pass · plus the completion gate
 ```
 
 - [ ] **Step 2: 只看四个数**
 
-| 指标              | 11-26 基线 | 12-10 门槛 | 未达标的处理                                   |
-| ----------------- | ---------- | ---------- | ---------------------------------------------- |
-| lifetime 占新付费 | 4/5 = 80%  | ≥80%       | 检查 Task 3 是否随新版到达用户；未到达则先发版 |
-| 试用付费转化      | 0.12%      | ≥0.4%      | 检查 Task 3/4 是否上线；未上线则先上线再读     |
-| 结账完成率        | 5.8%       | ≥20%       | 回看 Creem 弃单拆解，找新的失败节点            |
-| 到期 badge 触达   | —          | ≥60%       | 检查 SW 唤醒时机，而非文案                     |
+| 指标              | 11-26 基线                                             | 12-10 门槛 | 未达标的处理                                   |
+| ----------------- | ------------------------------------------------------ | ---------- | ---------------------------------------------- |
+| lifetime 占新付费 | 0 单（11-24 起）→ 未测；全量 active 4/5 均为切换前购买 | ≥80%       | 检查 Task 3 是否随新版到达用户；未到达则先发版 |
+| 试用付费转化      | 0.12%                                                  | ≥0.4%      | 检查 Task 3/4 是否上线；未上线则先上线再读     |
+| 结账完成率        | 5.8%                                                   | ≥20%       | 回看 Creem 弃单拆解，找新的失败节点            |
+| 到期 badge 触达   | —                                                      | ≥60%       | 检查 SW 唤醒时机，而非文案                     |
 
 > 「扫描者中下载占比」（44.4%）已从门槛降为观察项：Task 2 证明覆盖不是瓶颈，这一段也没有对应改动，把它当门槛等于考核一个没人动过的数。
 
