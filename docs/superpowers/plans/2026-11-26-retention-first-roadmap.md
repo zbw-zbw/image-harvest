@@ -28,7 +28,8 @@
 | 5    | 到期 toolbar badge        | ✅ `463ff45` + 官网 `8b915cb`                |
 | 6    | 商店分发                  | ⏳ 1.2.14 已提审（人工），评分回读从过审日算 |
 | 7    | 12-10 复核与 go/no-go     | ⏳ 等数据                                    |
-| 8-14 | 长期路线 W5-W12           | ⏳ 见 §长期路线，发版闸门解除后起算          |
+| 8    | LLM 可见性（W5）          | ✅ 官网 `4009fbd`                            |
+| 9-14 | 长期路线 W6-W12           | ⏳ Task 9 卡在过审，Task 10 可开工           |
 
 > 代码可完成的部分到 Task 5 为止。Task 6/7 分别卡在“人工提审”与“时间窗口”，不应为了推进而提前宣布达标。
 >
@@ -480,15 +481,49 @@ pnpm exec tsx scripts/funnel-baseline.ts
 
 这一层不依赖扩展审核，可以立刻开工。
 
-**Task 8：LLM 可见性**
+**Task 8：LLM 可见性（已完成 2026-11-26）**
 
 理由：商店排名受用户量差 3 个数量级的结构性压制（`image downloader` 第 100 名），短期改不动；但 chatgpt.com 已经是官网第一大外部来源（106 次/月），LLM 引用不看 store ranking，看内容结构。
 
-- Create: `public/llms.txt` — 一句话定位 + 三个对比页入口 + 免费/付费边界
-- Create: `src/app/[locale]/compare/[slug]/page.tsx` — 3 个对比页（vs Image Downloader / Imageye / ImageAssistant），每页含结构化 FAQ + `SoftwareApplication` JSON-LD
-- Modify: `src/app/sitemap.ts`
+**Files：**
 
-判据（W6 末）：chatgpt.com referral 106 → ≥200/月；至少 1 个对比页被外部 LLM 抓取（Vercel 日志里的 referrer/UA）。
+- Create: `public/llms.txt` ✅
+- Create: `src/lib/compare-data.ts` ✅ — 3 家竞品的双语数据 + 品类工作流表
+- Create: `src/app/[locale]/compare/page.tsx` ✅
+- Create: `src/app/[locale]/compare/[slug]/page.tsx` ✅
+- Modify: `src/app/sitemap.ts` ✅ — `/compare` + 3 个 slug
+- Create: `tests/compare-data.test.ts` ✅（5 例）
+
+- [x] **Step 1: 先立两条不臆造的规则**
+
+写在 `compare-data.ts` 文件头，后续加页面时不会忘：
+
+1. 竞品数字是 **2026-11-25 商店实抓的快照**，页面上必须带采集日期。评分会漂，过期数字比没有数字更糟。
+2. 工作流表描述的是**品类的常见实现**，不写「某竞品做不到」——没有逐个审过对方的每个构建版本，断言别人的缺口就是猜。
+
+商店链接一律用**搜索词**而不是猜 32 位 extension id：猜错是 404，搜索总能落地。
+
+- [x] **Step 2: 页面用平铺 FAQ，不用折叠**
+
+`FaqJsonLd` + `<h3>/<p>` 直接铺在 HTML 里。折叠面板里的答案在部分抓取路径中不计入，而这批页面的唯一目的就是被抓取和引用。
+
+- [x] **Step 3: 验证（本地 3111 实跑）**
+
+| 检查                                          | 结果                                                      |
+| --------------------------------------------- | --------------------------------------------------------- |
+| `pnpm typecheck` / `eslint`                   | 干净                                                      |
+| `pnpm test`                                   | **37 files / 286 tests**（新增 5 例）                     |
+| `pnpm build`                                  | 成功，3 个 slug × en/zh 全部生成                          |
+| `/compare`、3 个详情页、`/zh/compare/imageye` | 全部 200                                                  |
+| `/llms.txt`、`/sitemap.xml`                   | 200，sitemap 含 3 个对比页 + hreflang                     |
+| canonical / hreflang                          | `x-default` / `en` / `zh` 三组正确                        |
+| JSON-LD                                       | `FAQPage` + `BreadcrumbList` + 全局 `SoftwareApplication` |
+
+- [x] **Step 4: 提交**
+
+官网仓 `4009fbd` `feat(seo): add comparison pages and llms.txt for assistant discovery`。
+
+**判据（W6 末读）：** chatgpt.com referral 106 → ≥200/月；至少 1 个对比页被外部 LLM 抓取（Vercel 日志里的 referrer/UA）。**判据没到之前不加新的对比页**——先把这 3 个页面的引用跑出来，再决定要不要扩到 Fiktu 等第 4、5 家。
 
 **Task 9：评分观察（零代码）**
 
