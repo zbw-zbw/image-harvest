@@ -35,6 +35,12 @@
 >
 > **发版闸门：** 1.2.14 在审期间不提 1.2.15。CWS 同一 item 只允许一个待审提交，提新版必须先 Cancel review，审核从头计时（官方口径，每 publisher 每天最多取消 6 次）。1.2.14 出结果当天再决定 1.2.15 的内容；若结果是拒绝，则按拒因决定「原样重提 1.2.14」还是「修复并入 1.2.15」。
 
+**官网部署（2026-11-26 18:40 CST）：** 官网仓 7 个待推送提交（`8b915cb`..`3751c07`）已推送，Vercel 构建完成。生产核对：`/pricing` 标题为「$49.99 once, no subscription」、`/zh/pricing` 为「$49.99 终身买断，无需订阅」、首页 CTA 为「Get lifetime access」且带税费预告、`/llms.txt` 与 `/compare` 均 200。
+
+> 部署前的一切官网事件读数都不包含这些改动：Task 8 与 Task 13 的观测窗口从此次部署起算，之前的数据只能当「改前基线」。
+>
+> **依赖顺序：** `trial_badge_shown` 的服务端白名单必须先于 1.2.15 到达生产——遥测入口对未知事件是硬丢弃（`if (!isKnownEvent(e.event)) continue`）。本次部署已先落地，1.2.15 上线即可计数；若反过来（扩展先到、官网未部署），门槛 3 会一直是 0 且看不出原因。
+
 ---
 
 ## 基线证据（2026-11-26 实测）
@@ -356,7 +362,7 @@ export async function refreshTrialBadge(now = Date.now()): Promise<TrialBadgeAct
 **完成记录（2026-11-26）：**
 
 - 扩展仓 `463ff45` `feat(retention): light a one-shot toolbar badge when the trial expires`。
-- 官网仓 `8b915cb` `feat(telemetry): accept the trial badge reach event`（parity 测试 2/2 通过）。
+- 官网仓 `8b915cb` `feat(telemetry): accept the trial badge reach event`（parity 测试 2/2 通过；2026-11-26 18:40 已随官网部署到达生产）。
 - `npm test` **81 files / 1,854 tests 全绿**；`npm run typecheck` 与 eslint 干净；`npm run build` + `npm run size` 三项预算均通过（sidepanel 135.36/136 kB、background 10.00/12 kB、content 11.49/14 kB）。
 
 **验收（W4 结束读）：** 到期 cohort 中 `trial_badge_shown` 人数 / `trial_expired` 人数 ≥ 60%；点亮后 7 天内重新打开面板的比例 ≥ 25%。
@@ -607,6 +613,7 @@ computed gates: 1/3 measured, 0 pass · plus the completion gate
 - ✅ 代码路径核对：Creem 与 PayPal 都按 `planId=lifetime` / `type=one-time` 起结账，`purchase.ts` 据此走 PayPal 的 one-time 端点。
 - ✅ 首页 Pro 卡补税费预告（`tComparison('proTaxNote')`）：CTA 改成直接起 lifetime 结账后，§基线证据里那条「GB $49.99 → $59.99」的价格差必须在首页就说清楚，不能只留在定价页。
 - ✅ `scripts/funnel-baseline.ts` 新增 `Checkout plan split`：按 plan 打出 `checkout_started`，零值也打，这是当前唯一可读的 SKU 信号。
+- ✅ 已部署（2026-11-26 18:40 CST）：生产 `/pricing`、`/zh/pricing`、首页 Pro 卡均已是一次性付费口径，判据的 30 天观察窗口从部署当天起算。
 - ⏳ CWS 描述：1.2.14 在审期间不动商店侧，过审后再改。
 - 未改 `TrialExpiredBanner` 的「annual plan is the cheapest way in」：那是到期挽回的刻意选择（年付折算月价最低），不属于本次口径统一。扩展侧 `TrialValueMomentBanner` 用同一个年付锚点（`$29.99/yr = $2.49/mo`），理由相同，且它在 1.2.14 在审包里，本轮不动。
 - 扩展侧无 SKU 预设：`ProUpgradeModal` / `TrialGraceBanner` / `TrialValueMomentBanner` 全部调 `pricingPageUrl(trigger, feature, count)`，不带 plan，默认选中由定价页的 `HERO_PLAN_ID` 决定，已经一致。
