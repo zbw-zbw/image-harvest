@@ -58,6 +58,19 @@ HOW TO ADD A NEW RELEASE ENTRY
 
 ---
 
+## [1.2.14] — 2026-11-26
+
+### 🔄 Changed
+
+- **The review request starts with a simpler question.** Instead of jumping
+  straight to "write a store review", the prompt now asks how Image Harvest
+  is working for you: "Works great" leads to the review page, while "Needs
+  work" opens the feedback form so we can fix what's wrong. The trigger
+  (50 saved images) and the "Maybe later" / "Don't ask again" controls are
+  unchanged.
+
+---
+
 ## [1.2.13] — 2026-11-25
 
 ### 🔄 Changed

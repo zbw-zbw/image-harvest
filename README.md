@@ -94,12 +94,11 @@
 
 ---
 
-## 🆕 What's New (v1.2.13)
+## 🆕 What's New (v1.2.14)
 
 > The fast-changing summary that lives at the top so you don't have to scroll to [CHANGELOG.md](./CHANGELOG.md).
 
-- 📐 **A wider panel puts the extra width to work**: two layouts still assumed the default 400px width. List thumbnails stayed a fixed 160px strip, so at 600px each photo floated in about 120px of empty space on both sides, and the collection modal fell back to a single column with a small thumbnail stranded in the middle. Thumbnails now fill the card, and the collection grid shows two columns.
-- 🔄 **The store listing now shows the real panel**: the first screenshot pairs the actual side panel with a short headline instead of an abstract graphic, and both promo tiles use the same brand gradient. What you see in the store is what the extension looks like.
+- 👍 **A lighter review ask**: the rating prompt now starts with a one-click question — "How's Image Harvest working for you?" Answer "Works great" and it takes you to the store review page; answer "Needs work" and it opens the feedback form instead, so we can fix what's wrong. Same trigger (50 saved images), same "Maybe later" / "Don't ask again" controls.
 
 ---
 
@@ -459,7 +458,7 @@ The marketing site for Image Harvest (landing page, pricing, FAQ, license activa
 
 See [CHANGELOG.md](./CHANGELOG.md) for the full release history.
 
-**Latest**: `v1.2.1` — ✨ Trial value-moment banner (50+ image batch downloads), 🌐 Now also on Microsoft Edge Add-ons. See [CHANGELOG.md](./CHANGELOG.md) for the full list.
+**Latest**: `v1.2.14` — 👍 Two-step review prompt: a quick thumbs up/down before the store ask; "Needs work" opens the feedback form instead. See [CHANGELOG.md](./CHANGELOG.md) for the full list.
 
 ---
 
