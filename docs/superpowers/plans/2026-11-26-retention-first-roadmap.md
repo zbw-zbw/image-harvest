@@ -29,7 +29,7 @@
 | 6    | 商店分发                  | ⏳ 1.2.14 已提审（人工），评分回读从过审日算 |
 | 7    | 12-10 复核与 go/no-go     | ⏳ 等数据                                    |
 | 8    | LLM 可见性（W5）          | ✅ 官网 `4009fbd`                            |
-| 9-14 | 长期路线 W6-W12           | ⏳ Task 9 等过审；Task 10/11 已证伪（见下）  |
+| 9-14 | 长期路线 W6-W12           | ⏳ Task 9 等过审；10/11 已证伪；13 已完成    |
 
 > 代码可完成的部分到 Task 5 为止。Task 6/7 分别卡在“人工提审”与“时间窗口”，不应为了推进而提前宣布达标。
 >
@@ -565,14 +565,20 @@ pnpm exec tsx scripts/funnel-baseline.ts
 
 ### W11-W12（01-22 → 02-04）：商业化层，只做表达
 
-**Task 13：单次工具的表达统一**
+**Task 13：单次工具的表达统一（2026-11-26 完成，官网侧）**
 
 不做定价 A/B：付费样本 5 个，任何价格实验都是噪音。
 
-- Modify: `src/app/[locale]/pricing/page.tsx`、CWS 描述、对比页 — 统一「one-time, no subscription」
-- 人工检查 Creem 与 PayPal 的 lifetime 都是默认选中
+- ✅ 首页 Pro 卡（`src/app/[locale]/page.tsx`）改报 lifetime：`$99.99 → $49.99 one-time`，CTA 从 `monthly / subscription` 改为 `lifetime / one-time`。改前首页主 CTA 与定价页默认 SKU 相反。
+- ✅ 定价页标题/描述/OG/subtitle 全部以「one-time, no subscription」开头（`pricing/page.tsx` + `messages/{en,zh}.json`）。`subtitle` 用 `{lifetimePrice}` 插值，跟随 `feature_limits` 的可配置价，不写死数字。
+- ✅ 分享卡（`pricing/opengraph-image.tsx`）从 `Pro from $2.49/month` 改为 `Pro once $49.99`，highlights 把 lifetime 置顶。
+- ✅ 竞品对比文（`blog/best-image-extractor-chrome`）的价格顺序改为 lifetime 优先。
+- ✅ 对比页（Task 8）原文已是「lifetime 是默认，月/年是备选」，无需改。
+- ✅ 代码路径核对：Creem 与 PayPal 都按 `planId=lifetime` / `type=one-time` 起结账，`purchase.ts` 据此走 PayPal 的 one-time 端点。
+- ⏳ CWS 描述：1.2.14 在审期间不动商店侧，过审后再改。
+- 未改 `TrialExpiredBanner` 的「annual plan is the cheapest way in」：那是到期挽回的刻意选择（年付折算月价最低），不属于本次口径统一。
 
-判据：`pricing_viewed → checkout_created`（口径修好后才有意义）。
+判据：`pricing_viewed → checkout_created`（口径修好后才有意义）。上线后 14 天读。
 
 **Task 14：团队版触发条件（只登记，不实现）**
 
