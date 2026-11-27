@@ -136,7 +136,12 @@ jobs:
 
   e2e:
     name: E2E (Playwright)
-    runs-on: ubuntu-latest
+    # `ubuntu-latest` now resolves to ubuntu26.04-x64, and Playwright 1.60.0
+    # refuses to install Chromium there:
+    #   Error: Playwright does not support chromium on ubuntu26.04-x64
+    # That failed every push in ~1s from 2026-11-23 on. Pin the last image
+    # Playwright supports; drop the pin once it ships 26.04 support.
+    runs-on: ubuntu-24.04
     needs: build
     steps:
       - uses: actions/checkout@v4
@@ -169,31 +174,17 @@ jobs:
       # the whole pipeline red even though the browser downloaded fine. The
       # ubuntu-latest image already ships the shared libraries Chromium needs
       # in practice, so the deps step is best-effort and time-boxed.
-      # A cache restored half-written, or saved by a different Playwright
-      # build, makes `install` bail out in about a second — that is what
-      # reddened every push from 2026-11-23 on (exit 1, no download time).
-      # Wiping the cache alone did not fix it, so the failure is surfaced as
-      # a job annotation: annotations stay readable in the public API even
-      # when the step log is not, which is what we need to diagnose it.
+      # A browser download or install failure here used to be invisible: the
+      # step log needs auth, so the job just said "exit code 1". Emit the
+      # stderr as an annotation — annotations stay readable in the public
+      # API — instead of repeating that investigation.
       - name: Install Playwright browser
         run: |
-          PKG="$(node -p "require('@playwright/test/package.json').version" 2>&1)"
-          BIN="$(ls node_modules/.bin/playwright 2>&1 || true)"
-          CACHE="$(ls -1 ~/.cache/ms-playwright 2>&1 | tr '\n' ',' || true)"
-          echo "pkg=$PKG"
-          echo "bin=$BIN"
-          echo "cache=$CACHE"
           if ! OUT="$(npx playwright install chromium 2>&1)"; then
             echo "$OUT"
             FLAT="$(printf '%s' "$OUT" | tr '\n' '|' | cut -c1-600)"
-            echo "::error::attempt1: pkg=$PKG bin=$BIN cache=$CACHE || $FLAT"
-            rm -rf ~/.cache/ms-playwright || true
-            if ! OUT2="$(npx playwright install chromium 2>&1)"; then
-              echo "$OUT2"
-              FLAT2="$(printf '%s' "$OUT2" | tr '\n' '|' | cut -c1-600)"
-              echo "::error::attempt2 after cache wipe: $FLAT2"
-              exit 1
-            fi
+            echo "::error::playwright install failed: $FLAT"
+            exit 1
           fi
         timeout-minutes: 10
       - name: Install Playwright system dependencies
