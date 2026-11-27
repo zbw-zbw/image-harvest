@@ -428,9 +428,20 @@ cd image-harvest-backend/website && pnpm exec tsx scripts/rating-funnel.ts
 
 Expected: `sentiment=up` 占比与 `up → rate` 转化分开看。硬指标：`up → rate` ≥ 25%（旧路径直接问时 rate 只有 4%）。
 
-- [ ] **Step 3: 标题/简介加入主搜索词（人工，商店后台）**
+- [ ] **Step 3: 标题/简介加入主搜索词**
 
-在 CWS 短描述里补 `batch` 与 `bulk`（当前 `batch image downloader` 排名 11，差一位进首屏）。不改标题，只改描述与截图首图文案。
+短描述已随 1.2.15 落地（`1cc4f3b`）：`_locales/en/messages.json` 的 `extDesc` 改成
+`Batch and bulk image downloader. Finds every image on a page, saves as ZIP, multi-tab extract, AI tags, duplicate detection.`（124/132 字符），
+同步记入 `docs/chrome-store/summary.md`。
+
+**口径修正：CWS 后台的 Summary 是只读的**，它由 manifest 的 `description: '__MSG_extDesc__'` 带入，不能在后台单独编辑。
+所以这一步只能在提审时随包生效——当时 `v1.2.15` 已打完 tag，为此重打了一次（`c836bb8` → `1cc4f3b`）。
+不改标题。
+
+剩余人工动作：
+
+- 上传 Release 页的 `image-harvest-v1.2.15.zip` 并提交审核；
+- 截图首图文案若要露出 `batch` / `bulk`：素材变更同样走审核，攒在这次提审一起换，不单独提。
 
 - [x] **Step 4: 记录到快照文件（§5.4 已写，待过审后补回读）**
 
