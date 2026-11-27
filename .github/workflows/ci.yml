@@ -169,8 +169,22 @@ jobs:
       # the whole pipeline red even though the browser downloaded fine. The
       # ubuntu-latest image already ships the shared libraries Chromium needs
       # in practice, so the deps step is best-effort and time-boxed.
+      # A cache restored half-written, or saved by a different Playwright
+      # build, makes `install` bail out in about a second — that is what
+      # reddened every push from 2026-11-23 on (exit 1, no download time).
+      # Print what we actually have, then drop the cache and retry once
+      # before failing the job, so a bad cache costs seconds instead of a
+      # red build.
       - name: Install Playwright browser
-        run: npx playwright install chromium
+        run: |
+          node -p "'playwright ' + require('@playwright/test/package.json').version"
+          ls -l node_modules/.bin/playwright || echo "::warning::no local playwright bin"
+          ls -1 ~/.cache/ms-playwright 2>/dev/null || echo "no cached browsers"
+          npx playwright install chromium || {
+            echo "::warning::install failed — dropping the browser cache and retrying"
+            rm -rf ~/.cache/ms-playwright
+            npx playwright install chromium
+          }
         timeout-minutes: 10
       - name: Install Playwright system dependencies
         run: npx playwright install-deps chromium
